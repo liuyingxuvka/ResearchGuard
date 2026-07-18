@@ -1,0 +1,122 @@
+model:
+  id: structured_artifact_deck
+  title: Structured Artifact Deck Example
+  root_claim: C1
+  artifact_kind: presentation
+nodes:
+  D0:
+    type: Document
+    text: Validation briefing deck
+    artifact_kind: presentation
+    order_index: 0
+    importance: 0.75
+    salience: core
+  S1:
+    type: Section
+    text: Validation story
+    artifact_kind: presentation
+    order_index: 1
+    importance: 0.72
+    salience: core
+  B1:
+    type: ArgumentBlock
+    text: Slide 1 - Main result
+    artifact_kind: presentation
+    locator: slide 1
+    order_index: 1
+    role: result
+    importance: 0.82
+  B2:
+    type: ArgumentBlock
+    text: Slide 2 - Runtime decision
+    artifact_kind: presentation
+    locator: slide 2
+    order_index: 2
+    role: decision
+    importance: 0.8
+  B3:
+    type: ArgumentBlock
+    text: Slide 3 - Scope boundary
+    artifact_kind: presentation
+    locator: slide 3
+    order_index: 3
+    role: risk
+    importance: 0.86
+  C1:
+    type: Claim
+    text: The validation result is suitable for a customer-facing briefing.
+    parent: B1
+    importance: 0.95
+    salience: core
+    importance_reason: Main deck takeaway.
+  E1:
+    type: Evidence
+    text: Validation traces match the expected operating trend.
+    parent: B1
+    importance: 0.82
+    salience: supporting
+  W1:
+    type: Warrant
+    text: Matching operating trend is enough for a bounded briefing claim.
+    parent: B1
+    importance: 0.78
+    salience: bridge
+  C2:
+    type: Claim
+    text: The runtime choice is acceptable for the current review.
+    parent: B2
+    importance: 0.82
+    salience: core
+  C3:
+    type: Claim
+    text: The validation result is suitable for a customer-facing briefing.
+    parent: B2
+    importance: 0.76
+    salience: supporting
+  L1:
+    type: Limitation
+    text: The conclusion only applies inside the validated operating envelope.
+    parent: B3
+    importance: 0.92
+    salience: risk
+    importance_reason: This boundary constrains the main conclusion.
+edges:
+  - source: E1
+    target: C1
+    type: supports
+    weight: 0.8
+    importance: 0.82
+    importance_reason: Primary validation evidence.
+  - source: W1
+    target: C1
+    type: supports
+    weight: 0.7
+    importance: 0.78
+  - source: L1
+    target: C1
+    type: qualifies
+    weight: 0.8
+    importance: 0.9
+hierarchy:
+  D0:
+    - S1
+  S1:
+    - B1
+    - B2
+    - B3
+  B1:
+    - C1
+    - E1
+    - W1
+  B2:
+    - C2
+    - C3
+  B3:
+    - L1
+acceptance:
+  C1:
+    all_of:
+      - E1
+      - W1
+    requires_not_out:
+      - L1

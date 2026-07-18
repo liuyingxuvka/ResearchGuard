@@ -1,0 +1,4 @@
+interface:
+  display_name: "TraceGuard"
+  short_description: "Stress-test timelines and competing storylines"
+  default_prompt: "Use $traceguard to reconstruct and test this evidence-backed storyline."

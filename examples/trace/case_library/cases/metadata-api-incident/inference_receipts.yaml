@@ -1,0 +1,51 @@
+- receipt_id: traceguard-inference-094ab3c40b510a32e57f3f09
+  problem_fingerprint: 5349ab7f414a97626ec1ebb9aca3ff1cb68fbcb2d8599c896fa862b3a27e5800
+  solution_fingerprint: ad801d15f413eda325ecb7dbce3a42a10bff1fec60aed76777acb35c3664e692
+  factor_catalog_fingerprint: 707e1de15e0e56a352b731426df3e5198b71ad288f4bebd06fdf9f694d216088
+  hard_constraint_catalog_fingerprint: 4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945
+  provenance_fingerprint: f00f6d415726bfec9f76681631d6dda67791b19bbb5e4bcd915ef0ceffb73c87
+  schema_id: researchguard.trace.model.v2
+  policy_id: researchguard.trace.inference-policy.v2
+  factor_set_id: researchguard.trace.factor-set.v2
+  solver_id: osqp.direct.v1
+  solver_configuration_fingerprint: ba19baa311551fb52b425e498c0e97e723f31cd0901a1e0d7588fb7a7aebbda7
+  solver_backend: osqp
+  solver_backend_version: 1.1.3
+  solver_status: solved
+  primal_residual: 0.0
+  dual_residual: 0.0
+  maximum_constraint_violation: 0.0
+  iterations: 75
+  objective: 0.137243624706
+  trace_projections:
+    - trace_id: trace_metadata_incident
+      validation_status: validated
+      support: 0.760683798996
+      current_stage: unknown
+      evidence_ids: [ev_issue_triage, ev_log_spike, ev_pr_fix]
+      top_support_factor_ids:
+        - evidence-supports-trace:trace_metadata_incident
+        - trace-supports-hypothesis:trace_metadata_incident:implicit:trace_metadata_incident
+        - independent-support:trace_metadata_incident
+        - temporal-support:trace_metadata_incident
+      top_opposition_factor_ids:
+        - trace-sparsity:trace_metadata_incident
+      binding_constraint_ids: []
+      claim_boundary: Structural HL-MRF/MAP support, not calibrated probability or factual proof.
+      safe_wording: The current case model structurally supports a validated incident storyline within the listed evidence boundary.
+      unsafe_wording_avoided: factual certainty or proof beyond the declared evidence
+  hypothesis_projections:
+    - hypothesis_id: implicit:trace_metadata_incident
+      support: 0.543345570711
+      rank: 1
+      live: true
+      causal_support: null
+      causal_status: not_requested
+      top_support_factor_ids:
+        - trace-supports-hypothesis:trace_metadata_incident:implicit:trace_metadata_incident
+      top_opposition_factor_ids:
+        - hypothesis-sparsity:implicit:trace_metadata_incident
+      claim_boundary: This is a competing-storyline support projection, not a causal claim.
+  claim_boundary: Structural support and bounded qualitative-causal licenses only; not factual proof, calibrated probability, do-operator identification, ATE, or CATE.
+  record_kind: inference_observation
+  observation_only: true

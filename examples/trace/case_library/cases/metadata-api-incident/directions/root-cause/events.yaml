@@ -1,0 +1,51 @@
+- event_id: event_error_spike
+  evidence_ids:
+    - ev_log_spike
+  actor_ids:
+    - ent_service
+  action: error rate increased
+  object_ids:
+    - ent_service
+  event_type: log_entry
+  time_interval:
+    start: '2026-05-12'
+    precision: exact_date
+    confidence: 0.86
+  location_ids: []
+  trace_hint: metadata incident
+  stage_hint: unknown
+  extraction_confidence: 0.84
+- event_id: event_triage
+  evidence_ids:
+    - ev_issue_triage
+  actor_ids:
+    - ent_service
+  action: triaged suspected cache cause
+  object_ids:
+    - ent_cache
+  event_type: issue
+  time_interval:
+    start: '2026-05-12'
+    precision: exact_date
+    confidence: 0.82
+  location_ids: []
+  trace_hint: metadata incident
+  stage_hint: unknown
+  extraction_confidence: 0.8
+- event_id: event_mitigation
+  evidence_ids:
+    - ev_pr_fix
+  actor_ids:
+    - ent_service
+  action: mitigation PR opened
+  object_ids:
+    - ent_cache
+  event_type: pr
+  time_interval:
+    start: '2026-05-13'
+    precision: exact_date
+    confidence: 0.84
+  location_ids: []
+  trace_hint: metadata incident
+  stage_hint: unknown
+  extraction_confidence: 0.82

@@ -1,0 +1,38 @@
+{
+  "schema": "researchguard.logic.template-pack-profile.v1",
+  "profile_id": "researchguard.logic.base",
+  "profile_version": "1.0.0",
+  "family": "base",
+  "is_base": true,
+  "selector": {
+    "purposes": [],
+    "required_capabilities": [],
+    "context_tags_any": []
+  },
+  "strictly_dominates": [],
+  "composable_with": [],
+  "emitted_fields": {
+    "purpose.scope": {
+      "$request": "purpose"
+    }
+  },
+  "field_owners": {
+    "purpose.scope": "researchguard.logic.base"
+  },
+  "native_binding": {
+    "route_id": "route:logicguard-authoritative-depth",
+    "owner_callable": "researchguard.logic.validator:validate_model",
+    "owner_fingerprint": "fa6c2463c28622385d319a273f4cf90c11668d5d5596af24a38b5dac7c37cbcf",
+    "validators": [
+      {
+        "validator_id": "logicguard-template-pack:base",
+        "callable": "researchguard.logic_template_packs.native_validators:validate_base_profile",
+        "callable_fingerprint": "9a42198a8bf363a678834ccef1132452f8238faac456384567387c51977c0ca5"
+      }
+    ]
+  },
+  "required_instance_fields": [
+    "purpose.scope"
+  ],
+  "claim_boundary": "The base profile records only the explicit request purpose; it does not select or execute a domain workflow."
+}

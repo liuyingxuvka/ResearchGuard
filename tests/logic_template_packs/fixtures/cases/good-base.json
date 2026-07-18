@@ -1,0 +1,18 @@
+{
+  "case_id": "good-base",
+  "kind": "request",
+  "request": {
+    "purpose": "preserve an explicit unmatched request",
+    "capabilities": ["unmatched-capability"],
+    "context_tags": [],
+    "allow_base": true,
+    "parameters": {}
+  },
+  "expected": {
+    "decision": "base",
+    "candidate_ids": [],
+    "selected_profile_ids": ["researchguard.logic.base"],
+    "finding_codes": [],
+    "build_status": "valid"
+  }
+}

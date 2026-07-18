@@ -1,0 +1,20 @@
+{
+  "case_id": "good-direct-purpose",
+  "kind": "request",
+  "request": {
+    "purpose": "guard the stated reasoning purpose",
+    "capabilities": ["purpose"],
+    "context_tags": [],
+    "allow_base": false,
+    "parameters": {
+      "protected_failure_ids": ["overclaim", "scope-drift"]
+    }
+  },
+  "expected": {
+    "decision": "selected",
+    "candidate_ids": ["researchguard.logic.purpose"],
+    "selected_profile_ids": ["researchguard.logic.purpose"],
+    "finding_codes": [],
+    "build_status": "valid"
+  }
+}

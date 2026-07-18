@@ -1,0 +1,18 @@
+{
+  "case_id": "no-match",
+  "kind": "request",
+  "request": {
+    "purpose": "request an unsupported capability",
+    "capabilities": ["unmatched-capability"],
+    "context_tags": [],
+    "allow_base": false,
+    "parameters": {}
+  },
+  "expected": {
+    "decision": "no_match",
+    "candidate_ids": [],
+    "selected_profile_ids": [],
+    "finding_codes": ["no_matching_profile"],
+    "build_status": "blocked"
+  }
+}

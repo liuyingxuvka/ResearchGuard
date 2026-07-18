@@ -1,0 +1,5 @@
+{
+  "fixture_version":"researchguard.trace.library-execution-cases.v1",
+  "positive":{"target_skill_id":"traceguard.case-library"},
+  "shallow":{"missing_obligation_id":"evidence_before_event_or_trace","missing_relationship":{"object_id":"evidence:e1","relationship_id":"event_trace_or_gap_disposition"}}
+}

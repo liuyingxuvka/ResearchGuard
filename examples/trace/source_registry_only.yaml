@@ -1,0 +1,65 @@
+metadata:
+  schema_version: researchguard.trace.model.v2
+  purpose: Demonstrate source registry row is not project database.
+  repository: https://github.com/liuyingxuvka/ResearchGuard
+  skill: TraceGuard
+  math_boundary: Typed constrained HL-MRF/MAP inference compiled to one convex QP
+    and solved directly by OSQP; structural support is not calibrated probability.
+  cli: researchguard trace validate examples/source_registry_only.yaml
+  boundary: Source-only records must not be drawn as project points.
+sources:
+- source_id: src_registry
+  lineage_id: lineage_registry
+  independence_group: source_registry
+  title: ProjectRadar source registry row
+  source_type: source_registry
+  source_reliability: 0.5
+  source_status: stable_keep
+evidence:
+- evidence_id: ev_source_only
+  source_id: src_registry
+  raw_text: Registry row names a URL to inspect later.
+  evidence_type: source_only
+  extraction_confidence: 0.5
+  evidence_specificity: 0.2
+  supports:
+  - event_source_only
+  limits:
+  - not a project record
+  warnings:
+  - source row is not project
+  usable_as_project_evidence: false
+entities:
+- mention_id: ent_source
+  evidence_id: ev_source_only
+  raw_name: Registry row
+  normalized_name: registry row
+  entity_type: source
+  aliases: []
+  confidence: 0.5
+events:
+- event_id: event_source_only
+  evidence_ids:
+  - ev_source_only
+  actor_ids:
+  - ent_source
+  action: source row listed
+  object_ids:
+  - ent_source
+  event_type: source_only
+  time_interval:
+    precision: unknown
+    confidence: 0.0
+  location_ids: []
+  stage_hint: unknown
+  extraction_confidence: 0.2
+traces:
+- trace_id: trace_source_only
+  title: Source registry row only
+  trace_type: source_registry
+  event_ids:
+  - event_source_only
+  entity_ids:
+  - ent_source
+  location_ids: []
+  current_stage: unknown

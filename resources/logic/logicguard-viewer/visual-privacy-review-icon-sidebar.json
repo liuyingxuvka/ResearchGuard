@@ -1,0 +1,16 @@
+{
+  "schema_version": "skillguard.visual_privacy_review.v1",
+  "asset_path": "assets/logicguard-viewer/logicguard-library-icon-sidebar.png",
+  "asset_sha256": "BC14F716829C7E3AF5C0E2284793D02E9AD1F1CC6F6A051BCE6F32B25E0756A2",
+  "reviewed_at": "2026-07-16T00:20:19Z",
+  "status": "passed",
+  "checks": {
+    "local_paths_visible": false,
+    "personal_accounts_visible": false,
+    "real_user_or_customer_data_visible": false,
+    "credentials_or_tokens_visible": false
+  },
+  "limitations": [
+    "This review covers the current static raster only; any replacement image requires a new hash-bound visual review."
+  ]
+}

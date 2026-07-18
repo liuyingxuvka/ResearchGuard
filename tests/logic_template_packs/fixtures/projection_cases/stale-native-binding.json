@@ -1,0 +1,11 @@
+{
+  "fixture_id": "fixture:projection:stale-native-binding",
+  "mutation": {
+    "kind": "set-first-validator-content-hash",
+    "value": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "expected_codes": [
+    "native_content_hash_stale",
+    "catalog_projection_stale"
+  ]
+}

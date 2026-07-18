@@ -1,0 +1,7 @@
+{
+  "fixture_id": "fixture:projection:good",
+  "mutation": {
+    "kind": "none"
+  },
+  "expected_codes": []
+}

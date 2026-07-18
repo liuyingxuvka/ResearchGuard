@@ -1,0 +1,6 @@
+library_version: '0.3'
+name: Example TraceGuard Case Library
+purpose: Lightweight project/case-scoped TraceGuard investigation memory.
+boundary: Example fixture; not a LogicGuard source-library model.
+created_at: '2026-05-31T00:00:00+00:00'
+updated_at: '2026-05-31T00:00:00+00:00'

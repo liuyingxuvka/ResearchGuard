@@ -1,0 +1,48 @@
+{
+  "schema": "researchguard.logic.template-pack-profile.v1",
+  "profile_id": "researchguard.logic.execution-package",
+  "profile_version": "1.0.0",
+  "family": "execution-package",
+  "is_base": false,
+  "selector": {
+    "purposes": [],
+    "required_capabilities": [
+      "execution-package"
+    ],
+    "context_tags_any": []
+  },
+  "strictly_dominates": [],
+  "composable_with": [
+    "researchguard.logic.synthesis"
+  ],
+  "emitted_fields": {
+    "execution.claim_boundary": "This profile declares checks and enforced closure; it does not claim those checks have run.",
+    "execution.closure": "enforced",
+    "execution.declared_checks": {
+      "$request": "declared_checks"
+    }
+  },
+  "field_owners": {
+    "execution.claim_boundary": "researchguard.logic.execution-package",
+    "execution.closure": "researchguard.logic.execution-package",
+    "execution.declared_checks": "researchguard.logic.execution-package"
+  },
+  "native_binding": {
+    "route_id": "route:logicguard-authoritative-depth",
+    "owner_callable": "researchguard.logic.execution_depth:build_logic_depth_receipt",
+    "owner_fingerprint": "715d09963a835881494ce90311a2cd8591de98a67b69803e072e314c112bb29d",
+    "validators": [
+      {
+        "validator_id": "logicguard-template-pack:execution-package",
+        "callable": "researchguard.logic_template_packs.native_validators:validate_execution_package_profile",
+        "callable_fingerprint": "57ef83ac18016602ee04b883fcbd397f5b07b9eb9287dfaf576a00bacba1f214"
+      }
+    ]
+  },
+  "required_instance_fields": [
+    "execution.claim_boundary",
+    "execution.closure",
+    "execution.declared_checks"
+  ],
+  "claim_boundary": "This profile validates an execution-package declaration; terminal receipts remain separate required evidence."
+}

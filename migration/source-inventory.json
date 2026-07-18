@@ -1,0 +1,51 @@
+{
+  "artifact_kind": "researchguard_source_migration_inventory",
+  "frozen_at": "2026-07-18",
+  "target_version": "0.1.0",
+  "sources": [
+    {
+      "id": "logicguard",
+      "path_label": "{{logicguard_author_root}}",
+      "branch": "codex/validated-template-packs",
+      "head": "6724b21104d0fb8d9a6191a25d053cb054651bf5",
+      "upstream": "ca2c2127d9d4fc7cc571f3e023c37223388abb47",
+      "dirty_count": 0,
+      "source_version": "0.19.0",
+      "tracked_file_count": 542,
+      "test_file_count": 52,
+      "member_skill_ids": [
+        "logicguard",
+        "logicguard-artifact-synthesis",
+        "logicguard-model-deepening",
+        "logicguard-project-library-viewer",
+        "logicguard-source-library",
+        "logicguard-structured-artifact"
+      ]
+    },
+    {
+      "id": "sourceguard",
+      "path_label": "{{sourceguard_author_root}}",
+      "branch": "main",
+      "head": "9b601c09799c1407ebba14989d17ff812aa93559",
+      "upstream": "f58e5bf177110fd7a2d3d0f469e3c06859ca8b48",
+      "dirty_count": 0,
+      "source_version": "0.6.0",
+      "tracked_file_count": 314,
+      "test_file_count": 16,
+      "member_skill_ids": ["sourceguard"]
+    },
+    {
+      "id": "traceguard",
+      "path_label": "{{traceguard_author_root}}",
+      "branch": "main",
+      "head": "7751471292244dce3bfb27cd220a6efb320fc3e8",
+      "upstream": "afd4237dcabb018973caf99b07a9234efa25f766",
+      "dirty_count": 0,
+      "source_version": "0.6.0",
+      "tracked_file_count": 503,
+      "test_file_count": 16,
+      "member_skill_ids": ["traceguard", "traceguard-library"]
+    }
+  ],
+  "claim_boundary": "This freezes migration inputs only. It does not prove migrated code, installation, validation, release, or repository privacy."
+}

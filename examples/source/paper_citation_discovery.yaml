@@ -1,0 +1,149 @@
+guard_contract:
+  schema_version: researchguard.source.model_guard_contract.v2
+  model_id: paper_citation_discovery
+  purpose: Prevent an unqualified citation-lineage anchor from being treated as a usable baseline source.
+  prevented_failures:
+  - failure_id: failure:paper-citation:unqualified-baseline
+    title: Unqualified citation candidate is promoted as baseline support
+    block_when: the baseline gap is treated as closed although its historical anchor is not claim-usable
+    oracle_id: oracle:sourceguard:source-qualification
+    known_good:
+      case_id: good:paper-citation:qualified-baseline
+      observation_path: model-purpose-observation.yaml
+      expected_native_status: pass
+      mutation_id: ''
+      expected_native_finding: ''
+    known_bad:
+      case_id: bad:paper-citation:unqualified-baseline
+      observation_path: model-purpose-observation.yaml
+      expected_native_status: blocked
+      mutation_id: make-all-anchors-unusable
+      expected_native_finding: gaps:gap-baseline
+  external_universe:
+    gap_ids:
+    - gap-baseline
+    - gap-counter
+    target_unit_ids: []
+  claim_boundary: Citation candidates are not final claim support until modeled downstream.
+  native_oracle_catalog_fingerprint: 2C01D891559625D9123F17E817B63B3E4E9323CA1C3EB81923B82D7DBDC79B15
+  purpose_frozen: true
+  purpose_freeze_sequence: 1
+  candidate_construction_sequence: 2
+candidate_contract_fingerprint: 24C85CE24C8CB56E1749251900C1F7CFAF377F36B978FC5A9B1E2FB24F18F190
+metadata:
+  purpose: Expand paper lineage and find baseline or counterevidence sources.
+  repository: https://github.com/liuyingxuvka/ResearchGuard
+  skill: SourceGuard
+  math_boundary: POMDP-inspired approximate planner; utility ranks source discovery value, not truth.
+  cli: researchguard source plan examples/paper_citation_discovery.yaml --model-contract examples/paper_citation_discovery.contract.json
+    --pretty
+  boundary: Citation candidates are not final claim support until modeled downstream.
+  version: 0.1.0
+  source_policy: public_only
+leads:
+- lead_id: paper-lineage
+  question: Which papers should be checked before relying on the target paper's result line?
+  hypothesis: Backward and forward citations may expose method baselines, result limitations, and counterevidence.
+  importance: 0.85
+  status: open
+  related_entities:
+  - Target Paper 2024
+  - baseline method
+  - replication
+  related_sources:
+  - src-target-paper
+  related_anchors:
+  - anchor-target-citation
+  gaps:
+  - gap-baseline
+  - gap-counter
+sources:
+- source_id: src-target-paper
+  title: Target Paper 2024
+  source_type: paper
+  url: https://example.invalid/target-paper
+  source_status: saved
+  source_reliability: 0.6
+  source_role: expert_analysis
+  source_date: '2024-02-01'
+  coverage_period: 2023-2024
+  language: en
+  country: unknown
+  access_status: public
+  notes: Candidate target paper; method/result/background roles need citation expansion.
+anchors:
+- anchor_id: anchor-target-citation
+  source_id: src-target-paper
+  anchor_type: citation
+  locator: reference=TargetPaper2024; section=related-work
+  text: ''
+  normalized_summary: Target paper references prior baseline methods.
+  modality: text
+  observed_at: '2026-05-31T00:00:00Z'
+  extraction_confidence: 0.8
+  specificity: 0.7
+  supports: []
+  limits: []
+  warnings: []
+  usable_for_trace: false
+  usable_for_claim: false
+  notes: Anchor records citation location only.
+gaps:
+- gap_id: gap-baseline
+  lead_id: paper-lineage
+  gap_type: missing_baseline
+  description: Baseline method and result context are not fully mapped.
+  importance: 0.8
+  blocking: true
+  suggested_source_roles:
+  - historical_background
+  - expert_analysis
+  suggested_modalities:
+  - text
+  semantic_state: discovered
+- gap_id: gap-counter
+  lead_id: paper-lineage
+  gap_type: missing_counterevidence
+  description: Forward citations or replications may limit or contradict the result line.
+  importance: 0.85
+  blocking: true
+  suggested_source_roles:
+  - counter_evidence
+  - limiting_evidence
+  suggested_modalities:
+  - text
+  semantic_state: discovered
+actions:
+- action_id: action-citation-backward
+  action_type: citation_backward
+  query: Target Paper 2024 references baseline method result context
+  target_lead_id: paper-lineage
+  target_gap_id: gap-baseline
+  expected_source_role: historical_background
+  expected_modality: text
+  source_policy: public_only
+  cost: 0.2
+  permission_risk: 0.0
+  status: proposed
+  parameters:
+    role_hint: method_background
+- action_id: action-citation-forward
+  action_type: citation_forward
+  query: Target Paper 2024 cited by replication limitation contradiction
+  target_lead_id: paper-lineage
+  target_gap_id: gap-counter
+  expected_source_role: limiting_evidence
+  expected_modality: text
+  source_policy: public_only
+  cost: 0.3
+  permission_risk: 0.0
+  status: proposed
+  parameters:
+    role_hint: result_limitation
+observations: []
+graph_edges:
+- source: src-target-paper
+  target: anchor-target-citation
+  edge_type: mentions
+  notes: Citation anchor comes from target paper.
+weights: {}

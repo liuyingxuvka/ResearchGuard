@@ -1,0 +1,481 @@
+metadata:
+  schema_version: researchguard.trace.model.v2
+  purpose: ProjectRadar-style hydrogen project trace candidate with mixed source lanes.
+  model_instance_id: researchguard.trace.example.project-radar.hydrogen-trace
+  repository: https://github.com/liuyingxuvka/ResearchGuard
+  skill: TraceGuard
+  math_boundary: Typed constrained HL-MRF/MAP inference compiled to one convex QP
+    and solved directly by OSQP; structural support is not calibrated probability.
+  cli: researchguard trace evaluate examples/project_radar_hydrogen_trace.yaml --pretty
+  boundary: Source registry rows become evidence, events, and trace candidates before
+    project claims.
+  guard_purpose_contract:
+    schema_version: researchguard.trace.guard_purpose_binding.v2
+    contract_kind: task_model_instance
+    contract_id: researchguard.trace.example.project-radar.task-purpose.v1
+    model_instance_id: researchguard.trace.example.project-radar.hydrogen-trace
+    purpose: Prevent this project-radar trace model from treating unusable event evidence
+      or a contradictory event order as a supported clean storyline.
+    claim_boundary: This task model tests evidence usability and visible temporal
+      contradiction for the packaged example; it does not prove factual project status,
+      causality, or future outcomes.
+    selected_failure_ids:
+    - missing-event-evidence
+    - hidden-temporal-contradiction
+    contract_ref: project_radar_task_purpose.json
+    contract_fingerprint: 0b92fdd04484b5a6f6224a2977d2dcb91dd699cc89f2b9f3f95520492492494c
+    proof_receipt_fingerprint: 529f69d4126c6efff9bef6721e143084eba72164e1bd4307aaa026377ee5374a
+    candidate_fingerprint: 9fcf29e758171235bc9cca6a86415d9416e85e6c20c1348f94505aabc61affd0
+    purpose_declared_sequence: 1
+    proof_completed_sequence: 2
+    candidate_bound_sequence: 3
+sources:
+- source_id: src_funding
+  lineage_id: lineage_funding_award
+  independence_group: source_funding
+  title: Regional hydrogen funding award
+  url: https://example.org/funding/rhine-h2
+  source_type: funding
+  source_reliability: 0.92
+  source_status: stable_keep
+  cleaning_category: keep
+  source_date: '2024-06-15'
+  country: DE
+- source_id: src_tender
+  lineage_id: lineage_tender_notice
+  independence_group: source_tender
+  title: Electrolyzer tender notice
+  url: https://example.org/tenders/rhine-h2
+  source_type: procurement
+  source_reliability: 0.9
+  source_status: stable_keep
+  cleaning_category: keep
+  source_date: '2025-01-10'
+  country: DE
+- source_id: src_company
+  lineage_id: lineage_company_page
+  independence_group: source_company
+  title: Rhine Hydrogen Hub company page
+  url: https://example.org/company/rhine-h2
+  source_type: company_page
+  source_reliability: 0.82
+  source_status: stable_keep
+  cleaning_category: keep
+  source_date: '2025-03-20'
+  country: DE
+- source_id: src_patent
+  lineage_id: lineage_patent
+  independence_group: source_patent
+  title: Electrolyzer stack patent
+  url: https://example.org/patents/h2-stack
+  source_type: patent
+  source_reliability: 0.78
+  source_status: stable_keep
+  cleaning_category: keep
+  source_date: '2023-11-01'
+  country: EP
+- source_id: src_hiring
+  lineage_id: lineage_hiring
+  independence_group: source_hiring
+  title: Commissioning engineer hiring post
+  url: https://example.org/jobs/rhine-h2
+  source_type: hiring
+  source_reliability: 0.68
+  source_status: stable_keep
+  cleaning_category: keep
+  source_date: '2025-04-01'
+  country: DE
+- source_id: src_auth
+  lineage_id: lineage_restricted_attachment
+  independence_group: source_restricted_attachment
+  title: Restricted procurement attachment
+  url: https://example.org/restricted/rhine-h2
+  source_type: procurement
+  source_reliability: 0.85
+  source_status: need_auth_or_permission
+  cleaning_category: access_gap
+  source_date: '2025-04-12'
+  country: DE
+evidence:
+- evidence_id: ev_funding
+  source_id: src_funding
+  raw_text: Funding award names the Rhine Hydrogen Hub and a 20 MW electrolyzer package.
+  normalized_summary: Funding supports a project candidate but not operation.
+  evidence_type: funding_award
+  extraction_confidence: 0.9
+  evidence_specificity: 0.9
+  importance: 0.95
+  supports:
+  - ev_funding
+  limits:
+  - no construction start
+  warnings: []
+  usable_as_project_evidence: true
+- evidence_id: ev_tender
+  source_id: src_tender
+  raw_text: Tender notice requests bids for equipment at the Rhine Hydrogen Hub site.
+  normalized_summary: Tender supports tendering stage.
+  evidence_type: tender_notice
+  extraction_confidence: 0.88
+  evidence_specificity: 0.86
+  importance: 0.92
+  supports:
+  - ev_tender
+  limits:
+  - award not shown
+  warnings: []
+  usable_as_project_evidence: true
+- evidence_id: ev_company
+  source_id: src_company
+  raw_text: Company page says Rhine Hydrogen Hub is preparing early implementation.
+  normalized_summary: Company page supports an announced or early implementation candidate.
+  evidence_type: company_announcement
+  extraction_confidence: 0.8
+  evidence_specificity: 0.76
+  supports:
+  - ev_company
+  limits:
+  - no operation claim
+  warnings: []
+  usable_as_project_evidence: true
+- evidence_id: ev_patent
+  source_id: src_patent
+  raw_text: Patent describes electrolyzer stack technology relevant to the company.
+  normalized_summary: Patent supports technology background only.
+  evidence_type: patent
+  extraction_confidence: 0.72
+  evidence_specificity: 0.64
+  supports:
+  - ev_patent
+  limits:
+  - not deployment evidence
+  warnings:
+  - patent is not deployment evidence
+  usable_as_trace_evidence: true
+  usable_as_project_evidence: false
+- evidence_id: ev_hiring
+  source_id: src_hiring
+  raw_text: Hiring post seeks commissioning engineer for hydrogen equipment.
+  normalized_summary: Hiring is a weak commissioning or operational signal.
+  evidence_type: hiring
+  extraction_confidence: 0.7
+  evidence_specificity: 0.62
+  supports:
+  - ev_hiring
+  limits:
+  - not operation evidence
+  warnings:
+  - hiring is not operation evidence
+  usable_as_trace_evidence: true
+  usable_as_project_evidence: false
+- evidence_id: ev_auth_gap
+  source_id: src_auth
+  raw_text: Restricted attachment may include contract details but has not been checked.
+  normalized_summary: Access gap.
+  evidence_type: unknown
+  extraction_confidence: 0.2
+  evidence_specificity: 0.2
+  supports: []
+  limits:
+  - not checked evidence
+  warnings:
+  - need_auth_or_permission is an access gap
+  usable_as_project_evidence: false
+entities:
+- mention_id: ent_project
+  evidence_id: ev_funding
+  raw_name: Rhine Hydrogen Hub
+  normalized_name: rhine hydrogen hub
+  entity_type: project
+  aliases:
+  - Rhine H2 Hub
+  country: DE
+  role: project
+  confidence: 0.9
+- mention_id: ent_project_alias
+  evidence_id: ev_tender
+  raw_name: Rhine H2 Hub
+  normalized_name: rhine h2 hub
+  entity_type: project
+  aliases:
+  - Rhine Hydrogen Hub
+  country: DE
+  role: project
+  confidence: 0.82
+- mention_id: ent_company
+  evidence_id: ev_company
+  raw_name: Rhine Electrolysis GmbH
+  normalized_name: rhine electrolysis gmbh
+  entity_type: organization
+  aliases: []
+  country: DE
+  role: developer
+  confidence: 0.84
+- mention_id: ent_tech
+  evidence_id: ev_patent
+  raw_name: Alkaline electrolyzer stack
+  normalized_name: alkaline electrolyzer stack
+  entity_type: technology
+  aliases:
+  - electrolyzer stack
+  country: null
+  role: technology
+  confidence: 0.78
+entity_resolutions:
+- left_id: ent_project
+  right_id: ent_project_alias
+  relation: same_as
+  score: 0.91
+  reasons:
+  - alias_match
+  blockers: []
+locations:
+- location_id: loc_site
+  raw_text: Rhine industrial park
+  normalized_name: rhine industrial park
+  country: DE
+  region: North Rhine-Westphalia
+  location_role: project_site
+  geocoding_precision: region
+  confidence: 0.78
+- location_id: loc_patent
+  raw_text: European Patent Office
+  normalized_name: european patent office
+  country: EP
+  location_role: patent_office_country
+  geocoding_precision: country
+  confidence: 0.7
+events:
+- event_id: event_patent
+  evidence_ids:
+  - ev_patent
+  actor_ids:
+  - ent_company
+  action: filed technology patent
+  object_ids:
+  - ent_tech
+  event_type: patent
+  time_interval:
+    start: '2023'
+    precision: year
+    confidence: 0.8
+  location_ids:
+  - loc_patent
+  technology_ids:
+  - ent_tech
+  project_hint: Rhine Hydrogen Hub
+  stage_hint: weak_signal
+  extraction_confidence: 0.58
+- event_id: event_funding
+  evidence_ids:
+  - ev_funding
+  actor_ids:
+  - ent_company
+  action: received funding
+  object_ids:
+  - ent_project
+  event_type: funding_award
+  time_interval:
+    start: '2024-06-15'
+    precision: exact_date
+    confidence: 0.9
+  location_ids:
+  - loc_site
+  technology_ids:
+  - ent_tech
+  project_hint: Rhine Hydrogen Hub
+  stage_hint: funded
+  extraction_confidence: 0.86
+  importance: 0.95
+- event_id: event_tender
+  evidence_ids:
+  - ev_tender
+  actor_ids:
+  - ent_company
+  action: opened tender
+  object_ids:
+  - ent_project_alias
+  event_type: tender_notice
+  time_interval:
+    start: 2025-01
+    precision: month
+    confidence: 0.86
+  location_ids:
+  - loc_site
+  technology_ids:
+  - ent_tech
+  project_hint: Rhine Hydrogen Hub
+  stage_hint: tendering
+  extraction_confidence: 0.84
+  importance: 0.92
+- event_id: event_company
+  evidence_ids:
+  - ev_company
+  actor_ids:
+  - ent_company
+  action: announced early implementation
+  object_ids:
+  - ent_project
+  event_type: company_announcement
+  time_interval:
+    start: '2025-03-20'
+    precision: exact_date
+    confidence: 0.78
+  location_ids:
+  - loc_site
+  technology_ids:
+  - ent_tech
+  project_hint: Rhine Hydrogen Hub
+  stage_hint: tendering
+  extraction_confidence: 0.74
+- event_id: event_hiring
+  evidence_ids:
+  - ev_hiring
+  actor_ids:
+  - ent_company
+  action: posted commissioning role
+  object_ids:
+  - ent_project
+  event_type: hiring
+  time_interval:
+    start: 2025-Q2
+    precision: quarter
+    confidence: 0.65
+  location_ids:
+  - loc_site
+  technology_ids:
+  - ent_tech
+  project_hint: Rhine Hydrogen Hub
+  stage_hint: weak_signal
+  extraction_confidence: 0.54
+- event_id: event_access_gap
+  evidence_ids:
+  - ev_auth_gap
+  actor_ids:
+  - ent_company
+  action: inaccessible attachment listed
+  object_ids:
+  - ent_project
+  event_type: unknown
+  time_interval:
+    precision: unknown
+    confidence: 0.0
+  location_ids: []
+  technology_ids: []
+  project_hint: Rhine Hydrogen Hub
+  stage_hint: unknown
+  extraction_confidence: 0.2
+traces:
+- trace_id: trace_rhine_h2
+  title: Rhine Hydrogen Hub candidate trace
+  trace_type: project
+  event_ids:
+  - event_patent
+  - event_funding
+  - event_tender
+  - event_company
+  - event_hiring
+  - event_access_gap
+  entity_ids:
+  - ent_project
+  - ent_project_alias
+  - ent_company
+  - ent_tech
+  location_ids:
+  - loc_site
+  - loc_patent
+  current_stage: tendering
+  importance: 0.9
+  claim: Rhine Hydrogen Hub may be entering early implementation.
+  notes: Patent and hiring are weak lanes; restricted attachment is access gap.
+storyline_hypotheses:
+- hypothesis_id: h_implementation
+  claim: Funding and tender evidence support an early-implementation storyline.
+  role: primary
+  trace_ids:
+  - trace_rhine_h2
+  event_ids:
+  - event_funding
+  - event_tender
+  importance: 0.9
+  uncertainty: 0.35
+  causal: false
+  bounded_non_causal: true
+  downstream_consumers:
+  - ProjectRadar
+  - LogicGuard
+- hypothesis_id: h_public_signal_only
+  claim: The observed material may remain public signaling without implementation.
+  role: alternative
+  trace_ids:
+  - trace_rhine_h2
+  event_ids:
+  - event_patent
+  - event_company
+  - event_hiring
+  importance: 0.75
+  uncertainty: 0.55
+  causal: false
+  bounded_non_causal: true
+hypothesis_evidence_links:
+- link_id: link_implementation_funding
+  hypothesis_id: h_implementation
+  evidence_id: ev_funding
+  polarity: support
+  declared_relevance: 1.0
+- link_id: link_implementation_tender
+  hypothesis_id: h_implementation
+  evidence_id: ev_tender
+  polarity: support
+  declared_relevance: 1.0
+- link_id: link_signal_patent
+  hypothesis_id: h_public_signal_only
+  evidence_id: ev_patent
+  polarity: support
+  declared_relevance: 0.8
+- link_id: link_signal_company
+  hypothesis_id: h_public_signal_only
+  evidence_id: ev_company
+  polarity: support
+  declared_relevance: 0.9
+- link_id: link_signal_hiring
+  hypothesis_id: h_public_signal_only
+  evidence_id: ev_hiring
+  polarity: support
+  declared_relevance: 0.8
+- link_id: link_signal_funding_opposes
+  hypothesis_id: h_public_signal_only
+  evidence_id: ev_funding
+  polarity: oppose
+  declared_relevance: 0.9
+- link_id: link_signal_tender_opposes
+  hypothesis_id: h_public_signal_only
+  evidence_id: ev_tender
+  polarity: oppose
+  declared_relevance: 0.9
+hypothesis_relations:
+- relation_id: relation_implementation_vs_signal
+  left_hypothesis_id: h_implementation
+  right_hypothesis_id: h_public_signal_only
+  relation: alternative
+  evidence_ids:
+  - ev_funding
+  - ev_tender
+evidence_ablations:
+- ablation_id: remove_strong_project_signals
+  hypothesis_id: h_implementation
+  trace_id: trace_rhine_h2
+  description: Remove the funding and tender evidence from their linked events.
+  remove_evidence_ids:
+  - ev_funding
+  - ev_tender
+  importance: 0.9
+expected_sensitivities:
+- sensitivity_id: sensitivity_without_strong_signals
+  perturbation_id: remove_strong_project_signals
+  target_kind: hypothesis
+  target_id: h_implementation
+  rationale: Without funding and tender support, the implementation storyline should
+    weaken.
+  expected_direction: decrease
+  minimum_absolute_change: 0.1

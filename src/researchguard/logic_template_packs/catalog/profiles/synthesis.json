@@ -1,0 +1,50 @@
+{
+  "schema": "researchguard.logic.template-pack-profile.v1",
+  "profile_id": "researchguard.logic.synthesis",
+  "profile_version": "1.0.0",
+  "family": "synthesis",
+  "is_base": false,
+  "selector": {
+    "purposes": [],
+    "required_capabilities": [
+      "synthesis"
+    ],
+    "context_tags_any": []
+  },
+  "strictly_dominates": [],
+  "composable_with": [
+    "researchguard.logic.execution-package"
+  ],
+  "emitted_fields": {
+    "synthesis.claim_boundary": "This profile declares synthesis intent and delivery shape; it does not certify the delivered artifact.",
+    "synthesis.delivery_profile": {
+      "$request": "delivery_profile"
+    },
+    "synthesis.goal": {
+      "$request": "synthesis_goal"
+    }
+  },
+  "field_owners": {
+    "synthesis.claim_boundary": "researchguard.logic.synthesis",
+    "synthesis.delivery_profile": "researchguard.logic.synthesis",
+    "synthesis.goal": "researchguard.logic.synthesis"
+  },
+  "native_binding": {
+    "route_id": "route:researchguard.logic:artifact-synthesis",
+    "owner_callable": "researchguard.logic.synthesis:synthesize_artifact_plan",
+    "owner_fingerprint": "34b9c6bf687be28f91c88077ba349df00d671d77eeb4b9352139b764a32604a8",
+    "validators": [
+      {
+        "validator_id": "logicguard-template-pack:synthesis",
+        "callable": "researchguard.logic_template_packs.native_validators:validate_synthesis_profile",
+        "callable_fingerprint": "84ce00bcdbe0f979e96f14206139bdcc69137267cffa898d2a4a9bba1dbe26d8"
+      }
+    ]
+  },
+  "required_instance_fields": [
+    "synthesis.claim_boundary",
+    "synthesis.delivery_profile",
+    "synthesis.goal"
+  ],
+  "claim_boundary": "This profile validates synthesis request structure and current native binding only."
+}

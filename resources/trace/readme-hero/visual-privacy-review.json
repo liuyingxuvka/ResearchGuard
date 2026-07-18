@@ -1,0 +1,16 @@
+{
+  "schema_version": "skillguard.visual_privacy_review.v1",
+  "asset_path": "assets/readme-hero/hero.png",
+  "asset_sha256": "44EC16A14C5D587DE4B70B8099F923D68D15890CE72498C96ADCD31DBFBC1C2A",
+  "reviewed_at": "2026-07-16T00:20:19Z",
+  "status": "passed",
+  "checks": {
+    "local_paths_visible": false,
+    "personal_accounts_visible": false,
+    "real_user_or_customer_data_visible": false,
+    "credentials_or_tokens_visible": false
+  },
+  "limitations": [
+    "This review covers the current static raster only; any replacement image requires a new hash-bound visual review."
+  ]
+}

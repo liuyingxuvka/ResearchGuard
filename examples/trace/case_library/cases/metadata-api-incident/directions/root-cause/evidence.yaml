@@ -1,0 +1,45 @@
+- evidence_id: ev_log_spike
+  source_id: src_log
+  raw_text: Error rate increased after cache invalidation at 09:10 UTC.
+  normalized_summary: Log evidence supports incident onset.
+  evidence_type: log_entry
+  extraction_confidence: 0.88
+  evidence_specificity: 0.86
+  supports:
+    - event_error_spike
+  limits:
+    - does not explain root cause alone
+  warnings: []
+  usable_as_trace_evidence: true
+  library_status: usable
+  added_at: '2026-05-31T00:00:00+00:00'
+- evidence_id: ev_issue_triage
+  source_id: src_issue
+  raw_text: Issue records triage that cache invalidation caused stale metadata reads.
+  normalized_summary: Issue evidence supports triage event.
+  evidence_type: issue
+  extraction_confidence: 0.82
+  evidence_specificity: 0.8
+  supports:
+    - event_triage
+  limits:
+    - needs PR or log corroboration
+  warnings: []
+  usable_as_trace_evidence: true
+  library_status: usable
+  added_at: '2026-05-31T00:00:00+00:00'
+- evidence_id: ev_pr_fix
+  source_id: src_pr
+  raw_text: PR adds cache namespace guard and emergency rollback script.
+  normalized_summary: PR evidence supports mitigation event.
+  evidence_type: pr
+  extraction_confidence: 0.84
+  evidence_specificity: 0.82
+  supports:
+    - event_mitigation
+  limits:
+    - does not prove customer impact resolved
+  warnings: []
+  usable_as_trace_evidence: true
+  library_status: usable
+  added_at: '2026-05-31T00:00:00+00:00'

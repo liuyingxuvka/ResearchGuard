@@ -1,0 +1,30 @@
+observation_id: obs-independent-report-1
+action_id: action-independent-search-1
+observed_sources:
+  - source_id: src-independent-report-1
+    title: Independent report with an anchored result
+    source_type: report
+    source_status: saved
+    source_reliability: 0.9
+    source_role: independent_report
+    lineage_id: origin-independent-report-1
+    access_status: public
+    notes: Example observation for the semantic-depth receipt path.
+observed_anchors:
+  - anchor_id: anchor-independent-report-1
+    source_id: src-independent-report-1
+    anchor_type: paragraph
+    locator: section=results;paragraph=3
+    text: Example anchored result text.
+    normalized_summary: An independent report addresses the declared evidence gap.
+    modality: text
+    extraction_confidence: 0.9
+    specificity: 0.9
+    supports: ["gap-independent-1"]
+    usable_for_claim: true
+    notes: Example only; real observations must come from an actual source-reading tool or human review.
+new_entities: []
+new_leads: []
+new_gaps: []
+contradictions: []
+notes: Supplied observation used to demonstrate clone-update-replan behavior.

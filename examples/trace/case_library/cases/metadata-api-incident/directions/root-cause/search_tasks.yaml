@@ -1,0 +1,4 @@
+- task_id: search_permanent_fix
+  question: Find evidence that permanent fix was reviewed and merged.
+  status: open
+  priority: high

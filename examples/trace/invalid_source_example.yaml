@@ -1,0 +1,74 @@
+metadata:
+  schema_version: researchguard.trace.model.v2
+  purpose: Demonstrate that invalid_or_empty source cannot validate a trace.
+  repository: https://github.com/liuyingxuvka/ResearchGuard
+  skill: TraceGuard
+  math_boundary: Typed constrained HL-MRF/MAP inference compiled to one convex QP
+    and solved directly by OSQP; structural support is not calibrated probability.
+  cli: researchguard trace diagnose examples/invalid_source_example.yaml --pretty
+  boundary: invalid_or_empty sources are excluded from validation evidence.
+sources:
+- source_id: src_invalid
+  lineage_id: lineage_invalid
+  independence_group: source_invalid
+  title: Empty scraped page
+  source_type: company_page
+  source_reliability: 0.1
+  source_status: invalid_or_empty
+  cleaning_category: invalid_or_empty
+evidence:
+- evidence_id: ev_invalid
+  source_id: src_invalid
+  raw_text: ''
+  evidence_type: company_announcement
+  extraction_confidence: 0.1
+  evidence_specificity: 0.1
+  supports:
+  - event_invalid
+  limits:
+  - empty page
+  warnings:
+  - invalid source
+  usable_as_project_evidence: false
+entities:
+- mention_id: ent_project
+  evidence_id: ev_invalid
+  raw_name: Empty Page Project
+  normalized_name: empty page project
+  entity_type: project
+  aliases: []
+  confidence: 0.2
+locations:
+- location_id: loc_unknown
+  raw_text: Unknown
+  normalized_name: unknown
+  location_role: unknown
+  confidence: 0.1
+events:
+- event_id: event_invalid
+  evidence_ids:
+  - ev_invalid
+  actor_ids:
+  - ent_project
+  action: empty claim
+  object_ids:
+  - ent_project
+  event_type: company_announcement
+  time_interval:
+    precision: unknown
+    confidence: 0.0
+  location_ids:
+  - loc_unknown
+  stage_hint: announced
+  extraction_confidence: 0.1
+traces:
+- trace_id: trace_invalid
+  title: Invalid source trace
+  trace_type: project
+  event_ids:
+  - event_invalid
+  entity_ids:
+  - ent_project
+  location_ids:
+  - loc_unknown
+  current_stage: unknown

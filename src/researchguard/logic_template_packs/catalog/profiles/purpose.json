@@ -1,0 +1,48 @@
+{
+  "schema": "researchguard.logic.template-pack-profile.v1",
+  "profile_id": "researchguard.logic.purpose",
+  "profile_version": "1.0.0",
+  "family": "purpose",
+  "is_base": false,
+  "selector": {
+    "purposes": [],
+    "required_capabilities": [
+      "purpose"
+    ],
+    "context_tags_any": []
+  },
+  "strictly_dominates": [],
+  "composable_with": [],
+  "emitted_fields": {
+    "purpose.claim_boundary": "This profile declares purpose and protected failures; it does not prove an argument or artifact.",
+    "purpose.guarded_purpose": {
+      "$request": "purpose"
+    },
+    "purpose.protected_failure_ids": {
+      "$request": "protected_failure_ids"
+    }
+  },
+  "field_owners": {
+    "purpose.claim_boundary": "researchguard.logic.purpose",
+    "purpose.guarded_purpose": "researchguard.logic.purpose",
+    "purpose.protected_failure_ids": "researchguard.logic.purpose"
+  },
+  "native_binding": {
+    "route_id": "route:logicguard-authoritative-depth",
+    "owner_callable": "researchguard.logic.validator:validate_model",
+    "owner_fingerprint": "fa6c2463c28622385d319a273f4cf90c11668d5d5596af24a38b5dac7c37cbcf",
+    "validators": [
+      {
+        "validator_id": "logicguard-template-pack:purpose",
+        "callable": "researchguard.logic_template_packs.native_validators:validate_purpose_profile",
+        "callable_fingerprint": "fe688cae9fabaf4bb349752f278e219f3e52c4765088b237be71d795416028d0"
+      }
+    ]
+  },
+  "required_instance_fields": [
+    "purpose.claim_boundary",
+    "purpose.guarded_purpose",
+    "purpose.protected_failure_ids"
+  ],
+  "claim_boundary": "This profile validates explicit purpose fields and protected failure identifiers only."
+}

@@ -1,0 +1,50 @@
+{
+  "schema": "researchguard.logic.template-pack-profile.v1",
+  "profile_id": "researchguard.logic.structured-artifact",
+  "profile_version": "1.0.0",
+  "family": "structured-artifact",
+  "is_base": false,
+  "selector": {
+    "purposes": [],
+    "required_capabilities": [
+      "structured-artifact"
+    ],
+    "context_tags_any": []
+  },
+  "strictly_dominates": [
+    "researchguard.logic.argument"
+  ],
+  "composable_with": [],
+  "emitted_fields": {
+    "structure.artifact_kind": {
+      "$request": "artifact_kind"
+    },
+    "structure.boundaries": {
+      "$request": "structure_boundaries"
+    },
+    "structure.claim_boundary": "This profile maps declared artifact boundaries; it does not certify final content quality."
+  },
+  "field_owners": {
+    "structure.artifact_kind": "researchguard.logic.structured-artifact",
+    "structure.boundaries": "researchguard.logic.structured-artifact",
+    "structure.claim_boundary": "researchguard.logic.structured-artifact"
+  },
+  "native_binding": {
+    "route_id": "route:researchguard.logic:structured-artifact",
+    "owner_callable": "researchguard.logic.structured_artifact:build_artifact_map",
+    "owner_fingerprint": "6ce01f7ed6ae920371112bcbcde90a73d977bf7ede04ac0baac2ba5703e2b503",
+    "validators": [
+      {
+        "validator_id": "logicguard-template-pack:structured-artifact",
+        "callable": "researchguard.logic_template_packs.native_validators:validate_structured_artifact_profile",
+        "callable_fingerprint": "c9e9876537f486ac4000a810dbfc8fb7d29e1694301ccece6f76428079c7bb53"
+      }
+    ]
+  },
+  "required_instance_fields": [
+    "structure.artifact_kind",
+    "structure.boundaries",
+    "structure.claim_boundary"
+  ],
+  "claim_boundary": "This profile validates artifact-map inputs and the current native route binding only."
+}

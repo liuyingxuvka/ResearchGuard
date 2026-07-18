@@ -1,0 +1,5 @@
+schema: spec-driven
+created: 2026-07-18
+goal: Ship ResearchGuard v0.1.0 with researchguard, logicguard, sourceguard, and
+  traceguard direct skill entries over one atomic runtime and installation
+  suite.

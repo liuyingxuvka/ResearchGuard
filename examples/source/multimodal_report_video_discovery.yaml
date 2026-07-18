@@ -1,0 +1,220 @@
+guard_contract:
+  schema_version: researchguard.source.model_guard_contract.v2
+  model_id: multimodal_report_video_discovery
+  purpose: Prevent a located but unusable image or video anchor from closing the visual evidence gap.
+  prevented_failures:
+  - failure_id: failure:multimodal:unqualified-visual-anchor
+    title: Unqualified visual anchor is promoted as usable evidence
+    block_when: the visual gap is treated as closed although the supplied visual anchor is not claim-usable
+    oracle_id: oracle:sourceguard:source-qualification
+    known_good:
+      case_id: good:multimodal:qualified-visual
+      observation_path: model-purpose-observation.yaml
+      expected_native_status: pass
+      mutation_id: ''
+      expected_native_finding: ''
+    known_bad:
+      case_id: bad:multimodal:unqualified-visual
+      observation_path: model-purpose-observation.yaml
+      expected_native_status: blocked
+      mutation_id: make-all-anchors-unusable
+      expected_native_finding: gaps:gap-visual
+  external_universe:
+    gap_ids:
+    - gap-pdf-page
+    - gap-visual
+    target_unit_ids: []
+  claim_boundary: Multimodal anchors need locators and supplied extraction input; SourceGuard does not perform OCR or media
+    understanding.
+  native_oracle_catalog_fingerprint: 2C01D891559625D9123F17E817B63B3E4E9323CA1C3EB81923B82D7DBDC79B15
+  purpose_frozen: true
+  purpose_freeze_sequence: 1
+  candidate_construction_sequence: 2
+candidate_contract_fingerprint: 9CA840CE36EA3F0CEAF5EFFB04575FC089F30F31DB2D775999783E5F8A0D82B0
+metadata:
+  purpose: Model report, image, and video source discovery needs without fake extraction.
+  repository: https://github.com/liuyingxuvka/ResearchGuard
+  skill: SourceGuard
+  math_boundary: POMDP-inspired approximate planner; utility ranks source discovery value, not truth.
+  cli: researchguard source plan examples/multimodal_report_video_discovery.yaml --model-contract examples/multimodal_report_video_discovery.contract.json
+    --pretty
+  boundary: Multimodal anchors need locators and supplied extraction input; SourceGuard does not perform OCR or media understanding.
+  version: 0.1.0
+  source_policy: public_only
+leads:
+- lead_id: multimodal-lead
+  question: Which report pages or media segments should be checked next?
+  hypothesis: A report, figure, and video mention the same project, but anchor specificity is incomplete.
+  importance: 0.8
+  status: open
+  related_entities:
+  - Example Report
+  - Example Video
+  related_sources:
+  - src-report
+  - src-video
+  - src-image
+  related_anchors:
+  - anchor-report-page
+  - anchor-figure
+  - anchor-video-segment
+  gaps:
+  - gap-visual
+  - gap-pdf-page
+sources:
+- source_id: src-report
+  title: Example deployment report
+  source_type: pdf_report
+  url: https://example.invalid/report.pdf
+  source_status: candidate
+  source_reliability: 0.5
+  source_role: independent_report
+  source_date: '2025-09-01'
+  coverage_period: '2025'
+  language: en
+  country: US
+  access_status: public
+  notes: Report candidate requires page-specific anchors.
+- source_id: src-video
+  title: Example project video
+  source_type: video
+  url: https://example.invalid/video
+  source_status: candidate
+  source_reliability: 0.3
+  source_role: visual_evidence
+  source_date: '2025-09-02'
+  coverage_period: '2025'
+  language: en
+  country: US
+  access_status: public
+  notes: Video locator exists, transcript not supplied.
+- source_id: src-image
+  title: Example project image
+  source_type: image
+  url: https://example.invalid/image
+  source_status: candidate
+  source_reliability: 0.3
+  source_role: visual_evidence
+  source_date: '2025-09-02'
+  coverage_period: '2025'
+  language: ''
+  country: US
+  access_status: public
+  notes: Image region needs explicit extraction input.
+anchors:
+- anchor_id: anchor-report-page
+  source_id: src-report
+  anchor_type: page
+  locator: page=12
+  text: ''
+  normalized_summary: Candidate report page related to the project.
+  modality: pdf_page
+  observed_at: '2026-05-31T00:00:00Z'
+  extraction_confidence: 0.0
+  specificity: 0.7
+  supports: []
+  limits: []
+  warnings:
+  - No OCR text supplied.
+  usable_for_trace: false
+  usable_for_claim: false
+  notes: Page anchor only.
+- anchor_id: anchor-figure
+  source_id: src-image
+  anchor_type: image_region
+  locator: image_id=project-image; region=optional
+  text: ''
+  normalized_summary: Candidate image region; no visual recognition claimed.
+  modality: image
+  observed_at: '2026-05-31T00:00:00Z'
+  extraction_confidence: 0.0
+  specificity: 0.6
+  supports: []
+  limits: []
+  warnings:
+  - No visual recognition supplied.
+  usable_for_trace: false
+  usable_for_claim: false
+  notes: Locator only.
+- anchor_id: anchor-video-segment
+  source_id: src-video
+  anchor_type: video_segment
+  locator: timestamp=00:12:05-00:12:31
+  text: ''
+  normalized_summary: Candidate video segment; no transcript or visual extraction supplied.
+  modality: video
+  observed_at: '2026-05-31T00:00:00Z'
+  extraction_confidence: 0.0
+  specificity: 0.6
+  supports: []
+  limits: []
+  warnings:
+  - No transcript or video recognition supplied.
+  usable_for_trace: false
+  usable_for_claim: false
+  notes: Segment locator only.
+gaps:
+- gap_id: gap-visual
+  lead_id: multimodal-lead
+  gap_type: missing_visual_anchor
+  description: Need a precise locator and supplied extraction input for visual material.
+  importance: 0.8
+  blocking: true
+  suggested_source_roles:
+  - visual_evidence
+  suggested_modalities:
+  - image
+  - video
+  semantic_state: discovered
+- gap_id: gap-pdf-page
+  lead_id: multimodal-lead
+  gap_type: missing_pdf_page
+  description: Need page-specific report anchors with supplied text or summary.
+  importance: 0.75
+  blocking: true
+  suggested_source_roles:
+  - independent_report
+  - primary_source
+  suggested_modalities:
+  - pdf_page
+  semantic_state: discovered
+actions:
+- action_id: action-pdf-page
+  action_type: pdf_page_search
+  query: Example deployment report page table figure project
+  target_lead_id: multimodal-lead
+  target_gap_id: gap-pdf-page
+  expected_source_role: independent_report
+  expected_modality: pdf_page
+  source_policy: public_only
+  cost: 0.3
+  permission_risk: 0.0
+  status: proposed
+  parameters: {}
+- action_id: action-video
+  action_type: video_search
+  query: Example project video segment deployment
+  target_lead_id: multimodal-lead
+  target_gap_id: gap-visual
+  expected_source_role: visual_evidence
+  expected_modality: video
+  source_policy: public_only
+  cost: 0.5
+  permission_risk: 0.0
+  status: proposed
+  parameters: {}
+- action_id: action-image
+  action_type: image_search
+  query: Example project image site figure
+  target_lead_id: multimodal-lead
+  target_gap_id: gap-visual
+  expected_source_role: visual_evidence
+  expected_modality: image
+  source_policy: public_only
+  cost: 0.4
+  permission_risk: 0.0
+  status: proposed
+  parameters: {}
+observations: []
+graph_edges: []
+weights: {}

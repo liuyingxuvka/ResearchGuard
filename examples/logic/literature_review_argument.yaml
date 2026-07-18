@@ -1,0 +1,82 @@
+model:
+  id: literature_review_argument
+  title: "Literature review gap argument"
+  root_claim: C0
+
+nodes:
+  D0:
+    type: Document
+    text: "Literature review draft."
+  S_intro:
+    type: Section
+    text: "Introduction and gap"
+  C0:
+    type: Claim
+    text: "Existing research always ignores deployment-time failure recovery."
+    scope: "all AI workflow literature"
+    confidence: 0.5
+  C1:
+    type: Claim
+    text: "Prior work focuses on training-time evaluation."
+    scope: "reviewed papers"
+    confidence: 0.7
+  E1:
+    type: Evidence
+    text: "Eight reviewed papers emphasize benchmark accuracy and offline evaluation."
+    confidence: 0.75
+    scope: "reviewed papers"
+  K1:
+    type: Context
+    text: "AI systems are increasingly deployed in operational workflows."
+    confidence: 0.8
+  W1:
+    type: Warrant
+    text: "If a representative review set covers training-time evaluation but not recovery, it supports a scoped gap claim for that set."
+    confidence: 0.7
+  D1:
+    type: Definition
+    term: "recovery"
+    text: "recovery: returning a workflow to a valid state after failure."
+  D2:
+    type: Definition
+    term: "recovery"
+    text: "recovery: improving model accuracy after retraining."
+  L1:
+    type: Limitation
+    text: "Only eight papers were reviewed."
+    confidence: 0.85
+
+edges:
+  - source: E1
+    target: C1
+    type: supports
+    weight: 0.8
+  - source: C1
+    target: C0
+    type: supports
+    weight: 0.7
+  - source: W1
+    target: C0
+    type: supports
+    weight: 0.8
+  - source: K1
+    target: C0
+    type: supports
+    weight: 0.3
+  - source: L1
+    target: C0
+    type: qualifies
+    weight: 0.7
+
+acceptance:
+  C1:
+    all_of: [E1]
+    threshold: 0.6
+  C0:
+    all_of: [C1, W1]
+    threshold: 0.65
+    scope_match: true
+
+hierarchy:
+  D0: [S_intro]
+  S_intro: [K1, D1, D2, E1, C1, W1, L1, C0]

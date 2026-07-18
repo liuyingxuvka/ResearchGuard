@@ -1,0 +1,203 @@
+metadata:
+  schema_version: researchguard.trace.model.v2
+  purpose: Generic incident-response storyline from logs, issue, pull request, and
+    meeting note.
+  repository: https://github.com/liuyingxuvka/ResearchGuard
+  skill: TraceGuard
+  math_boundary: Typed constrained HL-MRF/MAP inference compiled to one convex QP
+    and solved directly by OSQP; structural support is not calibrated probability.
+  cli: researchguard trace evaluate examples/incident_response_storyline.yaml --pretty
+  boundary: This is an incident storyline, not a project or deployment claim.
+sources:
+- source_id: src_log
+  lineage_id: lineage_log
+  independence_group: source_log
+  title: Service error log
+  source_type: log
+  source_reliability: 0.86
+  source_status: stable_keep
+  source_date: '2026-05-12'
+- source_id: src_issue
+  lineage_id: lineage_issue
+  independence_group: source_issue
+  title: Incident tracking issue
+  source_type: issue
+  source_reliability: 0.82
+  source_status: stable_keep
+  source_date: '2026-05-12'
+- source_id: src_pr
+  lineage_id: lineage_pr
+  independence_group: source_pr
+  title: Mitigation pull request
+  source_type: pr
+  source_reliability: 0.84
+  source_status: stable_keep
+  source_date: '2026-05-13'
+- source_id: src_meeting
+  lineage_id: lineage_meeting
+  independence_group: source_meeting
+  title: Post-incident meeting note
+  source_type: meeting_note
+  source_reliability: 0.78
+  source_status: stable_keep
+  source_date: '2026-05-14'
+evidence:
+- evidence_id: ev_log_spike
+  source_id: src_log
+  raw_text: Error rate increased after cache invalidation at 09:10 UTC.
+  normalized_summary: Log evidence supports incident onset.
+  evidence_type: log_entry
+  extraction_confidence: 0.88
+  evidence_specificity: 0.86
+  supports:
+  - event_error_spike
+  limits:
+  - does not explain root cause alone
+  warnings: []
+  usable_as_trace_evidence: true
+- evidence_id: ev_issue_triage
+  source_id: src_issue
+  raw_text: Issue records triage that cache invalidation caused stale metadata reads.
+  normalized_summary: Issue evidence supports triage event.
+  evidence_type: issue
+  extraction_confidence: 0.82
+  evidence_specificity: 0.8
+  supports:
+  - event_triage
+  limits:
+  - needs PR or log corroboration
+  warnings: []
+  usable_as_trace_evidence: true
+- evidence_id: ev_pr_fix
+  source_id: src_pr
+  raw_text: PR adds cache namespace guard and emergency rollback script.
+  normalized_summary: PR evidence supports mitigation event.
+  evidence_type: pr
+  extraction_confidence: 0.84
+  evidence_specificity: 0.82
+  supports:
+  - event_mitigation
+  limits:
+  - does not prove customer impact resolved
+  warnings: []
+  usable_as_trace_evidence: true
+- evidence_id: ev_meeting_boundary
+  source_id: src_meeting
+  raw_text: Meeting note says user impact likely ended after rollback; permanent fix
+    still pending review.
+  normalized_summary: Meeting evidence supports resolution boundary and remaining
+    limitation.
+  evidence_type: meeting_note
+  extraction_confidence: 0.78
+  evidence_specificity: 0.76
+  supports:
+  - event_boundary
+  limits:
+  - permanent fix pending
+  warnings: []
+  usable_as_trace_evidence: true
+entities:
+- mention_id: ent_service
+  evidence_id: ev_log_spike
+  raw_name: Metadata API
+  normalized_name: metadata api
+  entity_type: asset
+  aliases:
+  - metadata service
+  role: affected_service
+  confidence: 0.86
+- mention_id: ent_cache
+  evidence_id: ev_issue_triage
+  raw_name: Cache invalidation job
+  normalized_name: cache invalidation job
+  entity_type: asset
+  aliases:
+  - cache job
+  role: suspected_cause
+  confidence: 0.8
+events:
+- event_id: event_error_spike
+  evidence_ids:
+  - ev_log_spike
+  actor_ids:
+  - ent_service
+  action: error rate increased
+  object_ids:
+  - ent_service
+  event_type: log_entry
+  time_interval:
+    start: '2026-05-12'
+    precision: exact_date
+    confidence: 0.86
+  location_ids: []
+  trace_hint: metadata incident
+  stage_hint: unknown
+  extraction_confidence: 0.84
+- event_id: event_triage
+  evidence_ids:
+  - ev_issue_triage
+  actor_ids:
+  - ent_service
+  action: triaged suspected cache cause
+  object_ids:
+  - ent_cache
+  event_type: issue
+  time_interval:
+    start: '2026-05-12'
+    precision: exact_date
+    confidence: 0.82
+  location_ids: []
+  trace_hint: metadata incident
+  stage_hint: unknown
+  extraction_confidence: 0.8
+- event_id: event_mitigation
+  evidence_ids:
+  - ev_pr_fix
+  actor_ids:
+  - ent_service
+  action: mitigation PR opened
+  object_ids:
+  - ent_cache
+  event_type: pr
+  time_interval:
+    start: '2026-05-13'
+    precision: exact_date
+    confidence: 0.84
+  location_ids: []
+  trace_hint: metadata incident
+  stage_hint: unknown
+  extraction_confidence: 0.82
+- event_id: event_boundary
+  evidence_ids:
+  - ev_meeting_boundary
+  actor_ids:
+  - ent_service
+  action: post-incident boundary recorded
+  object_ids:
+  - ent_cache
+  event_type: meeting_note
+  time_interval:
+    start: '2026-05-14'
+    precision: exact_date
+    confidence: 0.78
+  location_ids: []
+  trace_hint: metadata incident
+  stage_hint: unknown
+  extraction_confidence: 0.76
+traces:
+- trace_id: trace_metadata_incident
+  title: Metadata API cache invalidation incident storyline
+  trace_type: incident_storyline
+  event_ids:
+  - event_error_spike
+  - event_triage
+  - event_mitigation
+  - event_boundary
+  entity_ids:
+  - ent_service
+  - ent_cache
+  location_ids: []
+  current_stage: unknown
+  claim: Metadata API incident likely involved cache invalidation and mitigation PR,
+    with permanent fix pending review.
+  notes: This storyline reconstructs incident sequence, not project status.

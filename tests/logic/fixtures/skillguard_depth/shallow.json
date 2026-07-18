@@ -1,0 +1,14 @@
+{
+  "budget": 8,
+  "case_id": "logicguard-shallow-root-plus-evidence",
+  "model": {
+    "edges": [
+      {"source": "E1", "target": "C0", "type": "supports"}
+    ],
+    "model": {"id": "skillguard-logic-shallow", "root_claim": "C0"},
+    "nodes": {
+      "C0": {"importance": 1.0, "text": "Over-broad conclusion", "type": "Claim"},
+      "E1": {"confidence": 0.9, "importance": 0.9, "provided": true, "type": "Evidence"}
+    }
+  }
+}

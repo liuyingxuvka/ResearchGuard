@@ -1,0 +1,651 @@
+{
+  "base_profile_id": "discovery",
+  "catalog_digest": "sha256:269954344f2a4c1734fb1072ff34cc5b572d2ca8ef97f020facd3539df83190b",
+  "catalog_id": "researchguard.source.template-pack.catalog",
+  "catalog_version": "1.0.0",
+  "claim_boundary": "SourceGuard template instances plan source discovery only; source candidates are not evidence, anchors are not events, and handoffs are not downstream validation.",
+  "guard_family": "sourceguard",
+  "native_binding": {
+    "adapter_id": "researchguard.source.template_packs",
+    "schema_owner_id": "researchguard.source.schema.BeliefState.from_dict",
+    "validator_id": "researchguard.source.template_packs.validate_native_payload"
+  },
+  "profiles": [
+    {
+      "composition": {
+        "allowed": true,
+        "compatible_with": [
+          "gap",
+          "citation",
+          "disconfirming",
+          "numeric-provenance",
+          "multimodal-anchor",
+          "lineage",
+          "bridge-evidence"
+        ]
+      },
+      "fragment": {
+        "action": {
+          "action_id": "action-discovery",
+          "action_type": "text_search",
+          "cost": 0.3,
+          "expected_modality": "text",
+          "expected_source_role": "independent_report",
+          "notes": "Candidate search action only; external observation is required.",
+          "parameters": {
+            "template_profile_id": "discovery"
+          },
+          "permission_risk": 0,
+          "query": "{subject} independent report",
+          "source_policy": "public_only",
+          "status": "proposed",
+          "target_gap_id": "gap-discovery",
+          "target_lead_id": "lead-discovery"
+        },
+        "gap": {
+          "blocking": true,
+          "description": "No independent source candidate has been recorded for {subject}.",
+          "gap_id": "gap-discovery",
+          "gap_type": "missing_independent_source",
+          "importance": 0.8,
+          "lead_id": "lead-discovery",
+          "notes": "Template profile: discovery.",
+          "semantic_state": "discovered",
+          "suggested_modalities": [
+            "text"
+          ],
+          "suggested_source_roles": [
+            "independent_report"
+          ]
+        },
+        "lead": {
+          "gaps": [
+            "gap-discovery"
+          ],
+          "hypothesis": "An independent source may corroborate or limit the working claim about {subject}.",
+          "importance": 0.8,
+          "lead_id": "lead-discovery",
+          "notes": "Template profile: discovery.",
+          "question": "Which independent source should be searched next for {subject}?",
+          "related_entities": [
+            "{subject}"
+          ],
+          "status": "open"
+        }
+      },
+      "owned_fields": [
+        "leads/discovery",
+        "gaps/discovery",
+        "actions/discovery"
+      ],
+      "priority": 10,
+      "profile_digest": "sha256:8e4b4a404e02d005f2a56979db439accfa09dd6f5622392c83fc84e60b44cb2e",
+      "profile_id": "discovery",
+      "profile_version": "1.0.0",
+      "selector": {
+        "excluded_intents": [],
+        "required_intents": [
+          "discovery"
+        ]
+      },
+      "strict_dominates": []
+    },
+    {
+      "composition": {
+        "allowed": true,
+        "compatible_with": [
+          "discovery",
+          "citation",
+          "disconfirming",
+          "numeric-provenance",
+          "multimodal-anchor",
+          "lineage",
+          "bridge-evidence"
+        ]
+      },
+      "fragment": {
+        "action": {
+          "action_id": "action-gap",
+          "action_type": "primary_source_search",
+          "cost": 0.3,
+          "expected_modality": "text",
+          "expected_source_role": "primary_source",
+          "notes": "Candidate search action only; external observation is required.",
+          "parameters": {
+            "template_profile_id": "gap"
+          },
+          "permission_risk": 0,
+          "query": "{subject} primary source",
+          "source_policy": "public_only",
+          "status": "proposed",
+          "target_gap_id": "gap-gap",
+          "target_lead_id": "lead-gap"
+        },
+        "gap": {
+          "blocking": true,
+          "description": "The declared gap for {subject} lacks a primary source candidate.",
+          "gap_id": "gap-gap",
+          "gap_type": "missing_primary_source",
+          "importance": 0.8,
+          "lead_id": "lead-gap",
+          "notes": "Template profile: gap.",
+          "semantic_state": "discovered",
+          "suggested_modalities": [
+            "text"
+          ],
+          "suggested_source_roles": [
+            "primary_source"
+          ]
+        },
+        "lead": {
+          "gaps": [
+            "gap-gap"
+          ],
+          "hypothesis": "A primary source may close or narrow the declared gap for {subject}.",
+          "importance": 0.8,
+          "lead_id": "lead-gap",
+          "notes": "Template profile: gap.",
+          "question": "Which source can close the highest-priority gap for {subject}?",
+          "related_entities": [
+            "{subject}"
+          ],
+          "status": "open"
+        }
+      },
+      "owned_fields": [
+        "leads/gap",
+        "gaps/gap",
+        "actions/gap"
+      ],
+      "priority": 10,
+      "profile_digest": "sha256:842c421ffd2a8ff35b5f6c9a8cc9450c498bd312b825e7f8f1b00daf560fdb12",
+      "profile_id": "gap",
+      "profile_version": "1.0.0",
+      "selector": {
+        "excluded_intents": [],
+        "required_intents": [
+          "gap"
+        ]
+      },
+      "strict_dominates": []
+    },
+    {
+      "composition": {
+        "allowed": true,
+        "compatible_with": [
+          "discovery",
+          "gap",
+          "disconfirming",
+          "numeric-provenance",
+          "multimodal-anchor",
+          "lineage",
+          "bridge-evidence"
+        ]
+      },
+      "fragment": {
+        "action": {
+          "action_id": "action-citation",
+          "action_type": "citation_backward",
+          "cost": 0.3,
+          "expected_modality": "text",
+          "expected_source_role": "primary_source",
+          "notes": "Candidate search action only; external observation is required.",
+          "parameters": {
+            "template_profile_id": "citation"
+          },
+          "permission_risk": 0,
+          "query": "{subject} cited original source",
+          "source_policy": "public_only",
+          "status": "proposed",
+          "target_gap_id": "gap-citation",
+          "target_lead_id": "lead-citation"
+        },
+        "gap": {
+          "blocking": true,
+          "description": "The citation chain for {subject} does not yet resolve to a primary source.",
+          "gap_id": "gap-citation",
+          "gap_type": "missing_primary_source",
+          "importance": 0.8,
+          "lead_id": "lead-citation",
+          "notes": "Template profile: citation.",
+          "semantic_state": "discovered",
+          "suggested_modalities": [
+            "text"
+          ],
+          "suggested_source_roles": [
+            "primary_source"
+          ]
+        },
+        "lead": {
+          "gaps": [
+            "gap-citation"
+          ],
+          "hypothesis": "Backward citation search may recover the original source behind {subject}.",
+          "importance": 0.8,
+          "lead_id": "lead-citation",
+          "notes": "Template profile: citation.",
+          "question": "Which cited source is the original support for {subject}?",
+          "related_entities": [
+            "{subject}"
+          ],
+          "status": "open"
+        }
+      },
+      "owned_fields": [
+        "leads/citation",
+        "gaps/citation",
+        "actions/citation"
+      ],
+      "priority": 10,
+      "profile_digest": "sha256:34e1c815cf3b4cb1dc7c67fb646e54f2f66d65423276b87ba4dd4fe5bbd6a68a",
+      "profile_id": "citation",
+      "profile_version": "1.0.0",
+      "selector": {
+        "excluded_intents": [],
+        "required_intents": [
+          "citation"
+        ]
+      },
+      "strict_dominates": []
+    },
+    {
+      "composition": {
+        "allowed": true,
+        "compatible_with": [
+          "discovery",
+          "gap",
+          "citation",
+          "numeric-provenance",
+          "multimodal-anchor",
+          "lineage",
+          "bridge-evidence"
+        ]
+      },
+      "fragment": {
+        "action": {
+          "action_id": "action-disconfirming",
+          "action_type": "counterevidence_search",
+          "cost": 0.3,
+          "expected_modality": "text",
+          "expected_source_role": "counter_evidence",
+          "notes": "Candidate search action only; external observation is required.",
+          "parameters": {
+            "template_profile_id": "disconfirming"
+          },
+          "permission_risk": 0,
+          "query": "{subject} counterevidence limitation",
+          "source_policy": "public_only",
+          "status": "proposed",
+          "target_gap_id": "gap-disconfirming",
+          "target_lead_id": "lead-disconfirming"
+        },
+        "gap": {
+          "blocking": true,
+          "description": "No disconfirming or limiting source candidate has been recorded for {subject}.",
+          "gap_id": "gap-disconfirming",
+          "gap_type": "missing_counterevidence",
+          "importance": 0.8,
+          "lead_id": "lead-disconfirming",
+          "notes": "Template profile: disconfirming.",
+          "semantic_state": "discovered",
+          "suggested_modalities": [
+            "text"
+          ],
+          "suggested_source_roles": [
+            "counter_evidence"
+          ]
+        },
+        "lead": {
+          "gaps": [
+            "gap-disconfirming"
+          ],
+          "hypothesis": "Counterevidence may change the safe scope of the working claim about {subject}.",
+          "importance": 0.8,
+          "lead_id": "lead-disconfirming",
+          "notes": "Template profile: disconfirming.",
+          "question": "What credible source could disconfirm or limit {subject}?",
+          "related_entities": [
+            "{subject}"
+          ],
+          "status": "open"
+        }
+      },
+      "owned_fields": [
+        "leads/disconfirming",
+        "gaps/disconfirming",
+        "actions/disconfirming"
+      ],
+      "priority": 20,
+      "profile_digest": "sha256:62b2a1cdd2a7352573c3564f91413f35a8cd6af6bc6f17d87dae3beae8386e7a",
+      "profile_id": "disconfirming",
+      "profile_version": "1.0.0",
+      "selector": {
+        "excluded_intents": [],
+        "required_intents": [
+          "citation",
+          "disconfirming"
+        ]
+      },
+      "strict_dominates": [
+        "citation"
+      ]
+    },
+    {
+      "composition": {
+        "allowed": true,
+        "compatible_with": [
+          "discovery",
+          "gap",
+          "citation",
+          "disconfirming",
+          "multimodal-anchor",
+          "lineage",
+          "bridge-evidence"
+        ]
+      },
+      "fragment": {
+        "action": {
+          "action_id": "action-numeric_provenance",
+          "action_type": "report_page_search",
+          "cost": 0.3,
+          "expected_modality": "table",
+          "expected_source_role": "validation_evidence",
+          "notes": "Candidate search action only; external observation is required.",
+          "parameters": {
+            "template_profile_id": "numeric-provenance"
+          },
+          "permission_risk": 0,
+          "query": "{subject} dataset table report page",
+          "source_policy": "public_only",
+          "status": "proposed",
+          "target_gap_id": "gap-numeric_provenance",
+          "target_lead_id": "lead-numeric_provenance"
+        },
+        "gap": {
+          "blocking": true,
+          "description": "The numeric claim about {subject} lacks an exact source locator.",
+          "gap_id": "gap-numeric_provenance",
+          "gap_type": "missing_primary_source",
+          "importance": 0.8,
+          "lead_id": "lead-numeric_provenance",
+          "notes": "Template profile: numeric-provenance.",
+          "semantic_state": "discovered",
+          "suggested_modalities": [
+            "table"
+          ],
+          "suggested_source_roles": [
+            "validation_evidence"
+          ]
+        },
+        "lead": {
+          "gaps": [
+            "gap-numeric_provenance"
+          ],
+          "hypothesis": "A page- or row-level source can make the numeric provenance for {subject} reviewable.",
+          "importance": 0.8,
+          "lead_id": "lead-numeric_provenance",
+          "notes": "Template profile: numeric-provenance.",
+          "question": "Which exact table, row, or report page originates the number used for {subject}?",
+          "related_entities": [
+            "{subject}"
+          ],
+          "status": "open"
+        }
+      },
+      "owned_fields": [
+        "leads/numeric-provenance",
+        "gaps/numeric-provenance",
+        "actions/numeric-provenance"
+      ],
+      "priority": 10,
+      "profile_digest": "sha256:122b8c64e4635edec8a7d8944b6052a5e5b32dbab34b0fca321cf072e6176bbc",
+      "profile_id": "numeric-provenance",
+      "profile_version": "1.0.0",
+      "selector": {
+        "excluded_intents": [],
+        "required_intents": [
+          "numeric-provenance"
+        ]
+      },
+      "strict_dominates": []
+    },
+    {
+      "composition": {
+        "allowed": true,
+        "compatible_with": [
+          "discovery",
+          "gap",
+          "citation",
+          "disconfirming",
+          "numeric-provenance",
+          "lineage",
+          "bridge-evidence"
+        ]
+      },
+      "fragment": {
+        "action": {
+          "action_id": "action-multimodal_anchor",
+          "action_type": "image_search",
+          "cost": 0.3,
+          "expected_modality": "image",
+          "expected_source_role": "visual_evidence",
+          "notes": "Candidate search action only; external observation is required.",
+          "parameters": {
+            "template_profile_id": "multimodal-anchor"
+          },
+          "permission_risk": 0,
+          "query": "{subject} official image figure",
+          "source_policy": "public_only",
+          "status": "proposed",
+          "target_gap_id": "gap-multimodal_anchor",
+          "target_lead_id": "lead-multimodal_anchor"
+        },
+        "gap": {
+          "blocking": true,
+          "description": "The multimodal source candidate for {subject} lacks a reviewable visual anchor.",
+          "gap_id": "gap-multimodal_anchor",
+          "gap_type": "missing_visual_anchor",
+          "importance": 0.8,
+          "lead_id": "lead-multimodal_anchor",
+          "notes": "Template profile: multimodal-anchor.",
+          "semantic_state": "discovered",
+          "suggested_modalities": [
+            "image"
+          ],
+          "suggested_source_roles": [
+            "visual_evidence"
+          ]
+        },
+        "lead": {
+          "gaps": [
+            "gap-multimodal_anchor"
+          ],
+          "hypothesis": "A concrete image or figure locator may support a bounded observation about {subject}.",
+          "importance": 0.8,
+          "lead_id": "lead-multimodal_anchor",
+          "notes": "Template profile: multimodal-anchor.",
+          "question": "Which observable visual anchor is needed for {subject}?",
+          "related_entities": [
+            "{subject}"
+          ],
+          "status": "open"
+        }
+      },
+      "owned_fields": [
+        "leads/multimodal-anchor",
+        "gaps/multimodal-anchor",
+        "actions/multimodal-anchor"
+      ],
+      "priority": 10,
+      "profile_digest": "sha256:a0331be56194c30e9eb34d4b0ed4fb7ee65403c610a72292e6273881c06aee9e",
+      "profile_id": "multimodal-anchor",
+      "profile_version": "1.0.0",
+      "selector": {
+        "excluded_intents": [],
+        "required_intents": [
+          "multimodal-anchor"
+        ]
+      },
+      "strict_dominates": []
+    },
+    {
+      "composition": {
+        "allowed": true,
+        "compatible_with": [
+          "discovery",
+          "gap",
+          "citation",
+          "disconfirming",
+          "numeric-provenance",
+          "multimodal-anchor",
+          "bridge-evidence"
+        ]
+      },
+      "fragment": {
+        "action": {
+          "action_id": "action-lineage",
+          "action_type": "citation_forward",
+          "cost": 0.3,
+          "expected_modality": "text",
+          "expected_source_role": "historical_background",
+          "notes": "Candidate search action only; external observation is required.",
+          "parameters": {
+            "template_profile_id": "lineage"
+          },
+          "permission_risk": 0,
+          "query": "{subject} research lineage references",
+          "source_policy": "public_only",
+          "status": "proposed",
+          "target_gap_id": "gap-lineage",
+          "target_lead_id": "lead-lineage"
+        },
+        "gap": {
+          "blocking": true,
+          "description": "The source lineage for {subject} has an unresolved structural gap.",
+          "gap_id": "gap-lineage",
+          "gap_type": "missing_structural_source_support",
+          "importance": 0.8,
+          "lead_id": "lead-lineage",
+          "notes": "Template profile: lineage.",
+          "semantic_state": "discovered",
+          "suggested_modalities": [
+            "text"
+          ],
+          "suggested_source_roles": [
+            "historical_background"
+          ]
+        },
+        "lead": {
+          "gaps": [
+            "gap-lineage"
+          ],
+          "hypothesis": "Forward and backward lineage sources may reveal how {subject} developed.",
+          "importance": 0.8,
+          "lead_id": "lead-lineage",
+          "notes": "Template profile: lineage.",
+          "question": "Which sources establish the research or document lineage of {subject}?",
+          "related_entities": [
+            "{subject}"
+          ],
+          "status": "open"
+        }
+      },
+      "owned_fields": [
+        "leads/lineage",
+        "gaps/lineage",
+        "actions/lineage"
+      ],
+      "priority": 10,
+      "profile_digest": "sha256:bab2bd63d10538ebddeaab1fb3692621a968ca737472f5b5767caf7abbbb5d0c",
+      "profile_id": "lineage",
+      "profile_version": "1.0.0",
+      "selector": {
+        "excluded_intents": [],
+        "required_intents": [
+          "lineage"
+        ]
+      },
+      "strict_dominates": []
+    },
+    {
+      "composition": {
+        "allowed": true,
+        "compatible_with": [
+          "discovery",
+          "gap",
+          "citation",
+          "disconfirming",
+          "numeric-provenance",
+          "multimodal-anchor",
+          "lineage"
+        ]
+      },
+      "fragment": {
+        "action": {
+          "action_id": "action-bridge_evidence",
+          "action_type": "text_search",
+          "cost": 0.3,
+          "expected_modality": "text",
+          "expected_source_role": "bridge_evidence",
+          "notes": "Candidate search action only; external observation is required.",
+          "parameters": {
+            "template_profile_id": "bridge-evidence"
+          },
+          "permission_risk": 0,
+          "query": "{subject} bridge evidence transition",
+          "source_policy": "public_only",
+          "status": "proposed",
+          "target_gap_id": "gap-bridge_evidence",
+          "target_lead_id": "lead-bridge_evidence"
+        },
+        "gap": {
+          "blocking": true,
+          "description": "The structural handoff around {subject} lacks explicit bridge evidence.",
+          "gap_id": "gap-bridge_evidence",
+          "gap_type": "missing_bridge_evidence",
+          "importance": 0.8,
+          "lead_id": "lead-bridge_evidence",
+          "notes": "Template profile: bridge-evidence.",
+          "semantic_state": "discovered",
+          "suggested_modalities": [
+            "text"
+          ],
+          "suggested_source_roles": [
+            "bridge_evidence"
+          ]
+        },
+        "lead": {
+          "gaps": [
+            "gap-bridge_evidence"
+          ],
+          "hypothesis": "A bridge source may support the handoff without pretending to prove either endpoint.",
+          "importance": 0.8,
+          "lead_id": "lead-bridge_evidence",
+          "notes": "Template profile: bridge-evidence.",
+          "question": "Which source bridges the two supported units around {subject}?",
+          "related_entities": [
+            "{subject}"
+          ],
+          "status": "open"
+        }
+      },
+      "owned_fields": [
+        "leads/bridge-evidence",
+        "gaps/bridge-evidence",
+        "actions/bridge-evidence"
+      ],
+      "priority": 10,
+      "profile_digest": "sha256:c63683030844e4759427ebbd4e62503165a1178c22ea34b285e4df51edf70d12",
+      "profile_id": "bridge-evidence",
+      "profile_version": "1.0.0",
+      "selector": {
+        "excluded_intents": [],
+        "required_intents": [
+          "bridge-evidence"
+        ]
+      },
+      "strict_dominates": []
+    }
+  ],
+  "schema_id": "guard-template-pack.catalog.v1"
+}

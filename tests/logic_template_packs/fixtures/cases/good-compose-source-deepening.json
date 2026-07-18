@@ -1,0 +1,23 @@
+{
+  "case_id": "good-compose-source-deepening",
+  "kind": "request",
+  "request": {
+    "purpose": "preserve sources and deepen weak support",
+    "capabilities": ["source-library", "deepening"],
+    "context_tags": ["source-backed"],
+    "allow_base": false,
+    "parameters": {
+      "source_registry": ["source-001", "source-002"],
+      "source_provenance": {"source-001": "declared", "source-002": "declared"},
+      "deepening_queue": ["claim-A", "claim-B"],
+      "deepening_stop_rules": ["support sufficient", "scope boundary reached"]
+    }
+  },
+  "expected": {
+    "decision": "composed",
+    "candidate_ids": ["researchguard.logic.deepening", "researchguard.logic.source-library"],
+    "selected_profile_ids": ["researchguard.logic.deepening", "researchguard.logic.source-library"],
+    "finding_codes": [],
+    "build_status": "valid"
+  }
+}

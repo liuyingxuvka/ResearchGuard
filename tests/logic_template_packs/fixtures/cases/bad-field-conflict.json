@@ -1,0 +1,25 @@
+{
+  "case_id": "bad-field-conflict",
+  "kind": "catalog_request_mutation",
+  "target": "profiles/source-library.json",
+  "operations": [
+    {"op": "set", "path": ["emitted_fields", "deepening.queue"], "value": {"$request": "deepening_queue"}},
+    {"op": "set", "path": ["field_owners", "deepening.queue"], "value": "researchguard.logic.source-library"}
+  ],
+  "recompute_profile_digest": true,
+  "recompute_catalog_digest": true,
+  "request": {
+    "purpose": "expose a composed-field ownership collision",
+    "capabilities": ["source-library", "deepening"],
+    "context_tags": [],
+    "allow_base": false,
+    "parameters": {"deepening_queue": ["claim-A"]}
+  },
+  "expected": {
+    "decision": "ambiguous",
+    "candidate_ids": ["researchguard.logic.deepening", "researchguard.logic.source-library"],
+    "selected_profile_ids": [],
+    "finding_codes": ["field_owner_conflict", "no_complete_dominator"],
+    "build_status": "blocked"
+  }
+}

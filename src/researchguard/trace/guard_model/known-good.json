@@ -1,0 +1,15 @@
+{
+  "schema_version": "researchguard.trace.guard_model_cases.v1",
+  "contract_kind": "family_baseline",
+  "authority_scope": "family_capability_regression",
+  "production_authority": false,
+  "cases": [
+    {
+      "case_id": "good:project-radar-complete-storyline",
+      "oracle_id": "oracle:traceguard:known-good",
+      "scenario": "known_good",
+      "model_path": "examples/project_radar_hydrogen_trace.yaml",
+      "expected_native_decision": "pass"
+    }
+  ]
+}

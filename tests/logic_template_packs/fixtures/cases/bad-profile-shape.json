@@ -1,0 +1,11 @@
+{
+  "case_id": "bad-profile-shape",
+  "kind": "catalog_mutation",
+  "target": "profiles/argument.json",
+  "operations": [
+    {"op": "set", "path": ["unexpected"], "value": true}
+  ],
+  "recompute_profile_digest": true,
+  "recompute_catalog_digest": true,
+  "expected": {"load_status": "blocked", "finding_codes": ["unknown_or_missing_fields"]}
+}

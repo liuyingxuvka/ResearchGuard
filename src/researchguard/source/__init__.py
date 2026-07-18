@@ -1,0 +1,102 @@
+"""
+Purpose: Expose SourceGuard package metadata and public model helpers.
+Repository: https://github.com/liuyingxuvka/ResearchGuard
+Skill: SourceGuard
+Math boundary: Expected utility ranks search value, not factual truth or calibrated probability.
+CLI: researchguard source plan <model.yaml> --model-contract <model.contract.json>
+Boundary: Source candidates and evidence anchors require downstream TraceGuard/LogicGuard review before final claims.
+"""
+
+from .schema import (
+    BeliefState,
+    EvidenceAnchor,
+    Gap,
+    GapClosureBasis,
+    GapQualification,
+    GapTransition,
+    Lead,
+    Observation,
+    PlanResult,
+    ReplanComparison,
+    ScoredAction,
+    SearchAction,
+    SourceCoverageDimension,
+    SourceCoverageUniverse,
+    SourceDepthPolicy,
+    SourceDepthReceipt,
+    SourceObjectDepthRow,
+    SourceRecord,
+)
+from .depth import apply_observation_and_replan, build_source_coverage_universe, build_source_depth_receipt, model_fingerprint
+from .task_iteration import (
+    GAP_REDUCTION_LEVELS,
+    SEARCH_ITERATION_CLAIM_BOUNDARY,
+    SEARCH_ITERATION_RECEIPT_SCHEMA,
+    SEARCH_OUTCOME_PREDICTION_SCHEMA,
+    SEARCH_ROLLBACK_RECEIPT_SCHEMA,
+    NativeDepthRevalidation,
+    ProtectedGapRevalidation,
+    RealizedSearchOutcome,
+    SearchCandidateReview,
+    SearchIterationReceipt,
+    SearchOutcomePrediction,
+    SearchPredictionError,
+    SearchRollbackReceipt,
+    compare_search_outcome,
+    derive_realized_search_outcome,
+    freeze_search_outcome_prediction,
+    revalidate_native_depth_receipt,
+    review_search_candidate,
+    rollback_search_iteration,
+    run_search_iteration,
+    validate_search_prediction_binding,
+)
+
+from researchguard import __version__
+
+__all__ = [
+    "__version__",
+    "BeliefState",
+    "EvidenceAnchor",
+    "Gap",
+    "GapClosureBasis",
+    "GapQualification",
+    "GapTransition",
+    "Lead",
+    "Observation",
+    "NativeDepthRevalidation",
+    "ProtectedGapRevalidation",
+    "PlanResult",
+    "ReplanComparison",
+    "ScoredAction",
+    "SearchAction",
+    "SearchCandidateReview",
+    "SearchIterationReceipt",
+    "SearchOutcomePrediction",
+    "SearchPredictionError",
+    "SearchRollbackReceipt",
+    "RealizedSearchOutcome",
+    "SourceCoverageDimension",
+    "SourceCoverageUniverse",
+    "SourceDepthPolicy",
+    "SourceDepthReceipt",
+    "SourceObjectDepthRow",
+    "SourceRecord",
+    "GAP_REDUCTION_LEVELS",
+    "SEARCH_ITERATION_CLAIM_BOUNDARY",
+    "SEARCH_ITERATION_RECEIPT_SCHEMA",
+    "SEARCH_OUTCOME_PREDICTION_SCHEMA",
+    "SEARCH_ROLLBACK_RECEIPT_SCHEMA",
+    "apply_observation_and_replan",
+    "build_source_coverage_universe",
+    "build_source_depth_receipt",
+    "model_fingerprint",
+    "compare_search_outcome",
+    "derive_realized_search_outcome",
+    "freeze_search_outcome_prediction",
+    "revalidate_native_depth_receipt",
+    "review_search_candidate",
+    "rollback_search_iteration",
+    "run_search_iteration",
+    "validate_search_prediction_binding",
+]

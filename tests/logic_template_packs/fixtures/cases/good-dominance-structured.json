@@ -1,0 +1,21 @@
+{
+  "case_id": "good-dominance-structured",
+  "kind": "request",
+  "request": {
+    "purpose": "audit a structured report",
+    "capabilities": ["argument", "structured-artifact"],
+    "context_tags": ["report"],
+    "allow_base": false,
+    "parameters": {
+      "artifact_kind": "report",
+      "structure_boundaries": ["section", "paragraph"]
+    }
+  },
+  "expected": {
+    "decision": "selected",
+    "candidate_ids": ["researchguard.logic.argument", "researchguard.logic.structured-artifact"],
+    "selected_profile_ids": ["researchguard.logic.structured-artifact"],
+    "finding_codes": [],
+    "build_status": "valid"
+  }
+}

@@ -1,0 +1,194 @@
+{
+  "schema_version": "skillguard.contract_source.v2",
+  "skill_id": "traceguard",
+  "repository_role": "skill_maintainer_source",
+  "maintenance_unit_id": "unit:researchguard-suite",
+  "member_skill_ids": [
+    "researchguard",
+    "logicguard",
+    "sourceguard",
+    "traceguard"
+  ],
+  "consumer_projection": {
+    "projection_id": "projection:consumer-distribution",
+    "prohibited_path_prefixes": [
+      ".skillguard/"
+    ],
+    "prohibited_prompt_tokens": [
+      "SkillGuard",
+      ".skillguard",
+      "skillguard.py"
+    ],
+    "release_manifest_path": "consumer-release.json"
+  },
+  "model_id": "researchguard.traceguard.contract.current",
+  "model_path": ".flowguard/traceguard_skill_contract_model.py",
+  "confirmed": true,
+  "integration_mode": "native-integrated",
+  "native_route_owner": "owner:researchguard:traceguard",
+  "may_define_parallel_execution_route": false,
+  "may_define_skillguard_runtime_route": false,
+  "native_route_bindings": [
+    {
+      "binding_id": "native:researchguard:traceguard",
+      "native_route_id": "route:researchguard:traceguard",
+      "required_before_closure": true,
+      "source": "skills/traceguard/SKILL.md"
+    }
+  ],
+  "native_check_bindings": [
+    {
+      "binding_id": "native-check:researchguard:traceguard:consumer-contract",
+      "native_check_id": "check:traceguard:consumer-contract",
+      "required": true,
+      "evidence_source": "scripts/check_researchguard_suite.py"
+    },
+    {
+      "binding_id": "native-check:researchguard:traceguard:native-tests",
+      "native_check_id": "check:traceguard:native-tests",
+      "required": true,
+      "evidence_source": "tests"
+    }
+  ],
+  "implementation_paths": [
+    "skills/traceguard",
+    "src/researchguard/trace",
+    "tests/trace"
+  ],
+  "step_bindings": [
+    {
+      "step_id": "step:researchguard:traceguard:contract",
+      "action": {
+        "kind": "native",
+        "summary": "Validate the exact current consumer skill and route boundary."
+      },
+      "check_ids": [
+        "check:traceguard:consumer-contract"
+      ],
+      "output_artifact_ids": []
+    },
+    {
+      "step_id": "step:researchguard:traceguard:tests",
+      "action": {
+        "kind": "native",
+        "summary": "Execute the member-owned current native regression suite."
+      },
+      "check_ids": [
+        "check:traceguard:native-tests"
+      ],
+      "output_artifact_ids": []
+    }
+  ],
+  "checks": [
+    {
+      "check_id": "check:traceguard:consumer-contract",
+      "maintenance_unit_id": "unit:researchguard-suite",
+      "member_skill_id": "traceguard",
+      "evidence_subject_id": "subject:researchguard:traceguard:consumer-contract",
+      "semantic_check_id": "semantic:researchguard:traceguard:consumer-contract:current",
+      "kind": "command",
+      "command": "python",
+      "args": [
+        "scripts/check_researchguard_suite.py",
+        "--member",
+        "traceguard",
+        "--json"
+      ],
+      "cwd_token": "repository_root",
+      "input_selectors": [
+        {
+          "kind": "path",
+          "path": "skills/traceguard/SKILL.md"
+        },
+        {
+          "kind": "path",
+          "path": "skills/traceguard/agents/openai.yaml"
+        },
+        {
+          "kind": "path",
+          "path": "scripts/check_researchguard_suite.py"
+        },
+        {
+          "kind": "path",
+          "path": ".flowguard/traceguard_skill_contract_model.py"
+        },
+        {
+          "kind": "path",
+          "path": ".flowguard/researchguard_skill_contract_model_common.py"
+        }
+      ],
+      "expected": {
+        "exit_code": 0
+      },
+      "timeout_seconds": 60,
+      "evidence_class": "hard",
+      "evidence_domain_id": "evidence-domain:researchguard:traceguard:consumer-contract",
+      "execution_owner_id": "owner:researchguard:traceguard:consumer-contract",
+      "native_route_id": "route:researchguard:traceguard",
+      "depends_on_check_ids": [],
+      "covers_obligation_ids": [
+        "obligation:researchguard:traceguard:consumer-contract"
+      ],
+      "coverage_scope": "declared_obligations",
+      "coverage_rationale": "This check is the sole execution owner for its exact member obligation."
+    },
+    {
+      "check_id": "check:traceguard:native-tests",
+      "maintenance_unit_id": "unit:researchguard-suite",
+      "member_skill_id": "traceguard",
+      "evidence_subject_id": "subject:researchguard:traceguard:native-tests",
+      "semantic_check_id": "semantic:researchguard:traceguard:native-tests:current",
+      "kind": "command",
+      "command": "python",
+      "args": [
+        "-m",
+        "pytest",
+        "tests/trace",
+        "-q"
+      ],
+      "cwd_token": "repository_root",
+      "input_selectors": [
+        {
+          "kind": "subtree",
+          "path": "skills/traceguard"
+        },
+        {
+          "kind": "subtree",
+          "path": "src/researchguard/trace"
+        },
+        {
+          "kind": "subtree",
+          "path": "tests/trace"
+        }
+      ],
+      "expected": {
+        "exit_code": 0
+      },
+      "timeout_seconds": 900,
+      "evidence_class": "hard",
+      "evidence_domain_id": "evidence-domain:researchguard:traceguard:native-tests",
+      "execution_owner_id": "owner:researchguard:traceguard:native-tests",
+      "native_route_id": "route:researchguard:traceguard",
+      "depends_on_check_ids": [
+        "check:traceguard:consumer-contract"
+      ],
+      "covers_obligation_ids": [
+        "obligation:researchguard:traceguard:native-tests"
+      ],
+      "coverage_scope": "declared_obligations",
+      "coverage_rationale": "This check is the sole execution owner for its exact member obligation."
+    }
+  ],
+  "artifacts": [],
+  "closure_profiles": [
+    {
+      "profile_id": "enforced",
+      "required_obligation_ids": [
+        "obligation:researchguard:traceguard:consumer-contract",
+        "obligation:researchguard:traceguard:native-tests"
+      ]
+    }
+  ],
+  "judgment_rubrics": [],
+  "claim_boundary": "This contract covers the current traceguard consumer projection, native route, and member-owned tests inside ResearchGuard v0.1.0. It does not prove source truth, unrun external work, installation, publication, or future AI behavior."
+}

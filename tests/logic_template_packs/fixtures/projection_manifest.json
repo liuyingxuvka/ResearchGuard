@@ -1,0 +1,25 @@
+{
+  "schema": "researchguard.logic.skillguard-projection-fixtures.v1",
+  "cases": [
+    {
+      "case_id": "projection-good",
+      "file": "projection_cases/good.json"
+    },
+    {
+      "case_id": "projection-unknown-root",
+      "file": "projection_cases/unknown-root.json"
+    },
+    {
+      "case_id": "projection-candidate-inventory-mismatch",
+      "file": "projection_cases/candidate-inventory-mismatch.json"
+    },
+    {
+      "case_id": "projection-wrong-route",
+      "file": "projection_cases/wrong-route.json"
+    },
+    {
+      "case_id": "projection-stale-native-binding",
+      "file": "projection_cases/stale-native-binding.json"
+    }
+  ]
+}

@@ -1,0 +1,79 @@
+{
+  "schema_version": "researchguard.trace.unified_inference_approved_deltas.v1",
+  "policy_id": "researchguard.trace.inference-policy.v2",
+  "claim_boundary": "This inventory freezes maintained-example public status and structural-support ranges after the direct schema-v2 cutover. It is differential regression evidence, not factual calibration.",
+  "cases": [
+    {
+      "model": "examples/trace/hiring_as_weak_signal.yaml",
+      "trace_id": "trace_hiring",
+      "previous_status": "weak_signal",
+      "current_status": "weak_signal",
+      "support_min": 0.283236,
+      "support_max": 0.283238,
+      "delta_disposition": "retained weak-signal boundary under the unified objective"
+    },
+    {
+      "model": "examples/trace/incident_response_storyline.yaml",
+      "trace_id": "trace_metadata_incident",
+      "previous_status": "validated",
+      "current_status": "validated",
+      "support_min": 0.799532,
+      "support_max": 0.799535,
+      "delta_disposition": "retained validated incident chain under hard and typed temporal gates"
+    },
+    {
+      "model": "examples/trace/invalid_source_example.yaml",
+      "trace_id": "trace_invalid",
+      "previous_status": "insufficient",
+      "current_status": "insufficient",
+      "support_min": 0.0,
+      "support_max": 0.000001,
+      "delta_disposition": "hard invalid-source constraint preserved with no soft compensation"
+    },
+    {
+      "model": "examples/trace/operation_before_tender_contradiction.yaml",
+      "trace_id": "trace_delta",
+      "previous_status": "contradicted",
+      "current_status": "contradicted",
+      "support_min": 0.169999,
+      "support_max": 0.170001,
+      "delta_disposition": "retained blocking temporal contradiction"
+    },
+    {
+      "model": "examples/trace/patent_as_weak_signal.yaml",
+      "trace_id": "trace_patent",
+      "previous_status": "weak_signal",
+      "current_status": "weak_signal",
+      "support_min": 0.283236,
+      "support_max": 0.283238,
+      "delta_disposition": "retained patent-as-weak-signal boundary"
+    },
+    {
+      "model": "examples/trace/project_radar_hydrogen_trace.yaml",
+      "trace_id": "trace_rhine_h2",
+      "previous_status": "candidate",
+      "current_status": "candidate",
+      "support_min": 0.726675,
+      "support_max": 0.726678,
+      "delta_disposition": "retained bounded candidate status while depth coverage remains independently complete"
+    },
+    {
+      "model": "examples/trace/source_registry_only.yaml",
+      "trace_id": "trace_source_only",
+      "previous_status": "source_only",
+      "current_status": "source_only",
+      "support_min": 0.169999,
+      "support_max": 0.170001,
+      "delta_disposition": "retained source-only non-trace boundary"
+    },
+    {
+      "model": "examples/trace/structural_thesis_trace.yaml",
+      "trace_id": "trace-technology-to-method",
+      "previous_status": "candidate",
+      "current_status": "candidate",
+      "support_min": 0.414829,
+      "support_max": 0.414832,
+      "delta_disposition": "retained structural-handoff candidate boundary"
+    }
+  ]
+}

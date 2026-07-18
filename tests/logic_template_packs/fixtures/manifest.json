@@ -1,0 +1,19 @@
+{
+  "schema": "researchguard.logic.template-pack-fixtures.v1",
+  "cases": [
+    {"case_id": "ambiguity-purpose-argument", "kind": "request", "path": "cases/ambiguity-purpose-argument.json"},
+    {"case_id": "bad-field-conflict", "kind": "catalog_request_mutation", "path": "cases/bad-field-conflict.json"},
+    {"case_id": "bad-manifest-shape", "kind": "catalog_mutation", "path": "cases/bad-manifest-shape.json"},
+    {"case_id": "bad-missing-field-owner", "kind": "catalog_mutation", "path": "cases/bad-missing-field-owner.json"},
+    {"case_id": "bad-profile-shape", "kind": "catalog_mutation", "path": "cases/bad-profile-shape.json"},
+    {"case_id": "bad-stale-profile-digest", "kind": "catalog_mutation", "path": "cases/bad-stale-profile-digest.json"},
+    {"case_id": "bad-unknown-native-binding", "kind": "catalog_mutation", "path": "cases/bad-unknown-native-binding.json"},
+    {"case_id": "good-base", "kind": "request", "path": "cases/good-base.json"},
+    {"case_id": "good-compose-source-deepening", "kind": "request", "path": "cases/good-compose-source-deepening.json"},
+    {"case_id": "good-compose-synthesis-execution", "kind": "request", "path": "cases/good-compose-synthesis-execution.json"},
+    {"case_id": "good-direct-argument", "kind": "request", "path": "cases/good-direct-argument.json"},
+    {"case_id": "good-direct-purpose", "kind": "request", "path": "cases/good-direct-purpose.json"},
+    {"case_id": "good-dominance-structured", "kind": "request", "path": "cases/good-dominance-structured.json"},
+    {"case_id": "no-match", "kind": "request", "path": "cases/no-match.json"}
+  ]
+}

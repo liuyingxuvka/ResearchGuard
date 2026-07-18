@@ -1,0 +1,11 @@
+direction_id: root-cause
+case_id: metadata-api-incident
+title: Root cause and mitigation direction
+question: Did cache invalidation cause stale metadata reads, and what mitigation followed?
+status: open
+priority: high
+search_terms:
+  - cache invalidation stale metadata
+  - metadata api mitigation pr
+created_at: '2026-05-31T00:00:00+00:00'
+updated_at: '2026-05-31T00:00:00+00:00'

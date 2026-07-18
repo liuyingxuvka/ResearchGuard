@@ -1,0 +1,126 @@
+model:
+  id: engineering_efficiency_argument
+  title: "Efficiency improvement argument"
+  root_claim: C0
+
+nodes:
+  D0:
+    type: Document
+    text: "Technical report on transient system efficiency."
+    level: document
+  S_results:
+    type: Section
+    text: "Results section"
+    level: section
+  B_results:
+    type: ArgumentBlock
+    text: "Results block"
+    level: section
+  C0:
+    type: Claim
+    text: "The proposed control strategy improves transient system efficiency."
+    level: document
+    scope: "tested transient load profile"
+    confidence: 0.5
+  C1:
+    type: Claim
+    text: "Compressor power is reduced."
+    level: paragraph
+    scope: "tested transient load profile"
+    confidence: 0.8
+  C2:
+    type: Claim
+    text: "Useful stack output remains comparable."
+    level: paragraph
+    scope: "tested transient load profile"
+    confidence: 0.7
+  E1:
+    type: Evidence
+    text: "Simulation results show lower compressor power under the same load profile."
+    confidence: 0.8
+    scope: "tested transient load profile"
+  E2:
+    type: Evidence
+    text: "Stack voltage remains in the same operating range."
+    confidence: 0.7
+    scope: "tested transient load profile"
+  W1:
+    type: Warrant
+    text: "If auxiliary power decreases while useful output remains comparable, net system efficiency improves."
+    confidence: 0.75
+  A1:
+    type: Assumption
+    text: "Boundary conditions are comparable across both simulations."
+    confidence: 0.4
+    impact: high
+    unsupported: true
+  R1:
+    type: Rebuttal
+    text: "The lower compressor power may result from different air stoichiometry limits."
+    confidence: 0.6
+    active: true
+
+edges:
+  - source: E1
+    target: C1
+    type: supports
+    weight: 0.9
+  - source: E2
+    target: C2
+    type: supports
+    weight: 0.8
+  - source: C1
+    target: C0
+    type: supports
+    weight: 0.7
+  - source: C2
+    target: C0
+    type: supports
+    weight: 0.7
+  - source: W1
+    target: C0
+    type: supports
+    weight: 1.0
+  - source: A1
+    target: C0
+    type: depends_on
+    weight: 1.0
+  - source: R1
+    target: W1
+    type: undercuts
+    weight: 0.8
+
+acceptance:
+  C0:
+    all_of: [C1, C2, W1]
+    requires_not_out: [A1]
+    threshold: 0.65
+    no_undefeated_rebuttal: true
+    scope_match: true
+  C1:
+    all_of: [E1]
+    threshold: 0.6
+  C2:
+    all_of: [E2]
+    threshold: 0.6
+
+hierarchy:
+  D0: [S_results]
+  S_results: [B_results]
+  B_results: [E1, E2, C1, C2, W1, A1, R1, C0]
+
+blocks:
+  B_results:
+    title: "Results Section"
+    level: section
+    parent: S_results
+    input_nodes: [E1, E2, A1, R1]
+    internal_nodes: [W1, C1, C2]
+    output_claims: [C0]
+    local_assumptions: [A1]
+    local_rebuttals: [R1]
+    acceptance_conditions:
+      C0:
+        all_of: [C1, C2, W1]
+        requires_not_out: [A1]
+        threshold: 0.65

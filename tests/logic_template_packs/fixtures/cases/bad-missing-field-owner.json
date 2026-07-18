@@ -1,0 +1,11 @@
+{
+  "case_id": "bad-missing-field-owner",
+  "kind": "catalog_mutation",
+  "target": "profiles/argument.json",
+  "operations": [
+    {"op": "remove", "path": ["field_owners", "argument.root_claim"]}
+  ],
+  "recompute_profile_digest": true,
+  "recompute_catalog_digest": true,
+  "expected": {"load_status": "blocked", "finding_codes": ["field_owner_inventory_mismatch"]}
+}

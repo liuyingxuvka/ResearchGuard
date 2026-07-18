@@ -1,0 +1,39 @@
+{
+  "budget": 8,
+  "case_id": "logicguard-deep-role-complete",
+  "model": {
+    "edges": [
+      {"source": "E1", "target": "C0", "type": "supports"},
+      {"source": "W1", "target": "C0", "type": "supports"},
+      {"source": "A1", "target": "C0", "type": "depends_on"},
+      {"source": "L1", "target": "C0", "type": "qualifies"},
+      {"source": "R1", "target": "C0", "type": "attacks"}
+    ],
+    "model": {
+      "id": "logicguard-depth-regression",
+      "root_claim": "C0",
+      "target_units": [
+        {
+          "unit_id": "unit:central-argument",
+          "node_ids": ["C0", "E1", "W1", "A1", "L1", "R1"]
+        }
+      ],
+      "model_cards": [
+        {
+          "card_id": "card:central-argument",
+          "node_ids": ["C0", "E1", "W1", "A1", "L1", "R1"],
+          "importance": 1.0
+        }
+      ],
+      "role_dispositions": {"competition": "not_applicable"}
+    },
+    "nodes": {
+      "A1": {"confidence": 0.8, "importance": 0.7, "type": "Assumption"},
+      "C0": {"importance": 1.0, "text": "Bounded conclusion", "type": "Claim"},
+      "E1": {"confidence": 0.9, "importance": 0.95, "provided": true, "type": "Evidence"},
+      "L1": {"confidence": 0.8, "importance": 0.7, "type": "Limitation"},
+      "R1": {"active": false, "confidence": 0.8, "importance": 0.7, "type": "Rebuttal"},
+      "W1": {"confidence": 0.8, "importance": 0.95, "type": "Warrant"}
+    }
+  }
+}

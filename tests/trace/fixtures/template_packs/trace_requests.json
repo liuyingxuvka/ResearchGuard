@@ -1,0 +1,67 @@
+{
+  "cases": [
+    {
+      "name": "explicit-base",
+      "request": {
+        "request_id": "trace-fixture-base",
+        "intent_tags": ["unknown-intent"],
+        "subject": "service history",
+        "allow_base": true
+      },
+      "disposition": "base",
+      "selected": ["purpose"]
+    },
+    {
+      "name": "explicit-no-match",
+      "request": {
+        "request_id": "trace-fixture-no-match",
+        "intent_tags": ["unknown-intent"],
+        "subject": "service history",
+        "allow_base": false
+      },
+      "disposition": "no_match",
+      "selected": []
+    },
+    {
+      "name": "single-profile",
+      "request": {
+        "request_id": "trace-fixture-handoff",
+        "intent_tags": ["handoff"],
+        "subject": "paper section handoff"
+      },
+      "disposition": "selected",
+      "selected": ["handoff"]
+    },
+    {
+      "name": "strict-dominance",
+      "request": {
+        "request_id": "trace-fixture-causal",
+        "intent_tags": ["incident", "causal"],
+        "subject": "outage cause"
+      },
+      "disposition": "selected",
+      "selected": ["causal"]
+    },
+    {
+      "name": "safe-composition",
+      "request": {
+        "request_id": "trace-fixture-composition",
+        "intent_tags": ["research-lineage", "technology-progression"],
+        "subject": "electrolyzer development"
+      },
+      "disposition": "composed",
+      "selected": ["research-lineage", "technology-progression"]
+    },
+    {
+      "name": "request-blocked-composition",
+      "request": {
+        "request_id": "trace-fixture-ambiguous",
+        "intent_tags": ["research-lineage", "technology-progression"],
+        "subject": "electrolyzer development",
+        "allow_composition": false
+      },
+      "disposition": "ambiguous",
+      "selected": []
+    }
+  ]
+}

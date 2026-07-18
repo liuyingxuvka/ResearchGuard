@@ -1,0 +1,11 @@
+{
+  "case_id": "bad-unknown-native-binding",
+  "kind": "catalog_mutation",
+  "target": "profiles/argument.json",
+  "operations": [
+    {"op": "set", "path": ["native_binding", "route_id"], "value": "route:parallel-argument-engine"}
+  ],
+  "recompute_profile_digest": true,
+  "recompute_catalog_digest": true,
+  "expected": {"load_status": "blocked", "finding_codes": ["unknown_native_binding"]}
+}

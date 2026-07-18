@@ -1,0 +1,48 @@
+{
+  "schema": "researchguard.logic.template-pack-profile.v1",
+  "profile_id": "researchguard.logic.argument",
+  "profile_version": "1.0.0",
+  "family": "argument",
+  "is_base": false,
+  "selector": {
+    "purposes": [],
+    "required_capabilities": [
+      "argument"
+    ],
+    "context_tags_any": []
+  },
+  "strictly_dominates": [],
+  "composable_with": [],
+  "emitted_fields": {
+    "argument.acceptance": {
+      "$request": "acceptance"
+    },
+    "argument.claim_boundary": "This profile structures an argument request; it does not establish factual truth.",
+    "argument.root_claim": {
+      "$request": "root_claim"
+    }
+  },
+  "field_owners": {
+    "argument.acceptance": "researchguard.logic.argument",
+    "argument.claim_boundary": "researchguard.logic.argument",
+    "argument.root_claim": "researchguard.logic.argument"
+  },
+  "native_binding": {
+    "route_id": "route:logicguard-authoritative-depth",
+    "owner_callable": "researchguard.logic.argument_modeling:create_argument_model",
+    "owner_fingerprint": "8ebe1fc58f6526a2911b262c11b74248fc360bbd64393fdca0d10c2b224a3f8a",
+    "validators": [
+      {
+        "validator_id": "logicguard-template-pack:argument",
+        "callable": "researchguard.logic_template_packs.native_validators:validate_argument_profile",
+        "callable_fingerprint": "66d9bdc90123d18ba1226dbcaab369978f96ac50003a3ba5a2bd18685ed3bc56"
+      }
+    ]
+  },
+  "required_instance_fields": [
+    "argument.acceptance",
+    "argument.claim_boundary",
+    "argument.root_claim"
+  ],
+  "claim_boundary": "This profile validates the declared argument seed and its native binding, not the truth or sufficiency of the final argument."
+}

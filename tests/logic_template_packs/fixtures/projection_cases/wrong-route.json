@@ -1,0 +1,10 @@
+{
+  "fixture_id": "fixture:projection:wrong-route",
+  "mutation": {
+    "kind": "set-root-route",
+    "value": "route:logicguard:wrong"
+  },
+  "expected_codes": [
+    "native_route_mismatch"
+  ]
+}

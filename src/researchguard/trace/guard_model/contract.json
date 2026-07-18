@@ -1,0 +1,174 @@
+{
+  "schema_version": "researchguard.trace.guard_family_baseline.v1",
+  "contract_kind": "family_baseline",
+  "authority_scope": "family_capability_regression",
+  "production_authority": false,
+  "model_id": "researchguard.trace.inference.prevented-failure-contract",
+  "target_skill_id": "traceguard",
+  "native_owner_id": "researchguard.trace.inference",
+  "fixed_route_id": "researchguard.trace.inference",
+  "enforcement": "enforced",
+  "purpose": "Prove that the TraceGuard family exposes native oracles which can block unsupported, shallow, causally overclaimed, scope-overclaimed, or prediction-overclaimed temporal storylines when a task model explicitly selects them.",
+  "external_universe": {
+    "universe_id": "researchguard.trace.inference.failure-universe.v2",
+    "membership_rule": "Every failure class declared below is required, and every class owns exactly one target-native known-bad proof.",
+    "failure_class_ids": [
+      "missing-event-evidence",
+      "caller-output-authority",
+      "duplicate-lineage-overcount",
+      "hard-gate-compensation",
+      "solver-fallback",
+      "detached-explanation",
+      "perturbation-without-reinference",
+      "hidden-temporal-contradiction",
+      "chronology-promoted-to-causality",
+      "untested-critical-perturbation",
+      "shallow-trace-temporal-depth",
+      "unresolved-causal-confounder",
+      "expected-sensitivity-mismatch",
+      "internal-perturbation-promoted-to-prediction",
+      "bounded-scope-promoted-to-broad"
+    ]
+  },
+  "failure_classes": [
+    {
+      "failure_class_id": "missing-event-evidence",
+      "prevents": "An event or trace with no usable supporting evidence is accepted as a supported storyline.",
+      "native_oracle_id": "oracle:traceguard:missing-event-evidence",
+      "known_bad_case_id": "bad:missing-event-evidence"
+    },
+    {
+      "failure_class_id": "caller-output-authority",
+      "prevents": "Caller-authored final status, support, rank, or causal license is accepted as inference input.",
+      "native_oracle_id": "oracle:traceguard:caller-output-authority",
+      "known_bad_case_id": "bad:caller-output-authority"
+    },
+    {
+      "failure_class_id": "duplicate-lineage-overcount",
+      "prevents": "A syndicated or copied source from the same independence group accumulates as independent support.",
+      "native_oracle_id": "oracle:traceguard:duplicate-lineage-overcount",
+      "known_bad_case_id": "bad:duplicate-lineage-overcount"
+    },
+    {
+      "failure_class_id": "hard-gate-compensation",
+      "prevents": "Strong soft evidence compensates for an invalid-source or other hard admissibility constraint.",
+      "native_oracle_id": "oracle:traceguard:hard-gate-compensation",
+      "known_bad_case_id": "bad:hard-gate-compensation"
+    },
+    {
+      "failure_class_id": "solver-fallback",
+      "prevents": "A backend failure silently switches to heuristic or legacy scoring and still emits a validated result.",
+      "native_oracle_id": "oracle:traceguard:solver-fallback",
+      "known_bad_case_id": "bad:solver-fallback"
+    },
+    {
+      "failure_class_id": "detached-explanation",
+      "prevents": "A projection cites a factor or constraint that is absent from its canonical inference receipt.",
+      "native_oracle_id": "oracle:traceguard:detached-explanation",
+      "known_bad_case_id": "bad:detached-explanation"
+    },
+    {
+      "failure_class_id": "perturbation-without-reinference",
+      "prevents": "A scenario perturbation is treated as effective without a distinct transformed problem and canonical inference receipt.",
+      "native_oracle_id": "oracle:traceguard:perturbation-without-reinference",
+      "known_bad_case_id": "bad:perturbation-without-reinference"
+    },
+    {
+      "failure_class_id": "hidden-temporal-contradiction",
+      "prevents": "A time-order contradiction is hidden while the baseline storyline is licensed.",
+      "native_oracle_id": "oracle:traceguard:hidden-temporal-contradiction",
+      "known_bad_case_id": "bad:hidden-temporal-contradiction"
+    },
+    {
+      "failure_class_id": "chronology-promoted-to-causality",
+      "prevents": "Chronological order is promoted to a causal conclusion without a mechanism and confounder review.",
+      "native_oracle_id": "oracle:traceguard:chronology-promoted-to-causality",
+      "known_bad_case_id": "bad:chronology-promoted-to-causality"
+    },
+    {
+      "failure_class_id": "untested-critical-perturbation",
+      "prevents": "Broad closure passes while a model-derived critical perturbation remains unexecuted.",
+      "native_oracle_id": "oracle:traceguard:untested-critical-perturbation",
+      "known_bad_case_id": "bad:untested-critical-perturbation"
+    },
+    {
+      "failure_class_id": "shallow-trace-temporal-depth",
+      "prevents": "A broad trace passes with too few or badly distributed qualified event children.",
+      "native_oracle_id": "oracle:traceguard:shallow-trace-temporal-depth",
+      "known_bad_case_id": "bad:shallow-trace-temporal-depth"
+    },
+    {
+      "failure_class_id": "unresolved-causal-confounder",
+      "prevents": "An important causal storyline closes while a linked confounder remains unresolved.",
+      "native_oracle_id": "oracle:traceguard:unresolved-causal-confounder",
+      "known_bad_case_id": "bad:unresolved-causal-confounder"
+    },
+    {
+      "failure_class_id": "expected-sensitivity-mismatch",
+      "prevents": "A same-engine perturbation is accepted when its observed support delta contradicts its declared expected sensitivity.",
+      "native_oracle_id": "oracle:traceguard:expected-sensitivity-mismatch",
+      "known_bad_case_id": "bad:expected-sensitivity-mismatch"
+    },
+    {
+      "failure_class_id": "internal-perturbation-promoted-to-prediction",
+      "prevents": "Internal storyline perturbation is promoted to factual future prediction without a target-owned future holdout.",
+      "native_oracle_id": "oracle:traceguard:internal-perturbation-promoted-to-prediction",
+      "known_bad_case_id": "bad:internal-perturbation-promoted-to-prediction"
+    },
+    {
+      "failure_class_id": "bounded-scope-promoted-to-broad",
+      "prevents": "A bounded evaluation is presented as a broad storyline license.",
+      "native_oracle_id": "oracle:traceguard:bounded-scope-promoted-to-broad",
+      "known_bad_case_id": "bad:bounded-scope-promoted-to-broad"
+    }
+  ],
+  "required_proof": {
+    "known_good_count": 1,
+    "known_bad_per_failure_class": 1
+  },
+  "native_execution_contract": {
+    "production_check_id": "check:traceguard-native-depth",
+    "evidence_domain": "scheduled_production",
+    "important_obligation_ids": [
+      "obligation:traceguard-inference-integrity",
+      "obligation:traceguard-object-depth",
+      "obligation:traceguard-perturbation-depth",
+      "obligation:traceguard-prediction-boundary"
+    ],
+    "universe_policies": [
+      {
+        "universe_id": "universe:traceguard-inference-receipts",
+        "inventory_rule": "Project each canonical problem, solver-quality, solution, contribution, explanation, and perturbation receipt identity; every public projection must remain attached.",
+        "claim_scope": "broad"
+      },
+      {
+        "universe_id": "universe:traceguard-storyline-objects",
+        "inventory_rule": "Project every TraceGuard native object-depth row; every critical object must be validated.",
+        "claim_scope": "broad"
+      },
+      {
+        "universe_id": "universe:traceguard-perturbations",
+        "inventory_rule": "Project every model-derived perturbation candidate; every critical perturbation must be executed and validated.",
+        "claim_scope": "broad"
+      },
+      {
+        "universe_id": "universe:traceguard-trace-events",
+        "inventory_rule": "Project every eligible event of every trace and enforce the target-native square-root event floor across early, middle, and late strata.",
+        "claim_scope": "broad"
+      }
+    ],
+    "calibration_checks": [
+      {
+        "check_id": "check:traceguard-calibration-positive",
+        "case_kind": "positive",
+        "expected_status": "EXECUTION_DEPTH_PASS"
+      },
+      {
+        "check_id": "check:traceguard-calibration-shallow",
+        "case_kind": "shallow",
+        "expected_status": "SHALLOW_BLOCKED"
+      }
+    ]
+  },
+  "claim_boundary": "A passing proof shows only that the current bundled TraceGuard family runtime accepts the family known-good and blocks the catalogued family regression cases. It does not choose what any task model must prevent, does not substitute for a task-model-instance purpose contract and proof, and does not establish factual truth for an arbitrary investigation."
+}

@@ -1,0 +1,11 @@
+{
+  "case_id": "bad-manifest-shape",
+  "kind": "catalog_mutation",
+  "target": "manifest.json",
+  "operations": [
+    {"op": "remove", "path": ["catalog_version"]}
+  ],
+  "recompute_profile_digest": false,
+  "recompute_catalog_digest": false,
+  "expected": {"load_status": "blocked", "finding_codes": ["unknown_or_missing_fields"]}
+}

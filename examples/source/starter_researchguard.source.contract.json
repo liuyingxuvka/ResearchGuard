@@ -1,0 +1,21 @@
+{
+  "schema_version": "researchguard.source.model_guard_contract.v2",
+  "model_id": "starter-researchguard-source",
+  "purpose": "Prevent this starter search candidate from being treated as qualified independent support before its anchor passes SourceGuard qualification.",
+  "prevented_failures": [
+    {
+      "failure_id": "failure:starter:unqualified-independent-promotion",
+      "title": "Unqualified starter result is promoted as independent support",
+      "block_when": "the starter gap is treated as closed although its supplied anchor is not usable for the claim",
+      "oracle_id": "oracle:sourceguard:source-qualification",
+      "known_good": {"case_id": "good:starter:qualified-independent", "observation_path": "model-purpose-observation.yaml", "expected_native_status": "pass", "mutation_id": "", "expected_native_finding": ""},
+      "known_bad": {"case_id": "bad:starter:unqualified-independent", "observation_path": "model-purpose-observation.yaml", "expected_native_status": "blocked", "mutation_id": "make-all-anchors-unusable", "expected_native_finding": "gaps:gap-independent-1"}
+    }
+  ],
+  "external_universe": {"gap_ids": ["gap-independent-1"], "target_unit_ids": []},
+  "claim_boundary": "This starter model supports search planning only and cannot license broad source support or gap closure.",
+  "native_oracle_catalog_fingerprint": "2C01D891559625D9123F17E817B63B3E4E9323CA1C3EB81923B82D7DBDC79B15",
+  "purpose_frozen": true,
+  "purpose_freeze_sequence": 1,
+  "candidate_construction_sequence": 2
+}

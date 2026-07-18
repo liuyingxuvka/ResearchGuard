@@ -1,0 +1,11 @@
+{
+  "fixture_id": "fixture:projection:unknown-root",
+  "mutation": {
+    "kind": "set-root-field",
+    "field": "undeclared_authority",
+    "value": true
+  },
+  "expected_codes": [
+    "unknown_field"
+  ]
+}

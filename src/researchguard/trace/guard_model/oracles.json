@@ -1,0 +1,25 @@
+{
+  "schema_version": "researchguard.trace.guard_model_oracles.v1",
+  "contract_kind": "family_baseline",
+  "authority_scope": "family_capability_regression",
+  "production_authority": false,
+  "model_id": "researchguard.trace.inference.prevented-failure-contract",
+  "oracles": [
+    {"oracle_id": "oracle:traceguard:known-good", "scenario": "known_good", "native_decision": "pass"},
+    {"oracle_id": "oracle:traceguard:missing-event-evidence", "scenario": "missing_event_evidence", "native_decision": "blocked"},
+    {"oracle_id": "oracle:traceguard:caller-output-authority", "scenario": "caller_output_authority", "native_decision": "blocked"},
+    {"oracle_id": "oracle:traceguard:duplicate-lineage-overcount", "scenario": "duplicate_lineage_overcount", "native_decision": "blocked"},
+    {"oracle_id": "oracle:traceguard:hard-gate-compensation", "scenario": "hard_gate_compensation", "native_decision": "blocked"},
+    {"oracle_id": "oracle:traceguard:solver-fallback", "scenario": "solver_fallback", "native_decision": "blocked"},
+    {"oracle_id": "oracle:traceguard:detached-explanation", "scenario": "detached_explanation", "native_decision": "blocked"},
+    {"oracle_id": "oracle:traceguard:perturbation-without-reinference", "scenario": "perturbation_without_reinference", "native_decision": "blocked"},
+    {"oracle_id": "oracle:traceguard:hidden-temporal-contradiction", "scenario": "hidden_temporal_contradiction", "native_decision": "blocked"},
+    {"oracle_id": "oracle:traceguard:chronology-promoted-to-causality", "scenario": "chronology_promoted_to_causality", "native_decision": "blocked"},
+    {"oracle_id": "oracle:traceguard:untested-critical-perturbation", "scenario": "untested_critical_perturbation", "native_decision": "blocked"},
+    {"oracle_id": "oracle:traceguard:shallow-trace-temporal-depth", "scenario": "shallow_trace_temporal_depth", "native_decision": "blocked"},
+    {"oracle_id": "oracle:traceguard:unresolved-causal-confounder", "scenario": "unresolved_causal_confounder", "native_decision": "blocked"},
+    {"oracle_id": "oracle:traceguard:expected-sensitivity-mismatch", "scenario": "expected_sensitivity_mismatch", "native_decision": "blocked"},
+    {"oracle_id": "oracle:traceguard:internal-perturbation-promoted-to-prediction", "scenario": "internal_perturbation_promoted_to_prediction", "native_decision": "blocked"},
+    {"oracle_id": "oracle:traceguard:bounded-scope-promoted-to-broad", "scenario": "bounded_scope_promoted_to_broad", "native_decision": "blocked"}
+  ]
+}

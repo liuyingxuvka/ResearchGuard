@@ -1,0 +1,11 @@
+{
+  "case_id": "bad-stale-profile-digest",
+  "kind": "catalog_mutation",
+  "target": "profiles/argument.json",
+  "operations": [
+    {"op": "set", "path": ["claim_boundary"], "value": "Changed without updating the declared content identity."}
+  ],
+  "recompute_profile_digest": false,
+  "recompute_catalog_digest": false,
+  "expected": {"load_status": "blocked", "finding_codes": ["stale_profile_digest"]}
+}

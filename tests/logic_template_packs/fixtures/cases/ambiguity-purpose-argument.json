@@ -1,0 +1,18 @@
+{
+  "case_id": "ambiguity-purpose-argument",
+  "kind": "request",
+  "request": {
+    "purpose": "make two unrelated families match",
+    "capabilities": ["purpose", "argument"],
+    "context_tags": [],
+    "allow_base": true,
+    "parameters": {}
+  },
+  "expected": {
+    "decision": "ambiguous",
+    "candidate_ids": ["researchguard.logic.argument", "researchguard.logic.purpose"],
+    "selected_profile_ids": [],
+    "finding_codes": ["composition_not_declared", "no_complete_dominator"],
+    "build_status": "blocked"
+  }
+}

@@ -1,0 +1,92 @@
+observation_id: observation:example-model-purpose-good
+observed_sources:
+  - source_id: source:purpose:fuel-primary
+    source_type: report
+    source_status: saved
+    source_reliability: 0.9
+    source_role: primary_source
+    lineage_id: lineage:purpose:fuel-primary
+    access_status: public
+  - source_id: source:purpose:visual
+    source_type: report
+    source_status: saved
+    source_reliability: 0.9
+    source_role: visual_evidence
+    lineage_id: lineage:purpose:visual
+    access_status: public
+  - source_id: source:purpose:history
+    source_type: paper
+    source_status: saved
+    source_reliability: 0.9
+    source_role: historical_background
+    lineage_id: lineage:purpose:history
+    access_status: public
+  - source_id: source:purpose:independent
+    source_type: report
+    source_status: saved
+    source_reliability: 0.9
+    source_role: independent_report
+    lineage_id: lineage:purpose:independent
+    access_status: public
+  - source_id: source:purpose:bridge
+    source_type: paper
+    source_status: saved
+    source_reliability: 0.9
+    source_role: bridge_evidence
+    lineage_id: lineage:purpose:bridge
+    access_status: public
+observed_anchors:
+  - anchor_id: anchor:purpose:fuel-primary
+    source_id: source:purpose:fuel-primary
+    anchor_type: paragraph
+    locator: section=deployment;paragraph=1
+    normalized_summary: Qualified primary material addresses the weak-signal gap.
+    modality: text
+    extraction_confidence: 0.9
+    specificity: 0.9
+    supports: [gap-weak-signal]
+    usable_for_claim: true
+  - anchor_id: anchor:purpose:visual
+    source_id: source:purpose:visual
+    anchor_type: image
+    locator: figure=1
+    normalized_summary: Qualified visual material addresses the visual-anchor gap.
+    modality: image
+    extraction_confidence: 0.9
+    specificity: 0.9
+    supports: [gap-visual]
+    usable_for_claim: true
+  - anchor_id: anchor:purpose:history
+    source_id: source:purpose:history
+    anchor_type: paragraph
+    locator: section=baseline;paragraph=2
+    normalized_summary: Qualified historical material addresses the baseline gap.
+    modality: text
+    extraction_confidence: 0.9
+    specificity: 0.9
+    supports: [gap-baseline]
+    usable_for_claim: true
+  - anchor_id: anchor:purpose:independent
+    source_id: source:purpose:independent
+    anchor_type: paragraph
+    locator: section=results;paragraph=3
+    normalized_summary: Qualified independent material addresses the starter gap.
+    modality: text
+    extraction_confidence: 0.9
+    specificity: 0.9
+    supports: [gap-independent-1]
+    usable_for_claim: true
+  - anchor_id: anchor:purpose:bridge
+    source_id: source:purpose:bridge
+    anchor_type: paragraph
+    locator: section=method;paragraph=4
+    normalized_summary: Qualified bridge material addresses the structural method gap.
+    modality: text
+    extraction_confidence: 0.9
+    specificity: 0.9
+    supports: [gap-structural-method-bridge]
+    usable_for_claim: true
+new_entities: []
+new_leads: []
+new_gaps: []
+contradictions: []

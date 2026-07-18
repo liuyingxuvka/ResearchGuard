@@ -1,0 +1,67 @@
+{
+  "cases": [
+    {
+      "name": "explicit-base",
+      "request": {
+        "request_id": "source-fixture-base",
+        "intent_tags": ["unknown-intent"],
+        "subject": "hydrogen project",
+        "allow_base": true
+      },
+      "disposition": "base",
+      "selected": ["discovery"]
+    },
+    {
+      "name": "explicit-no-match",
+      "request": {
+        "request_id": "source-fixture-no-match",
+        "intent_tags": ["unknown-intent"],
+        "subject": "hydrogen project",
+        "allow_base": false
+      },
+      "disposition": "no_match",
+      "selected": []
+    },
+    {
+      "name": "single-profile",
+      "request": {
+        "request_id": "source-fixture-numeric",
+        "intent_tags": ["numeric-provenance"],
+        "subject": "electrolyzer efficiency"
+      },
+      "disposition": "selected",
+      "selected": ["numeric-provenance"]
+    },
+    {
+      "name": "strict-dominance",
+      "request": {
+        "request_id": "source-fixture-dominance",
+        "intent_tags": ["citation", "disconfirming"],
+        "subject": "deployment claim"
+      },
+      "disposition": "selected",
+      "selected": ["disconfirming"]
+    },
+    {
+      "name": "safe-composition",
+      "request": {
+        "request_id": "source-fixture-composition",
+        "intent_tags": ["citation", "lineage"],
+        "subject": "research lineage"
+      },
+      "disposition": "composed",
+      "selected": ["citation", "lineage"]
+    },
+    {
+      "name": "request-blocked-composition",
+      "request": {
+        "request_id": "source-fixture-ambiguous",
+        "intent_tags": ["citation", "lineage"],
+        "subject": "research lineage",
+        "allow_composition": false
+      },
+      "disposition": "ambiguous",
+      "selected": []
+    }
+  ]
+}

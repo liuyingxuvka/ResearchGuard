@@ -1,0 +1,21 @@
+{
+  "case_id": "good-direct-argument",
+  "kind": "request",
+  "request": {
+    "purpose": "model one bounded argument",
+    "capabilities": ["argument"],
+    "context_tags": ["review"],
+    "allow_base": false,
+    "parameters": {
+      "root_claim": "The proposed conclusion is licensed within the declared scope.",
+      "acceptance": ["premises are declared", "scope is bounded"]
+    }
+  },
+  "expected": {
+    "decision": "selected",
+    "candidate_ids": ["researchguard.logic.argument"],
+    "selected_profile_ids": ["researchguard.logic.argument"],
+    "finding_codes": [],
+    "build_status": "valid"
+  }
+}

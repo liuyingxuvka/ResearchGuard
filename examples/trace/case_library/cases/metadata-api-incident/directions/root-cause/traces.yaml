@@ -1,0 +1,14 @@
+- trace_id: trace_metadata_incident
+  title: Metadata API root-cause storyline
+  trace_type: incident_storyline
+  event_ids:
+    - event_error_spike
+    - event_triage
+    - event_mitigation
+  entity_ids:
+    - ent_service
+    - ent_cache
+  location_ids: []
+  current_stage: unknown
+  claim: Metadata API incident likely involved cache invalidation and mitigation PR.
+  notes: Case-library generated trace; permanent resolution is still a gap.

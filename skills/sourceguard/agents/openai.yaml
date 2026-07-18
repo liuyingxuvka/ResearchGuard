@@ -1,0 +1,4 @@
+interface:
+  display_name: "SourceGuard"
+  short_description: "Plan evidence discovery and qualify source use"
+  default_prompt: "Use $sourceguard to plan and qualify the evidence needed for this claim."

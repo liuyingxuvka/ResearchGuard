@@ -1,0 +1,96 @@
+model:
+  id: ai_generated_answer_audit
+  title: "AI generated answer logic audit"
+  root_claim: C0
+
+nodes:
+  D0:
+    type: Document
+    text: "Audit of an AI answer."
+  S_answer:
+    type: Section
+    text: "Answer body"
+  C0:
+    type: Claim
+    text: "This library guarantees the fastest inference for every Python project."
+    scope: "all Python projects"
+    confidence: 0.4
+  C1:
+    type: Claim
+    text: "The library is fast on the benchmark used in the answer."
+    scope: "single benchmark"
+    confidence: 0.65
+  E1:
+    type: Evidence
+    text: "A blog benchmark reports lower latency on one transformer workload."
+    confidence: 0.55
+    scope: "single benchmark"
+  K1:
+    type: Context
+    text: "The library has many GitHub stars and active development."
+    confidence: 0.8
+  A1:
+    type: Assumption
+    text: "The benchmark workload represents every Python project."
+    confidence: 0.2
+    hidden: true
+    impact: high
+  R1:
+    type: Rebuttal
+    text: "Inference speed depends on model size, hardware, batch shape, and backend."
+    confidence: 0.85
+    active: true
+  U1:
+    type: Undercutter
+    text: "Popularity does not show runtime performance."
+    confidence: 0.9
+    active: true
+  W1:
+    type: Warrant
+    text: "A benchmark supports a performance claim only for comparable workloads and hardware."
+    confidence: 0.75
+
+edges:
+  - source: E1
+    target: C1
+    type: supports
+    weight: 0.8
+  - source: C1
+    target: C0
+    type: supports
+    weight: 0.6
+  - source: K1
+    target: C0
+    type: supports
+    weight: 0.2
+  - source: W1
+    target: C0
+    type: supports
+    weight: 0.7
+  - source: A1
+    target: C0
+    type: depends_on
+    weight: 0.9
+  - source: R1
+    target: C0
+    type: attacks
+    weight: 0.8
+  - source: U1
+    target: W1
+    type: undercuts
+    weight: 0.8
+
+acceptance:
+  C1:
+    all_of: [E1]
+    threshold: 0.5
+  C0:
+    all_of: [C1, W1]
+    requires_not_out: [A1]
+    threshold: 0.75
+    no_undefeated_rebuttal: true
+    scope_match: true
+
+hierarchy:
+  D0: [S_answer]
+  S_answer: [K1, E1, C1, W1, A1, R1, U1, C0]

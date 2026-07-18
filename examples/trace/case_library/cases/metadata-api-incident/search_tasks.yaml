@@ -1,0 +1,4 @@
+- task_id: search_resolution_confirmation
+  question: Find a post-incident source confirming permanent fix status.
+  status: open
+  priority: high

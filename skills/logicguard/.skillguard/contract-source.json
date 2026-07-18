@@ -1,0 +1,204 @@
+{
+  "schema_version": "skillguard.contract_source.v2",
+  "skill_id": "logicguard",
+  "repository_role": "skill_maintainer_source",
+  "maintenance_unit_id": "unit:researchguard-suite",
+  "member_skill_ids": [
+    "researchguard",
+    "logicguard",
+    "sourceguard",
+    "traceguard"
+  ],
+  "consumer_projection": {
+    "projection_id": "projection:consumer-distribution",
+    "prohibited_path_prefixes": [
+      ".skillguard/"
+    ],
+    "prohibited_prompt_tokens": [
+      "SkillGuard",
+      ".skillguard",
+      "skillguard.py"
+    ],
+    "release_manifest_path": "consumer-release.json"
+  },
+  "model_id": "researchguard.logicguard.contract.current",
+  "model_path": ".flowguard/logicguard_skill_contract_model.py",
+  "confirmed": true,
+  "integration_mode": "native-integrated",
+  "native_route_owner": "owner:researchguard:logicguard",
+  "may_define_parallel_execution_route": false,
+  "may_define_skillguard_runtime_route": false,
+  "native_route_bindings": [
+    {
+      "binding_id": "native:researchguard:logicguard",
+      "native_route_id": "route:researchguard:logicguard",
+      "required_before_closure": true,
+      "source": "skills/logicguard/SKILL.md"
+    }
+  ],
+  "native_check_bindings": [
+    {
+      "binding_id": "native-check:researchguard:logicguard:consumer-contract",
+      "native_check_id": "check:logicguard:consumer-contract",
+      "required": true,
+      "evidence_source": "scripts/check_researchguard_suite.py"
+    },
+    {
+      "binding_id": "native-check:researchguard:logicguard:native-tests",
+      "native_check_id": "check:logicguard:native-tests",
+      "required": true,
+      "evidence_source": "tests"
+    }
+  ],
+  "implementation_paths": [
+    "skills/logicguard",
+    "src/researchguard/logic",
+    "src/researchguard/logic_template_packs",
+    "src/researchguard/logic_viewer",
+    "tests/logic"
+  ],
+  "step_bindings": [
+    {
+      "step_id": "step:researchguard:logicguard:contract",
+      "action": {
+        "kind": "native",
+        "summary": "Validate the exact current consumer skill and route boundary."
+      },
+      "check_ids": [
+        "check:logicguard:consumer-contract"
+      ],
+      "output_artifact_ids": []
+    },
+    {
+      "step_id": "step:researchguard:logicguard:tests",
+      "action": {
+        "kind": "native",
+        "summary": "Execute the member-owned current native regression suite."
+      },
+      "check_ids": [
+        "check:logicguard:native-tests"
+      ],
+      "output_artifact_ids": []
+    }
+  ],
+  "checks": [
+    {
+      "check_id": "check:logicguard:consumer-contract",
+      "maintenance_unit_id": "unit:researchguard-suite",
+      "member_skill_id": "logicguard",
+      "evidence_subject_id": "subject:researchguard:logicguard:consumer-contract",
+      "semantic_check_id": "semantic:researchguard:logicguard:consumer-contract:current",
+      "kind": "command",
+      "command": "python",
+      "args": [
+        "scripts/check_researchguard_suite.py",
+        "--member",
+        "logicguard",
+        "--json"
+      ],
+      "cwd_token": "repository_root",
+      "input_selectors": [
+        {
+          "kind": "path",
+          "path": "skills/logicguard/SKILL.md"
+        },
+        {
+          "kind": "path",
+          "path": "skills/logicguard/agents/openai.yaml"
+        },
+        {
+          "kind": "path",
+          "path": "scripts/check_researchguard_suite.py"
+        },
+        {
+          "kind": "path",
+          "path": ".flowguard/logicguard_skill_contract_model.py"
+        },
+        {
+          "kind": "path",
+          "path": ".flowguard/researchguard_skill_contract_model_common.py"
+        }
+      ],
+      "expected": {
+        "exit_code": 0
+      },
+      "timeout_seconds": 60,
+      "evidence_class": "hard",
+      "evidence_domain_id": "evidence-domain:researchguard:logicguard:consumer-contract",
+      "execution_owner_id": "owner:researchguard:logicguard:consumer-contract",
+      "native_route_id": "route:researchguard:logicguard",
+      "depends_on_check_ids": [],
+      "covers_obligation_ids": [
+        "obligation:researchguard:logicguard:consumer-contract"
+      ],
+      "coverage_scope": "declared_obligations",
+      "coverage_rationale": "This check is the sole execution owner for its exact member obligation."
+    },
+    {
+      "check_id": "check:logicguard:native-tests",
+      "maintenance_unit_id": "unit:researchguard-suite",
+      "member_skill_id": "logicguard",
+      "evidence_subject_id": "subject:researchguard:logicguard:native-tests",
+      "semantic_check_id": "semantic:researchguard:logicguard:native-tests:current",
+      "kind": "command",
+      "command": "python",
+      "args": [
+        "-m",
+        "pytest",
+        "tests/logic",
+        "-q"
+      ],
+      "cwd_token": "repository_root",
+      "input_selectors": [
+        {
+          "kind": "subtree",
+          "path": "skills/logicguard"
+        },
+        {
+          "kind": "subtree",
+          "path": "src/researchguard/logic"
+        },
+        {
+          "kind": "subtree",
+          "path": "src/researchguard/logic_template_packs"
+        },
+        {
+          "kind": "subtree",
+          "path": "src/researchguard/logic_viewer"
+        },
+        {
+          "kind": "subtree",
+          "path": "tests/logic"
+        }
+      ],
+      "expected": {
+        "exit_code": 0
+      },
+      "timeout_seconds": 900,
+      "evidence_class": "hard",
+      "evidence_domain_id": "evidence-domain:researchguard:logicguard:native-tests",
+      "execution_owner_id": "owner:researchguard:logicguard:native-tests",
+      "native_route_id": "route:researchguard:logicguard",
+      "depends_on_check_ids": [
+        "check:logicguard:consumer-contract"
+      ],
+      "covers_obligation_ids": [
+        "obligation:researchguard:logicguard:native-tests"
+      ],
+      "coverage_scope": "declared_obligations",
+      "coverage_rationale": "This check is the sole execution owner for its exact member obligation."
+    }
+  ],
+  "artifacts": [],
+  "closure_profiles": [
+    {
+      "profile_id": "enforced",
+      "required_obligation_ids": [
+        "obligation:researchguard:logicguard:consumer-contract",
+        "obligation:researchguard:logicguard:native-tests"
+      ]
+    }
+  ],
+  "judgment_rubrics": [],
+  "claim_boundary": "This contract covers the current logicguard consumer projection, native route, and member-owned tests inside ResearchGuard v0.1.0. It does not prove source truth, unrun external work, installation, publication, or future AI behavior."
+}

@@ -1,0 +1,50 @@
+{
+  "schema": "researchguard.logic.template-pack-profile.v1",
+  "profile_id": "researchguard.logic.source-library",
+  "profile_version": "1.0.0",
+  "family": "source-library",
+  "is_base": false,
+  "selector": {
+    "purposes": [],
+    "required_capabilities": [
+      "source-library"
+    ],
+    "context_tags_any": []
+  },
+  "strictly_dominates": [],
+  "composable_with": [
+    "researchguard.logic.deepening"
+  ],
+  "emitted_fields": {
+    "source.claim_boundary": "This profile preserves declared source registry and provenance inputs; it does not validate source truth.",
+    "source.provenance": {
+      "$request": "source_provenance"
+    },
+    "source.registry": {
+      "$request": "source_registry"
+    }
+  },
+  "field_owners": {
+    "source.claim_boundary": "researchguard.logic.source-library",
+    "source.provenance": "researchguard.logic.source-library",
+    "source.registry": "researchguard.logic.source-library"
+  },
+  "native_binding": {
+    "route_id": "route:researchguard.logic:source-library",
+    "owner_callable": "researchguard.logic.source_library:SourceLibrary",
+    "owner_fingerprint": "089d8ba2cc6ce36ff05811b386f85f9cae65302482f5a1a09c5750342b06c216",
+    "validators": [
+      {
+        "validator_id": "logicguard-template-pack:source-library",
+        "callable": "researchguard.logic_template_packs.native_validators:validate_source_library_profile",
+        "callable_fingerprint": "c7cbc23871b63a625f4e8b76793c2b74a5cc9478e64091abd416d2a5d732edde"
+      }
+    ]
+  },
+  "required_instance_fields": [
+    "source.claim_boundary",
+    "source.provenance",
+    "source.registry"
+  ],
+  "claim_boundary": "This profile validates source-library request structure, field ownership, and current native binding only."
+}

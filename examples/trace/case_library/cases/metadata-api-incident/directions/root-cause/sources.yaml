@@ -1,0 +1,45 @@
+- source_id: src_log
+  lineage_id: lineage_log
+  independence_group: source_log
+  title: Service error log
+  url: null
+  source_type: log
+  source_reliability: 0.86
+  source_status: stable_keep
+  cleaning_category: null
+  source_date: '2026-05-12'
+  notes: Error spike source.
+  case_id: metadata-api-incident
+  direction_id: root-cause
+  library_status: saved
+  added_at: '2026-05-31T00:00:00+00:00'
+- source_id: src_issue
+  lineage_id: lineage_issue
+  independence_group: source_issue
+  title: Incident tracking issue
+  url: null
+  source_type: issue
+  source_reliability: 0.82
+  source_status: stable_keep
+  cleaning_category: null
+  source_date: '2026-05-12'
+  notes: Triage source.
+  case_id: metadata-api-incident
+  direction_id: root-cause
+  library_status: saved
+  added_at: '2026-05-31T00:00:00+00:00'
+- source_id: src_pr
+  lineage_id: lineage_pr
+  independence_group: source_pr
+  title: Mitigation pull request
+  url: null
+  source_type: pr
+  source_reliability: 0.84
+  source_status: stable_keep
+  cleaning_category: null
+  source_date: '2026-05-13'
+  notes: Mitigation source.
+  case_id: metadata-api-incident
+  direction_id: root-cause
+  library_status: saved
+  added_at: '2026-05-31T00:00:00+00:00'

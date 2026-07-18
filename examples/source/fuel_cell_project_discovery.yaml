@@ -1,0 +1,256 @@
+guard_contract:
+  schema_version: researchguard.source.model_guard_contract.v2
+  model_id: fuel_cell_project_discovery
+  purpose: Prevent a weak fuel-cell deployment signal from being promoted before a claim-usable primary anchor is observed.
+  prevented_failures:
+  - failure_id: failure:fuel-cell:unqualified-deployment-signal
+    title: Weak deployment signal is promoted as qualified project evidence
+    block_when: the weak-signal gap is treated as closed although its primary anchor is not claim-usable
+    oracle_id: oracle:sourceguard:source-qualification
+    known_good:
+      case_id: good:fuel-cell:qualified-primary
+      observation_path: model-purpose-observation.yaml
+      expected_native_status: pass
+      mutation_id: ''
+      expected_native_finding: ''
+    known_bad:
+      case_id: bad:fuel-cell:unqualified-primary
+      observation_path: model-purpose-observation.yaml
+      expected_native_status: blocked
+      mutation_id: make-all-anchors-unusable
+      expected_native_finding: gaps:gap-weak-signal
+  external_universe:
+    gap_ids:
+    - gap-execution
+    - gap-independent
+    - gap-location
+    - gap-weak-signal
+    target_unit_ids: []
+  claim_boundary: Weak signals are source candidates, not deployment proof.
+  native_oracle_catalog_fingerprint: 2C01D891559625D9123F17E817B63B3E4E9323CA1C3EB81923B82D7DBDC79B15
+  purpose_frozen: true
+  purpose_freeze_sequence: 1
+  candidate_construction_sequence: 2
+candidate_contract_fingerprint: 1AF12F1FC5258485C5E3EC389AF085E744F5100C8C10228CEA313896EF0F0A5F
+metadata:
+  purpose: Investigate whether a fuel cell project is deployed or operating.
+  repository: https://github.com/liuyingxuvka/ResearchGuard
+  skill: SourceGuard
+  math_boundary: POMDP-inspired approximate planner; utility ranks source discovery value, not truth.
+  cli: researchguard source plan examples/fuel_cell_project_discovery.yaml --model-contract examples/fuel_cell_project_discovery.contract.json
+    --pretty
+  boundary: Weak signals are source candidates, not deployment proof.
+  version: 0.1.0
+  source_policy: public_only
+  domain_hints:
+  - fuel cell
+  - named industrial park
+  - project operation
+  qualification_thresholds:
+    source_reliability: 0.5
+    extraction_confidence: 0.5
+    specificity: 0.5
+leads:
+- lead_id: fuel-cell-deployment
+  question: Has the named fuel cell project been deployed or operated?
+  hypothesis: Company-facing signals may point to a real deployment, but execution evidence is missing.
+  importance: 0.95
+  status: supported_incomplete
+  related_entities:
+  - Example FuelCellCo
+  - Example Industrial Park
+  related_sources:
+  - src-company-pr
+  - src-patent
+  - src-hiring
+  - src-government-page
+  related_anchors: []
+  gaps:
+  - gap-weak-signal
+  - gap-execution
+  - gap-location
+  - gap-independent
+sources:
+- source_id: src-company-pr
+  title: Company press release announcing fuel cell project
+  source_type: web_page
+  url: https://example.invalid/company-pr
+  source_status: candidate
+  source_reliability: 0.4
+  source_role: official_claim
+  source_date: '2025-06-12'
+  coverage_period: '2025'
+  language: en
+  country: US
+  access_status: public
+  notes: One-sided official claim; not deployment proof.
+- source_id: src-patent
+  title: Fuel cell control patent
+  source_type: patent
+  url: https://example.invalid/patent
+  source_status: candidate
+  source_reliability: 0.5
+  source_role: hypothesis_source
+  source_date: '2024-10-01'
+  coverage_period: 2023-2024
+  language: en
+  country: US
+  access_status: public
+  notes: Technical signal only.
+- source_id: src-hiring
+  title: Hiring page mentioning fuel cell operators
+  source_type: web_page
+  url: https://example.invalid/jobs
+  source_status: candidate
+  source_reliability: 0.3
+  source_role: hypothesis_source
+  source_date: '2025-03-20'
+  coverage_period: '2025'
+  language: en
+  country: US
+  access_status: public
+  notes: Hiring is a weak signal.
+- source_id: src-government-page
+  title: Government project listing candidate
+  source_type: government_record
+  url: https://example.invalid/government-project
+  source_status: candidate
+  source_reliability: 0.6
+  source_role: primary_source
+  source_date: '2025-07-01'
+  coverage_period: '2025'
+  language: en
+  country: US
+  access_status: public
+  notes: Candidate official record; needs anchors.
+anchors: []
+gaps:
+- gap_id: gap-weak-signal
+  lead_id: fuel-cell-deployment
+  gap_type: weak_signal_only
+  description: Current material is mostly company, patent, and hiring signals.
+  importance: 0.9
+  blocking: true
+  suggested_source_roles:
+  - primary_source
+  - independent_report
+  - counter_evidence
+  suggested_modalities:
+  - text
+  semantic_state: discovered
+  requires_claim_usability: true
+- gap_id: gap-execution
+  lead_id: fuel-cell-deployment
+  gap_type: missing_execution_evidence
+  description: No anchored evidence that the project has operated or delivered output.
+  importance: 1.0
+  blocking: true
+  suggested_source_roles:
+  - primary_source
+  - independent_report
+  - visual_evidence
+  suggested_modalities:
+  - text
+  - image
+  - video
+  - pdf_page
+  semantic_state: discovered
+  requires_claim_usability: true
+- gap_id: gap-location
+  lead_id: fuel-cell-deployment
+  gap_type: missing_location
+  description: Project site location is not anchored.
+  importance: 0.8
+  blocking: true
+  suggested_source_roles:
+  - primary_source
+  - visual_evidence
+  suggested_modalities:
+  - map
+  - image
+  semantic_state: discovered
+  requires_claim_usability: true
+- gap_id: gap-independent
+  lead_id: fuel-cell-deployment
+  gap_type: missing_independent_source
+  description: No independent local media, regulator, or procurement source has been recorded.
+  importance: 0.9
+  blocking: true
+  suggested_source_roles:
+  - independent_report
+  - limiting_evidence
+  suggested_modalities:
+  - text
+  - pdf_page
+  semantic_state: discovered
+  requires_claim_usability: true
+actions:
+- action_id: action-government-records
+  action_type: source_domain_search
+  query: Example FuelCellCo project government record procurement operating permit
+  target_lead_id: fuel-cell-deployment
+  target_gap_id: gap-execution
+  expected_source_role: primary_source
+  expected_modality: text
+  source_policy: public_only
+  cost: 0.4
+  permission_risk: 0.0
+  status: proposed
+  parameters:
+    domain_hint: government_records
+- action_id: action-site-photos
+  action_type: image_search
+  query: Example Industrial Park fuel cell project site photo
+  target_lead_id: fuel-cell-deployment
+  target_gap_id: gap-location
+  expected_source_role: visual_evidence
+  expected_modality: image
+  source_policy: public_only
+  cost: 0.5
+  permission_risk: 0.0
+  status: proposed
+  parameters: {}
+- action_id: action-local-media
+  action_type: text_search
+  query: Example FuelCellCo fuel cell project local media operation
+  target_lead_id: fuel-cell-deployment
+  target_gap_id: gap-independent
+  expected_source_role: independent_report
+  expected_modality: text
+  source_policy: public_only
+  cost: 0.3
+  permission_risk: 0.0
+  status: proposed
+  parameters: {}
+- action_id: action-procurement
+  action_type: source_domain_search
+  query: Example FuelCellCo fuel cell procurement bid contract
+  target_lead_id: fuel-cell-deployment
+  target_gap_id: gap-execution
+  expected_source_role: primary_source
+  expected_modality: pdf_page
+  source_policy: public_only
+  cost: 0.5
+  permission_risk: 0.0
+  status: proposed
+  parameters:
+    record_type: procurement
+- action_id: action-counter
+  action_type: counterevidence_search
+  query: Example FuelCellCo fuel cell project delayed cancelled not operating
+  target_lead_id: fuel-cell-deployment
+  target_gap_id: gap-weak-signal
+  expected_source_role: counter_evidence
+  expected_modality: text
+  source_policy: public_only
+  cost: 0.3
+  permission_risk: 0.0
+  status: proposed
+  parameters: {}
+observations: []
+graph_edges:
+- source: src-company-pr
+  target: fuel-cell-deployment
+  edge_type: candidate_for
+  notes: Company claim opens source discovery lead.
+weights: {}

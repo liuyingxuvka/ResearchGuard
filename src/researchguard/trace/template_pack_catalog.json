@@ -1,0 +1,1086 @@
+{
+  "schema_id": "guard-template-pack.catalog.v2",
+  "guard_family": "traceguard",
+  "catalog_id": "researchguard.trace.template-pack.catalog",
+  "catalog_version": "2.0.0",
+  "base_profile_id": "purpose",
+  "claim_boundary": "TraceGuard template instances are non-factual model skeletons; source rows are not evidence, evidence must precede events, events must precede traces, and generated traces are not validated.",
+  "native_binding": {
+    "adapter_id": "researchguard.trace.template_packs",
+    "validator_id": "researchguard.trace.template_packs.validate_native_payload",
+    "schema_owner_id": "researchguard.trace.schema.TraceGuardModel.from_dict",
+    "reference_validator_id": "researchguard.trace.validation.validate_references",
+    "command_spec_owner_id": "researchguard.trace.cli.build_parser"
+  },
+  "profiles": [
+    {
+      "profile_id": "purpose",
+      "profile_version": "2.0.0",
+      "priority": 10,
+      "selector": {
+        "required_intents": [
+          "purpose"
+        ],
+        "excluded_intents": []
+      },
+      "strict_dominates": [],
+      "composition": {
+        "allowed": true,
+        "compatible_with": [
+          "incident",
+          "causal",
+          "competing-storyline",
+          "counterfactual",
+          "handoff",
+          "research-lineage",
+          "technology-progression",
+          "case-library"
+        ]
+      },
+      "owned_fields": [
+        "sources/purpose",
+        "evidence/purpose",
+        "events/purpose",
+        "traces/purpose"
+      ],
+      "native_binding": {
+        "command_id": "validate"
+      },
+      "fragment": {
+        "source": {
+          "source_id": "src_purpose",
+          "lineage_id": "lineage_purpose",
+          "independence_group": "group_purpose",
+          "title": "Purpose-bounded trace source for {subject}",
+          "url": null,
+          "source_type": "other",
+          "source_reliability": 0.5,
+          "source_status": "stable_keep",
+          "notes": "Template profile purpose; source row is not evidence."
+        },
+        "evidence": {
+          "evidence_id": "ev_purpose",
+          "source_id": "src_purpose",
+          "raw_text": "Replace with observed evidence for {subject}.",
+          "normalized_summary": "Unvalidated purpose evidence placeholder for {subject}.",
+          "evidence_type": "purpose",
+          "extraction_confidence": 0,
+          "evidence_specificity": 0,
+          "supports": [
+            "trace_purpose"
+          ],
+          "limits": [
+            "Template-generated placeholder is not factual evidence."
+          ],
+          "warnings": [
+            "External observation and review are required."
+          ],
+          "usable_as_trace_evidence": false,
+          "usable_as_project_evidence": false
+        },
+        "event": {
+          "event_id": "event_purpose",
+          "evidence_ids": [
+            "ev_purpose"
+          ],
+          "actor_ids": [],
+          "action": "recorded purpose evidence for {subject}",
+          "object_ids": [],
+          "event_type": "purpose_context",
+          "location_ids": [],
+          "technology_ids": [],
+          "trace_hint": "trace_purpose",
+          "project_hint": null,
+          "stage_hint": null,
+          "extraction_confidence": 0,
+          "extraction_notes": "Template-generated event skeleton; native references only."
+        },
+        "trace": {
+          "trace_id": "trace_purpose",
+          "title": "Purpose-bounded trace for {subject}",
+          "trace_type": "purpose",
+          "event_ids": [
+            "event_purpose"
+          ],
+          "entity_ids": [],
+          "location_ids": [],
+          "current_stage": "unknown",
+          "claim": "Candidate purpose storyline for {subject}.",
+          "weakest_link": "Template placeholder evidence has not been externally observed.",
+          "notes": "Template profile purpose."
+        }
+      },
+      "profile_digest": "sha256:2f52c89ad21cd5165ea6a88537c0630820dc688c17628368023937bbcaf5d8fb"
+    },
+    {
+      "profile_id": "incident",
+      "profile_version": "2.0.0",
+      "priority": 10,
+      "selector": {
+        "required_intents": [
+          "incident"
+        ],
+        "excluded_intents": []
+      },
+      "strict_dominates": [],
+      "composition": {
+        "allowed": true,
+        "compatible_with": [
+          "purpose",
+          "causal",
+          "competing-storyline",
+          "counterfactual",
+          "handoff",
+          "research-lineage",
+          "technology-progression",
+          "case-library"
+        ]
+      },
+      "owned_fields": [
+        "sources/incident",
+        "evidence/incident",
+        "events/incident",
+        "traces/incident"
+      ],
+      "native_binding": {
+        "command_id": "diagnose"
+      },
+      "fragment": {
+        "source": {
+          "source_id": "src_incident",
+          "lineage_id": "lineage_incident",
+          "independence_group": "group_incident",
+          "title": "Incident trace source for {subject}",
+          "url": null,
+          "source_type": "other",
+          "source_reliability": 0.5,
+          "source_status": "stable_keep",
+          "notes": "Template profile incident; source row is not evidence."
+        },
+        "evidence": {
+          "evidence_id": "ev_incident",
+          "source_id": "src_incident",
+          "raw_text": "Replace with observed evidence for {subject}.",
+          "normalized_summary": "Unvalidated incident evidence placeholder for {subject}.",
+          "evidence_type": "incident",
+          "extraction_confidence": 0,
+          "evidence_specificity": 0,
+          "supports": [
+            "trace_incident"
+          ],
+          "limits": [
+            "Template-generated placeholder is not factual evidence."
+          ],
+          "warnings": [
+            "External observation and review are required."
+          ],
+          "usable_as_trace_evidence": false,
+          "usable_as_project_evidence": false
+        },
+        "event": {
+          "event_id": "event_incident",
+          "evidence_ids": [
+            "ev_incident"
+          ],
+          "actor_ids": [],
+          "action": "recorded an incident observation for {subject}",
+          "object_ids": [],
+          "event_type": "incident",
+          "location_ids": [],
+          "technology_ids": [],
+          "trace_hint": "trace_incident",
+          "project_hint": null,
+          "stage_hint": null,
+          "extraction_confidence": 0,
+          "extraction_notes": "Template-generated event skeleton; native references only."
+        },
+        "trace": {
+          "trace_id": "trace_incident",
+          "title": "Incident trace for {subject}",
+          "trace_type": "incident",
+          "event_ids": [
+            "event_incident"
+          ],
+          "entity_ids": [],
+          "location_ids": [],
+          "current_stage": "unknown",
+          "claim": "Candidate incident storyline for {subject}.",
+          "weakest_link": "Template placeholder evidence has not been externally observed.",
+          "notes": "Template profile incident."
+        }
+      },
+      "profile_digest": "sha256:21528d14476872ed658680335f1227bebaa68ea0a295c9c50836aa32f80d5551"
+    },
+    {
+      "profile_id": "causal",
+      "profile_version": "2.0.0",
+      "priority": 20,
+      "selector": {
+        "required_intents": [
+          "incident",
+          "causal"
+        ],
+        "excluded_intents": []
+      },
+      "strict_dominates": [
+        "incident"
+      ],
+      "composition": {
+        "allowed": true,
+        "compatible_with": [
+          "purpose",
+          "incident",
+          "competing-storyline",
+          "counterfactual",
+          "handoff",
+          "research-lineage",
+          "technology-progression",
+          "case-library"
+        ]
+      },
+      "owned_fields": [
+        "sources/causal",
+        "evidence/causal",
+        "events/causal",
+        "traces/causal",
+        "storyline_hypotheses/causal",
+        "hypothesis_evidence_links/causal",
+        "causal_mechanisms/causal",
+        "confounder_reviews/causal",
+        "causal_scopes/causal",
+        "causal_candidates/causal"
+      ],
+      "native_binding": {
+        "command_id": "evaluate"
+      },
+      "fragment": {
+        "source": {
+          "source_id": "src_causal",
+          "lineage_id": "lineage_causal",
+          "independence_group": "group_causal",
+          "title": "Causal candidate trace source for {subject}",
+          "url": null,
+          "source_type": "other",
+          "source_reliability": 0.5,
+          "source_status": "stable_keep",
+          "notes": "Template profile causal; source row is not evidence."
+        },
+        "evidence": {
+          "evidence_id": "ev_causal",
+          "source_id": "src_causal",
+          "raw_text": "Replace with observed evidence for {subject}.",
+          "normalized_summary": "Unvalidated causal evidence placeholder for {subject}.",
+          "evidence_type": "causal",
+          "extraction_confidence": 0,
+          "evidence_specificity": 0,
+          "supports": [
+            "trace_causal"
+          ],
+          "limits": [
+            "Template-generated placeholder is not factual evidence."
+          ],
+          "warnings": [
+            "External observation and review are required."
+          ],
+          "usable_as_trace_evidence": false,
+          "usable_as_project_evidence": false
+        },
+        "event": {
+          "event_id": "event_causal",
+          "evidence_ids": [
+            "ev_causal"
+          ],
+          "actor_ids": [],
+          "action": "recorded a bounded causal lead for {subject}",
+          "object_ids": [],
+          "event_type": "causal_candidate",
+          "location_ids": [],
+          "technology_ids": [],
+          "trace_hint": "trace_causal",
+          "project_hint": null,
+          "stage_hint": null,
+          "extraction_confidence": 0,
+          "extraction_notes": "Template-generated event skeleton; native references only."
+        },
+        "trace": {
+          "trace_id": "trace_causal",
+          "title": "Causal candidate trace for {subject}",
+          "trace_type": "causal",
+          "event_ids": [
+            "event_causal"
+          ],
+          "entity_ids": [],
+          "location_ids": [],
+          "current_stage": "unknown",
+          "claim": "Candidate causal storyline for {subject}.",
+          "weakest_link": "Template placeholder evidence has not been externally observed.",
+          "notes": "Template profile causal."
+        },
+        "storyline_hypotheses": [
+          {
+            "hypothesis_id": "hypothesis_causal",
+            "claim": "Bounded causal candidate for {subject}.",
+            "role": "primary",
+            "trace_ids": [
+              "trace_causal"
+            ],
+            "event_ids": [
+              "event_causal"
+            ],
+            "mechanism_ids": [
+              "mechanism_causal"
+            ],
+            "confounder_ids": [
+              "confounder_causal"
+            ],
+            "importance": 0.5,
+            "uncertainty": 1,
+            "causal": true,
+            "bounded_non_causal": false
+          }
+        ],
+        "hypothesis_evidence_links": [
+          {
+            "link_id": "link_causal_support",
+            "hypothesis_id": "hypothesis_causal",
+            "evidence_id": "ev_causal",
+            "polarity": "support",
+            "declared_relevance": 0,
+            "rationale": "Template placeholder declares a link but supplies no factual support."
+          }
+        ],
+        "causal_mechanisms": [
+          {
+            "mechanism_id": "mechanism_causal",
+            "hypothesis_id": "hypothesis_causal",
+            "description": "Replace with a temporally ordered mechanism for {subject}.",
+            "evidence_ids": [
+              "ev_causal"
+            ],
+            "declared_relevance": 0
+          }
+        ],
+        "confounder_reviews": [
+          {
+            "confounder_id": "confounder_causal",
+            "hypothesis_id": "hypothesis_causal",
+            "description": "Replace with a named alternative explanation or confounder.",
+            "status": "unresolved",
+            "evidence_ids": [],
+            "importance": 1
+          }
+        ],
+        "causal_scopes": [
+          {
+            "scope_id": "scope_causal",
+            "description": "Replace with the bounded population, time, location, and conditions.",
+            "population": null,
+            "time_window": null,
+            "location_ids": [],
+            "boundary_conditions": [
+              "Template scope is incomplete."
+            ]
+          }
+        ],
+        "causal_candidates": [
+          {
+            "causal_id": "causal_candidate",
+            "hypothesis_id": "hypothesis_causal",
+            "cause_event_ids": [
+              "event_causal"
+            ],
+            "effect_event_ids": [
+              "event_causal"
+            ],
+            "mechanism_ids": [
+              "mechanism_causal"
+            ],
+            "confounder_ids": [
+              "confounder_causal"
+            ],
+            "alternative_hypothesis_ids": [],
+            "scope_id": "scope_causal"
+          }
+        ]
+      },
+      "profile_digest": "sha256:41a5aae97a504232650c8e7b6d0588f1bede6b59d7f2af9ddaec6507ef1933c6"
+    },
+    {
+      "profile_id": "competing-storyline",
+      "profile_version": "2.0.0",
+      "priority": 10,
+      "selector": {
+        "required_intents": [
+          "competing-storyline"
+        ],
+        "excluded_intents": []
+      },
+      "strict_dominates": [],
+      "composition": {
+        "allowed": true,
+        "compatible_with": [
+          "purpose",
+          "incident",
+          "causal",
+          "counterfactual",
+          "handoff",
+          "research-lineage",
+          "technology-progression",
+          "case-library"
+        ]
+      },
+      "owned_fields": [
+        "sources/competing-storyline",
+        "evidence/competing-storyline",
+        "events/competing-storyline",
+        "traces/competing-storyline",
+        "storyline_hypotheses/competing-storyline",
+        "hypothesis_evidence_links/competing-storyline",
+        "hypothesis_relations/competing-storyline"
+      ],
+      "native_binding": {
+        "command_id": "diagnose"
+      },
+      "fragment": {
+        "source": {
+          "source_id": "src_competing_storyline",
+          "lineage_id": "lineage_competing_storyline",
+          "independence_group": "group_competing_storyline",
+          "title": "Competing storyline source for {subject}",
+          "url": null,
+          "source_type": "other",
+          "source_reliability": 0.5,
+          "source_status": "stable_keep",
+          "notes": "Template profile competing-storyline; source row is not evidence."
+        },
+        "evidence": {
+          "evidence_id": "ev_competing_storyline",
+          "source_id": "src_competing_storyline",
+          "raw_text": "Replace with observed evidence for {subject}.",
+          "normalized_summary": "Unvalidated competing-storyline evidence placeholder for {subject}.",
+          "evidence_type": "competing-storyline",
+          "extraction_confidence": 0,
+          "evidence_specificity": 0,
+          "supports": [
+            "trace_competing_storyline"
+          ],
+          "limits": [
+            "Template-generated placeholder is not factual evidence."
+          ],
+          "warnings": [
+            "External observation and review are required."
+          ],
+          "usable_as_trace_evidence": false,
+          "usable_as_project_evidence": false
+        },
+        "event": {
+          "event_id": "event_competing_storyline",
+          "evidence_ids": [
+            "ev_competing_storyline"
+          ],
+          "actor_ids": [],
+          "action": "recorded one competing storyline lead for {subject}",
+          "object_ids": [],
+          "event_type": "storyline_branch",
+          "location_ids": [],
+          "technology_ids": [],
+          "trace_hint": "trace_competing_storyline",
+          "project_hint": null,
+          "stage_hint": null,
+          "extraction_confidence": 0,
+          "extraction_notes": "Template-generated event skeleton; native references only."
+        },
+        "trace": {
+          "trace_id": "trace_competing_storyline",
+          "title": "Competing storyline for {subject}",
+          "trace_type": "competing_storyline",
+          "event_ids": [
+            "event_competing_storyline"
+          ],
+          "entity_ids": [],
+          "location_ids": [],
+          "current_stage": "unknown",
+          "claim": "Candidate competing-storyline storyline for {subject}.",
+          "weakest_link": "Template placeholder evidence has not been externally observed.",
+          "notes": "Template profile competing-storyline."
+        },
+        "storyline_hypotheses": [
+          {
+            "hypothesis_id": "hypothesis_competing_primary",
+            "claim": "Primary candidate explanation for {subject}.",
+            "role": "primary",
+            "trace_ids": [
+              "trace_competing_storyline"
+            ],
+            "event_ids": [
+              "event_competing_storyline"
+            ],
+            "importance": 0.5,
+            "uncertainty": 1,
+            "causal": false,
+            "bounded_non_causal": true
+          },
+          {
+            "hypothesis_id": "hypothesis_competing_alternative",
+            "claim": "Alternative candidate explanation for {subject}.",
+            "role": "alternative",
+            "trace_ids": [
+              "trace_competing_storyline"
+            ],
+            "event_ids": [
+              "event_competing_storyline"
+            ],
+            "importance": 0.5,
+            "uncertainty": 1,
+            "causal": false,
+            "bounded_non_causal": true
+          }
+        ],
+        "hypothesis_evidence_links": [
+          {
+            "link_id": "link_competing_primary",
+            "hypothesis_id": "hypothesis_competing_primary",
+            "evidence_id": "ev_competing_storyline",
+            "polarity": "support",
+            "declared_relevance": 0,
+            "rationale": "Template placeholder; replace with independently grounded evidence."
+          }
+        ],
+        "hypothesis_relations": [
+          {
+            "relation_id": "relation_competing_pair",
+            "left_hypothesis_id": "hypothesis_competing_primary",
+            "right_hypothesis_id": "hypothesis_competing_alternative",
+            "relation": "competes_with",
+            "evidence_ids": []
+          }
+        ]
+      },
+      "profile_digest": "sha256:5bfcd5a27d93a7864e21aaf5c13d86ebba244a817fb10097d9c1ef9d30feede3"
+    },
+    {
+      "profile_id": "counterfactual",
+      "profile_version": "2.0.0",
+      "priority": 10,
+      "selector": {
+        "required_intents": [
+          "counterfactual"
+        ],
+        "excluded_intents": []
+      },
+      "strict_dominates": [],
+      "composition": {
+        "allowed": true,
+        "compatible_with": [
+          "purpose",
+          "incident",
+          "causal",
+          "competing-storyline",
+          "handoff",
+          "research-lineage",
+          "technology-progression",
+          "case-library"
+        ]
+      },
+      "owned_fields": [
+        "sources/counterfactual",
+        "evidence/counterfactual",
+        "events/counterfactual",
+        "traces/counterfactual",
+        "scenario_perturbations/counterfactual",
+        "expected_sensitivities/counterfactual"
+      ],
+      "native_binding": {
+        "command_id": "evaluate"
+      },
+      "fragment": {
+        "source": {
+          "source_id": "src_counterfactual",
+          "lineage_id": "lineage_counterfactual",
+          "independence_group": "group_counterfactual",
+          "title": "Counterfactual trace source for {subject}",
+          "url": null,
+          "source_type": "other",
+          "source_reliability": 0.5,
+          "source_status": "stable_keep",
+          "notes": "Template profile counterfactual; source row is not evidence."
+        },
+        "evidence": {
+          "evidence_id": "ev_counterfactual",
+          "source_id": "src_counterfactual",
+          "raw_text": "Replace with observed evidence for {subject}.",
+          "normalized_summary": "Unvalidated counterfactual evidence placeholder for {subject}.",
+          "evidence_type": "counterfactual",
+          "extraction_confidence": 0,
+          "evidence_specificity": 0,
+          "supports": [
+            "trace_counterfactual"
+          ],
+          "limits": [
+            "Template-generated placeholder is not factual evidence."
+          ],
+          "warnings": [
+            "External observation and review are required."
+          ],
+          "usable_as_trace_evidence": false,
+          "usable_as_project_evidence": false
+        },
+        "event": {
+          "event_id": "event_counterfactual",
+          "evidence_ids": [
+            "ev_counterfactual"
+          ],
+          "actor_ids": [],
+          "action": "recorded a counterfactual condition for {subject}",
+          "object_ids": [],
+          "event_type": "counterfactual_condition",
+          "location_ids": [],
+          "technology_ids": [],
+          "trace_hint": "trace_counterfactual",
+          "project_hint": null,
+          "stage_hint": null,
+          "extraction_confidence": 0,
+          "extraction_notes": "Template-generated event skeleton; native references only."
+        },
+        "trace": {
+          "trace_id": "trace_counterfactual",
+          "title": "Counterfactual trace for {subject}",
+          "trace_type": "counterfactual",
+          "event_ids": [
+            "event_counterfactual"
+          ],
+          "entity_ids": [],
+          "location_ids": [],
+          "current_stage": "unknown",
+          "claim": "Candidate counterfactual storyline for {subject}.",
+          "weakest_link": "Template placeholder evidence has not been externally observed.",
+          "notes": "Template profile counterfactual."
+        },
+        "scenario_perturbations": [
+          {
+            "perturbation_id": "perturbation_counterfactual",
+            "trace_id": "trace_counterfactual",
+            "hypothesis_id": null,
+            "description": "Remove the placeholder evidence and re-run the same inference engine.",
+            "remove_evidence_ids": [
+              "ev_counterfactual"
+            ],
+            "remove_event_ids": [],
+            "add_evidence_ids": [],
+            "add_event_ids": [],
+            "importance": 0.5
+          }
+        ],
+        "expected_sensitivities": [
+          {
+            "sensitivity_id": "sensitivity_counterfactual",
+            "perturbation_id": "perturbation_counterfactual",
+            "target_kind": "trace",
+            "target_id": "trace_counterfactual",
+            "expected_direction": "decrease",
+            "minimum_absolute_change": 0,
+            "rationale": "The same inference model should not gain support when its only evidence is removed."
+          }
+        ]
+      },
+      "profile_digest": "sha256:38dfb9617ab8a11e34d3111f231001537159abdc5fda8b26bc059549b83a2ce3"
+    },
+    {
+      "profile_id": "handoff",
+      "profile_version": "2.0.0",
+      "priority": 10,
+      "selector": {
+        "required_intents": [
+          "handoff"
+        ],
+        "excluded_intents": []
+      },
+      "strict_dominates": [],
+      "composition": {
+        "allowed": true,
+        "compatible_with": [
+          "purpose",
+          "incident",
+          "causal",
+          "competing-storyline",
+          "counterfactual",
+          "research-lineage",
+          "technology-progression",
+          "case-library"
+        ]
+      },
+      "owned_fields": [
+        "sources/handoff",
+        "evidence/handoff",
+        "events/handoff",
+        "traces/handoff"
+      ],
+      "native_binding": {
+        "command_id": "export-logicguard"
+      },
+      "fragment": {
+        "source": {
+          "source_id": "src_handoff",
+          "lineage_id": "lineage_handoff",
+          "independence_group": "group_handoff",
+          "title": "Handoff trace source for {subject}",
+          "url": null,
+          "source_type": "other",
+          "source_reliability": 0.5,
+          "source_status": "stable_keep",
+          "notes": "Template profile handoff; source row is not evidence."
+        },
+        "evidence": {
+          "evidence_id": "ev_handoff",
+          "source_id": "src_handoff",
+          "raw_text": "Replace with observed evidence for {subject}.",
+          "normalized_summary": "Unvalidated handoff evidence placeholder for {subject}.",
+          "evidence_type": "handoff",
+          "extraction_confidence": 0,
+          "evidence_specificity": 0,
+          "supports": [
+            "trace_handoff"
+          ],
+          "limits": [
+            "Template-generated placeholder is not factual evidence."
+          ],
+          "warnings": [
+            "External observation and review are required."
+          ],
+          "usable_as_trace_evidence": false,
+          "usable_as_project_evidence": false
+        },
+        "event": {
+          "event_id": "event_handoff",
+          "evidence_ids": [
+            "ev_handoff"
+          ],
+          "actor_ids": [],
+          "action": "recorded an evidence-backed handoff lead for {subject}",
+          "object_ids": [],
+          "event_type": "handoff",
+          "location_ids": [],
+          "technology_ids": [],
+          "trace_hint": "trace_handoff",
+          "project_hint": null,
+          "stage_hint": null,
+          "extraction_confidence": 0,
+          "extraction_notes": "Template-generated event skeleton; native references only."
+        },
+        "trace": {
+          "trace_id": "trace_handoff",
+          "title": "Handoff trace for {subject}",
+          "trace_type": "handoff",
+          "event_ids": [
+            "event_handoff"
+          ],
+          "entity_ids": [],
+          "location_ids": [],
+          "current_stage": "unknown",
+          "claim": "Candidate handoff storyline for {subject}.",
+          "weakest_link": "Template placeholder evidence has not been externally observed.",
+          "notes": "Template profile handoff."
+        }
+      },
+      "profile_digest": "sha256:7e8f1154288ac7e643e6ab352de2367812baa1198e104de6acbce9b3d3f2fcde"
+    },
+    {
+      "profile_id": "research-lineage",
+      "profile_version": "2.0.0",
+      "priority": 10,
+      "selector": {
+        "required_intents": [
+          "research-lineage"
+        ],
+        "excluded_intents": []
+      },
+      "strict_dominates": [],
+      "composition": {
+        "allowed": true,
+        "compatible_with": [
+          "purpose",
+          "incident",
+          "causal",
+          "competing-storyline",
+          "counterfactual",
+          "handoff",
+          "technology-progression",
+          "case-library"
+        ]
+      },
+      "owned_fields": [
+        "sources/research-lineage",
+        "evidence/research-lineage",
+        "events/research-lineage",
+        "traces/research-lineage"
+      ],
+      "native_binding": {
+        "command_id": "report"
+      },
+      "fragment": {
+        "source": {
+          "source_id": "src_research_lineage",
+          "lineage_id": "lineage_research_lineage",
+          "independence_group": "group_research_lineage",
+          "title": "Research lineage source for {subject}",
+          "url": null,
+          "source_type": "other",
+          "source_reliability": 0.5,
+          "source_status": "stable_keep",
+          "notes": "Template profile research-lineage; source row is not evidence."
+        },
+        "evidence": {
+          "evidence_id": "ev_research_lineage",
+          "source_id": "src_research_lineage",
+          "raw_text": "Replace with observed evidence for {subject}.",
+          "normalized_summary": "Unvalidated research-lineage evidence placeholder for {subject}.",
+          "evidence_type": "research-lineage",
+          "extraction_confidence": 0,
+          "evidence_specificity": 0,
+          "supports": [
+            "trace_research_lineage"
+          ],
+          "limits": [
+            "Template-generated placeholder is not factual evidence."
+          ],
+          "warnings": [
+            "External observation and review are required."
+          ],
+          "usable_as_trace_evidence": false,
+          "usable_as_project_evidence": false
+        },
+        "event": {
+          "event_id": "event_research_lineage",
+          "evidence_ids": [
+            "ev_research_lineage"
+          ],
+          "actor_ids": [],
+          "action": "recorded a research-lineage observation for {subject}",
+          "object_ids": [],
+          "event_type": "research_lineage",
+          "location_ids": [],
+          "technology_ids": [],
+          "trace_hint": "trace_research_lineage",
+          "project_hint": null,
+          "stage_hint": null,
+          "extraction_confidence": 0,
+          "extraction_notes": "Template-generated event skeleton; native references only."
+        },
+        "trace": {
+          "trace_id": "trace_research_lineage",
+          "title": "Research lineage for {subject}",
+          "trace_type": "research_lineage",
+          "event_ids": [
+            "event_research_lineage"
+          ],
+          "entity_ids": [],
+          "location_ids": [],
+          "current_stage": "unknown",
+          "claim": "Candidate research-lineage storyline for {subject}.",
+          "weakest_link": "Template placeholder evidence has not been externally observed.",
+          "notes": "Template profile research-lineage."
+        }
+      },
+      "profile_digest": "sha256:36db51e04009dac0d810a32e66b8b687be76ab81a5782ac6c230f3612277ebbe"
+    },
+    {
+      "profile_id": "technology-progression",
+      "profile_version": "2.0.0",
+      "priority": 10,
+      "selector": {
+        "required_intents": [
+          "technology-progression"
+        ],
+        "excluded_intents": []
+      },
+      "strict_dominates": [],
+      "composition": {
+        "allowed": true,
+        "compatible_with": [
+          "purpose",
+          "incident",
+          "causal",
+          "competing-storyline",
+          "counterfactual",
+          "handoff",
+          "research-lineage",
+          "case-library"
+        ]
+      },
+      "owned_fields": [
+        "sources/technology-progression",
+        "evidence/technology-progression",
+        "events/technology-progression",
+        "traces/technology-progression"
+      ],
+      "native_binding": {
+        "command_id": "gaps"
+      },
+      "fragment": {
+        "source": {
+          "source_id": "src_technology_progression",
+          "lineage_id": "lineage_technology_progression",
+          "independence_group": "group_technology_progression",
+          "title": "Technology progression source for {subject}",
+          "url": null,
+          "source_type": "other",
+          "source_reliability": 0.5,
+          "source_status": "stable_keep",
+          "notes": "Template profile technology-progression; source row is not evidence."
+        },
+        "evidence": {
+          "evidence_id": "ev_technology_progression",
+          "source_id": "src_technology_progression",
+          "raw_text": "Replace with observed evidence for {subject}.",
+          "normalized_summary": "Unvalidated technology-progression evidence placeholder for {subject}.",
+          "evidence_type": "technology-progression",
+          "extraction_confidence": 0,
+          "evidence_specificity": 0,
+          "supports": [
+            "trace_technology_progression"
+          ],
+          "limits": [
+            "Template-generated placeholder is not factual evidence."
+          ],
+          "warnings": [
+            "External observation and review are required."
+          ],
+          "usable_as_trace_evidence": false,
+          "usable_as_project_evidence": false
+        },
+        "event": {
+          "event_id": "event_technology_progression",
+          "evidence_ids": [
+            "ev_technology_progression"
+          ],
+          "actor_ids": [],
+          "action": "recorded a technology-progression observation for {subject}",
+          "object_ids": [],
+          "event_type": "technology_progression",
+          "location_ids": [],
+          "technology_ids": [],
+          "trace_hint": "trace_technology_progression",
+          "project_hint": null,
+          "stage_hint": null,
+          "extraction_confidence": 0,
+          "extraction_notes": "Template-generated event skeleton; native references only."
+        },
+        "trace": {
+          "trace_id": "trace_technology_progression",
+          "title": "Technology progression for {subject}",
+          "trace_type": "technology_progression",
+          "event_ids": [
+            "event_technology_progression"
+          ],
+          "entity_ids": [],
+          "location_ids": [],
+          "current_stage": "unknown",
+          "claim": "Candidate technology-progression storyline for {subject}.",
+          "weakest_link": "Template placeholder evidence has not been externally observed.",
+          "notes": "Template profile technology-progression."
+        }
+      },
+      "profile_digest": "sha256:5525b0648d4103e213933218c3424ef25e4dc6cdbd2d0bb94685dbc330e809e6"
+    },
+    {
+      "profile_id": "case-library",
+      "profile_version": "2.0.0",
+      "priority": 10,
+      "selector": {
+        "required_intents": [
+          "case-library"
+        ],
+        "excluded_intents": []
+      },
+      "strict_dominates": [],
+      "composition": {
+        "allowed": true,
+        "compatible_with": [
+          "purpose",
+          "incident",
+          "causal",
+          "competing-storyline",
+          "counterfactual",
+          "handoff",
+          "research-lineage",
+          "technology-progression"
+        ]
+      },
+      "owned_fields": [
+        "sources/case-library",
+        "evidence/case-library",
+        "events/case-library",
+        "traces/case-library"
+      ],
+      "native_binding": {
+        "command_id": "report"
+      },
+      "fragment": {
+        "source": {
+          "source_id": "src_case_library",
+          "lineage_id": "lineage_case_library",
+          "independence_group": "group_case_library",
+          "title": "Case-library trace source for {subject}",
+          "url": null,
+          "source_type": "other",
+          "source_reliability": 0.5,
+          "source_status": "stable_keep",
+          "notes": "Template profile case-library; source row is not evidence."
+        },
+        "evidence": {
+          "evidence_id": "ev_case_library",
+          "source_id": "src_case_library",
+          "raw_text": "Replace with observed evidence for {subject}.",
+          "normalized_summary": "Unvalidated case-library evidence placeholder for {subject}.",
+          "evidence_type": "case-library",
+          "extraction_confidence": 0,
+          "evidence_specificity": 0,
+          "supports": [
+            "trace_case_library"
+          ],
+          "limits": [
+            "Template-generated placeholder is not factual evidence."
+          ],
+          "warnings": [
+            "External observation and review are required."
+          ],
+          "usable_as_trace_evidence": false,
+          "usable_as_project_evidence": false
+        },
+        "event": {
+          "event_id": "event_case_library",
+          "evidence_ids": [
+            "ev_case_library"
+          ],
+          "actor_ids": [],
+          "action": "recorded a case-library observation for {subject}",
+          "object_ids": [],
+          "event_type": "case_library_record",
+          "location_ids": [],
+          "technology_ids": [],
+          "trace_hint": "trace_case_library",
+          "project_hint": null,
+          "stage_hint": null,
+          "extraction_confidence": 0,
+          "extraction_notes": "Template-generated event skeleton; native references only."
+        },
+        "trace": {
+          "trace_id": "trace_case_library",
+          "title": "Case-library trace for {subject}",
+          "trace_type": "case_library",
+          "event_ids": [
+            "event_case_library"
+          ],
+          "entity_ids": [],
+          "location_ids": [],
+          "current_stage": "unknown",
+          "claim": "Candidate case-library storyline for {subject}.",
+          "weakest_link": "Template placeholder evidence has not been externally observed.",
+          "notes": "Template profile case-library."
+        }
+      },
+      "profile_digest": "sha256:449938085676c25cd2efc84dfad5198049a9fefb3a3b6f334e42b5106fd0c3ac"
+    }
+  ],
+  "catalog_digest": "sha256:34bba5e25260772e324d022c1ad6ce337682c0c12ea9e61f4ab4d00fefcbf40c"
+}

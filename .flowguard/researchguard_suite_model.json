@@ -1,0 +1,76 @@
+{
+  "artifact_kind": "flowguard_researchguard_suite_model",
+  "model_id": "researchguard.suite.v0.1.0",
+  "schema_version": "1.0",
+  "behavior_plane": "product_runtime",
+  "business_intents": [
+    {
+      "business_intent_id": "researchguard.cross_guard_research",
+      "primary_path_id": "researchguard.run",
+      "native_owner_id": "researchguard.routing"
+    },
+    {
+      "business_intent_id": "researchguard.argument_licensing",
+      "primary_path_id": "researchguard.logic",
+      "native_owner_id": "logicguard"
+    },
+    {
+      "business_intent_id": "researchguard.evidence_discovery",
+      "primary_path_id": "researchguard.source",
+      "native_owner_id": "sourceguard"
+    },
+    {
+      "business_intent_id": "researchguard.trace_reconstruction",
+      "primary_path_id": "researchguard.trace",
+      "native_owner_id": "traceguard"
+    }
+  ],
+  "function_blocks": [
+    {
+      "id": "route",
+      "relation": "Intent x Unrouted -> Set(MemberRequest x Routed, TypedGap x Blocked)",
+      "alternate_success": false
+    },
+    {
+      "id": "execute_member",
+      "relation": "MemberRequest x Routed -> Set(NativeResult x Terminal)",
+      "alternate_success": false
+    },
+    {
+      "id": "request_handoff",
+      "relation": "NativeResult x Terminal -> Set(TypedHandoff x AwaitingOwner)",
+      "alternate_success": false
+    },
+    {
+      "id": "orchestrate_handoff",
+      "relation": "TypedHandoff x AwaitingOwner -> Set(MemberRequest x Routed, TypedGap x Blocked)",
+      "alternate_success": false
+    },
+    {
+      "id": "install_suite",
+      "relation": "FrozenSuite x InstalledOld -> Set(InstalledCurrent x Active, InstalledOld x RolledBack)",
+      "alternate_success": false
+    },
+    {
+      "id": "migrate_legacy",
+      "relation": "LegacySnapshot x UpgradePending -> Set(CurrentStaging x Validated, LegacySnapshot x RolledBack)",
+      "alternate_success": false
+    }
+  ],
+  "hard_invariants": [
+    "one_distribution",
+    "four_skill_members",
+    "same_suite_fingerprint",
+    "direct_and_umbrella_same_primary_path",
+    "selected_route_failure_is_terminal",
+    "typed_handoff_requires_explicit_owner",
+    "no_old_package",
+    "no_old_cli",
+    "no_old_skill_id",
+    "no_forwarding_stub",
+    "no_compatibility_reader",
+    "no_fallback_route",
+    "no_dual_output"
+  ],
+  "claim_boundary": "This model governs suite routing, installation, migration, and authority topology. Member-native LogicGuard, SourceGuard, and TraceGuard evidence remains necessary for domain claims."
+}

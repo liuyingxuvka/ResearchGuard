@@ -1,0 +1,17 @@
+{
+  "profile_id": "researchguard.logic.model-mesh.reference-scale.v1",
+  "model_count": 100,
+  "nodes_per_model": 100,
+  "local_edges_per_model": 199,
+  "cross_edge_count": 100,
+  "membership_stride": 10,
+  "expected_qualified_nodes": 10000,
+  "expected_combined_edges": 20000,
+  "capped_materialization_nodes": 500,
+  "thresholds": {
+    "cold_open_and_membership_lookup_seconds": 5.0,
+    "capped_materialization_seconds": 10.0,
+    "scc_and_full_evaluation_seconds": 60.0,
+    "additional_peak_memory_mib": 512.0
+  }
+}

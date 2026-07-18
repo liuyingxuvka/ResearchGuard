@@ -1,0 +1,4 @@
+interface:
+  display_name: "LogicGuard"
+  short_description: "Audit and deepen argument structure"
+  default_prompt: "Use $logicguard to model and validate this argument or structured artifact."

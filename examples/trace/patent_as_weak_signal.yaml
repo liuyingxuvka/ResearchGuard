@@ -1,0 +1,77 @@
+metadata:
+  schema_version: researchguard.trace.model.v2
+  purpose: Demonstrate that patent-only evidence remains a weak signal.
+  repository: https://github.com/liuyingxuvka/ResearchGuard
+  skill: TraceGuard
+  math_boundary: Typed constrained HL-MRF/MAP inference compiled to one convex QP
+    and solved directly by OSQP; structural support is not calibrated probability.
+  cli: researchguard trace validate examples/patent_as_weak_signal.yaml
+  boundary: Patent evidence is technology background unless linked to explicit deployment
+    evidence.
+sources:
+- source_id: src_patent
+  lineage_id: lineage_patent
+  independence_group: source_patent
+  title: Storage process patent
+  source_type: patent
+  source_reliability: 0.78
+  source_status: stable_keep
+evidence:
+- evidence_id: ev_patent
+  source_id: src_patent
+  raw_text: Patent describes storage process.
+  evidence_type: patent
+  extraction_confidence: 0.72
+  evidence_specificity: 0.6
+  supports:
+  - event_patent
+  limits:
+  - not deployment evidence
+  warnings:
+  - patent is not deployment evidence
+  usable_as_project_evidence: false
+entities:
+- mention_id: ent_tech
+  evidence_id: ev_patent
+  raw_name: Storage process
+  normalized_name: storage process
+  entity_type: technology
+  aliases: []
+  confidence: 0.7
+locations:
+- location_id: loc_patent
+  raw_text: Patent office country
+  normalized_name: patent office country
+  country: US
+  location_role: patent_office_country
+  confidence: 0.6
+events:
+- event_id: event_patent
+  evidence_ids:
+  - ev_patent
+  actor_ids: []
+  action: patent filed
+  object_ids:
+  - ent_tech
+  event_type: patent
+  time_interval:
+    start: '2025'
+    precision: year
+    confidence: 0.7
+  location_ids:
+  - loc_patent
+  technology_ids:
+  - ent_tech
+  stage_hint: weak_signal
+  extraction_confidence: 0.55
+traces:
+- trace_id: trace_patent
+  title: Patent-only weak signal
+  trace_type: technology_signal
+  event_ids:
+  - event_patent
+  entity_ids:
+  - ent_tech
+  location_ids:
+  - loc_patent
+  current_stage: weak_signal

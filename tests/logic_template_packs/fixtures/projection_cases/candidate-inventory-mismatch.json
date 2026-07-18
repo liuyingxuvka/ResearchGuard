@@ -1,0 +1,11 @@
+{
+  "fixture_id": "fixture:projection:candidate-inventory-mismatch",
+  "mutation": {
+    "kind": "remove-applicability-result",
+    "template_id": "researchguard.logic.argument"
+  },
+  "expected_codes": [
+    "candidate_inventory_mismatch",
+    "native_applicability_results_stale"
+  ]
+}

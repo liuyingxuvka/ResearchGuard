@@ -1,0 +1,78 @@
+model:
+  id: scientific_causal_claim
+  title: "Causal interpretation audit"
+  root_claim: C0
+
+nodes:
+  D0:
+    type: Document
+    text: "Research note on treatment response."
+  S_results:
+    type: Section
+    text: "Results"
+  C0:
+    type: Claim
+    text: "The intervention causes improved recovery in all patients."
+    scope: "general patient population"
+    confidence: 0.5
+  E1:
+    type: Evidence
+    text: "Observed treatment exposure is correlated with faster recovery."
+    confidence: 0.78
+    evidence_kind: correlation
+    scope: "single observational dataset"
+  M1:
+    type: Method
+    text: "Retrospective observational analysis without random assignment."
+    confidence: 0.8
+    scope: "single observational dataset"
+  A1:
+    type: Assumption
+    text: "Measured covariates remove the relevant confounding."
+    confidence: 0.35
+    impact: high
+    unsupported: true
+  R1:
+    type: Rebuttal
+    text: "Unmeasured confounding may explain the association."
+    confidence: 0.75
+    active: true
+  L1:
+    type: Limitation
+    text: "The data support association, not causal identification."
+    confidence: 0.9
+
+edges:
+  - source: E1
+    target: C0
+    type: supports
+    weight: 0.6
+  - source: M1
+    target: C0
+    type: supports
+    weight: 0.3
+  - source: A1
+    target: C0
+    type: depends_on
+    weight: 0.9
+  - source: R1
+    target: C0
+    type: attacks
+    weight: 0.8
+  - source: L1
+    target: C0
+    type: qualifies
+    weight: 0.7
+
+acceptance:
+  C0:
+    all_of: [E1]
+    requires_not_out: [A1]
+    threshold: 0.7
+    no_undefeated_rebuttal: true
+    scope_match: true
+    warrant_required: true
+
+hierarchy:
+  D0: [S_results]
+  S_results: [M1, E1, A1, R1, L1, C0]

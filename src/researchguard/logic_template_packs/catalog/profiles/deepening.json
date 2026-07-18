@@ -1,0 +1,50 @@
+{
+  "schema": "researchguard.logic.template-pack-profile.v1",
+  "profile_id": "researchguard.logic.deepening",
+  "profile_version": "1.0.0",
+  "family": "deepening",
+  "is_base": false,
+  "selector": {
+    "purposes": [],
+    "required_capabilities": [
+      "deepening"
+    ],
+    "context_tags_any": []
+  },
+  "strictly_dominates": [],
+  "composable_with": [
+    "researchguard.logic.source-library"
+  ],
+  "emitted_fields": {
+    "deepening.claim_boundary": "This profile declares a deepening queue and stop rules; it does not prove that all support is sufficient.",
+    "deepening.queue": {
+      "$request": "deepening_queue"
+    },
+    "deepening.stop_rules": {
+      "$request": "deepening_stop_rules"
+    }
+  },
+  "field_owners": {
+    "deepening.claim_boundary": "researchguard.logic.deepening",
+    "deepening.queue": "researchguard.logic.deepening",
+    "deepening.stop_rules": "researchguard.logic.deepening"
+  },
+  "native_binding": {
+    "route_id": "route:researchguard.logic:model-deepening",
+    "owner_callable": "researchguard.logic.importance:summarize_importance",
+    "owner_fingerprint": "7ec66f7a603cbc558be5671000e95d891f67e89862a50dc5242ec0cbfc9090d0",
+    "validators": [
+      {
+        "validator_id": "logicguard-template-pack:deepening",
+        "callable": "researchguard.logic_template_packs.native_validators:validate_deepening_profile",
+        "callable_fingerprint": "250581e8b622a66eab74138a5b90f92434ccd61641aa400c3a5ab771c88ffc23"
+      }
+    ]
+  },
+  "required_instance_fields": [
+    "deepening.claim_boundary",
+    "deepening.queue",
+    "deepening.stop_rules"
+  ],
+  "claim_boundary": "This profile validates declared deepening inputs and current native ownership, not final reasoning completeness."
+}

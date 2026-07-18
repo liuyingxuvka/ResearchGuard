@@ -1,0 +1,22 @@
+{
+  "case_id": "good-compose-synthesis-execution",
+  "kind": "request",
+  "request": {
+    "purpose": "synthesize a bounded delivery package",
+    "capabilities": ["synthesis", "execution-package"],
+    "context_tags": ["delivery"],
+    "allow_base": false,
+    "parameters": {
+      "synthesis_goal": "Produce a report plan from validated modeled material.",
+      "delivery_profile": {"format": "report", "audience": "reviewer"},
+      "declared_checks": ["structure", "native-bindings", "claim-boundary"]
+    }
+  },
+  "expected": {
+    "decision": "composed",
+    "candidate_ids": ["researchguard.logic.execution-package", "researchguard.logic.synthesis"],
+    "selected_profile_ids": ["researchguard.logic.execution-package", "researchguard.logic.synthesis"],
+    "finding_codes": [],
+    "build_status": "valid"
+  }
+}

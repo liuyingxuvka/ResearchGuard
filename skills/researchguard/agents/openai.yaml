@@ -1,0 +1,4 @@
+interface:
+  display_name: "ResearchGuard"
+  short_description: "Route research work to one exact Guard owner"
+  default_prompt: "Use $researchguard to select exactly one research Guard and preserve typed handoffs."

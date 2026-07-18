@@ -1,0 +1,23 @@
+{
+  "schema_version": "researchguard.trace.guard_model_cases.v1",
+  "contract_kind": "family_baseline",
+  "authority_scope": "family_capability_regression",
+  "production_authority": false,
+  "cases": [
+    {"case_id": "bad:missing-event-evidence", "failure_class_id": "missing-event-evidence", "oracle_id": "oracle:traceguard:missing-event-evidence", "scenario": "missing_event_evidence", "expected_native_decision": "blocked"},
+    {"case_id": "bad:caller-output-authority", "failure_class_id": "caller-output-authority", "oracle_id": "oracle:traceguard:caller-output-authority", "scenario": "caller_output_authority", "expected_native_decision": "blocked"},
+    {"case_id": "bad:duplicate-lineage-overcount", "failure_class_id": "duplicate-lineage-overcount", "oracle_id": "oracle:traceguard:duplicate-lineage-overcount", "scenario": "duplicate_lineage_overcount", "expected_native_decision": "blocked"},
+    {"case_id": "bad:hard-gate-compensation", "failure_class_id": "hard-gate-compensation", "oracle_id": "oracle:traceguard:hard-gate-compensation", "scenario": "hard_gate_compensation", "expected_native_decision": "blocked"},
+    {"case_id": "bad:solver-fallback", "failure_class_id": "solver-fallback", "oracle_id": "oracle:traceguard:solver-fallback", "scenario": "solver_fallback", "expected_native_decision": "blocked"},
+    {"case_id": "bad:detached-explanation", "failure_class_id": "detached-explanation", "oracle_id": "oracle:traceguard:detached-explanation", "scenario": "detached_explanation", "expected_native_decision": "blocked"},
+    {"case_id": "bad:perturbation-without-reinference", "failure_class_id": "perturbation-without-reinference", "oracle_id": "oracle:traceguard:perturbation-without-reinference", "scenario": "perturbation_without_reinference", "expected_native_decision": "blocked"},
+    {"case_id": "bad:hidden-temporal-contradiction", "failure_class_id": "hidden-temporal-contradiction", "oracle_id": "oracle:traceguard:hidden-temporal-contradiction", "scenario": "hidden_temporal_contradiction", "expected_native_decision": "blocked"},
+    {"case_id": "bad:chronology-promoted-to-causality", "failure_class_id": "chronology-promoted-to-causality", "oracle_id": "oracle:traceguard:chronology-promoted-to-causality", "scenario": "chronology_promoted_to_causality", "expected_native_decision": "blocked"},
+    {"case_id": "bad:untested-critical-perturbation", "failure_class_id": "untested-critical-perturbation", "oracle_id": "oracle:traceguard:untested-critical-perturbation", "scenario": "untested_critical_perturbation", "expected_native_decision": "blocked"},
+    {"case_id": "bad:shallow-trace-temporal-depth", "failure_class_id": "shallow-trace-temporal-depth", "oracle_id": "oracle:traceguard:shallow-trace-temporal-depth", "scenario": "shallow_trace_temporal_depth", "expected_native_decision": "blocked"},
+    {"case_id": "bad:unresolved-causal-confounder", "failure_class_id": "unresolved-causal-confounder", "oracle_id": "oracle:traceguard:unresolved-causal-confounder", "scenario": "unresolved_causal_confounder", "expected_native_decision": "blocked"},
+    {"case_id": "bad:expected-sensitivity-mismatch", "failure_class_id": "expected-sensitivity-mismatch", "oracle_id": "oracle:traceguard:expected-sensitivity-mismatch", "scenario": "expected_sensitivity_mismatch", "expected_native_decision": "blocked"},
+    {"case_id": "bad:internal-perturbation-promoted-to-prediction", "failure_class_id": "internal-perturbation-promoted-to-prediction", "oracle_id": "oracle:traceguard:internal-perturbation-promoted-to-prediction", "scenario": "internal_perturbation_promoted_to_prediction", "expected_native_decision": "blocked"},
+    {"case_id": "bad:bounded-scope-promoted-to-broad", "failure_class_id": "bounded-scope-promoted-to-broad", "oracle_id": "oracle:traceguard:bounded-scope-promoted-to-broad", "scenario": "bounded_scope_promoted_to_broad", "expected_native_decision": "blocked"}
+  ]
+}

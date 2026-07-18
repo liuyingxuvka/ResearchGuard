@@ -1,0 +1,78 @@
+metadata:
+  schema_version: researchguard.trace.model.v2
+  purpose: Demonstrate that hiring-only evidence remains a weak signal and not operation
+    evidence.
+  repository: https://github.com/liuyingxuvka/ResearchGuard
+  skill: TraceGuard
+  math_boundary: Typed constrained HL-MRF/MAP inference compiled to one convex QP
+    and solved directly by OSQP; structural support is not calibrated probability.
+  cli: researchguard trace validate examples/hiring_as_weak_signal.yaml
+  boundary: Hiring evidence does not prove commissioning completion or operation.
+sources:
+- source_id: src_hiring
+  lineage_id: lineage_hiring
+  independence_group: source_hiring
+  title: Operations engineer hiring post
+  source_type: hiring
+  source_reliability: 0.68
+  source_status: stable_keep
+evidence:
+- evidence_id: ev_hiring
+  source_id: src_hiring
+  raw_text: Hiring an operations engineer for the site.
+  evidence_type: hiring
+  extraction_confidence: 0.7
+  evidence_specificity: 0.62
+  supports:
+  - event_hiring
+  limits:
+  - not operation evidence
+  warnings:
+  - hiring is not operation evidence
+  usable_as_project_evidence: false
+entities:
+- mention_id: ent_project
+  evidence_id: ev_hiring
+  raw_name: Hiring Signal Project
+  normalized_name: hiring signal project
+  entity_type: project
+  aliases: []
+  country: US
+  role: project
+  confidence: 0.65
+locations:
+- location_id: loc_site
+  raw_text: Site County
+  normalized_name: site county
+  country: US
+  location_role: project_site
+  confidence: 0.65
+events:
+- event_id: event_hiring
+  evidence_ids:
+  - ev_hiring
+  actor_ids:
+  - ent_project
+  action: posted operations role
+  object_ids:
+  - ent_project
+  event_type: hiring
+  time_interval:
+    start: 2025-Q1
+    precision: quarter
+    confidence: 0.7
+  location_ids:
+  - loc_site
+  stage_hint: weak_signal
+  extraction_confidence: 0.5
+traces:
+- trace_id: trace_hiring
+  title: Hiring-only weak signal
+  trace_type: project_signal
+  event_ids:
+  - event_hiring
+  entity_ids:
+  - ent_project
+  location_ids:
+  - loc_site
+  current_stage: weak_signal

@@ -1,0 +1,56 @@
+metadata:
+  schema_version: researchguard.trace.model.v2
+  purpose: Demonstrate structural trace handoff fields for thesis-style reasoning.
+  repository: https://github.com/liuyingxuvka/ResearchGuard
+  skill: TraceGuard
+  math_boundary: Confidence is structural support, not factual certainty.
+  cli: researchguard trace evaluate examples/structural_thesis_trace.yaml --pretty
+  boundary: Synthetic example; not a real thesis or factual claim.
+sources:
+- source_id: src-method-note
+  lineage_id: lineage_method_note
+  independence_group: source_method_note
+  title: Synthetic method note
+  source_type: internal_note
+  source_status: stable_keep
+  source_reliability: 0.8
+  source_date: '2026-01-01'
+  coverage_period: '2025'
+evidence:
+- evidence_id: ev-method-gap
+  source_id: src-method-note
+  raw_text: The technical limitation is used to justify the method boundary.
+  normalized_summary: Technical limitation feeds method boundary.
+  evidence_type: design_note
+  extraction_confidence: 0.8
+  evidence_specificity: 0.8
+  locator: section=method-gap
+  supports:
+  - event-technology-to-method
+  usable_as_trace_evidence: true
+events:
+- event_id: event-technology-to-method
+  evidence_ids:
+  - ev-method-gap
+  action: Technology limitation is converted into a method boundary.
+  event_type: requirement_to_design
+  time_interval:
+    start: 2025-01
+    precision: month
+    confidence: 0.7
+  extraction_confidence: 0.8
+traces:
+- trace_id: trace-technology-to-method
+  title: Technology summary feeds method gap
+  trace_type: thesis_validation_chain
+  event_ids:
+  - event-technology-to-method
+  current_stage: method
+  claim: The technology summary supports the later method gap within the stated boundary.
+  structure_unit_id: chapter_3.technology_summary
+  source_unit_id: chapter_3.technology_summary
+  destination_unit_id: chapter_4.method_gap
+  downstream_consumer: chapter_4.method_gap
+  trace_layer: requirement_to_design
+  weakest_link: Only one synthetic method note is present.
+  conclusion_transfer_status: partial

@@ -1,0 +1,76 @@
+model:
+  id: policy_argument
+  title: "Policy recommendation audit"
+  root_claim: C0
+
+nodes:
+  D0:
+    type: Document
+    text: "Policy memo."
+  S_policy:
+    type: Section
+    text: "Recommendation"
+  C0:
+    type: Claim
+    text: "The city should always replace manual inspections with AI triage because it reduces cost."
+    scope: "all city departments"
+    confidence: 0.5
+  E1:
+    type: Evidence
+    text: "A pilot in one department reduced average review time by 18 percent."
+    confidence: 0.7
+    scope: "single department pilot"
+  E2:
+    type: Evidence
+    text: "Staff reported fewer repetitive tasks during the pilot."
+    confidence: 0.55
+    scope: "single department pilot"
+  W1:
+    type: Warrant
+    text: "Lower review time can support a cost-reduction claim only when service quality and staffing cost are comparable."
+    confidence: 0.65
+  A1:
+    type: Assumption
+    text: "Quality, appeal rate, and staffing levels remain comparable after rollout."
+    confidence: 0.35
+    hidden: true
+    impact: high
+  R1:
+    type: Rebuttal
+    text: "The pilot did not measure false negatives or appeal workload."
+    confidence: 0.8
+    active: true
+
+edges:
+  - source: E1
+    target: C0
+    type: supports
+    weight: 0.7
+  - source: E2
+    target: C0
+    type: supports
+    weight: 0.4
+  - source: W1
+    target: C0
+    type: supports
+    weight: 0.8
+  - source: A1
+    target: C0
+    type: depends_on
+    weight: 0.9
+  - source: R1
+    target: C0
+    type: attacks
+    weight: 0.8
+
+acceptance:
+  C0:
+    all_of: [E1, W1]
+    requires_not_out: [A1]
+    threshold: 0.7
+    no_undefeated_rebuttal: true
+    scope_match: true
+
+hierarchy:
+  D0: [S_policy]
+  S_policy: [E1, E2, W1, A1, R1, C0]

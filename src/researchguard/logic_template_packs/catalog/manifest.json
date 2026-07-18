@@ -1,0 +1,66 @@
+{
+  "schema": "researchguard.logic.template-pack-manifest.v1",
+  "catalog_id": "researchguard.logic.validated-template-packs",
+  "catalog_version": "1.0.0",
+  "base_profile_id": "researchguard.logic.base",
+  "required_families": [
+    "argument",
+    "deepening",
+    "execution-package",
+    "purpose",
+    "source-library",
+    "structured-artifact",
+    "synthesis"
+  ],
+  "profiles": [
+    {
+      "profile_id": "researchguard.logic.argument",
+      "family": "argument",
+      "path": "profiles/argument.json",
+      "sha256": "ec3c0d4b4e354434ef7a80c27b0f759c1ddc811f663de518f5a3f657526501d5"
+    },
+    {
+      "profile_id": "researchguard.logic.base",
+      "family": "base",
+      "path": "profiles/base.json",
+      "sha256": "2b53e8da256429963b00afbd9e2d7e513da409239e56b0b847407a0fef5977d8"
+    },
+    {
+      "profile_id": "researchguard.logic.deepening",
+      "family": "deepening",
+      "path": "profiles/deepening.json",
+      "sha256": "d31a6464e5fa2e7149848297e70d2ed0e5b39cad442ee44933b4a6800f920857"
+    },
+    {
+      "profile_id": "researchguard.logic.execution-package",
+      "family": "execution-package",
+      "path": "profiles/execution-package.json",
+      "sha256": "3c9227189ef1660b11fae6f290e5c3425b7fab01dd1dda4e74e6fadc4325c126"
+    },
+    {
+      "profile_id": "researchguard.logic.purpose",
+      "family": "purpose",
+      "path": "profiles/purpose.json",
+      "sha256": "524bd2e0cbcc015ebdfae0dd7963b7371dc056f17395449a53bade1e91ec495b"
+    },
+    {
+      "profile_id": "researchguard.logic.source-library",
+      "family": "source-library",
+      "path": "profiles/source-library.json",
+      "sha256": "07f17667f162ee27c6e7910a0c839402d4f0e8719f77d31260f2d699c5e96416"
+    },
+    {
+      "profile_id": "researchguard.logic.structured-artifact",
+      "family": "structured-artifact",
+      "path": "profiles/structured-artifact.json",
+      "sha256": "ce5bd396538aedb5ffbabdad0f12ff9abedaf0580fe393be58c77929ea85ed6d"
+    },
+    {
+      "profile_id": "researchguard.logic.synthesis",
+      "family": "synthesis",
+      "path": "profiles/synthesis.json",
+      "sha256": "50dae76a2e8cfa295d37d6bf7ac0652b65da75917111e017e5d03f6947d7f821"
+    }
+  ],
+  "catalog_digest": "c426298f32eeae382c27f9f459e7ea682b240388b6b3c297094b0c119381dfdd"
+}

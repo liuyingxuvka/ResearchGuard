@@ -1,0 +1,18 @@
+- mention_id: ent_service
+  evidence_id: ev_log_spike
+  raw_name: Metadata API
+  normalized_name: metadata api
+  entity_type: asset
+  aliases:
+    - metadata service
+  role: affected_service
+  confidence: 0.86
+- mention_id: ent_cache
+  evidence_id: ev_issue_triage
+  raw_name: Cache invalidation job
+  normalized_name: cache invalidation job
+  entity_type: asset
+  aliases:
+    - cache job
+  role: suspected_cause
+  confidence: 0.8
