@@ -1,0 +1,114 @@
+metadata:
+  schema_version: researchguard.trace.model.v2
+  purpose: Demonstrate visible temporal contradiction when operation predates tender
+    evidence.
+  repository: https://github.com/liuyingxuvka/ResearchGuard
+  skill: TraceGuard
+  math_boundary: Typed constrained HL-MRF/MAP inference compiled to one convex QP
+    and solved directly by OSQP; structural support is not calibrated probability.
+  cli: researchguard trace diagnose examples/operation_before_tender_contradiction.yaml
+    --pretty
+  boundary: Contradicted traces must not be reported as clean project timelines.
+sources:
+- source_id: src_news
+  lineage_id: lineage_news
+  independence_group: source_news
+  title: News operation claim
+  source_type: news
+  source_reliability: 0.55
+  source_status: stable_keep
+- source_id: src_tender
+  lineage_id: lineage_tender
+  independence_group: source_tender
+  title: Tender notice after claimed operation
+  source_type: procurement
+  source_reliability: 0.9
+  source_status: stable_keep
+evidence:
+- evidence_id: ev_operation
+  source_id: src_news
+  raw_text: The plant is already operating in early 2024.
+  evidence_type: news
+  extraction_confidence: 0.6
+  evidence_specificity: 0.6
+  supports:
+  - event_operation
+  limits:
+  - single news claim
+  warnings: []
+  usable_as_project_evidence: true
+- evidence_id: ev_tender
+  source_id: src_tender
+  raw_text: Tender notice for first equipment package published in 2025.
+  evidence_type: tender_notice
+  extraction_confidence: 0.9
+  evidence_specificity: 0.9
+  supports:
+  - event_tender
+  limits: []
+  warnings: []
+  usable_as_project_evidence: true
+entities:
+- mention_id: ent_project
+  evidence_id: ev_operation
+  raw_name: Delta H2 Project
+  normalized_name: delta h2 project
+  entity_type: project
+  aliases: []
+  country: US
+  role: project
+  confidence: 0.7
+locations:
+- location_id: loc_site
+  raw_text: Delta County
+  normalized_name: delta county
+  country: US
+  location_role: project_site
+  confidence: 0.7
+events:
+- event_id: event_operation
+  evidence_ids:
+  - ev_operation
+  actor_ids:
+  - ent_project
+  action: claimed operation
+  object_ids:
+  - ent_project
+  event_type: operation_start
+  time_interval:
+    start: '2024'
+    precision: year
+    confidence: 0.7
+  location_ids:
+  - loc_site
+  stage_hint: operation
+  extraction_confidence: 0.55
+- event_id: event_tender
+  evidence_ids:
+  - ev_tender
+  actor_ids:
+  - ent_project
+  action: tender opened
+  object_ids:
+  - ent_project
+  event_type: tender_notice
+  time_interval:
+    start: '2025'
+    precision: year
+    confidence: 0.9
+  location_ids:
+  - loc_site
+  stage_hint: tendering
+  extraction_confidence: 0.86
+traces:
+- trace_id: trace_delta
+  title: Delta H2 contradicted trace
+  trace_type: project
+  event_ids:
+  - event_operation
+  - event_tender
+  entity_ids:
+  - ent_project
+  location_ids:
+  - loc_site
+  current_stage: unknown

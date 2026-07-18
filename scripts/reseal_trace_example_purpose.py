@@ -16,7 +16,7 @@ from researchguard.trace.purpose_contract import (
 ROOT = Path(__file__).resolve().parents[1]
 EXAMPLES = ROOT / "examples" / "trace"
 CONTRACT_PATH = EXAMPLES / "project_radar_task_purpose.json"
-CURRENT_BINDING_SCHEMA = "researchguard.trace.guard_purpose_binding.v2"
+CURRENT_BINDING_SCHEMA = "researchguard.trace.guard_purpose_binding.v3"
 
 
 def _read_yaml(path: Path) -> dict:
@@ -81,4 +81,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

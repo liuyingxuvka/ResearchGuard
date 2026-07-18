@@ -1,0 +1,39 @@
+{
+  "schema_version": "researchguard.trace.task_model_purpose.v1",
+  "contract_kind": "task_model_instance",
+  "contract_id": "researchguard.trace.example.project-radar.task-purpose.v1",
+  "model_instance_id": "researchguard.trace.example.project-radar.hydrogen-trace",
+  "target_skill_id": "traceguard",
+  "enforcement": "enforced",
+  "purpose": "Prevent this project-radar trace model from treating unusable event evidence or a contradictory event order as a supported clean storyline.",
+  "claim_boundary": "This task model tests evidence usability and visible temporal contradiction for the packaged example; it does not prove factual project status, causality, or future outcomes.",
+  "selected_failure_ids": [
+    "missing-event-evidence",
+    "hidden-temporal-contradiction"
+  ],
+  "known_good": {
+    "case_id": "good:project-radar-supported-trace",
+    "native_oracle_id": "oracle:traceguard:known-good",
+    "model_path": "project_radar_hydrogen_trace.yaml",
+    "model_sha256": "9fcf29e758171235bc9cca6a86415d9416e85e6c20c1348f94505aabc61affd0"
+  },
+  "known_bad_cases": [
+    {
+      "case_id": "bad:project-radar-unusable-event-evidence",
+      "failure_id": "missing-event-evidence",
+      "prevents": "An event or trace with unusable evidence is accepted as a supported storyline.",
+      "native_oracle_id": "oracle:traceguard:missing-event-evidence",
+      "model_path": "invalid_source_example.yaml",
+      "model_sha256": "1d420200cd5475df8b7567eaeb1e41ecb1a14ba0bc4f930874f8b582d407c3f9"
+    },
+    {
+      "case_id": "bad:project-radar-hidden-time-order-conflict",
+      "failure_id": "hidden-temporal-contradiction",
+      "prevents": "A blocking time-order contradiction is hidden while a clean storyline is licensed.",
+      "native_oracle_id": "oracle:traceguard:hidden-temporal-contradiction",
+      "model_path": "operation_before_tender_contradiction.yaml",
+      "model_sha256": "6d5166f6988bda85340721e9aef58a8c7e905dee382aeae9bdfd657cb9baacc1"
+    }
+  ],
+  "declaration_sequence": 1
+}

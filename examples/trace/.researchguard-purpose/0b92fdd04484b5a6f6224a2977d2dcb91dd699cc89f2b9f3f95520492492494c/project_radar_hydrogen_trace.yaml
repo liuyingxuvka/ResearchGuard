@@ -10,7 +10,7 @@ metadata:
   boundary: Source registry rows become evidence, events, and trace candidates before
     project claims.
   guard_purpose_contract:
-    schema_version: researchguard.trace.guard_purpose_binding.v3
+    schema_version: researchguard.trace.guard_purpose_binding.v2
     contract_kind: task_model_instance
     contract_id: researchguard.trace.example.project-radar.task-purpose.v1
     model_instance_id: researchguard.trace.example.project-radar.hydrogen-trace
@@ -22,9 +22,9 @@ metadata:
     selected_failure_ids:
     - missing-event-evidence
     - hidden-temporal-contradiction
-    contract_ref: .researchguard-purpose/0b92fdd04484b5a6f6224a2977d2dcb91dd699cc89f2b9f3f95520492492494c/project_radar_task_purpose.json
+    contract_ref: project_radar_task_purpose.json
     contract_fingerprint: 0b92fdd04484b5a6f6224a2977d2dcb91dd699cc89f2b9f3f95520492492494c
-    proof_receipt_fingerprint: 7c7946664c1f72f9087af56f5fff056ea71ef6c174d370365f5aae9fb8c8aa97
+    proof_receipt_fingerprint: 529f69d4126c6efff9bef6721e143084eba72164e1bd4307aaa026377ee5374a
     candidate_fingerprint: 9fcf29e758171235bc9cca6a86415d9416e85e6c20c1348f94505aabc61affd0
     purpose_declared_sequence: 1
     proof_completed_sequence: 2

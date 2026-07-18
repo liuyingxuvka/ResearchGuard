@@ -237,7 +237,11 @@ def test_candidate_binding_rejects_missing_binding_and_candidate_tamper(
         candidate,
         candidate_path=candidate_path,
     )
-    assert current["schema_version"] == "researchguard.trace.guard_purpose_binding.v2"
+    assert current["schema_version"] == "researchguard.trace.guard_purpose_binding.v3"
+    assert current["contract_ref"].startswith(".researchguard-purpose/")
+    bundled_contract = candidate_path.parent / current["contract_ref"]
+    assert bundled_contract.is_file()
+    assert (bundled_contract.parent / "project_radar_hydrogen_trace.yaml").is_file()
     assert current["selected_failure_ids"] == [
         "missing-event-evidence",
         "hidden-temporal-contradiction",
@@ -258,5 +262,16 @@ def test_candidate_binding_rejects_missing_binding_and_candidate_tamper(
         "traceguard_guard_purpose_binding_stale_or_mismatched",
         require_current_guard_purpose_binding,
         tampered,
+        candidate_path=candidate_path,
+    )
+
+    retired = deepcopy(candidate)
+    retired["metadata"]["guard_purpose_contract"]["schema_version"] = (
+        "researchguard.trace.guard_purpose_binding.v2"
+    )
+    _assert_contract_error(
+        "traceguard_guard_purpose_binding_stale_or_mismatched",
+        require_current_guard_purpose_binding,
+        retired,
         candidate_path=candidate_path,
     )

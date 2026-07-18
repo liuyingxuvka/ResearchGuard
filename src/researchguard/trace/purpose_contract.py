@@ -11,9 +11,11 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import shutil
 from copy import deepcopy
 from pathlib import Path
 from typing import Any, Mapping
+import uuid
 
 import yaml
 
@@ -421,7 +423,7 @@ def build_guard_purpose_binding(
             str(contract.get("contract_id", "")),
         )
     return {
-        "schema_version": "researchguard.trace.guard_purpose_binding.v2",
+        "schema_version": "researchguard.trace.guard_purpose_binding.v3",
         "contract_kind": "task_model_instance",
         "contract_id": str(contract["contract_id"]),
         "model_instance_id": str(contract["model_instance_id"]),
@@ -438,6 +440,68 @@ def build_guard_purpose_binding(
     }
 
 
+def _materialize_task_contract_bundle(
+    contract_path: Path,
+    candidate_path: Path,
+    contract: Mapping[str, Any],
+    proof_receipt: Mapping[str, Any],
+) -> str:
+    candidate_parent = candidate_path.parent
+    if not candidate_parent.is_dir():
+        raise GuardPurposeContractError(
+            "traceguard_candidate_parent_missing",
+            candidate_parent.as_posix(),
+        )
+    fingerprint = str(proof_receipt["contract_fingerprint"]).lower()
+    bundle_parent = candidate_parent / ".researchguard-purpose"
+    bundle_root = bundle_parent / fingerprint
+    source_rows = [
+        (contract_path, Path(contract_path.name)),
+        *[
+            (
+                _safe_case_path(contract_path, row),
+                Path(str(row["model_path"])),
+            )
+            for row in [contract["known_good"], *contract["known_bad_cases"]]
+        ],
+    ]
+    expected = {
+        relative.as_posix(): source.read_bytes()
+        for source, relative in source_rows
+    }
+
+    if bundle_root.exists():
+        actual = {
+            path.relative_to(bundle_root).as_posix(): path.read_bytes()
+            for path in bundle_root.rglob("*")
+            if path.is_file()
+        }
+        if actual != expected:
+            raise GuardPurposeContractError(
+                "traceguard_task_purpose_bundle_conflict",
+                bundle_root.as_posix(),
+            )
+    else:
+        bundle_parent.mkdir(parents=True, exist_ok=True)
+        stage = bundle_parent / f".stage-{uuid.uuid4().hex}"
+        stage.mkdir()
+        try:
+            for source, relative in source_rows:
+                destination = stage / relative
+                destination.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(source, destination)
+            os.replace(stage, bundle_root)
+        finally:
+            if stage.exists():
+                shutil.rmtree(stage)
+
+    return (
+        Path(".researchguard-purpose")
+        .joinpath(fingerprint, contract_path.name)
+        .as_posix()
+    )
+
+
 def bind_task_guard_purpose(
     model_data: Mapping[str, Any],
     *,
@@ -450,9 +514,12 @@ def bind_task_guard_purpose(
     family = load_family_guard_catalog()
     contract = _normalize_task_contract(raw, family_catalog=family)
     proof = prove_task_guard_contract(resolved_contract)
-    contract_ref = Path(
-        os.path.relpath(resolved_contract, start=resolved_candidate.parent)
-    ).as_posix()
+    contract_ref = _materialize_task_contract_bundle(
+        resolved_contract,
+        resolved_candidate,
+        contract,
+        proof,
+    )
     output = deepcopy(dict(model_data))
     metadata = output.setdefault("metadata", {})
     if not isinstance(metadata, dict):
@@ -502,7 +569,7 @@ def require_current_guard_purpose_binding(
             "traceguard_task_purpose_model_instance_mismatch",
             Path(candidate_path).as_posix(),
         )
-    if actual.get("schema_version") != "researchguard.trace.guard_purpose_binding.v2":
+    if actual.get("schema_version") != "researchguard.trace.guard_purpose_binding.v3":
         raise GuardPurposeContractError(
             "traceguard_guard_purpose_binding_stale_or_mismatched",
             str(actual.get("schema_version", "")),
