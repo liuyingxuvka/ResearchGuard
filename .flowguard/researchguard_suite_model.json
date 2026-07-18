@@ -1,6 +1,6 @@
 {
   "artifact_kind": "flowguard_researchguard_suite_model",
-  "model_id": "researchguard.suite.v0.1.0",
+  "model_id": "researchguard.suite.v0.1.1",
   "schema_version": "1.0",
   "behavior_plane": "product_runtime",
   "business_intents": [
@@ -37,6 +37,11 @@
       "alternate_success": false
     },
     {
+      "id": "resolve_mesh_store_package_identity",
+      "relation": "ResearchGuardVersion x Unresolved -> Set(CurrentPackageIdentity x Resolved, IdentityGap x Blocked)",
+      "alternate_success": false
+    },
+    {
       "id": "request_handoff",
       "relation": "NativeResult x Terminal -> Set(TypedHandoff x AwaitingOwner)",
       "alternate_success": false
@@ -70,7 +75,10 @@
     "no_forwarding_stub",
     "no_compatibility_reader",
     "no_fallback_route",
-    "no_dual_output"
+    "no_dual_output",
+    "mesh_store_uses_researchguard_package_identity",
+    "predecessor_distribution_state_cannot_change_fingerprint",
+    "no_predecessor_distribution_query"
   ],
   "claim_boundary": "This model governs suite routing, installation, migration, and authority topology. Member-native LogicGuard, SourceGuard, and TraceGuard evidence remains necessary for domain claims."
 }

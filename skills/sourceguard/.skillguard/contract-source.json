@@ -53,6 +53,7 @@
   "implementation_paths": [
     "skills/sourceguard",
     "src/researchguard/source",
+    "examples/source",
     "tests/source"
   ],
   "step_bindings": [
@@ -158,6 +159,10 @@
         },
         {
           "kind": "subtree",
+          "path": "examples/source"
+        },
+        {
+          "kind": "subtree",
           "path": "tests/source"
         }
       ],
@@ -190,5 +195,5 @@
     }
   ],
   "judgment_rubrics": [],
-  "claim_boundary": "This contract covers the current sourceguard consumer projection, native route, and member-owned tests inside ResearchGuard v0.1.0. It does not prove source truth, unrun external work, installation, publication, or future AI behavior."
+  "claim_boundary": "This contract covers the current sourceguard consumer projection, native route, and member-owned tests inside ResearchGuard v0.1.1. It does not prove source truth, unrun external work, installation, publication, or future AI behavior."
 }

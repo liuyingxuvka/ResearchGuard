@@ -1,4 +1,4 @@
-"""Install or check the first current ResearchGuard suite projection."""
+"""Install or check the sole current ResearchGuard suite projection."""
 
 from __future__ import annotations
 
@@ -31,7 +31,7 @@ RETIRED_SKILLS = (
     "logicguard-project-library-viewer",
     "traceguard-library",
 )
-VERSION = "0.1.0"
+VERSION = "0.1.1"
 
 
 class InstallError(RuntimeError):
@@ -277,11 +277,12 @@ def install() -> dict[str, object]:
         prior_version = importlib.metadata.version("researchguard")
     except importlib.metadata.PackageNotFoundError:
         prior_version = ""
-    if prior_version:
+    if prior_version not in {"", "0.1.0", VERSION}:
         raise InstallError(
-            "v0.1.0 is a first-install transaction; an existing ResearchGuard "
-            "distribution requires an explicit direct upgrade"
+            f"direct v0.1.1 replacement requires v0.1.0, v0.1.1, or no prior "
+            f"ResearchGuard distribution; found {prior_version}"
         )
+    prior_manifest = MANIFEST_PATH.read_bytes() if MANIFEST_PATH.is_file() else None
 
     with tempfile.TemporaryDirectory(prefix="researchguard-wheel-") as temporary:
         wheel_dir = Path(temporary)
@@ -298,9 +299,11 @@ def install() -> dict[str, object]:
             ],
             timeout=600,
         )
-        wheels = sorted(wheel_dir.glob("researchguard-0.1.0-*.whl"))
+        wheels = sorted(wheel_dir.glob(f"researchguard-{VERSION}-*.whl"))
         if len(wheels) != 1:
-            raise InstallError("wheel build did not produce exactly one v0.1.0 artifact")
+            raise InstallError(
+                f"wheel build did not produce exactly one v{VERSION} artifact"
+            )
         _native_command(
             [
                 sys.executable,
@@ -339,13 +342,14 @@ def install() -> dict[str, object]:
             _native_command([console, command, "--help"])
     except Exception:
         _restore_skills(backup)
-        subprocess.run(
-            [sys.executable, "-m", "pip", "uninstall", "-y", "researchguard"],
-            text=True,
-            capture_output=True,
-        )
-        if MANIFEST_PATH.exists():
-            MANIFEST_PATH.unlink()
+        if prior_manifest is None:
+            if MANIFEST_PATH.exists():
+                MANIFEST_PATH.unlink()
+        else:
+            INSTALL_ROOT.mkdir(parents=True, exist_ok=True)
+            temporary_manifest = MANIFEST_PATH.with_suffix(".restore")
+            temporary_manifest.write_bytes(prior_manifest)
+            os.replace(temporary_manifest, MANIFEST_PATH)
         raise
     shutil.rmtree(backup)
     return report

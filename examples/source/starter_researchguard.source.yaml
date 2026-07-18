@@ -37,7 +37,7 @@ metadata:
   math_boundary: POMDP-inspired approximate planner; utility ranks source discovery value, not truth.
   cli: researchguard source plan examples/starter_researchguard.source.yaml --model-contract examples/starter_researchguard.source.contract.json
   boundary: Candidate sources are not evidence; anchors are not events; handoff is not downstream validation.
-  version: 0.1.0
+  version: 0.1.1
   source_policy: public_only
   domain_hints:
   - example entity

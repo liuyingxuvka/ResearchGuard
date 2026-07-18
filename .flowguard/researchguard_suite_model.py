@@ -14,6 +14,7 @@ from flowguard import (
 )
 
 FLOWGUARD_MODEL_MARKER = "flowguard-executable-model"
+CURRENT_RESEARCHGUARD_VERSION = "0.1.1"
 
 
 MEMBER_BY_INTENT = {
@@ -40,6 +41,22 @@ class RouteState:
     primary_path_id: str = ""
     terminal_status: str = ""
     handoff_target: str = ""
+    alternate_attempts: int = 0
+
+
+@dataclass(frozen=True)
+class PackageIdentityRequest:
+    researchguard_version: str
+    predecessor_distribution_state: str
+    predecessor_version: str = ""
+
+
+@dataclass(frozen=True)
+class PackageIdentityState:
+    phase: str = "unresolved"
+    package_version: str = ""
+    fingerprint_owner: str = ""
+    predecessor_queries: int = 0
     alternate_attempts: int = 0
 
 
@@ -197,6 +214,48 @@ class OrchestrateHandoff:
         )
 
 
+class ResolveMeshStorePackageIdentity:
+    name = "ResolveMeshStorePackageIdentity"
+    accepted_input_type = PackageIdentityRequest
+    reads = ("researchguard_version",)
+    writes = (
+        "phase",
+        "package_version",
+        "fingerprint_owner",
+        "predecessor_queries",
+    )
+    input_description = "the sole current ResearchGuard in-package version"
+    output_description = "one current durable mesh-store identity"
+    idempotency = "predecessor distribution state is outside the relation"
+
+    def apply(
+        self,
+        request: PackageIdentityRequest,
+        state: PackageIdentityState,
+    ):
+        if (
+            state.phase != "unresolved"
+            or request.researchguard_version != CURRENT_RESEARCHGUARD_VERSION
+        ):
+            yield FunctionResult(
+                request,
+                replace(state, phase="blocked"),
+                label="package_identity_blocked",
+            )
+            return
+        yield FunctionResult(
+            request,
+            replace(
+                state,
+                phase="resolved",
+                package_version=request.researchguard_version,
+                fingerprint_owner="researchguard",
+                predecessor_queries=0,
+            ),
+            label="package_identity_resolved_current",
+        )
+
+
 def no_alternate_success() -> Invariant:
     def predicate(state: RouteState, _trace):
         if state.alternate_attempts:
@@ -233,6 +292,41 @@ def terminal_failure_stays_terminal() -> Invariant:
 INVARIANTS = (no_alternate_success(), terminal_failure_stays_terminal())
 
 
+def current_package_identity() -> Invariant:
+    def predicate(state: PackageIdentityState, _trace):
+        if state.phase == "resolved" and (
+            state.package_version != CURRENT_RESEARCHGUARD_VERSION
+            or state.fingerprint_owner != "researchguard"
+        ):
+            return InvariantResult.fail("mesh store identity is not current ResearchGuard")
+        return InvariantResult.pass_()
+
+    return Invariant(
+        "mesh_store_uses_researchguard_package_identity",
+        "Durable mesh-store identity is owned only by the current ResearchGuard package.",
+        predicate,
+    )
+
+
+def no_predecessor_distribution_query() -> Invariant:
+    def predicate(state: PackageIdentityState, _trace):
+        if state.predecessor_queries:
+            return InvariantResult.fail("a retired distribution influenced current identity")
+        return InvariantResult.pass_()
+
+    return Invariant(
+        "no_predecessor_distribution_query",
+        "Current identity never queries a retired Guard distribution.",
+        predicate,
+    )
+
+
+PACKAGE_IDENTITY_INVARIANTS = (
+    current_package_identity(),
+    no_predecessor_distribution_query(),
+)
+
+
 def build_workflow() -> Workflow:
     return Workflow(
         (Route(), ExecuteMember(), OrchestrateHandoff()),
@@ -240,8 +334,16 @@ def build_workflow() -> Workflow:
     )
 
 
+def build_package_identity_workflow() -> Workflow:
+    return Workflow(
+        (ResolveMeshStorePackageIdentity(),),
+        name="researchguard_package_identity",
+    )
+
+
 def scenarios() -> tuple[Scenario, ...]:
     workflow = build_workflow()
+    identity_workflow = build_package_identity_workflow()
     return (
         Scenario(
             name="RG01_direct_logic",
@@ -345,14 +447,55 @@ def scenarios() -> tuple[Scenario, ...]:
             workflow=workflow,
             invariants=INVARIANTS,
         ),
+        Scenario(
+            name="RG07_predecessor_distribution_absent",
+            description="Missing retired LogicGuard distribution cannot alter current identity.",
+            initial_state=PackageIdentityState(),
+            external_input_sequence=(
+                PackageIdentityRequest(
+                    CURRENT_RESEARCHGUARD_VERSION,
+                    predecessor_distribution_state="absent",
+                ),
+            ),
+            expected=ScenarioExpectation(
+                expected_status="ok",
+                required_trace_labels=("package_identity_resolved_current",),
+                summary="current ResearchGuard identity resolves without predecessor query",
+            ),
+            workflow=identity_workflow,
+            invariants=PACKAGE_IDENTITY_INVARIANTS,
+        ),
+        Scenario(
+            name="RG08_predecessor_distribution_present",
+            description="Installed retired LogicGuard distribution cannot alter current identity.",
+            initial_state=PackageIdentityState(),
+            external_input_sequence=(
+                PackageIdentityRequest(
+                    CURRENT_RESEARCHGUARD_VERSION,
+                    predecessor_distribution_state="present",
+                    predecessor_version="999.999.999",
+                ),
+            ),
+            expected=ScenarioExpectation(
+                expected_status="ok",
+                required_trace_labels=("package_identity_resolved_current",),
+                summary="the same current identity resolves when predecessor is present",
+            ),
+            workflow=identity_workflow,
+            invariants=PACKAGE_IDENTITY_INVARIANTS,
+        ),
     )
 
 
 __all__ = [
     "INVARIANTS",
+    "PACKAGE_IDENTITY_INVARIANTS",
     "MEMBER_BY_INTENT",
+    "PackageIdentityRequest",
+    "PackageIdentityState",
     "ResearchRequest",
     "RouteState",
+    "build_package_identity_workflow",
     "build_workflow",
     "scenarios",
 ]

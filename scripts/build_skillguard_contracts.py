@@ -18,6 +18,7 @@ TEST_ARGS = {
         "tests/test_root_cli.py",
         "tests/test_skill_suite.py",
         "tests/test_install_researchguard.py",
+        "tests/test_zero_residuals.py",
         "-q",
     ],
     "logicguard": ["-m", "pytest", "tests/logic", "-q"],
@@ -34,11 +35,13 @@ IMPLEMENTATION_PATHS = {
         "src/researchguard/routing.py",
         "src/researchguard/suite.py",
         "scripts/check_researchguard_suite.py",
+        "scripts/check_zero_residuals.py",
         "scripts/install_researchguard.py",
         "tests/test_suite_routing.py",
         "tests/test_root_cli.py",
         "tests/test_skill_suite.py",
         "tests/test_install_researchguard.py",
+        "tests/test_zero_residuals.py",
     ],
     "logicguard": [
         "skills/logicguard",
@@ -50,6 +53,7 @@ IMPLEMENTATION_PATHS = {
     "sourceguard": [
         "skills/sourceguard",
         "src/researchguard/source",
+        "examples/source",
         "tests/source",
     ],
     "traceguard": [
@@ -229,7 +233,7 @@ def contract(member: str) -> dict:
         "judgment_rubrics": [],
         "claim_boundary": (
             f"This contract covers the current {member} consumer projection, "
-            "native route, and member-owned tests inside ResearchGuard v0.1.0. "
+            "native route, and member-owned tests inside ResearchGuard v0.1.1. "
             "It does not prove source truth, unrun external work, installation, "
             "publication, or future AI behavior."
         ),

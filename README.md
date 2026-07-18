@@ -1,7 +1,7 @@
 # ResearchGuard
 
-**Current version:** `v0.1.0`  
-**当前版本：** `v0.1.0`
+**Current version:** `v0.1.1`
+**当前版本：** `v0.1.1`
 
 ResearchGuard is one versioned research-quality guard suite with four direct
 Codex entrypoints:
@@ -17,7 +17,7 @@ version, and one suite fingerprint. A selected member failure is terminal.
 ResearchGuard does not retry through another member, silently downgrade, or
 load legacy package formats.
 
-The first release is `v0.1.0`.
+The first release was `v0.1.0`.
 
 ## Codex-facing source intake contract
 

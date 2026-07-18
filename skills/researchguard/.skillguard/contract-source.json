@@ -58,11 +58,13 @@
     "src/researchguard/routing.py",
     "src/researchguard/suite.py",
     "scripts/check_researchguard_suite.py",
+    "scripts/check_zero_residuals.py",
     "scripts/install_researchguard.py",
     "tests/test_suite_routing.py",
     "tests/test_root_cli.py",
     "tests/test_skill_suite.py",
-    "tests/test_install_researchguard.py"
+    "tests/test_install_researchguard.py",
+    "tests/test_zero_residuals.py"
   ],
   "step_bindings": [
     {
@@ -156,6 +158,7 @@
         "tests/test_root_cli.py",
         "tests/test_skill_suite.py",
         "tests/test_install_researchguard.py",
+        "tests/test_zero_residuals.py",
         "-q"
       ],
       "cwd_token": "repository_root",
@@ -190,6 +193,10 @@
         },
         {
           "kind": "path",
+          "path": "scripts/check_zero_residuals.py"
+        },
+        {
+          "kind": "path",
           "path": "scripts/install_researchguard.py"
         },
         {
@@ -207,6 +214,10 @@
         {
           "kind": "path",
           "path": "tests/test_install_researchguard.py"
+        },
+        {
+          "kind": "path",
+          "path": "tests/test_zero_residuals.py"
         }
       ],
       "expected": {
@@ -238,5 +249,5 @@
     }
   ],
   "judgment_rubrics": [],
-  "claim_boundary": "This contract covers the current researchguard consumer projection, native route, and member-owned tests inside ResearchGuard v0.1.0. It does not prove source truth, unrun external work, installation, publication, or future AI behavior."
+  "claim_boundary": "This contract covers the current researchguard consumer projection, native route, and member-owned tests inside ResearchGuard v0.1.1. It does not prove source truth, unrun external work, installation, publication, or future AI behavior."
 }
