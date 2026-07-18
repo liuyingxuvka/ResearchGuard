@@ -32,6 +32,10 @@ normal-runtime authority.
 - Do not let `$researchguard` reimplement a member's native judgment.
 - Do not preserve old package names, console scripts, Skill IDs, schemas, or
   aliases for convenience.
+- Resolve the installed `researchguard` console executable from the wheel's
+  installed distribution record and execute that exact file during installation
+  validation. PATH lookup, alternate commands, and fallback launchers are not
+  installation authorities.
 - Do not make old repositories private before the new release and consumer
   migration are verified.
 - Do not treat a typed cross-Guard handoff as automatic fallback.

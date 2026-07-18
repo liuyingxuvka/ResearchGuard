@@ -58,9 +58,11 @@
     "src/researchguard/routing.py",
     "src/researchguard/suite.py",
     "scripts/check_researchguard_suite.py",
+    "scripts/install_researchguard.py",
     "tests/test_suite_routing.py",
     "tests/test_root_cli.py",
-    "tests/test_skill_suite.py"
+    "tests/test_skill_suite.py",
+    "tests/test_install_researchguard.py"
   ],
   "step_bindings": [
     {
@@ -153,6 +155,7 @@
         "tests/test_suite_routing.py",
         "tests/test_root_cli.py",
         "tests/test_skill_suite.py",
+        "tests/test_install_researchguard.py",
         "-q"
       ],
       "cwd_token": "repository_root",
@@ -187,6 +190,10 @@
         },
         {
           "kind": "path",
+          "path": "scripts/install_researchguard.py"
+        },
+        {
+          "kind": "path",
           "path": "tests/test_suite_routing.py"
         },
         {
@@ -196,6 +203,10 @@
         {
           "kind": "path",
           "path": "tests/test_skill_suite.py"
+        },
+        {
+          "kind": "path",
+          "path": "tests/test_install_researchguard.py"
         }
       ],
       "expected": {

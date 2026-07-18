@@ -97,6 +97,35 @@ def _installed_version() -> str:
         raise InstallError("ResearchGuard distribution metadata is unavailable") from exc
 
 
+def _installed_console_entrypoint() -> Path:
+    try:
+        distribution = importlib.metadata.distribution("researchguard")
+    except importlib.metadata.PackageNotFoundError as exc:
+        raise InstallError("ResearchGuard distribution metadata is unavailable") from exc
+    entries = [
+        entry
+        for entry in distribution.entry_points
+        if entry.group == "console_scripts"
+        and entry.name == "researchguard"
+        and entry.value == "researchguard.cli:main"
+    ]
+    if len(entries) != 1:
+        raise InstallError(
+            "installed distribution must declare exactly one researchguard console entry"
+        )
+    candidates = [
+        Path(distribution.locate_file(relative)).resolve()
+        for relative in distribution.files or ()
+        if Path(str(relative)).name.lower() in {"researchguard", "researchguard.exe"}
+    ]
+    current = sorted({path for path in candidates if path.is_file()})
+    if len(current) != 1:
+        raise InstallError(
+            "installed distribution must materialize exactly one researchguard console executable"
+        )
+    return current[0]
+
+
 def _native_command(args: list[str], *, timeout: int = 300) -> None:
     completed = subprocess.run(
         args,
@@ -304,9 +333,10 @@ def install() -> dict[str, object]:
         report = check_current()
         if report["status"] != "pass":
             raise InstallError(json.dumps(report, ensure_ascii=False))
-        _native_command(["researchguard", "--version"])
+        console = str(_installed_console_entrypoint())
+        _native_command([console, "--version"])
         for command in ("logic", "source", "trace"):
-            _native_command(["researchguard", command, "--help"])
+            _native_command([console, command, "--help"])
     except Exception:
         _restore_skills(backup)
         subprocess.run(
