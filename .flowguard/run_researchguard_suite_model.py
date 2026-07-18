@@ -55,6 +55,9 @@ def _check_topology() -> list[str]:
         "no_compatibility_reader",
         "no_fallback_route",
         "no_dual_output",
+        "mesh_store_uses_researchguard_package_identity",
+        "predecessor_distribution_state_cannot_change_fingerprint",
+        "no_predecessor_distribution_query",
     }
     missing = sorted(required - invariants)
     if missing:

@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import base64
 import hashlib
-import importlib.metadata
 import json
 import os
 import socket
@@ -13,6 +12,7 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Any, Callable, Iterable, Iterator, Mapping, Protocol
 
+from .. import __version__ as RESEARCHGUARD_VERSION
 from .identity import (
     EdgeId,
     MeshEvaluationId,
@@ -86,10 +86,7 @@ def _storage_segment(identity: Any) -> str:
 
 
 def _package_version() -> str:
-    try:
-        return importlib.metadata.version("logicguard")
-    except importlib.metadata.PackageNotFoundError:
-        return "0+local"
+    return RESEARCHGUARD_VERSION
 
 
 MESH_STORE_TOOL_FINGERPRINT = canonical_digest(

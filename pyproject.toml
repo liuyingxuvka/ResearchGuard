@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "researchguard"
-version = "0.1.0"
+version = "0.1.1"
 description = "One versioned research guard suite for argument, source-discovery, and evidence-trace reasoning."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -62,4 +62,3 @@ include = ["researchguard*"]
 testpaths = ["tests"]
 addopts = "-q"
 pythonpath = ["src"]
-

@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.1.1 - 2026-07-18
+
+- Bind durable mesh-store receipts and fingerprints to the current
+  `researchguard` package identity only.
+- Prove that a retired `logicguard` distribution being present or absent cannot
+  change the current ResearchGuard fingerprint.
+- Strengthen zero-residual checks so retired Python imports, distribution
+  metadata queries, and declared dependencies block release.
+- Directly migrate the current SourceGuard examples to the v0.1.1 suite
+  identity and bind them into the SourceGuard maintenance graph.
+- Support one direct `v0.1.0` to `v0.1.1` replacement transaction without
+  introducing a compatibility reader, alias, or fallback runtime.
+
 ## v0.1.0 - 2026-07-18
 
 - Consolidate LogicGuard, SourceGuard, and TraceGuard into one versioned

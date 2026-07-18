@@ -39,6 +39,46 @@
 - Rerun affected FlowGuard model checks and focused tests before broad confidence.
 
 
+## researchguard-v0.1.1-package-identity - Model-miss repair
+
+- Project: ResearchGuard
+- Trigger reason: the v0.1.0 mesh-store fingerprint queried the retired
+  `logicguard` distribution and produced `0.18.0` instead of the current
+  ResearchGuard `0.1.0` identity.
+- Status: completed
+- Skill decision: reused the existing ResearchGuard suite model and applied
+  the model-miss and development-process routes.
+- Model files:
+  - `.flowguard/researchguard_suite_model.py`
+  - `.flowguard/researchguard_suite_model.json`
+  - `.flowguard/run_researchguard_suite_model.py`
+- Model-miss class: `code_boundary_mismatch`
+- Findings:
+  - package identity now comes only from the current in-package
+    `researchguard.__version__`;
+  - predecessor-present and predecessor-absent scenarios resolve the same
+    current identity without a metadata query or alternate-success edge;
+  - the zero-residual scanner rejects retired imports, metadata queries, and
+    declared dependencies.
+- Commands:
+  - PASS: focused package-identity, residual, installer, and suite-routing tests
+    (`16 passed`)
+  - PASS: executable FlowGuard model (`8/8` scenarios)
+  - PASS: zero-residual scanner (`0` findings)
+- Counterexamples: the frozen v0.1.0 reproduction resolved
+  `logicguard==0.18.0` into the mesh-store tool fingerprint.
+- Friction points: predictive-KB preflight was fail-closed because the current
+  Chaos Brain maintenance standard was not committed; no fallback retrieval
+  was attempted.
+- Skipped steps: native member tests, installation, and release evidence are
+  separate gates and are not claimed by this entry.
+- Next actions: run all member-native checks, the full suite, exact installation
+  parity, and the v0.1.1 release identity audit.
+- Claim boundary: this entry covers the executable model-miss repair and
+  focused evidence only; it does not by itself prove full tests, installation,
+  or publication.
+
+
 ## flowguard-project-upgrade - FlowGuard project upgrade record update
 
 - Project: ResearchGuard

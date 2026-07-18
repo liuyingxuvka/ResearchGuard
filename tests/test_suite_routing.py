@@ -8,7 +8,7 @@ from researchguard.suite import suite_identity
 def test_suite_identity_is_single_and_complete() -> None:
     identity = suite_identity()
     assert identity["suite_id"] == SUITE_ID
-    assert identity["version"] == __version__ == "0.1.0"
+    assert identity["version"] == __version__ == "0.1.1"
     assert identity["members"] == list(MEMBER_IDS)
     assert identity["distribution"] == "researchguard"
     assert identity["console_script"] == "researchguard"
@@ -64,4 +64,3 @@ def test_handoff_waits_for_explicit_outer_owner() -> None:
     )
     assert handoff.status == "awaiting_owner"
     assert handoff.target_member_id == "traceguard"
-
