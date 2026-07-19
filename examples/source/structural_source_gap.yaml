@@ -35,7 +35,7 @@ metadata:
   repository: https://github.com/liuyingxuvka/ResearchGuard
   skill: SourceGuard
   math_boundary: Utility ranks source discovery value, not truth.
-  version: 0.1.1
+  version: 0.1.2
   source_policy: public_only
 leads:
 - lead_id: thesis-technology-summary

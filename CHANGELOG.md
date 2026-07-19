@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.1.2 - 2026-07-19
+
+- Refresh the four ResearchGuard author-side SkillGuard contracts and current
+  FlowGuard adoption records without exposing maintainer evidence to consumers.
+- Keep `researchguard` as the single runtime distribution while preserving
+  ResearchGuard, LogicGuard, SourceGuard, and TraceGuard as direct skill
+  entrypoints backed by exactly three native member owners.
+- Support one direct `v0.1.1` to `v0.1.2` replacement transaction with no
+  compatibility reader, alias, alternate launcher, or fallback runtime.
+
 ## v0.1.1 - 2026-07-18
 
 - Bind durable mesh-store receipts and fingerprints to the current

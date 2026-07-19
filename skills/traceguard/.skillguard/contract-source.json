@@ -53,6 +53,7 @@
   "implementation_paths": [
     "skills/traceguard",
     "src/researchguard/trace",
+    ".flowguard/traceguard_skill_contract_model.py",
     ".flowguard/researchguard_skill_contract_model_common.py",
     "tests/trace"
   ],
@@ -158,6 +159,14 @@
           "path": "src/researchguard/trace"
         },
         {
+          "kind": "path",
+          "path": ".flowguard/traceguard_skill_contract_model.py"
+        },
+        {
+          "kind": "path",
+          "path": ".flowguard/researchguard_skill_contract_model_common.py"
+        },
+        {
           "kind": "subtree",
           "path": "tests/trace"
         }
@@ -191,5 +200,5 @@
     }
   ],
   "judgment_rubrics": [],
-  "claim_boundary": "This contract covers the current traceguard consumer projection, native route, and member-owned tests inside ResearchGuard v0.1.1. It does not prove source truth, unrun external work, installation, publication, or future AI behavior."
+  "claim_boundary": "This contract covers the current traceguard consumer projection, native route, and member-owned tests inside ResearchGuard v0.1.2. It does not prove source truth, unrun external work, installation, publication, or future AI behavior."
 }

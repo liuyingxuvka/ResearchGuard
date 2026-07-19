@@ -55,6 +55,7 @@
     "src/researchguard/logic",
     "src/researchguard/logic_template_packs",
     "src/researchguard/logic_viewer",
+    ".flowguard/logicguard_skill_contract_model.py",
     ".flowguard/researchguard_skill_contract_model_common.py",
     "tests/logic"
   ],
@@ -168,6 +169,14 @@
           "path": "src/researchguard/logic_viewer"
         },
         {
+          "kind": "path",
+          "path": ".flowguard/logicguard_skill_contract_model.py"
+        },
+        {
+          "kind": "path",
+          "path": ".flowguard/researchguard_skill_contract_model_common.py"
+        },
+        {
           "kind": "subtree",
           "path": "tests/logic"
         }
@@ -201,5 +210,5 @@
     }
   ],
   "judgment_rubrics": [],
-  "claim_boundary": "This contract covers the current logicguard consumer projection, native route, and member-owned tests inside ResearchGuard v0.1.1. It does not prove source truth, unrun external work, installation, publication, or future AI behavior."
+  "claim_boundary": "This contract covers the current logicguard consumer projection, native route, and member-owned tests inside ResearchGuard v0.1.2. It does not prove source truth, unrun external work, installation, publication, or future AI behavior."
 }

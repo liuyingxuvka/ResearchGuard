@@ -57,6 +57,7 @@
     "src/researchguard/cli.py",
     "src/researchguard/routing.py",
     "src/researchguard/suite.py",
+    ".flowguard/researchguard_skill_contract_model.py",
     ".flowguard/researchguard_skill_contract_model_common.py",
     "scripts/check_researchguard_suite.py",
     "scripts/check_zero_residuals.py",
@@ -190,6 +191,14 @@
         },
         {
           "kind": "path",
+          "path": ".flowguard/researchguard_skill_contract_model.py"
+        },
+        {
+          "kind": "path",
+          "path": ".flowguard/researchguard_skill_contract_model_common.py"
+        },
+        {
+          "kind": "path",
           "path": "scripts/check_researchguard_suite.py"
         },
         {
@@ -250,5 +259,5 @@
     }
   ],
   "judgment_rubrics": [],
-  "claim_boundary": "This contract covers the current researchguard consumer projection, native route, and member-owned tests inside ResearchGuard v0.1.1. It does not prove source truth, unrun external work, installation, publication, or future AI behavior."
+  "claim_boundary": "This contract covers the current researchguard consumer projection, native route, and member-owned tests inside ResearchGuard v0.1.2. It does not prove source truth, unrun external work, installation, publication, or future AI behavior."
 }

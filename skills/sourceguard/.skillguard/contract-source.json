@@ -53,6 +53,7 @@
   "implementation_paths": [
     "skills/sourceguard",
     "src/researchguard/source",
+    ".flowguard/sourceguard_skill_contract_model.py",
     ".flowguard/researchguard_skill_contract_model_common.py",
     "examples/source",
     "tests/source"
@@ -159,6 +160,14 @@
           "path": "src/researchguard/source"
         },
         {
+          "kind": "path",
+          "path": ".flowguard/sourceguard_skill_contract_model.py"
+        },
+        {
+          "kind": "path",
+          "path": ".flowguard/researchguard_skill_contract_model_common.py"
+        },
+        {
           "kind": "subtree",
           "path": "examples/source"
         },
@@ -196,5 +205,5 @@
     }
   ],
   "judgment_rubrics": [],
-  "claim_boundary": "This contract covers the current sourceguard consumer projection, native route, and member-owned tests inside ResearchGuard v0.1.1. It does not prove source truth, unrun external work, installation, publication, or future AI behavior."
+  "claim_boundary": "This contract covers the current sourceguard consumer projection, native route, and member-owned tests inside ResearchGuard v0.1.2. It does not prove source truth, unrun external work, installation, publication, or future AI behavior."
 }

@@ -1,6 +1,6 @@
 {
   "artifact_kind": "flowguard_researchguard_suite_model",
-  "model_id": "researchguard.suite.v0.1.1",
+  "model_id": "researchguard.suite.v0.1.2",
   "schema_version": "1.0",
   "behavior_plane": "product_runtime",
   "business_intents": [

@@ -14,7 +14,7 @@ from flowguard import (
 )
 
 FLOWGUARD_MODEL_MARKER = "flowguard-executable-model"
-CURRENT_RESEARCHGUARD_VERSION = "0.1.1"
+CURRENT_RESEARCHGUARD_VERSION = "0.1.2"
 
 
 MEMBER_BY_INTENT = {
