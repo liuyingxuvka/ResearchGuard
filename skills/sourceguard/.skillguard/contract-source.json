@@ -53,6 +53,7 @@
   "implementation_paths": [
     "skills/sourceguard",
     "src/researchguard/source",
+    ".flowguard/researchguard_skill_contract_model_common.py",
     "examples/source",
     "tests/source"
   ],

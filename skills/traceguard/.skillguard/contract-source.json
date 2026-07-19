@@ -53,6 +53,7 @@
   "implementation_paths": [
     "skills/traceguard",
     "src/researchguard/trace",
+    ".flowguard/researchguard_skill_contract_model_common.py",
     "tests/trace"
   ],
   "step_bindings": [

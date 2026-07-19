@@ -55,6 +55,7 @@
     "src/researchguard/logic",
     "src/researchguard/logic_template_packs",
     "src/researchguard/logic_viewer",
+    ".flowguard/researchguard_skill_contract_model_common.py",
     "tests/logic"
   ],
   "step_bindings": [

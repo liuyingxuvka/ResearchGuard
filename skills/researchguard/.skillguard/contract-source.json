@@ -57,6 +57,7 @@
     "src/researchguard/cli.py",
     "src/researchguard/routing.py",
     "src/researchguard/suite.py",
+    ".flowguard/researchguard_skill_contract_model_common.py",
     "scripts/check_researchguard_suite.py",
     "scripts/check_zero_residuals.py",
     "scripts/install_researchguard.py",
