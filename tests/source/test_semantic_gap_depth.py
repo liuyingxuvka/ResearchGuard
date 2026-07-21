@@ -17,6 +17,8 @@ from researchguard.source import (
     build_source_depth_receipt,
 )
 from researchguard.source.planner import generate_actions_from_gaps
+from researchguard.source.guard_contract import prove_target_model_contract
+from researchguard.source.loader import load_model
 from researchguard.source.update import apply_observation
 from researchguard.source.schema import (
     SchemaError,
@@ -25,6 +27,7 @@ from researchguard.source.schema import (
     bind_sourceguard_model_contract,
     build_sourceguard_model_contract,
     sourceguard_model_contract_fingerprint,
+    to_plain,
 )
 
 
@@ -360,6 +363,66 @@ def _broad_observation(*, shared_lineage: bool = False) -> Observation:
     )
 
 
+def test_content_anchor_purpose_contract_observes_catalog_blocking_finding(
+    tmp_path: Path,
+) -> None:
+    model = _broad_state()
+    observation = _broad_observation()
+    contract = build_sourceguard_model_contract(
+        model_id="test-content-anchor-purpose-proof",
+        purpose="Prevent contentless anchors from satisfying governed source depth.",
+        prevented_failures=[
+            SourceGuardPreventedFailure(
+                failure_id="failure:test:contentless-anchor",
+                title="Contentless anchor satisfies governed source depth",
+                block_when=(
+                    "a governed gap passes although every linked anchor lacks extracted "
+                    "text and a normalized content summary"
+                ),
+                oracle_id="oracle:sourceguard:content-anchor",
+                known_good=SourceGuardProofCase(
+                    "good:test:content-bearing",
+                    "content-anchor-observation.json",
+                    "pass",
+                ),
+                known_bad=SourceGuardProofCase(
+                    "bad:test:contentless",
+                    "content-anchor-observation.json",
+                    "blocked",
+                    "remove-anchor-content",
+                    "sourceguard_blocked:contentless-anchor",
+                ),
+            )
+        ],
+        gap_ids=[gap.gap_id for gap in model.gaps],
+        target_unit_ids=["unit:central-claim"],
+        claim_boundary=(
+            "Content-anchor depth identity only; factual truth remains downstream."
+        ),
+    )
+    bind_sourceguard_model_contract(model, contract=contract)
+
+    model_path = tmp_path / "content-anchor-model.json"
+    contract_path = tmp_path / "content-anchor-model.contract.json"
+    observation_path = tmp_path / "content-anchor-observation.json"
+    model_path.write_text(json.dumps(to_plain(model), indent=2), encoding="utf-8")
+    contract_path.write_text(json.dumps(contract.to_dict(), indent=2), encoding="utf-8")
+    observation_path.write_text(
+        json.dumps(to_plain(observation), indent=2), encoding="utf-8"
+    )
+
+    loaded = load_model(model_path, contract_path)
+    proof = prove_target_model_contract(loaded, contract_path)
+
+    assert proof["status"] == "pass"
+    assert proof["failure_results"][0]["known_good"]["status"] == "pass"
+    assert proof["failure_results"][0]["known_bad"] == {
+        "status": "blocked",
+        "observation_path": "content-anchor-observation.json",
+        "native_finding": "sourceguard_blocked:contentless-anchor",
+    }
+
+
 def test_one_gap_one_source_cannot_license_broad_source_depth() -> None:
     state = _guard(
         BeliefState(
@@ -552,7 +615,15 @@ def test_locator_without_anchor_content_cannot_satisfy_broad_object_depth() -> N
 
     assert receipt.broad_claim_licensed is False
     assert all(item.status == "fail" for item in receipt.coverage_universe.object_depth_rows)
-    assert any("no_content_qualified_anchor" in item.findings for item in receipt.coverage_universe.object_depth_rows)
+    rows = receipt.coverage_universe.object_depth_rows
+    assert all(
+        "sourceguard_blocked:contentless-anchor" in item.findings for item in rows
+    )
+    assert all(
+        any(finding.startswith("missing_portfolio_classes:") for finding in item.findings)
+        for item in rows
+    )
+    assert all("independent_lineage_floor_not_met" in item.findings for item in rows)
 
 
 def test_missing_lineage_is_not_treated_as_independent_source_identity() -> None:

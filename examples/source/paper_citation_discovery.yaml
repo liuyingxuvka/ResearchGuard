@@ -38,7 +38,7 @@ metadata:
   cli: researchguard source plan examples/paper_citation_discovery.yaml --model-contract examples/paper_citation_discovery.contract.json
     --pretty
   boundary: Citation candidates are not final claim support until modeled downstream.
-  version: 0.1.2
+  version: 0.1.3
   source_policy: public_only
 leads:
 - lead_id: paper-lineage

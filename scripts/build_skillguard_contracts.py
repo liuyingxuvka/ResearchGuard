@@ -57,6 +57,7 @@ IMPLEMENTATION_PATHS = {
     "sourceguard": [
         "skills/sourceguard",
         "src/researchguard/source",
+        ".flowguard/sourceguard_content_anchor_oracle_model.py",
         ".flowguard/sourceguard_skill_contract_model.py",
         ".flowguard/researchguard_skill_contract_model_common.py",
         "examples/source",
@@ -241,7 +242,7 @@ def contract(member: str) -> dict:
         "judgment_rubrics": [],
         "claim_boundary": (
             f"This contract covers the current {member} consumer projection, "
-            "native route, and member-owned tests inside ResearchGuard v0.1.2. "
+            "native route, and member-owned tests inside ResearchGuard v0.1.3. "
             "It does not prove source truth, unrun external work, installation, "
             "publication, or future AI behavior."
         ),

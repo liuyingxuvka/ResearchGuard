@@ -462,7 +462,7 @@ def build_source_coverage_universe(
         if len(gap_lineages) < policy.minimum_independent_lineages:
             row_findings.append("independent_lineage_floor_not_met")
         if not qualified_rows:
-            row_findings.append("no_content_qualified_anchor")
+            row_findings.append("sourceguard_blocked:contentless-anchor")
         obligation_evidence: list[dict[str, object]] = []
         for portfolio_class in sorted(required_classes):
             for evidence_row in qualified_rows:

@@ -61,7 +61,7 @@ def _assert(condition: bool, message: str, checks: list[dict[str, str]]) -> None
 
 
 def _check_common(checks: list[dict[str, str]]) -> None:
-    _assert(__version__ == "0.1.2", "suite version is exactly 0.1.2", checks)
+    _assert(__version__ == "0.1.3", "suite version is exactly 0.1.3", checks)
     skill_dirs = sorted(path.name for path in (ROOT / "skills").iterdir() if path.is_dir())
     _assert(
         skill_dirs == sorted(MEMBERS),

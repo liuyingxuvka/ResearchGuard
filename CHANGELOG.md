@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.1.3 - 2026-07-22
+
+- Align the SourceGuard content-anchor depth finding with the catalog-declared
+  `sourceguard_blocked:contentless-anchor` oracle contract so the native
+  target-purpose gate closes for the declared bad case.
+- Add an executable FlowGuard regression model and native end-to-end coverage
+  that reject the retired `no_content_qualified_anchor` finding without an
+  alias, dual emission, or fallback path.
+- Support one direct `v0.1.2` to `v0.1.3` replacement transaction with no
+  compatibility reader, alternate launcher, or fallback runtime.
+
 ## v0.1.2 - 2026-07-19
 
 - Refresh the four ResearchGuard author-side SkillGuard contracts and current
