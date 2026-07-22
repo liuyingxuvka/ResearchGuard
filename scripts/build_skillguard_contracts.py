@@ -242,7 +242,7 @@ def contract(member: str) -> dict:
         "judgment_rubrics": [],
         "claim_boundary": (
             f"This contract covers the current {member} consumer projection, "
-            "native route, and member-owned tests inside ResearchGuard v0.1.3. "
+            "native route, and member-owned tests inside ResearchGuard v0.1.4. "
             "It does not prove source truth, unrun external work, installation, "
             "publication, or future AI behavior."
         ),

@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.1.4 - 2026-07-22
+
+- Adopt SkillGuard 0.4 bounded evidence lifecycle for the four maintained ResearchGuard members.
+- Preserve the eight target-declared semantic checks and four independent closure identities.
+- Keep consumer distributions free of author-side SkillGuard state.
+
 ## v0.1.3 - 2026-07-22
 
 - Align the SourceGuard content-anchor depth finding with the catalog-declared

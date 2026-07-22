@@ -1,0 +1,112 @@
+{
+  "schema_version": "researchguard.skillguard_unit_validation_plan.v1",
+  "status": "frozen",
+  "maintenance_unit_id": "unit:researchguard-suite",
+  "member_skill_ids": [
+    "researchguard",
+    "logicguard",
+    "sourceguard",
+    "traceguard"
+  ],
+  "toolchain": {
+    "skillguard_version": "0.4.0",
+    "skillguard_source_revision": "3cfdca77567dacfa77c8a8d0696e116fe0e925c3",
+    "flowguard_version": "0.59.0",
+    "python_command": "python"
+  },
+  "private_roots": {
+    "run_state_root": "work/skillguard/v0.4.0-current/run-state",
+    "owner_evidence_root": "work/verification/skillguard-v0.4.0-current/owner-evidence"
+  },
+  "members": [
+    {
+      "member_skill_id": "researchguard",
+      "contract_hash": "FC029E3FE867A1BAE56565CA1F3EAF75299BF0BE2F1C9B7919665187CFCA6AC6",
+      "manifest_hash": "C8275989512639C8B9729A2B9E31932499D5E806E2F91F4F7D6FCBDD31BFFF77",
+      "checks": [
+        {
+          "check_id": "check:researchguard:consumer-contract",
+          "evidence_subject_id": "subject:researchguard:researchguard:consumer-contract",
+          "execution_owner_id": "owner:researchguard:researchguard:consumer-contract",
+          "evidence_domain_id": "evidence-domain:researchguard:researchguard:consumer-contract",
+          "depends_on_check_ids": []
+        },
+        {
+          "check_id": "check:researchguard:native-tests",
+          "evidence_subject_id": "subject:researchguard:researchguard:native-tests",
+          "execution_owner_id": "owner:researchguard:researchguard:native-tests",
+          "evidence_domain_id": "evidence-domain:researchguard:researchguard:native-tests",
+          "depends_on_check_ids": ["check:researchguard:consumer-contract"]
+        }
+      ]
+    },
+    {
+      "member_skill_id": "logicguard",
+      "contract_hash": "22061428B79DEE46E5F6AEBEDAFE95C49CE8C53334C87FC6199E2B012388E23F",
+      "manifest_hash": "712580E429EF0F7825C4DFBF4D333D83386F1836D8B16F7B947DCADEF51E54C9",
+      "checks": [
+        {
+          "check_id": "check:logicguard:consumer-contract",
+          "evidence_subject_id": "subject:researchguard:logicguard:consumer-contract",
+          "execution_owner_id": "owner:researchguard:logicguard:consumer-contract",
+          "evidence_domain_id": "evidence-domain:researchguard:logicguard:consumer-contract",
+          "depends_on_check_ids": []
+        },
+        {
+          "check_id": "check:logicguard:native-tests",
+          "evidence_subject_id": "subject:researchguard:logicguard:native-tests",
+          "execution_owner_id": "owner:researchguard:logicguard:native-tests",
+          "evidence_domain_id": "evidence-domain:researchguard:logicguard:native-tests",
+          "depends_on_check_ids": ["check:logicguard:consumer-contract"]
+        }
+      ]
+    },
+    {
+      "member_skill_id": "sourceguard",
+      "contract_hash": "4E95BC1BB8C972628E6E8C8DC4516A3F91336D33CF54FF50634D34D562063692",
+      "manifest_hash": "7677CDD741E451E0CCE8FDDC2734FCD5A0AF3F1F9419BB42F31FB66937349466",
+      "checks": [
+        {
+          "check_id": "check:sourceguard:consumer-contract",
+          "evidence_subject_id": "subject:researchguard:sourceguard:consumer-contract",
+          "execution_owner_id": "owner:researchguard:sourceguard:consumer-contract",
+          "evidence_domain_id": "evidence-domain:researchguard:sourceguard:consumer-contract",
+          "depends_on_check_ids": []
+        },
+        {
+          "check_id": "check:sourceguard:native-tests",
+          "evidence_subject_id": "subject:researchguard:sourceguard:native-tests",
+          "execution_owner_id": "owner:researchguard:sourceguard:native-tests",
+          "evidence_domain_id": "evidence-domain:researchguard:sourceguard:native-tests",
+          "depends_on_check_ids": ["check:sourceguard:consumer-contract"]
+        }
+      ]
+    },
+    {
+      "member_skill_id": "traceguard",
+      "contract_hash": "14B3E42A0A3212A9C7F7D3196D54732B45F7602564200A33EFB09A6E7F77E1FF",
+      "manifest_hash": "49F97C6B80838A5A013C6FC77845C8A580531B25363A8A2C8E179EDAA44D4D3A",
+      "checks": [
+        {
+          "check_id": "check:traceguard:consumer-contract",
+          "evidence_subject_id": "subject:researchguard:traceguard:consumer-contract",
+          "execution_owner_id": "owner:researchguard:traceguard:consumer-contract",
+          "evidence_domain_id": "evidence-domain:researchguard:traceguard:consumer-contract",
+          "depends_on_check_ids": []
+        },
+        {
+          "check_id": "check:traceguard:native-tests",
+          "evidence_subject_id": "subject:researchguard:traceguard:native-tests",
+          "execution_owner_id": "owner:researchguard:traceguard:native-tests",
+          "evidence_domain_id": "evidence-domain:researchguard:traceguard:native-tests",
+          "depends_on_check_ids": ["check:traceguard:consumer-contract"]
+        }
+      ]
+    }
+  ],
+  "execution_owner_count": 8,
+  "check_count": 8,
+  "cross_unit_receipt_reuse": false,
+  "skillguard_adds_domain_route": false,
+  "claim_boundary": "This freezes the exact same-unit owner inventory for the current local maintenance change. It does not itself execute a check, activate a consumer installation, publish a release, or retire predecessor repositories."
+}

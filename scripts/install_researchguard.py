@@ -31,7 +31,7 @@ RETIRED_SKILLS = (
     "logicguard-project-library-viewer",
     "traceguard-library",
 )
-VERSION = "0.1.3"
+VERSION = "0.1.4"
 
 
 class InstallError(RuntimeError):
@@ -279,7 +279,7 @@ def install() -> dict[str, object]:
         prior_version = ""
     if prior_version not in {"", "0.1.2", VERSION}:
         raise InstallError(
-            f"direct v0.1.3 replacement requires v0.1.2, v0.1.3, or no prior "
+            f"direct v0.1.4 replacement requires v0.1.3, v0.1.4, or no prior "
             f"ResearchGuard distribution; found {prior_version}"
         )
     prior_manifest = MANIFEST_PATH.read_bytes() if MANIFEST_PATH.is_file() else None

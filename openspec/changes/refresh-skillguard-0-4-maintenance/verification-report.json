@@ -1,0 +1,132 @@
+{
+  "schema_version": "researchguard.skillguard_0_4_verification_report.v1",
+  "status": "passed_with_installation_gap",
+  "flowguard": {
+    "project_audit": "passed",
+    "maintenance_model": {
+      "status": "passed",
+      "scenario_count": 5,
+      "expected_violation_count": 2,
+      "declared_check_count": 8,
+      "mesh_findings": []
+    },
+    "suite_model": {
+      "status": "passed",
+      "scenario_count": 8,
+      "topology_findings": []
+    }
+  },
+  "skillguard": {
+    "source_version": "0.4.0",
+    "source_revision": "3cfdca77567dacfa77c8a8d0696e116fe0e925c3",
+    "maintainer_audit": "passed",
+    "maintenance_unit_id": "unit:researchguard-suite",
+    "check_count": 8,
+    "execution_owner_count": 8,
+    "members": [
+      {
+        "member_skill_id": "researchguard",
+        "contract_hash": "FC029E3FE867A1BAE56565CA1F3EAF75299BF0BE2F1C9B7919665187CFCA6AC6",
+        "manifest_hash": "C8275989512639C8B9729A2B9E31932499D5E806E2F91F4F7D6FCBDD31BFFF77",
+        "run_id": "run-ca6cd12e2f64cda407a3",
+        "closure_receipt_id": "closure-1983b4f19a7a991d04feb5ab",
+        "closure_hash": "82B1D2BD7C3687937E470EDAEEDA6CD70F33D52C1DE4A6CE9319F832E0AE9A86",
+        "status": "passed"
+      },
+      {
+        "member_skill_id": "logicguard",
+        "contract_hash": "22061428B79DEE46E5F6AEBEDAFE95C49CE8C53334C87FC6199E2B012388E23F",
+        "manifest_hash": "712580E429EF0F7825C4DFBF4D333D83386F1836D8B16F7B947DCADEF51E54C9",
+        "run_id": "run-6149f51fa16577476a22",
+        "closure_receipt_id": "closure-1f8a02eb12460a5e93d64b1f",
+        "closure_hash": "18AED96C2D3D5517154D53AB1067BD22A212B8AF75C9A07C42EB6D7245986789",
+        "status": "passed"
+      },
+      {
+        "member_skill_id": "sourceguard",
+        "contract_hash": "4E95BC1BB8C972628E6E8C8DC4516A3F91336D33CF54FF50634D34D562063692",
+        "manifest_hash": "7677CDD741E451E0CCE8FDDC2734FCD5A0AF3F1F9419BB42F31FB66937349466",
+        "run_id": "run-72d88ba1e935a7d78297",
+        "closure_receipt_id": "closure-5b9c67329eaacd333af15179",
+        "closure_hash": "4DC3325FAF43D29797C480D57E1F2E10DA299F4FF2D398E19A26B1A63B9FFFDD",
+        "status": "passed"
+      },
+      {
+        "member_skill_id": "traceguard",
+        "contract_hash": "14B3E42A0A3212A9C7F7D3196D54732B45F7602564200A33EFB09A6E7F77E1FF",
+        "manifest_hash": "49F97C6B80838A5A013C6FC77845C8A580531B25363A8A2C8E179EDAA44D4D3A",
+        "run_id": "run-b9edfda096c7216f9bdf",
+        "closure_receipt_id": "closure-4d83f1a5317d37ebcc8a3f00",
+        "closure_hash": "FC5D7F5F989C96005450CF9BAB7BAD764B3FF16881BA414932839E0B65724262",
+        "status": "passed"
+      }
+    ],
+    "evidence_audit": {
+      "status": "passed",
+      "audit_hash": "sha256:00533e5fdec999a6d672874eee1962ef077f184b97669b3a0ed9f04b392219cf",
+      "current": 42,
+      "orphan": 0,
+      "corrupt_or_ambiguous": 0,
+      "temporary_lock_files": 8,
+      "collectible_byte_count": 0
+    }
+  },
+  "consumer_projection": {
+    "status": "runtime_content_parity_passed",
+    "members": [
+      {
+        "member_skill_id": "researchguard",
+        "source_file_count": 2,
+        "installed_runtime_file_count": 2,
+        "missing": [],
+        "extra": [],
+        "hash_mismatch": [],
+        "author_control_leaks": [],
+        "consumer_release_present": false
+      },
+      {
+        "member_skill_id": "logicguard",
+        "source_file_count": 9,
+        "installed_runtime_file_count": 9,
+        "missing": [],
+        "extra": [],
+        "hash_mismatch": [],
+        "author_control_leaks": [],
+        "consumer_release_present": false
+      },
+      {
+        "member_skill_id": "sourceguard",
+        "source_file_count": 3,
+        "installed_runtime_file_count": 3,
+        "missing": [],
+        "extra": [],
+        "hash_mismatch": [],
+        "author_control_leaks": [],
+        "consumer_release_present": false
+      },
+      {
+        "member_skill_id": "traceguard",
+        "source_file_count": 6,
+        "installed_runtime_file_count": 6,
+        "missing": [],
+        "extra": [],
+        "hash_mismatch": [],
+        "author_control_leaks": [],
+        "consumer_release_present": false
+      }
+    ],
+    "installation_status": "not_run",
+    "installation_gap": "All four installed runtime trees match source, but the current target-owned consumer-release.json and installation transaction identity are absent."
+  },
+  "skipped": [
+    "Global consumer installation was not run.",
+    "Old standalone repositories were not modified, adopted, retired, or deleted.",
+    "Historical SkillGuard evidence was not quarantined or purged.",
+    "Git commit, push, tag, release, and publication were not run."
+  ],
+  "residual_risk": [
+    "The editable SkillGuard source and installed skill files are 0.4.0, but Python distribution metadata still reports 0.3.3; this change used the explicit 0.4.0 source scripts and did not perform a global installation repair.",
+    "The new owner-evidence store has eight zero-byte lock artifacts classified as temporary; the lifecycle audit reports no orphan, corruption, or collectible bytes."
+  ],
+  "claim_boundary": "This report indexes current local FlowGuard and SkillGuard evidence for the exact four-member author-maintenance change. It is not itself a SkillGuard receipt and does not prove global installation, publication, predecessor retirement, source truth, or future AI behavior."
+}
