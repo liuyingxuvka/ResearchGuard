@@ -14,7 +14,7 @@
 
 - [x] 3.1 Extend router, umbrella prompt, CLI inventory, suite model, known-good/known-bad cases, installer, and clean consumer authority to exactly four members.
 - [x] 3.2 Update SkillGuard contract sources and generated artifacts with exact component ownership.
-- [ ] 3.3 Update README, changelog, package version, and release evidence for v0.2.0.
+- [x] 3.3 Update README, changelog, package version, and release evidence for v0.2.0.
 
 ## 4. Closure
 
