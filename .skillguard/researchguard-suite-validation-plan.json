@@ -54,8 +54,8 @@
     },
     {
       "member_skill_id": "logicguard",
-      "contract_hash": "9F53E29E807E9F1411D685324DC743D0CFD77B2C0437ECAD01367DE5D483BFD1",
-      "manifest_hash": "96BA2A6EF60765E81812474B68CF36F35C38804D47E27349DBD299730EF4B8C7",
+      "contract_hash": "2F984AFCAF2C58B1ECF189734F62834D0BB4611328ADF3815E70B6F421433FD4",
+      "manifest_hash": "26C0B806B751647542F828741659A70180A342BA82BED240E53703FF8B19CD25",
       "checks": [
         {
           "check_id": "check:logicguard:consumer-contract",
