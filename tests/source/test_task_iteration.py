@@ -216,6 +216,29 @@ def test_valid_candidate_can_be_accepted_even_when_cost_prediction_misses() -> N
     assert receipt.selected_model_fingerprint == model_fingerprint(candidate)
 
 
+def test_task_local_search_does_not_close_with_another_native_gap() -> None:
+    state = _guarded_state()
+    prediction = _prediction(
+        state,
+        task_id="search-task-1",
+        purpose="close the declared source coverage",
+        coverage_ids=("g-target", "g-protected"),
+    )
+
+    candidate, receipt = run_search_iteration(
+        state,
+        prediction,
+        _qualified_observation(),
+        actual_cost=0.2,
+        decision="accept",
+    )
+
+    assert candidate.gap_by_id()["g-target"].semantic_state == "closed"
+    assert receipt.effective_disposition == "continue_iteration"
+    assert receipt.open_gap_ids == ("g-protected",)
+    assert receipt.terminal_reason == "continue_iteration"
+
+
 def test_counterevidence_prediction_error_is_explicit() -> None:
     state = _guarded_state()
     prediction = _prediction(state, expected_counterevidence=False)

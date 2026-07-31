@@ -48,6 +48,20 @@ Declare the trace scope and evidence objects, validate lineage and hard gates,
 build and evaluate the canonical trace, test alternatives and perturbations,
 and preserve weakest links, safe wording, and typed handoffs.
 
+## Task-Local Trace Maturation
+
+For a non-trivial trace task, freeze the task id, purpose, trace coverage,
+assumptions, unknowns, and iteration before building the trace. Each important
+trace object or link must have a predicted observation and a falsifier. Use
+native evidence comparison, perturbation, and holdout receipts to produce gap
+transitions and next actions; do not treat an AI statement that it
+"understands" the trace as evidence. Continue revising the task-local model
+while predictive or coverage gaps remain. Broad closure requires the explicit
+`model_closed_for_task` terminal; `progress_stalled`, `iteration_limit`,
+`external_input_required`, and `scope_excluded` remain visible non-closure
+terminals. This deepens the existing trace/evidence loop and does not loosen
+its lineage or causal-scope gates.
+
 ## Hard Gates
 
 Solver failure, unacceptable residuals, missing evidence lineage, unresolved

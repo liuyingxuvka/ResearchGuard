@@ -36,6 +36,16 @@ SUPPORTED_PREDICTION_MODES = frozenset(
         "scope-narrowing",
     }
 )
+MODEL_TERMINALS = frozenset(
+    {
+        "continue_iteration",
+        "model_closed_for_task",
+        "external_input_required",
+        "scope_excluded",
+        "progress_stalled",
+        "iteration_limit",
+    }
+)
 ARGUMENT_ITERATION_CLAIM_BOUNDARY = (
     "This receipt proves one task-local prediction, native LogicGuard observation, "
     "declared protected-claim checks, and immutable revision disposition. It does "
@@ -56,6 +66,14 @@ class ArgumentPrediction:
     max_size: int
     protected_claim_ids: tuple[str, ...]
     frozen_at: str
+    task_id: str = ""
+    purpose: str = ""
+    coverage_ids: tuple[str, ...] = ()
+    assumptions: tuple[str, ...] = ()
+    unknowns: tuple[str, ...] = ()
+    iteration: int = 0
+    max_iterations: int = 8
+    prior_gap_fingerprints: tuple[str, ...] = ()
     schema_version: str = ARGUMENT_PREDICTION_SCHEMA
 
     def __post_init__(self) -> None:
@@ -83,6 +101,12 @@ class ArgumentPrediction:
             raise ValueError("protected_claim_ids must not contain duplicates")
         if not self.frozen_at:
             raise ValueError("frozen_at must not be empty")
+        if self.task_id and not self.coverage_ids:
+            raise ValueError("task-local argument predictions require coverage_ids")
+        if len(set(self.coverage_ids)) != len(self.coverage_ids):
+            raise ValueError("coverage_ids must not contain duplicates")
+        if self.iteration < 0 or self.max_iterations < 1:
+            raise ValueError("iteration must be non-negative and max_iterations must be positive")
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -98,6 +122,14 @@ class ArgumentPrediction:
             "max_size": self.max_size,
             "protected_claim_ids": list(self.protected_claim_ids),
             "frozen_at": self.frozen_at,
+            "task_id": self.task_id,
+            "purpose": self.purpose,
+            "coverage_ids": list(self.coverage_ids),
+            "assumptions": list(self.assumptions),
+            "unknowns": list(self.unknowns),
+            "iteration": self.iteration,
+            "max_iterations": self.max_iterations,
+            "prior_gap_fingerprints": list(self.prior_gap_fingerprints),
         }
 
     @classmethod
@@ -119,6 +151,14 @@ class ArgumentPrediction:
                 str(item) for item in (raw.get("protected_claim_ids") or ())
             ),
             frozen_at=str(raw.get("frozen_at", "")),
+            task_id=str(raw.get("task_id", "")),
+            purpose=str(raw.get("purpose", "")),
+            coverage_ids=tuple(str(item) for item in (raw.get("coverage_ids") or ())),
+            assumptions=tuple(str(item) for item in (raw.get("assumptions") or ())),
+            unknowns=tuple(str(item) for item in (raw.get("unknowns") or ())),
+            iteration=int(raw.get("iteration", 0)),
+            max_iterations=int(raw.get("max_iterations", 8)),
+            prior_gap_fingerprints=tuple(str(item) for item in (raw.get("prior_gap_fingerprints") or ())),
         )
 
 
@@ -191,6 +231,11 @@ class ArgumentIterationReceipt:
     completed_at: str
     schema_version: str = ARGUMENT_ITERATION_RECEIPT_SCHEMA
     claim_boundary: str = ARGUMENT_ITERATION_CLAIM_BOUNDARY
+    open_gap_ids: tuple[str, ...] = ()
+    gap_transitions: Mapping[str, str] = None  # type: ignore[assignment]
+    next_actions: tuple[str, ...] = ()
+    terminal_reason: str = "continue_iteration"
+    progressed: bool = False
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -219,6 +264,11 @@ class ArgumentIterationReceipt:
             ),
             "completed_at": self.completed_at,
             "claim_boundary": self.claim_boundary,
+            "open_gap_ids": list(self.open_gap_ids),
+            "gap_transitions": dict(self.gap_transitions or {}),
+            "next_actions": list(self.next_actions),
+            "terminal_reason": self.terminal_reason,
+            "progressed": self.progressed,
         }
 
 
@@ -257,6 +307,14 @@ def freeze_argument_prediction(
     max_size: int = 2,
     protected_claim_ids: Sequence[str] = (),
     prediction_id: str | None = None,
+    task_id: str = "",
+    purpose: str = "",
+    coverage_ids: Sequence[str] = (),
+    assumptions: Sequence[str] = (),
+    unknowns: Sequence[str] = (),
+    iteration: int = 0,
+    max_iterations: int = 8,
+    prior_gap_fingerprints: Sequence[str] = (),
 ) -> ArgumentPrediction:
     """Freeze an expectation without running the native simulator."""
 
@@ -289,6 +347,14 @@ def freeze_argument_prediction(
         max_size=max_size,
         protected_claim_ids=tuple(str(item) for item in protected_claim_ids),
         frozen_at=utc_now(),
+        task_id=task_id,
+        purpose=purpose,
+        coverage_ids=tuple(str(item) for item in coverage_ids),
+        assumptions=tuple(str(item) for item in assumptions),
+        unknowns=tuple(str(item) for item in unknowns),
+        iteration=iteration,
+        max_iterations=max_iterations,
+        prior_gap_fingerprints=tuple(str(item) for item in prior_gap_fingerprints),
     )
 
 
@@ -403,6 +469,33 @@ def revalidate_protected_claims(
     return tuple(rows)
 
 
+def _argument_open_gaps(
+    model: LogicModel,
+    observation: ArgumentObservation,
+    prediction: ArgumentPrediction,
+) -> tuple[str, ...]:
+    """Derive executable native gaps; prose/self-report never enters this set."""
+
+    gaps: set[str] = set()
+    native = observation.native_result
+    if native.get("warnings"):
+        gaps.update(
+            f"native-warning:{index}"
+            for index, _ in enumerate(native["warnings"])
+        )
+    if native.get("cycles"):
+        gaps.add("native-argument-cycle")
+    root = native.get("root")
+    if isinstance(root, Mapping):
+        blockers = root.get("blockers", ())
+        if isinstance(blockers, list):
+            gaps.update(f"native-blocker:{blocker}" for blocker in blockers)
+    for coverage_id in prediction.coverage_ids:
+        if coverage_id not in model.nodes:
+            gaps.add(f"coverage-missing:{coverage_id}")
+    return tuple(sorted(gaps))
+
+
 def run_argument_iteration(
     store: ModelStore,
     baseline: LogicModel,
@@ -421,8 +514,9 @@ def run_argument_iteration(
     baseline_snapshot = _ensure_baseline_snapshot(store, baseline, prediction, actor)
     baseline_observation = observe_argument_prediction(baseline, prediction)
     baseline_comparison = compare_argument_prediction(prediction, baseline_observation)
+    baseline_gaps = _argument_open_gaps(baseline, baseline_observation, prediction)
 
-    if baseline_comparison.matches:
+    if baseline_comparison.matches and not baseline_gaps:
         return ArgumentIterationReceipt(
             prediction=prediction,
             baseline_observation=baseline_observation,
@@ -437,6 +531,37 @@ def run_argument_iteration(
             candidate_revision=None,
             store_receipt=None,
             completed_at=utc_now(),
+            open_gap_ids=(),
+            next_actions=("no_model_change_needed",),
+            terminal_reason="model_closed_for_task",
+            progressed=prediction.iteration == 0,
+        )
+    if candidate is None and baseline_comparison.matches and baseline_gaps:
+        return ArgumentIterationReceipt(
+            prediction=prediction,
+            baseline_observation=baseline_observation,
+            baseline_comparison=baseline_comparison,
+            candidate_observation=None,
+            candidate_comparison=None,
+            protected_claims=(),
+            requested_disposition=decision,
+            effective_disposition="continue_iteration",
+            disposition_reason="native LogicGuard gaps remain despite a matching perturbation",
+            baseline_revision=str(baseline_snapshot.revision),
+            candidate_revision=None,
+            store_receipt=None,
+            completed_at=utc_now(),
+            open_gap_ids=baseline_gaps,
+            next_actions=("deepen_logic_model",),
+            terminal_reason=(
+                "iteration_limit"
+                if prediction.iteration >= prediction.max_iterations
+                else "continue_iteration"
+            ),
+            progressed=(
+                prediction.iteration == 0
+                or set(baseline_gaps) != set(prediction.prior_gap_fingerprints)
+            ),
         )
     if candidate is None:
         raise ValueError("a candidate model is required after a baseline prediction mismatch")
@@ -445,6 +570,7 @@ def run_argument_iteration(
         candidate, prediction, require_baseline_binding=False
     )
     candidate_comparison = compare_argument_prediction(prediction, candidate_observation)
+    candidate_gaps = _argument_open_gaps(candidate, candidate_observation, prediction)
     protected = revalidate_protected_claims(
         baseline, candidate, prediction.protected_claim_ids
     )
@@ -457,7 +583,7 @@ def run_argument_iteration(
     )
     transaction.stage(candidate)
     staged_revision = transaction.staged_snapshot.revision
-    can_accept = candidate_comparison.matches and protected_ok
+    can_accept = candidate_comparison.matches and protected_ok and not candidate_gaps
     if decision == "accept" and can_accept:
         try:
             store_receipt = transaction.commit()
@@ -478,6 +604,10 @@ def run_argument_iteration(
                     exc.receipt.to_dict() if exc.receipt is not None else None
                 ),
                 completed_at=utc_now(),
+                open_gap_ids=candidate_gaps or baseline_gaps,
+                next_actions=("deepen_logic_model",),
+                terminal_reason="continue_iteration",
+                progressed=bool(set(candidate_gaps) != set(baseline_gaps)),
             )
         return ArgumentIterationReceipt(
             prediction=prediction,
@@ -493,6 +623,10 @@ def run_argument_iteration(
             candidate_revision=str(store_receipt.revision),
             store_receipt=store_receipt.to_dict(),
             completed_at=utc_now(),
+            open_gap_ids=(),
+            next_actions=("no_model_change_needed",),
+            terminal_reason="model_closed_for_task",
+            progressed=True,
         )
 
     reasons: list[str] = []
@@ -502,7 +636,10 @@ def run_argument_iteration(
         reasons.append("candidate does not produce the frozen expected status")
     if not protected_ok:
         reasons.append("one or more protected claims changed")
+    if candidate_gaps:
+        reasons.append("native LogicGuard gaps remain open")
     abort_receipt = transaction.abort("; ".join(reasons))
+    continuation = decision == "accept" and candidate_comparison.matches and protected_ok and bool(candidate_gaps)
     return ArgumentIterationReceipt(
         prediction=prediction,
         baseline_observation=baseline_observation,
@@ -511,12 +648,24 @@ def run_argument_iteration(
         candidate_comparison=candidate_comparison,
         protected_claims=protected,
         requested_disposition=decision,
-        effective_disposition="rejected",
+        effective_disposition="continue_iteration" if continuation else "rejected",
         disposition_reason="; ".join(reasons),
         baseline_revision=str(baseline_snapshot.revision),
         candidate_revision=str(staged_revision),
         store_receipt=abort_receipt.to_dict(),
         completed_at=utc_now(),
+        open_gap_ids=candidate_gaps or baseline_gaps,
+        next_actions=("deepen_logic_model",),
+        terminal_reason=(
+            "iteration_limit"
+            if prediction.iteration >= prediction.max_iterations
+            else (
+                "progress_stalled"
+                if set(candidate_gaps or baseline_gaps) == set(prediction.prior_gap_fingerprints)
+                else "continue_iteration"
+            )
+        ),
+        progressed=bool(set(candidate_gaps) != set(baseline_gaps)),
     )
 
 

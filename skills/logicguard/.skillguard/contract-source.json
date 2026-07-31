@@ -49,6 +49,12 @@
       "native_check_id": "check:logicguard:native-tests",
       "required": true,
       "evidence_source": "tests"
+    },
+    {
+      "binding_id": "native-check:researchguard:logicguard:task-model-closure",
+      "native_check_id": "check:logicguard:task-model-closure",
+      "required": true,
+      "evidence_source": "tests/task-local-iteration"
     }
   ],
   "implementation_paths": [
@@ -56,6 +62,9 @@
     "src/researchguard/logic",
     "src/researchguard/logic_template_packs",
     "src/researchguard/logic_viewer",
+    ".flowguard/researchguard_suite_model.py",
+    ".flowguard/researchguard_suite_model.json",
+    ".flowguard/run_researchguard_suite_model.py",
     ".flowguard/logicguard_skill_contract_model.py",
     ".flowguard/researchguard_skill_contract_model_common.py",
     "tests/logic"
@@ -80,6 +89,17 @@
       },
       "check_ids": [
         "check:logicguard:native-tests"
+      ],
+      "output_artifact_ids": []
+    },
+    {
+      "step_id": "step:researchguard:logicguard:task-model-closure",
+      "action": {
+        "kind": "native",
+        "summary": "Execute the target-owned task-local model closure and gap-continuation checks."
+      },
+      "check_ids": [
+        "check:logicguard:task-model-closure"
       ],
       "output_artifact_ids": []
     }
@@ -183,6 +203,18 @@
         },
         {
           "kind": "path",
+          "path": ".flowguard/researchguard_suite_model.py"
+        },
+        {
+          "kind": "path",
+          "path": ".flowguard/researchguard_suite_model.json"
+        },
+        {
+          "kind": "path",
+          "path": ".flowguard/run_researchguard_suite_model.py"
+        },
+        {
+          "kind": "path",
           "path": ".flowguard/logicguard_skill_contract_model.py"
         },
         {
@@ -210,6 +242,44 @@
       ],
       "coverage_scope": "declared_obligations",
       "coverage_rationale": "This check is the sole execution owner for its exact member obligation."
+    },
+    {
+      "check_id": "check:logicguard:task-model-closure",
+      "maintenance_unit_id": "unit:researchguard-suite",
+      "member_skill_id": "logicguard",
+      "evidence_subject_id": "subject:researchguard:logicguard:task-model-closure",
+      "semantic_check_id": "semantic:researchguard:logicguard:task-model-closure:current",
+      "kind": "command",
+      "command": "python",
+      "args": [
+        "-m",
+        "pytest",
+        "tests/logic/test_task_iteration.py",
+        "-q"
+      ],
+      "cwd_token": "repository_root",
+      "input_selectors": [
+        {
+          "kind": "path",
+          "path": "tests/logic/test_task_iteration.py"
+        }
+      ],
+      "expected": {
+        "exit_code": 0
+      },
+      "timeout_seconds": 900,
+      "evidence_class": "hard",
+      "evidence_domain_id": "evidence-domain:researchguard:logicguard:task-model-closure",
+      "execution_owner_id": "owner:researchguard:logicguard:task-model-closure",
+      "native_route_id": "route:researchguard:logicguard",
+      "depends_on_check_ids": [
+        "check:logicguard:native-tests"
+      ],
+      "covers_obligation_ids": [
+        "obligation:researchguard:logicguard:task-model-closure"
+      ],
+      "coverage_scope": "declared_obligations",
+      "coverage_rationale": "This check is the sole execution owner for its exact member obligation."
     }
   ],
   "artifacts": [],
@@ -218,10 +288,11 @@
       "profile_id": "enforced",
       "required_obligation_ids": [
         "obligation:researchguard:logicguard:consumer-contract",
-        "obligation:researchguard:logicguard:native-tests"
+        "obligation:researchguard:logicguard:native-tests",
+        "obligation:researchguard:logicguard:task-model-closure"
       ]
     }
   ],
   "judgment_rubrics": [],
-  "claim_boundary": "This contract covers the current logicguard consumer projection, native route, and member-owned tests inside ResearchGuard v0.2.0. It does not prove source truth, unrun external work, installation, publication, or future AI behavior."
+  "claim_boundary": "This contract covers the current logicguard consumer projection, native route, and member-owned tests inside ResearchGuard v0.3.0. It does not prove source truth, unrun external work, installation, publication, or future AI behavior."
 }

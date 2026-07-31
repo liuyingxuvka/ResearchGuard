@@ -106,6 +106,14 @@ class PredictionSnapshot:
     weakens_when: str
     factual_future_prediction_licensed: bool
     snapshot_fingerprint: str
+    task_id: str = ""
+    purpose: str = ""
+    coverage_ids: tuple[str, ...] = ()
+    assumptions: tuple[str, ...] = ()
+    unknowns: tuple[str, ...] = ()
+    iteration: int = 0
+    max_iterations: int = 8
+    prior_gap_fingerprints: tuple[str, ...] = ()
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -123,6 +131,14 @@ class PredictionSnapshot:
         expected_evidence = _ordered_unique(data.get("expected_evidence_ids", []))
         expected_events = _ordered_unique(data.get("expected_event_ids", []))
         expected_order = tuple(str(item) for item in data.get("expected_event_order", []))
+        task_id = str(data.get("task_id", "")).strip()
+        coverage_ids = _ordered_unique(data.get("coverage_ids", []))
+        if task_id and not coverage_ids:
+            raise TaskIterationError("task-local trace predictions require coverage_ids")
+        iteration = int(data.get("iteration", 0))
+        max_iterations = int(data.get("max_iterations", 8))
+        if iteration < 0 or max_iterations < 1:
+            raise TaskIterationError("iteration must be non-negative and max_iterations must be positive")
         if not expected_evidence and not expected_events:
             raise TaskIterationError(
                 "prediction requires expected_evidence_ids or expected_event_ids"
@@ -149,6 +165,14 @@ class PredictionSnapshot:
             "expected_event_order": expected_order,
             "weakens_when": str(data.get("weakens_when", "")).strip(),
             "factual_future_prediction_licensed": False,
+            "task_id": task_id,
+            "purpose": str(data.get("purpose", "")).strip(),
+            "coverage_ids": coverage_ids,
+            "assumptions": _ordered_unique(data.get("assumptions", [])),
+            "unknowns": _ordered_unique(data.get("unknowns", [])),
+            "iteration": iteration,
+            "max_iterations": max_iterations,
+            "prior_gap_fingerprints": _ordered_unique(data.get("prior_gap_fingerprints", [])),
         }
         if not payload["prediction_id"] or not payload["target_id"]:
             raise TaskIterationError("prediction_id and target_id are required")
@@ -179,6 +203,8 @@ class EvidenceBatchObservation:
     future_holdout_status: str
     future_holdout_validator_receipt: str
     observation_fingerprint: str
+    gap_transitions: Mapping[str, str] | None = None
+    external_input_ids: tuple[str, ...] = ()
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -206,6 +232,11 @@ class EvidenceBatchObservation:
             "future_holdout_validator_receipt": str(
                 data.get("future_holdout_validator_receipt", "")
             ),
+            "gap_transitions": {
+                str(key): str(value)
+                for key, value in (data.get("gap_transitions") or {}).items()
+            },
+            "external_input_ids": _ordered_unique(data.get("external_input_ids", [])),
         }
         if not payload["observation_id"]:
             raise TaskIterationError("observation_id is required")
@@ -242,6 +273,14 @@ def freeze_prediction(
     expected_event_ids: Iterable[str] = (),
     expected_event_order: Iterable[str] = (),
     weakens_when: str,
+    task_id: str = "",
+    purpose: str = "",
+    coverage_ids: Iterable[str] = (),
+    assumptions: Iterable[str] = (),
+    unknowns: Iterable[str] = (),
+    iteration: int = 0,
+    max_iterations: int = 8,
+    prior_gap_fingerprints: Iterable[str] = (),
 ) -> PredictionSnapshot:
     """Freeze a prediction before a new evidence batch is read."""
 
@@ -261,6 +300,14 @@ def freeze_prediction(
         "expected_event_order": list(expected_event_order),
         "weakens_when": weakens_when,
         "factual_future_prediction_licensed": False,
+        "task_id": task_id,
+        "purpose": purpose,
+        "coverage_ids": list(coverage_ids),
+        "assumptions": list(assumptions),
+        "unknowns": list(unknowns),
+        "iteration": iteration,
+        "max_iterations": max_iterations,
+        "prior_gap_fingerprints": list(prior_gap_fingerprints),
     }
     return PredictionSnapshot.from_dict(payload)
 
@@ -345,6 +392,18 @@ def compare_prediction_observation(
             "future_holdout_validator_missing",
             "future-event expectation requires a passing target-owned holdout receipt",
         )
+    open_gap_ids = tuple(item.mismatch_id for item in mismatches)
+    gap_fingerprint = fingerprint(open_gap_ids)
+    if observation.external_input_ids and not open_gap_ids:
+        terminal_reason = "external_input_required"
+    elif not open_gap_ids:
+        terminal_reason = "model_closed_for_task"
+    elif prediction.iteration >= prediction.max_iterations:
+        terminal_reason = "iteration_limit"
+    elif gap_fingerprint in set(prediction.prior_gap_fingerprints):
+        terminal_reason = "progress_stalled"
+    else:
+        terminal_reason = "continue_iteration"
     payload: dict[str, Any] = {
         "schema_version": COMPARISON_SCHEMA,
         "prediction_id": prediction.prediction_id,
@@ -354,6 +413,17 @@ def compare_prediction_observation(
         "baseline_model_path": prediction.baseline_model_path,
         "baseline_model_sha256": prediction.baseline_model_sha256,
         "mismatches": [item.to_dict() for item in mismatches],
+        "task_id": prediction.task_id,
+        "purpose": prediction.purpose,
+        "coverage_ids": list(prediction.coverage_ids),
+        "open_gap_ids": list(open_gap_ids),
+        "gap_fingerprint": gap_fingerprint,
+        "gap_transitions": dict(observation.gap_transitions or {}),
+        "next_actions": ["deepen_trace_evidence"] if open_gap_ids else ["no_model_change_needed"],
+        "terminal_reason": terminal_reason,
+        "iteration": prediction.iteration,
+        "progressed": prediction.iteration == 0 or gap_fingerprint not in set(prediction.prior_gap_fingerprints),
+        "external_input_ids": list(observation.external_input_ids),
         "original_prediction_status": "weakened" if mismatches else "matched",
         "factual_future_prediction_licensed": False,
         "claim_boundary": (
@@ -437,13 +507,39 @@ def decide_candidate_revision(
     if observation.quality_status != "valid":
         reasons.append("observation quality is not valid")
 
+    candidate_gap_ids = sorted(
+        set(unaddressed)
+        | {
+            f"candidate-evaluation:{item}"
+            for item in result_payload.get("errors", [])
+        }
+    )
+    if candidate_gap_ids and not reasons:
+        reasons.append("candidate storyline evidence gaps remain open")
     if force_rollback:
         disposition = "rolled_back"
-        reasons.append("rollback explicitly requested")
+        if "rollback explicitly requested" not in reasons:
+            reasons.append("rollback explicitly requested")
     elif reasons:
         disposition = "rejected"
     else:
         disposition = "accepted"
+    if candidate_gap_ids and not force_rollback and not reasons[:-1]:
+        disposition = "continue_iteration"
+    terminal_reason = (
+        "model_closed_for_task"
+        if not candidate_gap_ids and disposition == "accepted"
+        else (
+            "iteration_limit"
+            if comparison.get("terminal_reason") == "iteration_limit"
+            else (
+                "progress_stalled"
+                if comparison.get("terminal_reason") == "progress_stalled"
+                else "continue_iteration"
+            )
+        )
+    )
+
     effective_hash = candidate_hash if disposition == "accepted" else baseline_hash
     payload: dict[str, Any] = {
         "schema_version": REVISION_SCHEMA,
@@ -475,6 +571,13 @@ def decide_candidate_revision(
         ),
         "disposition": disposition,
         "rejection_reasons": reasons,
+        "task_id": comparison.get("task_id", ""),
+        "iteration": comparison.get("iteration", 0),
+        "open_gap_ids": candidate_gap_ids,
+        "gap_transitions": dict(observation.gap_transitions or {}),
+        "next_actions": ["deepen_trace_evidence"] if candidate_gap_ids else ["no_model_change_needed"],
+        "terminal_reason": terminal_reason,
+        "progressed": bool(candidate_gap_ids) and candidate_gap_ids != list(comparison.get("open_gap_ids", [])),
         "effective_model_sha256": effective_hash,
         "factual_future_prediction_licensed": False,
         "claim_boundary": (

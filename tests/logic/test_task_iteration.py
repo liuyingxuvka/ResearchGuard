@@ -171,6 +171,31 @@ def test_matching_baseline_needs_no_revision(tmp_path: Path) -> None:
     assert len(store.list_revisions(baseline.id)) == 1
 
 
+def test_task_local_matching_prediction_keeps_native_coverage_gap_open(
+    tmp_path: Path,
+) -> None:
+    baseline, _ = _baseline_and_candidate()
+    prediction = freeze_argument_prediction(
+        baseline,
+        expected_state="OUT",
+        mode="assumption-flip",
+        root_claim="C0",
+        node_id="A1",
+        task_id="argument-task-1",
+        purpose="close the declared argument coverage",
+        coverage_ids=("missing-coverage-node",),
+        prediction_id="prediction-strict-coverage",
+    )
+
+    receipt = run_argument_iteration(
+        FileModelStore(tmp_path / "store"), baseline, prediction, decision="accept"
+    )
+
+    assert receipt.effective_disposition == "continue_iteration"
+    assert receipt.open_gap_ids == ("coverage-missing:missing-coverage-node",)
+    assert receipt.terminal_reason == "continue_iteration"
+
+
 def test_candidate_is_accepted_as_immutable_child_and_can_be_rolled_back(
     tmp_path: Path,
 ) -> None:

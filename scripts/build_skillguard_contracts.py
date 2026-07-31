@@ -33,6 +33,14 @@ TEST_ARGS = {
     "experimentguard": ["-m", "pytest", "tests/experiment", "-q"],
 }
 
+ITERATION_TEST_ARGS = {
+    "researchguard": ["-m", "pytest", "tests/experiment", "tests/logic", "tests/source", "tests/trace", "-q"],
+    "logicguard": ["-m", "pytest", "tests/logic/test_task_iteration.py", "-q"],
+    "sourceguard": ["-m", "pytest", "tests/source/test_task_iteration.py", "-q"],
+    "traceguard": ["-m", "pytest", "tests/trace/test_task_iteration.py", "-q"],
+    "experimentguard": ["-m", "pytest", "tests/experiment/test_recommendation.py", "-q"],
+}
+
 IMPLEMENTATION_PATHS = {
     "researchguard": [
         "skills/researchguard",
@@ -55,12 +63,19 @@ IMPLEMENTATION_PATHS = {
         "tests/test_install_researchguard.py",
         "tests/test_suite_model_currentness.py",
         "tests/test_zero_residuals.py",
+        "tests/logic/test_task_iteration.py",
+        "tests/source/test_task_iteration.py",
+        "tests/trace/test_task_iteration.py",
+        "tests/experiment/test_recommendation.py",
     ],
     "logicguard": [
         "skills/logicguard",
         "src/researchguard/logic",
         "src/researchguard/logic_template_packs",
         "src/researchguard/logic_viewer",
+        ".flowguard/researchguard_suite_model.py",
+        ".flowguard/researchguard_suite_model.json",
+        ".flowguard/run_researchguard_suite_model.py",
         ".flowguard/logicguard_skill_contract_model.py",
         ".flowguard/researchguard_skill_contract_model_common.py",
         "tests/logic",
@@ -68,6 +83,9 @@ IMPLEMENTATION_PATHS = {
     "sourceguard": [
         "skills/sourceguard",
         "src/researchguard/source",
+        ".flowguard/researchguard_suite_model.py",
+        ".flowguard/researchguard_suite_model.json",
+        ".flowguard/run_researchguard_suite_model.py",
         ".flowguard/sourceguard_content_anchor_oracle_model.py",
         ".flowguard/sourceguard_skill_contract_model.py",
         ".flowguard/researchguard_skill_contract_model_common.py",
@@ -77,6 +95,9 @@ IMPLEMENTATION_PATHS = {
     "traceguard": [
         "skills/traceguard",
         "src/researchguard/trace",
+        ".flowguard/researchguard_suite_model.py",
+        ".flowguard/researchguard_suite_model.json",
+        ".flowguard/run_researchguard_suite_model.py",
         ".flowguard/traceguard_skill_contract_model.py",
         ".flowguard/researchguard_skill_contract_model_common.py",
         "tests/trace",
@@ -84,6 +105,9 @@ IMPLEMENTATION_PATHS = {
     "experimentguard": [
         "skills/experimentguard",
         "src/researchguard/experiment",
+        ".flowguard/researchguard_suite_model.py",
+        ".flowguard/researchguard_suite_model.json",
+        ".flowguard/run_researchguard_suite_model.py",
         ".flowguard/experimentguard_skill_contract_model.py",
         ".flowguard/researchguard_skill_contract_model_common.py",
         "tests/experiment",
@@ -134,6 +158,8 @@ def contract(member: str) -> dict:
     contract_check_id = f"check:{member}:consumer-contract"
     contract_obligation = f"obligation:researchguard:{member}:consumer-contract"
     native_obligation = f"obligation:researchguard:{member}:native-tests"
+    deepening_check_id = f"check:{member}:task-model-closure"
+    deepening_obligation = f"obligation:researchguard:{member}:task-model-closure"
     route_id = f"route:researchguard:{member}"
     checks = [
         check(
@@ -195,6 +221,32 @@ def contract(member: str) -> dict:
             obligation=native_obligation,
             timeout=900,
         ),
+        check(
+            member,
+            kind="task-model-closure",
+            command="python",
+            args=ITERATION_TEST_ARGS[member],
+            selectors=[
+                {
+                    "kind": "path",
+                    "path": path,
+                }
+                for path in (
+                    [
+                        "tests/experiment/test_recommendation.py",
+                        "tests/logic/test_task_iteration.py",
+                        "tests/source/test_task_iteration.py",
+                        "tests/trace/test_task_iteration.py",
+                    ]
+                    if member == "researchguard"
+                    else [f"tests/{member.replace('logicguard', 'logic').replace('sourceguard', 'source').replace('traceguard', 'trace').replace('experimentguard', 'experiment')}/test_task_iteration.py" if member != "experimentguard" else "tests/experiment/test_recommendation.py"]
+                )
+                if (ROOT / path).exists()
+            ],
+            depends=[f"check:{member}:native-tests"],
+            obligation=deepening_obligation,
+            timeout=900,
+        ),
     ]
     return {
         "schema_version": "skillguard.contract_source.v2",
@@ -236,6 +288,12 @@ def contract(member: str) -> dict:
                 "required": True,
                 "evidence_source": "tests",
             },
+            {
+                "binding_id": f"native-check:researchguard:{member}:task-model-closure",
+                "native_check_id": deepening_check_id,
+                "required": True,
+                "evidence_source": "tests/task-local-iteration",
+            },
         ],
         "implementation_paths": IMPLEMENTATION_PATHS[member],
         "step_bindings": [
@@ -257,6 +315,15 @@ def contract(member: str) -> dict:
                 "check_ids": [f"check:{member}:native-tests"],
                 "output_artifact_ids": [],
             },
+            {
+                "step_id": f"step:researchguard:{member}:task-model-closure",
+                "action": {
+                    "kind": "native",
+                    "summary": "Execute the target-owned task-local model closure and gap-continuation checks.",
+                },
+                "check_ids": [deepening_check_id],
+                "output_artifact_ids": [],
+            },
         ],
         "checks": checks,
         "artifacts": [],
@@ -266,13 +333,14 @@ def contract(member: str) -> dict:
                 "required_obligation_ids": [
                     contract_obligation,
                     native_obligation,
+                    deepening_obligation,
                 ],
             }
         ],
         "judgment_rubrics": [],
         "claim_boundary": (
             f"This contract covers the current {member} consumer projection, "
-            "native route, and member-owned tests inside ResearchGuard v0.2.0. "
+            "native route, and member-owned tests inside ResearchGuard v0.3.0. "
             "It does not prove source truth, unrun external work, installation, "
             "publication, or future AI behavior."
         ),

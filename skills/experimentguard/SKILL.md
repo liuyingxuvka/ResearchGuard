@@ -41,6 +41,18 @@ probabilities.
    every unresolved hypothesis pair.
 5. Keep the result recommendation-only and state its claim boundary.
 
+## Task-Local Experiment Iteration
+
+When a recommendation is part of a larger research task, freeze the task id,
+purpose, experiment coverage, assumptions, unknowns, and current iteration
+with the hypothesis predictions. After real observations are supplied, classify
+each hypothesis as supported, weakened, or undetermined and rebuild the finite
+discriminating set from the surviving hypotheses. The engine records the
+observation, unresolved pairs, next experiments, and an explicit terminal
+reason; it never asks the model whether it understands and never invents a
+probability. Continue until `model_closed_for_task`, or stop visibly with
+`iteration_limit`, `progress_stalled`, or `external_input_required`.
+
 ## Local Route
 
 Use `researchguard experiment recommend <spec.json>`. Direct and umbrella

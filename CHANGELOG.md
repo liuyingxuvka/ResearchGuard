@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.3.0 - 2026-07-31
+
+- Added task-local iterative maturation for LogicGuard, SourceGuard,
+  TraceGuard, and ExperimentGuard with predictions, falsifiers, gap
+  transitions, next actions, progress, and explicit terminals.
+- Added ExperimentGuard observation/iteration routes and target-native
+  closure checks for all five ResearchGuard consumer surfaces.
+
 ## v0.2.0 - 2026-07-30
 
 - Add ExperimentGuard as the fourth native ResearchGuard member and fifth

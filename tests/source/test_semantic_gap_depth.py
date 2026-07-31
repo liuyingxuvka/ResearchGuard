@@ -689,6 +689,7 @@ def test_v2_skillguard_binds_native_receipt_without_parallel_planner() -> None:
     assert set(checks) == manifest_ids == {
         "check:sourceguard:consumer-contract",
         "check:sourceguard:native-tests",
+        "check:sourceguard:task-model-closure",
     }
     assert source["maintenance_unit_id"] == "unit:researchguard-suite"
     assert source["integration_mode"] == "native-integrated"

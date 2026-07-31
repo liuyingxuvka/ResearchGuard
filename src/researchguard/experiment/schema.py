@@ -20,6 +20,50 @@ class ExperimentSpec:
 
 
 @dataclass(frozen=True)
+class ExperimentObservation:
+    experiment_id: str
+    observed_outcome: str
+    evidence_id: str
+    status: Literal["valid", "invalid", "not_run"] = "valid"
+
+    def to_dict(self) -> dict[str, object]:
+        return asdict(self)
+
+
+@dataclass(frozen=True)
+class HypothesisDisposition:
+    hypothesis_id: str
+    status: Literal["supported", "weakened", "undetermined"]
+    matched_experiment_ids: tuple[str, ...] = ()
+    contradicted_experiment_ids: tuple[str, ...] = ()
+
+    def to_dict(self) -> dict[str, object]:
+        return asdict(self)
+
+
+@dataclass(frozen=True)
+class ExperimentIterationReceipt:
+    recommendation: ExperimentRecommendation
+    observations: tuple[ExperimentObservation, ...]
+    hypothesis_dispositions: tuple[HypothesisDisposition, ...]
+    open_hypothesis_pairs: tuple[tuple[str, str], ...]
+    next_experiment_ids: tuple[str, ...]
+    terminal_reason: str
+    progressed: bool
+
+    def to_dict(self) -> dict[str, object]:
+        return {
+            "recommendation": self.recommendation.to_dict(),
+            "observations": [item.to_dict() for item in self.observations],
+            "hypothesis_dispositions": [item.to_dict() for item in self.hypothesis_dispositions],
+            "open_hypothesis_pairs": [list(item) for item in self.open_hypothesis_pairs],
+            "next_experiment_ids": list(self.next_experiment_ids),
+            "terminal_reason": self.terminal_reason,
+            "progressed": self.progressed,
+        }
+
+
+@dataclass(frozen=True)
 class ExperimentRecommendation:
     status: Literal[
         "recommended",
@@ -41,7 +85,10 @@ class ExperimentRecommendation:
 
 
 __all__ = [
+    "ExperimentIterationReceipt",
+    "ExperimentObservation",
     "ExperimentRecommendation",
     "ExperimentSpec",
     "HypothesisPrediction",
+    "HypothesisDisposition",
 ]

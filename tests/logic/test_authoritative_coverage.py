@@ -302,6 +302,7 @@ def test_skill_contract_binds_authoritative_native_receipt_without_parallel_rout
     assert set(checks) == manifest_ids == {
         "check:logicguard:consumer-contract",
         "check:logicguard:native-tests",
+        "check:logicguard:task-model-closure",
     }
     assert contract["integration_mode"] == "native-integrated"
     assert contract["may_define_parallel_execution_route"] is False

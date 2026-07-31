@@ -47,6 +47,20 @@ Declare the target claim and source roles, build the current gap/search model,
 execute or inspect retrieval evidence, qualify each source for its intended
 claim use, and preserve unresolved gaps and typed handoffs.
 
+## Task-Local Search-Model Maturation
+
+For a non-trivial search task, freeze the task id, purpose, coverage gaps,
+assumptions, unknowns, iteration, and the expected result of the selected
+search action. The action must carry a prediction and a falsifier; the model
+does not ask the caller or the model to self-report an understanding level.
+Apply the real retrieval observation, compare predicted and realized gap
+transitions, and keep any native SourceGuard gaps as explicit next actions.
+Only a task-local result with no remaining covered or native gaps may be
+accepted as `model_closed_for_task`; otherwise return
+`continue_iteration`, `progress_stalled`, `iteration_limit`, or
+`external_input_required`. Historical callers that omit the task-local fields
+retain their bounded legacy contract, while new task-local calls are strict.
+
 ## Hard Gates
 
 Unanchored source identity, missing provenance, unsupported status projection,

@@ -212,6 +212,7 @@ def test_affected_skillguard_contracts_bind_native_depth_without_parallel_route(
     assert set(checks) == manifest_ids == {
         "check:logicguard:consumer-contract",
         "check:logicguard:native-tests",
+        "check:logicguard:task-model-closure",
     }
     assert contract["native_route_owner"] == "owner:researchguard:logicguard"
     assert contract["may_define_parallel_execution_route"] is False

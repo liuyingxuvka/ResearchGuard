@@ -69,6 +69,18 @@ researchguard run --member traceguard -- <member arguments>
 researchguard run --member experimentguard -- <member arguments>
 ```
 
+## Task-Local Deepening Boundary
+
+When the selected member is used for a non-trivial task, the member—not this
+umbrella—owns the iterative model loop. The member freezes task purpose and
+coverage, derives predictions and falsifiers, applies native observations, and
+returns gap transitions, next actions, and an explicit terminal reason. The
+umbrella must preserve that receipt and must not replace it with a self-report
+such as "understood" or run a second member to manufacture closure. A result
+with open gaps remains open or is visibly stopped as stalled, limited, or
+external-input-required; only the selected member can declare its task model
+closed.
+
 Direct member commands execute the same owner and primary path:
 
 ```powershell

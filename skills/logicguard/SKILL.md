@@ -48,6 +48,20 @@ Select one current route, load its target-owned instructions, build or inspect
 the argument model, execute the route's native checks, and preserve gaps and
 handoffs before writing a conclusion.
 
+## Task-Local Model Maturation
+
+For a non-trivial argument task, freeze a task id, purpose, explicit model
+coverage, assumptions, and unknowns before the native checks. For every
+important covered node, record a concrete prediction and a falsifier or
+disconfirming condition. Let native diagnostics, simulation, and source/trace
+receipts produce gap transitions; a free-form answer saying that the model is
+"understood" is never evidence. Keep revising the task-local model while an
+addressable gap or predictive weakness remains, and return the next action with
+the current iteration. Close only with `model_closed_for_task`, or visibly stop
+with `progress_stalled`, `iteration_limit`, `external_input_required`, or
+`scope_excluded`. This extends the existing model-deepening route; it does not
+create a second LogicGuard workflow.
+
 ## Hard Gates
 
 Missing warrants, hidden assumptions, overclaim, scope mismatch, unanswered

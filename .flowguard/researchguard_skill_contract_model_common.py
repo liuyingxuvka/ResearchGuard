@@ -24,12 +24,15 @@ def build_contract_model(member: str) -> dict[str, Any]:
     function_id = f"function:researchguard:{member}"
     contract_step = f"step:researchguard:{member}:contract"
     tests_step = f"step:researchguard:{member}:tests"
+    deepening_step = f"step:researchguard:{member}:task-model-closure"
     success_step = f"step:researchguard:{member}:success"
     blocked_step = f"step:researchguard:{member}:blocked"
     contract_obligation = f"obligation:researchguard:{member}:consumer-contract"
     native_obligation = f"obligation:researchguard:{member}:native-tests"
+    deepening_obligation = f"obligation:researchguard:{member}:task-model-closure"
     contract_invariant = f"invariant:researchguard:{member}:consumer-contract"
     native_invariant = f"invariant:researchguard:{member}:native-tests"
+    deepening_invariant = f"invariant:researchguard:{member}:task-model-closure"
 
     return {
         "schema_version": "skillguard.flowguard_model_export.v2",
@@ -64,6 +67,7 @@ def build_contract_model(member: str) -> dict[str, Any]:
                 "step_ids": [
                     contract_step,
                     tests_step,
+                    deepening_step,
                     success_step,
                     blocked_step,
                 ],
@@ -90,11 +94,19 @@ def build_contract_model(member: str) -> dict[str, Any]:
                 "terminal_kind": "",
             },
             {
+                "step_id": deepening_step,
+                "route_id": route_id,
+                "owner_id": member,
+                "action_kind": "native",
+                "prerequisite_step_ids": [tests_step],
+                "terminal_kind": "",
+            },
+            {
                 "step_id": success_step,
                 "route_id": route_id,
                 "owner_id": member,
                 "action_kind": "terminal",
-                "prerequisite_step_ids": [tests_step],
+                "prerequisite_step_ids": [deepening_step],
                 "terminal_kind": "success",
             },
             {
@@ -106,7 +118,7 @@ def build_contract_model(member: str) -> dict[str, Any]:
                 "terminal_kind": "blocked",
             },
         ],
-        "invariant_ids": [contract_invariant, native_invariant],
+        "invariant_ids": [contract_invariant, native_invariant, deepening_invariant],
         "obligations": [
             {
                 "obligation_id": contract_obligation,
@@ -114,6 +126,13 @@ def build_contract_model(member: str) -> dict[str, Any]:
                 "owner_step_ids": [contract_step],
                 "required": True,
                 "description": "The public consumer entry and internal route inventory are exact.",
+            },
+            {
+                "obligation_id": deepening_obligation,
+                "invariant_id": deepening_invariant,
+                "owner_step_ids": [deepening_step],
+                "required": True,
+                "description": "The target-owned task-local model closure check passes with no addressable gap.",
             },
             {
                 "obligation_id": native_obligation,

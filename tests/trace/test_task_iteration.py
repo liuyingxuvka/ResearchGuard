@@ -121,6 +121,30 @@ def test_comparison_records_missing_expected_evidence_and_order() -> None:
     assert payload["factual_future_prediction_licensed"] is False
 
 
+def test_task_local_trace_keeps_prediction_gap_open_until_revision() -> None:
+    prediction = freeze_prediction(
+        model_path=EXAMPLE,
+        prediction_id="prediction-task-local",
+        frozen_at="2026-07-17T10:00:00+00:00",
+        target_kind="storyline",
+        target_id="trace_metadata_incident",
+        prediction_kind="evidence_footprint",
+        expected_evidence_ids=["ev_pr_fix"],
+        expected_event_ids=["event_boundary"],
+        weakens_when="The expected evidence is absent.",
+        task_id="trace-task-1",
+        purpose="close the incident evidence coverage",
+        coverage_ids=["ev_pr_fix", "ev_meeting_boundary"],
+    )
+    payload = compare_prediction_observation(
+        prediction, _observation(include_holdout=False)
+    )
+
+    assert payload["open_gap_ids"]
+    assert payload["terminal_reason"] == "continue_iteration"
+    assert payload["next_actions"] == ["deepen_trace_evidence"]
+
+
 def test_future_event_requires_separate_holdout_validator() -> None:
     prediction = freeze_prediction(
         model_path=EXAMPLE,
