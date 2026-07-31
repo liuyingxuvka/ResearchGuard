@@ -1,4 +1,4 @@
 interface:
   display_name: "LogicGuard"
   short_description: "Audit and deepen argument structure"
-  default_prompt: "Use $logicguard to model and validate this argument or structured artifact."
+  default_prompt: "Use $logicguard to run the strict task-bound argument-model loop, consume current native depth evidence, protect covered claims, test an independent holdout, and close only when no covered gap remains."

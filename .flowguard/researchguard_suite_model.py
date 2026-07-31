@@ -14,7 +14,7 @@ from flowguard import (
 )
 
 FLOWGUARD_MODEL_MARKER = "flowguard-executable-model"
-CURRENT_RESEARCHGUARD_VERSION = "0.3.0"
+CURRENT_RESEARCHGUARD_VERSION = "0.4.0"
 
 
 MEMBER_BY_INTENT = {
@@ -26,12 +26,16 @@ MEMBER_BY_INTENT = {
         "researchguard.experiment",
     ),
 }
+MEMBER_PATHS = {member_id: path_id for member_id, path_id in MEMBER_BY_INTENT.values()}
 
 
 @dataclass(frozen=True)
 class ResearchRequest:
     intent: str
     entrypoint: str = "researchguard"
+    admission_row_count: int = 0
+    admitted_members: tuple[str, ...] = ()
+    admission_evidence_current: bool = True
     native_status: str = "pass"
     handoff_target: str = ""
     allow_handoff: bool = False
@@ -67,9 +71,18 @@ class PackageIdentityState:
 class Route:
     name = "Route"
     accepted_input_type = ResearchRequest
-    reads = ("intent", "entrypoint", "already_routed")
+    reads = (
+        "intent",
+        "entrypoint",
+        "already_routed",
+        "admission_row_count",
+        "admitted_members",
+        "admission_evidence_current",
+    )
     writes = ("phase", "member_id", "primary_path_id")
-    input_description = "one direct or umbrella research request"
+    input_description = (
+        "one direct request or one umbrella request with exact current four-member admission evidence"
+    )
     output_description = "one selected member path or typed route gap"
     idempotency = "the same current request selects the same sole path"
 
@@ -102,16 +115,51 @@ class Route:
                 )
                 return
 
-        selected = MEMBER_BY_INTENT.get(request.intent)
-        if selected is None:
-            yield FunctionResult(
-                request,
-                replace(state, phase="blocked", terminal_status="ambiguous"),
-                label="route_ambiguous_blocked",
-            )
-            return
+        if request.entrypoint == "researchguard":
+            if request.admission_row_count != 4 or not request.admission_evidence_current:
+                yield FunctionResult(
+                    request,
+                    replace(state, phase="blocked", terminal_status="admission_stale"),
+                    label="member_admission_stale_blocked",
+                )
+                return
+            if (
+                len(set(request.admitted_members)) != len(request.admitted_members)
+                or any(member not in MEMBER_PATHS for member in request.admitted_members)
+            ):
+                yield FunctionResult(
+                    request,
+                    replace(state, phase="blocked", terminal_status="admission_malformed"),
+                    label="member_admission_malformed_blocked",
+                )
+                return
+            if not request.admitted_members:
+                yield FunctionResult(
+                    request,
+                    replace(state, phase="blocked", terminal_status="no_match"),
+                    label="member_admission_no_match_blocked",
+                )
+                return
+            if len(request.admitted_members) != 1:
+                yield FunctionResult(
+                    request,
+                    replace(state, phase="blocked", terminal_status="ambiguous"),
+                    label="member_admission_ambiguous_blocked",
+                )
+                return
+            member_id = request.admitted_members[0]
+            primary_path_id = MEMBER_PATHS[member_id]
+        else:
+            selected = MEMBER_BY_INTENT.get(request.intent)
+            if selected is None:
+                yield FunctionResult(
+                    request,
+                    replace(state, phase="blocked", terminal_status="intent_mismatch"),
+                    label="route_direct_mismatch_blocked",
+                )
+                return
+            member_id, primary_path_id = selected
 
-        member_id, primary_path_id = selected
         yield FunctionResult(
             request,
             replace(
@@ -378,7 +426,13 @@ def scenarios() -> tuple[Scenario, ...]:
             name="RG02_umbrella_logic",
             description="Umbrella dispatch reaches the same sole logic path.",
             initial_state=RouteState(),
-            external_input_sequence=(ResearchRequest("argument_licensing"),),
+            external_input_sequence=(
+                ResearchRequest(
+                    "argument_licensing",
+                    admission_row_count=4,
+                    admitted_members=("logicguard",),
+                ),
+            ),
             expected=ScenarioExpectation(
                 expected_status="ok",
                 required_trace_labels=(
@@ -392,13 +446,15 @@ def scenarios() -> tuple[Scenario, ...]:
         ),
         Scenario(
             name="RG03_ambiguous_blocks",
-            description="Unknown intent blocks before native execution.",
+            description="A complete admission set with no match blocks before native execution.",
             initial_state=RouteState(),
-            external_input_sequence=(ResearchRequest("unknown"),),
+            external_input_sequence=(
+                ResearchRequest("unknown", admission_row_count=4),
+            ),
             expected=ScenarioExpectation(
                 expected_status="ok",
-                required_trace_labels=("route_ambiguous_blocked",),
-                summary="ambiguous intent is visible",
+                required_trace_labels=("member_admission_no_match_blocked",),
+                summary="zero member admission is visible",
             ),
             workflow=workflow,
             invariants=INVARIANTS,
@@ -408,7 +464,12 @@ def scenarios() -> tuple[Scenario, ...]:
             description="Selected SourceGuard failure cannot reroute to another member.",
             initial_state=RouteState(),
             external_input_sequence=(
-                ResearchRequest("evidence_discovery", native_status="failed"),
+                ResearchRequest(
+                    "evidence_discovery",
+                    admission_row_count=4,
+                    admitted_members=("sourceguard",),
+                    native_status="failed",
+                ),
             ),
             expected=ScenarioExpectation(
                 expected_status="ok",
@@ -428,6 +489,8 @@ def scenarios() -> tuple[Scenario, ...]:
             external_input_sequence=(
                 ResearchRequest(
                     "argument_licensing",
+                    admission_row_count=4,
+                    admitted_members=("logicguard",),
                     handoff_target="sourceguard",
                     allow_handoff=False,
                 ),
@@ -448,7 +511,12 @@ def scenarios() -> tuple[Scenario, ...]:
             description="An already routed request cannot re-enter the umbrella.",
             initial_state=RouteState(),
             external_input_sequence=(
-                ResearchRequest("trace_reconstruction", already_routed=True),
+                ResearchRequest(
+                    "trace_reconstruction",
+                    admission_row_count=4,
+                    admitted_members=("traceguard",),
+                    already_routed=True,
+                ),
             ),
             expected=ScenarioExpectation(
                 expected_status="ok",
@@ -517,6 +585,45 @@ def scenarios() -> tuple[Scenario, ...]:
                 summary=(
                     "direct experiment reaches researchguard.experiment"
                 ),
+            ),
+            workflow=workflow,
+            invariants=INVARIANTS,
+        ),
+        Scenario(
+            name="RG10_multiple_member_admissions_block",
+            description="Two member-authored applicability rows cannot be resolved by order or keywords.",
+            initial_state=RouteState(),
+            external_input_sequence=(
+                ResearchRequest(
+                    "cross_guard_research",
+                    admission_row_count=4,
+                    admitted_members=("logicguard", "sourceguard"),
+                ),
+            ),
+            expected=ScenarioExpectation(
+                expected_status="ok",
+                required_trace_labels=("member_admission_ambiguous_blocked",),
+                summary="multiple member admissions block without fallback",
+            ),
+            workflow=workflow,
+            invariants=INVARIANTS,
+        ),
+        Scenario(
+            name="RG11_stale_member_admission_blocks",
+            description="Incomplete or stale member evidence cannot select a route.",
+            initial_state=RouteState(),
+            external_input_sequence=(
+                ResearchRequest(
+                    "argument_licensing",
+                    admission_row_count=4,
+                    admitted_members=("logicguard",),
+                    admission_evidence_current=False,
+                ),
+            ),
+            expected=ScenarioExpectation(
+                expected_status="ok",
+                required_trace_labels=("member_admission_stale_blocked",),
+                summary="stale member admission blocks before execution",
             ),
             workflow=workflow,
             invariants=INVARIANTS,

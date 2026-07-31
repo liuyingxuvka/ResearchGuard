@@ -18,8 +18,26 @@ if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
 from researchguard import __version__  # noqa: E402
-from researchguard.routing import RouteBinding, bind_member_request  # noqa: E402
+from researchguard.experiment.admission import (  # noqa: E402
+    author_admission_evidence as experiment_admission,
+)
+from researchguard.logic.admission import (  # noqa: E402
+    author_admission_evidence as logic_admission,
+)
+from researchguard.routing import (  # noqa: E402
+    ADMISSION_SET_SCHEMA,
+    RouteBinding,
+    bind_member_request,
+    request_fingerprint,
+    select_member_request,
+)
+from researchguard.source.admission import (  # noqa: E402
+    author_admission_evidence as source_admission,
+)
 from researchguard.source.schema import Gap, SchemaError  # noqa: E402
+from researchguard.trace.admission import (  # noqa: E402
+    author_admission_evidence as trace_admission,
+)
 
 
 MEMBERS = (
@@ -29,7 +47,7 @@ MEMBERS = (
     "traceguard",
     "experimentguard",
 )
-CURRENT_VERSION = "0.3.0"
+CURRENT_VERSION = "0.4.0"
 RETIRED_SKILL_IDS = (
     "logicguard-source-library",
     "logicguard-structured-artifact",
@@ -135,6 +153,12 @@ def _check_common(checks: list[dict[str, str]]) -> None:
 
 
 def _check_researchguard(checks: list[dict[str, str]]) -> None:
+    builders = {
+        "logicguard": logic_admission,
+        "sourceguard": source_admission,
+        "traceguard": trace_admission,
+        "experimentguard": experiment_admission,
+    }
     for member in (
         "logicguard",
         "sourceguard",
@@ -142,7 +166,28 @@ def _check_researchguard(checks: list[dict[str, str]]) -> None:
         "experimentguard",
     ):
         direct = bind_member_request(member, ("--help",))
-        umbrella = bind_member_request(member, ("--help",))
+        intent = f"intent:native-suite:{member}"
+        request_digest = request_fingerprint(("--help",), business_intent_id=intent)
+        evidence = {
+            "schema_version": ADMISSION_SET_SCHEMA,
+            "member_evidence": [
+                builder(
+                    request_fingerprint=request_digest,
+                    applicability=(
+                        "applicable" if candidate == member else "not_applicable"
+                    ),
+                    forbidden_status="clear",
+                    applicability_evidence_refs=(f"native:{candidate}:applicability",),
+                    forbidden_evidence_refs=(f"native:{candidate}:forbidden-review",),
+                )
+                for candidate, builder in builders.items()
+            ],
+        }
+        umbrella = select_member_request(
+            evidence,
+            ("--help",),
+            business_intent_id=intent,
+        )
         _assert(
             isinstance(direct, RouteBinding)
             and isinstance(umbrella, RouteBinding)
@@ -235,6 +280,13 @@ def _check_experimentguard(checks: list[dict[str, str]]) -> None:
 
     result = recommend_experiments(
         ExperimentSpec(
+            task_id="task:native-suite:experimentguard",
+            purpose="verify finite recommendation",
+            coverage_ids=("hypotheses:h1-h2", "experiments:e1-e2"),
+            assumptions=(),
+            unknowns=(),
+            iteration=0,
+            max_iterations=2,
             hypothesis_predictions=(
                 HypothesisPrediction("h1", {"e1": "up", "e2": "same"}),
                 HypothesisPrediction("h2", {"e1": "down", "e2": "same"}),

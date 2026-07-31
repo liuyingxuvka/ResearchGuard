@@ -5,9 +5,15 @@ from __future__ import annotations
 import json
 import sys
 from collections.abc import Callable, Sequence
+from pathlib import Path
 
 from . import __version__
-from .routing import RouteBinding, TypedGap, bind_member_request
+from .routing import (
+    RouteBinding,
+    TypedGap,
+    bind_member_request,
+    select_member_request,
+)
 
 
 MemberMain = Callable[[list[str] | None], int]
@@ -46,9 +52,9 @@ def _execute(member_id: str, member_argv: Sequence[str]) -> int:
 
 
 def _run_umbrella(argv: Sequence[str]) -> int:
-    member_id: str | None = None
     business_intent_id: str | None = None
     active_request_id: str | None = None
+    admission_evidence_path: Path | None = None
     member_argv: list[str] = []
     index = 0
     while index < len(argv):
@@ -56,7 +62,11 @@ def _run_umbrella(argv: Sequence[str]) -> int:
         if token == "--":
             member_argv = list(argv[index + 1 :])
             break
-        if token in {"--member", "--business-intent-id", "--active-request-id"}:
+        if token in {
+            "--admission-evidence",
+            "--business-intent-id",
+            "--active-request-id",
+        }:
             if index + 1 >= len(argv):
                 gap = TypedGap(
                     status="blocked",
@@ -66,8 +76,8 @@ def _run_umbrella(argv: Sequence[str]) -> int:
                 _print_machine(gap)
                 return 2
             value = argv[index + 1]
-            if token == "--member":
-                member_id = value
+            if token == "--admission-evidence":
+                admission_evidence_path = Path(value)
             elif token == "--business-intent-id":
                 business_intent_id = value
             else:
@@ -84,8 +94,39 @@ def _run_umbrella(argv: Sequence[str]) -> int:
         )
         _print_machine(gap)
         return 2
-    binding = bind_member_request(
-        member_id,
+    if not business_intent_id or admission_evidence_path is None:
+        gap = TypedGap(
+            status="blocked",
+            code="member-admission-required",
+            message=(
+                "The umbrella requires --business-intent-id and one exact "
+                "--admission-evidence artifact authored by all four members."
+            ),
+        )
+        _print_machine(gap)
+        return 2
+    try:
+        admission_payload = json.loads(
+            admission_evidence_path.read_text(encoding="utf-8")
+        )
+    except (OSError, json.JSONDecodeError) as exc:
+        gap = TypedGap(
+            status="blocked",
+            code="member-admission-unreadable",
+            message=str(exc),
+        )
+        _print_machine(gap)
+        return 2
+    if not isinstance(admission_payload, dict):
+        gap = TypedGap(
+            status="blocked",
+            code="member-admission-invalid",
+            message="Admission evidence must be a JSON object.",
+        )
+        _print_machine(gap)
+        return 2
+    binding = select_member_request(
+        admission_payload,
         member_argv,
         business_intent_id=business_intent_id,
         active_request_id=active_request_id,
@@ -109,7 +150,7 @@ def _print_help() -> None:
                 "experiment  execute the ExperimentGuard recommendation owner",
                 "",
                 "umbrella form:",
-                "  researchguard run --member MEMBER [--business-intent-id ID] -- ARGS",
+                "  researchguard run --business-intent-id ID --admission-evidence FILE -- ARGS",
             )
         )
     )

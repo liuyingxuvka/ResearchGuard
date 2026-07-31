@@ -1,4 +1,4 @@
 interface:
   display_name: "ExperimentGuard"
   short_description: "Recommend discriminating experiments"
-  default_prompt: "Use $experimentguard to recommend the smallest declared experiment set that distinguishes these hypotheses."
+  default_prompt: "Use $experimentguard to run the strict finite-discrimination loop: preserve invalid and not-run gaps, treat zero survivors as a prediction-matrix miss, and require independent holdout evidence before closure."

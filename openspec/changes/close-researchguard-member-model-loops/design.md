@@ -24,6 +24,17 @@ ResearchGuard is a versioned suite, not a fourth research mathematics engine. Lo
 3. SourceGuard distinguishes an available search action from provider/permission unavailability and finite-action exhaustion.
 4. TraceGuard requires evidence/event/time/alternative/causal-boundary closure appropriate to the requested claim and never treats narrative smoothness as future prediction.
 5. ExperimentGuard adds `observe` and `iterate` data paths after external execution; unexpected results create a matrix-revision gap, not a truth decision.
+6. Every current task packet requires task purpose, independently bound coverage,
+   explicit assumptions and unknowns, iteration/predecessor identity, base and
+   candidate identity, current native receipt, computed gap lineage, and one exact
+   terminal. Former packet schemas are rejected.
+7. Gap transitions and progress are computed from consecutive current receipts;
+   the caller cannot declare a gap resolved or a task understood.
+8. Candidate closure requires a holdout whose evidence identity is disjoint from
+   construction evidence. The target-native receipt remains semantic authority.
+9. The umbrella consumes exactly four member-authored admission rows bound to the
+   same request and current member contract fingerprints. Zero or many admitted
+   rows block before execution.
 
 ## Risks / Trade-offs
 

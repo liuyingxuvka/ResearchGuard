@@ -1,7 +1,7 @@
 # ResearchGuard
 
-**Current version:** `v0.3.0`
-**当前版本：** `v0.3.0`
+**Current version:** `v0.4.0`
+**当前版本：** `v0.4.0`
 
 ResearchGuard is one versioned research-quality guard suite with five direct
 Codex entrypoints:
@@ -47,3 +47,13 @@ probabilities.
 All direct entries bind to the same native member owners used by the umbrella.
 There are no legacy Skill IDs, command wrappers, aliases, dual readers, or
 failure-triggered alternate routes.
+
+In v0.4.0 the umbrella no longer accepts a caller-selected `--member`. It
+requires one current admission row authored by each native member over the
+same request, and routes only when exactly one member is applicable and clear
+of its forbidden conditions. Each member's task-local loop now binds purpose,
+coverage, assumptions, unknowns, iteration lineage, predictions, native
+receipts, computed gap transitions, addressable next actions, and exact stop
+reasons. LogicGuard, TraceGuard, and ExperimentGuard require independent
+holdout evidence for predictive closure; SourceGuard preserves provider and
+finite-action stop boundaries.

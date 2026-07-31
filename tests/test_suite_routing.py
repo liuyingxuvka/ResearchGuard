@@ -1,14 +1,26 @@
 from __future__ import annotations
 
 from researchguard import MEMBER_IDS, SUITE_ID, __version__
-from researchguard.routing import RouteBinding, TypedGap, bind_member_request, create_handoff
+from researchguard.experiment.admission import author_admission_evidence as experiment_evidence
+from researchguard.logic.admission import author_admission_evidence as logic_evidence
+from researchguard.source.admission import author_admission_evidence as source_evidence
+from researchguard.trace.admission import author_admission_evidence as trace_evidence
+from researchguard.routing import (
+    ADMISSION_SET_SCHEMA,
+    RouteBinding,
+    TypedGap,
+    bind_member_request,
+    create_handoff,
+    request_fingerprint,
+    select_member_request,
+)
 from researchguard.suite import suite_identity
 
 
 def test_suite_identity_is_single_and_complete() -> None:
     identity = suite_identity()
     assert identity["suite_id"] == SUITE_ID
-    assert identity["version"] == __version__ == "0.3.0"
+    assert identity["version"] == __version__ == "0.4.0"
     assert identity["members"] == list(MEMBER_IDS)
     assert identity["distribution"] == "researchguard"
     assert identity["console_script"] == "researchguard"
@@ -74,3 +86,49 @@ def test_handoff_waits_for_explicit_outer_owner() -> None:
     )
     assert handoff.status == "awaiting_owner"
     assert handoff.target_member_id == "traceguard"
+
+
+def _admission_set(*, admitted: tuple[str, ...] = ("sourceguard",)):
+    argv = ["plan", "source.yaml"]
+    intent = "intent:source-discovery"
+    digest = request_fingerprint(argv, business_intent_id=intent)
+    builders = {
+        "logicguard": logic_evidence,
+        "sourceguard": source_evidence,
+        "traceguard": trace_evidence,
+        "experimentguard": experiment_evidence,
+    }
+    rows = []
+    for member, builder in builders.items():
+        rows.append(
+            builder(
+                request_fingerprint=digest,
+                applicability="applicable" if member in admitted else "not_applicable",
+                forbidden_status="clear",
+                applicability_evidence_refs=(f"native:{member}:applicability",),
+                forbidden_evidence_refs=(f"native:{member}:forbidden-review",),
+            )
+        )
+    return {"schema_version": ADMISSION_SET_SCHEMA, "member_evidence": rows}, argv, intent
+
+
+def test_member_authored_admission_selects_exactly_one() -> None:
+    payload, argv, intent = _admission_set()
+    result = select_member_request(payload, argv, business_intent_id=intent)
+    assert isinstance(result, RouteBinding)
+    assert result.member_id == "sourceguard"
+
+
+def test_two_admitted_members_block_without_list_order_fallback() -> None:
+    payload, argv, intent = _admission_set(admitted=("sourceguard", "logicguard"))
+    result = select_member_request(payload, argv, business_intent_id=intent)
+    assert isinstance(result, TypedGap)
+    assert result.code == "member-admission-ambiguous"
+
+
+def test_stale_or_missing_member_admission_blocks() -> None:
+    payload, argv, intent = _admission_set()
+    payload["member_evidence"][0]["request_fingerprint"] = "sha256:" + "0" * 64
+    result = select_member_request(payload, argv, business_intent_id=intent)
+    assert isinstance(result, TypedGap)
+    assert result.code == "admission-request-stale"

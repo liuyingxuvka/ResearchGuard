@@ -1,8 +1,17 @@
 {
   "claim_boundary": "Author adoption marks only this explicit skill-maintainer repository. It creates no consumer or ordinary-project dependency and proves no target-domain work.",
   "maintenance_default": "skillguard-author-maintenance-only",
-  "managed_block_hash": "4B41A26A23027F17987B367C2C0FF358061342110CACEC300252930C2A363D3B",
+  "managed_block_hash": "3525E602FAC393744653826F835E4A0199FF4F66B7F56A844B09BFA8C1807511",
   "managed_skills": [
+    {
+      "integration_mode": "native-integrated",
+      "maintenance_unit_id": "unit:researchguard-suite",
+      "native_owner_id": "experimentguard",
+      "native_route_evidence_path": "skills/experimentguard/SKILL.md",
+      "native_route_status": "present",
+      "skill_id": "experimentguard",
+      "skill_path": "skills/experimentguard"
+    },
     {
       "integration_mode": "native-integrated",
       "maintenance_unit_id": "unit:researchguard-suite",
@@ -40,8 +49,8 @@
       "skill_path": "skills/traceguard"
     }
   ],
-  "manifest_hash": "D444957F0CED8FBA2DA31CDE70809047070A9C8DEFA8200A853FBE837A57AD85",
-  "project_id": "ResearchGuard",
+  "manifest_hash": "B170E6CF628F596237625C6D47AA3727107FBE9D3C1D088B1E60D06733A81CE5",
+  "project_id": "rg",
   "project_prompt_path": "AGENTS.md",
   "repository_role": "skill_maintainer_source",
   "schema_version": "skillguard.project_adoption.v1",

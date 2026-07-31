@@ -8,6 +8,7 @@ from .schema import (
     ExperimentSpec,
     HypothesisDisposition,
     HypothesisPrediction,
+    PredictionMatrixRevisionCandidate,
 )
 
 __all__ = [
@@ -17,6 +18,7 @@ __all__ = [
     "ExperimentSpec",
     "HypothesisDisposition",
     "HypothesisPrediction",
+    "PredictionMatrixRevisionCandidate",
     "observe_experiments",
     "recommend_experiments",
 ]

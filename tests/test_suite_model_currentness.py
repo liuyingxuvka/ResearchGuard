@@ -31,10 +31,10 @@ def test_all_suite_version_authorities_are_current() -> None:
     topology = json.loads(JSON_MODEL_PATH.read_text(encoding="utf-8"))
     model = _load_model()
 
-    assert package["project"]["version"] == "0.3.0"
-    assert __version__ == "0.3.0"
-    assert model.CURRENT_RESEARCHGUARD_VERSION == "0.3.0"
-    assert topology["model_id"] == "researchguard.suite.v0.3.0"
+    assert package["project"]["version"] == "0.4.0"
+    assert __version__ == "0.4.0"
+    assert model.CURRENT_RESEARCHGUARD_VERSION == "0.4.0"
+    assert topology["model_id"] == "researchguard.suite.v0.4.0"
     assert (
         "flowguard @ git+https://github.com/liuyingxuvka/FlowGuard.git"
         "@b6f30533d67b62bcb6a0838937e5dcc5d965e58a"

@@ -9,6 +9,10 @@ LogicGuard, SourceGuard, TraceGuard, and the new ExperimentGuard already have na
 - Add real-result observation and revision iterations to ExperimentGuard while keeping it recommendation-only for execution.
 - Keep ResearchGuard's exact-one-member router and explicit handoff boundaries; no automatic sibling invocation or aggregate understanding status.
 - Add member-specific known-good and known-bad depth/iteration tests and update prompts.
+- Replace permissive v1 task packets with current-only task, coverage,
+  predecessor, native-receipt, gap-lineage, holdout, and exact-terminal packets.
+- Reconcile four member-authored applicability and forbidden-condition rows before
+  the umbrella selects one member; caller choice and lexical order are not evidence.
 
 ## Capabilities
 
@@ -25,3 +29,5 @@ LogicGuard, SourceGuard, TraceGuard, and the new ExperimentGuard already have na
 
 - `src/researchguard/logic`, `source`, `trace`, and `experiment` schemas/engines/CLIs; member SKILL.md files; tests; generated local consumer projection.
 - No central learner, cross-member receipt sharing, source execution, experiment execution, probability invention, or factual-truth claim.
+- No legacy task-packet reader, self-authored gap transition, same-evidence holdout,
+  or zero-surviving-hypothesis success terminal.

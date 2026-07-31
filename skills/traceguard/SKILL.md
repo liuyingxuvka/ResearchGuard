@@ -51,10 +51,16 @@ and preserve weakest links, safe wording, and typed handoffs.
 ## Task-Local Trace Maturation
 
 For a non-trivial trace task, freeze the task id, purpose, trace coverage,
-assumptions, unknowns, and iteration before building the trace. Each important
+coverage fingerprint, assumptions, unknowns, iteration bound, and predecessor
+receipt on later iterations before building the trace. Each important
 trace object or link must have a predicted observation and a falsifier. Use
-native evidence comparison, perturbation, and holdout receipts to produce gap
-transitions and next actions; do not treat an AI statement that it
+evidence/event/source bindings whose hashes match the actual current model,
+then run native depth comparison and perturbation to compute the input,
+resolved, persisted, and introduced gaps. Self-reported gap transitions do not
+count. A candidate revision may close only after a separate holdout observation
+with disjoint observation, evidence, and content fingerprints passes against
+the candidate and the candidate's native depth receipt has no covered gap; do
+not reuse the fitting observation as holdout. Do not treat an AI statement that it
 "understands" the trace as evidence. Continue revising the task-local model
 while predictive or coverage gaps remain. Broad closure requires the explicit
 `model_closed_for_task` terminal; `progress_stalled`, `iteration_limit`,
@@ -67,7 +73,7 @@ its lineage or causal-scope gates.
 Solver failure, unacceptable residuals, missing evidence lineage, unresolved
 critical objects, ineffective critical perturbations, scope transfer, or an
 unsupported predictive holdout blocks broad or predictive closure. There is no
-solver fallback.
+solver fallback, semantic-binding fallback, or same-observation holdout.
 
 ## Output Requirements
 

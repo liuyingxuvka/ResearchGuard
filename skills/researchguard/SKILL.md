@@ -49,7 +49,9 @@ stronger claim, or create a second implementation of member work.
 
 ## Required Workflow
 
-1. Classify the request by its first required native action.
+1. Freeze the business intent and exact member arguments, then ask each of the
+   four members for its current, member-authored admission evidence over that
+   same request fingerprint. Do not infer admission from keywords.
 2. Use `logicguard` for argument structure, warrants, assumptions, rebuttals,
    artifact structure, source-library preservation, model deepening, synthesis,
    or the LogicGuard project-library viewer.
@@ -60,14 +62,17 @@ stronger claim, or create a second implementation of member work.
 5. Use `experimentguard` for recommendation-only discriminating experiment
    selection from explicit hypotheses and predicted outcomes.
 6. Use the umbrella only for a genuinely cross-member or ambiguous request.
-   Select exactly one member before any member executes:
+   Supply the exact four-row admission set; the umbrella executes only when
+   exactly one current member contract reports `applicable` and all forbidden
+   conditions for that member are explicitly absent:
 
 ```powershell
-researchguard run --member logicguard -- <member arguments>
-researchguard run --member sourceguard -- <member arguments>
-researchguard run --member traceguard -- <member arguments>
-researchguard run --member experimentguard -- <member arguments>
+researchguard run --business-intent-id <intent-id> --admission-evidence <four-member.json> -- <member arguments>
 ```
+
+Missing, malformed, stale, zero-match, or many-match admission blocks before
+member execution. `--member` is not an umbrella selector and lexical fallback
+is not a current route.
 
 ## Task-Local Deepening Boundary
 
@@ -75,7 +80,7 @@ When the selected member is used for a non-trivial task, the member—not this
 umbrella—owns the iterative model loop. The member freezes task purpose and
 coverage, derives predictions and falsifiers, applies native observations, and
 returns gap transitions, next actions, and an explicit terminal reason. The
-umbrella must preserve that receipt and must not replace it with a self-report
+umbrella must preserve the member's native receipt and must not replace it with a self-report
 such as "understood" or run a second member to manufacture closure. A result
 with open gaps remains open or is visibly stopped as stalled, limited, or
 external-input-required; only the selected member can declare its task model
@@ -98,6 +103,8 @@ the handoff. Re-entry with an active request id is blocked.
 ## Hard Gates
 
 - one exact member owns each execution;
+- the umbrella accepts exactly one member only from current member-authored
+  admission evidence bound to the exact request;
 - direct and umbrella entry bind to the same native owner;
 - ambiguity, recursion, unknown members, and terminal member failure are
   visible blocked results;

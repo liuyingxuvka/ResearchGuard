@@ -165,6 +165,7 @@ This repository is an explicit skill-authoring workspace. Use SkillGuard only wh
 Canonical SkillGuard repository: https://github.com/liuyingxuvka/SkillGuard
 
 Managed skills:
+- `skills/experimentguard` — native owner=`experimentguard`, maintenance unit=`unit:researchguard-suite`, route evidence=`skills/experimentguard/SKILL.md`; the target skill keeps domain-route, judgment, action, and native-check authority.
 - `skills/logicguard` — native owner=`logicguard`, maintenance unit=`unit:researchguard-suite`, route evidence=`skills/logicguard/SKILL.md`; the target skill keeps domain-route, judgment, action, and native-check authority.
 - `skills/researchguard` — native owner=`researchguard`, maintenance unit=`unit:researchguard-suite`, route evidence=`skills/researchguard/SKILL.md`; the target skill keeps domain-route, judgment, action, and native-check authority.
 - `skills/sourceguard` — native owner=`sourceguard`, maintenance unit=`unit:researchguard-suite`, route evidence=`skills/sourceguard/SKILL.md`; the target skill keeps domain-route, judgment, action, and native-check authority.

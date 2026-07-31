@@ -397,6 +397,15 @@ def cmd_iterate(args: argparse.Namespace) -> int:
                 expected_event_ids=args.expected_event or [],
                 expected_event_order=args.expected_event_order or [],
                 weakens_when=args.weakens_when,
+                task_id=args.task_id,
+                purpose=args.purpose,
+                coverage_ids=args.coverage_id,
+                assumptions=args.assumption,
+                unknowns=args.unknown,
+                iteration=args.iteration,
+                max_iterations=args.max_iterations,
+                prior_receipt_fingerprint=args.prior_receipt_fingerprint,
+                prior_open_gap_ids=args.prior_open_gap_id,
             ).to_dict()
         elif args.iteration_command == "compare":
             artifact = compare_prediction_observation(
@@ -408,6 +417,7 @@ def cmd_iterate(args: argparse.Namespace) -> int:
                 comparison=load_comparison(args.comparison),
                 candidate_model_path=args.candidate,
                 observation=load_observation(args.observation),
+                holdout_observation=load_observation(args.holdout_observation),
                 required_holdout_evidence_ids=args.required_holdout_evidence or [],
                 addressed_mismatch_ids=args.address_mismatch or [],
                 force_rollback=args.rollback,
@@ -591,6 +601,15 @@ def build_parser() -> argparse.ArgumentParser:
     freeze.add_argument("--expected-event", action="append")
     freeze.add_argument("--expected-event-order", action="append")
     freeze.add_argument("--weakens-when", required=True)
+    freeze.add_argument("--task-id", required=True)
+    freeze.add_argument("--purpose", required=True)
+    freeze.add_argument("--coverage-id", action="append", required=True)
+    freeze.add_argument("--assumption", action="append", default=[])
+    freeze.add_argument("--unknown", action="append", default=[])
+    freeze.add_argument("--iteration", type=int, required=True)
+    freeze.add_argument("--max-iterations", type=int, required=True)
+    freeze.add_argument("--prior-receipt-fingerprint", default="")
+    freeze.add_argument("--prior-open-gap-id", action="append", default=[])
     freeze.add_argument("--output", required=True)
     freeze.add_argument("--pretty", action="store_true")
     freeze.set_defaults(handler=cmd_iterate)
@@ -605,6 +624,7 @@ def build_parser() -> argparse.ArgumentParser:
     decide = iteration_sub.add_parser("decide")
     decide.add_argument("--comparison", required=True)
     decide.add_argument("--observation", required=True)
+    decide.add_argument("--holdout-observation", required=True)
     decide.add_argument("--candidate", required=True)
     decide.add_argument("--required-holdout-evidence", action="append")
     decide.add_argument("--address-mismatch", action="append")

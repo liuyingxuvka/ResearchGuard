@@ -135,6 +135,16 @@ def build_parser() -> argparse.ArgumentParser:
         help="Claim whose unperturbed native status must remain unchanged; repeat as needed.",
     )
     iteration_freeze.add_argument("--prediction-id")
+    iteration_freeze.add_argument("--task-id", required=True)
+    iteration_freeze.add_argument("--purpose", required=True)
+    iteration_freeze.add_argument("--coverage-id", action="append", required=True)
+    iteration_freeze.add_argument("--assumption", action="append", default=[])
+    iteration_freeze.add_argument("--unknown", action="append", default=[])
+    iteration_freeze.add_argument("--iteration", type=int, required=True)
+    iteration_freeze.add_argument("--max-iterations", type=int, required=True)
+    iteration_freeze.add_argument("--prior-receipt-fingerprint", default="")
+    iteration_freeze.add_argument("--prior-open-gap-id", action="append", default=[])
+    iteration_freeze.add_argument("--holdout-claim", action="append", required=True)
     iteration_freeze.add_argument("--output", required=True)
     iteration_freeze.set_defaults(func=_cmd_argument_iteration_freeze)
 
@@ -551,6 +561,16 @@ def _cmd_argument_iteration_freeze(args: argparse.Namespace) -> int:
         max_size=args.max_size,
         protected_claim_ids=args.protect_claim,
         prediction_id=args.prediction_id,
+        task_id=args.task_id,
+        purpose=args.purpose,
+        coverage_ids=args.coverage_id,
+        assumptions=args.assumption,
+        unknowns=args.unknown,
+        iteration=args.iteration,
+        max_iterations=args.max_iterations,
+        prior_receipt_fingerprint=args.prior_receipt_fingerprint,
+        prior_open_gap_ids=args.prior_open_gap_id,
+        holdout_claim_ids=args.holdout_claim,
     )
     _write(args.output, prediction.to_dict())
     return 0

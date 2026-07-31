@@ -47,3 +47,46 @@ ResearchGuard SHALL not use a numeric understanding level or self-reported under
 - **GIVEN** a member answer contains an understanding level or self-assessment
 - **WHEN** the ResearchGuard router evaluates the result
 - **THEN** it uses only the member's native receipt and terminal reason
+
+### Requirement: Current task packets are strict and evidence-bound
+
+Every non-trivial member iteration SHALL bind a non-empty task id and purpose,
+an independently fingerprinted coverage universe, explicit assumptions and
+unknowns, an iteration and predecessor receipt, base and candidate identities,
+one current member-native depth receipt, computed input/resolved/persisted/
+introduced gaps, next actions, and one exact terminal. Former schemas SHALL be
+rejected rather than interpreted.
+
+#### Scenario: Caller claims a gap is resolved
+- **GIVEN** consecutive native receipts still contain the same addressable gap
+- **WHEN** the caller supplies prose saying it is resolved
+- **THEN** the member computes `persisted` and does not close the task
+
+#### Scenario: Holdout reuses construction evidence
+- **GIVEN** a candidate was built from one evidence fingerprint
+- **WHEN** the same evidence id or content fingerprint is supplied as holdout
+- **THEN** candidate closure is blocked
+
+### Requirement: Zero surviving hypotheses is an ExperimentGuard model miss
+
+When a valid external outcome agrees with none of the frozen prediction matrix,
+ExperimentGuard SHALL retain zero truth selections, emit a matrix-revision
+candidate bound to the base matrix, and require external model revision.
+
+#### Scenario: Every hypothesis is contradicted
+- **WHEN** all declared hypotheses disagree with the valid observation
+- **THEN** the terminal is not `model_closed_for_task`
+- **AND** `prediction-matrix-revision-required` remains an open gap
+
+### Requirement: Umbrella admission is exact and member-authored
+
+ResearchGuard SHALL reconcile exactly one current admission row from each member,
+all bound to the same request and each member's current admission contract.
+
+#### Scenario: Caller selects a member without admission evidence
+- **WHEN** the umbrella is invoked with only a member name
+- **THEN** it blocks before execution
+
+#### Scenario: Two members are admitted
+- **WHEN** two current rows say applicable and forbidden-clear
+- **THEN** the umbrella reports visible ambiguity without lexical fallback

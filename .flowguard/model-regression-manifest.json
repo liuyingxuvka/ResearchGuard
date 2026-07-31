@@ -9,7 +9,18 @@
     "src/researchguard/__init__.py",
     "src/researchguard/cli.py",
     "src/researchguard/routing.py",
+    "src/researchguard/logic/admission.py",
+    "src/researchguard/logic/cli.py",
+    "src/researchguard/logic/execution_depth.py",
+    "src/researchguard/logic/task_iteration.py",
+    "src/researchguard/source/admission.py",
+    "src/researchguard/source/cli.py",
+    "src/researchguard/source/task_iteration.py",
     "src/researchguard/source/stop_decision.py",
+    "src/researchguard/trace/admission.py",
+    "src/researchguard/trace/cli.py",
+    "src/researchguard/trace/storyline_depth.py",
+    "src/researchguard/trace/task_iteration.py",
     "src/researchguard/trace/inference/contradiction_core.py",
     "src/researchguard/logic/minimal_sets.py",
     "src/researchguard/experiment/*.py",
@@ -18,7 +29,13 @@
     "tests/source/test_stop_decision.py",
     "tests/trace/test_contradiction_core.py",
     "tests/logic/test_minimal_sets.py",
-    "tests/experiment/test_recommendation.py"
+    "tests/experiment/test_recommendation.py",
+    "tests/logic/test_task_iteration.py",
+    "tests/source/test_task_iteration.py",
+    "tests/trace/test_task_iteration.py",
+    "tests/test_root_cli.py",
+    "tests/test_suite_routing.py",
+    "tests/test_suite_model_currentness.py"
   ],
   "snapshot_only_input_globs": [
     ".flowguard/model-mesh/snapshots/*.json",
@@ -46,7 +63,18 @@
         "src/researchguard/__init__.py",
         "src/researchguard/cli.py",
         "src/researchguard/routing.py",
+        "src/researchguard/logic/admission.py",
+        "src/researchguard/logic/cli.py",
+        "src/researchguard/logic/execution_depth.py",
+        "src/researchguard/logic/task_iteration.py",
+        "src/researchguard/source/admission.py",
+        "src/researchguard/source/cli.py",
+        "src/researchguard/source/task_iteration.py",
         "src/researchguard/source/stop_decision.py",
+        "src/researchguard/trace/admission.py",
+        "src/researchguard/trace/cli.py",
+        "src/researchguard/trace/storyline_depth.py",
+        "src/researchguard/trace/task_iteration.py",
         "src/researchguard/trace/inference/contradiction_core.py",
         "src/researchguard/logic/minimal_sets.py",
         "src/researchguard/experiment/*.py",
@@ -55,7 +83,13 @@
         "tests/source/test_stop_decision.py",
         "tests/trace/test_contradiction_core.py",
         "tests/logic/test_minimal_sets.py",
-        "tests/experiment/test_recommendation.py"
+        "tests/experiment/test_recommendation.py",
+        "tests/logic/test_task_iteration.py",
+        "tests/source/test_task_iteration.py",
+        "tests/trace/test_task_iteration.py",
+        "tests/test_root_cli.py",
+        "tests/test_suite_routing.py",
+        "tests/test_suite_model_currentness.py"
       ],
       "expected_artifacts": [],
       "exclusion_reason": "",
@@ -64,15 +98,17 @@
       "model_kind": "executable_workflow",
       "purpose_closure": {
         "schema_version": "flowguard.model_purpose_closure.v1",
-        "model_instance_id": "regression:researchguard_suite:0.2.0",
+        "model_instance_id": "regression:researchguard_suite:0.4.0",
         "reusable_model_type_id": "researchguard_suite",
         "task_intent_id": "researchguard-regression:suite-route-and-decision-members",
         "declaration_phase": "before_candidate",
-        "guarded_purpose": "Prevent ambiguous routing, alternate-success retries, stale suite identity, or experiment execution claims from being accepted as current ResearchGuard behavior.",
+        "guarded_purpose": "Prevent unproven or ambiguous member admission, alternate-success retries, stale suite identity, premature member model closure, or experiment execution claims from being accepted as current ResearchGuard behavior.",
         "protected_failure_ids": [
           "researchguard:ambiguous-or-recursive-route",
+          "researchguard:unproven-member-admission",
           "researchguard:alternate-success-after-member-failure",
           "researchguard:stale-suite-identity",
+          "researchguard:premature-member-model-closure",
           "researchguard:experiment-execution-overclaim"
         ],
         "claim_boundary": "This closure covers only the registered finite ResearchGuard route, identity, handoff, and recommendation-boundary scenarios; member-native factual claims require separate evidence.",
@@ -85,9 +121,19 @@
             "oracle_id": "native:researchguard-suite:run-checks"
           },
           {
+            "failure_id": "researchguard:unproven-member-admission",
+            "known_bad_case_id": "scenario:rg03-rg10-rg11",
+            "oracle_id": "native:researchguard-suite:run-checks"
+          },
+          {
             "failure_id": "researchguard:alternate-success-after-member-failure",
             "known_bad_case_id": "scenario:rg04",
             "oracle_id": "native:researchguard-suite:run-checks"
+          },
+          {
+            "failure_id": "researchguard:premature-member-model-closure",
+            "known_bad_case_id": "native:member-task-iteration:strict-closure",
+            "oracle_id": "native:researchguard:member-task-iteration-tests"
           },
           {
             "failure_id": "researchguard:stale-suite-identity",

@@ -204,6 +204,15 @@ def build_parser() -> argparse.ArgumentParser:
         help="Gap whose complete task-local state must remain unchanged; repeat as needed.",
     )
     iteration_freeze.add_argument("--prediction-id")
+    iteration_freeze.add_argument("--task-id", required=True)
+    iteration_freeze.add_argument("--purpose", required=True)
+    iteration_freeze.add_argument("--coverage-id", action="append", required=True)
+    iteration_freeze.add_argument("--assumption", action="append", default=[])
+    iteration_freeze.add_argument("--unknown", action="append", default=[])
+    iteration_freeze.add_argument("--iteration", type=int, required=True)
+    iteration_freeze.add_argument("--max-iterations", type=int, required=True)
+    iteration_freeze.add_argument("--prior-receipt-fingerprint", default="")
+    iteration_freeze.add_argument("--prior-open-gap-id", action="append", default=[])
     iteration_freeze.add_argument("--output", required=True)
     iteration_freeze.set_defaults(func=_cmd_search_iteration_freeze)
 
@@ -213,7 +222,12 @@ def build_parser() -> argparse.ArgumentParser:
     iteration_run.add_argument("model")
     iteration_run.add_argument("--model-contract", required=True)
     iteration_run.add_argument("--prediction", required=True)
-    iteration_run.add_argument("--observation", required=True)
+    iteration_run.add_argument("--observation", default="")
+    iteration_run.add_argument(
+        "--provider-status",
+        choices=["OBSERVATION_SUPPLIED", "PROVIDER_UNAVAILABLE", "NOT_RUN"],
+        default="OBSERVATION_SUPPLIED",
+    )
     iteration_run.add_argument("--actual-cost", required=True, type=float)
     iteration_run.add_argument("--decision", choices=["accept", "reject"], default="reject")
     iteration_run.add_argument("--limit", type=int, default=5)
@@ -445,6 +459,15 @@ def _cmd_search_iteration_freeze(args: argparse.Namespace) -> int:
         cost_tolerance=args.cost_tolerance,
         protected_gap_ids=args.protect_gap,
         prediction_id=args.prediction_id,
+        task_id=args.task_id,
+        purpose=args.purpose,
+        coverage_ids=args.coverage_id,
+        assumptions=args.assumption,
+        unknowns=args.unknown,
+        iteration=args.iteration,
+        max_iterations=args.max_iterations,
+        prior_receipt_fingerprint=args.prior_receipt_fingerprint,
+        prior_open_gap_ids=args.prior_open_gap_id,
     )
     _write_json(args.output, prediction.to_dict())
     _json_out({"ok": True, "prediction": prediction.to_dict()}, True)
@@ -457,7 +480,7 @@ def _cmd_search_iteration_run(args: argparse.Namespace) -> int:
             args.model,
             args.model_contract,
             args.prediction,
-            args.observation,
+            *([args.observation] if args.observation else []),
         ],
         outputs=[
             args.candidate_output,
@@ -469,7 +492,7 @@ def _cmd_search_iteration_run(args: argparse.Namespace) -> int:
     prediction = SearchOutcomePrediction.from_dict(
         _load_json_object(args.prediction)
     )
-    observation = _load_observation(args.observation)
+    observation = _load_observation(args.observation) if args.observation else None
     candidate, receipt = run_search_iteration(
         baseline,
         prediction,
@@ -477,6 +500,7 @@ def _cmd_search_iteration_run(args: argparse.Namespace) -> int:
         actual_cost=args.actual_cost,
         decision=args.decision,
         limit=args.limit,
+        provider_status=args.provider_status,
     )
     write_yaml(args.candidate_output, candidate)
     assert candidate.guard_contract is not None

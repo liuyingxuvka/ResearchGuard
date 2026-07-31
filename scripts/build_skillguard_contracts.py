@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import argparse
 import json
 from pathlib import Path
 
@@ -15,6 +16,7 @@ MEMBERS = (
     "experimentguard",
 )
 UNIT_ID = "unit:researchguard-suite"
+VALIDATION_PLAN_PATH = ROOT / ".skillguard" / "researchguard-suite-validation-plan.json"
 
 TEST_ARGS = {
     "researchguard": [
@@ -54,6 +56,7 @@ IMPLEMENTATION_PATHS = {
         ".flowguard/run_researchguard_suite_model.py",
         ".flowguard/researchguard_skill_contract_model.py",
         ".flowguard/researchguard_skill_contract_model_common.py",
+        "scripts/build_skillguard_contracts.py",
         "scripts/check_researchguard_suite.py",
         "scripts/check_zero_residuals.py",
         "scripts/install_researchguard.py",
@@ -295,6 +298,45 @@ def contract(member: str) -> dict:
                 "evidence_source": "tests/task-local-iteration",
             },
         ],
+        "depth_profile": {
+            "schema_version": "skillguard.depth_profile.v2",
+            "profile_id": f"profile:researchguard:{member}:strict-model-closure",
+            "target_skill_id": member,
+            "integration_mode": "native-integrated",
+            "native_owner_id": f"owner:researchguard:{member}",
+            "native_route_ids": [route_id],
+            "native_check_ids": [
+                contract_check_id,
+                f"check:{member}:native-tests",
+                deepening_check_id,
+            ],
+            "model_deepening_check_id": deepening_check_id,
+            "skillguard_adds_domain_route": False,
+            "enforcement_level": "enforced",
+            "required_closure_profiles": ["enforced"],
+            "provider_runtime": {
+                "provider_id": "skillguard-local-provider",
+                "required_runtime_contract_id": "skillguard-declared-check-supervision-current",
+                "required_capability_ids": [
+                    "declared-check-inventory.v1",
+                    "declared-check-receipt-reconciliation.v1",
+                    "installation-receipt-binding.v1",
+                    "installation-currentness-replay.v1",
+                    "provider-runtime-enrollment.v1",
+                    "single-flight-check-execution.v1",
+                ],
+                "required_enrollment_status": "enrolled",
+                "readiness_check_ids": [
+                    contract_check_id,
+                    f"check:{member}:native-tests",
+                    deepening_check_id,
+                ],
+            },
+            "claim_boundary": (
+                "SkillGuard supervises only the exact current ResearchGuard target-owned "
+                "strict model-closure checks; it does not replace their domain judgment."
+            ),
+        },
         "implementation_paths": IMPLEMENTATION_PATHS[member],
         "step_bindings": [
             {
@@ -340,14 +382,79 @@ def contract(member: str) -> dict:
         "judgment_rubrics": [],
         "claim_boundary": (
             f"This contract covers the current {member} consumer projection, "
-            "native route, and member-owned tests inside ResearchGuard v0.3.0. "
+            "native route, and member-owned tests inside ResearchGuard v0.4.0. "
             "It does not prove source truth, unrun external work, installation, "
             "publication, or future AI behavior."
         ),
     }
 
 
-def main() -> int:
+def validation_plan() -> dict:
+    rows = []
+    owner_ids: list[str] = []
+    check_count = 0
+    for member in MEMBERS:
+        control = ROOT / "skills" / member / ".skillguard"
+        compiled = json.loads((control / "compiled-contract.json").read_text(encoding="utf-8"))
+        manifest = json.loads((control / "check-manifest.json").read_text(encoding="utf-8"))
+        if tuple(compiled.get("member_skill_ids", ())) != MEMBERS:
+            raise ValueError(f"{member} compiled contract is not the exact five-member unit")
+        if tuple(manifest.get("member_skill_ids", ())) != MEMBERS:
+            raise ValueError(f"{member} check manifest is not the exact five-member unit")
+        checks = []
+        for item in manifest.get("checks", ()):
+            row = {
+                "check_id": item["check_id"],
+                "evidence_subject_id": item["evidence_subject_id"],
+                "execution_owner_id": item["execution_owner_id"],
+                "evidence_domain_id": item["evidence_domain_id"],
+                "depends_on_check_ids": item["depends_on_check_ids"],
+            }
+            checks.append(row)
+            owner_ids.append(row["execution_owner_id"])
+        check_count += len(checks)
+        rows.append(
+            {
+                "member_skill_id": member,
+                "contract_hash": compiled["contract_hash"],
+                "manifest_hash": manifest["manifest_hash"],
+                "checks": checks,
+            }
+        )
+    if len(owner_ids) != len(set(owner_ids)):
+        raise ValueError("validation plan contains duplicate execution owners")
+    return {
+        "schema_version": "researchguard.skillguard_unit_validation_plan.v1",
+        "status": "frozen",
+        "maintenance_unit_id": UNIT_ID,
+        "member_skill_ids": list(MEMBERS),
+        "toolchain": {
+            "skillguard_version": "0.4.0",
+            "skillguard_source_revision": "3cfdca77567dacfa77c8a8d0696e116fe0e925c3",
+            "flowguard_version": "0.67.0",
+            "python_command": "python",
+        },
+        "private_roots": {
+            "run_state_root": "work/skillguard/v0.4.0-current/run-state",
+            "owner_evidence_root": "work/verification/skillguard-v0.4.0-current/owner-evidence",
+        },
+        "members": rows,
+        "execution_owner_count": len(owner_ids),
+        "check_count": check_count,
+        "cross_unit_receipt_reuse": False,
+        "skillguard_adds_domain_route": False,
+        "claim_boundary": (
+            "This freezes the exact same-unit owner inventory for the current local "
+            "maintenance change. It does not itself execute a check, activate a "
+            "consumer installation, publish a release, or retire predecessor repositories."
+        ),
+    }
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--write-validation-plan", action="store_true")
+    args = parser.parse_args(argv)
     for member in MEMBERS:
         control = ROOT / "skills" / member / ".skillguard"
         control.mkdir(parents=True, exist_ok=True)
@@ -356,7 +463,20 @@ def main() -> int:
             json.dumps(contract(member), ensure_ascii=False, indent=2) + "\n",
             encoding="utf-8",
         )
-    print(json.dumps({"unit": UNIT_ID, "members": MEMBERS}))
+    if args.write_validation_plan:
+        VALIDATION_PLAN_PATH.write_text(
+            json.dumps(validation_plan(), ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+        )
+    print(
+        json.dumps(
+            {
+                "unit": UNIT_ID,
+                "members": MEMBERS,
+                "validation_plan_written": args.write_validation_plan,
+            }
+        )
+    )
     return 0
 
 

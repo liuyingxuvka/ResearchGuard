@@ -23,4 +23,28 @@
 
 - [x] 4.1 Update the ResearchGuard umbrella prompt to preserve exact-one routing and opaque member handoffs.
 - [x] 4.2 Run member tests and `scripts/check_researchguard_suite.py`.
-- [x] 4.3 Regenerate and check local installed skills; do not push GitHub or create a remote release.
+- [x] 4.3 Regenerate all five maintained contracts and check their current source/compiled/manifest parity.
+
+## 5. Strict current-only closure repair
+
+- [x] 5.1 Replace Logic, Source, Trace, and Experiment task packets with strict
+  task/coverage/predecessor/base-candidate/native-receipt/gap-lineage terminals.
+- [x] 5.2 Reconcile exact four-member authored admission evidence in the umbrella.
+- [x] 5.3 Remove SourceGuard's pre-iterative success path and compute stop terminals
+  only after candidate acceptance and native revalidation.
+- [x] 5.4 Require TraceGuard semantic evidence/source/event bindings and a disjoint
+  holdout observation; run current native storyline depth on base and candidate.
+- [x] 5.5 Treat zero ExperimentGuard survivors and invalid/not-run/unknown observations
+  as explicit gaps with an unapplied immutable matrix-revision candidate.
+- [x] 5.6 Add exact known-bad tests for empty task scope, stale predecessor, self-report,
+  same-evidence holdout, no-progress, ambiguous routing, and zero survivors.
+- [x] 5.7 Update all five prompts, FlowGuard declared coverage, SkillGuard five-member
+  source plan, version 0.4.0, README, and changelog.
+- [x] 5.8 Run affected tests and local model checks. Leave final frozen full validation,
+  installation, commit, tag, push, and release to the integration owner.
+
+## 6. Final integration and publication
+
+- [ ] 6.1 Freeze the five-member source, toolchain, owner plan, and model authority; run one foreground full validation with current target-owned receipts.
+- [ ] 6.2 Install the package and all five clean consumer skills, then verify source/package/installed-skill parity.
+- [ ] 6.3 Commit, tag 0.4.0, push, publish the GitHub Release, and verify source/Git/tag/release identities separately.

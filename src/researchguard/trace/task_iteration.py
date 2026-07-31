@@ -17,14 +17,15 @@ from typing import Any, Iterable, Mapping
 import yaml
 
 from .evaluator import evaluate_model
+from .storyline_depth import evaluate_storyline_depth
 from .inference.types import fingerprint
 from .loader import load_model
 
 
-PREDICTION_SCHEMA = "researchguard.trace.task_prediction.v1"
-OBSERVATION_SCHEMA = "researchguard.trace.evidence_batch_observation.v1"
-COMPARISON_SCHEMA = "researchguard.trace.prediction_observation_comparison.v1"
-REVISION_SCHEMA = "researchguard.trace.candidate_storyline_revision.v1"
+PREDICTION_SCHEMA = "researchguard.trace.task_prediction.v2"
+OBSERVATION_SCHEMA = "researchguard.trace.evidence_batch_observation.v2"
+COMPARISON_SCHEMA = "researchguard.trace.prediction_observation_comparison.v2"
+REVISION_SCHEMA = "researchguard.trace.candidate_storyline_revision.v2"
 VALID_TARGET_KINDS = {"storyline", "hypothesis"}
 VALID_PREDICTION_KINDS = {"evidence_footprint", "future_event"}
 VALID_QUALITY = {"valid", "invalid", "access_gap"}
@@ -106,14 +107,16 @@ class PredictionSnapshot:
     weakens_when: str
     factual_future_prediction_licensed: bool
     snapshot_fingerprint: str
-    task_id: str = ""
-    purpose: str = ""
-    coverage_ids: tuple[str, ...] = ()
-    assumptions: tuple[str, ...] = ()
-    unknowns: tuple[str, ...] = ()
-    iteration: int = 0
-    max_iterations: int = 8
-    prior_gap_fingerprints: tuple[str, ...] = ()
+    task_id: str
+    purpose: str
+    coverage_ids: tuple[str, ...]
+    coverage_fingerprint: str
+    assumptions: tuple[str, ...]
+    unknowns: tuple[str, ...]
+    iteration: int
+    max_iterations: int
+    prior_receipt_fingerprint: str
+    prior_open_gap_ids: tuple[str, ...]
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -131,14 +134,28 @@ class PredictionSnapshot:
         expected_evidence = _ordered_unique(data.get("expected_evidence_ids", []))
         expected_events = _ordered_unique(data.get("expected_event_ids", []))
         expected_order = tuple(str(item) for item in data.get("expected_event_order", []))
+        required_task_fields = {
+            "task_id", "purpose", "coverage_ids", "coverage_fingerprint",
+            "assumptions", "unknowns", "iteration", "max_iterations",
+            "prior_receipt_fingerprint", "prior_open_gap_ids",
+        }
+        missing_task_fields = sorted(required_task_fields - set(data))
+        if missing_task_fields:
+            raise TaskIterationError(
+                "current trace prediction is missing task fields: "
+                + ", ".join(missing_task_fields)
+            )
         task_id = str(data.get("task_id", "")).strip()
         coverage_ids = _ordered_unique(data.get("coverage_ids", []))
-        if task_id and not coverage_ids:
-            raise TaskIterationError("task-local trace predictions require coverage_ids")
+        if not task_id or not str(data.get("purpose", "")).strip() or not coverage_ids:
+            raise TaskIterationError("task_id, purpose, and coverage_ids are required")
         iteration = int(data.get("iteration", 0))
         max_iterations = int(data.get("max_iterations", 8))
         if iteration < 0 or max_iterations < 1:
             raise TaskIterationError("iteration must be non-negative and max_iterations must be positive")
+        prior_receipt = str(data.get("prior_receipt_fingerprint", ""))
+        if iteration and not prior_receipt.startswith("sha256:"):
+            raise TaskIterationError("later iterations require prior_receipt_fingerprint")
         if not expected_evidence and not expected_events:
             raise TaskIterationError(
                 "prediction requires expected_evidence_ids or expected_event_ids"
@@ -168,12 +185,24 @@ class PredictionSnapshot:
             "task_id": task_id,
             "purpose": str(data.get("purpose", "")).strip(),
             "coverage_ids": coverage_ids,
+            "coverage_fingerprint": str(data.get("coverage_fingerprint", "")),
             "assumptions": _ordered_unique(data.get("assumptions", [])),
             "unknowns": _ordered_unique(data.get("unknowns", [])),
             "iteration": iteration,
             "max_iterations": max_iterations,
-            "prior_gap_fingerprints": _ordered_unique(data.get("prior_gap_fingerprints", [])),
+            "prior_receipt_fingerprint": prior_receipt,
+            "prior_open_gap_ids": _ordered_unique(data.get("prior_open_gap_ids", [])),
         }
+        expected_coverage_fingerprint = fingerprint(
+            {
+                "task_id": task_id,
+                "purpose": payload["purpose"],
+                "coverage_ids": coverage_ids,
+                "baseline_model_sha256": payload["baseline_model_sha256"],
+            }
+        )
+        if payload["coverage_fingerprint"] != expected_coverage_fingerprint:
+            raise TaskIterationError("coverage_fingerprint mismatch")
         if not payload["prediction_id"] or not payload["target_id"]:
             raise TaskIterationError("prediction_id and target_id are required")
         if not payload["weakens_when"]:
@@ -200,10 +229,12 @@ class EvidenceBatchObservation:
     event_order: tuple[str, ...]
     contradiction_ids: tuple[str, ...]
     source_refs: tuple[str, ...]
+    evidence_bindings: Mapping[str, str]
+    event_bindings: Mapping[str, str]
+    source_bindings: Mapping[str, str]
     future_holdout_status: str
     future_holdout_validator_receipt: str
     observation_fingerprint: str
-    gap_transitions: Mapping[str, str] | None = None
     external_input_ids: tuple[str, ...] = ()
 
     def to_dict(self) -> dict[str, Any]:
@@ -226,20 +257,28 @@ class EvidenceBatchObservation:
             "event_order": tuple(str(item) for item in data.get("event_order", [])),
             "contradiction_ids": _ordered_unique(data.get("contradiction_ids", [])),
             "source_refs": _ordered_unique(data.get("source_refs", [])),
+            "evidence_bindings": {str(key): str(value) for key, value in (data.get("evidence_bindings") or {}).items()},
+            "event_bindings": {str(key): str(value) for key, value in (data.get("event_bindings") or {}).items()},
+            "source_bindings": {str(key): str(value) for key, value in (data.get("source_bindings") or {}).items()},
             "future_holdout_status": str(
                 data.get("future_holdout_status", "not_run")
             ),
             "future_holdout_validator_receipt": str(
                 data.get("future_holdout_validator_receipt", "")
             ),
-            "gap_transitions": {
-                str(key): str(value)
-                for key, value in (data.get("gap_transitions") or {}).items()
-            },
             "external_input_ids": _ordered_unique(data.get("external_input_ids", [])),
         }
         if not payload["observation_id"]:
             raise TaskIterationError("observation_id is required")
+        if set(payload["evidence_bindings"]) != set(payload["evidence_ids"]):
+            raise TaskIterationError("evidence_bindings must cover exact evidence_ids")
+        if set(payload["event_bindings"]) != set(payload["event_ids"]):
+            raise TaskIterationError("event_bindings must cover exact event_ids")
+        if set(payload["source_bindings"]) != set(payload["source_refs"]):
+            raise TaskIterationError("source_bindings must cover exact source_refs")
+        for mapping_name in ("evidence_bindings", "event_bindings", "source_bindings"):
+            if any(not value.startswith("sha256:") for value in payload[mapping_name].values()):
+                raise TaskIterationError(f"{mapping_name} values must be sha256 fingerprints")
         _parse_timestamp(payload["observed_at"], "observed_at")
         if set(payload["event_order"]) - set(payload["event_ids"]):
             raise TaskIterationError("event_order may only contain event_ids")
@@ -273,19 +312,21 @@ def freeze_prediction(
     expected_event_ids: Iterable[str] = (),
     expected_event_order: Iterable[str] = (),
     weakens_when: str,
-    task_id: str = "",
-    purpose: str = "",
-    coverage_ids: Iterable[str] = (),
+    task_id: str,
+    purpose: str,
+    coverage_ids: Iterable[str],
     assumptions: Iterable[str] = (),
     unknowns: Iterable[str] = (),
-    iteration: int = 0,
-    max_iterations: int = 8,
-    prior_gap_fingerprints: Iterable[str] = (),
+    iteration: int,
+    max_iterations: int,
+    prior_receipt_fingerprint: str = "",
+    prior_open_gap_ids: Iterable[str] = (),
 ) -> PredictionSnapshot:
     """Freeze a prediction before a new evidence batch is read."""
 
     resolved = Path(model_path).resolve()
     load_model(resolved)
+    coverage = list(coverage_ids)
     payload = {
         "schema_version": PREDICTION_SCHEMA,
         "prediction_id": prediction_id,
@@ -302,12 +343,21 @@ def freeze_prediction(
         "factual_future_prediction_licensed": False,
         "task_id": task_id,
         "purpose": purpose,
-        "coverage_ids": list(coverage_ids),
+        "coverage_ids": coverage,
+        "coverage_fingerprint": fingerprint(
+            {
+                "task_id": task_id,
+                "purpose": purpose,
+                "coverage_ids": _ordered_unique(coverage),
+                "baseline_model_sha256": _sha256_file(resolved),
+            }
+        ),
         "assumptions": list(assumptions),
         "unknowns": list(unknowns),
         "iteration": iteration,
         "max_iterations": max_iterations,
-        "prior_gap_fingerprints": list(prior_gap_fingerprints),
+        "prior_receipt_fingerprint": prior_receipt_fingerprint,
+        "prior_open_gap_ids": list(prior_open_gap_ids),
     }
     return PredictionSnapshot.from_dict(payload)
 
@@ -332,6 +382,51 @@ def compare_prediction_observation(
         raise TaskIterationError(
             "observation must be later than the frozen prediction"
         )
+    model = load_model(prediction.baseline_model_path)
+    evidence_by_id = model.evidence_by_id()
+    event_by_id = model.event_by_id()
+    source_by_id = model.source_by_id()
+    for evidence_id, supplied in observation.evidence_bindings.items():
+        item = evidence_by_id.get(evidence_id)
+        if item is None or supplied != f"sha256:{fingerprint(asdict(item))}":
+            raise TaskIterationError(f"evidence binding is missing or stale: {evidence_id}")
+    for event_id, supplied in observation.event_bindings.items():
+        item = event_by_id.get(event_id)
+        if item is None or supplied != f"sha256:{fingerprint(asdict(item))}":
+            raise TaskIterationError(f"event binding is missing or stale: {event_id}")
+    for source_id, supplied in observation.source_bindings.items():
+        item = source_by_id.get(source_id)
+        if item is None or supplied != f"sha256:{fingerprint(asdict(item))}":
+            raise TaskIterationError(f"source binding is missing or stale: {source_id}")
+
+    baseline_result = evaluate_model(model)
+    native_depth = evaluate_storyline_depth(model, baseline_result)
+    native_gap_ids = tuple(
+        sorted(
+            {
+                "native-depth:" + str(
+                    item.get("gap_id")
+                    or item.get("finding_id")
+                    or fingerprint(item)[:20]
+                )
+                for item in native_depth.unresolved_gaps
+            }
+            | {f"native-critical-uncovered:{item}" for item in native_depth.critical_uncovered_ids}
+            | {f"native-critical-ineffective:{item}" for item in native_depth.critical_ineffective_ids}
+        )
+    )
+    known_coverage = (
+        set(evidence_by_id)
+        | set(event_by_id)
+        | set(source_by_id)
+        | {item.trace_id for item in model.traces}
+        | {item.hypothesis_id for item in model.storyline_hypotheses}
+    )
+    coverage_gaps = tuple(
+        f"coverage-missing:{item}"
+        for item in prediction.coverage_ids
+        if item not in known_coverage
+    )
     mismatches: list[StorylineMismatch] = []
 
     def add(kind: str, detail: str) -> None:
@@ -392,15 +487,20 @@ def compare_prediction_observation(
             "future_holdout_validator_missing",
             "future-event expectation requires a passing target-owned holdout receipt",
         )
-    open_gap_ids = tuple(item.mismatch_id for item in mismatches)
+    for native_gap in (*native_gap_ids, *coverage_gaps):
+        add("native_depth_gap", native_gap)
+    open_gap_ids = tuple(
+        item.detail if item.mismatch_type == "native_depth_gap" else item.mismatch_id
+        for item in mismatches
+    )
     gap_fingerprint = fingerprint(open_gap_ids)
-    if observation.external_input_ids and not open_gap_ids:
+    if observation.external_input_ids:
         terminal_reason = "external_input_required"
     elif not open_gap_ids:
         terminal_reason = "model_closed_for_task"
     elif prediction.iteration >= prediction.max_iterations:
         terminal_reason = "iteration_limit"
-    elif gap_fingerprint in set(prediction.prior_gap_fingerprints):
+    elif set(open_gap_ids) == set(prediction.prior_open_gap_ids) and prediction.iteration > 0:
         terminal_reason = "progress_stalled"
     else:
         terminal_reason = "continue_iteration"
@@ -418,11 +518,25 @@ def compare_prediction_observation(
         "coverage_ids": list(prediction.coverage_ids),
         "open_gap_ids": list(open_gap_ids),
         "gap_fingerprint": gap_fingerprint,
-        "gap_transitions": dict(observation.gap_transitions or {}),
+        "input_gap_ids": list(prediction.prior_open_gap_ids),
+        "resolved_gap_ids": sorted(set(prediction.prior_open_gap_ids) - set(open_gap_ids)),
+        "persisted_gap_ids": sorted(set(prediction.prior_open_gap_ids) & set(open_gap_ids)),
+        "introduced_gap_ids": sorted(set(open_gap_ids) - set(prediction.prior_open_gap_ids)),
+        "gap_transitions": {
+            **{gap: "resolved" for gap in set(prediction.prior_open_gap_ids) - set(open_gap_ids)},
+            **{gap: "persisted" for gap in set(prediction.prior_open_gap_ids) & set(open_gap_ids)},
+            **{gap: "introduced" for gap in set(open_gap_ids) - set(prediction.prior_open_gap_ids)},
+        },
+        "native_depth_receipt": native_depth.to_dict(),
+        "native_depth_receipt_id": native_depth.receipt_id,
         "next_actions": ["deepen_trace_evidence"] if open_gap_ids else ["no_model_change_needed"],
         "terminal_reason": terminal_reason,
         "iteration": prediction.iteration,
-        "progressed": prediction.iteration == 0 or gap_fingerprint not in set(prediction.prior_gap_fingerprints),
+        "progressed": bool(
+            set(prediction.prior_open_gap_ids) - set(open_gap_ids)
+            or set(open_gap_ids) - set(prediction.prior_open_gap_ids)
+            or (prediction.iteration == 0 and open_gap_ids)
+        ),
         "external_input_ids": list(observation.external_input_ids),
         "original_prediction_status": "weakened" if mismatches else "matched",
         "factual_future_prediction_licensed": False,
@@ -459,6 +573,7 @@ def decide_candidate_revision(
     comparison: Mapping[str, Any],
     candidate_model_path: str | Path,
     observation: EvidenceBatchObservation,
+    holdout_observation: EvidenceBatchObservation,
     required_holdout_evidence_ids: Iterable[str],
     addressed_mismatch_ids: Iterable[str] = (),
     force_rollback: bool = False,
@@ -472,6 +587,16 @@ def decide_candidate_revision(
         raise TaskIterationError(
             "candidate decision observation does not match the compared observation"
         )
+    if holdout_observation.observation_fingerprint == observation.observation_fingerprint:
+        raise TaskIterationError("holdout observation must be independent")
+    if set(holdout_observation.evidence_ids) & set(observation.evidence_ids):
+        raise TaskIterationError("holdout evidence ids must be disjoint from construction evidence")
+    if set(holdout_observation.evidence_bindings.values()) & set(
+        observation.evidence_bindings.values()
+    ):
+        raise TaskIterationError(
+            "holdout evidence fingerprints must be disjoint from construction evidence"
+        )
     baseline_path = Path(str(comparison.get("baseline_model_path", ""))).resolve()
     candidate_path = Path(candidate_model_path).resolve()
     if baseline_path == candidate_path:
@@ -481,8 +606,40 @@ def decide_candidate_revision(
     if candidate_hash == baseline_hash:
         raise TaskIterationError("candidate model content must differ from baseline")
 
-    candidate_result = evaluate_model(load_model(candidate_path))
+    candidate_model = load_model(candidate_path)
+    candidate_result = evaluate_model(candidate_model)
     result_payload = candidate_result.to_dict()
+    for evidence_id, supplied in observation.evidence_bindings.items():
+        item = candidate_model.evidence_by_id().get(evidence_id)
+        if item is None or supplied != f"sha256:{fingerprint(asdict(item))}":
+            raise TaskIterationError(
+                f"construction evidence binding is missing or stale in candidate: {evidence_id}"
+            )
+    for event_id, supplied in observation.event_bindings.items():
+        item = candidate_model.event_by_id().get(event_id)
+        if item is None or supplied != f"sha256:{fingerprint(asdict(item))}":
+            raise TaskIterationError(
+                f"construction event binding is missing or stale in candidate: {event_id}"
+            )
+    for source_id, supplied in observation.source_bindings.items():
+        item = candidate_model.source_by_id().get(source_id)
+        if item is None or supplied != f"sha256:{fingerprint(asdict(item))}":
+            raise TaskIterationError(
+                f"construction source binding is missing or stale in candidate: {source_id}"
+            )
+    for evidence_id, supplied in holdout_observation.evidence_bindings.items():
+        item = candidate_model.evidence_by_id().get(evidence_id)
+        if item is None or supplied != f"sha256:{fingerprint(asdict(item))}":
+            raise TaskIterationError(f"holdout evidence binding is missing or stale: {evidence_id}")
+    for event_id, supplied in holdout_observation.event_bindings.items():
+        item = candidate_model.event_by_id().get(event_id)
+        if item is None or supplied != f"sha256:{fingerprint(asdict(item))}":
+            raise TaskIterationError(f"holdout event binding is missing or stale: {event_id}")
+    for source_id, supplied in holdout_observation.source_bindings.items():
+        item = candidate_model.source_by_id().get(source_id)
+        if item is None or supplied != f"sha256:{fingerprint(asdict(item))}":
+            raise TaskIterationError(f"holdout source binding is missing or stale: {source_id}")
+    candidate_depth = evaluate_storyline_depth(candidate_model, candidate_result)
     mismatch_ids = {
         str(item.get("mismatch_id", ""))
         for item in comparison.get("mismatches", [])
@@ -492,7 +649,9 @@ def decide_candidate_revision(
     unknown_addressed = sorted(addressed - mismatch_ids)
     unaddressed = sorted(mismatch_ids - addressed)
     required_holdout = _ordered_unique(required_holdout_evidence_ids)
-    missing_holdout = sorted(set(required_holdout) - set(observation.evidence_ids))
+    missing_holdout = sorted(
+        set(required_holdout) - set(holdout_observation.evidence_ids)
+    )
     reasons: list[str] = []
     if unknown_addressed:
         reasons.append("unknown addressed mismatch ids: " + ", ".join(unknown_addressed))
@@ -504,8 +663,8 @@ def decide_candidate_revision(
         reasons.append("missing holdout evidence ids: " + ", ".join(missing_holdout))
     if not candidate_result.ok:
         reasons.append("canonical candidate evaluation did not pass")
-    if observation.quality_status != "valid":
-        reasons.append("observation quality is not valid")
+    if observation.quality_status != "valid" or holdout_observation.quality_status != "valid":
+        reasons.append("construction and holdout observations must both be valid")
 
     candidate_gap_ids = sorted(
         set(unaddressed)
@@ -513,6 +672,17 @@ def decide_candidate_revision(
             f"candidate-evaluation:{item}"
             for item in result_payload.get("errors", [])
         }
+        | {
+            "native-depth:" + str(
+                item.get("gap_id")
+                or item.get("finding_id")
+                or fingerprint(item)[:20]
+            )
+            for item in candidate_depth.unresolved_gaps
+        }
+        | {f"native-critical-uncovered:{item}" for item in candidate_depth.critical_uncovered_ids}
+        | {f"native-critical-ineffective:{item}" for item in candidate_depth.critical_ineffective_ids}
+        | ({"holdout-evidence-missing"} if missing_holdout else set())
     )
     if candidate_gap_ids and not reasons:
         reasons.append("candidate storyline evidence gaps remain open")
@@ -524,21 +694,23 @@ def decide_candidate_revision(
         disposition = "rejected"
     else:
         disposition = "accepted"
-    if candidate_gap_ids and not force_rollback and not reasons[:-1]:
+    if candidate_gap_ids and not force_rollback:
         disposition = "continue_iteration"
-    terminal_reason = (
-        "model_closed_for_task"
-        if not candidate_gap_ids and disposition == "accepted"
-        else (
-            "iteration_limit"
-            if comparison.get("terminal_reason") == "iteration_limit"
-            else (
-                "progress_stalled"
-                if comparison.get("terminal_reason") == "progress_stalled"
-                else "continue_iteration"
-            )
-        )
-    )
+    input_gaps = set(str(item) for item in comparison.get("open_gap_ids", []))
+    current_gaps = set(candidate_gap_ids)
+    resolved_gaps = sorted(input_gaps - current_gaps)
+    persisted_gaps = sorted(input_gaps & current_gaps)
+    introduced_gaps = sorted(current_gaps - input_gaps)
+    if not candidate_gap_ids and disposition == "accepted":
+        terminal_reason = "model_closed_for_task"
+    elif comparison.get("terminal_reason") == "iteration_limit":
+        terminal_reason = "iteration_limit"
+    elif current_gaps == input_gaps and int(comparison.get("iteration", 0)) > 0:
+        terminal_reason = "progress_stalled"
+    elif missing_holdout or disposition in {"rejected", "rolled_back"}:
+        terminal_reason = "external_input_required"
+    else:
+        terminal_reason = "continue_iteration"
 
     effective_hash = candidate_hash if disposition == "accepted" else baseline_hash
     payload: dict[str, Any] = {
@@ -550,6 +722,7 @@ def decide_candidate_revision(
                     "comparison": comparison.get("comparison_fingerprint"),
                     "candidate": candidate_hash,
                     "observation": observation.observation_fingerprint,
+                    "holdout": holdout_observation.observation_fingerprint,
                 }
             )[:20]
         ),
@@ -559,6 +732,7 @@ def decide_candidate_revision(
         "candidate_model_sha256": candidate_hash,
         "prediction_fingerprint": comparison.get("prediction_fingerprint"),
         "observation_fingerprint": observation.observation_fingerprint,
+        "holdout_observation_fingerprint": holdout_observation.observation_fingerprint,
         "comparison_fingerprint": comparison.get("comparison_fingerprint"),
         "addressed_mismatch_ids": sorted(addressed),
         "unaddressed_mismatch_ids": unaddressed,
@@ -569,15 +743,25 @@ def decide_candidate_revision(
         "candidate_inference_receipt_id": getattr(
             candidate_result.inference_receipt, "receipt_id", ""
         ),
+        "native_depth_receipt": candidate_depth.to_dict(),
+        "native_depth_receipt_id": candidate_depth.receipt_id,
         "disposition": disposition,
         "rejection_reasons": reasons,
         "task_id": comparison.get("task_id", ""),
         "iteration": comparison.get("iteration", 0),
+        "input_gap_ids": sorted(input_gaps),
+        "resolved_gap_ids": resolved_gaps,
+        "persisted_gap_ids": persisted_gaps,
+        "introduced_gap_ids": introduced_gaps,
         "open_gap_ids": candidate_gap_ids,
-        "gap_transitions": dict(observation.gap_transitions or {}),
+        "gap_transitions": {
+            **{gap: "resolved" for gap in resolved_gaps},
+            **{gap: "persisted" for gap in persisted_gaps},
+            **{gap: "introduced" for gap in introduced_gaps},
+        },
         "next_actions": ["deepen_trace_evidence"] if candidate_gap_ids else ["no_model_change_needed"],
         "terminal_reason": terminal_reason,
-        "progressed": bool(candidate_gap_ids) and candidate_gap_ids != list(comparison.get("open_gap_ids", [])),
+        "progressed": bool(resolved_gaps or introduced_gaps),
         "effective_model_sha256": effective_hash,
         "factual_future_prediction_licensed": False,
         "claim_boundary": (

@@ -1,6 +1,6 @@
 {
   "artifact_kind": "flowguard_researchguard_suite_model",
-  "model_id": "researchguard.suite.v0.3.0",
+  "model_id": "researchguard.suite.v0.4.0",
   "schema_version": "1.0",
   "behavior_plane": "product_runtime",
   "business_intents": [
@@ -33,7 +33,7 @@
   "function_blocks": [
     {
       "id": "route",
-      "relation": "Intent x Unrouted -> Set(MemberRequest x Routed, TypedGap x Blocked)",
+      "relation": "ExactFourMemberAdmissions x Unrouted -> Set(OneMemberRequest x Routed, AdmissionGap x Blocked)",
       "alternate_success": false
     },
     {
@@ -71,6 +71,9 @@
     "one_distribution",
     "five_skill_surfaces_four_native_members",
     "same_suite_fingerprint",
+    "exact_four_current_member_authored_admissions",
+    "exactly_one_applicable_member_before_execution",
+    "zero_or_many_admissions_block_without_lexical_fallback",
     "direct_and_umbrella_same_primary_path",
     "selected_route_failure_is_terminal",
     "typed_handoff_requires_explicit_owner",
@@ -85,5 +88,5 @@
     "predecessor_distribution_state_cannot_change_fingerprint",
     "no_predecessor_distribution_query"
   ],
-  "claim_boundary": "This model governs suite routing, installation, migration, and authority topology. Member-native LogicGuard, SourceGuard, TraceGuard, and ExperimentGuard evidence remains necessary for domain claims; experiment output is recommendation-only."
+  "claim_boundary": "This model governs exact member-authored suite admission, routing, installation, migration, and authority topology. Member-native LogicGuard, SourceGuard, TraceGuard, and ExperimentGuard receipts remain necessary for task-model closure and domain claims; experiment output is recommendation-only."
 }

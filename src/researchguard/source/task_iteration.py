@@ -28,8 +28,8 @@ from .schema import (
 )
 
 
-SEARCH_OUTCOME_PREDICTION_SCHEMA = "researchguard.source.search-outcome-prediction.v1"
-SEARCH_ITERATION_RECEIPT_SCHEMA = "researchguard.source.search-iteration-receipt.v1"
+SEARCH_OUTCOME_PREDICTION_SCHEMA = "researchguard.source.search-outcome-prediction.v2"
+SEARCH_ITERATION_RECEIPT_SCHEMA = "researchguard.source.search-iteration-receipt.v2"
 SEARCH_ROLLBACK_RECEIPT_SCHEMA = "researchguard.source.search-rollback-receipt.v1"
 GAP_REDUCTION_LEVELS = frozenset({"none", "partial", "closed"})
 SEARCH_ITERATION_CLAIM_BOUNDARY = (
@@ -52,14 +52,16 @@ class SearchOutcomePrediction:
     cost_tolerance: float
     protected_gap_ids: tuple[str, ...]
     frozen_at: str
-    task_id: str = ""
-    purpose: str = ""
-    coverage_ids: tuple[str, ...] = ()
-    assumptions: tuple[str, ...] = ()
-    unknowns: tuple[str, ...] = ()
-    iteration: int = 0
-    max_iterations: int = 8
-    prior_gap_fingerprints: tuple[str, ...] = ()
+    task_id: str
+    purpose: str
+    coverage_ids: tuple[str, ...]
+    coverage_fingerprint: str
+    assumptions: tuple[str, ...]
+    unknowns: tuple[str, ...]
+    iteration: int
+    max_iterations: int
+    prior_receipt_fingerprint: str
+    prior_open_gap_ids: tuple[str, ...]
     schema_version: str = SEARCH_OUTCOME_PREDICTION_SCHEMA
 
     def __post_init__(self) -> None:
@@ -87,12 +89,34 @@ class SearchOutcomePrediction:
             raise ValueError("target gap cannot also be protected")
         if not self.frozen_at:
             raise ValueError("frozen_at must not be empty")
-        if self.task_id and not self.coverage_ids:
+        if not self.task_id.strip() or not self.purpose.strip():
+            raise ValueError("task_id and purpose are required")
+        if not self.coverage_ids:
             raise ValueError("task-local search predictions require coverage_ids")
+        if not self.coverage_fingerprint.startswith("sha256:"):
+            raise ValueError("coverage_fingerprint is required")
+        expected_coverage_fingerprint = "sha256:" + hashlib.sha256(
+            json.dumps(
+                {
+                    "task_id": self.task_id,
+                    "purpose": self.purpose,
+                    "coverage_ids": sorted(self.coverage_ids),
+                    "baseline_fingerprint": self.baseline_fingerprint,
+                },
+                sort_keys=True,
+                separators=(",", ":"),
+            ).encode("utf-8")
+        ).hexdigest()
+        if self.coverage_fingerprint != expected_coverage_fingerprint:
+            raise ValueError("coverage_fingerprint does not bind the task coverage")
         if len(set(self.coverage_ids)) != len(self.coverage_ids):
             raise ValueError("coverage_ids must not contain duplicates")
         if self.iteration < 0 or self.max_iterations < 1:
             raise ValueError("iteration must be non-negative and max_iterations must be positive")
+        if self.iteration and not self.prior_receipt_fingerprint.startswith("sha256:"):
+            raise ValueError("later iterations require prior_receipt_fingerprint")
+        if len(set(self.prior_open_gap_ids)) != len(self.prior_open_gap_ids):
+            raise ValueError("prior_open_gap_ids must not contain duplicates")
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -111,15 +135,35 @@ class SearchOutcomePrediction:
             "task_id": self.task_id,
             "purpose": self.purpose,
             "coverage_ids": list(self.coverage_ids),
+            "coverage_fingerprint": self.coverage_fingerprint,
             "assumptions": list(self.assumptions),
             "unknowns": list(self.unknowns),
             "iteration": self.iteration,
             "max_iterations": self.max_iterations,
-            "prior_gap_fingerprints": list(self.prior_gap_fingerprints),
+            "prior_receipt_fingerprint": self.prior_receipt_fingerprint,
+            "prior_open_gap_ids": list(self.prior_open_gap_ids),
         }
 
     @classmethod
     def from_dict(cls, raw: Mapping[str, Any]) -> "SearchOutcomePrediction":
+        required_task_fields = {
+            "task_id",
+            "purpose",
+            "coverage_ids",
+            "coverage_fingerprint",
+            "assumptions",
+            "unknowns",
+            "iteration",
+            "max_iterations",
+            "prior_receipt_fingerprint",
+            "prior_open_gap_ids",
+        }
+        missing = sorted(required_task_fields - set(raw))
+        if missing:
+            raise ValueError(
+                "current search prediction is missing task fields: "
+                + ", ".join(missing)
+            )
         return cls(
             schema_version=str(raw.get("schema_version", "")),
             prediction_id=str(raw.get("prediction_id", "")),
@@ -144,11 +188,13 @@ class SearchOutcomePrediction:
             task_id=str(raw.get("task_id", "")),
             purpose=str(raw.get("purpose", "")),
             coverage_ids=tuple(str(item) for item in (raw.get("coverage_ids") or ())),
+            coverage_fingerprint=str(raw.get("coverage_fingerprint", "")),
             assumptions=tuple(str(item) for item in (raw.get("assumptions") or ())),
             unknowns=tuple(str(item) for item in (raw.get("unknowns") or ())),
             iteration=int(raw.get("iteration", 0)),
             max_iterations=int(raw.get("max_iterations", 8)),
-            prior_gap_fingerprints=tuple(str(item) for item in (raw.get("prior_gap_fingerprints") or ())),
+            prior_receipt_fingerprint=str(raw.get("prior_receipt_fingerprint", "")),
+            prior_open_gap_ids=tuple(str(item) for item in (raw.get("prior_open_gap_ids") or ())),
         )
 
 
@@ -274,11 +320,16 @@ class SearchIterationReceipt:
     completed_at: str
     schema_version: str = SEARCH_ITERATION_RECEIPT_SCHEMA
     claim_boundary: str = SEARCH_ITERATION_CLAIM_BOUNDARY
+    input_gap_ids: tuple[str, ...] = ()
+    resolved_gap_ids: tuple[str, ...] = ()
+    persisted_gap_ids: tuple[str, ...] = ()
+    introduced_gap_ids: tuple[str, ...] = ()
     open_gap_ids: tuple[str, ...] = ()
     gap_transitions: Mapping[str, str] | None = None
     next_actions: tuple[str, ...] = ()
     terminal_reason: str = "continue_iteration"
     progressed: bool = False
+    receipt_fingerprint: str = ""
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -296,11 +347,16 @@ class SearchIterationReceipt:
             "selected_model_fingerprint": self.selected_model_fingerprint,
             "completed_at": self.completed_at,
             "claim_boundary": self.claim_boundary,
+            "input_gap_ids": list(self.input_gap_ids),
+            "resolved_gap_ids": list(self.resolved_gap_ids),
+            "persisted_gap_ids": list(self.persisted_gap_ids),
+            "introduced_gap_ids": list(self.introduced_gap_ids),
             "open_gap_ids": list(self.open_gap_ids),
             "gap_transitions": dict(self.gap_transitions or {}),
             "next_actions": list(self.next_actions),
             "terminal_reason": self.terminal_reason,
             "progressed": self.progressed,
+            "receipt_fingerprint": self.receipt_fingerprint,
         }
 
 
@@ -337,14 +393,15 @@ def freeze_search_outcome_prediction(
     cost_tolerance: float = 0.1,
     protected_gap_ids: Sequence[str] = (),
     prediction_id: str | None = None,
-    task_id: str = "",
-    purpose: str = "",
-    coverage_ids: Sequence[str] = (),
+    task_id: str,
+    purpose: str,
+    coverage_ids: Sequence[str],
     assumptions: Sequence[str] = (),
     unknowns: Sequence[str] = (),
-    iteration: int = 0,
-    max_iterations: int = 8,
-    prior_gap_fingerprints: Sequence[str] = (),
+    iteration: int,
+    max_iterations: int,
+    prior_receipt_fingerprint: str = "",
+    prior_open_gap_ids: Sequence[str] = (),
 ) -> SearchOutcomePrediction:
     """Freeze expected search outcomes without applying any observation."""
 
@@ -355,6 +412,19 @@ def freeze_search_outcome_prediction(
     for gap_id in protected_gap_ids:
         if gap_id not in baseline.gap_by_id():
             raise ValueError(f"protected gap is missing from baseline: {gap_id}")
+    coverage = tuple(str(item) for item in coverage_ids)
+    coverage_fingerprint = "sha256:" + hashlib.sha256(
+        json.dumps(
+            {
+                "task_id": task_id,
+                "purpose": purpose,
+                "coverage_ids": sorted(coverage),
+                "baseline_fingerprint": model_fingerprint(baseline),
+            },
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode("utf-8")
+    ).hexdigest()
     return SearchOutcomePrediction(
         prediction_id=prediction_id or f"prediction-{uuid.uuid4().hex}",
         baseline_fingerprint=model_fingerprint(baseline),
@@ -369,12 +439,14 @@ def freeze_search_outcome_prediction(
         frozen_at=utc_now(),
         task_id=task_id,
         purpose=purpose,
-        coverage_ids=tuple(str(item) for item in coverage_ids),
+        coverage_ids=coverage,
+        coverage_fingerprint=coverage_fingerprint,
         assumptions=tuple(str(item) for item in assumptions),
         unknowns=tuple(str(item) for item in unknowns),
         iteration=iteration,
         max_iterations=max_iterations,
-        prior_gap_fingerprints=tuple(str(item) for item in prior_gap_fingerprints),
+        prior_receipt_fingerprint=prior_receipt_fingerprint,
+        prior_open_gap_ids=tuple(str(item) for item in prior_open_gap_ids),
     )
 
 
@@ -531,7 +603,7 @@ def review_search_candidate(
 def revalidate_native_depth_receipt(
     baseline: BeliefState,
     candidate: BeliefState,
-    observation: Observation,
+    observation: Observation | None,
     receipt: SourceDepthReceipt,
 ) -> NativeDepthRevalidation:
     """Fail closed unless native depth covers this exact candidate update."""
@@ -541,12 +613,22 @@ def revalidate_native_depth_receipt(
         receipt.result_model_fingerprint == model_fingerprint(candidate)
     )
     observation_current = bool(
-        receipt.provider_status == "OBSERVATION_SUPPLIED"
-        and receipt.observation_status == "APPLIED"
-        and receipt.observations_used == [observation.observation_id]
+        (
+            observation is not None
+            and receipt.provider_status == "OBSERVATION_SUPPLIED"
+            and receipt.observation_status == "APPLIED"
+            and receipt.observations_used == [observation.observation_id]
+        )
+        or (
+            observation is None
+            and receipt.provider_status in {"NOT_RUN", "PROVIDER_UNAVAILABLE"}
+            and receipt.observation_status in {"NOT_RUN", "PROVIDER_UNAVAILABLE"}
+            and not receipt.observations_used
+        )
     )
     depth_completed = bool(
-        receipt.planning_depth_completed and receipt.observation_depth_completed
+        receipt.planning_depth_completed
+        and (receipt.observation_depth_completed if observation is not None else True)
     )
     requested_scope = baseline.depth_policy.requested_claim_scope
     if requested_scope == "broad":
@@ -603,35 +685,60 @@ def revalidate_native_depth_receipt(
 def run_search_iteration(
     baseline: BeliefState,
     prediction: SearchOutcomePrediction,
-    observation: Observation,
+    observation: Observation | None,
     *,
     actual_cost: float,
     decision: str = "reject",
     limit: int = 5,
+    provider_status: str = "OBSERVATION_SUPPLIED",
 ) -> tuple[BeliefState, SearchIterationReceipt]:
     """Create and explicitly accept or reject one cloned candidate successor."""
 
     if decision not in {"accept", "reject"}:
         raise ValueError("decision must be 'accept' or 'reject'")
     validate_search_prediction_binding(baseline, prediction)
-    if observation.action_id != prediction.action_id:
+    normalized_provider = str(provider_status).upper()
+    if normalized_provider not in {"OBSERVATION_SUPPLIED", "PROVIDER_UNAVAILABLE", "NOT_RUN"}:
+        raise ValueError("unsupported provider_status")
+    if observation is None and normalized_provider == "OBSERVATION_SUPPLIED":
+        raise ValueError("OBSERVATION_SUPPLIED requires an observation")
+    if observation is not None and normalized_provider != "OBSERVATION_SUPPLIED":
+        raise ValueError("a supplied observation requires OBSERVATION_SUPPLIED")
+    if observation is not None and observation.action_id != prediction.action_id:
         raise ValueError(
             "observation action_id must equal the frozen prediction action_id"
         )
     candidate, depth_receipt = apply_observation_and_replan(
         baseline,
         observation,
-        provider_status="OBSERVATION_SUPPLIED",
+        provider_status=normalized_provider,
         limit=limit,
     )
-    realized = derive_realized_search_outcome(
-        baseline,
-        candidate,
-        observation,
-        prediction,
-        actual_cost=actual_cost,
-        limit=limit,
-    )
+    if observation is not None:
+        realized = derive_realized_search_outcome(
+            baseline,
+            candidate,
+            observation,
+            prediction,
+            actual_cost=actual_cost,
+            limit=limit,
+        )
+    else:
+        baseline_gap = baseline.gap_by_id()[prediction.target_gap_id]
+        candidate_gap = candidate.gap_by_id()[prediction.target_gap_id]
+        realized = RealizedSearchOutcome(
+            action_id=prediction.action_id,
+            target_gap_id=prediction.target_gap_id,
+            gap_reduction=_gap_reduction(baseline_gap, candidate_gap),
+            independent_lineage_found=False,
+            counterevidence_found=False,
+            actual_cost=float(actual_cost),
+            observation_id="",
+            observation_applied=False,
+            new_source_ids=(),
+            new_lineage_ids=(),
+            updated_action_rank=None,
+        )
     error = compare_search_outcome(prediction, realized)
     review = review_search_candidate(
         baseline, candidate, prediction.protected_gap_ids
@@ -647,42 +754,15 @@ def run_search_iteration(
         if gap_id not in candidate_gap_map
         or candidate_gap_map[gap_id].semantic_state != "closed"
     }
-    iterative = bool(
-        prediction.task_id
-        or prediction.coverage_ids
-        or prediction.iteration
-        or prediction.prior_gap_fingerprints
-    )
-    # The pre-iterative API deliberately accepted a candidate when the
-    # requested search action and protected-gap revalidation passed.  Keep
-    # that historical contract for callers that did not freeze a task-local
-    # coverage scope; only the new task-local route treats every remaining
-    # native gap as an obligation that must drive another iteration.
     open_gap_ids = sorted(
-        (
-            {
-                gap.gap_id
-                for gap in candidate.gaps
-                if gap.semantic_state != "closed"
-            }
-            | set(depth_receipt.unresolved_gap_ids)
-            | coverage_gaps
-        )
-        if iterative
-        else set()
+        {
+            gap.gap_id
+            for gap in candidate.gaps
+            if gap.semantic_state != "closed"
+        }
+        | set(depth_receipt.unresolved_gap_ids)
+        | coverage_gaps
     )
-    gap_transitions = {
-        item.gap_id: item.after_semantic_state
-        for item in depth_receipt.gap_transitions
-    }
-    if not open_gap_ids:
-        terminal_reason = "model_closed_for_task"
-    elif prediction.iteration >= prediction.max_iterations:
-        terminal_reason = "iteration_limit"
-    elif set(open_gap_ids) == set(prediction.prior_gap_fingerprints):
-        terminal_reason = "progress_stalled"
-    else:
-        terminal_reason = "continue_iteration"
     can_close = decision == "accept" and review.passed and native_review.passed and not open_gap_ids
     if can_close:
         effective = "accepted"
@@ -708,6 +788,49 @@ def run_search_iteration(
         selected_fingerprint = prediction.baseline_fingerprint
         if decision == "accept" and review.passed and native_review.passed and open_gap_ids:
             effective = "continue_iteration"
+    addressable_action_ids = tuple(
+        sorted(
+            action.action_id
+            for action in candidate.actions
+            if action.status == "proposed" and action.target_gap_id in set(open_gap_ids)
+        )
+    )
+    if can_close:
+        terminal_reason = "model_closed_for_task"
+    elif prediction.iteration >= prediction.max_iterations:
+        terminal_reason = "iteration_limit"
+    elif set(open_gap_ids) == set(prediction.prior_open_gap_ids) and prediction.iteration > 0:
+        terminal_reason = "progress_stalled"
+    elif normalized_provider == "PROVIDER_UNAVAILABLE":
+        terminal_reason = "provider_access_required"
+    elif open_gap_ids and not addressable_action_ids:
+        terminal_reason = "finite_action_exhausted"
+    elif decision == "reject":
+        terminal_reason = "external_input_required"
+    else:
+        terminal_reason = "continue_iteration"
+    before, after = set(prediction.prior_open_gap_ids), set(open_gap_ids)
+    resolved_gap_ids = tuple(sorted(before - after))
+    persisted_gap_ids = tuple(sorted(before & after))
+    introduced_gap_ids = tuple(sorted(after - before))
+    gap_transitions = {
+        **{gap: "resolved" for gap in resolved_gap_ids},
+        **{gap: "persisted" for gap in persisted_gap_ids},
+        **{gap: "introduced" for gap in introduced_gap_ids},
+    }
+    receipt_fingerprint = "sha256:" + hashlib.sha256(
+        json.dumps(
+            {
+                "prediction": prediction.to_dict(),
+                "candidate_fingerprint": candidate_fingerprint,
+                "native_depth_receipt": to_plain(depth_receipt),
+                "open_gap_ids": open_gap_ids,
+                "terminal_reason": terminal_reason,
+            },
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode("utf-8")
+    ).hexdigest()
     receipt = SearchIterationReceipt(
         prediction=prediction,
         realized_outcome=realized,
@@ -721,11 +844,24 @@ def run_search_iteration(
         disposition_reason=reason,
         selected_model_fingerprint=selected_fingerprint,
         completed_at=utc_now(),
+        input_gap_ids=prediction.prior_open_gap_ids,
+        resolved_gap_ids=resolved_gap_ids,
+        persisted_gap_ids=persisted_gap_ids,
+        introduced_gap_ids=introduced_gap_ids,
         open_gap_ids=tuple(open_gap_ids),
         gap_transitions=gap_transitions,
-        next_actions=("acquire_source_evidence",) if open_gap_ids else ("no_model_change_needed",),
+        next_actions=(
+            addressable_action_ids
+            if addressable_action_ids
+            else (
+                ("request_provider_access",)
+                if terminal_reason == "provider_access_required"
+                else (("revise_search_space",) if open_gap_ids else ("no_model_change_needed",))
+            )
+        ),
         terminal_reason=terminal_reason,
-        progressed=(prediction.iteration == 0 or set(open_gap_ids) != set(prediction.prior_gap_fingerprints)),
+        progressed=bool(resolved_gap_ids or introduced_gap_ids or (prediction.iteration == 0 and observation is not None)),
+        receipt_fingerprint=receipt_fingerprint,
     )
     return candidate, receipt
 

@@ -1,5 +1,19 @@
 # Changelog
 
+## v0.4.0 - 2026-07-31
+
+- Replaced caller-selected umbrella routing with exact four-member,
+  member-authored admission evidence and visible zero/many/stale blocking.
+- Made LogicGuard, SourceGuard, TraceGuard, and ExperimentGuard task-local
+  packets current-only, with explicit scope, iteration lineage, native
+  receipts, computed gap transitions, and exact terminal reasons.
+- Added independent holdout gates for predictive closure, actual semantic
+  binding checks for TraceGuard, provider/finite-action terminals for
+  SourceGuard, and prediction-matrix-miss revision candidates for
+  ExperimentGuard.
+- Expanded FlowGuard and SkillGuard maintenance coverage over the strict
+  runtime, prompts, and member-owned regression checks.
+
 ## v0.3.0 - 2026-07-31
 
 - Added task-local iterative maturation for LogicGuard, SourceGuard,

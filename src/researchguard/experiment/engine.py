@@ -1,7 +1,9 @@
-"""Exact finite experiment-set recommendation."""
+"""Exact finite experiment recommendation and evidence-bound iteration."""
 
 from __future__ import annotations
 
+import hashlib
+import json
 from itertools import combinations
 
 from .schema import (
@@ -9,169 +11,230 @@ from .schema import (
     ExperimentObservation,
     ExperimentRecommendation,
     ExperimentSpec,
-    HypothesisPrediction,
     HypothesisDisposition,
+    HypothesisPrediction,
+    PredictionMatrixRevisionCandidate,
 )
 
 
-def _pairs(spec: ExperimentSpec) -> tuple[tuple[str, str], ...]:
-    hypotheses = sorted(
-        item.hypothesis_id for item in spec.hypothesis_predictions
+def _digest(value: object) -> str:
+    body = json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+    return f"sha256:{hashlib.sha256(body.encode('utf-8')).hexdigest()}"
+
+
+def matrix_fingerprint(spec: ExperimentSpec, *, hypothesis_ids: tuple[str, ...] | None = None) -> str:
+    selected = set(hypothesis_ids) if hypothesis_ids is not None else None
+    return _digest(
+        {
+            "hypotheses": [
+                {
+                    "hypothesis_id": item.hypothesis_id,
+                    "outcomes_by_experiment": dict(sorted(item.outcomes_by_experiment.items())),
+                }
+                for item in sorted(spec.hypothesis_predictions, key=lambda row: row.hypothesis_id)
+                if selected is None or item.hypothesis_id in selected
+            ],
+            "candidate_experiment_ids": sorted(spec.candidate_experiment_ids),
+            "coverage_ids": sorted(spec.coverage_ids),
+        }
     )
-    return tuple(combinations(hypotheses, 2))
 
 
-def _prediction_map(
-    spec: ExperimentSpec,
-) -> dict[str, dict[str, str]]:
-    return {
-        item.hypothesis_id: dict(item.outcomes_by_experiment)
-        for item in spec.hypothesis_predictions
-    }
+def _pairs(spec: ExperimentSpec) -> tuple[tuple[str, str], ...]:
+    return tuple(combinations(sorted(item.hypothesis_id for item in spec.hypothesis_predictions), 2))
 
 
-def _unresolved(
-    selected: tuple[str, ...],
-    pairs: tuple[tuple[str, str], ...],
-    predictions: dict[str, dict[str, str]],
-) -> tuple[tuple[str, str], ...]:
+def _prediction_map(spec: ExperimentSpec) -> dict[str, dict[str, str]]:
+    return {item.hypothesis_id: dict(item.outcomes_by_experiment) for item in spec.hypothesis_predictions}
+
+
+def _unresolved(selected, pairs, predictions):
     return tuple(
         pair
         for pair in pairs
         if not any(
-            predictions[pair[0]].get(experiment_id)
-            != predictions[pair[1]].get(experiment_id)
-            and predictions[pair[0]].get(experiment_id) is not None
+            predictions[pair[0]].get(experiment_id) is not None
             and predictions[pair[1]].get(experiment_id) is not None
+            and predictions[pair[0]][experiment_id] != predictions[pair[1]][experiment_id]
             for experiment_id in selected
         )
     )
 
 
-def recommend_experiments(
-    spec: ExperimentSpec,
-) -> ExperimentRecommendation:
-    """Return every minimum-cardinality distinguishing set deterministically."""
-
-    candidates = tuple(sorted(set(spec.candidate_experiment_ids)))
+def recommend_experiments(spec: ExperimentSpec) -> ExperimentRecommendation:
+    candidates = tuple(sorted(spec.candidate_experiment_ids))
     predictions = _prediction_map(spec)
-    if (
-        len(predictions) < 2
-        or len(predictions) != len(spec.hypothesis_predictions)
-        or not candidates
-        or (
-            spec.maximum_experiment_count is not None
-            and spec.maximum_experiment_count < 1
-        )
-    ):
-        return ExperimentRecommendation(
-            status="blocked_invalid_input",
-            selected_experiment_ids=(),
-            alternative_minimal_sets=(),
-            unresolved_hypothesis_pairs=(),
-            reason_code="invalid_finite_experiment_spec",
-        )
-
+    if spec.maximum_experiment_count is not None and spec.maximum_experiment_count < 1:
+        return ExperimentRecommendation("blocked_invalid_input", (), (), (), "invalid_finite_experiment_spec")
     pairs = _pairs(spec)
-    limit = min(
-        len(candidates),
-        spec.maximum_experiment_count or len(candidates),
-    )
+    limit = min(len(candidates), spec.maximum_experiment_count or len(candidates))
     for size in range(1, limit + 1):
-        solutions = tuple(
-            selected
-            for selected in combinations(candidates, size)
-            if not _unresolved(selected, pairs, predictions)
-        )
+        solutions = tuple(selected for selected in combinations(candidates, size) if not _unresolved(selected, pairs, predictions))
         if solutions:
-            return ExperimentRecommendation(
-                status="recommended",
-                selected_experiment_ids=solutions[0],
-                alternative_minimal_sets=solutions,
-                unresolved_hypothesis_pairs=(),
-                reason_code="minimum_distinguishing_set_found",
-            )
-
-    unresolved = _unresolved(candidates, pairs, predictions)
+            return ExperimentRecommendation("recommended", solutions[0], solutions, (), "minimum_distinguishing_set_found")
     return ExperimentRecommendation(
-        status="indistinguishable",
-        selected_experiment_ids=(),
-        alternative_minimal_sets=(),
-        unresolved_hypothesis_pairs=unresolved,
-        reason_code="declared_candidates_cannot_distinguish_all_hypotheses",
+        "indistinguishable",
+        (),
+        (),
+        _unresolved(candidates, pairs, predictions),
+        "declared_candidates_cannot_distinguish_all_hypotheses",
     )
 
 
-def observe_experiments(
-    spec: ExperimentSpec,
-    observations: tuple[ExperimentObservation, ...],
-) -> ExperimentIterationReceipt:
-    """Apply supplied results to the finite prediction matrix, without probabilities."""
+def observe_experiments(spec: ExperimentSpec, observations: tuple[ExperimentObservation, ...]) -> ExperimentIterationReceipt:
+    """Consume external evidence; zero survivors is a model miss, never closure."""
 
+    if len({row.evidence_id for row in observations}) != len(observations):
+        raise ValueError("observation evidence_id values must be unique")
+    if len({row.evidence_fingerprint for row in observations}) != len(observations):
+        raise ValueError("observation evidence fingerprints must be independent")
+    predictions = _prediction_map(spec)
     candidates = set(spec.candidate_experiment_ids)
-    valid = [item for item in observations if item.experiment_id in candidates and item.status == "valid"]
-    observed_ids = {item.experiment_id for item in valid}
+    construction = tuple(row for row in observations if row.role == "construction")
+    holdouts = tuple(row for row in observations if row.role == "holdout")
+    gaps: set[str] = set()
+    valid_construction: list[ExperimentObservation] = []
+    unexpected: list[ExperimentObservation] = []
+    for row in observations:
+        if row.experiment_id not in candidates:
+            gaps.add(f"observation-outside-candidate-universe:{row.experiment_id}")
+            continue
+        if row.status != "valid":
+            gaps.add(f"observation-{row.status}:{row.experiment_id}")
+            continue
+        if not any(mapping.get(row.experiment_id) == row.observed_outcome for mapping in predictions.values()):
+            gaps.add(f"prediction-matrix-miss:{row.experiment_id}")
+            unexpected.append(row)
+            continue
+        if row.role == "construction":
+            valid_construction.append(row)
+
     dispositions: list[HypothesisDisposition] = []
-    prediction_map = _prediction_map(spec)
-    for hypothesis_id in sorted(prediction_map):
-        matched = tuple(
-            item.experiment_id
-            for item in valid
-            if prediction_map[hypothesis_id].get(item.experiment_id) == item.observed_outcome
+    active_ids: list[str] = []
+    for hypothesis_id in sorted(predictions):
+        matched = tuple(row.experiment_id for row in valid_construction if predictions[hypothesis_id].get(row.experiment_id) == row.observed_outcome)
+        contradicted = tuple(row.experiment_id for row in valid_construction if predictions[hypothesis_id].get(row.experiment_id) is not None and predictions[hypothesis_id].get(row.experiment_id) != row.observed_outcome)
+        if unexpected:
+            status = "model_miss"
+        elif contradicted:
+            status = "eliminated"
+        elif valid_construction and len(matched) == len(valid_construction):
+            status = "consistent"
+            active_ids.append(hypothesis_id)
+        else:
+            status = "underdetermined"
+            active_ids.append(hypothesis_id)
+        dispositions.append(HypothesisDisposition(hypothesis_id, status, matched, contradicted))
+
+    base_fingerprint = matrix_fingerprint(spec)
+    revision_candidate = None
+    if unexpected or not active_ids:
+        ids = tuple(row.evidence_id for row in unexpected) or tuple(row.evidence_id for row in valid_construction)
+        gaps.add("prediction-matrix-revision-required")
+        revision_candidate = PredictionMatrixRevisionCandidate(
+            candidate_id=f"matrix-revision:{_digest(ids)[7:27]}",
+            base_matrix_fingerprint=base_fingerprint,
+            unexpected_observation_ids=ids,
+            required_actions=("revise_hypothesis_or_prediction_matrix", "freeze_new_matrix_before_replay"),
         )
-        contradicted = tuple(
-            item.experiment_id
-            for item in valid
-            if prediction_map[hypothesis_id].get(item.experiment_id) is not None
-            and prediction_map[hypothesis_id].get(item.experiment_id) != item.observed_outcome
-        )
-        status = "weakened" if contradicted else ("supported" if matched and len(matched) == len(valid) else "undetermined")
-        dispositions.append(
-            HypothesisDisposition(
-                hypothesis_id=hypothesis_id,
-                status=status,
-                matched_experiment_ids=matched,
-                contradicted_experiment_ids=contradicted,
+        active_ids = []
+
+    candidate_fingerprint = matrix_fingerprint(spec, hypothesis_ids=tuple(active_ids))
+    observed_ids = {row.experiment_id for row in valid_construction}
+    if len(active_ids) > 1:
+        remaining_candidates = tuple(sorted(candidates - observed_ids))
+        if remaining_candidates:
+            remaining = ExperimentSpec(
+                task_id=spec.task_id,
+                purpose=spec.purpose,
+                coverage_ids=spec.coverage_ids,
+                assumptions=spec.assumptions,
+                unknowns=spec.unknowns,
+                iteration=spec.iteration,
+                max_iterations=spec.max_iterations,
+                prior_receipt_fingerprint=spec.prior_receipt_fingerprint,
+                prior_open_gap_ids=spec.prior_open_gap_ids,
+                hypothesis_predictions=tuple(row for row in spec.hypothesis_predictions if row.hypothesis_id in active_ids),
+                candidate_experiment_ids=remaining_candidates,
+                maximum_experiment_count=spec.maximum_experiment_count,
             )
+            recommendation = recommend_experiments(remaining)
+        else:
+            recommendation = ExperimentRecommendation(
+                "indistinguishable",
+                (),
+                (),
+                tuple(combinations(sorted(active_ids), 2)),
+                "declared_candidates_exhausted",
+            )
+        if recommendation.status == "indistinguishable":
+            gaps.add("declared-candidates-indistinguishable")
+    elif len(active_ids) == 1:
+        recommendation = ExperimentRecommendation("recommended", (), ((),), (), "one_hypothesis_consistent")
+        valid_holdout = tuple(
+            row
+            for row in holdouts
+            if row.status == "valid"
+            and predictions[active_ids[0]].get(row.experiment_id) == row.observed_outcome
+            and row.evidence_fingerprint not in {item.evidence_fingerprint for item in construction}
         )
-    active = tuple(
-        HypothesisPrediction(item.hypothesis_id, dict(item.outcomes_by_experiment))
-        for item in spec.hypothesis_predictions
-        if next(row for row in dispositions if row.hypothesis_id == item.hypothesis_id).status != "weakened"
-    )
-    if len(active) <= 1:
-        recommendation = ExperimentRecommendation(
-            status="recommended",
-            selected_experiment_ids=(),
-            alternative_minimal_sets=((),),
-            unresolved_hypothesis_pairs=(),
-            reason_code="one_hypothesis_remains",
-        )
+        if not valid_holdout:
+            gaps.add("independent-holdout-required")
     else:
-        remaining_spec = ExperimentSpec(
-            hypothesis_predictions=active,
-            candidate_experiment_ids=tuple(sorted(candidates - observed_ids)),
-            maximum_experiment_count=spec.maximum_experiment_count,
-        )
-        recommendation = recommend_experiments(remaining_spec)
-    pairs = recommendation.unresolved_hypothesis_pairs
-    if len(active) <= 1:
-        terminal_reason = "model_closed_for_task"
-    elif recommendation.status == "recommended":
-        terminal_reason = "continue_iteration"
-    elif recommendation.status == "indistinguishable":
-        terminal_reason = "continue_iteration" if recommendation.unresolved_hypothesis_pairs else "model_closed_for_task"
+        recommendation = ExperimentRecommendation("blocked_invalid_input", (), (), (), "prediction_matrix_revision_required")
+
+    prior = set(spec.prior_open_gap_ids)
+    current = set(gaps)
+    resolved = tuple(sorted(prior - current))
+    persisted = tuple(sorted(prior & current))
+    introduced = tuple(sorted(current - prior))
+    progressed = bool(resolved or introduced or (spec.iteration == 0 and observations))
+    if spec.iteration >= spec.max_iterations:
+        terminal = "iteration_limit"
+    elif current == prior and spec.iteration > 0:
+        terminal = "progress_stalled"
+    elif revision_candidate or any(gap.startswith("observation-") for gap in current) or "independent-holdout-required" in current or "declared-candidates-indistinguishable" in current:
+        terminal = "external_input_required"
+    elif current:
+        terminal = "continue_iteration"
+    elif len(active_ids) == 1:
+        terminal = "model_closed_for_task"
     else:
-        terminal_reason = "external_input_required"
+        terminal = "continue_iteration"
+
+    holdout_ids = tuple(row.evidence_id for row in holdouts if row.status == "valid")
+    receipt_material = {
+        "task_id": spec.task_id,
+        "iteration": spec.iteration,
+        "base": base_fingerprint,
+        "candidate": candidate_fingerprint,
+        "observation_fingerprints": [row.evidence_fingerprint for row in observations],
+        "open_gaps": sorted(current),
+        "terminal": terminal,
+    }
+    receipt_fingerprint = _digest(receipt_material)
     return ExperimentIterationReceipt(
+        task_id=spec.task_id,
+        iteration=spec.iteration,
+        base_matrix_fingerprint=base_fingerprint,
+        candidate_matrix_fingerprint=candidate_fingerprint,
         recommendation=recommendation,
-        observations=tuple(valid),
+        observations=observations,
         hypothesis_dispositions=tuple(dispositions),
-        open_hypothesis_pairs=pairs,
+        input_gap_ids=spec.prior_open_gap_ids,
+        resolved_gap_ids=resolved,
+        persisted_gap_ids=persisted,
+        introduced_gap_ids=introduced,
+        open_hypothesis_pairs=recommendation.unresolved_hypothesis_pairs,
         next_experiment_ids=recommendation.selected_experiment_ids,
-        terminal_reason=terminal_reason,
-        progressed=bool(valid),
+        native_receipt_id=f"experimentguard-iteration:{receipt_fingerprint[7:27]}",
+        revision_candidate=revision_candidate,
+        holdout_evidence_ids=holdout_ids,
+        rollback_matrix_fingerprint=base_fingerprint,
+        terminal_reason=terminal,  # type: ignore[arg-type]
+        progressed=progressed,
+        receipt_fingerprint=receipt_fingerprint,
     )
 
 
-__all__ = ["observe_experiments", "recommend_experiments"]
+__all__ = ["matrix_fingerprint", "observe_experiments", "recommend_experiments"]

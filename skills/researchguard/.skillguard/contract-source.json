@@ -57,6 +57,46 @@
       "evidence_source": "tests/task-local-iteration"
     }
   ],
+  "depth_profile": {
+    "schema_version": "skillguard.depth_profile.v2",
+    "profile_id": "profile:researchguard:researchguard:strict-model-closure",
+    "target_skill_id": "researchguard",
+    "integration_mode": "native-integrated",
+    "native_owner_id": "owner:researchguard:researchguard",
+    "native_route_ids": [
+      "route:researchguard:researchguard"
+    ],
+    "native_check_ids": [
+      "check:researchguard:consumer-contract",
+      "check:researchguard:native-tests",
+      "check:researchguard:task-model-closure"
+    ],
+    "model_deepening_check_id": "check:researchguard:task-model-closure",
+    "skillguard_adds_domain_route": false,
+    "enforcement_level": "enforced",
+    "required_closure_profiles": [
+      "enforced"
+    ],
+    "provider_runtime": {
+      "provider_id": "skillguard-local-provider",
+      "required_runtime_contract_id": "skillguard-declared-check-supervision-current",
+      "required_capability_ids": [
+        "declared-check-inventory.v1",
+        "declared-check-receipt-reconciliation.v1",
+        "installation-receipt-binding.v1",
+        "installation-currentness-replay.v1",
+        "provider-runtime-enrollment.v1",
+        "single-flight-check-execution.v1"
+      ],
+      "required_enrollment_status": "enrolled",
+      "readiness_check_ids": [
+        "check:researchguard:consumer-contract",
+        "check:researchguard:native-tests",
+        "check:researchguard:task-model-closure"
+      ]
+    },
+    "claim_boundary": "SkillGuard supervises only the exact current ResearchGuard target-owned strict model-closure checks; it does not replace their domain judgment."
+  },
   "implementation_paths": [
     "skills/researchguard",
     "src/researchguard/__init__.py",
@@ -69,6 +109,7 @@
     ".flowguard/run_researchguard_suite_model.py",
     ".flowguard/researchguard_skill_contract_model.py",
     ".flowguard/researchguard_skill_contract_model_common.py",
+    "scripts/build_skillguard_contracts.py",
     "scripts/check_researchguard_suite.py",
     "scripts/check_zero_residuals.py",
     "scripts/install_researchguard.py",
@@ -249,6 +290,10 @@
         },
         {
           "kind": "path",
+          "path": "scripts/build_skillguard_contracts.py"
+        },
+        {
+          "kind": "path",
           "path": "scripts/check_researchguard_suite.py"
         },
         {
@@ -383,5 +428,5 @@
     }
   ],
   "judgment_rubrics": [],
-  "claim_boundary": "This contract covers the current researchguard consumer projection, native route, and member-owned tests inside ResearchGuard v0.3.0. It does not prove source truth, unrun external work, installation, publication, or future AI behavior."
+  "claim_boundary": "This contract covers the current researchguard consumer projection, native route, and member-owned tests inside ResearchGuard v0.4.0. It does not prove source truth, unrun external work, installation, publication, or future AI behavior."
 }

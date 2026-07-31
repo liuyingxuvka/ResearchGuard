@@ -44,14 +44,22 @@ probabilities.
 ## Task-Local Experiment Iteration
 
 When a recommendation is part of a larger research task, freeze the task id,
-purpose, experiment coverage, assumptions, unknowns, and current iteration
-with the hypothesis predictions. After real observations are supplied, classify
-each hypothesis as supported, weakened, or undetermined and rebuild the finite
-discriminating set from the surviving hypotheses. The engine records the
-observation, unresolved pairs, next experiments, and an explicit terminal
-reason; it never asks the model whether it understands and never invents a
-probability. Continue until `model_closed_for_task`, or stop visibly with
-`iteration_limit`, `progress_stalled`, or `external_input_required`.
+purpose, experiment coverage and fingerprint, assumptions, unknowns, current
+iteration bound, and predecessor receipt on later iterations with the exact
+hypothesis and candidate inventories. Every observation must carry a unique
+evidence id, content fingerprint, source, observation time, construction or
+holdout role, and an explicit `valid`, `invalid`, or `not_run` status. Invalid
+and not-run evidence create visible gaps. After valid observations are
+supplied, compute each hypothesis disposition and rebuild the minimum finite
+discriminating set from the survivors. Zero survivors is a prediction-matrix
+miss: emit an immutable revision candidate and require a new iteration; never
+close by silently rewriting the matrix. One survivor closes only after valid,
+independent holdout evidence that was not used for construction. The engine
+records exact gap lineage, next experiments, native receipt identity, rollback
+base, and terminal reason; it never asks whether the model understands and
+never invents a probability. Continue until `model_closed_for_task`, or stop
+visibly with `iteration_limit`, `progress_stalled`, or
+`external_input_required`.
 
 ## Local Route
 

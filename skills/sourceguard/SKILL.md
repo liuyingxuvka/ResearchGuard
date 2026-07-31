@@ -50,16 +50,21 @@ claim use, and preserve unresolved gaps and typed handoffs.
 ## Task-Local Search-Model Maturation
 
 For a non-trivial search task, freeze the task id, purpose, coverage gaps,
-assumptions, unknowns, iteration, and the expected result of the selected
-search action. The action must carry a prediction and a falsifier; the model
+coverage fingerprint, assumptions, unknowns, iteration bound, predecessor
+receipt on later iterations, and the expected result of the selected search
+action. The action must carry a prediction and a falsifier; the model
 does not ask the caller or the model to self-report an understanding level.
 Apply the real retrieval observation, compare predicted and realized gap
-transitions, and keep any native SourceGuard gaps as explicit next actions.
-Only a task-local result with no remaining covered or native gaps may be
+transitions, rerun the current native SourceGuard depth check, and compute the
+input, resolved, persisted, and introduced gap sets from those artifacts.
+Caller-supplied gap transitions are never closure evidence. Keep every native
+gap as an addressable next action. Only a task-local result with a passing
+native receipt and no remaining covered or native gaps may be
 accepted as `model_closed_for_task`; otherwise return
 `continue_iteration`, `progress_stalled`, `iteration_limit`, or
-`external_input_required`. Historical callers that omit the task-local fields
-retain their bounded legacy contract, while new task-local calls are strict.
+`external_input_required`. Provider unavailability is an exact
+`provider_access_required` terminal; exhaustion of the finite declared actions
+is `finite_action_exhausted`. There is no legacy task-local packet or fallback.
 
 ## Hard Gates
 
