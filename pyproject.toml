@@ -39,7 +39,10 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-test = ["pytest>=8.0"]
+test = [
+  "pytest>=8.0",
+  "flowguard @ git+https://github.com/liuyingxuvka/FlowGuard.git@b6f30533d67b62bcb6a0838937e5dcc5d965e58a",
+]
 
 [project.scripts]
 researchguard = "researchguard.cli:main"

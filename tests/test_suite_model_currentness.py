@@ -35,6 +35,11 @@ def test_all_suite_version_authorities_are_current() -> None:
     assert __version__ == "0.2.0"
     assert model.CURRENT_RESEARCHGUARD_VERSION == "0.2.0"
     assert topology["model_id"] == "researchguard.suite.v0.2.0"
+    assert (
+        "flowguard @ git+https://github.com/liuyingxuvka/FlowGuard.git"
+        "@b6f30533d67b62bcb6a0838937e5dcc5d965e58a"
+        in package["project"]["optional-dependencies"]["test"]
+    )
 
 
 def test_suite_model_runner_and_currentness_test_are_freshness_inputs() -> None:

@@ -10,6 +10,8 @@
   with conservative wording licenses.
 - Restore exact suite/model/package currentness and register one observed
   FlowGuard model authority for the complete v0.2.0 route boundary.
+- Pin the FlowGuard v0.65.1 development dependency by immutable commit so a
+  clean Windows or Ubuntu test environment can execute the governed suite model.
 - Expand the single ResearchGuard SkillGuard maintenance unit to all five
   consumer skill surfaces without copying author-side state into consumers.
 
