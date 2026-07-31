@@ -131,14 +131,14 @@
             "oracle_id": "native:researchguard-suite:run-checks"
           },
           {
-            "failure_id": "researchguard:premature-member-model-closure",
-            "known_bad_case_id": "native:member-task-iteration:strict-closure",
-            "oracle_id": "native:researchguard:member-task-iteration-tests"
-          },
-          {
             "failure_id": "researchguard:stale-suite-identity",
             "known_bad_case_id": "native:researchguard-suite:currentness-mismatch",
             "oracle_id": "native:researchguard-suite:currentness-check"
+          },
+          {
+            "failure_id": "researchguard:premature-member-model-closure",
+            "known_bad_case_id": "native:member-task-iteration:strict-closure",
+            "oracle_id": "native:researchguard:member-task-iteration-tests"
           },
           {
             "failure_id": "researchguard:experiment-execution-overclaim",
@@ -152,8 +152,8 @@
         ],
         "model_sha256": "sha256:a5abc3bf79b1d12a6b45cc0b43d536cbb7eb5538272518bc0945a0eaeee7a819",
         "runner_sha256": "sha256:611e3bcbe9eebc31230d4822a2be8e984fa9064baf464e478863965a267051a7",
-        "declaration_fingerprint": "sha256:435c8879a230465f86c9257a1df2d49a45f64bd8e3a01a072849914e396700df",
-        "closure_fingerprint": "sha256:6bfc2a5368f7f6db3506fee00bdf4a10cebed9536e4d07e66eba5af27a92559a"
+        "declaration_fingerprint": "sha256:0de8d6f89fa8fd90f1914bfa2f92f0ae8401acfc4e2e57776811b48b4d840f12",
+        "closure_fingerprint": "sha256:7a3ba68a22945a5d074b3632cfd28ea79e2353dc69fbbe8aee744de20149063f"
       }
     }
   ]
