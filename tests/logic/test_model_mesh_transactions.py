@@ -249,6 +249,25 @@ def test_mesh_reads_are_immutable_and_lazy_model_reads_are_counted_once(tmp_path
         view.snapshot.metadata["mutated"] = True  # type: ignore[index]
 
 
+def test_open_view_validates_mesh_indexes_exactly_once(tmp_path, monkeypatch) -> None:
+    _p0, snapshots, store = create_mesh_store(tmp_path)
+    commit_first(store, snapshots)
+    calls = 0
+    original = store._read_mesh_indexes
+
+    def counted(snapshot):
+        nonlocal calls
+        calls += 1
+        return original(snapshot)
+
+    monkeypatch.setattr(store, "_read_mesh_indexes", counted)
+
+    view = store.open_view("brain-main")
+
+    assert str(view.snapshot.mesh_id) == "brain-main"
+    assert calls == 1
+
+
 def test_current_schema_index_repair_rebuilds_missing_exact_shard_with_receipt(tmp_path) -> None:
     _p0, snapshots, store = create_mesh_store(tmp_path)
     receipt = commit_first(store, snapshots)

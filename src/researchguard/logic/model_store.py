@@ -123,6 +123,28 @@ def canonical_digest(value: Any) -> str:
     return f"sha256:{hashlib.sha256(canonical_json_bytes(value)).hexdigest()}"
 
 
+def canonical_plain_json_bytes(value: Any) -> bytes:
+    """Serialize an already-normalized JSON value without rebuilding its tree.
+
+    Callers must supply only JSON-native dictionaries, lists, strings,
+    numbers, booleans, and ``None``.  Unlike ``canonical_json_bytes``, this
+    helper intentionally raises ``TypeError`` for model objects and other
+    projections so an unnormalized authority cannot be hashed accidentally.
+    """
+
+    return json.dumps(
+        value,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+        allow_nan=False,
+    ).encode("utf-8")
+
+
+def canonical_plain_digest(value: Any) -> str:
+    return f"sha256:{hashlib.sha256(canonical_plain_json_bytes(value)).hexdigest()}"
+
+
 def _freeze(value: Any) -> Any:
     if isinstance(value, Mapping):
         return MappingProxyType({str(key): _freeze(item) for key, item in value.items()})

@@ -20,6 +20,8 @@ from researchguard.logic.model_store import (
     StoreCorruptionError,
     StoreSchemaError,
     TombstonedModelError,
+    canonical_digest,
+    canonical_plain_digest,
 )
 from researchguard.logic.provenance import (
     OriginKind,
@@ -89,6 +91,19 @@ def valid_model_payload(model_id: str = "model-alpha", *, text: str = "Conclusio
             }
         },
     }
+
+
+def test_plain_json_digest_matches_general_digest_for_normalized_payload() -> None:
+    payload = valid_model_payload()
+
+    assert canonical_plain_digest(payload) == canonical_digest(payload)
+
+
+def test_plain_json_digest_rejects_unnormalized_model_objects() -> None:
+    snapshot = snapshot_for(valid_model_payload())
+
+    with pytest.raises(TypeError):
+        canonical_plain_digest(snapshot)
 
 
 def snapshot_for(payload: dict, parent: ModelRevision | None = None) -> ModelSnapshot:

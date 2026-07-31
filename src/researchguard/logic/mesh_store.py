@@ -358,6 +358,16 @@ class FileModelMeshStore:
         mesh_id: MeshId | str,
         revision: MeshRevision | str | None = None,
     ) -> ModelMeshSnapshot:
+        snapshot, _indexes = self._get_with_indexes(mesh_id, revision)
+        return snapshot
+
+    def _get_with_indexes(
+        self,
+        mesh_id: MeshId | str,
+        revision: MeshRevision | str | None = None,
+    ) -> tuple[ModelMeshSnapshot, MeshIndexBundle]:
+        """Load and validate one mesh snapshot and its indexes exactly once."""
+
         identity = MeshId.parse(mesh_id)
         manifest = self._load_manifest()
         entry = manifest["meshes"].get(str(identity))
@@ -373,8 +383,7 @@ class FileModelMeshStore:
         snapshot = self._read_mesh_snapshot(identity, MeshRevision.parse(requested))
         if revision is None and str(snapshot.revision) != entry.get("head"):
             raise MeshStoreCorruptionError("mesh head does not bind loaded snapshot")
-        self._read_mesh_indexes(snapshot)
-        return snapshot
+        return snapshot, self._read_mesh_indexes(snapshot)
 
     def list_meshes(self) -> tuple[MeshId, ...]:
         return tuple(MeshId(item) for item in sorted(self._load_manifest()["meshes"]))
@@ -407,8 +416,8 @@ class FileModelMeshStore:
     def open_view(
         self, mesh_id: MeshId | str, revision: MeshRevision | str | None = None
     ) -> MeshRevisionView:
-        snapshot = self.get(mesh_id, revision)
-        return MeshRevisionView(self, snapshot, self._read_mesh_indexes(snapshot))
+        snapshot, indexes = self._get_with_indexes(mesh_id, revision)
+        return MeshRevisionView(self, snapshot, indexes)
 
     def head_drift(
         self, mesh_id: MeshId | str, revision: MeshRevision | str | None = None

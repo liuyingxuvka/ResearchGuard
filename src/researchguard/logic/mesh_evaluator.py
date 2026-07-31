@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import copy
 import hashlib
 import inspect
 from collections import defaultdict
@@ -22,7 +23,7 @@ from .mesh_overlay import (
 from .mesh_scc import build_model_dependency_graph, compute_model_sccs
 from .model import Edge, Node
 from .model_mesh import qualified_model_key, qualified_node_key
-from .model_store import canonical_digest
+from .model_store import canonical_digest, canonical_plain_digest
 from .provenance import ProvenanceRecord
 from .schema import (
     ATTACK_EDGE_TYPES,
@@ -285,13 +286,15 @@ def _evaluate_with_proxies(model, proxy_inputs):
     return evaluate_model(model)
 
 
-def _depth_bindings(view, materialized, requested_scope, profile, budget):
+def _depth_bindings(
+    view, materialized, requested_scope, profile, budget, models, local_results
+):
     materialized_refs = {item.ref for item in materialized.nodes}
     bindings = []
     gaps = []
     for model_ref in materialized.model_pins:
         snapshot = view.model_snapshot(model_ref)
-        model = snapshot.to_model()
+        model = models[model_ref]
         local_requested = tuple(
             ref for ref in requested_scope if QualifiedModelRef(ref.model_id, ref.revision) == model_ref
         )
@@ -306,6 +309,7 @@ def _depth_bindings(view, materialized, requested_scope, profile, budget):
                 model,
                 budget=budget,
                 requested_claim_scope_ids=local_ids,
+                result=local_results[model_ref],
             )
             universe_ids = (
                 receipt.coverage_universe.important_node_ids
@@ -327,7 +331,7 @@ def _depth_bindings(view, materialized, requested_scope, profile, budget):
             )
             binding = MeshDepthBinding(
                 model_ref=model_ref,
-                depth_receipt_digest=canonical_digest(depth_payload),
+            depth_receipt_digest=canonical_plain_digest(depth_payload),
                 model_fingerprint=receipt.model_fingerprint,
                 requested_claim_refs=local_requested,
                 important_node_refs=important_refs,
@@ -374,7 +378,10 @@ def _dependency_binding(
         keys.append(
             MeshDependencyKey.create(
                 "node",
-                {"node_ref": node.ref.to_dict(), "payload_digest": canonical_digest(node.to_dict())},
+                {
+                    "node_ref": node.ref.to_dict(),
+                    "payload_digest": canonical_plain_digest(node.to_dict()),
+                },
             )
         )
     for membership in materialized.memberships:
@@ -516,7 +523,10 @@ def evaluate_materialized_mesh(
         working = dict(current)
         next_results = {}
         for model_ref in ordered_models:
-            model = view.model_snapshot(model_ref).to_model()
+            # Proxy evaluation mutates the temporary model.  Clone the one
+            # normalized model projection instead of reparsing the immutable
+            # snapshot for every SCC iteration.
+            model = copy.deepcopy(models[model_ref])
             result = _evaluate_with_proxies(model, inputs.get(model_ref, ()))
             next_results[model_ref] = result
             for node_id, node_result in result.node_results.items():
@@ -560,7 +570,13 @@ def evaluate_materialized_mesh(
         for ref, result in sorted(current.items(), key=lambda item: qualified_node_key(item[0]))
     )
     depth_bindings, depth_gaps = _depth_bindings(
-        view, materialized, requested_scope, profile, depth_budget
+        view,
+        materialized,
+        requested_scope,
+        profile,
+        depth_budget,
+        models,
+        local_results,
     )
     gaps = [f"materialization:{item}" for item in materialized.truncation_reasons]
     gaps.extend(depth_gaps)
@@ -579,7 +595,7 @@ def evaluate_materialized_mesh(
 
     block_results = []
     for model_ref in materialized.model_pins:
-        model = view.model_snapshot(model_ref).to_model()
+        model = models[model_ref]
         for block_id, block in sorted(model.blocks.items()):
             member_refs = tuple(
                 QualifiedNodeRef(model_ref.model_id, model_ref.revision, node_id)

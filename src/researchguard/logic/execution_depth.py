@@ -1485,8 +1485,12 @@ def _build_native_depth_analysis(
     *,
     budget: int = 6,
     requested_claim_scope_ids: Iterable[str] | None = None,
+    result: EvaluationResult | None = None,
 ) -> LogicDepthReceipt:
-    result = evaluate_model(model)
+    # Mesh evaluation already owns an exact native result for every pinned
+    # model.  Reuse it when supplied instead of evaluating the same immutable
+    # model a second time before depth analysis.
+    result = result or evaluate_model(model)
     policy = derive_importance_policy()
     universe = build_argument_coverage_universe(
         model,

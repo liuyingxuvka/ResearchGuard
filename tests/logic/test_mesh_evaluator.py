@@ -133,10 +133,12 @@ def test_mesh_evaluation_uses_internal_native_depth_without_public_contract_bypa
     tmp_path, monkeypatch
 ) -> None:
     calls: list[str] = []
+    supplied_results = []
     native_depth = mesh_evaluator_module._build_native_depth_analysis
 
     def recording_native_depth(model, **kwargs):
         calls.append(model.id)
+        supplied_results.append(kwargs.get("result"))
         return native_depth(model, **kwargs)
 
     monkeypatch.setattr(
@@ -157,7 +159,34 @@ def test_mesh_evaluation_uses_internal_native_depth_without_public_contract_bypa
     )
 
     assert calls == [str(item.model_id) for item in overlay.selected_models]
+    assert all(result is not None for result in supplied_results)
+    assert [result.model_id for result in supplied_results] == calls
     assert all(binding.depth_receipt_digest for binding in overlay.depth_bindings)
+
+
+def test_mesh_evaluation_hydrates_each_pinned_model_once(tmp_path, monkeypatch) -> None:
+    p0, snapshots = committed_models(tmp_path / "p0")
+    store = open_mesh_store(tmp_path / "mesh", p0, build_definition(snapshots))
+    view, materialized = materialize(store, (node_ref(snapshots[0], "evidence-one"),))
+    snapshot_type = type(snapshots[0])
+    original = snapshot_type.to_model
+    calls: list[str] = []
+
+    def counted(snapshot):
+        calls.append(str(snapshot.model_id))
+        return original(snapshot)
+
+    monkeypatch.setattr(snapshot_type, "to_model", counted)
+
+    evaluate_materialized_mesh(
+        view,
+        materialized,
+        requested_claim_scope=(node_ref(snapshots[1], "claim-root"),),
+        profile="bounded",
+        depth_budget=2,
+    )
+
+    assert sorted(calls) == sorted(str(item.model_id) for item in materialized.model_pins)
 
 
 @pytest.mark.parametrize(

@@ -16,7 +16,7 @@ from .identity import (
     QualifiedNodeRef,
 )
 from .model_mesh import ModelMeshSnapshot, qualified_model_key, qualified_node_key
-from .model_store import canonical_digest
+from .model_store import canonical_digest, canonical_plain_digest
 from .schema import (
     MESH_EVALUATION_OVERLAY_SCHEMA,
     MESH_SCHEMA_VERSION,
@@ -82,7 +82,9 @@ class MeshDependencyKey:
         if self.kind not in self.ALLOWED_KINDS:
             raise MeshOverlayError(f"unsupported mesh dependency kind: {self.kind!r}")
         object.__setattr__(self, "payload", _freeze(dict(self.payload or {})))
-        expected = canonical_digest({"kind": self.kind, "payload": _thaw(self.payload)})
+        expected = canonical_plain_digest(
+            {"kind": self.kind, "payload": _thaw(self.payload)}
+        )
         if self.identity_digest != expected:
             raise MeshOverlayError(
                 f"dependency key digest mismatch: found {self.identity_digest}, expected {expected}"
@@ -93,7 +95,9 @@ class MeshDependencyKey:
         normalized = dict(payload)
         return cls(
             kind=kind,
-            identity_digest=canonical_digest({"kind": kind, "payload": normalized}),
+            identity_digest=canonical_plain_digest(
+                {"kind": kind, "payload": normalized}
+            ),
             payload=normalized,
         )
 
@@ -169,7 +173,7 @@ class OverlayDependencyBinding:
             raise MeshOverlayError("overlay dependency profile must be broad or bounded")
         if not self.evaluator_fingerprint or not self.simulator_fingerprint:
             raise MeshOverlayError("dependency binding requires evaluator and simulator fingerprints")
-        expected = canonical_digest(self.fingerprint_payload())
+        expected = canonical_plain_digest(self.fingerprint_payload())
         if self.digest != expected:
             raise MeshOverlayError(
                 f"overlay dependency digest mismatch: found {self.digest}, expected {expected}"
@@ -252,7 +256,7 @@ class OverlayDependencyBinding:
             requested_claim_scope=tuple(requested_claim_scope),
             profile=profile,
             dependency_keys=tuple(dependency_keys),
-            digest=canonical_digest(payload),
+            digest=canonical_plain_digest(payload),
         )
 
     def to_dict(self) -> dict[str, Any]:
