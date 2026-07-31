@@ -3,6 +3,13 @@
 from __future__ import annotations
 
 from .diagnostics import diagnose_model
+from .minimal_sets import (
+    ConclusionLicense,
+    MinimalArgumentSet,
+    SetOracle,
+    WordingLicense,
+    license_conclusion,
+)
 from .delivery import DeliveryGuidance, DeliverySuggestion, adapt_delivery
 from .evaluator import evaluate_model
 from .execution_depth import (
@@ -365,6 +372,7 @@ __all__ = [
     "ClaimRoleCoverage",
     "ClaimScopeCoverage",
     "ConclusionCandidate",
+    "ConclusionLicense",
     "ConclusionTournament",
     "DepthCoverageItem",
     "DepthCoverageSummary",
@@ -390,6 +398,7 @@ __all__ = [
     "build_source_cards",
     "build_source_graph_payload",
     "LogicModel",
+    "MinimalArgumentSet",
     "Node",
     "PerturbationEffectiveness",
     "PerturbationPlanItem",
@@ -399,6 +408,7 @@ __all__ = [
     "STRUCTURAL_CLAIM_BOUNDARY",
     "SimulationResult",
     "SUPPORTED_PREDICTION_MODES",
+    "SetOracle",
     "ARGUMENT_ITERATION_CLAIM_BOUNDARY",
     "ARGUMENT_ITERATION_RECEIPT_SCHEMA",
     "ARGUMENT_PREDICTION_SCHEMA",
@@ -478,6 +488,8 @@ __all__ = [
     "summarize_importance",
     "synthesize_artifact_plan",
     "validate_model",
+    "WordingLicense",
+    "license_conclusion",
     "validate_prediction_binding",
     "verify_target_contract",
     "validate_evidence_provenance",

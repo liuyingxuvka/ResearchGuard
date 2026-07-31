@@ -5,10 +5,10 @@ import json
 from researchguard.cli import main
 
 
-def test_root_cli_has_exact_four_commands(capsys) -> None:
+def test_root_cli_has_exact_five_commands(capsys) -> None:
     assert main(["--help"]) == 0
     output = capsys.readouterr().out
-    assert "{run|logic|source|trace}" in output
+    assert "{run|logic|source|trace|experiment}" in output
 
 
 def test_umbrella_without_member_returns_typed_gap(capsys) -> None:

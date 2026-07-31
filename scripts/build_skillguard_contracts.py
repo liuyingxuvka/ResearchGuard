@@ -1,4 +1,4 @@
-"""Build the one ResearchGuard maintenance unit's four author-side contracts."""
+"""Build the ResearchGuard maintenance unit's five author-side contracts."""
 
 from __future__ import annotations
 
@@ -7,7 +7,13 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-MEMBERS = ("researchguard", "logicguard", "sourceguard", "traceguard")
+MEMBERS = (
+    "researchguard",
+    "logicguard",
+    "sourceguard",
+    "traceguard",
+    "experimentguard",
+)
 UNIT_ID = "unit:researchguard-suite"
 
 TEST_ARGS = {
@@ -24,6 +30,7 @@ TEST_ARGS = {
     "logicguard": ["-m", "pytest", "tests/logic", "-q"],
     "sourceguard": ["-m", "pytest", "tests/source", "-q"],
     "traceguard": ["-m", "pytest", "tests/trace", "-q"],
+    "experimentguard": ["-m", "pytest", "tests/experiment", "-q"],
 }
 
 IMPLEMENTATION_PATHS = {
@@ -34,6 +41,9 @@ IMPLEMENTATION_PATHS = {
         "src/researchguard/cli.py",
         "src/researchguard/routing.py",
         "src/researchguard/suite.py",
+        ".flowguard/researchguard_suite_model.py",
+        ".flowguard/researchguard_suite_model.json",
+        ".flowguard/run_researchguard_suite_model.py",
         ".flowguard/researchguard_skill_contract_model.py",
         ".flowguard/researchguard_skill_contract_model_common.py",
         "scripts/check_researchguard_suite.py",
@@ -43,6 +53,7 @@ IMPLEMENTATION_PATHS = {
         "tests/test_root_cli.py",
         "tests/test_skill_suite.py",
         "tests/test_install_researchguard.py",
+        "tests/test_suite_model_currentness.py",
         "tests/test_zero_residuals.py",
     ],
     "logicguard": [
@@ -69,6 +80,13 @@ IMPLEMENTATION_PATHS = {
         ".flowguard/traceguard_skill_contract_model.py",
         ".flowguard/researchguard_skill_contract_model_common.py",
         "tests/trace",
+    ],
+    "experimentguard": [
+        "skills/experimentguard",
+        "src/researchguard/experiment",
+        ".flowguard/experimentguard_skill_contract_model.py",
+        ".flowguard/researchguard_skill_contract_model_common.py",
+        "tests/experiment",
     ],
 }
 
@@ -132,6 +150,18 @@ def contract(member: str) -> dict:
                 {"kind": "path", "path": f"skills/{member}/SKILL.md"},
                 {"kind": "path", "path": f"skills/{member}/agents/openai.yaml"},
                 {"kind": "path", "path": "scripts/check_researchguard_suite.py"},
+                {
+                    "kind": "path",
+                    "path": ".flowguard/researchguard_suite_model.py",
+                },
+                {
+                    "kind": "path",
+                    "path": ".flowguard/researchguard_suite_model.json",
+                },
+                {
+                    "kind": "path",
+                    "path": ".flowguard/run_researchguard_suite_model.py",
+                },
                 {
                     "kind": "path",
                     "path": f".flowguard/{member}_skill_contract_model.py",
@@ -242,7 +272,7 @@ def contract(member: str) -> dict:
         "judgment_rubrics": [],
         "claim_boundary": (
             f"This contract covers the current {member} consumer projection, "
-            "native route, and member-owned tests inside ResearchGuard v0.1.4. "
+            "native route, and member-owned tests inside ResearchGuard v0.2.0. "
             "It does not prove source truth, unrun external work, installation, "
             "publication, or future AI behavior."
         ),

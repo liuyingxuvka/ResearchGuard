@@ -7,7 +7,13 @@ from typing import Any
 import flowguard
 
 
-MEMBERS = ("researchguard", "logicguard", "sourceguard", "traceguard")
+MEMBERS = (
+    "researchguard",
+    "logicguard",
+    "sourceguard",
+    "traceguard",
+    "experimentguard",
+)
 
 
 def build_contract_model(member: str) -> dict[str, Any]:

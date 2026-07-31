@@ -7,7 +7,8 @@
     "researchguard",
     "logicguard",
     "sourceguard",
-    "traceguard"
+    "traceguard",
+    "experimentguard"
   ],
   "consumer_projection": {
     "projection_id": "projection:consumer-distribution",
@@ -114,6 +115,18 @@
         },
         {
           "kind": "path",
+          "path": ".flowguard/researchguard_suite_model.py"
+        },
+        {
+          "kind": "path",
+          "path": ".flowguard/researchguard_suite_model.json"
+        },
+        {
+          "kind": "path",
+          "path": ".flowguard/run_researchguard_suite_model.py"
+        },
+        {
+          "kind": "path",
           "path": ".flowguard/logicguard_skill_contract_model.py"
         },
         {
@@ -210,5 +223,5 @@
     }
   ],
   "judgment_rubrics": [],
-  "claim_boundary": "This contract covers the current logicguard consumer projection, native route, and member-owned tests inside ResearchGuard v0.1.4. It does not prove source truth, unrun external work, installation, publication, or future AI behavior."
+  "claim_boundary": "This contract covers the current logicguard consumer projection, native route, and member-owned tests inside ResearchGuard v0.2.0. It does not prove source truth, unrun external work, installation, publication, or future AI behavior."
 }

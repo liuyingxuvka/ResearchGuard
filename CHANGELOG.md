@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.2.0 - 2026-07-30
+
+- Add ExperimentGuard as the fourth native ResearchGuard member and fifth
+  direct skill surface, with exact finite minimum-set recommendations and no
+  experiment execution or invented probability.
+- Add typed SourceGuard search-stop decisions, TraceGuard deletion-minimal
+  contradiction cores, and LogicGuard deletion-minimal support/attack evidence
+  with conservative wording licenses.
+- Restore exact suite/model/package currentness and register one observed
+  FlowGuard model authority for the complete v0.2.0 route boundary.
+- Expand the single ResearchGuard SkillGuard maintenance unit to all five
+  consumer skill surfaces without copying author-side state into consumers.
+
 ## v0.1.4 - 2026-07-22
 
 - Adopt SkillGuard 0.4 bounded evidence lifecycle for the four maintained ResearchGuard members.

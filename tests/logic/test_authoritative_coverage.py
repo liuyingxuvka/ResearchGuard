@@ -294,6 +294,7 @@ def test_skill_contract_binds_authoritative_native_receipt_without_parallel_rout
         "logicguard",
         "sourceguard",
         "traceguard",
+        "experimentguard",
     ]
     assert [row["profile_id"] for row in contract["closure_profiles"]] == [
         "enforced",

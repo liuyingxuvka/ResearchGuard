@@ -1,9 +1,9 @@
 # ResearchGuard
 
-**Current version:** `v0.1.4`
-**当前版本：** `v0.1.4`
+**Current version:** `v0.2.0`
+**当前版本：** `v0.2.0`
 
-ResearchGuard is one versioned research-quality guard suite with four direct
+ResearchGuard is one versioned research-quality guard suite with five direct
 Codex entrypoints:
 
 - `researchguard` routes cross-Guard or ambiguous research work.
@@ -11,8 +11,10 @@ Codex entrypoints:
 - `sourceguard` plans evidence and source discovery.
 - `traceguard` reconstructs and stress-tests evidence-backed timelines and
   qualitative causal storylines.
+- `experimentguard` recommends minimum finite experiment sets that distinguish
+  caller-declared hypotheses.
 
-All four entrypoints use one `researchguard` Python distribution, one suite
+All five entrypoints use one `researchguard` Python distribution, one suite
 version, and one suite fingerprint. A selected member failure is terminal.
 ResearchGuard does not retry through another member, silently downgrade, or
 load legacy package formats.
@@ -30,11 +32,17 @@ incomplete; generated prose is never promoted to evidence.
 ## Public Skill topology
 
 - `$researchguard` is the family router.
-- `$logicguard`, `$sourceguard`, and `$traceguard` remain complete direct
+- `$logicguard`, `$sourceguard`, `$traceguard`, and `$experimentguard` remain complete direct
   entrypoints.
 - LogicGuard's source library, structured-artifact audit, model deepening,
   artifact synthesis, and project library viewer are internal routes.
 - TraceGuard's case library is an internal route.
+
+SourceGuard now returns typed search-stop decisions; TraceGuard can expose a
+deletion-minimal contradiction core; LogicGuard can expose deletion-minimal
+support and attack sets with a conservative wording license. ExperimentGuard
+is recommendation-only: it never executes an experiment or invents
+probabilities.
 
 All direct entries bind to the same native member owners used by the umbrella.
 There are no legacy Skill IDs, command wrappers, aliases, dual readers, or

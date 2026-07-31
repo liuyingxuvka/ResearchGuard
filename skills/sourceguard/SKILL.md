@@ -57,6 +57,11 @@ basis blocks strong claim use. There is one current semantic-state authority.
 
 Report source roles, evidence, failures, blockers, skipped checks, unresolved
 gaps, residual risk, safe claim use, typed handoffs, and the claim boundary.
+When the user asks whether to keep searching, also return the typed native
+search-stop decision: `continue_search`, `stop_sufficient`,
+`blocked_unresolved_critical`, or `not_run`, with the declared marginal value,
+cost, budget, critical gaps, and selected next search kept visible. This is a
+planning decision, not a truth or probability claim.
 
 ## Detailed Route Contract
 

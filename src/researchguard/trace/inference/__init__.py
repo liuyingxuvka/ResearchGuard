@@ -1,6 +1,12 @@
 """Canonical TraceGuard inference kernel."""
 
 from .engine import infer_model
+from .contradiction_core import (
+    ConsistencyOracle,
+    ContradictionCore,
+    ContradictionCoreStatus,
+    find_deletion_minimal_contradiction_core,
+)
 from .policy import DEFAULT_POLICY, InferencePolicy
 from .types import (
     CompiledProblem,
@@ -16,6 +22,9 @@ from .types import (
 
 __all__ = [
     "CompiledProblem",
+    "ConsistencyOracle",
+    "ContradictionCore",
+    "ContradictionCoreStatus",
     "DEFAULT_POLICY",
     "FactorContribution",
     "HardConstraint",
@@ -27,4 +36,5 @@ __all__ = [
     "LinearExpression",
     "ObservedAtom",
     "infer_model",
+    "find_deletion_minimal_contradiction_core",
 ]

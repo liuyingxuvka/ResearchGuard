@@ -1,4 +1,4 @@
-"""Build the four canonical ResearchGuard consumer skills from frozen sources.
+"""Build the five canonical ResearchGuard consumer skills from frozen sources.
 
 This is a one-way source migration.  It deliberately does not emit predecessor
 skill ids, forwarding shims, alternate launchers, or author-side receipts into
@@ -198,13 +198,13 @@ def _main_member_skill(source: Path, *, name: str, description: str) -> str:
 def _researchguard_skill() -> str:
     return """---
 name: researchguard
-description: Route a research or investigation request to exactly one ResearchGuard member when the request crosses argument, source-discovery, or evidence-trace boundaries, or when the correct member is genuinely ambiguous. Use LogicGuard directly for argument structure, SourceGuard directly for evidence discovery planning, and TraceGuard directly for temporal or competing-storyline reconstruction.
+description: Route a research or investigation request to exactly one ResearchGuard member across argument, source-discovery, evidence-trace, and experiment-selection boundaries.
 ---
 
 # ResearchGuard
 
-ResearchGuard is the single suite-level entry for three complete member skills:
-`logicguard`, `sourceguard`, and `traceguard`. It coordinates them without
+ResearchGuard is the single suite-level entry for four complete native member skills:
+`logicguard`, `sourceguard`, `traceguard`, and `experimentguard`. It coordinates them without
 duplicating their native work or silently trying another member.
 
 ## Route once
@@ -217,13 +217,16 @@ duplicating their native work or silently trying another member.
    retrieval execution, provider evidence, and claim-use qualification.
 4. Use `traceguard` for temporal order, competing storylines, event/evidence
    separation, execution chains, counter-scenarios, and bounded causal stories.
-5. Use the umbrella only for a genuinely cross-member or ambiguous request.
+5. Use `experimentguard` for recommendation-only discriminating experiment
+   selection from explicit hypotheses and predicted outcomes.
+6. Use the umbrella only for a genuinely cross-member or ambiguous request.
    Select exactly one member before any member executes:
 
 ```powershell
 researchguard run --member logicguard -- <member arguments>
 researchguard run --member sourceguard -- <member arguments>
 researchguard run --member traceguard -- <member arguments>
+researchguard run --member experimentguard -- <member arguments>
 ```
 
 Direct member commands execute the same owner and primary path:
@@ -232,6 +235,7 @@ Direct member commands execute the same owner and primary path:
 researchguard logic <arguments>
 researchguard source <arguments>
 researchguard trace <arguments>
+researchguard experiment <arguments>
 ```
 
 ## Handoffs
@@ -250,6 +254,27 @@ the handoff. Re-entry with an active request id is blocked.
 - no member result is upgraded by another member;
 - no old command, skill id, alias, forwarding shell, or alternate runtime is
   part of the suite.
+"""
+
+
+def _experimentguard_skill() -> str:
+    return """---
+name: experimentguard
+description: Recommend a minimum finite set of experiments that can distinguish caller-declared hypotheses without executing experiments or inventing probabilities.
+---
+
+# ExperimentGuard Skill
+
+ExperimentGuard is the recommendation-only ResearchGuard member for
+discriminating-test design. Freeze unique hypotheses, candidate experiments,
+and explicit predicted outcomes; then return every minimum-cardinality
+distinguishing set, a deterministic selected set, and unresolved hypothesis
+pairs.
+
+Use `researchguard experiment recommend <spec.json>`. Never execute an
+experiment, invent an outcome or probability, infer causal truth, or silently
+route to another member. A recommendation proves only discrimination within
+the declared finite prediction table.
 """
 
 
@@ -283,6 +308,14 @@ def build(*, logic_root: Path, source_root: Path, trace_root: Path) -> None:
             "Audit and deepen argument structure",
             "Use $logicguard to model and validate this argument or structured artifact.",
         ),
+    )
+    logic_skill = SKILLS / "logicguard" / "SKILL.md"
+    _write_text(
+        logic_skill,
+        logic_skill.read_text(encoding="utf-8")
+        + "\nFor important conclusions, expose deletion-minimal support and "
+        "attack sets and license wording as `assert`, `qualify`, or "
+        "`withhold`. This is structural, not factual, evidence.\n",
     )
     logic_routes_root = SKILLS / "logicguard" / "references" / "routes"
     for predecessor, route in INTERNAL_LOGIC_ROUTES.items():
@@ -337,6 +370,14 @@ def build(*, logic_root: Path, source_root: Path, trace_root: Path) -> None:
             "Use $sourceguard to plan and qualify the evidence needed for this claim.",
         ),
     )
+    source_skill = SKILLS / "sourceguard" / "SKILL.md"
+    _write_text(
+        source_skill,
+        source_skill.read_text(encoding="utf-8")
+        + "\nWhen asked whether to continue searching, return the typed native "
+        "search-stop decision and preserve value, cost, budget, and critical "
+        "gaps. Do not turn these planning quantities into probabilities.\n",
+    )
     _copy_file(
         source_root / "sourceguard" / "scripts" / "sourceguard_closure_check.py",
         SKILLS / "sourceguard" / "scripts" / "sourceguard_closure_check.py",
@@ -364,6 +405,14 @@ def build(*, logic_root: Path, source_root: Path, trace_root: Path) -> None:
             "Stress-test timelines and competing storylines",
             "Use $traceguard to reconstruct and test this evidence-backed storyline.",
         ),
+    )
+    trace_skill = SKILLS / "traceguard" / "SKILL.md"
+    _write_text(
+        trace_skill,
+        trace_skill.read_text(encoding="utf-8")
+        + "\nWhen contradictions block closure, expose a deterministic "
+        "deletion-minimal contradiction core with per-constraint necessity "
+        "witnesses. Do not claim global minimum or uniqueness.\n",
     )
     trace_library = _strip_frontmatter(
         (trace_root / "traceguard-library" / "SKILL.md").read_text(encoding="utf-8")
@@ -423,6 +472,18 @@ def build(*, logic_root: Path, source_root: Path, trace_root: Path) -> None:
         '"traceguard.case-library"',
     )
     _write_text(trace_closure, trace_closure_text)
+    _write_text(
+        SKILLS / "experimentguard" / "SKILL.md",
+        _experimentguard_skill(),
+    )
+    _write_text(
+        SKILLS / "experimentguard" / "agents" / "openai.yaml",
+        _openai_yaml(
+            "ExperimentGuard",
+            "Recommend discriminating experiments",
+            "Use $experimentguard to recommend the smallest declared experiment set that distinguishes these hypotheses.",
+        ),
+    )
 
 
 if __name__ == "__main__":

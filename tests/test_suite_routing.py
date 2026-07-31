@@ -8,7 +8,7 @@ from researchguard.suite import suite_identity
 def test_suite_identity_is_single_and_complete() -> None:
     identity = suite_identity()
     assert identity["suite_id"] == SUITE_ID
-    assert identity["version"] == __version__ == "0.1.4"
+    assert identity["version"] == __version__ == "0.2.0"
     assert identity["members"] == list(MEMBER_IDS)
     assert identity["distribution"] == "researchguard"
     assert identity["console_script"] == "researchguard"
@@ -41,6 +41,16 @@ def test_selected_member_has_no_alternate_binding() -> None:
     assert isinstance(result, RouteBinding)
     assert result.member_id == "sourceguard"
     assert result.primary_path_id == "primary:researchguard:source"
+
+
+def test_experiment_member_is_recommendation_owner() -> None:
+    result = bind_member_request(
+        "experimentguard",
+        ["recommend", "experiment.json"],
+    )
+    assert isinstance(result, RouteBinding)
+    assert result.primary_path_id == "primary:researchguard:experiment"
+    assert result.machine_path == "researchguard.experiment.cli:main"
 
 
 def test_routed_request_cannot_reenter_umbrella() -> None:

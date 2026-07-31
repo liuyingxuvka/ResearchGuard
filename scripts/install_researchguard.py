@@ -22,7 +22,13 @@ SKILL_SOURCE = ROOT / "skills"
 ACTIVE_SKILL_ROOT = Path.home() / ".codex" / "skills"
 INSTALL_ROOT = Path.home() / ".codex" / "researchguard"
 MANIFEST_PATH = INSTALL_ROOT / "install-manifest.json"
-MEMBERS = ("researchguard", "logicguard", "sourceguard", "traceguard")
+MEMBERS = (
+    "researchguard",
+    "logicguard",
+    "sourceguard",
+    "traceguard",
+    "experimentguard",
+)
 RETIRED_SKILLS = (
     "logicguard-source-library",
     "logicguard-structured-artifact",
@@ -31,7 +37,7 @@ RETIRED_SKILLS = (
     "logicguard-project-library-viewer",
     "traceguard-library",
 )
-VERSION = "0.1.4"
+VERSION = "0.2.0"
 
 
 class InstallError(RuntimeError):
@@ -277,9 +283,9 @@ def install() -> dict[str, object]:
         prior_version = importlib.metadata.version("researchguard")
     except importlib.metadata.PackageNotFoundError:
         prior_version = ""
-    if prior_version not in {"", "0.1.2", VERSION}:
+    if prior_version not in {"", "0.1.4", VERSION}:
         raise InstallError(
-            f"direct v0.1.4 replacement requires v0.1.3, v0.1.4, or no prior "
+            f"direct v0.2.0 replacement requires v0.1.4, v0.2.0, or no prior "
             f"ResearchGuard distribution; found {prior_version}"
         )
     prior_manifest = MANIFEST_PATH.read_bytes() if MANIFEST_PATH.is_file() else None
@@ -338,7 +344,7 @@ def install() -> dict[str, object]:
             raise InstallError(json.dumps(report, ensure_ascii=False))
         console = str(_installed_console_entrypoint())
         _native_command([console, "--version"])
-        for command in ("logic", "source", "trace"):
+        for command in ("logic", "source", "trace", "experiment"):
             _native_command([console, command, "--help"])
     except Exception:
         _restore_skills(backup)

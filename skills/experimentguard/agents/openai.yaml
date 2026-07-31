@@ -1,0 +1,4 @@
+interface:
+  display_name: "ExperimentGuard"
+  short_description: "Recommend discriminating experiments"
+  default_prompt: "Use $experimentguard to recommend the smallest declared experiment set that distinguishes these hypotheses."

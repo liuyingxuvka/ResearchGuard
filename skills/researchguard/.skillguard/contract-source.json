@@ -7,7 +7,8 @@
     "researchguard",
     "logicguard",
     "sourceguard",
-    "traceguard"
+    "traceguard",
+    "experimentguard"
   ],
   "consumer_projection": {
     "projection_id": "projection:consumer-distribution",
@@ -57,6 +58,9 @@
     "src/researchguard/cli.py",
     "src/researchguard/routing.py",
     "src/researchguard/suite.py",
+    ".flowguard/researchguard_suite_model.py",
+    ".flowguard/researchguard_suite_model.json",
+    ".flowguard/run_researchguard_suite_model.py",
     ".flowguard/researchguard_skill_contract_model.py",
     ".flowguard/researchguard_skill_contract_model_common.py",
     "scripts/check_researchguard_suite.py",
@@ -66,6 +70,7 @@
     "tests/test_root_cli.py",
     "tests/test_skill_suite.py",
     "tests/test_install_researchguard.py",
+    "tests/test_suite_model_currentness.py",
     "tests/test_zero_residuals.py"
   ],
   "step_bindings": [
@@ -120,6 +125,18 @@
         {
           "kind": "path",
           "path": "scripts/check_researchguard_suite.py"
+        },
+        {
+          "kind": "path",
+          "path": ".flowguard/researchguard_suite_model.py"
+        },
+        {
+          "kind": "path",
+          "path": ".flowguard/researchguard_suite_model.json"
+        },
+        {
+          "kind": "path",
+          "path": ".flowguard/run_researchguard_suite_model.py"
         },
         {
           "kind": "path",
@@ -191,6 +208,18 @@
         },
         {
           "kind": "path",
+          "path": ".flowguard/researchguard_suite_model.py"
+        },
+        {
+          "kind": "path",
+          "path": ".flowguard/researchguard_suite_model.json"
+        },
+        {
+          "kind": "path",
+          "path": ".flowguard/run_researchguard_suite_model.py"
+        },
+        {
+          "kind": "path",
           "path": ".flowguard/researchguard_skill_contract_model.py"
         },
         {
@@ -227,6 +256,10 @@
         },
         {
           "kind": "path",
+          "path": "tests/test_suite_model_currentness.py"
+        },
+        {
+          "kind": "path",
           "path": "tests/test_zero_residuals.py"
         }
       ],
@@ -259,5 +292,5 @@
     }
   ],
   "judgment_rubrics": [],
-  "claim_boundary": "This contract covers the current researchguard consumer projection, native route, and member-owned tests inside ResearchGuard v0.1.4. It does not prove source truth, unrun external work, installation, publication, or future AI behavior."
+  "claim_boundary": "This contract covers the current researchguard consumer projection, native route, and member-owned tests inside ResearchGuard v0.2.0. It does not prove source truth, unrun external work, installation, publication, or future AI behavior."
 }

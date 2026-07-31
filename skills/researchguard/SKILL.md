@@ -1,14 +1,14 @@
 ---
 name: researchguard
-description: Route a research or investigation request to exactly one ResearchGuard member when the request crosses argument, source-discovery, or evidence-trace boundaries, or when the correct member is genuinely ambiguous. Use LogicGuard directly for argument structure, SourceGuard directly for evidence discovery planning, and TraceGuard directly for temporal or competing-storyline reconstruction.
+description: Route a research or investigation request to exactly one ResearchGuard member when the request crosses argument, source-discovery, evidence-trace, or experiment-selection boundaries, or when the correct member is genuinely ambiguous. Use LogicGuard for argument structure, SourceGuard for evidence discovery, TraceGuard for temporal reconstruction, and ExperimentGuard for discriminating-test recommendations.
 ---
 
 # ResearchGuard
 
 ## Purpose
 
-ResearchGuard is the single suite-level entry for three complete member skills:
-`logicguard`, `sourceguard`, and `traceguard`. It coordinates them without
+ResearchGuard is the single suite-level entry for four complete native member skills:
+`logicguard`, `sourceguard`, `traceguard`, and `experimentguard`. It coordinates them without
 duplicating their native work or silently trying another member.
 
 ## Entrypoint Scope
@@ -24,12 +24,15 @@ member remains a complete direct skill and the sole owner of its native work.
   source-role gaps, and claim-use qualification.
 - Read `traceguard` for temporal order, competing storylines, execution chains,
   counter-scenarios, and bounded causal narratives.
+- Read `experimentguard` for minimum finite experiment sets that distinguish
+  caller-declared hypotheses.
 
 ## Entrypoint Acceptance Map
 
 - `logicguard` intent -> one LogicGuard execution.
 - `sourceguard` intent -> one SourceGuard execution.
 - `traceguard` intent -> one TraceGuard execution.
+- `experimentguard` intent -> one ExperimentGuard execution.
 - genuine ambiguity -> visible blocked result before member execution.
 - typed cross-member need -> `awaiting_owner` handoff, never automatic
   execution of another member.
@@ -54,13 +57,16 @@ stronger claim, or create a second implementation of member work.
    retrieval execution, provider evidence, and claim-use qualification.
 4. Use `traceguard` for temporal order, competing storylines, event/evidence
    separation, execution chains, counter-scenarios, and bounded causal stories.
-5. Use the umbrella only for a genuinely cross-member or ambiguous request.
+5. Use `experimentguard` for recommendation-only discriminating experiment
+   selection from explicit hypotheses and predicted outcomes.
+6. Use the umbrella only for a genuinely cross-member or ambiguous request.
    Select exactly one member before any member executes:
 
 ```powershell
 researchguard run --member logicguard -- <member arguments>
 researchguard run --member sourceguard -- <member arguments>
 researchguard run --member traceguard -- <member arguments>
+researchguard run --member experimentguard -- <member arguments>
 ```
 
 Direct member commands execute the same owner and primary path:
@@ -69,6 +75,7 @@ Direct member commands execute the same owner and primary path:
 researchguard logic <arguments>
 researchguard source <arguments>
 researchguard trace <arguments>
+researchguard experiment <arguments>
 ```
 
 A member may emit a typed `awaiting_owner` handoff. A handoff names the source

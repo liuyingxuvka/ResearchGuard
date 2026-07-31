@@ -32,8 +32,8 @@ def _check_topology() -> list[str]:
     payload = json.loads(TOPOLOGY_PATH.read_text(encoding="utf-8"))
     findings: list[str] = []
     intents = payload.get("business_intents", [])
-    if len(intents) != 4:
-        findings.append("business intent inventory must contain exactly four rows")
+    if len(intents) != 5:
+        findings.append("business intent inventory must contain exactly five rows")
     paths = [row.get("primary_path_id") for row in intents]
     if len(paths) != len(set(paths)):
         findings.append("primary paths must be unique")
@@ -43,7 +43,7 @@ def _check_topology() -> list[str]:
     invariants = set(payload.get("hard_invariants", []))
     required = {
         "one_distribution",
-        "four_skill_members",
+        "five_skill_surfaces_four_native_members",
         "same_suite_fingerprint",
         "direct_and_umbrella_same_primary_path",
         "selected_route_failure_is_terminal",

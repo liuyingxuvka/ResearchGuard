@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import json
 import subprocess
 import sys
+import tomllib
 from pathlib import Path
 from typing import Callable
 
@@ -20,7 +22,14 @@ from researchguard.routing import RouteBinding, bind_member_request  # noqa: E40
 from researchguard.source.schema import Gap, SchemaError  # noqa: E402
 
 
-MEMBERS = ("researchguard", "logicguard", "sourceguard", "traceguard")
+MEMBERS = (
+    "researchguard",
+    "logicguard",
+    "sourceguard",
+    "traceguard",
+    "experimentguard",
+)
+CURRENT_VERSION = "0.2.0"
 RETIRED_SKILL_IDS = (
     "logicguard-source-library",
     "logicguard-structured-artifact",
@@ -60,12 +69,52 @@ def _assert(condition: bool, message: str, checks: list[dict[str, str]]) -> None
     )
 
 
+def _suite_model_version() -> str:
+    model_path = ROOT / ".flowguard" / "researchguard_suite_model.py"
+    spec = importlib.util.spec_from_file_location(
+        "researchguard_suite_currentness_model",
+        model_path,
+    )
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"cannot load suite model {model_path}")
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
+    spec.loader.exec_module(module)
+    return str(module.CURRENT_RESEARCHGUARD_VERSION)
+
+
+def _json_model_version() -> str:
+    payload = json.loads(
+        (ROOT / ".flowguard" / "researchguard_suite_model.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    prefix = "researchguard.suite.v"
+    model_id = str(payload.get("model_id", ""))
+    return model_id[len(prefix) :] if model_id.startswith(prefix) else ""
+
+
+def _package_metadata_version() -> str:
+    payload = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
+    return str(payload["project"]["version"])
+
+
 def _check_common(checks: list[dict[str, str]]) -> None:
-    _assert(__version__ == "0.1.4", "suite version is exactly 0.1.4", checks)
+    versions = {
+        "module": __version__,
+        "package_metadata": _package_metadata_version(),
+        "executable_model": _suite_model_version(),
+        "json_model": _json_model_version(),
+    }
+    _assert(
+        set(versions.values()) == {CURRENT_VERSION},
+        f"suite identity sources are exactly {CURRENT_VERSION}: {versions}",
+        checks,
+    )
     skill_dirs = sorted(path.name for path in (ROOT / "skills").iterdir() if path.is_dir())
     _assert(
         skill_dirs == sorted(MEMBERS),
-        "consumer skill inventory is exactly the four current members",
+        "consumer skill inventory is exactly the five current skill surfaces",
         checks,
     )
     current_text = "\n".join(
@@ -86,7 +135,12 @@ def _check_common(checks: list[dict[str, str]]) -> None:
 
 
 def _check_researchguard(checks: list[dict[str, str]]) -> None:
-    for member in ("logicguard", "sourceguard", "traceguard"):
+    for member in (
+        "logicguard",
+        "sourceguard",
+        "traceguard",
+        "experimentguard",
+    ):
         direct = bind_member_request(member, ("--help",))
         umbrella = bind_member_request(member, ("--help",))
         _assert(
@@ -100,8 +154,8 @@ def _check_researchguard(checks: list[dict[str, str]]) -> None:
     result = _python("-m", "researchguard", "--help")
     _assert(
         result.returncode == 0
-        and "run|logic|source|trace" in result.stdout,
-        "sole suite console exposes exactly the four current commands",
+        and "run|logic|source|trace|experiment" in result.stdout,
+        "sole suite console exposes exactly the five current commands",
         checks,
     )
 
@@ -172,11 +226,36 @@ def _check_traceguard(checks: list[dict[str, str]]) -> None:
     )
 
 
+def _check_experimentguard(checks: list[dict[str, str]]) -> None:
+    from researchguard.experiment import (  # noqa: PLC0415
+        ExperimentSpec,
+        HypothesisPrediction,
+        recommend_experiments,
+    )
+
+    result = recommend_experiments(
+        ExperimentSpec(
+            hypothesis_predictions=(
+                HypothesisPrediction("h1", {"e1": "up", "e2": "same"}),
+                HypothesisPrediction("h2", {"e1": "down", "e2": "same"}),
+            ),
+            candidate_experiment_ids=("e1", "e2"),
+        )
+    )
+    _assert(
+        result.status == "recommended"
+        and result.selected_experiment_ids == ("e1",),
+        "ExperimentGuard returns a recommendation-only exact minimum set",
+        checks,
+    )
+
+
 CHECKERS: dict[str, Callable[[list[dict[str, str]]], None]] = {
     "researchguard": _check_researchguard,
     "logicguard": _check_logicguard,
     "sourceguard": _check_sourceguard,
     "traceguard": _check_traceguard,
+    "experimentguard": _check_experimentguard,
 }
 
 
@@ -196,6 +275,7 @@ def main(argv: list[str] | None = None) -> int:
         "schema_version": "researchguard.native-suite-check.v1",
         "member": args.member,
         "status": status,
+        "suite_version": CURRENT_VERSION,
         "checks": checks,
         "claim_boundary": (
             "This check covers the current ResearchGuard consumer-skill topology, "

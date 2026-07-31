@@ -12,7 +12,13 @@ from researchguard.source.schema import Gap, SchemaError
 
 
 ROOT = Path(__file__).resolve().parents[1]
-MEMBERS = ("researchguard", "logicguard", "sourceguard", "traceguard")
+MEMBERS = (
+    "researchguard",
+    "logicguard",
+    "sourceguard",
+    "traceguard",
+    "experimentguard",
+)
 RETIRED_SKILL_IDS = (
     "logicguard-source-library",
     "logicguard-structured-artifact",
@@ -76,7 +82,7 @@ def test_consumer_projection_has_no_retired_skill_or_launcher() -> None:
     assert "run_traceguard.py" not in text
 
 
-def test_author_contracts_form_one_four_member_unit() -> None:
+def test_author_contracts_form_one_five_surface_unit() -> None:
     for member in MEMBERS:
         payload = json.loads(
             (
@@ -108,7 +114,7 @@ def test_sourceguard_rejects_retired_gap_projection() -> None:
 
 
 def test_current_commands_are_callable() -> None:
-    for command in ("logic", "source", "trace"):
+    for command in ("logic", "source", "trace", "experiment"):
         result = subprocess.run(
             [sys.executable, "-m", "researchguard", command, "--help"],
             cwd=ROOT,

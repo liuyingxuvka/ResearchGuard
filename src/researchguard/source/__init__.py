@@ -53,6 +53,12 @@ from .task_iteration import (
 )
 
 from researchguard import __version__
+from .stop_decision import (
+    SearchStopDecision,
+    SearchStopInput,
+    SearchStopStatus,
+    decide_search_stop,
+)
 
 __all__ = [
     "__version__",
@@ -82,6 +88,9 @@ __all__ = [
     "SourceDepthReceipt",
     "SourceObjectDepthRow",
     "SourceRecord",
+    "SearchStopDecision",
+    "SearchStopInput",
+    "SearchStopStatus",
     "GAP_REDUCTION_LEVELS",
     "SEARCH_ITERATION_CLAIM_BOUNDARY",
     "SEARCH_ITERATION_RECEIPT_SCHEMA",
@@ -99,4 +108,5 @@ __all__ = [
     "rollback_search_iteration",
     "run_search_iteration",
     "validate_search_prediction_binding",
+    "decide_search_stop",
 ]

@@ -1,6 +1,6 @@
 """TraceGuard entity-resolution helper.
 
-Purpose: Provide conservative record-linkage-style entity scoring for v0.1.4.
+Purpose: Provide conservative record-linkage-style entity scoring for v0.2.0.
 Repository: https://github.com/liuyingxuvka/ResearchGuard
 Skill: TraceGuard
 Math boundary: Heuristic scorer only; not full Fellegi-Sunter parameter estimation.

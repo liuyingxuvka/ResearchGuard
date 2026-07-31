@@ -11,7 +11,12 @@ from . import __version__
 from .suite import suite_fingerprint
 
 
-MemberID = Literal["logicguard", "sourceguard", "traceguard"]
+MemberID = Literal[
+    "logicguard",
+    "sourceguard",
+    "traceguard",
+    "experimentguard",
+]
 
 MEMBER_BINDINGS: dict[MemberID, tuple[str, str, str]] = {
     "logicguard": (
@@ -28,6 +33,11 @@ MEMBER_BINDINGS: dict[MemberID, tuple[str, str, str]] = {
         "traceguard",
         "primary:researchguard:trace",
         "researchguard.trace.cli:main",
+    ),
+    "experimentguard": (
+        "experimentguard",
+        "primary:researchguard:experiment",
+        "researchguard.experiment.cli:main",
     ),
 }
 
@@ -109,8 +119,8 @@ def bind_member_request(
             status="blocked",
             code="member-selection-required",
             message=(
-                "Select exactly one member: logicguard, sourceguard, or "
-                "traceguard."
+                "Select exactly one member: logicguard, sourceguard, "
+                "traceguard, or experimentguard."
             ),
         )
     if member_id not in MEMBER_BINDINGS:

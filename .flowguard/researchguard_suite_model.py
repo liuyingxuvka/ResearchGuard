@@ -14,13 +14,17 @@ from flowguard import (
 )
 
 FLOWGUARD_MODEL_MARKER = "flowguard-executable-model"
-CURRENT_RESEARCHGUARD_VERSION = "0.1.3"
+CURRENT_RESEARCHGUARD_VERSION = "0.2.0"
 
 
 MEMBER_BY_INTENT = {
     "argument_licensing": ("logicguard", "researchguard.logic"),
     "evidence_discovery": ("sourceguard", "researchguard.source"),
     "trace_reconstruction": ("traceguard", "researchguard.trace"),
+    "experiment_discrimination": (
+        "experimentguard",
+        "researchguard.experiment",
+    ),
 }
 
 
@@ -78,11 +82,17 @@ class Route:
             )
             return
 
-        if request.entrypoint in {"logicguard", "sourceguard", "traceguard"}:
+        if request.entrypoint in {
+            "logicguard",
+            "sourceguard",
+            "traceguard",
+            "experimentguard",
+        }:
             direct_intent = {
                 "logicguard": "argument_licensing",
                 "sourceguard": "evidence_discovery",
                 "traceguard": "trace_reconstruction",
+                "experimentguard": "experiment_discrimination",
             }[request.entrypoint]
             if request.intent != direct_intent:
                 yield FunctionResult(
@@ -190,6 +200,7 @@ class OrchestrateHandoff:
             "logicguard": "argument_licensing",
             "sourceguard": "evidence_discovery",
             "traceguard": "trace_reconstruction",
+            "experimentguard": "experiment_discrimination",
         }.get(state.handoff_target)
         selected = MEMBER_BY_INTENT.get(target_intent or "")
         if selected is None:
@@ -483,6 +494,32 @@ def scenarios() -> tuple[Scenario, ...]:
             ),
             workflow=identity_workflow,
             invariants=PACKAGE_IDENTITY_INVARIANTS,
+        ),
+        Scenario(
+            name="RG09_direct_experiment",
+            description=(
+                "Direct ExperimentGuard selects the sole recommendation-only "
+                "experiment path."
+            ),
+            initial_state=RouteState(),
+            external_input_sequence=(
+                ResearchRequest(
+                    "experiment_discrimination",
+                    entrypoint="experimentguard",
+                ),
+            ),
+            expected=ScenarioExpectation(
+                expected_status="ok",
+                required_trace_labels=(
+                    "route_selected_experimentguard",
+                    "member_terminal_pass",
+                ),
+                summary=(
+                    "direct experiment reaches researchguard.experiment"
+                ),
+            ),
+            workflow=workflow,
+            invariants=INVARIANTS,
         ),
     )
 

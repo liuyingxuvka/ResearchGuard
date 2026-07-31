@@ -1,0 +1,114 @@
+{
+  "schema_version": "flowguard.model_regression_manifest.v3",
+  "governed_input_globs": [
+    ".flowguard/researchguard_suite/model.py",
+    ".flowguard/researchguard_suite/run_checks.py",
+    ".flowguard/researchguard_suite_model.py",
+    ".flowguard/researchguard_suite_model.json",
+    ".flowguard/run_researchguard_suite_model.py",
+    "src/researchguard/__init__.py",
+    "src/researchguard/cli.py",
+    "src/researchguard/routing.py",
+    "src/researchguard/source/stop_decision.py",
+    "src/researchguard/trace/inference/contradiction_core.py",
+    "src/researchguard/logic/minimal_sets.py",
+    "src/researchguard/experiment/*.py",
+    "skills/*guard/SKILL.md",
+    "skills/*guard/agents/openai.yaml",
+    "tests/source/test_stop_decision.py",
+    "tests/trace/test_contradiction_core.py",
+    "tests/logic/test_minimal_sets.py",
+    "tests/experiment/test_recommendation.py"
+  ],
+  "snapshot_only_input_globs": [
+    ".flowguard/model-mesh/snapshots/*.json",
+    ".flowguard/model-mesh/receipts/*.json"
+  ],
+  "shared_input_groups": [],
+  "models": [
+    {
+      "model_id": "researchguard_suite",
+      "model_path": ".flowguard/researchguard_suite/model.py",
+      "runner": [
+        "{python}",
+        ".flowguard/researchguard_suite/run_checks.py"
+      ],
+      "tier": "full",
+      "timeout_seconds": 120,
+      "shard_safe": true,
+      "mutation_policy": "none",
+      "input_globs": [
+        ".flowguard/researchguard_suite/model.py",
+        ".flowguard/researchguard_suite/run_checks.py",
+        ".flowguard/researchguard_suite_model.py",
+        ".flowguard/researchguard_suite_model.json",
+        ".flowguard/run_researchguard_suite_model.py",
+        "src/researchguard/__init__.py",
+        "src/researchguard/cli.py",
+        "src/researchguard/routing.py",
+        "src/researchguard/source/stop_decision.py",
+        "src/researchguard/trace/inference/contradiction_core.py",
+        "src/researchguard/logic/minimal_sets.py",
+        "src/researchguard/experiment/*.py",
+        "skills/*guard/SKILL.md",
+        "skills/*guard/agents/openai.yaml",
+        "tests/source/test_stop_decision.py",
+        "tests/trace/test_contradiction_core.py",
+        "tests/logic/test_minimal_sets.py",
+        "tests/experiment/test_recommendation.py"
+      ],
+      "expected_artifacts": [],
+      "exclusion_reason": "",
+      "distribution_policy": "required_public",
+      "absence_reason": "",
+      "model_kind": "executable_workflow",
+      "purpose_closure": {
+        "schema_version": "flowguard.model_purpose_closure.v1",
+        "model_instance_id": "regression:researchguard_suite:0.2.0",
+        "reusable_model_type_id": "researchguard_suite",
+        "task_intent_id": "researchguard-regression:suite-route-and-decision-members",
+        "declaration_phase": "before_candidate",
+        "guarded_purpose": "Prevent ambiguous routing, alternate-success retries, stale suite identity, or experiment execution claims from being accepted as current ResearchGuard behavior.",
+        "protected_failure_ids": [
+          "researchguard:ambiguous-or-recursive-route",
+          "researchguard:alternate-success-after-member-failure",
+          "researchguard:stale-suite-identity",
+          "researchguard:experiment-execution-overclaim"
+        ],
+        "claim_boundary": "This closure covers only the registered finite ResearchGuard route, identity, handoff, and recommendation-boundary scenarios; member-native factual claims require separate evidence.",
+        "adoption_scope": "current_candidate_only",
+        "known_good_case_id": "native-runner:researchguard-suite:declared-route-scenarios",
+        "failure_bindings": [
+          {
+            "failure_id": "researchguard:ambiguous-or-recursive-route",
+            "known_bad_case_id": "scenario:rg03-or-rg06",
+            "oracle_id": "native:researchguard-suite:run-checks"
+          },
+          {
+            "failure_id": "researchguard:alternate-success-after-member-failure",
+            "known_bad_case_id": "scenario:rg04",
+            "oracle_id": "native:researchguard-suite:run-checks"
+          },
+          {
+            "failure_id": "researchguard:stale-suite-identity",
+            "known_bad_case_id": "native:researchguard-suite:currentness-mismatch",
+            "oracle_id": "native:researchguard-suite:currentness-check"
+          },
+          {
+            "failure_id": "researchguard:experiment-execution-overclaim",
+            "known_bad_case_id": "native:experimentguard:recommendation-boundary",
+            "oracle_id": "native:experimentguard:tests"
+          }
+        ],
+        "evidence_check_ids": [
+          "check:model-regression:researchguard-suite",
+          "check:researchguard:native-suite"
+        ],
+        "model_sha256": "sha256:a5abc3bf79b1d12a6b45cc0b43d536cbb7eb5538272518bc0945a0eaeee7a819",
+        "runner_sha256": "sha256:611e3bcbe9eebc31230d4822a2be8e984fa9064baf464e478863965a267051a7",
+        "declaration_fingerprint": "sha256:435c8879a230465f86c9257a1df2d49a45f64bd8e3a01a072849914e396700df",
+        "closure_fingerprint": "sha256:6bfc2a5368f7f6db3506fee00bdf4a10cebed9536e4d07e66eba5af27a92559a"
+      }
+    }
+  ]
+}

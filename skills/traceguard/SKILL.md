@@ -60,6 +60,11 @@ solver fallback.
 Report trace and receipt identities, evidence, failures, blockers, skipped
 checks, live alternatives, weakest links, residual risk, safe wording, typed
 handoffs, and the claim boundary.
+When contradictions block a trace, produce a deterministic deletion-minimal
+contradiction core from the current native consistency oracle. Report each
+constraint in the core and the necessity witness obtained by removing it.
+Call the set deletion-minimal only; do not claim it is the unique or globally
+smallest explanation.
 
 ## Detailed Route Contract
 

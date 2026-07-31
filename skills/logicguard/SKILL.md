@@ -60,6 +60,10 @@ become another route.
 Report the route and model identity, evidence, failures, blockers, skipped
 checks, open gaps, residual risk, safe wording, typed handoffs, and the claim
 boundary.
+For an important conclusion, expose one deletion-minimal support set and, when
+present, one deletion-minimal defeating attack set from the current argument
+model. License wording as `assert`, `qualify`, or `withhold`; this license is
+structural and never substitutes for factual verification.
 
 ## Skill Structure
 

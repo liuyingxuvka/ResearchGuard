@@ -26,6 +26,10 @@ def _member_main(member_id: str) -> MemberMain:
         from .trace.cli import main
 
         return main
+    if member_id == "experimentguard":
+        from .experiment.cli import main
+
+        return main
     raise ValueError(f"unknown member: {member_id}")
 
 
@@ -96,12 +100,13 @@ def _print_help() -> None:
     print(
         "\n".join(
             (
-                "usage: researchguard {run|logic|source|trace} ...",
+                "usage: researchguard {run|logic|source|trace|experiment} ...",
                 "",
                 "run     route once to one explicit member",
                 "logic   execute the LogicGuard native owner",
                 "source  execute the SourceGuard native owner",
                 "trace   execute the TraceGuard native owner",
+                "experiment  execute the ExperimentGuard recommendation owner",
                 "",
                 "umbrella form:",
                 "  researchguard run --member MEMBER [--business-intent-id ID] -- ARGS",
@@ -122,7 +127,7 @@ def main(argv: list[str] | None = None) -> int:
     command_argv = args[1:]
     if command == "run":
         return _run_umbrella(command_argv)
-    if command in {"logic", "source", "trace"}:
+    if command in {"logic", "source", "trace", "experiment"}:
         return _execute(f"{command}guard", command_argv)
     print(
         json.dumps(
