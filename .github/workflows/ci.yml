@@ -27,6 +27,10 @@ jobs:
           python-version: "3.12"
           cache: pip
 
+      - name: Enable Git long paths
+        if: runner.os == 'Windows'
+        run: git config --global core.longpaths true
+
       - name: Install
         run: python -m pip install --upgrade pip build && python -m pip install -e ".[test]"
 
