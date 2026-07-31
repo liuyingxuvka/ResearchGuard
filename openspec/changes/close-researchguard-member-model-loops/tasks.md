@@ -45,6 +45,6 @@
 
 ## 6. Final integration and publication
 
-- [ ] 6.1 Freeze the five-member source, toolchain, owner plan, and model authority; run one foreground full validation with current target-owned receipts.
-- [ ] 6.2 Install the package and all five clean consumer skills, then verify source/package/installed-skill parity.
+- [x] 6.1 Freeze the five-member source, toolchain, owner plan, and model authority; run one foreground full validation with current target-owned receipts.
+- [x] 6.2 Install the package and all five clean consumer skills, then verify source/package/installed-skill parity.
 - [ ] 6.3 Commit, tag 0.4.0, push, publish the GitHub Release, and verify source/Git/tag/release identities separately.
