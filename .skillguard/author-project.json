@@ -49,11 +49,11 @@
       "skill_path": "skills/traceguard"
     }
   ],
-  "manifest_hash": "BB0CE8234D6583260B861373F82E195BB63AC17B017B635D1CF1412D5A747197",
+  "manifest_hash": "C365726C3624D49BADBA5C457C440CB5AE44A1B8F8AE9A3FF5D2B5BA834CCC71",
   "project_id": "ResearchGuard",
   "project_prompt_path": "AGENTS.md",
   "repository_role": "skill_maintainer_source",
   "schema_version": "skillguard.project_adoption.v1",
   "skillguard_repository": "https://github.com/liuyingxuvka/SkillGuard",
-  "skillguard_version": "0.7.0"
+  "skillguard_version": "0.7.2"
 }

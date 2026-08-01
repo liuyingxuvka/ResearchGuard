@@ -1,0 +1,73 @@
+{
+  "schema_version": "researchguard.prompt-bundle-manifest.v1",
+  "bundles": [
+    {
+      "skill_id": "researchguard",
+      "entry_files": ["skills/researchguard/SKILL.md", "skills/researchguard/agents/openai.yaml", "skills/researchguard/references/member-admission-index.md"],
+      "max_entry_bytes": 12000,
+      "minimum_headroom_bytes": 1200
+    },
+    {
+      "skill_id": "logicguard",
+      "entry_files": ["skills/logicguard/SKILL.md", "skills/logicguard/agents/openai.yaml"],
+      "max_entry_bytes": 10000,
+      "minimum_headroom_bytes": 1000
+    },
+    {
+      "skill_id": "sourceguard",
+      "entry_files": ["skills/sourceguard/SKILL.md", "skills/sourceguard/agents/openai.yaml"],
+      "max_entry_bytes": 10000,
+      "minimum_headroom_bytes": 1000
+    },
+    {
+      "skill_id": "traceguard",
+      "entry_files": ["skills/traceguard/SKILL.md", "skills/traceguard/agents/openai.yaml"],
+      "max_entry_bytes": 10000,
+      "minimum_headroom_bytes": 1000
+    },
+    {
+      "skill_id": "experimentguard",
+      "entry_files": ["skills/experimentguard/SKILL.md", "skills/experimentguard/agents/openai.yaml"],
+      "max_entry_bytes": 6000,
+      "minimum_headroom_bytes": 600
+    }
+  ],
+  "reference_edges": [
+    {"skill_id": "researchguard", "trigger_id": "route:member-admission", "declared_in": "skills/researchguard/SKILL.md", "reference": "skills/researchguard/references/member-admission-index.md"},
+    {"skill_id": "logicguard", "trigger_id": "route:general-argument", "declared_in": "skills/logicguard/SKILL.md", "reference": "skills/logicguard/references/general-argument.md"},
+    {"skill_id": "logicguard", "trigger_id": "route:source-library", "declared_in": "skills/logicguard/SKILL.md", "reference": "skills/logicguard/references/routes/source-library.md"},
+    {"skill_id": "logicguard", "trigger_id": "route:structured-artifact", "declared_in": "skills/logicguard/SKILL.md", "reference": "skills/logicguard/references/routes/structured-artifact.md"},
+    {"skill_id": "logicguard", "trigger_id": "route:model-deepening", "declared_in": "skills/logicguard/SKILL.md", "reference": "skills/logicguard/references/routes/model-deepening.md"},
+    {"skill_id": "logicguard", "trigger_id": "route:artifact-synthesis", "declared_in": "skills/logicguard/SKILL.md", "reference": "skills/logicguard/references/routes/artifact-synthesis.md"},
+    {"skill_id": "logicguard", "trigger_id": "route:project-library-viewer", "declared_in": "skills/logicguard/SKILL.md", "reference": "skills/logicguard/references/routes/project-library-viewer.md"},
+    {"skill_id": "logicguard", "trigger_id": "trigger:task-model-maturation", "declared_in": "skills/logicguard/SKILL.md", "reference": "skills/logicguard/references/task-model-maturation.md"},
+    {"skill_id": "logicguard", "trigger_id": "trigger:broad-depth-closure", "declared_in": "skills/logicguard/SKILL.md", "reference": "skills/logicguard/references/broad-depth-and-closure.md"},
+    {"skill_id": "logicguard", "trigger_id": "trigger:structural-contribution", "declared_in": "skills/logicguard/SKILL.md", "reference": "skills/logicguard/references/structural-contribution.md"},
+    {"skill_id": "logicguard", "trigger_id": "trigger:citation-grounding", "declared_in": "skills/logicguard/SKILL.md", "reference": "skills/logicguard/references/citation-grounding.md"},
+    {"skill_id": "logicguard", "trigger_id": "trigger:commands", "declared_in": "skills/logicguard/SKILL.md", "reference": "skills/logicguard/references/commands.md"},
+    {"skill_id": "logicguard", "trigger_id": "trigger:template-pack", "declared_in": "skills/logicguard/SKILL.md", "reference": "skills/logicguard/references/validated-template-pack.md"},
+    {"skill_id": "logicguard", "trigger_id": "trigger:model-creation", "declared_in": "skills/logicguard/SKILL.md", "reference": "skills/logicguard/references/h-wadf-quick-reference.md"},
+    {"skill_id": "sourceguard", "trigger_id": "route:source-model", "declared_in": "skills/sourceguard/SKILL.md", "reference": "skills/sourceguard/references/source-model-protocol.md"},
+    {"skill_id": "sourceguard", "trigger_id": "trigger:retrieval-workflow", "declared_in": "skills/sourceguard/SKILL.md", "reference": "skills/sourceguard/references/retrieval-workflow.md"},
+    {"skill_id": "sourceguard", "trigger_id": "trigger:task-iteration", "declared_in": "skills/sourceguard/SKILL.md", "reference": "skills/sourceguard/references/task-iteration.md"},
+    {"skill_id": "sourceguard", "trigger_id": "trigger:broad-depth-closure", "declared_in": "skills/sourceguard/SKILL.md", "reference": "skills/sourceguard/references/broad-depth-and-closure.md"},
+    {"skill_id": "sourceguard", "trigger_id": "trigger:commands", "declared_in": "skills/sourceguard/SKILL.md", "reference": "skills/sourceguard/references/commands.md"},
+    {"skill_id": "sourceguard", "trigger_id": "trigger:safe-output", "declared_in": "skills/sourceguard/SKILL.md", "reference": "skills/sourceguard/references/safe-output.md"},
+    {"skill_id": "sourceguard", "trigger_id": "trigger:template-pack", "declared_in": "skills/sourceguard/SKILL.md", "reference": "skills/sourceguard/references/validated-template-pack.md"},
+    {"skill_id": "traceguard", "trigger_id": "route:general-trace", "declared_in": "skills/traceguard/SKILL.md", "reference": "skills/traceguard/references/routes/general-trace.md"},
+    {"skill_id": "traceguard", "trigger_id": "route:general-trace", "declared_in": "skills/traceguard/SKILL.md", "reference": "skills/traceguard/references/unified_inference_protocol.md"},
+    {"skill_id": "traceguard", "trigger_id": "route:case-library", "declared_in": "skills/traceguard/SKILL.md", "reference": "skills/traceguard/references/routes/case-library.md"},
+    {"skill_id": "traceguard", "trigger_id": "trigger:task-iteration", "declared_in": "skills/traceguard/SKILL.md", "reference": "skills/traceguard/references/task-iteration.md"},
+    {"skill_id": "traceguard", "trigger_id": "trigger:depth-closure", "declared_in": "skills/traceguard/SKILL.md", "reference": "skills/traceguard/references/depth-and-closure.md"},
+    {"skill_id": "traceguard", "trigger_id": "trigger:commands-handoffs", "declared_in": "skills/traceguard/SKILL.md", "reference": "skills/traceguard/references/commands-and-handoffs.md"},
+    {"skill_id": "traceguard", "trigger_id": "trigger:safe-output", "declared_in": "skills/traceguard/SKILL.md", "reference": "skills/traceguard/references/safe-output.md"},
+    {"skill_id": "traceguard", "trigger_id": "trigger:template-pack", "declared_in": "skills/traceguard/SKILL.md", "reference": "skills/traceguard/references/validated-template-pack.md"}
+  ],
+  "prohibited_eager_member_paths": [
+    "skills/logicguard/SKILL.md",
+    "skills/sourceguard/SKILL.md",
+    "skills/traceguard/SKILL.md",
+    "skills/experimentguard/SKILL.md"
+  ],
+  "claim_boundary": "Byte totals are deterministic prompt-regression proxies. They are not provider token counts or billing evidence."
+}

@@ -14,7 +14,7 @@ from flowguard import (
 )
 
 FLOWGUARD_MODEL_MARKER = "flowguard-executable-model"
-CURRENT_RESEARCHGUARD_VERSION = "0.4.0"
+CURRENT_RESEARCHGUARD_VERSION = "0.4.1"
 
 
 MEMBER_BY_INTENT = {
@@ -34,8 +34,18 @@ class ResearchRequest:
     intent: str
     entrypoint: str = "researchguard"
     admission_row_count: int = 0
-    admitted_members: tuple[str, ...] = ()
-    admission_evidence_current: bool = True
+    minimum_sufficient_members: tuple[str, ...] = ()
+    composition_member_ids: tuple[str, ...] = ()
+    composition_valid: bool = False
+    task_facts_current: bool = True
+    primary_action_fact_count: int = 1
+    source_spans_valid: bool = True
+    forbidden_review_complete: bool = True
+    selected_member_load_count: int = 1
+    nonselected_member_load_count: int = 0
+    untriggered_reference_count: int = 0
+    deep_triggered: bool = False
+    deep_reference_loaded: bool = False
     native_status: str = "pass"
     handoff_target: str = ""
     allow_handoff: bool = False
@@ -76,12 +86,17 @@ class Route:
         "entrypoint",
         "already_routed",
         "admission_row_count",
-        "admitted_members",
-        "admission_evidence_current",
+        "minimum_sufficient_members",
+        "composition_member_ids",
+        "composition_valid",
+        "task_facts_current",
+        "primary_action_fact_count",
+        "source_spans_valid",
+        "forbidden_review_complete",
     )
     writes = ("phase", "member_id", "primary_path_id")
     input_description = (
-        "one direct request or one umbrella request with exact current four-member admission evidence"
+        "one direct request or one umbrella request with source-bound task facts and four derived member rows"
     )
     output_description = "one selected member path or typed route gap"
     idempotency = "the same current request selects the same sole path"
@@ -116,16 +131,22 @@ class Route:
                 return
 
         if request.entrypoint == "researchguard":
-            if request.admission_row_count != 4 or not request.admission_evidence_current:
+            if (
+                request.admission_row_count != 4
+                or not request.task_facts_current
+                or request.primary_action_fact_count < 1
+                or not request.source_spans_valid
+                or not request.forbidden_review_complete
+            ):
                 yield FunctionResult(
                     request,
-                    replace(state, phase="blocked", terminal_status="admission_stale"),
-                    label="member_admission_stale_blocked",
+                    replace(state, phase="blocked", terminal_status="task_facts_invalid"),
+                    label="task_facts_invalid_blocked",
                 )
                 return
             if (
-                len(set(request.admitted_members)) != len(request.admitted_members)
-                or any(member not in MEMBER_PATHS for member in request.admitted_members)
+                len(set(request.minimum_sufficient_members)) != len(request.minimum_sufficient_members)
+                or any(member not in MEMBER_PATHS for member in request.minimum_sufficient_members)
             ):
                 yield FunctionResult(
                     request,
@@ -133,22 +154,46 @@ class Route:
                     label="member_admission_malformed_blocked",
                 )
                 return
-            if not request.admitted_members:
+            if not request.minimum_sufficient_members:
                 yield FunctionResult(
                     request,
                     replace(state, phase="blocked", terminal_status="no_match"),
                     label="member_admission_no_match_blocked",
                 )
                 return
-            if len(request.admitted_members) != 1:
+            if len(request.minimum_sufficient_members) == 1:
+                if request.composition_member_ids:
+                    yield FunctionResult(
+                        request,
+                        replace(state, phase="blocked", terminal_status="over_selection"),
+                        label="member_over_selection_blocked",
+                    )
+                    return
+                member_id = request.minimum_sufficient_members[0]
+                primary_path_id = MEMBER_PATHS[member_id]
+            else:
+                if (
+                    tuple(request.composition_member_ids) != tuple(request.minimum_sufficient_members)
+                    or not request.composition_valid
+                ):
+                    yield FunctionResult(
+                        request,
+                        replace(state, phase="blocked", terminal_status="composition_invalid"),
+                        label="member_composition_invalid_blocked",
+                    )
+                    return
                 yield FunctionResult(
                     request,
-                    replace(state, phase="blocked", terminal_status="ambiguous"),
-                    label="member_admission_ambiguous_blocked",
+                    replace(
+                        state,
+                        phase="composition_ready",
+                        member_id="+".join(request.minimum_sufficient_members),
+                        primary_path_id="researchguard.composition",
+                        terminal_status="planning_only",
+                    ),
+                    label="member_composition_ready",
                 )
                 return
-            member_id = request.admitted_members[0]
-            primary_path_id = MEMBER_PATHS[member_id]
         else:
             selected = MEMBER_BY_INTENT.get(request.intent)
             if selected is None:
@@ -218,6 +263,48 @@ class ExecuteMember:
             replace(state, phase="terminal", terminal_status="pass"),
             label="member_terminal_pass",
         )
+
+
+class ValidatePromptLoad:
+    name = "ValidatePromptLoad"
+    accepted_input_type = ResearchRequest
+    reads = (
+        "phase",
+        "member_id",
+        "selected_member_load_count",
+        "nonselected_member_load_count",
+        "untriggered_reference_count",
+        "deep_triggered",
+        "deep_reference_loaded",
+    )
+    writes = ("phase", "terminal_status")
+    input_description = "one routed member plus its declared conditional prompt-load graph"
+    output_description = "one selected-only prompt load or a visible load gap"
+    idempotency = "the same route and triggers admit the same files"
+
+    def apply(self, request: ResearchRequest, state: RouteState):
+        if state.phase != "routed":
+            yield FunctionResult(request, state, label="prompt_load_not_run")
+            return
+        if (
+            request.selected_member_load_count != 1
+            or request.nonselected_member_load_count != 0
+            or request.untriggered_reference_count != 0
+        ):
+            yield FunctionResult(
+                request,
+                replace(state, phase="blocked", terminal_status="prompt_load_invalid"),
+                label="prompt_load_invalid_blocked",
+            )
+            return
+        if request.deep_triggered and not request.deep_reference_loaded:
+            yield FunctionResult(
+                request,
+                replace(state, phase="blocked", terminal_status="deep_reference_missing"),
+                label="deep_reference_missing_blocked",
+            )
+            return
+        yield FunctionResult(request, state, label="prompt_load_selected_only")
 
 
 class OrchestrateHandoff:
@@ -388,7 +475,7 @@ PACKAGE_IDENTITY_INVARIANTS = (
 
 def build_workflow() -> Workflow:
     return Workflow(
-        (Route(), ExecuteMember(), OrchestrateHandoff()),
+        (Route(), ValidatePromptLoad(), ExecuteMember(), OrchestrateHandoff()),
         name="researchguard_route_authority",
     )
 
@@ -424,13 +511,13 @@ def scenarios() -> tuple[Scenario, ...]:
         ),
         Scenario(
             name="RG02_umbrella_logic",
-            description="Umbrella dispatch reaches the same sole logic path.",
+            description="Source-bound umbrella dispatch reaches the same sole logic path.",
             initial_state=RouteState(),
             external_input_sequence=(
                 ResearchRequest(
                     "argument_licensing",
                     admission_row_count=4,
-                    admitted_members=("logicguard",),
+                    minimum_sufficient_members=("logicguard",),
                 ),
             ),
             expected=ScenarioExpectation(
@@ -446,7 +533,7 @@ def scenarios() -> tuple[Scenario, ...]:
         ),
         Scenario(
             name="RG03_ambiguous_blocks",
-            description="A complete admission set with no match blocks before native execution.",
+            description="A complete derived admission set with no match blocks before native execution.",
             initial_state=RouteState(),
             external_input_sequence=(
                 ResearchRequest("unknown", admission_row_count=4),
@@ -467,7 +554,7 @@ def scenarios() -> tuple[Scenario, ...]:
                 ResearchRequest(
                     "evidence_discovery",
                     admission_row_count=4,
-                    admitted_members=("sourceguard",),
+                    minimum_sufficient_members=("sourceguard",),
                     native_status="failed",
                 ),
             ),
@@ -490,7 +577,7 @@ def scenarios() -> tuple[Scenario, ...]:
                 ResearchRequest(
                     "argument_licensing",
                     admission_row_count=4,
-                    admitted_members=("logicguard",),
+                    minimum_sufficient_members=("logicguard",),
                     handoff_target="sourceguard",
                     allow_handoff=False,
                 ),
@@ -514,7 +601,7 @@ def scenarios() -> tuple[Scenario, ...]:
                 ResearchRequest(
                     "trace_reconstruction",
                     admission_row_count=4,
-                    admitted_members=("traceguard",),
+                    minimum_sufficient_members=("traceguard",),
                     already_routed=True,
                 ),
             ),
@@ -590,40 +677,125 @@ def scenarios() -> tuple[Scenario, ...]:
             invariants=INVARIANTS,
         ),
         Scenario(
-            name="RG10_multiple_member_admissions_block",
-            description="Two member-authored applicability rows cannot be resolved by order or keywords.",
+            name="RG10_minimum_pair_composition_ready",
+            description="Two irreducible owners are accepted only through one exact composition.",
             initial_state=RouteState(),
             external_input_sequence=(
                 ResearchRequest(
                     "cross_guard_research",
                     admission_row_count=4,
-                    admitted_members=("logicguard", "sourceguard"),
+                    primary_action_fact_count=2,
+                    minimum_sufficient_members=("sourceguard", "traceguard"),
+                    composition_member_ids=("sourceguard", "traceguard"),
+                    composition_valid=True,
                 ),
             ),
             expected=ScenarioExpectation(
                 expected_status="ok",
-                required_trace_labels=("member_admission_ambiguous_blocked",),
-                summary="multiple member admissions block without fallback",
+                required_trace_labels=("member_composition_ready",),
+                summary="necessary pair yields planning-only composition evidence",
             ),
             workflow=workflow,
             invariants=INVARIANTS,
         ),
         Scenario(
-            name="RG11_stale_member_admission_blocks",
-            description="Incomplete or stale member evidence cannot select a route.",
+            name="RG11_stale_task_facts_block",
+            description="Incomplete or stale task facts cannot select a route.",
             initial_state=RouteState(),
             external_input_sequence=(
                 ResearchRequest(
                     "argument_licensing",
                     admission_row_count=4,
-                    admitted_members=("logicguard",),
-                    admission_evidence_current=False,
+                    minimum_sufficient_members=("logicguard",),
+                    task_facts_current=False,
                 ),
             ),
             expected=ScenarioExpectation(
                 expected_status="ok",
-                required_trace_labels=("member_admission_stale_blocked",),
-                summary="stale member admission blocks before execution",
+                required_trace_labels=("task_facts_invalid_blocked",),
+                summary="stale task facts block before execution",
+            ),
+            workflow=workflow,
+            invariants=INVARIANTS,
+        ),
+        Scenario(
+            name="RG12_nonselected_member_load_blocks",
+            description="An exact route cannot eagerly load a sibling member.",
+            initial_state=RouteState(),
+            external_input_sequence=(
+                ResearchRequest(
+                    "argument_licensing",
+                    entrypoint="logicguard",
+                    nonselected_member_load_count=1,
+                ),
+            ),
+            expected=ScenarioExpectation(
+                expected_status="ok",
+                required_trace_labels=("prompt_load_invalid_blocked",),
+                summary="sibling prompt load is visible and blocked",
+            ),
+            workflow=workflow,
+            invariants=INVARIANTS,
+        ),
+        Scenario(
+            name="RG13_deep_trigger_requires_reference",
+            description="A fired deep trigger cannot remain on the entry shell.",
+            initial_state=RouteState(),
+            external_input_sequence=(
+                ResearchRequest(
+                    "trace_reconstruction",
+                    entrypoint="traceguard",
+                    deep_triggered=True,
+                    deep_reference_loaded=False,
+                ),
+            ),
+            expected=ScenarioExpectation(
+                expected_status="ok",
+                required_trace_labels=("deep_reference_missing_blocked",),
+                summary="deep trigger requires its owning reference",
+            ),
+            workflow=workflow,
+            invariants=INVARIANTS,
+        ),
+        Scenario(
+            name="RG14_over_selection_blocks",
+            description="A caller cannot compose siblings when one member is sufficient.",
+            initial_state=RouteState(),
+            external_input_sequence=(
+                ResearchRequest(
+                    "argument_licensing",
+                    admission_row_count=4,
+                    minimum_sufficient_members=("logicguard",),
+                    composition_member_ids=("logicguard", "sourceguard"),
+                    composition_valid=True,
+                ),
+            ),
+            expected=ScenarioExpectation(
+                expected_status="ok",
+                required_trace_labels=("member_over_selection_blocked",),
+                summary="one sufficient member rejects a larger set",
+            ),
+            workflow=workflow,
+            invariants=INVARIANTS,
+        ),
+        Scenario(
+            name="RG15_incomplete_composition_blocks",
+            description="A necessary pair without complete order, ownership, and handoff evidence blocks.",
+            initial_state=RouteState(),
+            external_input_sequence=(
+                ResearchRequest(
+                    "cross_guard_research",
+                    admission_row_count=4,
+                    primary_action_fact_count=2,
+                    minimum_sufficient_members=("sourceguard", "traceguard"),
+                    composition_member_ids=("sourceguard", "traceguard"),
+                    composition_valid=False,
+                ),
+            ),
+            expected=ScenarioExpectation(
+                expected_status="ok",
+                required_trace_labels=("member_composition_invalid_blocked",),
+                summary="invalid composition never reaches member execution",
             ),
             workflow=workflow,
             invariants=INVARIANTS,

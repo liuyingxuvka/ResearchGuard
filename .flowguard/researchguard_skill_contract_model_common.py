@@ -23,14 +23,17 @@ def build_contract_model(member: str) -> dict[str, Any]:
     route_id = f"route:researchguard:{member}"
     function_id = f"function:researchguard:{member}"
     contract_step = f"step:researchguard:{member}:contract"
+    prompt_step = f"step:researchguard:{member}:prompt-load"
     tests_step = f"step:researchguard:{member}:tests"
     deepening_step = f"step:researchguard:{member}:task-model-closure"
     success_step = f"step:researchguard:{member}:success"
     blocked_step = f"step:researchguard:{member}:blocked"
     contract_obligation = f"obligation:researchguard:{member}:consumer-contract"
+    prompt_obligation = f"obligation:researchguard:{member}:prompt-load"
     native_obligation = f"obligation:researchguard:{member}:native-tests"
     deepening_obligation = f"obligation:researchguard:{member}:task-model-closure"
     contract_invariant = f"invariant:researchguard:{member}:consumer-contract"
+    prompt_invariant = f"invariant:researchguard:{member}:prompt-load"
     native_invariant = f"invariant:researchguard:{member}:native-tests"
     deepening_invariant = f"invariant:researchguard:{member}:task-model-closure"
 
@@ -66,6 +69,7 @@ def build_contract_model(member: str) -> dict[str, Any]:
                 "owner_id": member,
                 "step_ids": [
                     contract_step,
+                    prompt_step,
                     tests_step,
                     deepening_step,
                     success_step,
@@ -86,11 +90,19 @@ def build_contract_model(member: str) -> dict[str, Any]:
                 "terminal_kind": "",
             },
             {
-                "step_id": tests_step,
+                "step_id": prompt_step,
                 "route_id": route_id,
                 "owner_id": member,
                 "action_kind": "validator",
                 "prerequisite_step_ids": [contract_step],
+                "terminal_kind": "",
+            },
+            {
+                "step_id": tests_step,
+                "route_id": route_id,
+                "owner_id": member,
+                "action_kind": "validator",
+                "prerequisite_step_ids": [prompt_step],
                 "terminal_kind": "",
             },
             {
@@ -118,7 +130,7 @@ def build_contract_model(member: str) -> dict[str, Any]:
                 "terminal_kind": "blocked",
             },
         ],
-        "invariant_ids": [contract_invariant, native_invariant, deepening_invariant],
+        "invariant_ids": [contract_invariant, prompt_invariant, native_invariant, deepening_invariant],
         "obligations": [
             {
                 "obligation_id": contract_obligation,
@@ -126,6 +138,13 @@ def build_contract_model(member: str) -> dict[str, Any]:
                 "owner_step_ids": [contract_step],
                 "required": True,
                 "description": "The public consumer entry and internal route inventory are exact.",
+            },
+            {
+                "obligation_id": prompt_obligation,
+                "invariant_id": prompt_invariant,
+                "owner_step_ids": [prompt_step],
+                "required": True,
+                "description": "The selected entry and conditional reference load graph are current and contain no eager sibling path.",
             },
             {
                 "obligation_id": deepening_obligation,

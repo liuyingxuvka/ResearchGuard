@@ -31,6 +31,10 @@ declared outcome for each hypothesis/experiment relationship used for
 discrimination. Missing declarations remain visible and never become guessed
 probabilities.
 
+For umbrella admission, these inputs are source-bound task facts. The program,
+not AI, derives applicability from the current ExperimentGuard contract. A
+direct ExperimentGuard request bypasses umbrella admission.
+
 ## Required Workflow
 
 1. Freeze the hypothesis and candidate-experiment inventories.
@@ -41,9 +45,12 @@ probabilities.
    every unresolved hypothesis pair.
 5. Keep the result recommendation-only and state its claim boundary.
 
-## Task-Local Experiment Iteration
+## Conditional Task-Local Experiment Iteration
 
-When a recommendation is part of a larger research task, freeze the task id,
+Trigger the existing task-local loop only when a recommendation is part of a
+larger non-trivial research task, a real observation arrives, the prediction
+matrix misses, an addressable discrimination gap remains, or the user requests
+predictive/deep closure. Then freeze the task id,
 purpose, experiment coverage and fingerprint, assumptions, unknowns, current
 iteration bound, and predecessor receipt on later iterations with the exact
 hypothesis and candidate inventories. Every observation must carry a unique

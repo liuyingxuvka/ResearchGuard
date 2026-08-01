@@ -98,7 +98,7 @@
       "model_kind": "executable_workflow",
       "purpose_closure": {
         "schema_version": "flowguard.model_purpose_closure.v1",
-        "model_instance_id": "regression:researchguard_suite:0.4.0",
+        "model_instance_id": "regression:researchguard_suite:0.4.1",
         "reusable_model_type_id": "researchguard_suite",
         "task_intent_id": "researchguard-regression:suite-route-and-decision-members",
         "declaration_phase": "before_candidate",
@@ -152,8 +152,8 @@
         ],
         "model_sha256": "sha256:a5abc3bf79b1d12a6b45cc0b43d536cbb7eb5538272518bc0945a0eaeee7a819",
         "runner_sha256": "sha256:611e3bcbe9eebc31230d4822a2be8e984fa9064baf464e478863965a267051a7",
-        "declaration_fingerprint": "sha256:0de8d6f89fa8fd90f1914bfa2f92f0ae8401acfc4e2e57776811b48b4d840f12",
-        "closure_fingerprint": "sha256:7a3ba68a22945a5d074b3632cfd28ea79e2353dc69fbbe8aee744de20149063f"
+        "declaration_fingerprint": "sha256:eb892078b613d587021eeec71d8b3747327570dde131a31812f1c128c1dbe23c",
+        "closure_fingerprint": "sha256:8b55447b3f702ce178376aa4e5b3000a85873992c43219994b65a57e4adeb3c2"
       }
     }
   ]

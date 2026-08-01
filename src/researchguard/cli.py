@@ -10,6 +10,7 @@ from pathlib import Path
 from . import __version__
 from .routing import (
     RouteBinding,
+    RouteComposition,
     TypedGap,
     bind_member_request,
     select_member_request,
@@ -39,7 +40,7 @@ def _member_main(member_id: str) -> MemberMain:
     raise ValueError(f"unknown member: {member_id}")
 
 
-def _print_machine(payload: RouteBinding | TypedGap) -> None:
+def _print_machine(payload: RouteBinding | RouteComposition | TypedGap) -> None:
     print(json.dumps(payload.to_dict(), ensure_ascii=False, sort_keys=True))
 
 
@@ -54,7 +55,7 @@ def _execute(member_id: str, member_argv: Sequence[str]) -> int:
 def _run_umbrella(argv: Sequence[str]) -> int:
     business_intent_id: str | None = None
     active_request_id: str | None = None
-    admission_evidence_path: Path | None = None
+    task_facts_path: Path | None = None
     member_argv: list[str] = []
     index = 0
     while index < len(argv):
@@ -63,7 +64,7 @@ def _run_umbrella(argv: Sequence[str]) -> int:
             member_argv = list(argv[index + 1 :])
             break
         if token in {
-            "--admission-evidence",
+            "--task-facts",
             "--business-intent-id",
             "--active-request-id",
         }:
@@ -76,8 +77,8 @@ def _run_umbrella(argv: Sequence[str]) -> int:
                 _print_machine(gap)
                 return 2
             value = argv[index + 1]
-            if token == "--admission-evidence":
-                admission_evidence_path = Path(value)
+            if token == "--task-facts":
+                task_facts_path = Path(value)
             elif token == "--business-intent-id":
                 business_intent_id = value
             else:
@@ -94,39 +95,39 @@ def _run_umbrella(argv: Sequence[str]) -> int:
         )
         _print_machine(gap)
         return 2
-    if not business_intent_id or admission_evidence_path is None:
+    if not business_intent_id or task_facts_path is None:
         gap = TypedGap(
             status="blocked",
             code="member-admission-required",
             message=(
-                "The umbrella requires --business-intent-id and one exact "
-                "--admission-evidence artifact authored by all four members."
+                "The umbrella requires --business-intent-id and one current "
+                "--task-facts artifact with source-bound facts and exact forbidden reviews."
             ),
         )
         _print_machine(gap)
         return 2
     try:
-        admission_payload = json.loads(
-            admission_evidence_path.read_text(encoding="utf-8")
+        task_facts_payload = json.loads(
+            task_facts_path.read_text(encoding="utf-8")
         )
     except (OSError, json.JSONDecodeError) as exc:
         gap = TypedGap(
             status="blocked",
-            code="member-admission-unreadable",
+            code="task-facts-unreadable",
             message=str(exc),
         )
         _print_machine(gap)
         return 2
-    if not isinstance(admission_payload, dict):
+    if not isinstance(task_facts_payload, dict):
         gap = TypedGap(
             status="blocked",
-            code="member-admission-invalid",
-            message="Admission evidence must be a JSON object.",
+            code="task-facts-invalid",
+            message="Task facts must be a JSON object.",
         )
         _print_machine(gap)
         return 2
     binding = select_member_request(
-        admission_payload,
+        task_facts_payload,
         member_argv,
         business_intent_id=business_intent_id,
         active_request_id=active_request_id,
@@ -134,6 +135,11 @@ def _run_umbrella(argv: Sequence[str]) -> int:
     if isinstance(binding, TypedGap):
         _print_machine(binding)
         return 2
+    if isinstance(binding, RouteComposition):
+        # The umbrella coordinates the minimum sufficient set but never guesses
+        # member-specific arguments or treats a plan as completed native work.
+        _print_machine(binding)
+        return 0
     return _member_main(binding.member_id)(member_argv)
 
 
@@ -143,14 +149,14 @@ def _print_help() -> None:
             (
                 "usage: researchguard {run|logic|source|trace|experiment} ...",
                 "",
-                "run     route once to one explicit member",
+                "run     route to one member or emit one minimum-sufficient composition",
                 "logic   execute the LogicGuard native owner",
                 "source  execute the SourceGuard native owner",
                 "trace   execute the TraceGuard native owner",
                 "experiment  execute the ExperimentGuard recommendation owner",
                 "",
                 "umbrella form:",
-                "  researchguard run --business-intent-id ID --admission-evidence FILE -- ARGS",
+                "  researchguard run --business-intent-id ID --task-facts FILE -- ARGS",
             )
         )
     )

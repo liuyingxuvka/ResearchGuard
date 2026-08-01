@@ -45,6 +45,12 @@
       "evidence_source": "scripts/check_researchguard_suite.py"
     },
     {
+      "binding_id": "native-check:researchguard:researchguard:prompt-load",
+      "native_check_id": "check:researchguard:prompt-load",
+      "required": true,
+      "evidence_source": "scripts/check_prompt_bundles.py"
+    },
+    {
       "binding_id": "native-check:researchguard:researchguard:native-tests",
       "native_check_id": "check:researchguard:native-tests",
       "required": true,
@@ -68,6 +74,7 @@
     ],
     "native_check_ids": [
       "check:researchguard:consumer-contract",
+      "check:researchguard:prompt-load",
       "check:researchguard:native-tests",
       "check:researchguard:task-model-closure"
     ],
@@ -91,6 +98,7 @@
       "required_enrollment_status": "enrolled",
       "readiness_check_ids": [
         "check:researchguard:consumer-contract",
+        "check:researchguard:prompt-load",
         "check:researchguard:native-tests",
         "check:researchguard:task-model-closure"
       ]
@@ -101,9 +109,14 @@
     "skills/researchguard",
     "src/researchguard/__init__.py",
     "src/researchguard/__main__.py",
+    "src/researchguard/admission.py",
     "src/researchguard/cli.py",
     "src/researchguard/routing.py",
     "src/researchguard/suite.py",
+    "src/researchguard/logic/admission.py",
+    "src/researchguard/source/admission.py",
+    "src/researchguard/trace/admission.py",
+    "src/researchguard/experiment/admission.py",
     ".flowguard/researchguard_suite_model.py",
     ".flowguard/researchguard_suite_model.json",
     ".flowguard/run_researchguard_suite_model.py",
@@ -114,6 +127,7 @@
     "scripts/check_zero_residuals.py",
     "scripts/install_researchguard.py",
     "tests/test_suite_routing.py",
+    "tests/admission_fixtures.py",
     "tests/test_root_cli.py",
     "tests/test_skill_suite.py",
     "tests/test_install_researchguard.py",
@@ -122,7 +136,10 @@
     "tests/logic/test_task_iteration.py",
     "tests/source/test_task_iteration.py",
     "tests/trace/test_task_iteration.py",
-    "tests/experiment/test_recommendation.py"
+    "tests/experiment/test_recommendation.py",
+    "researchguard/prompt_bundle_manifest.json",
+    "scripts/check_prompt_bundles.py",
+    "tests/test_prompt_bundles.py"
   ],
   "step_bindings": [
     {
@@ -133,6 +150,17 @@
       },
       "check_ids": [
         "check:researchguard:consumer-contract"
+      ],
+      "output_artifact_ids": []
+    },
+    {
+      "step_id": "step:researchguard:researchguard:prompt-load",
+      "action": {
+        "kind": "native",
+        "summary": "Validate the selected-only entry budget and conditional reference graph."
+      },
+      "check_ids": [
+        "check:researchguard:prompt-load"
       ],
       "output_artifact_ids": []
     },
@@ -225,6 +253,80 @@
       "coverage_rationale": "This check is the sole execution owner for its exact member obligation."
     },
     {
+      "check_id": "check:researchguard:prompt-load",
+      "maintenance_unit_id": "unit:researchguard-suite",
+      "member_skill_id": "researchguard",
+      "evidence_subject_id": "subject:researchguard:researchguard:prompt-load",
+      "semantic_check_id": "semantic:researchguard:researchguard:prompt-load:current",
+      "kind": "command",
+      "command": "python",
+      "args": [
+        "scripts/check_prompt_bundles.py",
+        "--member",
+        "researchguard",
+        "--json"
+      ],
+      "cwd_token": "repository_root",
+      "input_selectors": [
+        {
+          "kind": "subtree",
+          "path": "skills/researchguard"
+        },
+        {
+          "kind": "path",
+          "path": "researchguard/prompt_bundle_manifest.json"
+        },
+        {
+          "kind": "path",
+          "path": "scripts/check_prompt_bundles.py"
+        },
+        {
+          "kind": "path",
+          "path": "tests/test_prompt_bundles.py"
+        },
+        {
+          "kind": "path",
+          "path": "src/researchguard/admission.py"
+        },
+        {
+          "kind": "path",
+          "path": "src/researchguard/routing.py"
+        },
+        {
+          "kind": "path",
+          "path": "src/researchguard/logic/admission.py"
+        },
+        {
+          "kind": "path",
+          "path": "src/researchguard/source/admission.py"
+        },
+        {
+          "kind": "path",
+          "path": "src/researchguard/trace/admission.py"
+        },
+        {
+          "kind": "path",
+          "path": "src/researchguard/experiment/admission.py"
+        }
+      ],
+      "expected": {
+        "exit_code": 0
+      },
+      "timeout_seconds": 60,
+      "evidence_class": "hard",
+      "evidence_domain_id": "evidence-domain:researchguard:researchguard:prompt-load",
+      "execution_owner_id": "owner:researchguard:researchguard:prompt-load",
+      "native_route_id": "route:researchguard:researchguard",
+      "depends_on_check_ids": [
+        "check:researchguard:consumer-contract"
+      ],
+      "covers_obligation_ids": [
+        "obligation:researchguard:researchguard:prompt-load"
+      ],
+      "coverage_scope": "declared_obligations",
+      "coverage_rationale": "This check is the sole execution owner for its exact member obligation."
+    },
+    {
       "check_id": "check:researchguard:native-tests",
       "maintenance_unit_id": "unit:researchguard-suite",
       "member_skill_id": "researchguard",
@@ -258,6 +360,10 @@
         },
         {
           "kind": "path",
+          "path": "src/researchguard/admission.py"
+        },
+        {
+          "kind": "path",
           "path": "src/researchguard/cli.py"
         },
         {
@@ -267,6 +373,22 @@
         {
           "kind": "path",
           "path": "src/researchguard/suite.py"
+        },
+        {
+          "kind": "path",
+          "path": "src/researchguard/logic/admission.py"
+        },
+        {
+          "kind": "path",
+          "path": "src/researchguard/source/admission.py"
+        },
+        {
+          "kind": "path",
+          "path": "src/researchguard/trace/admission.py"
+        },
+        {
+          "kind": "path",
+          "path": "src/researchguard/experiment/admission.py"
         },
         {
           "kind": "path",
@@ -310,6 +432,10 @@
         },
         {
           "kind": "path",
+          "path": "tests/admission_fixtures.py"
+        },
+        {
+          "kind": "path",
           "path": "tests/test_root_cli.py"
         },
         {
@@ -343,6 +469,18 @@
         {
           "kind": "path",
           "path": "tests/experiment/test_recommendation.py"
+        },
+        {
+          "kind": "path",
+          "path": "researchguard/prompt_bundle_manifest.json"
+        },
+        {
+          "kind": "path",
+          "path": "scripts/check_prompt_bundles.py"
+        },
+        {
+          "kind": "path",
+          "path": "tests/test_prompt_bundles.py"
         }
       ],
       "expected": {
@@ -354,7 +492,7 @@
       "execution_owner_id": "owner:researchguard:researchguard:native-tests",
       "native_route_id": "route:researchguard:researchguard",
       "depends_on_check_ids": [
-        "check:researchguard:consumer-contract"
+        "check:researchguard:prompt-load"
       ],
       "covers_obligation_ids": [
         "obligation:researchguard:researchguard:native-tests"
@@ -422,11 +560,12 @@
       "profile_id": "enforced",
       "required_obligation_ids": [
         "obligation:researchguard:researchguard:consumer-contract",
+        "obligation:researchguard:researchguard:prompt-load",
         "obligation:researchguard:researchguard:native-tests",
         "obligation:researchguard:researchguard:task-model-closure"
       ]
     }
   ],
   "judgment_rubrics": [],
-  "claim_boundary": "This contract covers the current researchguard consumer projection, native route, and member-owned tests inside ResearchGuard v0.4.0. It does not prove source truth, unrun external work, installation, publication, or future AI behavior."
+  "claim_boundary": "This contract covers the current researchguard consumer projection, native route, and member-owned tests inside ResearchGuard v0.4.1. It does not prove source truth, unrun external work, installation, publication, or future AI behavior."
 }

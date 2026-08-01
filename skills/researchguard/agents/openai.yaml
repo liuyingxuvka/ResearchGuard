@@ -1,4 +1,4 @@
 interface:
   display_name: "ResearchGuard"
-  short_description: "Route research work to one exact Guard owner"
-  default_prompt: "Use $researchguard with the exact four current member-authored admission rows to select one research Guard; block zero or multiple matches and preserve the selected member's native receipt and typed handoffs."
+  short_description: "Route research work to the smallest sufficient Guard set"
+  default_prompt: "Use $researchguard only when research ownership is ambiguous or irreducibly cross-member: extract source-bound primary responsibilities plus context, read the compact admission index, let current contracts derive the unique minimum sufficient member set, reject over-selection, and require explicit order, dependencies, responsibilities, handoffs, field owners, and claim boundary for any necessary composition. Load only selected members; a composition plan is not native execution evidence."

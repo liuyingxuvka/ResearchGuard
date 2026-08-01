@@ -1,4 +1,4 @@
 interface:
   display_name: "SourceGuard"
   short_description: "Plan evidence discovery and qualify source use"
-  default_prompt: "Use $sourceguard to run the strict task-bound search-model loop, compare real retrieval evidence with predictions, rerun native depth checks, and return exact gap lineage and stop reason."
+  default_prompt: "Use $sourceguard by loading the source-model entry first and only the references triggered by retrieval, iteration, broad closure, commands, safe wording, or template work; start the strict search-model loop when a real observation, model miss, deep claim, or addressable gap requires it."

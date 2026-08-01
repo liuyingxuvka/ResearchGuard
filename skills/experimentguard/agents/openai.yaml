@@ -1,4 +1,4 @@
 interface:
   display_name: "ExperimentGuard"
   short_description: "Recommend discriminating experiments"
-  default_prompt: "Use $experimentguard to run the strict finite-discrimination loop: preserve invalid and not-run gaps, treat zero survivors as a prediction-matrix miss, and require independent holdout evidence before closure."
+  default_prompt: "Use $experimentguard directly for a bounded minimum finite discriminating-set recommendation; trigger its existing strict observation/revision/holdout loop only when later evidence, a prediction-matrix miss, an addressable gap, or explicit predictive/deep closure requires it."

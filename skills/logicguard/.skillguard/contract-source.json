@@ -45,6 +45,12 @@
       "evidence_source": "scripts/check_researchguard_suite.py"
     },
     {
+      "binding_id": "native-check:researchguard:logicguard:prompt-load",
+      "native_check_id": "check:logicguard:prompt-load",
+      "required": true,
+      "evidence_source": "scripts/check_prompt_bundles.py"
+    },
+    {
       "binding_id": "native-check:researchguard:logicguard:native-tests",
       "native_check_id": "check:logicguard:native-tests",
       "required": true,
@@ -68,6 +74,7 @@
     ],
     "native_check_ids": [
       "check:logicguard:consumer-contract",
+      "check:logicguard:prompt-load",
       "check:logicguard:native-tests",
       "check:logicguard:task-model-closure"
     ],
@@ -91,6 +98,7 @@
       "required_enrollment_status": "enrolled",
       "readiness_check_ids": [
         "check:logicguard:consumer-contract",
+        "check:logicguard:prompt-load",
         "check:logicguard:native-tests",
         "check:logicguard:task-model-closure"
       ]
@@ -107,7 +115,10 @@
     ".flowguard/run_researchguard_suite_model.py",
     ".flowguard/logicguard_skill_contract_model.py",
     ".flowguard/researchguard_skill_contract_model_common.py",
-    "tests/logic"
+    "tests/logic",
+    "researchguard/prompt_bundle_manifest.json",
+    "scripts/check_prompt_bundles.py",
+    "tests/test_prompt_bundles.py"
   ],
   "step_bindings": [
     {
@@ -118,6 +129,17 @@
       },
       "check_ids": [
         "check:logicguard:consumer-contract"
+      ],
+      "output_artifact_ids": []
+    },
+    {
+      "step_id": "step:researchguard:logicguard:prompt-load",
+      "action": {
+        "kind": "native",
+        "summary": "Validate the selected-only entry budget and conditional reference graph."
+      },
+      "check_ids": [
+        "check:logicguard:prompt-load"
       ],
       "output_artifact_ids": []
     },
@@ -210,6 +232,56 @@
       "coverage_rationale": "This check is the sole execution owner for its exact member obligation."
     },
     {
+      "check_id": "check:logicguard:prompt-load",
+      "maintenance_unit_id": "unit:researchguard-suite",
+      "member_skill_id": "logicguard",
+      "evidence_subject_id": "subject:researchguard:logicguard:prompt-load",
+      "semantic_check_id": "semantic:researchguard:logicguard:prompt-load:current",
+      "kind": "command",
+      "command": "python",
+      "args": [
+        "scripts/check_prompt_bundles.py",
+        "--member",
+        "logicguard",
+        "--json"
+      ],
+      "cwd_token": "repository_root",
+      "input_selectors": [
+        {
+          "kind": "subtree",
+          "path": "skills/logicguard"
+        },
+        {
+          "kind": "path",
+          "path": "researchguard/prompt_bundle_manifest.json"
+        },
+        {
+          "kind": "path",
+          "path": "scripts/check_prompt_bundles.py"
+        },
+        {
+          "kind": "path",
+          "path": "tests/test_prompt_bundles.py"
+        }
+      ],
+      "expected": {
+        "exit_code": 0
+      },
+      "timeout_seconds": 60,
+      "evidence_class": "hard",
+      "evidence_domain_id": "evidence-domain:researchguard:logicguard:prompt-load",
+      "execution_owner_id": "owner:researchguard:logicguard:prompt-load",
+      "native_route_id": "route:researchguard:logicguard",
+      "depends_on_check_ids": [
+        "check:logicguard:consumer-contract"
+      ],
+      "covers_obligation_ids": [
+        "obligation:researchguard:logicguard:prompt-load"
+      ],
+      "coverage_scope": "declared_obligations",
+      "coverage_rationale": "This check is the sole execution owner for its exact member obligation."
+    },
+    {
       "check_id": "check:logicguard:native-tests",
       "maintenance_unit_id": "unit:researchguard-suite",
       "member_skill_id": "logicguard",
@@ -264,6 +336,18 @@
         {
           "kind": "subtree",
           "path": "tests/logic"
+        },
+        {
+          "kind": "path",
+          "path": "researchguard/prompt_bundle_manifest.json"
+        },
+        {
+          "kind": "path",
+          "path": "scripts/check_prompt_bundles.py"
+        },
+        {
+          "kind": "path",
+          "path": "tests/test_prompt_bundles.py"
         }
       ],
       "expected": {
@@ -275,7 +359,7 @@
       "execution_owner_id": "owner:researchguard:logicguard:native-tests",
       "native_route_id": "route:researchguard:logicguard",
       "depends_on_check_ids": [
-        "check:logicguard:consumer-contract"
+        "check:logicguard:prompt-load"
       ],
       "covers_obligation_ids": [
         "obligation:researchguard:logicguard:native-tests"
@@ -328,11 +412,12 @@
       "profile_id": "enforced",
       "required_obligation_ids": [
         "obligation:researchguard:logicguard:consumer-contract",
+        "obligation:researchguard:logicguard:prompt-load",
         "obligation:researchguard:logicguard:native-tests",
         "obligation:researchguard:logicguard:task-model-closure"
       ]
     }
   ],
   "judgment_rubrics": [],
-  "claim_boundary": "This contract covers the current logicguard consumer projection, native route, and member-owned tests inside ResearchGuard v0.4.0. It does not prove source truth, unrun external work, installation, publication, or future AI behavior."
+  "claim_boundary": "This contract covers the current logicguard consumer projection, native route, and member-owned tests inside ResearchGuard v0.4.1. It does not prove source truth, unrun external work, installation, publication, or future AI behavior."
 }

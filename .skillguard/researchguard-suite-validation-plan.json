@@ -10,20 +10,20 @@
     "experimentguard"
   ],
   "toolchain": {
-    "skillguard_version": "0.4.0",
-    "skillguard_source_revision": "3cfdca77567dacfa77c8a8d0696e116fe0e925c3",
-    "flowguard_version": "0.67.0",
+    "skillguard_version": "0.7.2",
+    "skillguard_source_revision": "sha256:831992b5d53f92ab901abea09008047e09e7863d9ffa61ef039b929829552830",
+    "flowguard_version": "0.68.2",
     "python_command": "python"
   },
   "private_roots": {
-    "run_state_root": "work/skillguard/v0.4.0-current/run-state",
-    "owner_evidence_root": "work/verification/skillguard-v0.4.0-current/owner-evidence"
+    "run_state_root": "work/skillguard/v0.7.2-current/run-state",
+    "owner_evidence_root": "work/verification/skillguard-v0.7.2-current/owner-evidence"
   },
   "members": [
     {
       "member_skill_id": "researchguard",
-      "contract_hash": "B848DCE851C1790B02709377F78E283A523621101569A6A767F6FB560D72637D",
-      "manifest_hash": "317C59CA1D2593190D2A812F865538C2C0C5B0C9D1215B0057EC3CDBE6722032",
+      "contract_hash": "3F6C537A64FE1A20ED9D465900C8F82E9BC1927D50D4C2E1AB35A220BC809B3C",
+      "manifest_hash": "8AD95CC2837B72BC0B2720448C52FE65DD84338A050E5F617D66F91A4079AE8C",
       "checks": [
         {
           "check_id": "check:researchguard:consumer-contract",
@@ -33,12 +33,21 @@
           "depends_on_check_ids": []
         },
         {
+          "check_id": "check:researchguard:prompt-load",
+          "evidence_subject_id": "subject:researchguard:researchguard:prompt-load",
+          "execution_owner_id": "owner:researchguard:researchguard:prompt-load",
+          "evidence_domain_id": "evidence-domain:researchguard:researchguard:prompt-load",
+          "depends_on_check_ids": [
+            "check:researchguard:consumer-contract"
+          ]
+        },
+        {
           "check_id": "check:researchguard:native-tests",
           "evidence_subject_id": "subject:researchguard:researchguard:native-tests",
           "execution_owner_id": "owner:researchguard:researchguard:native-tests",
           "evidence_domain_id": "evidence-domain:researchguard:researchguard:native-tests",
           "depends_on_check_ids": [
-            "check:researchguard:consumer-contract"
+            "check:researchguard:prompt-load"
           ]
         },
         {
@@ -54,8 +63,8 @@
     },
     {
       "member_skill_id": "logicguard",
-      "contract_hash": "2F984AFCAF2C58B1ECF189734F62834D0BB4611328ADF3815E70B6F421433FD4",
-      "manifest_hash": "26C0B806B751647542F828741659A70180A342BA82BED240E53703FF8B19CD25",
+      "contract_hash": "A0E02B6246063067CA2FE6A3571B2C6C7FA35930F8CEE0A7526018CBD201405C",
+      "manifest_hash": "D8FA7750D178C2A734273830C0717C02D35B60A51D15BC7C2A60F555BF363C11",
       "checks": [
         {
           "check_id": "check:logicguard:consumer-contract",
@@ -65,12 +74,21 @@
           "depends_on_check_ids": []
         },
         {
+          "check_id": "check:logicguard:prompt-load",
+          "evidence_subject_id": "subject:researchguard:logicguard:prompt-load",
+          "execution_owner_id": "owner:researchguard:logicguard:prompt-load",
+          "evidence_domain_id": "evidence-domain:researchguard:logicguard:prompt-load",
+          "depends_on_check_ids": [
+            "check:logicguard:consumer-contract"
+          ]
+        },
+        {
           "check_id": "check:logicguard:native-tests",
           "evidence_subject_id": "subject:researchguard:logicguard:native-tests",
           "execution_owner_id": "owner:researchguard:logicguard:native-tests",
           "evidence_domain_id": "evidence-domain:researchguard:logicguard:native-tests",
           "depends_on_check_ids": [
-            "check:logicguard:consumer-contract"
+            "check:logicguard:prompt-load"
           ]
         },
         {
@@ -86,8 +104,8 @@
     },
     {
       "member_skill_id": "sourceguard",
-      "contract_hash": "3BBD03710BF93FB95B784FE0FD9F6781A6587122DFBEF6E9F4AE6257FC5308D8",
-      "manifest_hash": "6B185427CECAD815F799EA8BC8FD4D2FF174C7DFF22DD045B055685112B5B2A8",
+      "contract_hash": "12ECBC398E25C698302D9D4454FE8D0459FADD70398739B6A72FAB99840A8C34",
+      "manifest_hash": "D68854B5E67100028CDE1001C9CB610C6FA1B18A0F42C42F675C8011B1731CDA",
       "checks": [
         {
           "check_id": "check:sourceguard:consumer-contract",
@@ -97,12 +115,21 @@
           "depends_on_check_ids": []
         },
         {
+          "check_id": "check:sourceguard:prompt-load",
+          "evidence_subject_id": "subject:researchguard:sourceguard:prompt-load",
+          "execution_owner_id": "owner:researchguard:sourceguard:prompt-load",
+          "evidence_domain_id": "evidence-domain:researchguard:sourceguard:prompt-load",
+          "depends_on_check_ids": [
+            "check:sourceguard:consumer-contract"
+          ]
+        },
+        {
           "check_id": "check:sourceguard:native-tests",
           "evidence_subject_id": "subject:researchguard:sourceguard:native-tests",
           "execution_owner_id": "owner:researchguard:sourceguard:native-tests",
           "evidence_domain_id": "evidence-domain:researchguard:sourceguard:native-tests",
           "depends_on_check_ids": [
-            "check:sourceguard:consumer-contract"
+            "check:sourceguard:prompt-load"
           ]
         },
         {
@@ -118,8 +145,8 @@
     },
     {
       "member_skill_id": "traceguard",
-      "contract_hash": "CB0A7AAF6A235ADDD8F37EBDA13B5669B4B9188897B07E8882B777780AD88EF6",
-      "manifest_hash": "344274E856B6720DDE001998D8404D39208FF474D7C19027EFC0A276A445B9E2",
+      "contract_hash": "1D5BBD26911D52F1D33F2B7506ECDC9DAD4A26AAF8EAB55E0F422D8FE7D7D42A",
+      "manifest_hash": "DBBF79ADE3CF9AFB73A0D73607E6BF60A2CC260902E2DCF52AAF33A5A7997097",
       "checks": [
         {
           "check_id": "check:traceguard:consumer-contract",
@@ -129,12 +156,21 @@
           "depends_on_check_ids": []
         },
         {
+          "check_id": "check:traceguard:prompt-load",
+          "evidence_subject_id": "subject:researchguard:traceguard:prompt-load",
+          "execution_owner_id": "owner:researchguard:traceguard:prompt-load",
+          "evidence_domain_id": "evidence-domain:researchguard:traceguard:prompt-load",
+          "depends_on_check_ids": [
+            "check:traceguard:consumer-contract"
+          ]
+        },
+        {
           "check_id": "check:traceguard:native-tests",
           "evidence_subject_id": "subject:researchguard:traceguard:native-tests",
           "execution_owner_id": "owner:researchguard:traceguard:native-tests",
           "evidence_domain_id": "evidence-domain:researchguard:traceguard:native-tests",
           "depends_on_check_ids": [
-            "check:traceguard:consumer-contract"
+            "check:traceguard:prompt-load"
           ]
         },
         {
@@ -150,8 +186,8 @@
     },
     {
       "member_skill_id": "experimentguard",
-      "contract_hash": "1F5F6B2E86EB8B13BA329D587E63FB6D0A383F00F25FD42E82D612742C1BA086",
-      "manifest_hash": "5EDB8EAA1C0CC64E7E049900CA6DE88EF6B1B5A5E730FD816B82CBBCE612FC3E",
+      "contract_hash": "E91D1EDD46D0196F69BA67B53F370E4A769C1701157B191F003D4DF139B090E1",
+      "manifest_hash": "DD31B49D68E35F3BBD9D6385D284A1825DA0D10E0B9B08F32AA0106D56351004",
       "checks": [
         {
           "check_id": "check:experimentguard:consumer-contract",
@@ -161,12 +197,21 @@
           "depends_on_check_ids": []
         },
         {
+          "check_id": "check:experimentguard:prompt-load",
+          "evidence_subject_id": "subject:researchguard:experimentguard:prompt-load",
+          "execution_owner_id": "owner:researchguard:experimentguard:prompt-load",
+          "evidence_domain_id": "evidence-domain:researchguard:experimentguard:prompt-load",
+          "depends_on_check_ids": [
+            "check:experimentguard:consumer-contract"
+          ]
+        },
+        {
           "check_id": "check:experimentguard:native-tests",
           "evidence_subject_id": "subject:researchguard:experimentguard:native-tests",
           "execution_owner_id": "owner:researchguard:experimentguard:native-tests",
           "evidence_domain_id": "evidence-domain:researchguard:experimentguard:native-tests",
           "depends_on_check_ids": [
-            "check:experimentguard:consumer-contract"
+            "check:experimentguard:prompt-load"
           ]
         },
         {
@@ -181,8 +226,8 @@
       ]
     }
   ],
-  "execution_owner_count": 15,
-  "check_count": 15,
+  "execution_owner_count": 20,
+  "check_count": 20,
   "cross_unit_receipt_reuse": false,
   "skillguard_adds_domain_route": false,
   "claim_boundary": "This freezes the exact same-unit owner inventory for the current local maintenance change. It does not itself execute a check, activate a consumer installation, publish a release, or retire predecessor repositories."

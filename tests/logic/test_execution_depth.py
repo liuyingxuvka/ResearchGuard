@@ -211,6 +211,7 @@ def test_affected_skillguard_contracts_bind_native_depth_without_parallel_route(
 
     assert set(checks) == manifest_ids == {
         "check:logicguard:consumer-contract",
+        "check:logicguard:prompt-load",
         "check:logicguard:native-tests",
         "check:logicguard:task-model-closure",
     }

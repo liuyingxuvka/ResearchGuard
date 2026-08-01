@@ -3,6 +3,9 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
+import importlib.metadata
+import importlib.util
 import json
 from pathlib import Path
 
@@ -17,6 +20,9 @@ MEMBERS = (
 )
 UNIT_ID = "unit:researchguard-suite"
 VALIDATION_PLAN_PATH = ROOT / ".skillguard" / "researchguard-suite-validation-plan.json"
+RESEARCHGUARD_VERSION = "0.4.1"
+FLOWGUARD_VERSION = "0.68.2"
+SKILLGUARD_VERSION = "0.7.2"
 
 TEST_ARGS = {
     "researchguard": [
@@ -48,9 +54,14 @@ IMPLEMENTATION_PATHS = {
         "skills/researchguard",
         "src/researchguard/__init__.py",
         "src/researchguard/__main__.py",
+        "src/researchguard/admission.py",
         "src/researchguard/cli.py",
         "src/researchguard/routing.py",
         "src/researchguard/suite.py",
+        "src/researchguard/logic/admission.py",
+        "src/researchguard/source/admission.py",
+        "src/researchguard/trace/admission.py",
+        "src/researchguard/experiment/admission.py",
         ".flowguard/researchguard_suite_model.py",
         ".flowguard/researchguard_suite_model.json",
         ".flowguard/run_researchguard_suite_model.py",
@@ -61,6 +72,7 @@ IMPLEMENTATION_PATHS = {
         "scripts/check_zero_residuals.py",
         "scripts/install_researchguard.py",
         "tests/test_suite_routing.py",
+        "tests/admission_fixtures.py",
         "tests/test_root_cli.py",
         "tests/test_skill_suite.py",
         "tests/test_install_researchguard.py",
@@ -117,6 +129,47 @@ IMPLEMENTATION_PATHS = {
     ],
 }
 
+PROMPT_GOVERNANCE_PATHS = (
+    "researchguard/prompt_bundle_manifest.json",
+    "scripts/check_prompt_bundles.py",
+    "tests/test_prompt_bundles.py",
+)
+for _member_paths in IMPLEMENTATION_PATHS.values():
+    _member_paths.extend(path for path in PROMPT_GOVERNANCE_PATHS if path not in _member_paths)
+
+
+def _installed_version(distribution: str, expected: str) -> str:
+    actual = importlib.metadata.version(distribution)
+    if actual != expected:
+        raise ValueError(
+            f"{distribution} toolchain mismatch: expected {expected}, found {actual}"
+        )
+    return actual
+
+
+def _skillguard_source_fingerprint() -> str:
+    spec = importlib.util.find_spec("skillguard")
+    if spec is None or spec.origin is None:
+        raise ValueError("installed SkillGuard source root is unavailable")
+    source_root = Path(spec.origin).resolve().parent.parent
+    if not (source_root / "SKILL.md").is_file() or not (
+        source_root / "scripts" / "skillguard_compile.py"
+    ).is_file():
+        raise ValueError("installed SkillGuard source root is not an author toolchain")
+    rows: dict[str, str] = {}
+    for path in sorted(item for item in source_root.rglob("*") if item.is_file()):
+        relative = path.relative_to(source_root)
+        if "__pycache__" in relative.parts or path.suffix in {".pyc", ".pyo"}:
+            continue
+        rows[relative.as_posix()] = hashlib.sha256(path.read_bytes()).hexdigest()
+    encoded = json.dumps(
+        rows,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    return f"sha256:{hashlib.sha256(encoded).hexdigest()}"
+
 
 def check(
     member: str,
@@ -160,6 +213,8 @@ def check(
 def contract(member: str) -> dict:
     contract_check_id = f"check:{member}:consumer-contract"
     contract_obligation = f"obligation:researchguard:{member}:consumer-contract"
+    prompt_check_id = f"check:{member}:prompt-load"
+    prompt_obligation = f"obligation:researchguard:{member}:prompt-load"
     native_obligation = f"obligation:researchguard:{member}:native-tests"
     deepening_check_id = f"check:{member}:task-model-closure"
     deepening_obligation = f"obligation:researchguard:{member}:task-model-closure"
@@ -206,6 +261,37 @@ def contract(member: str) -> dict:
         ),
         check(
             member,
+            kind="prompt-load",
+            command="python",
+            args=[
+                "scripts/check_prompt_bundles.py",
+                "--member",
+                member,
+                "--json",
+            ],
+            selectors=[
+                {"kind": "subtree", "path": f"skills/{member}"},
+                {"kind": "path", "path": "researchguard/prompt_bundle_manifest.json"},
+                {"kind": "path", "path": "scripts/check_prompt_bundles.py"},
+                {"kind": "path", "path": "tests/test_prompt_bundles.py"},
+            ] + (
+                [
+                    {"kind": "path", "path": "src/researchguard/admission.py"},
+                    {"kind": "path", "path": "src/researchguard/routing.py"},
+                    {"kind": "path", "path": "src/researchguard/logic/admission.py"},
+                    {"kind": "path", "path": "src/researchguard/source/admission.py"},
+                    {"kind": "path", "path": "src/researchguard/trace/admission.py"},
+                    {"kind": "path", "path": "src/researchguard/experiment/admission.py"},
+                ]
+                if member == "researchguard"
+                else []
+            ),
+            depends=[contract_check_id],
+            obligation=prompt_obligation,
+            timeout=60,
+        ),
+        check(
+            member,
             kind="native-tests",
             command="python",
             args=TEST_ARGS[member],
@@ -220,7 +306,7 @@ def contract(member: str) -> dict:
                 }
                 for path in IMPLEMENTATION_PATHS[member]
             ],
-            depends=[contract_check_id],
+            depends=[prompt_check_id],
             obligation=native_obligation,
             timeout=900,
         ),
@@ -286,6 +372,12 @@ def contract(member: str) -> dict:
                 "evidence_source": "scripts/check_researchguard_suite.py",
             },
             {
+                "binding_id": f"native-check:researchguard:{member}:prompt-load",
+                "native_check_id": prompt_check_id,
+                "required": True,
+                "evidence_source": "scripts/check_prompt_bundles.py",
+            },
+            {
                 "binding_id": f"native-check:researchguard:{member}:native-tests",
                 "native_check_id": f"check:{member}:native-tests",
                 "required": True,
@@ -307,6 +399,7 @@ def contract(member: str) -> dict:
             "native_route_ids": [route_id],
             "native_check_ids": [
                 contract_check_id,
+                prompt_check_id,
                 f"check:{member}:native-tests",
                 deepening_check_id,
             ],
@@ -328,6 +421,7 @@ def contract(member: str) -> dict:
                 "required_enrollment_status": "enrolled",
                 "readiness_check_ids": [
                     contract_check_id,
+                    prompt_check_id,
                     f"check:{member}:native-tests",
                     deepening_check_id,
                 ],
@@ -346,6 +440,15 @@ def contract(member: str) -> dict:
                     "summary": "Validate the exact current consumer skill and route boundary.",
                 },
                 "check_ids": [contract_check_id],
+                "output_artifact_ids": [],
+            },
+            {
+                "step_id": f"step:researchguard:{member}:prompt-load",
+                "action": {
+                    "kind": "native",
+                    "summary": "Validate the selected-only entry budget and conditional reference graph.",
+                },
+                "check_ids": [prompt_check_id],
                 "output_artifact_ids": [],
             },
             {
@@ -374,6 +477,7 @@ def contract(member: str) -> dict:
                 "profile_id": "enforced",
                 "required_obligation_ids": [
                     contract_obligation,
+                    prompt_obligation,
                     native_obligation,
                     deepening_obligation,
                 ],
@@ -382,7 +486,7 @@ def contract(member: str) -> dict:
         "judgment_rubrics": [],
         "claim_boundary": (
             f"This contract covers the current {member} consumer projection, "
-            "native route, and member-owned tests inside ResearchGuard v0.4.0. "
+            f"native route, and member-owned tests inside ResearchGuard v{RESEARCHGUARD_VERSION}. "
             "It does not prove source truth, unrun external work, installation, "
             "publication, or future AI behavior."
         ),
@@ -390,6 +494,8 @@ def contract(member: str) -> dict:
 
 
 def validation_plan() -> dict:
+    skillguard_version = _installed_version("skillguard", SKILLGUARD_VERSION)
+    flowguard_version = _installed_version("flowguard", FLOWGUARD_VERSION)
     rows = []
     owner_ids: list[str] = []
     check_count = 0
@@ -429,14 +535,14 @@ def validation_plan() -> dict:
         "maintenance_unit_id": UNIT_ID,
         "member_skill_ids": list(MEMBERS),
         "toolchain": {
-            "skillguard_version": "0.4.0",
-            "skillguard_source_revision": "3cfdca77567dacfa77c8a8d0696e116fe0e925c3",
-            "flowguard_version": "0.67.0",
+            "skillguard_version": skillguard_version,
+            "skillguard_source_revision": _skillguard_source_fingerprint(),
+            "flowguard_version": flowguard_version,
             "python_command": "python",
         },
         "private_roots": {
-            "run_state_root": "work/skillguard/v0.4.0-current/run-state",
-            "owner_evidence_root": "work/verification/skillguard-v0.4.0-current/owner-evidence",
+            "run_state_root": "work/skillguard/v0.7.2-current/run-state",
+            "owner_evidence_root": "work/verification/skillguard-v0.7.2-current/owner-evidence",
         },
         "members": rows,
         "execution_owner_count": len(owner_ids),

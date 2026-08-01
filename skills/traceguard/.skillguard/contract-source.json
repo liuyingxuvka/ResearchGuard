@@ -45,6 +45,12 @@
       "evidence_source": "scripts/check_researchguard_suite.py"
     },
     {
+      "binding_id": "native-check:researchguard:traceguard:prompt-load",
+      "native_check_id": "check:traceguard:prompt-load",
+      "required": true,
+      "evidence_source": "scripts/check_prompt_bundles.py"
+    },
+    {
       "binding_id": "native-check:researchguard:traceguard:native-tests",
       "native_check_id": "check:traceguard:native-tests",
       "required": true,
@@ -68,6 +74,7 @@
     ],
     "native_check_ids": [
       "check:traceguard:consumer-contract",
+      "check:traceguard:prompt-load",
       "check:traceguard:native-tests",
       "check:traceguard:task-model-closure"
     ],
@@ -91,6 +98,7 @@
       "required_enrollment_status": "enrolled",
       "readiness_check_ids": [
         "check:traceguard:consumer-contract",
+        "check:traceguard:prompt-load",
         "check:traceguard:native-tests",
         "check:traceguard:task-model-closure"
       ]
@@ -105,7 +113,10 @@
     ".flowguard/run_researchguard_suite_model.py",
     ".flowguard/traceguard_skill_contract_model.py",
     ".flowguard/researchguard_skill_contract_model_common.py",
-    "tests/trace"
+    "tests/trace",
+    "researchguard/prompt_bundle_manifest.json",
+    "scripts/check_prompt_bundles.py",
+    "tests/test_prompt_bundles.py"
   ],
   "step_bindings": [
     {
@@ -116,6 +127,17 @@
       },
       "check_ids": [
         "check:traceguard:consumer-contract"
+      ],
+      "output_artifact_ids": []
+    },
+    {
+      "step_id": "step:researchguard:traceguard:prompt-load",
+      "action": {
+        "kind": "native",
+        "summary": "Validate the selected-only entry budget and conditional reference graph."
+      },
+      "check_ids": [
+        "check:traceguard:prompt-load"
       ],
       "output_artifact_ids": []
     },
@@ -208,6 +230,56 @@
       "coverage_rationale": "This check is the sole execution owner for its exact member obligation."
     },
     {
+      "check_id": "check:traceguard:prompt-load",
+      "maintenance_unit_id": "unit:researchguard-suite",
+      "member_skill_id": "traceguard",
+      "evidence_subject_id": "subject:researchguard:traceguard:prompt-load",
+      "semantic_check_id": "semantic:researchguard:traceguard:prompt-load:current",
+      "kind": "command",
+      "command": "python",
+      "args": [
+        "scripts/check_prompt_bundles.py",
+        "--member",
+        "traceguard",
+        "--json"
+      ],
+      "cwd_token": "repository_root",
+      "input_selectors": [
+        {
+          "kind": "subtree",
+          "path": "skills/traceguard"
+        },
+        {
+          "kind": "path",
+          "path": "researchguard/prompt_bundle_manifest.json"
+        },
+        {
+          "kind": "path",
+          "path": "scripts/check_prompt_bundles.py"
+        },
+        {
+          "kind": "path",
+          "path": "tests/test_prompt_bundles.py"
+        }
+      ],
+      "expected": {
+        "exit_code": 0
+      },
+      "timeout_seconds": 60,
+      "evidence_class": "hard",
+      "evidence_domain_id": "evidence-domain:researchguard:traceguard:prompt-load",
+      "execution_owner_id": "owner:researchguard:traceguard:prompt-load",
+      "native_route_id": "route:researchguard:traceguard",
+      "depends_on_check_ids": [
+        "check:traceguard:consumer-contract"
+      ],
+      "covers_obligation_ids": [
+        "obligation:researchguard:traceguard:prompt-load"
+      ],
+      "coverage_scope": "declared_obligations",
+      "coverage_rationale": "This check is the sole execution owner for its exact member obligation."
+    },
+    {
       "check_id": "check:traceguard:native-tests",
       "maintenance_unit_id": "unit:researchguard-suite",
       "member_skill_id": "traceguard",
@@ -254,6 +326,18 @@
         {
           "kind": "subtree",
           "path": "tests/trace"
+        },
+        {
+          "kind": "path",
+          "path": "researchguard/prompt_bundle_manifest.json"
+        },
+        {
+          "kind": "path",
+          "path": "scripts/check_prompt_bundles.py"
+        },
+        {
+          "kind": "path",
+          "path": "tests/test_prompt_bundles.py"
         }
       ],
       "expected": {
@@ -265,7 +349,7 @@
       "execution_owner_id": "owner:researchguard:traceguard:native-tests",
       "native_route_id": "route:researchguard:traceguard",
       "depends_on_check_ids": [
-        "check:traceguard:consumer-contract"
+        "check:traceguard:prompt-load"
       ],
       "covers_obligation_ids": [
         "obligation:researchguard:traceguard:native-tests"
@@ -318,11 +402,12 @@
       "profile_id": "enforced",
       "required_obligation_ids": [
         "obligation:researchguard:traceguard:consumer-contract",
+        "obligation:researchguard:traceguard:prompt-load",
         "obligation:researchguard:traceguard:native-tests",
         "obligation:researchguard:traceguard:task-model-closure"
       ]
     }
   ],
   "judgment_rubrics": [],
-  "claim_boundary": "This contract covers the current traceguard consumer projection, native route, and member-owned tests inside ResearchGuard v0.4.0. It does not prove source truth, unrun external work, installation, publication, or future AI behavior."
+  "claim_boundary": "This contract covers the current traceguard consumer projection, native route, and member-owned tests inside ResearchGuard v0.4.1. It does not prove source truth, unrun external work, installation, publication, or future AI behavior."
 }

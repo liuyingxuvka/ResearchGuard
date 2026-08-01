@@ -18,26 +18,16 @@ if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
 from researchguard import __version__  # noqa: E402
-from researchguard.experiment.admission import (  # noqa: E402
-    author_admission_evidence as experiment_admission,
-)
-from researchguard.logic.admission import (  # noqa: E402
-    author_admission_evidence as logic_admission,
-)
+from researchguard.admission import COMPOSITION_SCHEMA, TASK_FACTS_SCHEMA  # noqa: E402
 from researchguard.routing import (  # noqa: E402
-    ADMISSION_SET_SCHEMA,
+    MEMBER_ADMISSION_CONTRACTS,
     RouteBinding,
+    RouteComposition,
     bind_member_request,
     request_fingerprint,
     select_member_request,
 )
-from researchguard.source.admission import (  # noqa: E402
-    author_admission_evidence as source_admission,
-)
 from researchguard.source.schema import Gap, SchemaError  # noqa: E402
-from researchguard.trace.admission import (  # noqa: E402
-    author_admission_evidence as trace_admission,
-)
 
 
 MEMBERS = (
@@ -47,7 +37,7 @@ MEMBERS = (
     "traceguard",
     "experimentguard",
 )
-CURRENT_VERSION = "0.4.0"
+CURRENT_VERSION = "0.4.1"
 RETIRED_SKILL_IDS = (
     "logicguard-source-library",
     "logicguard-structured-artifact",
@@ -150,15 +140,64 @@ def _check_common(checks: list[dict[str, str]]) -> None:
         "consumer projection contains no retired command or wrapper",
         checks,
     )
+    result = _python("scripts/check_prompt_bundles.py", "--json")
+    prompt_payload = json.loads(result.stdout) if result.returncode == 0 else {}
+    _assert(
+        result.returncode == 0 and prompt_payload.get("status") == "pass",
+        "target-owned prompt bundles, load graph, and generated admission index pass",
+        checks,
+    )
+
+
+def _task_facts(member: str, argv: tuple[str, ...], intent: str) -> dict:
+    primary = {
+        "logicguard": "logic.argument_structure",
+        "sourceguard": "source.primary_discovery",
+        "traceguard": "trace.temporal_reconstruction",
+        "experimentguard": "experiment.discriminating_set",
+    }[member]
+    context = {
+        "experimentguard": (
+            "experiment.explicit_hypotheses",
+            "experiment.finite_candidates",
+            "experiment.predicted_outcomes",
+        )
+    }.get(member, ())
+    kinds = (primary, *context)
+    facts = []
+    for index, kind in enumerate(kinds):
+        quote = f"native suite fact {index}: {kind}"
+        facts.append(
+            {
+                "fact_id": f"fact:{index}",
+                "kind": kind,
+                "role": "primary_action" if index == 0 else "context",
+                "statement": quote,
+                "source_span": {"source_id": f"native-suite:{index}", "start": 0, "end": len(quote), "quote": quote},
+            }
+        )
+    review_quote = str(facts[0]["source_span"]["quote"])
+    reviews = []
+    for candidate, contract in MEMBER_ADMISSION_CONTRACTS.items():
+        for condition in contract["forbidden_conditions"]:
+            present = bool(set(kinds).intersection(condition["any_fact_kinds"]))
+            reviews.append(
+                {
+                    "member_id": candidate,
+                    "condition_id": condition["condition_id"],
+                    "disposition": "present" if present else "absent",
+                    "source_span": {"source_id": "native-suite:review", "start": 0, "end": len(review_quote), "quote": review_quote},
+                }
+            )
+    return {
+        "schema_version": TASK_FACTS_SCHEMA,
+        "request_fingerprint": request_fingerprint(argv, business_intent_id=intent),
+        "facts": facts,
+        "forbidden_reviews": reviews,
+    }
 
 
 def _check_researchguard(checks: list[dict[str, str]]) -> None:
-    builders = {
-        "logicguard": logic_admission,
-        "sourceguard": source_admission,
-        "traceguard": trace_admission,
-        "experimentguard": experiment_admission,
-    }
     for member in (
         "logicguard",
         "sourceguard",
@@ -167,22 +206,7 @@ def _check_researchguard(checks: list[dict[str, str]]) -> None:
     ):
         direct = bind_member_request(member, ("--help",))
         intent = f"intent:native-suite:{member}"
-        request_digest = request_fingerprint(("--help",), business_intent_id=intent)
-        evidence = {
-            "schema_version": ADMISSION_SET_SCHEMA,
-            "member_evidence": [
-                builder(
-                    request_fingerprint=request_digest,
-                    applicability=(
-                        "applicable" if candidate == member else "not_applicable"
-                    ),
-                    forbidden_status="clear",
-                    applicability_evidence_refs=(f"native:{candidate}:applicability",),
-                    forbidden_evidence_refs=(f"native:{candidate}:forbidden-review",),
-                )
-                for candidate, builder in builders.items()
-            ],
-        }
+        evidence = _task_facts(member, ("--help",), intent)
         umbrella = select_member_request(
             evidence,
             ("--help",),
@@ -196,6 +220,66 @@ def _check_researchguard(checks: list[dict[str, str]]) -> None:
             f"direct and umbrella {member} bindings share one owner and path",
             checks,
         )
+    pair_argv = ("plan", "mixed-task.json")
+    pair_intent = "intent:native-suite:source-trace"
+    pair = _task_facts("sourceguard", pair_argv, pair_intent)
+    trace_quote = "native suite fact 1: trace.temporal_reconstruction"
+    pair["facts"].append(
+        {
+            "fact_id": "fact:trace",
+            "kind": "trace.temporal_reconstruction",
+            "role": "primary_action",
+            "statement": trace_quote,
+            "source_span": {
+                "source_id": "native-suite:trace",
+                "start": 0,
+                "end": len(trace_quote),
+                "quote": trace_quote,
+            },
+        }
+    )
+    pair["composition"] = {
+        "schema_version": COMPOSITION_SCHEMA,
+        "steps": [
+            {
+                "step_id": "step:source",
+                "order": 1,
+                "member_id": "sourceguard",
+                "responsibility_condition_ids": ["source.primary.discovery"],
+                "depends_on_step_ids": [],
+                "input_handoff_ids": [],
+                "output_handoff_ids": ["handoff:source-trace"],
+            },
+            {
+                "step_id": "step:trace",
+                "order": 2,
+                "member_id": "traceguard",
+                "responsibility_condition_ids": ["trace.primary.reconstruction"],
+                "depends_on_step_ids": ["step:source"],
+                "input_handoff_ids": ["handoff:source-trace"],
+                "output_handoff_ids": [],
+            },
+        ],
+        "handoffs": [
+            {
+                "handoff_id": "handoff:source-trace",
+                "from_step_id": "step:source",
+                "to_step_id": "step:trace",
+                "field_ids": ["field:evidence-anchors"],
+            }
+        ],
+        "field_owners": [
+            {"field_id": "field:evidence-anchors", "owner_step_id": "step:source"}
+        ],
+        "overall_claim_boundary": "This proves route composition only, not native member completion.",
+    }
+    composed = select_member_request(pair, pair_argv, business_intent_id=pair_intent)
+    _assert(
+        isinstance(composed, RouteComposition)
+        and composed.member_ids == ("sourceguard", "traceguard"),
+        "umbrella accepts one necessary minimum-sufficient composition",
+        checks,
+    )
     result = _python("-m", "researchguard", "--help")
     _assert(
         result.returncode == 0

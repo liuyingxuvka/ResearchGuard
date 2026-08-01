@@ -1,119 +1,55 @@
 ---
 name: researchguard
-description: Route a research or investigation request to exactly one ResearchGuard member when the request crosses argument, source-discovery, evidence-trace, or experiment-selection boundaries, or when the correct member is genuinely ambiguous. Use LogicGuard for argument structure, SourceGuard for evidence discovery, TraceGuard for temporal reconstruction, and ExperimentGuard for discriminating-test recommendations.
+description: Route a genuinely ambiguous or cross-member research request to the minimum sufficient current ResearchGuard member set from source-bound task facts. Use direct LogicGuard, SourceGuard, TraceGuard, or ExperimentGuard entry when one native owner is already clear.
 ---
 
 # ResearchGuard
 
 ## Purpose
 
-ResearchGuard is the single suite-level entry for four complete native member skills:
-`logicguard`, `sourceguard`, `traceguard`, and `experimentguard`. It coordinates them without
-duplicating their native work or silently trying another member.
+ResearchGuard owns suite-level classification and explicit handoff for four complete members: `logicguard`, `sourceguard`, `traceguard`, and `experimentguard`. It never duplicates member work or silently tries another member.
 
-## Entrypoint Scope
+## Narrow entry
 
-This umbrella owns suite-level classification and explicit handoff only. Each
-member remains a complete direct skill and the sole owner of its native work.
+Use a member directly when the first action is clear. Direct entry bypasses this umbrella and reaches the same native owner.
 
-## Local Material Routing
+Use the umbrella only when the first action is genuinely ambiguous or the request mentions several member domains. Read `references/member-admission-index.md` under trigger `route:member-admission` before classification. Do not load the four member skills to decide the route.
 
-- Read `logicguard` for argument structure, source-library work, artifact
-  structure, deepening, synthesis, and project-library inspection.
-- Read `sourceguard` for evidence-discovery planning, retrieval, provenance,
-  source-role gaps, and claim-use qualification.
-- Read `traceguard` for temporal order, competing storylines, execution chains,
-  counter-scenarios, and bounded causal narratives.
-- Read `experimentguard` for minimum finite experiment sets that distinguish
-  caller-declared hypotheses.
+AI extracts one or more `primary_action` responsibility facts and optional context facts. Every fact has a stable id, current fact kind, statement, role, and exact request source span. AI does not set `applicable` or choose members. Each member's current contract derives its own positive, required, forbidden, first-action, and first-reference result. The router then selects the unique smallest set covering every primary responsibility.
 
-## Entrypoint Acceptance Map
-
-- `logicguard` intent -> one LogicGuard execution.
-- `sourceguard` intent -> one SourceGuard execution.
-- `traceguard` intent -> one TraceGuard execution.
-- `experimentguard` intent -> one ExperimentGuard execution.
-- genuine ambiguity -> visible blocked result before member execution.
-- typed cross-member need -> `awaiting_owner` handoff, never automatic
-  execution of another member.
-
-## Use When
-
-Use the umbrella for genuinely cross-member or ambiguous research requests.
-Use a member directly when its native owner is already clear.
-
-## Do Not Use When
-
-Do not use the umbrella to retry a failed member, combine member results into a
-stronger claim, or create a second implementation of member work.
-
-## Required Workflow
-
-1. Freeze the business intent and exact member arguments, then ask each of the
-   four members for its current, member-authored admission evidence over that
-   same request fingerprint. Do not infer admission from keywords.
-2. Use `logicguard` for argument structure, warrants, assumptions, rebuttals,
-   artifact structure, source-library preservation, model deepening, synthesis,
-   or the LogicGuard project-library viewer.
-3. Use `sourceguard` for evidence/source discovery plans, source-role gaps,
-   retrieval execution, provider evidence, and claim-use qualification.
-4. Use `traceguard` for temporal order, competing storylines, event/evidence
-   separation, execution chains, counter-scenarios, and bounded causal stories.
-5. Use `experimentguard` for recommendation-only discriminating experiment
-   selection from explicit hypotheses and predicted outcomes.
-6. Use the umbrella only for a genuinely cross-member or ambiguous request.
-   Supply the exact four-row admission set; the umbrella executes only when
-   exactly one current member contract reports `applicable` and all forbidden
-   conditions for that member are explicitly absent:
+Run:
 
 ```powershell
-researchguard run --business-intent-id <intent-id> --admission-evidence <four-member.json> -- <member arguments>
+researchguard run --business-intent-id <intent-id> --task-facts <task-facts.json> -- <member arguments>
 ```
 
-Missing, malformed, stale, zero-match, or many-match admission blocks before
-member execution. `--member` is not an umbrella selector and lexical fallback
-is not a current route.
+If one member covers the whole request, use only that member; a larger composition is over-selection. If several irreducible responsibilities require several members, include one `researchguard.member-composition.v1` object declaring the exact member set, contiguous order, earlier-step dependencies, per-member condition responsibilities, input/output handoffs, one producing owner for every handed field, and an overall claim boundary. The umbrella emits `composition_ready`; it does not guess member arguments or claim that native work ran.
 
-## Task-Local Deepening Boundary
+Missing or placeholder spans, stale fingerprints, unknown fact kinds, incomplete forbidden reviews, zero coverage, equal-minimum ambiguity, over-selection, or an incomplete composition block before member execution. There is no keyword, list-order, alias, `run all`, retry, or compatibility fallback.
 
-When the selected member is used for a non-trivial task, the member—not this
-umbrella—owns the iterative model loop. The member freezes task purpose and
-coverage, derives predictions and falsifiers, applies native observations, and
-returns gap transitions, next actions, and an explicit terminal reason. The
-umbrella must preserve the member's native receipt and must not replace it with a self-report
-such as "understood" or run a second member to manufacture closure. A result
-with open gaps remains open or is visibly stopped as stalled, limited, or
-external-input-required; only the selected member can declare its task model
-closed.
+## Member boundary
 
-Direct member commands execute the same owner and primary path:
+- LogicGuard owns argument structure, source-library work, structured artifacts, model deepening, synthesis, and its project-library viewer.
+- SourceGuard owns evidence discovery, retrieval, provenance, source-role gaps, and claim-use qualification.
+- TraceGuard owns temporal reconstruction, competing storylines, execution/effect chains, counter-scenarios, and bounded causal narratives.
+- ExperimentGuard owns recommendation-only minimum finite experiment sets over declared hypotheses and outcomes.
 
-```powershell
-researchguard logic <arguments>
-researchguard source <arguments>
-researchguard trace <arguments>
-researchguard experiment <arguments>
-```
+Context alone does not create another responsibility. A source-bound primary responsibility does. Necessary multi-member work uses the declared composition and typed handoffs; a handoff never executes the target member automatically.
 
-A member may emit a typed `awaiting_owner` handoff. A handoff names the source
-request, source member, target member, handoff kind, and payload. It does not
-execute the next member. Start one new explicit member request after inspecting
-the handoff. Re-entry with an active request id is blocked.
+## Selected-member depth
 
-## Hard Gates
+The selected member—not the umbrella—owns task-local predictions, falsifiers, native observations, gap lineage, revision, holdout evidence, and closure. A statement that the model "understands" is never evidence. Open native gaps remain open or end visibly as stalled, limited, externally dependent, or scope-excluded.
 
-- one exact member owns each execution;
-- the umbrella accepts exactly one member only from current member-authored
-  admission evidence bound to the exact request;
-- direct and umbrella entry bind to the same native owner;
-- ambiguity, recursion, unknown members, and terminal member failure are
-  visible blocked results;
-- no member result is upgraded by another member;
-- no old command, skill id, alias, forwarding shell, or alternate runtime is
-  part of the suite.
+## Hard gates
 
-## Output Requirements
+- one exact member owns each native execution, while the umbrella may coordinate only the minimum sufficient set;
+- direct and umbrella entry bind the same native owner and primary path;
+- all four derived rows bind the same request and current contracts;
+- every forbidden condition has an exact disposition;
+- responsibilities and handed fields have exactly one owner;
+- recursion, ambiguity, over-selection, unknown inputs, invalid composition, and member failure remain visible;
+- no member result is upgraded by another member.
 
-Report the selected member and path, evidence, failures, blockers, skipped checks,
-residual risk, any typed handoff, and the claim boundary. A failed,
-blocked, ambiguous, recursive, or not-run member remains visible and terminal.
+## Output
+
+Report the selected member or minimum sufficient set, declared order and responsibilities, evidence, failures, blockers, skipped checks, loaded references, residual risk, typed handoffs, field owners, terminal reason, and claim boundary.

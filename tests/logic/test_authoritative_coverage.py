@@ -301,6 +301,7 @@ def test_skill_contract_binds_authoritative_native_receipt_without_parallel_rout
     ]
     assert set(checks) == manifest_ids == {
         "check:logicguard:consumer-contract",
+        "check:logicguard:prompt-load",
         "check:logicguard:native-tests",
         "check:logicguard:task-model-closure",
     }

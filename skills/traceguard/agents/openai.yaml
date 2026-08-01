@@ -1,4 +1,4 @@
 interface:
   display_name: "TraceGuard"
   short_description: "Stress-test timelines and competing storylines"
-  default_prompt: "Use $traceguard to run the strict task-bound trace loop over actual semantic bindings, current native depth evidence, and a disjoint independent holdout before closure."
+  default_prompt: "Use $traceguard by selecting the general or case-library route and loading only its triggered references; enter the strict canonical inference, perturbation, revision, and disjoint-holdout loop for non-trivial, broad, causal, predictive, contradictory, model-miss, repeated-failure, or open-gap work."

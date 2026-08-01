@@ -1,5 +1,23 @@
 # Changelog
 
+## v0.4.1 - 2026-08-01
+
+- Replaced caller-authored applicability with source-bound task facts and
+  member-owned admission-v2 condition derivation, including exact per-condition
+  forbidden review and visible stale/placeholder/ambiguous blocking.
+- Added minimum-sufficient member-set derivation: one independently sufficient
+  member remains direct, while necessary compositions require exact members,
+  order, dependencies, responsibilities, handoffs, field owners, and one claim
+  boundary; over-selection and unbounded `run all` remain blocked.
+- Added one generated admission index and selected-only prompt loading; direct
+  member requests continue to bypass the umbrella.
+- Reduced the ResearchGuard, LogicGuard, SourceGuard, and TraceGuard entry
+  prompts and moved existing deep protocols, commands, safety language, and
+  template guidance into conditionally loaded target-owned references.
+- Added prompt-bundle/load-graph budgets and known-bad checks while preserving
+  every member's existing strict task-local prediction, native depth, gap, and
+  holdout closure rules.
+
 ## v0.4.0 - 2026-07-31
 
 - Replaced caller-selected umbrella routing with exact four-member,

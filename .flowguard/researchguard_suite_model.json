@@ -1,6 +1,6 @@
 {
   "artifact_kind": "flowguard_researchguard_suite_model",
-  "model_id": "researchguard.suite.v0.4.0",
+  "model_id": "researchguard.suite.v0.4.1",
   "schema_version": "1.0",
   "behavior_plane": "product_runtime",
   "business_intents": [
@@ -33,7 +33,12 @@
   "function_blocks": [
     {
       "id": "route",
-      "relation": "ExactFourMemberAdmissions x Unrouted -> Set(OneMemberRequest x Routed, AdmissionGap x Blocked)",
+      "relation": "SourceBoundTaskFacts x Unrouted -> Set(DerivedExactFourAdmissions x MinimumSufficientMemberSet x (OneMemberRequest x Routed + DeclarativeComposition x CompositionReady), AdmissionGap x Blocked)",
+      "alternate_success": false
+    },
+    {
+      "id": "validate_prompt_load",
+      "relation": "SelectedMember x DeclaredTriggers -> Set(SelectedEntryAndTriggeredReferences x Routed, PromptLoadGap x Blocked)",
       "alternate_success": false
     },
     {
@@ -71,9 +76,17 @@
     "one_distribution",
     "five_skill_surfaces_four_native_members",
     "same_suite_fingerprint",
-    "exact_four_current_member_authored_admissions",
-    "exactly_one_applicable_member_before_execution",
-    "zero_or_many_admissions_block_without_lexical_fallback",
+    "source_bound_task_facts_do_not_set_applicability",
+    "exact_four_current_member_derived_admissions",
+    "exact_forbidden_condition_dispositions",
+    "minimum_sufficient_member_set_covers_every_primary_responsibility",
+    "one_sufficient_member_forbids_over_selection",
+    "necessary_composition_has_exact_members_order_dependencies_responsibilities_handoffs_field_owners_and_claim_boundary",
+    "zero_coverage_or_equal_minimum_ambiguity_blocks_without_lexical_fallback",
+    "direct_member_bypasses_umbrella",
+    "selected_member_only_prompt_load",
+    "triggered_reference_required",
+    "untriggered_reference_not_loaded",
     "direct_and_umbrella_same_primary_path",
     "selected_route_failure_is_terminal",
     "typed_handoff_requires_explicit_owner",
@@ -88,5 +101,5 @@
     "predecessor_distribution_state_cannot_change_fingerprint",
     "no_predecessor_distribution_query"
   ],
-  "claim_boundary": "This model governs exact member-authored suite admission, routing, installation, migration, and authority topology. Member-native LogicGuard, SourceGuard, TraceGuard, and ExperimentGuard receipts remain necessary for task-model closure and domain claims; experiment output is recommendation-only."
+  "claim_boundary": "This model governs source-bound derived admission, minimum-sufficient member-set selection, declarative composition planning, selected-only conditional prompt loading, routing, installation, migration, and authority topology. A composition-ready result does not prove any native member execution. Member-native LogicGuard, SourceGuard, TraceGuard, and ExperimentGuard receipts remain necessary for task-model closure and domain claims; experiment output is recommendation-only."
 }

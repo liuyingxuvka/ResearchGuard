@@ -1,4 +1,4 @@
 interface:
   display_name: "LogicGuard"
   short_description: "Audit and deepen argument structure"
-  default_prompt: "Use $logicguard to run the strict task-bound argument-model loop, consume current native depth evidence, protect covered claims, test an independent holdout, and close only when no covered gap remains."
+  default_prompt: "Use $logicguard by selecting one current internal route and loading only its declared references; trigger the existing strict prediction/depth/holdout loop only for non-trivial, broad, predictive, contradictory, model-miss, repeated-failure, or open-gap work, and never close while a native gap remains."
