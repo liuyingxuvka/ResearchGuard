@@ -1,7 +1,9 @@
 # researchguard-member-model-loops Specification
 
 ## Purpose
-TBD - created by archiving change close-researchguard-member-model-loops. Update Purpose after archive.
+Define separate target-owned iterative closure for LogicGuard, SourceGuard,
+TraceGuard, and ExperimentGuard while preserving ResearchGuard's exact-one
+member routing boundary.
 ## Requirements
 ### Requirement: Each member owns its own iterative closure
 
