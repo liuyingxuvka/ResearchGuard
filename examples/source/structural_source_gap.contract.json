@@ -12,7 +12,7 @@
       "known_bad": {"case_id": "bad:structural-gap:unqualified-bridge", "observation_path": "model-purpose-observation.yaml", "expected_native_status": "blocked", "mutation_id": "make-all-anchors-unusable", "expected_native_finding": "gaps:gap-structural-method-bridge"}
     }
   ],
-  "external_universe": {"gap_ids": ["gap-structural-method-bridge"], "target_unit_ids": ["chapter_3.technology_summary"]},
+  "external_universe": {"gap_ids": ["gap-structural-method-bridge"], "target_unit_ids": ["chapter_3.technology_summary"], "source_role_ids": ["source-role:gap-structural-method-bridge:bridge_evidence", "source-role:gap-structural-method-bridge:method_source"], "lineage_slot_ids": [], "anchor_requirement_ids": [], "handoff_ids": []},
   "claim_boundary": "Source discovery and evidence-depth only; factual truth remains downstream.",
   "native_oracle_catalog_fingerprint": "2C01D891559625D9123F17E817B63B3E4E9323CA1C3EB81923B82D7DBDC79B15",
   "purpose_frozen": true,

@@ -311,6 +311,7 @@ class HypothesisProjection:
 @dataclass(frozen=True)
 class InferenceReceipt:
     receipt_id: str
+    model_fingerprint: str
     problem_fingerprint: str
     solution_fingerprint: str
     atom_values_fingerprint: str
@@ -342,6 +343,7 @@ class InferenceReceipt:
     def to_dict(self) -> dict[str, Any]:
         return {
             "receipt_id": self.receipt_id,
+            "model_fingerprint": self.model_fingerprint,
             "problem_fingerprint": self.problem_fingerprint,
             "solution_fingerprint": self.solution_fingerprint,
             "atom_values_fingerprint": self.atom_values_fingerprint,

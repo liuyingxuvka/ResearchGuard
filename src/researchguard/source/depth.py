@@ -678,6 +678,12 @@ def build_source_coverage_universe(
         "discovered_target_unit_ids": discovered_target_units,
         "require_explicit_lineage": policy.require_explicit_lineage,
         "require_anchor_content": policy.require_anchor_content,
+        "required_gap_ids": sorted(policy.required_gap_ids),
+        "required_lineage_slot_ids": sorted(policy.required_lineage_slot_ids),
+        "required_anchor_requirement_ids": sorted(policy.required_anchor_requirement_ids),
+        "required_handoff_ids": sorted(policy.required_handoff_ids),
+        "known_good_case_ids": sorted(policy.known_good_case_ids),
+        "known_bad_case_ids": sorted(policy.known_bad_case_ids),
         "per_gap_portfolio_required": policy.per_gap_portfolio_required,
         "dimensions": [
             {
@@ -839,6 +845,23 @@ def apply_observation_and_replan(
         ],
         broad_claim_licensed=broad_claim_licensed,
         status=status,
+        deepest_proven_layer=(
+            "native-observation-closure"
+            if broad_claim_licensed
+            else ("observation-and-replan" if observation_depth else "planning")
+        ),
+        first_unresolved_gap=(unresolved[0] if unresolved else ""),
+        affected_obligation_ids=sorted(
+            {
+                gap.gap_id
+                for gap in updated.gaps
+                if observation is not None
+                and (
+                    gap.qualification.observation_id == observation.observation_id
+                    or observation.observation_id in gap.closure_basis.observation_ids
+                )
+            }
+        ),
     )
     return updated, receipt
 

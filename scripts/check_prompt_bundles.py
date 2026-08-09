@@ -71,6 +71,7 @@ def check_prompt_bundles(
     manifest = _read_manifest() if manifest is None else manifest
     failures: list[dict[str, str]] = []
     bundles: list[dict[str, Any]] = []
+    bundle_entries: dict[str, str] = {}
     for row in manifest.get("bundles", []):
         skill_id = str(row.get("skill_id", ""))
         if member != "all" and skill_id != member:
@@ -88,6 +89,9 @@ def check_prompt_bundles(
             failures.append({"code": "entry-budget-exceeded", "skill_id": skill_id, "detail": f"{total}>{limit}"})
         if headroom < minimum:
             failures.append({"code": "entry-headroom-insufficient", "skill_id": skill_id, "detail": f"{headroom}<{minimum}"})
+        bundle_entries[skill_id] = "\n".join(
+            path.read_text(encoding="utf-8") for path in paths
+        )
         bundles.append(
             {
                 "skill_id": skill_id,
@@ -112,6 +116,111 @@ def check_prompt_bundles(
         relative_reference = Path(reference).relative_to(Path("skills") / str(edge["skill_id"])).as_posix()
         if relative_reference not in declaration or trigger not in declaration:
             failures.append({"code": "reference-edge-undeclared", "skill_id": str(edge.get("skill_id", "")), "detail": f"{trigger}:{relative_reference}"})
+
+    reference_edges = {
+        (
+            str(edge.get("skill_id", "")),
+            str(edge.get("trigger_id", "")),
+            str(edge.get("reference", "")),
+        )
+        for edge in manifest.get("reference_edges", [])
+    }
+    boundary_rows = [
+        row
+        for row in manifest.get("conditional_blueprint_boundaries", [])
+        if member == "all" or str(row.get("skill_id", "")) == member
+    ]
+    expected_boundary_skills = {
+        skill_id for skill_id in bundle_entries if member == "all" or skill_id == member
+    }
+    actual_boundary_skills = [str(row.get("skill_id", "")) for row in boundary_rows]
+    if set(actual_boundary_skills) != expected_boundary_skills or len(actual_boundary_skills) != len(
+        set(actual_boundary_skills)
+    ):
+        failures.append(
+            {
+                "code": "blueprint-boundary-inventory-mismatch",
+                "skill_id": member,
+                "detail": ",".join(actual_boundary_skills),
+            }
+        )
+
+    for row in boundary_rows:
+        skill_id = str(row.get("skill_id", ""))
+        trigger_id = str(row.get("trigger_id", ""))
+        reference = str(row.get("reference", ""))
+        role = str(row.get("role", ""))
+        if (skill_id, trigger_id, reference) not in reference_edges:
+            failures.append(
+                {
+                    "code": "blueprint-boundary-edge-missing",
+                    "skill_id": skill_id,
+                    "detail": f"{trigger_id}:{reference}",
+                }
+            )
+            continue
+        if role not in {"composition-transport", "member-domain-dna"}:
+            failures.append(
+                {
+                    "code": "blueprint-boundary-role-invalid",
+                    "skill_id": skill_id,
+                    "detail": role,
+                }
+            )
+            continue
+        target = ROOT / reference
+        if not target.is_file():
+            continue
+        reference_text = target.read_text(encoding="utf-8")
+        required_reference_terms = {
+            "ResearchGuard repository software-DNA root",
+            "FlowGuard-owned",
+            "member-domain DNA",
+        }
+        if role == "composition-transport":
+            required_reference_terms.add("composition transport")
+        missing_reference_terms = sorted(
+            term for term in required_reference_terms if term not in reference_text
+        )
+        if missing_reference_terms:
+            failures.append(
+                {
+                    "code": "blueprint-reference-boundary-missing",
+                    "skill_id": skill_id,
+                    "detail": ",".join(missing_reference_terms),
+                }
+            )
+        entry_text = bundle_entries.get(skill_id, "")
+        missing_entry_terms = sorted(
+            term
+            for term in (
+                "ResearchGuard repository software-DNA root",
+                "FlowGuard-owned",
+                "member-domain DNA",
+            )
+            if term not in entry_text
+        )
+        if missing_entry_terms:
+            failures.append(
+                {
+                    "code": "blueprint-entry-boundary-missing",
+                    "skill_id": skill_id,
+                    "detail": ",".join(missing_entry_terms),
+                }
+            )
+        eager_terms = sorted(
+            str(term)
+            for term in manifest.get("prohibited_eager_self_dna_terms", [])
+            if str(term) and str(term) in entry_text
+        )
+        if eager_terms:
+            failures.append(
+                {
+                    "code": "blueprint-self-dna-detail-eager",
+                    "skill_id": skill_id,
+                    "detail": ",".join(eager_terms),
+                }
+            )
 
     expected_index = render_member_admission_index()
     if member in {"all", "researchguard"} and (

@@ -23,7 +23,7 @@
       "profile_id": "researchguard.logic.base",
       "family": "base",
       "path": "profiles/base.json",
-      "sha256": "2b53e8da256429963b00afbd9e2d7e513da409239e56b0b847407a0fef5977d8"
+      "sha256": "7ad5cbb9a4096ceba5c9a8a4c4c35b639f47238e51fe0cbc6c32b18f5c53bd08"
     },
     {
       "profile_id": "researchguard.logic.deepening",
@@ -35,13 +35,13 @@
       "profile_id": "researchguard.logic.execution-package",
       "family": "execution-package",
       "path": "profiles/execution-package.json",
-      "sha256": "3c9227189ef1660b11fae6f290e5c3425b7fab01dd1dda4e74e6fadc4325c126"
+      "sha256": "137f9e0312dffa44bf7ea9f5c471858710e432c5a5f171a850abaf93d1c6c94c"
     },
     {
       "profile_id": "researchguard.logic.purpose",
       "family": "purpose",
       "path": "profiles/purpose.json",
-      "sha256": "524bd2e0cbcc015ebdfae0dd7963b7371dc056f17395449a53bade1e91ec495b"
+      "sha256": "a08eaa8918babff1f09a07e44e81ee392d74a8a876bbf938a96665431981766e"
     },
     {
       "profile_id": "researchguard.logic.source-library",
@@ -53,7 +53,7 @@
       "profile_id": "researchguard.logic.structured-artifact",
       "family": "structured-artifact",
       "path": "profiles/structured-artifact.json",
-      "sha256": "ce5bd396538aedb5ffbabdad0f12ff9abedaf0580fe393be58c77929ea85ed6d"
+      "sha256": "51810cd787e1efe12449c7996886651fe5c3e00090b262091259ff70bdddbdb4"
     },
     {
       "profile_id": "researchguard.logic.synthesis",
@@ -62,5 +62,5 @@
       "sha256": "50dae76a2e8cfa295d37d6bf7ac0652b65da75917111e017e5d03f6947d7f821"
     }
   ],
-  "catalog_digest": "c426298f32eeae382c27f9f459e7ea682b240388b6b3c297094b0c119381dfdd"
+  "catalog_digest": "574e4a3ab176ad4a92899b68c321a86a1fa3bdc2e44b0bc61bebefe28a720c1b"
 }

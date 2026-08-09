@@ -30,6 +30,12 @@ class _PassingDepth:
     unresolved_gaps = ()
     critical_uncovered_ids = ()
     critical_ineffective_ids = ()
+    hierarchy_fingerprint = "sha256:" + "1" * 64
+    interface_fingerprint = "sha256:" + "2" * 64
+    live_alternative_ids = ()
+    causal_boundaries = ()
+    deepest_proven_layer = "native-storyline-depth"
+    first_unresolved_gap = ""
 
     def to_dict(self):
         return {

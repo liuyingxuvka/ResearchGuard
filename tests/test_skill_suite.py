@@ -27,6 +27,13 @@ RETIRED_SKILL_IDS = (
     "logicguard-project-library-viewer",
     "traceguard-library",
 )
+BLUEPRINT_REFERENCES = {
+    "researchguard": "references/member-model-envelope.md",
+    "logicguard": "references/domain-blueprint-contract.md",
+    "sourceguard": "references/information-blueprint.md",
+    "traceguard": "references/trace-blueprint-contract.md",
+    "experimentguard": "references/experiment-model-protocol.md",
+}
 
 
 def test_consumer_skill_inventory_and_metadata_are_exact() -> None:
@@ -98,6 +105,89 @@ def test_author_contracts_form_one_five_surface_unit() -> None:
         assert payload["skill_id"] == member
         assert payload["integration_mode"] == "native-integrated"
         assert payload["may_define_skillguard_runtime_route"] is False
+
+
+def test_member_domain_dna_and_repository_software_dna_stay_separate() -> None:
+    eager_detail_terms = (
+        "seven software-DNA readiness layers",
+        "repository denominator",
+        "canonical self-DNA export",
+        "architecture reduction",
+    )
+    for member, reference in BLUEPRINT_REFERENCES.items():
+        skill_root = ROOT / "skills" / member
+        skill_text = skill_root.joinpath("SKILL.md").read_text(encoding="utf-8")
+        agent_text = skill_root.joinpath("agents/openai.yaml").read_text(
+            encoding="utf-8"
+        )
+        reference_text = skill_root.joinpath(reference).read_text(encoding="utf-8")
+        for entry_text in (skill_text, agent_text):
+            assert "member-domain dna" in entry_text.casefold()
+            assert "ResearchGuard repository software-DNA root" in entry_text
+            assert "FlowGuard-owned" in entry_text
+            assert not any(term in entry_text for term in eager_detail_terms)
+        assert "member-domain DNA" in reference_text
+        assert "ResearchGuard repository software-DNA root" in reference_text
+        assert "FlowGuard-owned" in reference_text
+        if member == "researchguard":
+            assert "composition transport" in reference_text
+        else:
+            assert "not a whole-repository software blueprint" in reference_text
+
+
+def test_member_domain_dna_entrypoints_preserve_external_authority_boundary() -> None:
+    reference_paths = {
+        member: [reference]
+        for member, reference in BLUEPRINT_REFERENCES.items()
+    }
+    reference_paths["researchguard"].append("references/external-domain-dna.md")
+
+    for member, references in reference_paths.items():
+        skill_root = ROOT / "skills" / member
+        entry_text = "\n".join(
+            (
+                skill_root.joinpath("SKILL.md").read_text(encoding="utf-8"),
+                skill_root.joinpath("agents/openai.yaml").read_text(
+                    encoding="utf-8"
+                ),
+            )
+        ).casefold()
+        for term in (
+            "external",
+            "admission",
+            "native",
+            "persistent",
+            "immutable",
+            "cache",
+            "unverified",
+            "different target",
+            "separate anchor",
+            "generic",
+            "issuer",
+            "inline candidate-authoring",
+        ):
+            assert term in entry_text, (member, term)
+
+        for reference in references:
+            reference_text = skill_root.joinpath(reference).read_text(
+                encoding="utf-8"
+            ).casefold()
+            for term in (
+                "external",
+                "admission",
+                "native",
+                "persistent",
+                "immutable",
+                "cache",
+                "unverified",
+                "different target",
+                "generic",
+                "issuer",
+                "inline candidate-authoring",
+                "exactly one",
+                "replay",
+            ):
+                assert term in reference_text, (member, reference, term)
 
 
 def test_sourceguard_rejects_retired_gap_projection() -> None:

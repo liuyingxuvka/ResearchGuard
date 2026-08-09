@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from ..schema import SCHEMA_ID, TraceGuardModel
+from ..schema import SCHEMA_ID, TraceGuardModel, trace_model_fingerprint
 from ..validation import validate_references
 from .factors import (
     build_entity_factors,
@@ -51,6 +51,7 @@ def compile_model(
     metadata: dict[str, Any] = {
         "builder_order": [builder.__module__ for builder in builders],
         "model_instance_id": model.metadata.get("model_instance_id", ""),
+        "model_fingerprint": trace_model_fingerprint(model),
     }
     for builder in builders:
         result = builder(model, policy)

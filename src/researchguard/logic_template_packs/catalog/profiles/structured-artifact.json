@@ -32,7 +32,7 @@
   "native_binding": {
     "route_id": "route:researchguard.logic:structured-artifact",
     "owner_callable": "researchguard.logic.structured_artifact:build_artifact_map",
-    "owner_fingerprint": "6ce01f7ed6ae920371112bcbcde90a73d977bf7ede04ac0baac2ba5703e2b503",
+    "owner_fingerprint": "bb91a62d50734aa9f8e3c366c556221ded3c8127c207450351bab1a7a47e4313",
     "validators": [
       {
         "validator_id": "logicguard-template-pack:structured-artifact",

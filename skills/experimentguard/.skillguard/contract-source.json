@@ -22,6 +22,22 @@
     ],
     "release_manifest_path": "consumer-release.json"
   },
+  "projection_consumers": [
+    {
+      "consumer_id": "projection:researchguard-suite-maintenance-definition",
+      "kind": "source_maintenance",
+      "input_selectors": [
+        {
+          "kind": "path",
+          "path": ".skillguard/test-mesh.json"
+        },
+        {
+          "kind": "path",
+          "path": "scripts/check_researchguard_test_mesh.py"
+        }
+      ]
+    }
+  ],
   "model_id": "researchguard.experimentguard.contract.current",
   "model_path": ".flowguard/experimentguard_skill_contract_model.py",
   "confirmed": true,
@@ -116,7 +132,17 @@
     "tests/experiment",
     "researchguard/prompt_bundle_manifest.json",
     "scripts/check_prompt_bundles.py",
-    "tests/test_prompt_bundles.py"
+    "src/researchguard/target_authority.py",
+    "src/researchguard/model_envelope.py",
+    "src/researchguard/experiment/owner_attestation.py",
+    "src/researchguard/experiment/blueprint.py",
+    "src/researchguard/experiment/schema.py",
+    "src/researchguard/experiment/engine.py",
+    "src/researchguard/experiment/cli.py",
+    "tests/experiment/test_blueprint_design.py",
+    "skills/experimentguard/references/experiment-model-protocol.md",
+    ".skillguard/test-mesh.json",
+    "scripts/check_researchguard_test_mesh.py"
   ],
   "step_bindings": [
     {
@@ -251,15 +277,15 @@
         },
         {
           "kind": "path",
+          "path": "skills/experimentguard/references/experiment-model-protocol.md"
+        },
+        {
+          "kind": "path",
           "path": "researchguard/prompt_bundle_manifest.json"
         },
         {
           "kind": "path",
           "path": "scripts/check_prompt_bundles.py"
-        },
-        {
-          "kind": "path",
-          "path": "tests/test_prompt_bundles.py"
         }
       ],
       "expected": {
@@ -304,40 +330,40 @@
           "path": "src/researchguard/experiment"
         },
         {
-          "kind": "path",
-          "path": ".flowguard/researchguard_suite_model.py"
-        },
-        {
-          "kind": "path",
-          "path": ".flowguard/researchguard_suite_model.json"
-        },
-        {
-          "kind": "path",
-          "path": ".flowguard/run_researchguard_suite_model.py"
-        },
-        {
-          "kind": "path",
-          "path": ".flowguard/experimentguard_skill_contract_model.py"
-        },
-        {
-          "kind": "path",
-          "path": ".flowguard/researchguard_skill_contract_model_common.py"
-        },
-        {
           "kind": "subtree",
           "path": "tests/experiment"
         },
         {
           "kind": "path",
-          "path": "researchguard/prompt_bundle_manifest.json"
+          "path": "src/researchguard/target_authority.py"
         },
         {
           "kind": "path",
-          "path": "scripts/check_prompt_bundles.py"
+          "path": "src/researchguard/model_envelope.py"
         },
         {
           "kind": "path",
-          "path": "tests/test_prompt_bundles.py"
+          "path": "src/researchguard/experiment/owner_attestation.py"
+        },
+        {
+          "kind": "path",
+          "path": "src/researchguard/experiment/blueprint.py"
+        },
+        {
+          "kind": "path",
+          "path": "src/researchguard/experiment/schema.py"
+        },
+        {
+          "kind": "path",
+          "path": "src/researchguard/experiment/engine.py"
+        },
+        {
+          "kind": "path",
+          "path": "src/researchguard/experiment/cli.py"
+        },
+        {
+          "kind": "path",
+          "path": "tests/experiment/test_blueprint_design.py"
         }
       ],
       "expected": {
@@ -355,7 +381,7 @@
         "obligation:researchguard:experimentguard:native-tests"
       ],
       "coverage_scope": "declared_obligations",
-      "coverage_rationale": "This check is the sole execution owner for its exact member obligation."
+      "coverage_rationale": "This existing member-native owner runs the complete declared member test suite once. Its exact blueprint code/test selectors cover native qualification, qualification-first impact and reverse trace, persisted fresh-process target-authority replay, and caller-forged/co-shrunk self-attestation rejection without adding duplicate execution owners. "
     },
     {
       "check_id": "check:experimentguard:task-model-closure",
@@ -409,5 +435,5 @@
     }
   ],
   "judgment_rubrics": [],
-  "claim_boundary": "This contract covers the current experimentguard consumer projection, native route, and member-owned tests inside ResearchGuard v0.4.1. It does not prove source truth, unrun external work, installation, publication, or future AI behavior."
+  "claim_boundary": "This contract covers the current experimentguard consumer projection, native route, and member-owned tests inside ResearchGuard v0.4.3. The four exact native-blueprint evidence categories are selectors of the one existing target-owned native-tests owner, so final validation does not repeat the same member suite. Distinct model obligation ids remain a later binding with the frozen FlowGuard self-DNA toolchain. It does not prove source truth, unrun external work, installed currentness, publication, or future AI behavior."
 }

@@ -8,6 +8,7 @@ cases before the model can be used.
 
 from __future__ import annotations
 
+import base64
 from copy import deepcopy
 import hashlib
 import json
@@ -16,7 +17,7 @@ from typing import Any
 
 import yaml
 
-from .depth import build_source_depth_receipt
+from .depth import build_source_depth_receipt, model_fingerprint
 from .schema import (
     BeliefState,
     Observation,
@@ -27,6 +28,10 @@ from .schema import (
 
 
 TARGET_PURPOSE_RESULT_SCHEMA = "researchguard.source.target_model_purpose_proof.v1"
+PORTABLE_TARGET_PROOF_MATERIAL_SCHEMA = (
+    "researchguard.source.portable_target_proof_material.v1"
+)
+PORTABLE_TARGET_PROOF_MATERIAL_ID = "sourceguard:target-proof-material"
 
 
 def load_target_contract(path: str | Path) -> SourceGuardModelContract:
@@ -82,6 +87,14 @@ def target_contract_input_fingerprint(
 
 def _load_observation(path: Path) -> Observation:
     raw = yaml.safe_load(path.read_text(encoding="utf-8"))
+    return Observation.from_dict(raw or {})
+
+
+def _load_observation_bytes(body: bytes, relative_path: str) -> Observation:
+    try:
+        raw = yaml.safe_load(body.decode("utf-8"))
+    except (UnicodeError, yaml.YAMLError) as exc:
+        raise SchemaError(f"portable observation is unreadable: {relative_path}") from exc
     return Observation.from_dict(raw or {})
 
 
@@ -141,11 +154,22 @@ def _evaluate_case(
     failure: SourceGuardPreventedFailure,
     *,
     bad: bool,
+    portable_documents: dict[str, bytes] | None = None,
 ) -> tuple[Any, set[str], Path]:
     case = failure.known_bad if bad else failure.known_good
-    observation_path = _resolve_target_input(contract_path, case.observation_path)
+    if portable_documents is None:
+        observation_path = _resolve_target_input(contract_path, case.observation_path)
+        observation = _load_observation(observation_path)
+    else:
+        relative = Path(case.observation_path).as_posix()
+        if Path(relative).is_absolute() or ".." in Path(relative).parts:
+            raise SchemaError("portable purpose proof input escapes the contract root")
+        body = portable_documents.get(relative)
+        if body is None:
+            raise SchemaError(f"portable purpose proof input is missing: {relative}")
+        observation_path = contract_path.parent / relative
+        observation = _load_observation_bytes(body, relative)
     candidate = deepcopy(model)
-    observation = _load_observation(observation_path)
     if bad:
         apply_native_oracle_mutation(candidate, observation, case.mutation_id)
     receipt = build_source_depth_receipt(
@@ -156,6 +180,98 @@ def _evaluate_case(
     return receipt, _native_findings(receipt), observation_path
 
 
+def build_portable_target_contract_material(
+    model: BeliefState, *, contract_path: str | Path
+) -> bytes:
+    """Freeze SourceGuard's exact contract/observation proof denominator."""
+
+    contract = model.guard_contract
+    if contract is None:
+        raise SchemaError("target model purpose proof requires a current contract")
+    resolved = Path(contract_path).resolve(strict=True)
+    rows = []
+    for path in target_contract_input_paths(contract, resolved):
+        body = path.read_bytes()
+        rows.append(
+            {
+                "relative_path": path.relative_to(resolved.parent).as_posix(),
+                "sha256": hashlib.sha256(body).hexdigest(),
+                "body_b64": base64.b64encode(body).decode("ascii"),
+            }
+        )
+    return (
+        json.dumps(
+            {
+                "schema_version": PORTABLE_TARGET_PROOF_MATERIAL_SCHEMA,
+                # Portable material must describe the target's logical layout,
+                # not the exporter machine's temporary absolute directory.
+                "contract_locator": resolved.name,
+                "files": rows,
+            },
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        )
+        + "\n"
+    ).encode("utf-8")
+
+
+def _portable_target_documents(
+    model: BeliefState, material: bytes, *, contract_path: str | Path
+) -> dict[str, bytes]:
+    try:
+        raw = json.loads(material.decode("utf-8"))
+    except (UnicodeError, json.JSONDecodeError) as exc:
+        raise SchemaError("portable SourceGuard target proof material is not JSON") from exc
+    if not isinstance(raw, dict) or set(raw) != {
+        "schema_version",
+        "contract_locator",
+        "files",
+    }:
+        raise SchemaError("portable SourceGuard target proof denominator is invalid")
+    if raw["schema_version"] != PORTABLE_TARGET_PROOF_MATERIAL_SCHEMA:
+        raise SchemaError("portable SourceGuard target proof schema is not current")
+    resolved = Path(contract_path).resolve()
+    locator = Path(str(raw["contract_locator"]))
+    if (
+        locator.is_absolute()
+        or ".." in locator.parts
+        or locator.as_posix() != resolved.name
+    ):
+        raise SchemaError("portable SourceGuard contract locator differs")
+    rows = raw["files"]
+    if not isinstance(rows, list):
+        raise SchemaError("portable SourceGuard target proof files are invalid")
+    documents: dict[str, bytes] = {}
+    for row in rows:
+        if not isinstance(row, dict) or set(row) != {
+            "relative_path",
+            "sha256",
+            "body_b64",
+        }:
+            raise SchemaError("portable SourceGuard target proof file is invalid")
+        relative = Path(str(row["relative_path"])).as_posix()
+        if Path(relative).is_absolute() or ".." in Path(relative).parts or relative in documents:
+            raise SchemaError("portable SourceGuard target proof path is invalid")
+        try:
+            body = base64.b64decode(str(row["body_b64"]).encode("ascii"), validate=True)
+        except (UnicodeError, ValueError) as exc:
+            raise SchemaError("portable SourceGuard target proof bytes are invalid") from exc
+        if hashlib.sha256(body).hexdigest() != str(row["sha256"]):
+            raise SchemaError("portable SourceGuard target proof fingerprint differs")
+        documents[relative] = body
+    contract = model.guard_contract
+    if contract is None:
+        raise SchemaError("target model purpose proof requires a current contract")
+    required = {resolved.name}
+    for failure in contract.prevented_failures:
+        required.add(Path(failure.known_good.observation_path).as_posix())
+        required.add(Path(failure.known_bad.observation_path).as_posix())
+    if set(documents) != required:
+        raise SchemaError("portable SourceGuard target proof file denominator is not closed")
+    return documents
+
+
 def prove_target_model_contract(
     model: BeliefState,
     contract_path: str | Path,
@@ -164,6 +280,19 @@ def prove_target_model_contract(
     if contract is None:
         raise SchemaError("target model purpose proof requires a current contract")
     contract_path = Path(contract_path).resolve()
+    from ..portable_material import portable_native_material_bytes_by_id
+
+    portable_material = portable_native_material_bytes_by_id(
+        member_id="sourceguard",
+        material_id=PORTABLE_TARGET_PROOF_MATERIAL_ID,
+    )
+    portable_documents = (
+        None
+        if portable_material is None
+        else _portable_target_documents(
+            model, portable_material, contract_path=contract_path
+        )
+    )
     results: list[dict[str, Any]] = []
     for failure in contract.prevented_failures:
         _, good_findings, good_path = _evaluate_case(
@@ -171,6 +300,7 @@ def prove_target_model_contract(
             contract_path,
             failure,
             bad=False,
+            portable_documents=portable_documents,
         )
         expected = failure.known_bad.expected_native_finding
         if expected in good_findings:
@@ -182,6 +312,7 @@ def prove_target_model_contract(
             contract_path,
             failure,
             bad=True,
+            portable_documents=portable_documents,
         )
         if expected not in bad_findings:
             raise SchemaError(
@@ -203,13 +334,29 @@ def prove_target_model_contract(
                 },
             }
         )
-    return {
+    payload = {
         "schema_version": TARGET_PURPOSE_RESULT_SCHEMA,
         "status": "pass",
         "model_id": contract.model_id,
-        "contract_input_fingerprint": target_contract_input_fingerprint(
-            contract,
-            contract_path,
+        "model_fingerprint": f"sha256:{model_fingerprint(model)}",
+        "model_contract_fingerprint": model.candidate_contract_fingerprint,
+        "contract_input_fingerprint": (
+            target_contract_input_fingerprint(contract, contract_path)
+            if portable_documents is None
+            else hashlib.sha256(
+                json.dumps(
+                    [
+                        {
+                            "path": relative,
+                            "sha256": hashlib.sha256(body).hexdigest().upper(),
+                        }
+                        for relative, body in sorted(portable_documents.items())
+                    ],
+                    ensure_ascii=False,
+                    sort_keys=True,
+                    separators=(",", ":"),
+                ).encode("utf-8")
+            ).hexdigest().upper()
         ),
         "failure_results": results,
         "claim_boundary": (
@@ -217,11 +364,16 @@ def prove_target_model_contract(
             "it does not prove source truth or final argument support."
         ),
     }
+    payload["receipt_fingerprint"] = "sha256:" + hashlib.sha256(
+        json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    ).hexdigest()
+    return payload
 
 
 __all__ = [
     "TARGET_PURPOSE_RESULT_SCHEMA",
     "apply_native_oracle_mutation",
+    "build_portable_target_contract_material",
     "load_target_contract",
     "prove_target_model_contract",
     "target_contract_input_fingerprint",

@@ -12,7 +12,7 @@
       "known_bad": {"case_id": "bad:fuel-cell:unqualified-primary", "observation_path": "model-purpose-observation.yaml", "expected_native_status": "blocked", "mutation_id": "make-all-anchors-unusable", "expected_native_finding": "gaps:gap-weak-signal"}
     }
   ],
-  "external_universe": {"gap_ids": ["gap-execution", "gap-independent", "gap-location", "gap-weak-signal"], "target_unit_ids": []},
+  "external_universe": {"gap_ids": ["gap-execution", "gap-independent", "gap-location", "gap-weak-signal"], "target_unit_ids": [], "source_role_ids": ["source-role:gap-execution:independent_report", "source-role:gap-execution:primary_source", "source-role:gap-execution:visual_evidence", "source-role:gap-independent:independent_report", "source-role:gap-independent:limiting_evidence", "source-role:gap-location:primary_source", "source-role:gap-location:visual_evidence", "source-role:gap-weak-signal:counter_evidence", "source-role:gap-weak-signal:independent_report", "source-role:gap-weak-signal:primary_source"], "lineage_slot_ids": [], "anchor_requirement_ids": [], "handoff_ids": []},
   "claim_boundary": "Weak signals are source candidates, not deployment proof.",
   "native_oracle_catalog_fingerprint": "2C01D891559625D9123F17E817B63B3E4E9323CA1C3EB81923B82D7DBDC79B15",
   "purpose_frozen": true,

@@ -1,0 +1,3188 @@
+{
+  "claim_boundary": "This external-domain DNA binds paper:arxiv-1706.03762v7 within declared scope scope:attention-v7:reported-enfr-bleu-consistency to a closed material inventory, structure graph, four member-native transitions, executable parent mappings, and code, material, test, oracle, and evidence relations. It proves deterministic model consistency and closure only for that declared scope; a complete file inventory does not imply complete whole-target semantics. External authenticity requires exact current-material replay and trusted whole-artifact identities. It does not establish factual truth, undocumented causality or intent, execute experiments, or replace the four native member owners.",
+  "dependency_edges": [
+    {
+      "edge_id": "dependency:sourceguard:traceguard",
+      "from_id": "model:sourceguard:attention-v7",
+      "relation": "member_native_handoff",
+      "to_id": "model:traceguard:attention-v7"
+    },
+    {
+      "edge_id": "dependency:traceguard:logicguard",
+      "from_id": "model:traceguard:attention-v7",
+      "relation": "member_native_handoff",
+      "to_id": "model:logicguard:attention-v7"
+    },
+    {
+      "edge_id": "dependency:logicguard:experimentguard",
+      "from_id": "model:logicguard:attention-v7",
+      "relation": "member_native_handoff",
+      "to_id": "model:experimentguard:attention-v7"
+    }
+  ],
+  "member_models": {
+    "experimentguard": {
+      "behavior_id": "experimentguard.finite-discriminating-recommendation",
+      "bindings": [
+        {
+          "binding_id": "binding:experimentguard:input:1",
+          "direction": "input_to_model",
+          "object_id": "claim:abstract-enfr-bleu-41.8",
+          "role": "declared_prerequisite"
+        },
+        {
+          "binding_id": "binding:experimentguard:input:2",
+          "direction": "input_to_model",
+          "object_id": "claim:enfr-bleu-conflict-exists",
+          "role": "declared_prerequisite"
+        },
+        {
+          "binding_id": "binding:experimentguard:input:3",
+          "direction": "input_to_model",
+          "object_id": "claim:prose-enfr-bleu-41.0",
+          "role": "declared_prerequisite"
+        },
+        {
+          "binding_id": "binding:experimentguard:input:4",
+          "direction": "input_to_model",
+          "object_id": "claim:table-enfr-bleu-41.8",
+          "role": "declared_prerequisite"
+        },
+        {
+          "binding_id": "binding:experimentguard:input:5",
+          "direction": "input_to_model",
+          "object_id": "edge:abstract-supports-41.8",
+          "role": "declared_prerequisite"
+        },
+        {
+          "binding_id": "binding:experimentguard:input:6",
+          "direction": "input_to_model",
+          "object_id": "edge:prose-conflicts-41.8",
+          "role": "declared_prerequisite"
+        },
+        {
+          "binding_id": "binding:experimentguard:input:7",
+          "direction": "input_to_model",
+          "object_id": "edge:table-supports-41.8",
+          "role": "declared_prerequisite"
+        },
+        {
+          "binding_id": "binding:experimentguard:input:8",
+          "direction": "input_to_model",
+          "object_id": "gap:authoritative-enfr-bleu-unresolved",
+          "role": "declared_prerequisite"
+        },
+        {
+          "binding_id": "binding:experimentguard:output:1",
+          "direction": "model_to_output",
+          "object_id": "experiment:check-version-history",
+          "role": "member_owned_output"
+        },
+        {
+          "binding_id": "binding:experimentguard:output:2",
+          "direction": "model_to_output",
+          "object_id": "experiment:compare-frozen-locators",
+          "role": "member_owned_output"
+        },
+        {
+          "binding_id": "binding:experimentguard:output:3",
+          "direction": "model_to_output",
+          "object_id": "gap:no-author-resolution-evidence",
+          "role": "member_owned_output"
+        },
+        {
+          "binding_id": "binding:experimentguard:output:4",
+          "direction": "model_to_output",
+          "object_id": "hypothesis:reported-score-is-41.0",
+          "role": "member_owned_output"
+        },
+        {
+          "binding_id": "binding:experimentguard:output:5",
+          "direction": "model_to_output",
+          "object_id": "hypothesis:reported-score-is-41.8",
+          "role": "member_owned_output"
+        }
+      ],
+      "claim_boundary": "ExperimentGuard recommends from the declared finite hypotheses and outcomes; it does not execute external experiments or choose factual truth.",
+      "effect": [
+        "compare_declared_values",
+        "preserve_unresolved_hypotheses"
+      ],
+      "evidence_bindings": [
+        {
+          "evidence_id": "evidence:experimentguard:model",
+          "producer_entrypoint": "researchguard.experiment.blueprint:check_blueprint",
+          "role": "model",
+          "status": "current",
+          "subject_id": "model:experimentguard:attention-v7"
+        },
+        {
+          "evidence_id": "evidence:experimentguard:material",
+          "producer_entrypoint": "researchguard.experiment.owner_attestation:evaluate_external_object_transition",
+          "role": "material",
+          "status": "current",
+          "subject_id": "paper:arxiv-1706.03762v7"
+        },
+        {
+          "evidence_id": "evidence:experimentguard:test",
+          "producer_entrypoint": "researchguard.experiment.owner_attestation:evaluate_external_object_transition",
+          "role": "test",
+          "status": "current",
+          "subject_id": "test:experimentguard:external-object-known-good"
+        },
+        {
+          "evidence_id": "evidence:experimentguard:oracle",
+          "producer_entrypoint": "researchguard.experiment.owner_attestation:evaluate_external_object_transition",
+          "role": "oracle",
+          "status": "current",
+          "subject_id": "oracle:experimentguard:external-object-transition"
+        },
+        {
+          "evidence_id": "evidence:experimentguard:native_receipt",
+          "producer_entrypoint": "researchguard.experiment.owner_attestation:replay_native_owner_attestation",
+          "role": "native_receipt",
+          "status": "current",
+          "subject_id": "receipt:experimentguard:current"
+        }
+      ],
+      "input": {
+        "comparison_experiment_id": "experiment:compare-frozen-locators",
+        "hypothesis_ids_by_value": {
+          "41.0": "hypothesis:reported-score-is-41.0",
+          "41.8": "hypothesis:reported-score-is-41.8"
+        },
+        "resolution_experiment_id": "experiment:check-version-history",
+        "uncertainty_gap_id": "gap:no-author-resolution-evidence"
+      },
+      "member_id": "experimentguard",
+      "model_id": "model:experimentguard:attention-v7",
+      "native_binding": {
+        "behavior_manifest_fingerprint": "sha256:b48b815c22d8f2f1a00f55a201f0d0fb56fb4af62199ae85bbeebeddc02fc05d",
+        "behavior_manifest_id": "member-behavior-manifest:experimentguard:b48b815c22d8f2f1a00f55a201f0d0fb56fb4af62199ae85bbeebeddc02fc05d",
+        "domain_behavior_id": "experimentguard.finite-discriminating-recommendation",
+        "envelope_fingerprint": "sha256:d93ac4cab0e573c530687a2e8c7983203c53cac179cfec1d2d6a372c0639b492",
+        "envelope_id": "envelope:experimentguard",
+        "expected_target_anchor_fingerprint": "sha256:a59d100bcd204abf1ad2408f3ab17b5b4e81052f4b1e4a6ad84dceb618e187ff",
+        "expected_target_anchor_id": "expected-target-anchor:7803bae60f55f7cbfe5b5667baff7b7f62baa3404412139b9fd3b746337d7981",
+        "model_fingerprint": "sha256:d7a38d356871b0989ce5763df2e9704071d7e3fba80b075f802d0ae2e66a4b7d",
+        "native_model_id": "experiment-design:task:test-composition",
+        "native_receipt_ids": [
+          "receipt:experimentguard:current"
+        ]
+      },
+      "native_route": {
+        "blueprint_checker": "researchguard.experiment.blueprint:check_blueprint",
+        "external_transition": "researchguard.experiment.owner_attestation:evaluate_external_object_transition",
+        "owner_attestation": "researchguard.experiment.owner_attestation:replay_native_owner_attestation"
+      },
+      "oracle_binding": {
+        "bad_case_id": "test:experimentguard:external-object-known-bad",
+        "checker_entrypoint": "researchguard.experiment.owner_attestation:evaluate_external_object_transition",
+        "good_case_id": "test:experimentguard:external-object-known-good",
+        "oracle_id": "oracle:experimentguard:external-object-transition",
+        "owner_id": "experimentguard",
+        "protected_failure": "inventing an executed experiment, probability, or resolved truth"
+      },
+      "output": {
+        "experiments": [
+          {
+            "experiment_id": "experiment:compare-frozen-locators",
+            "input_ids": [
+              "anchor:abstract-enfr-bleu-41.8",
+              "anchor:results-table-enfr-bleu-41.8",
+              "anchor:results-prose-enfr-bleu-41.0"
+            ],
+            "locator": "source/ms.tex:127;source/results.tex:26;source/results.tex:39",
+            "observed_outcomes": {
+              "source/ms.tex:127": "41.8",
+              "source/results.tex:26": "41.8",
+              "source/results.tex:39": "41.0"
+            },
+            "output_ids": [
+              "observation:divergent-values"
+            ],
+            "purpose": "Compare every frozen anchor without changing or selecting its value.",
+            "status": "completed_variance_preserved"
+          },
+          {
+            "experiment_id": "experiment:check-version-history",
+            "input_ids": [],
+            "locator": "outside-frozen-target",
+            "observed_outcomes": {
+              "frozen_target": "no_external_resolution"
+            },
+            "output_ids": [
+              "observation:resolution-not-run"
+            ],
+            "purpose": "Seek an authoritative resolution outside the frozen target when variance exists.",
+            "status": "not_run_outside_frozen_target"
+          }
+        ],
+        "gaps": [
+          {
+            "code": "resolution-experiment-not-run",
+            "detail": "No authoritative resolution evidence exists inside the frozen target.",
+            "gap_id": "gap:no-author-resolution-evidence"
+          }
+        ],
+        "hypotheses": [
+          {
+            "hypothesis_id": "hypothesis:reported-score-is-41.0",
+            "predictions": {
+              "experiment:check-version-history": "authoritative external resolution favors 41.0",
+              "experiment:compare-frozen-locators": "frozen occurrences preserve the observed value pattern"
+            },
+            "text": "The intended reported value is 41.0."
+          },
+          {
+            "hypothesis_id": "hypothesis:reported-score-is-41.8",
+            "predictions": {
+              "experiment:check-version-history": "authoritative external resolution favors 41.8",
+              "experiment:compare-frozen-locators": "frozen occurrences preserve the observed value pattern"
+            },
+            "text": "The intended reported value is 41.8."
+          }
+        ],
+        "recommendation": {
+          "alternative_minimal_sets": [
+            [
+              "experiment:check-version-history"
+            ]
+          ],
+          "reason": "The comparison preserves observed variance but cannot distinguish undocumented intent.",
+          "selected_experiment_ids": [
+            "experiment:compare-frozen-locators"
+          ],
+          "unresolved_hypothesis_pairs": [
+            [
+              "hypothesis:reported-score-is-41.0",
+              "hypothesis:reported-score-is-41.8"
+            ]
+          ]
+        }
+      },
+      "owned_object_ids": [
+        "experiment:check-version-history",
+        "experiment:compare-frozen-locators",
+        "gap:no-author-resolution-evidence",
+        "hypothesis:reported-score-is-41.0",
+        "hypothesis:reported-score-is-41.8"
+      ],
+      "post_state": {
+        "unresolved_hypothesis_pairs": [
+          [
+            "hypothesis:reported-score-is-41.0",
+            "hypothesis:reported-score-is-41.8"
+          ]
+        ],
+        "variance_status": "open"
+      },
+      "pre_state": {
+        "resolved_hypothesis_ids": [],
+        "variance_status": "open"
+      },
+      "protected_failure": "inventing an executed experiment, probability, or resolved truth",
+      "scope_binding": {
+        "completion_status": "complete_within_declared_scope",
+        "declared_complete_object_ids": [
+          "experiment:check-version-history",
+          "experiment:compare-frozen-locators",
+          "gap:no-author-resolution-evidence",
+          "hypothesis:reported-score-is-41.0",
+          "hypothesis:reported-score-is-41.8"
+        ],
+        "declared_input_object_ids": [
+          "claim:abstract-enfr-bleu-41.8",
+          "claim:enfr-bleu-conflict-exists",
+          "claim:prose-enfr-bleu-41.0",
+          "claim:table-enfr-bleu-41.8",
+          "edge:abstract-supports-41.8",
+          "edge:prose-conflicts-41.8",
+          "edge:table-supports-41.8",
+          "gap:authoritative-enfr-bleu-unresolved"
+        ],
+        "expansion_frontier_ids": [
+          "frontier:attention-v7:recursive-semantic-inventory"
+        ],
+        "scope_id": "scope:attention-v7:reported-enfr-bleu-consistency"
+      },
+      "test_bindings": [
+        {
+          "behavior_id": "experimentguard.finite-discriminating-recommendation",
+          "oracle_id": "oracle:experimentguard:external-object-transition",
+          "role": "known_good",
+          "test_id": "test:experimentguard:external-object-known-good"
+        },
+        {
+          "behavior_id": "experimentguard.finite-discriminating-recommendation",
+          "oracle_id": "oracle:experimentguard:external-object-transition",
+          "role": "known_bad",
+          "test_id": "test:experimentguard:external-object-known-bad"
+        }
+      ]
+    },
+    "logicguard": {
+      "behavior_id": "logicguard.argument-artifact-qualification",
+      "bindings": [
+        {
+          "binding_id": "binding:logicguard:input:1",
+          "direction": "input_to_model",
+          "object_id": "event:abstract-reports-41.8",
+          "role": "declared_prerequisite"
+        },
+        {
+          "binding_id": "binding:logicguard:input:2",
+          "direction": "input_to_model",
+          "object_id": "event:prose-reports-41.0",
+          "role": "declared_prerequisite"
+        },
+        {
+          "binding_id": "binding:logicguard:input:3",
+          "direction": "input_to_model",
+          "object_id": "event:table-reports-41.8",
+          "role": "declared_prerequisite"
+        },
+        {
+          "binding_id": "binding:logicguard:input:4",
+          "direction": "input_to_model",
+          "object_id": "gap:trace-cannot-resolve-author-intent",
+          "role": "declared_prerequisite"
+        },
+        {
+          "binding_id": "binding:logicguard:input:5",
+          "direction": "input_to_model",
+          "object_id": "storyline:enfr-bleu-discrepancy",
+          "role": "declared_prerequisite"
+        },
+        {
+          "binding_id": "binding:logicguard:output:1",
+          "direction": "model_to_output",
+          "object_id": "claim:abstract-enfr-bleu-41.8",
+          "role": "member_owned_output"
+        },
+        {
+          "binding_id": "binding:logicguard:output:2",
+          "direction": "model_to_output",
+          "object_id": "claim:enfr-bleu-conflict-exists",
+          "role": "member_owned_output"
+        },
+        {
+          "binding_id": "binding:logicguard:output:3",
+          "direction": "model_to_output",
+          "object_id": "claim:prose-enfr-bleu-41.0",
+          "role": "member_owned_output"
+        },
+        {
+          "binding_id": "binding:logicguard:output:4",
+          "direction": "model_to_output",
+          "object_id": "claim:table-enfr-bleu-41.8",
+          "role": "member_owned_output"
+        },
+        {
+          "binding_id": "binding:logicguard:output:5",
+          "direction": "model_to_output",
+          "object_id": "edge:abstract-supports-41.8",
+          "role": "member_owned_output"
+        },
+        {
+          "binding_id": "binding:logicguard:output:6",
+          "direction": "model_to_output",
+          "object_id": "edge:prose-conflicts-41.8",
+          "role": "member_owned_output"
+        },
+        {
+          "binding_id": "binding:logicguard:output:7",
+          "direction": "model_to_output",
+          "object_id": "edge:table-supports-41.8",
+          "role": "member_owned_output"
+        },
+        {
+          "binding_id": "binding:logicguard:output:8",
+          "direction": "model_to_output",
+          "object_id": "gap:authoritative-enfr-bleu-unresolved",
+          "role": "member_owned_output"
+        }
+      ],
+      "claim_boundary": "LogicGuard licenses only the bounded conclusion supported by declared premises; factual truth and undocumented intent remain outside the model.",
+      "effect": [
+        "license_bounded_variance",
+        "enforce_scope_limits"
+      ],
+      "evidence_bindings": [
+        {
+          "evidence_id": "evidence:logicguard:model",
+          "producer_entrypoint": "researchguard.logic.blueprint:check_blueprint",
+          "role": "model",
+          "status": "current",
+          "subject_id": "model:logicguard:attention-v7"
+        },
+        {
+          "evidence_id": "evidence:logicguard:material",
+          "producer_entrypoint": "researchguard.logic.owner_attestation:evaluate_external_object_transition",
+          "role": "material",
+          "status": "current",
+          "subject_id": "paper:arxiv-1706.03762v7"
+        },
+        {
+          "evidence_id": "evidence:logicguard:test",
+          "producer_entrypoint": "researchguard.logic.owner_attestation:evaluate_external_object_transition",
+          "role": "test",
+          "status": "current",
+          "subject_id": "test:logicguard:external-object-known-good"
+        },
+        {
+          "evidence_id": "evidence:logicguard:oracle",
+          "producer_entrypoint": "researchguard.logic.owner_attestation:evaluate_external_object_transition",
+          "role": "oracle",
+          "status": "current",
+          "subject_id": "oracle:logicguard:external-object-transition"
+        },
+        {
+          "evidence_id": "evidence:logicguard:native_receipt",
+          "producer_entrypoint": "researchguard.logic.owner_attestation:replay_native_owner_attestation",
+          "role": "native_receipt",
+          "status": "current",
+          "subject_id": "receipt:logicguard:current"
+        }
+      ],
+      "input": {
+        "claim_specs": [
+          {
+            "claim_id": "claim:abstract-enfr-bleu-41.8",
+            "edge_id": "edge:abstract-supports-41.8",
+            "event_id": "event:abstract-reports-41.8"
+          },
+          {
+            "claim_id": "claim:table-enfr-bleu-41.8",
+            "edge_id": "edge:table-supports-41.8",
+            "event_id": "event:table-reports-41.8"
+          },
+          {
+            "claim_id": "claim:prose-enfr-bleu-41.0",
+            "edge_id": "edge:prose-conflicts-41.8",
+            "event_id": "event:prose-reports-41.0"
+          }
+        ],
+        "scope_limits": [
+          "The model licenses the existence of a textual conflict, not a correction to 41.8 or 41.0."
+        ],
+        "summary_claim_id": "claim:enfr-bleu-conflict-exists",
+        "uncertainty_gap_id": "gap:authoritative-enfr-bleu-unresolved"
+      },
+      "member_id": "logicguard",
+      "model_id": "model:logicguard:attention-v7",
+      "native_binding": {
+        "behavior_manifest_fingerprint": "sha256:2d871ff989f1c17584b44e772e7bb137d294e7b3cda7c2efc62578d9794a418c",
+        "behavior_manifest_id": "member-behavior-manifest:logicguard:2d871ff989f1c17584b44e772e7bb137d294e7b3cda7c2efc62578d9794a418c",
+        "domain_behavior_id": "logicguard.argument-artifact-qualification",
+        "envelope_fingerprint": "sha256:d6220dc2b786f3db8443bb9d67112922ee9415bd4f896ba297f98b0782a492b2",
+        "envelope_id": "envelope:logicguard",
+        "expected_target_anchor_fingerprint": "sha256:c2738f4cfba99d70503396123173658082ced5cd2bf6dbdb461969de6365e80a",
+        "expected_target_anchor_id": "expected-target-anchor:1417cdbf1126323e16c11f4846bfe79ee90de89d3ec080cf7f3b1d4fdd77a301",
+        "model_fingerprint": "sha256:445bb2c5ea9be1ed455a66c76be5fee968e90dcbd0d97fbbde503b456ae3e83e",
+        "native_model_id": "current-model",
+        "native_receipt_ids": [
+          "receipt:logicguard:current"
+        ]
+      },
+      "native_route": {
+        "blueprint_checker": "researchguard.logic.blueprint:check_blueprint",
+        "external_transition": "researchguard.logic.owner_attestation:evaluate_external_object_transition",
+        "owner_attestation": "researchguard.logic.owner_attestation:replay_native_owner_attestation"
+      },
+      "oracle_binding": {
+        "bad_case_id": "test:logicguard:external-object-known-bad",
+        "checker_entrypoint": "researchguard.logic.owner_attestation:evaluate_external_object_transition",
+        "good_case_id": "test:logicguard:external-object-known-good",
+        "oracle_id": "oracle:logicguard:external-object-transition",
+        "owner_id": "logicguard",
+        "protected_failure": "licensing truth or undocumented intent beyond the declared premises and scope"
+      },
+      "output": {
+        "argument_edges": [
+          {
+            "edge_id": "edge:abstract-supports-41.8",
+            "from_claim_id": "claim:abstract-enfr-bleu-41.8",
+            "relation": "supports_bounded_summary",
+            "to_claim_id": "claim:enfr-bleu-conflict-exists"
+          },
+          {
+            "edge_id": "edge:table-supports-41.8",
+            "from_claim_id": "claim:table-enfr-bleu-41.8",
+            "relation": "supports_bounded_summary",
+            "to_claim_id": "claim:enfr-bleu-conflict-exists"
+          },
+          {
+            "edge_id": "edge:prose-conflicts-41.8",
+            "from_claim_id": "claim:prose-enfr-bleu-41.0",
+            "relation": "supports_bounded_summary",
+            "to_claim_id": "claim:enfr-bleu-conflict-exists"
+          }
+        ],
+        "claims": [
+          {
+            "claim_id": "claim:abstract-enfr-bleu-41.8",
+            "evidence_ids": [
+              "anchor:abstract-enfr-bleu-41.8"
+            ],
+            "premise_ids": [],
+            "scope": "source/ms.tex:127",
+            "status": "source_anchored",
+            "text": "Frozen source occurrence source/ms.tex:127 reports 41.8."
+          },
+          {
+            "claim_id": "claim:table-enfr-bleu-41.8",
+            "evidence_ids": [
+              "anchor:results-table-enfr-bleu-41.8"
+            ],
+            "premise_ids": [],
+            "scope": "source/results.tex:26",
+            "status": "source_anchored",
+            "text": "Frozen source occurrence source/results.tex:26 reports 41.8."
+          },
+          {
+            "claim_id": "claim:prose-enfr-bleu-41.0",
+            "evidence_ids": [
+              "anchor:results-prose-enfr-bleu-41.0"
+            ],
+            "premise_ids": [],
+            "scope": "source/results.tex:39",
+            "status": "source_anchored",
+            "text": "Frozen source occurrence source/results.tex:39 reports 41.0."
+          },
+          {
+            "claim_id": "claim:enfr-bleu-conflict-exists",
+            "evidence_ids": [
+              "anchor:abstract-enfr-bleu-41.8",
+              "anchor:results-table-enfr-bleu-41.8",
+              "anchor:results-prose-enfr-bleu-41.0"
+            ],
+            "premise_ids": [
+              "claim:abstract-enfr-bleu-41.8",
+              "claim:table-enfr-bleu-41.8",
+              "claim:prose-enfr-bleu-41.0"
+            ],
+            "scope": "reported-value consistency only; not factual truth or undocumented intent",
+            "status": "licensed_bounded_variance",
+            "text": "Frozen target contains divergent reported values: 41.0, 41.8."
+          }
+        ],
+        "gaps": [
+          {
+            "code": "authoritative-resolution-not-licensed",
+            "detail": "The native argument licenses the observed variance, not one value as authoritative.",
+            "gap_id": "gap:authoritative-enfr-bleu-unresolved"
+          }
+        ],
+        "scope_limits": [
+          "The model licenses the existence of a textual conflict, not a correction to 41.8 or 41.0."
+        ]
+      },
+      "owned_object_ids": [
+        "claim:abstract-enfr-bleu-41.8",
+        "claim:enfr-bleu-conflict-exists",
+        "claim:prose-enfr-bleu-41.0",
+        "claim:table-enfr-bleu-41.8",
+        "edge:abstract-supports-41.8",
+        "edge:prose-conflicts-41.8",
+        "edge:table-supports-41.8",
+        "gap:authoritative-enfr-bleu-unresolved"
+      ],
+      "post_state": {
+        "licensed_claim_ids": [
+          "claim:abstract-enfr-bleu-41.8",
+          "claim:table-enfr-bleu-41.8",
+          "claim:prose-enfr-bleu-41.0",
+          "claim:enfr-bleu-conflict-exists"
+        ],
+        "open_gap_ids": [
+          "gap:authoritative-enfr-bleu-unresolved"
+        ]
+      },
+      "pre_state": {
+        "licensed_claim_ids": [],
+        "open_rebuttal_ids": []
+      },
+      "protected_failure": "licensing truth or undocumented intent beyond the declared premises and scope",
+      "scope_binding": {
+        "completion_status": "complete_within_declared_scope",
+        "declared_complete_object_ids": [
+          "claim:abstract-enfr-bleu-41.8",
+          "claim:enfr-bleu-conflict-exists",
+          "claim:prose-enfr-bleu-41.0",
+          "claim:table-enfr-bleu-41.8",
+          "edge:abstract-supports-41.8",
+          "edge:prose-conflicts-41.8",
+          "edge:table-supports-41.8",
+          "gap:authoritative-enfr-bleu-unresolved"
+        ],
+        "declared_input_object_ids": [
+          "event:abstract-reports-41.8",
+          "event:prose-reports-41.0",
+          "event:table-reports-41.8",
+          "gap:trace-cannot-resolve-author-intent",
+          "storyline:enfr-bleu-discrepancy"
+        ],
+        "expansion_frontier_ids": [
+          "frontier:attention-v7:recursive-semantic-inventory"
+        ],
+        "scope_id": "scope:attention-v7:reported-enfr-bleu-consistency"
+      },
+      "test_bindings": [
+        {
+          "behavior_id": "logicguard.argument-artifact-qualification",
+          "oracle_id": "oracle:logicguard:external-object-transition",
+          "role": "known_good",
+          "test_id": "test:logicguard:external-object-known-good"
+        },
+        {
+          "behavior_id": "logicguard.argument-artifact-qualification",
+          "oracle_id": "oracle:logicguard:external-object-transition",
+          "role": "known_bad",
+          "test_id": "test:logicguard:external-object-known-bad"
+        }
+      ]
+    },
+    "sourceguard": {
+      "behavior_id": "sourceguard.information-blueprint-qualification",
+      "bindings": [
+        {
+          "binding_id": "binding:sourceguard:input:1",
+          "direction": "input_to_model",
+          "object_id": "artifact:ms-tex",
+          "role": "declared_prerequisite"
+        },
+        {
+          "binding_id": "binding:sourceguard:input:2",
+          "direction": "input_to_model",
+          "object_id": "artifact:paper-pdf",
+          "role": "declared_prerequisite"
+        },
+        {
+          "binding_id": "binding:sourceguard:input:3",
+          "direction": "input_to_model",
+          "object_id": "artifact:paper-source-tar",
+          "role": "declared_prerequisite"
+        },
+        {
+          "binding_id": "binding:sourceguard:input:4",
+          "direction": "input_to_model",
+          "object_id": "artifact:results-tex",
+          "role": "declared_prerequisite"
+        },
+        {
+          "binding_id": "binding:sourceguard:input:5",
+          "direction": "input_to_model",
+          "object_id": "artifact:source-background-tex",
+          "role": "declared_prerequisite"
+        },
+        {
+          "binding_id": "binding:sourceguard:input:6",
+          "direction": "input_to_model",
+          "object_id": "artifact:source-figures-modalnet-19-png",
+          "role": "declared_prerequisite"
+        },
+        {
+          "binding_id": "binding:sourceguard:input:7",
+          "direction": "input_to_model",
+          "object_id": "artifact:source-figures-modalnet-20-png",
+          "role": "declared_prerequisite"
+        },
+        {
+          "binding_id": "binding:sourceguard:input:8",
+          "direction": "input_to_model",
+          "object_id": "artifact:source-figures-modalnet-21-png",
+          "role": "declared_prerequisite"
+        },
+        {
+          "binding_id": "binding:sourceguard:input:9",
+          "direction": "input_to_model",
+          "object_id": "artifact:source-figures-modalnet-22-png",
+          "role": "declared_prerequisite"
+        },
+        {
+          "binding_id": "binding:sourceguard:input:10",
+          "direction": "input_to_model",
+          "object_id": "artifact:source-figures-modalnet-23-png",
+          "role": "declared_prerequisite"
+        },
+        {
+          "binding_id": "binding:sourceguard:input:11",
+          "direction": "input_to_model",
+          "object_id": "artifact:source-figures-modalnet-32-png",
+          "role": "declared_prerequisite"
+        },
+        {
+          "binding_id": "binding:sourceguard:input:12",
+          "direction": "input_to_model",
+          "object_id": "artifact:source-introduction-tex",
+          "role": "declared_prerequisite"
+        },
+        {
+          "binding_id": "binding:sourceguard:input:13",
+          "direction": "input_to_model",
+          "object_id": "artifact:source-model-architecture-tex",
+          "role": "declared_prerequisite"
+        },
+        {
+          "binding_id": "binding:sourceguard:input:14",
+          "direction": "input_to_model",
+          "object_id": "artifact:source-nips-2017-sty",
+          "role": "declared_prerequisite"
+        },
+        {
+          "binding_id": "binding:sourceguard:input:15",
+          "direction": "input_to_model",
+          "object_id": "artifact:source-parameter-attention-tex",
+          "role": "declared_prerequisite"
+        },
+        {
+          "binding_id": "binding:sourceguard:input:16",
+          "direction": "input_to_model",
+          "object_id": "artifact:source-sqrt-d-trick-tex",
+          "role": "declared_prerequisite"
+        },
+        {
+          "binding_id": "binding:sourceguard:input:17",
+          "direction": "input_to_model",
+          "object_id": "artifact:source-training-tex",
+          "role": "declared_prerequisite"
+        },
+        {
+          "binding_id": "binding:sourceguard:input:18",
+          "direction": "input_to_model",
+          "object_id": "artifact:source-vis-anaphora-resolution-new-pdf",
+          "role": "declared_prerequisite"
+        },
+        {
+          "binding_id": "binding:sourceguard:input:19",
+          "direction": "input_to_model",
+          "object_id": "artifact:source-vis-anaphora-resolution2-new-pdf",
+          "role": "declared_prerequisite"
+        },
+        {
+          "binding_id": "binding:sourceguard:input:20",
+          "direction": "input_to_model",
+          "object_id": "artifact:source-vis-attending-to-head-new-pdf",
+          "role": "declared_prerequisite"
+        },
+        {
+          "binding_id": "binding:sourceguard:input:21",
+          "direction": "input_to_model",
+          "object_id": "artifact:source-vis-attending-to-head2-new-pdf",
+          "role": "declared_prerequisite"
+        },
+        {
+          "binding_id": "binding:sourceguard:input:22",
+          "direction": "input_to_model",
+          "object_id": "artifact:source-vis-making-more-difficult-new-pdf",
+          "role": "declared_prerequisite"
+        },
+        {
+          "binding_id": "binding:sourceguard:input:23",
+          "direction": "input_to_model",
+          "object_id": "artifact:source-vis-making-more-difficult5-new-pdf",
+          "role": "declared_prerequisite"
+        },
+        {
+          "binding_id": "binding:sourceguard:input:24",
+          "direction": "input_to_model",
+          "object_id": "artifact:source-visualizations-tex",
+          "role": "declared_prerequisite"
+        },
+        {
+          "binding_id": "binding:sourceguard:input:25",
+          "direction": "input_to_model",
+          "object_id": "artifact:source-why-self-attention-tex",
+          "role": "declared_prerequisite"
+        },
+        {
+          "binding_id": "binding:sourceguard:input:26",
+          "direction": "input_to_model",
+          "object_id": "paper:arxiv-1706.03762v7",
+          "role": "declared_prerequisite"
+        },
+        {
+          "binding_id": "binding:sourceguard:input:27",
+          "direction": "input_to_model",
+          "object_id": "structure:abstract",
+          "role": "declared_prerequisite"
+        },
+        {
+          "binding_id": "binding:sourceguard:input:28",
+          "direction": "input_to_model",
+          "object_id": "structure:paper-root",
+          "role": "declared_prerequisite"
+        },
+        {
+          "binding_id": "binding:sourceguard:input:29",
+          "direction": "input_to_model",
+          "object_id": "structure:results-prose",
+          "role": "declared_prerequisite"
+        },
+        {
+          "binding_id": "binding:sourceguard:input:30",
+          "direction": "input_to_model",
+          "object_id": "structure:results-table",
+          "role": "declared_prerequisite"
+        },
+        {
+          "binding_id": "binding:sourceguard:output:1",
+          "direction": "model_to_output",
+          "object_id": "anchor:abstract-enfr-bleu-41.8",
+          "role": "member_owned_output"
+        },
+        {
+          "binding_id": "binding:sourceguard:output:2",
+          "direction": "model_to_output",
+          "object_id": "anchor:results-prose-enfr-bleu-41.0",
+          "role": "member_owned_output"
+        },
+        {
+          "binding_id": "binding:sourceguard:output:3",
+          "direction": "model_to_output",
+          "object_id": "anchor:results-table-enfr-bleu-41.8",
+          "role": "member_owned_output"
+        },
+        {
+          "binding_id": "binding:sourceguard:output:4",
+          "direction": "model_to_output",
+          "object_id": "gap:enfr-bleu-conflict",
+          "role": "member_owned_output"
+        },
+        {
+          "binding_id": "binding:sourceguard:output:5",
+          "direction": "model_to_output",
+          "object_id": "source:paper:arxiv-1706.03762v7",
+          "role": "member_owned_output"
+        }
+      ],
+      "claim_boundary": "SourceGuard identifies declared source roles, coverage, and exact locators; it does not decide factual truth or undocumented intent.",
+      "effect": [
+        "freeze_source_identity",
+        "expose_value_variance"
+      ],
+      "evidence_bindings": [
+        {
+          "evidence_id": "evidence:sourceguard:model",
+          "producer_entrypoint": "researchguard.source.blueprint:check_blueprint",
+          "role": "model",
+          "status": "current",
+          "subject_id": "model:sourceguard:attention-v7"
+        },
+        {
+          "evidence_id": "evidence:sourceguard:material",
+          "producer_entrypoint": "researchguard.source.owner_attestation:evaluate_external_object_transition",
+          "role": "material",
+          "status": "current",
+          "subject_id": "paper:arxiv-1706.03762v7"
+        },
+        {
+          "evidence_id": "evidence:sourceguard:test",
+          "producer_entrypoint": "researchguard.source.owner_attestation:evaluate_external_object_transition",
+          "role": "test",
+          "status": "current",
+          "subject_id": "test:sourceguard:external-object-known-good"
+        },
+        {
+          "evidence_id": "evidence:sourceguard:oracle",
+          "producer_entrypoint": "researchguard.source.owner_attestation:evaluate_external_object_transition",
+          "role": "oracle",
+          "status": "current",
+          "subject_id": "oracle:sourceguard:external-object-transition"
+        },
+        {
+          "evidence_id": "evidence:sourceguard:native_receipt",
+          "producer_entrypoint": "researchguard.source.owner_attestation:replay_native_owner_attestation",
+          "role": "native_receipt",
+          "status": "current",
+          "subject_id": "receipt:sourceguard:current"
+        }
+      ],
+      "input": {
+        "extraction_requests": [
+          {
+            "anchor_id": "anchor:abstract-enfr-bleu-41.8",
+            "artifact_id": "artifact:ms-tex",
+            "claim_id": "claim:reported-enfr-bleu",
+            "expected_structure_kind": "section",
+            "expected_value": "41.8",
+            "role": "reported_value_in_abstract",
+            "selector": {
+              "fingerprint": "sha256:749738eb19495a2ab3588629199533e0b073614cd2428a5dabbf22714c4dbdbf",
+              "locator": "source/ms.tex:127",
+              "occurrence_id": "occurrence:attention-v7:abstract-enfr-bleu",
+              "parameters": {
+                "line_number": 127,
+                "value_group": "value",
+                "value_pattern": "(?P<value>41\\.[08])"
+              },
+              "selector_kind": "line_pattern"
+            },
+            "source_id": "source:paper:arxiv-1706.03762v7",
+            "structure_node_id": "structure:abstract"
+          },
+          {
+            "anchor_id": "anchor:results-table-enfr-bleu-41.8",
+            "artifact_id": "artifact:results-tex",
+            "claim_id": "claim:reported-enfr-bleu",
+            "expected_structure_kind": "table",
+            "expected_value": "41.8",
+            "role": "reported_value_in_results_table",
+            "selector": {
+              "fingerprint": "sha256:99e536ea4c447a538b6405230070167befbc4ffebbd7188eddfccc50b0c3b444",
+              "locator": "source/results.tex:26",
+              "occurrence_id": "occurrence:attention-v7:results-table-enfr-bleu",
+              "parameters": {
+                "line_number": 26,
+                "value_group": "value",
+                "value_pattern": "(?P<value>41\\.[08])"
+              },
+              "selector_kind": "line_pattern"
+            },
+            "source_id": "source:paper:arxiv-1706.03762v7",
+            "structure_node_id": "structure:results-table"
+          },
+          {
+            "anchor_id": "anchor:results-prose-enfr-bleu-41.0",
+            "artifact_id": "artifact:results-tex",
+            "claim_id": "claim:reported-enfr-bleu",
+            "expected_structure_kind": "paragraph",
+            "expected_value": "41.0",
+            "role": "reported_value_in_results_prose",
+            "selector": {
+              "fingerprint": "sha256:f5911f7dae5150c266b2026df96e2125bd3567ca97bb73b3b872e0c71335cd18",
+              "locator": "source/results.tex:39",
+              "occurrence_id": "occurrence:attention-v7:results-prose-enfr-bleu",
+              "parameters": {
+                "line_number": 39,
+                "value_group": "value",
+                "value_pattern": "(?P<value>41\\.[08])"
+              },
+              "selector_kind": "line_pattern"
+            },
+            "source_id": "source:paper:arxiv-1706.03762v7",
+            "structure_node_id": "structure:results-prose"
+          }
+        ],
+        "source_roles": [
+          {
+            "coverage_ids": [
+              "artifact:ms-tex",
+              "artifact:paper-pdf",
+              "artifact:paper-source-tar",
+              "artifact:results-tex",
+              "artifact:source-background-tex",
+              "artifact:source-figures-modalnet-19-png",
+              "artifact:source-figures-modalnet-20-png",
+              "artifact:source-figures-modalnet-21-png",
+              "artifact:source-figures-modalnet-22-png",
+              "artifact:source-figures-modalnet-23-png",
+              "artifact:source-figures-modalnet-32-png",
+              "artifact:source-introduction-tex",
+              "artifact:source-model-architecture-tex",
+              "artifact:source-nips-2017-sty",
+              "artifact:source-parameter-attention-tex",
+              "artifact:source-sqrt-d-trick-tex",
+              "artifact:source-training-tex",
+              "artifact:source-vis-anaphora-resolution-new-pdf",
+              "artifact:source-vis-anaphora-resolution2-new-pdf",
+              "artifact:source-vis-attending-to-head-new-pdf",
+              "artifact:source-vis-attending-to-head2-new-pdf",
+              "artifact:source-vis-making-more-difficult-new-pdf",
+              "artifact:source-vis-making-more-difficult5-new-pdf",
+              "artifact:source-visualizations-tex",
+              "artifact:source-why-self-attention-tex",
+              "paper:arxiv-1706.03762v7",
+              "structure:abstract",
+              "structure:paper-root",
+              "structure:results-prose",
+              "structure:results-table"
+            ],
+            "role": "primary_author_source",
+            "source_id": "source:paper:arxiv-1706.03762v7"
+          }
+        ],
+        "target_id": "paper:arxiv-1706.03762v7",
+        "variance_gap_id": "gap:enfr-bleu-conflict"
+      },
+      "member_id": "sourceguard",
+      "model_id": "model:sourceguard:attention-v7",
+      "native_binding": {
+        "behavior_manifest_fingerprint": "sha256:9fc8f01952400c5466c8cd8b03ce336be59b10c96ec68c668aeef7e533a60eb4",
+        "behavior_manifest_id": "member-behavior-manifest:sourceguard:9fc8f01952400c5466c8cd8b03ce336be59b10c96ec68c668aeef7e533a60eb4",
+        "domain_behavior_id": "sourceguard.information-blueprint-qualification",
+        "envelope_fingerprint": "sha256:b7c2f6dcb84f39b2068fc9468cea23e938727c1b35216f44c6ec1300d411fee1",
+        "envelope_id": "envelope:sourceguard",
+        "expected_target_anchor_fingerprint": "sha256:c1a9d8cb07d20bb98a0786120f088c28c3e30cddfa12875fd66bcb3b62860aaa",
+        "expected_target_anchor_id": "expected-target-anchor:c8284c182fb3d6b493b2a9c77bcfbb3656bacdbdcfa8b6b6634e35758df5739e",
+        "model_fingerprint": "sha256:8f478dad00e8f7b535a94576bbdd02c3f5efafdefbac089ad95b47250532da26",
+        "native_model_id": "source-blueprint:source-blueprint-test",
+        "native_receipt_ids": [
+          "receipt:sourceguard:current"
+        ]
+      },
+      "native_route": {
+        "blueprint_checker": "researchguard.source.blueprint:check_blueprint",
+        "external_transition": "researchguard.source.owner_attestation:evaluate_external_object_transition",
+        "owner_attestation": "researchguard.source.owner_attestation:replay_native_owner_attestation"
+      },
+      "oracle_binding": {
+        "bad_case_id": "test:sourceguard:external-object-known-bad",
+        "checker_entrypoint": "researchguard.source.owner_attestation:evaluate_external_object_transition",
+        "good_case_id": "test:sourceguard:external-object-known-good",
+        "oracle_id": "oracle:sourceguard:external-object-transition",
+        "owner_id": "sourceguard",
+        "protected_failure": "inventing source role, coverage, locator, or extracted value"
+      },
+      "output": {
+        "claim_anchors": [
+          {
+            "anchor_id": "anchor:abstract-enfr-bleu-41.8",
+            "claim_id": "claim:reported-enfr-bleu",
+            "locator": "source/ms.tex:127",
+            "source_id": "source:paper:arxiv-1706.03762v7",
+            "status": "located",
+            "value": "41.8"
+          },
+          {
+            "anchor_id": "anchor:results-table-enfr-bleu-41.8",
+            "claim_id": "claim:reported-enfr-bleu",
+            "locator": "source/results.tex:26",
+            "source_id": "source:paper:arxiv-1706.03762v7",
+            "status": "located",
+            "value": "41.8"
+          },
+          {
+            "anchor_id": "anchor:results-prose-enfr-bleu-41.0",
+            "claim_id": "claim:reported-enfr-bleu",
+            "locator": "source/results.tex:39",
+            "source_id": "source:paper:arxiv-1706.03762v7",
+            "status": "located",
+            "value": "41.0"
+          }
+        ],
+        "gaps": [
+          {
+            "code": "inconsistent-primary-source-values",
+            "detail": "Frozen anchor values differ: claim:reported-enfr-bleu=41.0,41.8",
+            "gap_id": "gap:enfr-bleu-conflict"
+          }
+        ],
+        "source_roles": [
+          {
+            "coverage_ids": [
+              "artifact:ms-tex",
+              "artifact:paper-pdf",
+              "artifact:paper-source-tar",
+              "artifact:results-tex",
+              "artifact:source-background-tex",
+              "artifact:source-figures-modalnet-19-png",
+              "artifact:source-figures-modalnet-20-png",
+              "artifact:source-figures-modalnet-21-png",
+              "artifact:source-figures-modalnet-22-png",
+              "artifact:source-figures-modalnet-23-png",
+              "artifact:source-figures-modalnet-32-png",
+              "artifact:source-introduction-tex",
+              "artifact:source-model-architecture-tex",
+              "artifact:source-nips-2017-sty",
+              "artifact:source-parameter-attention-tex",
+              "artifact:source-sqrt-d-trick-tex",
+              "artifact:source-training-tex",
+              "artifact:source-vis-anaphora-resolution-new-pdf",
+              "artifact:source-vis-anaphora-resolution2-new-pdf",
+              "artifact:source-vis-attending-to-head-new-pdf",
+              "artifact:source-vis-attending-to-head2-new-pdf",
+              "artifact:source-vis-making-more-difficult-new-pdf",
+              "artifact:source-vis-making-more-difficult5-new-pdf",
+              "artifact:source-visualizations-tex",
+              "artifact:source-why-self-attention-tex",
+              "paper:arxiv-1706.03762v7",
+              "structure:abstract",
+              "structure:paper-root",
+              "structure:results-prose",
+              "structure:results-table"
+            ],
+            "role": "primary_author_source",
+            "source_id": "source:paper:arxiv-1706.03762v7"
+          }
+        ],
+        "unavailable_source_ids": []
+      },
+      "owned_object_ids": [
+        "anchor:abstract-enfr-bleu-41.8",
+        "anchor:results-prose-enfr-bleu-41.0",
+        "anchor:results-table-enfr-bleu-41.8",
+        "gap:enfr-bleu-conflict",
+        "source:paper:arxiv-1706.03762v7"
+      ],
+      "post_state": {
+        "open_gap_ids": [
+          "gap:enfr-bleu-conflict"
+        ],
+        "source_status": "qualified_with_variance"
+      },
+      "pre_state": {
+        "open_gap_ids": [],
+        "source_status": "frozen"
+      },
+      "protected_failure": "inventing source role, coverage, locator, or extracted value",
+      "scope_binding": {
+        "completion_status": "complete_within_declared_scope",
+        "declared_complete_object_ids": [
+          "anchor:abstract-enfr-bleu-41.8",
+          "anchor:results-prose-enfr-bleu-41.0",
+          "anchor:results-table-enfr-bleu-41.8",
+          "gap:enfr-bleu-conflict",
+          "source:paper:arxiv-1706.03762v7"
+        ],
+        "declared_input_object_ids": [
+          "artifact:ms-tex",
+          "artifact:paper-pdf",
+          "artifact:paper-source-tar",
+          "artifact:results-tex",
+          "artifact:source-background-tex",
+          "artifact:source-figures-modalnet-19-png",
+          "artifact:source-figures-modalnet-20-png",
+          "artifact:source-figures-modalnet-21-png",
+          "artifact:source-figures-modalnet-22-png",
+          "artifact:source-figures-modalnet-23-png",
+          "artifact:source-figures-modalnet-32-png",
+          "artifact:source-introduction-tex",
+          "artifact:source-model-architecture-tex",
+          "artifact:source-nips-2017-sty",
+          "artifact:source-parameter-attention-tex",
+          "artifact:source-sqrt-d-trick-tex",
+          "artifact:source-training-tex",
+          "artifact:source-vis-anaphora-resolution-new-pdf",
+          "artifact:source-vis-anaphora-resolution2-new-pdf",
+          "artifact:source-vis-attending-to-head-new-pdf",
+          "artifact:source-vis-attending-to-head2-new-pdf",
+          "artifact:source-vis-making-more-difficult-new-pdf",
+          "artifact:source-vis-making-more-difficult5-new-pdf",
+          "artifact:source-visualizations-tex",
+          "artifact:source-why-self-attention-tex",
+          "paper:arxiv-1706.03762v7",
+          "structure:abstract",
+          "structure:paper-root",
+          "structure:results-prose",
+          "structure:results-table"
+        ],
+        "expansion_frontier_ids": [
+          "frontier:attention-v7:recursive-semantic-inventory"
+        ],
+        "scope_id": "scope:attention-v7:reported-enfr-bleu-consistency"
+      },
+      "test_bindings": [
+        {
+          "behavior_id": "sourceguard.information-blueprint-qualification",
+          "oracle_id": "oracle:sourceguard:external-object-transition",
+          "role": "known_good",
+          "test_id": "test:sourceguard:external-object-known-good"
+        },
+        {
+          "behavior_id": "sourceguard.information-blueprint-qualification",
+          "oracle_id": "oracle:sourceguard:external-object-transition",
+          "role": "known_bad",
+          "test_id": "test:sourceguard:external-object-known-bad"
+        }
+      ]
+    },
+    "traceguard": {
+      "behavior_id": "traceguard.investigation-reconstruction",
+      "bindings": [
+        {
+          "binding_id": "binding:traceguard:input:1",
+          "direction": "input_to_model",
+          "object_id": "anchor:abstract-enfr-bleu-41.8",
+          "role": "declared_prerequisite"
+        },
+        {
+          "binding_id": "binding:traceguard:input:2",
+          "direction": "input_to_model",
+          "object_id": "anchor:results-prose-enfr-bleu-41.0",
+          "role": "declared_prerequisite"
+        },
+        {
+          "binding_id": "binding:traceguard:input:3",
+          "direction": "input_to_model",
+          "object_id": "anchor:results-table-enfr-bleu-41.8",
+          "role": "declared_prerequisite"
+        },
+        {
+          "binding_id": "binding:traceguard:input:4",
+          "direction": "input_to_model",
+          "object_id": "gap:enfr-bleu-conflict",
+          "role": "declared_prerequisite"
+        },
+        {
+          "binding_id": "binding:traceguard:input:5",
+          "direction": "input_to_model",
+          "object_id": "source:paper:arxiv-1706.03762v7",
+          "role": "declared_prerequisite"
+        },
+        {
+          "binding_id": "binding:traceguard:output:1",
+          "direction": "model_to_output",
+          "object_id": "event:abstract-reports-41.8",
+          "role": "member_owned_output"
+        },
+        {
+          "binding_id": "binding:traceguard:output:2",
+          "direction": "model_to_output",
+          "object_id": "event:prose-reports-41.0",
+          "role": "member_owned_output"
+        },
+        {
+          "binding_id": "binding:traceguard:output:3",
+          "direction": "model_to_output",
+          "object_id": "event:table-reports-41.8",
+          "role": "member_owned_output"
+        },
+        {
+          "binding_id": "binding:traceguard:output:4",
+          "direction": "model_to_output",
+          "object_id": "gap:trace-cannot-resolve-author-intent",
+          "role": "member_owned_output"
+        },
+        {
+          "binding_id": "binding:traceguard:output:5",
+          "direction": "model_to_output",
+          "object_id": "storyline:enfr-bleu-discrepancy",
+          "role": "member_owned_output"
+        }
+      ],
+      "claim_boundary": "TraceGuard reconstructs the declared evidence-bound sequence; it does not infer undocumented causality, correction, or intent.",
+      "effect": [
+        "order_declared_occurrences",
+        "preserve_unresolved_variance"
+      ],
+      "evidence_bindings": [
+        {
+          "evidence_id": "evidence:traceguard:model",
+          "producer_entrypoint": "researchguard.trace.blueprint:check_blueprint",
+          "role": "model",
+          "status": "current",
+          "subject_id": "model:traceguard:attention-v7"
+        },
+        {
+          "evidence_id": "evidence:traceguard:material",
+          "producer_entrypoint": "researchguard.trace.owner_attestation:evaluate_external_object_transition",
+          "role": "material",
+          "status": "current",
+          "subject_id": "paper:arxiv-1706.03762v7"
+        },
+        {
+          "evidence_id": "evidence:traceguard:test",
+          "producer_entrypoint": "researchguard.trace.owner_attestation:evaluate_external_object_transition",
+          "role": "test",
+          "status": "current",
+          "subject_id": "test:traceguard:external-object-known-good"
+        },
+        {
+          "evidence_id": "evidence:traceguard:oracle",
+          "producer_entrypoint": "researchguard.trace.owner_attestation:evaluate_external_object_transition",
+          "role": "oracle",
+          "status": "current",
+          "subject_id": "oracle:traceguard:external-object-transition"
+        },
+        {
+          "evidence_id": "evidence:traceguard:native_receipt",
+          "producer_entrypoint": "researchguard.trace.owner_attestation:replay_native_owner_attestation",
+          "role": "native_receipt",
+          "status": "current",
+          "subject_id": "receipt:traceguard:current"
+        }
+      ],
+      "input": {
+        "event_specs": [
+          {
+            "anchor_id": "anchor:abstract-enfr-bleu-41.8",
+            "event_id": "event:abstract-reports-41.8",
+            "stage": "abstract"
+          },
+          {
+            "anchor_id": "anchor:results-table-enfr-bleu-41.8",
+            "event_id": "event:table-reports-41.8",
+            "stage": "results_table"
+          },
+          {
+            "anchor_id": "anchor:results-prose-enfr-bleu-41.0",
+            "event_id": "event:prose-reports-41.0",
+            "stage": "results_explanation"
+          }
+        ],
+        "storyline_id": "storyline:enfr-bleu-discrepancy",
+        "uncertainty_gap_id": "gap:trace-cannot-resolve-author-intent"
+      },
+      "member_id": "traceguard",
+      "model_id": "model:traceguard:attention-v7",
+      "native_binding": {
+        "behavior_manifest_fingerprint": "sha256:dab1676fd45ee1cc7ff39927f985ff9bc2e97f2ec810a85a37ddcbfdb57b480c",
+        "behavior_manifest_id": "member-behavior-manifest:traceguard:dab1676fd45ee1cc7ff39927f985ff9bc2e97f2ec810a85a37ddcbfdb57b480c",
+        "domain_behavior_id": "traceguard.investigation-reconstruction",
+        "envelope_fingerprint": "sha256:2865083a8a89b0a536e7509abd080630fee043e20ae4be7a076a85eecab7812b",
+        "envelope_id": "envelope:traceguard",
+        "expected_target_anchor_fingerprint": "sha256:7da5613220b9429e791e3bc33367996ec57b3917ccc88e220abaa816eaf4052a",
+        "expected_target_anchor_id": "expected-target-anchor:c0306385c23f1000dcfb853005e3c42b5bc3dfa5d0a2e96a77980673b116e1a1",
+        "model_fingerprint": "sha256:df69d69d3db89759255bf8c10d8a26806f45ef0da0b00f865b934fffda831fa4",
+        "native_model_id": "trace-blueprint:blueprint-test",
+        "native_receipt_ids": [
+          "receipt:traceguard:current"
+        ]
+      },
+      "native_route": {
+        "blueprint_checker": "researchguard.trace.blueprint:check_blueprint",
+        "external_transition": "researchguard.trace.owner_attestation:evaluate_external_object_transition",
+        "owner_attestation": "researchguard.trace.owner_attestation:replay_native_owner_attestation"
+      },
+      "oracle_binding": {
+        "bad_case_id": "test:traceguard:external-object-known-bad",
+        "checker_entrypoint": "researchguard.trace.owner_attestation:evaluate_external_object_transition",
+        "good_case_id": "test:traceguard:external-object-known-good",
+        "oracle_id": "oracle:traceguard:external-object-transition",
+        "owner_id": "traceguard",
+        "protected_failure": "turning chronology into undocumented causality, correction, or intent"
+      },
+      "output": {
+        "gaps": [
+          {
+            "code": "trace-does-not-establish-undocumented-resolution",
+            "detail": "The ordered occurrences do not establish an undocumented correction or intent.",
+            "gap_id": "gap:trace-cannot-resolve-author-intent"
+          }
+        ],
+        "ordered_events": [
+          {
+            "event_id": "event:abstract-reports-41.8",
+            "evidence_ids": [
+              "anchor:abstract-enfr-bleu-41.8"
+            ],
+            "output_ids": [
+              "observed-value:41.8"
+            ],
+            "predecessor_ids": [],
+            "stage": "abstract"
+          },
+          {
+            "event_id": "event:table-reports-41.8",
+            "evidence_ids": [
+              "anchor:results-table-enfr-bleu-41.8"
+            ],
+            "output_ids": [
+              "observed-value:41.8"
+            ],
+            "predecessor_ids": [
+              "event:abstract-reports-41.8"
+            ],
+            "stage": "results_table"
+          },
+          {
+            "event_id": "event:prose-reports-41.0",
+            "evidence_ids": [
+              "anchor:results-prose-enfr-bleu-41.0"
+            ],
+            "output_ids": [
+              "observed-value:41.0"
+            ],
+            "predecessor_ids": [
+              "event:table-reports-41.8"
+            ],
+            "stage": "results_explanation"
+          }
+        ],
+        "storylines": [
+          {
+            "event_ids": [
+              "event:abstract-reports-41.8",
+              "event:table-reports-41.8",
+              "event:prose-reports-41.0"
+            ],
+            "status": "variance_open",
+            "storyline_id": "storyline:enfr-bleu-discrepancy",
+            "unresolved_gap_ids": [
+              "gap:trace-cannot-resolve-author-intent"
+            ]
+          }
+        ]
+      },
+      "owned_object_ids": [
+        "event:abstract-reports-41.8",
+        "event:prose-reports-41.0",
+        "event:table-reports-41.8",
+        "gap:trace-cannot-resolve-author-intent",
+        "storyline:enfr-bleu-discrepancy"
+      ],
+      "post_state": {
+        "latest_event_id": "event:prose-reports-41.0",
+        "storyline_status": "variance_open"
+      },
+      "pre_state": {
+        "open_gap_ids": [
+          "gap:enfr-bleu-conflict"
+        ],
+        "ordered_event_ids": []
+      },
+      "protected_failure": "turning chronology into undocumented causality, correction, or intent",
+      "scope_binding": {
+        "completion_status": "complete_within_declared_scope",
+        "declared_complete_object_ids": [
+          "event:abstract-reports-41.8",
+          "event:prose-reports-41.0",
+          "event:table-reports-41.8",
+          "gap:trace-cannot-resolve-author-intent",
+          "storyline:enfr-bleu-discrepancy"
+        ],
+        "declared_input_object_ids": [
+          "anchor:abstract-enfr-bleu-41.8",
+          "anchor:results-prose-enfr-bleu-41.0",
+          "anchor:results-table-enfr-bleu-41.8",
+          "gap:enfr-bleu-conflict",
+          "source:paper:arxiv-1706.03762v7"
+        ],
+        "expansion_frontier_ids": [
+          "frontier:attention-v7:recursive-semantic-inventory"
+        ],
+        "scope_id": "scope:attention-v7:reported-enfr-bleu-consistency"
+      },
+      "test_bindings": [
+        {
+          "behavior_id": "traceguard.investigation-reconstruction",
+          "oracle_id": "oracle:traceguard:external-object-transition",
+          "role": "known_good",
+          "test_id": "test:traceguard:external-object-known-good"
+        },
+        {
+          "behavior_id": "traceguard.investigation-reconstruction",
+          "oracle_id": "oracle:traceguard:external-object-transition",
+          "role": "known_bad",
+          "test_id": "test:traceguard:external-object-known-bad"
+        }
+      ]
+    }
+  },
+  "parent_function_block": {
+    "block_id": "function-block:paper:arxiv-1706.03762v7",
+    "child_input_mappings": [
+      {
+        "child_input_id": "binding:experimentguard:input:1",
+        "child_model_id": "model:experimentguard:attention-v7",
+        "mapping_id": "parent-mapping:binding:experimentguard:input:1",
+        "source_object_id": "claim:abstract-enfr-bleu-41.8",
+        "source_owner_id": "logicguard"
+      },
+      {
+        "child_input_id": "binding:experimentguard:input:2",
+        "child_model_id": "model:experimentguard:attention-v7",
+        "mapping_id": "parent-mapping:binding:experimentguard:input:2",
+        "source_object_id": "claim:enfr-bleu-conflict-exists",
+        "source_owner_id": "logicguard"
+      },
+      {
+        "child_input_id": "binding:experimentguard:input:3",
+        "child_model_id": "model:experimentguard:attention-v7",
+        "mapping_id": "parent-mapping:binding:experimentguard:input:3",
+        "source_object_id": "claim:prose-enfr-bleu-41.0",
+        "source_owner_id": "logicguard"
+      },
+      {
+        "child_input_id": "binding:experimentguard:input:4",
+        "child_model_id": "model:experimentguard:attention-v7",
+        "mapping_id": "parent-mapping:binding:experimentguard:input:4",
+        "source_object_id": "claim:table-enfr-bleu-41.8",
+        "source_owner_id": "logicguard"
+      },
+      {
+        "child_input_id": "binding:experimentguard:input:5",
+        "child_model_id": "model:experimentguard:attention-v7",
+        "mapping_id": "parent-mapping:binding:experimentguard:input:5",
+        "source_object_id": "edge:abstract-supports-41.8",
+        "source_owner_id": "logicguard"
+      },
+      {
+        "child_input_id": "binding:experimentguard:input:6",
+        "child_model_id": "model:experimentguard:attention-v7",
+        "mapping_id": "parent-mapping:binding:experimentguard:input:6",
+        "source_object_id": "edge:prose-conflicts-41.8",
+        "source_owner_id": "logicguard"
+      },
+      {
+        "child_input_id": "binding:experimentguard:input:7",
+        "child_model_id": "model:experimentguard:attention-v7",
+        "mapping_id": "parent-mapping:binding:experimentguard:input:7",
+        "source_object_id": "edge:table-supports-41.8",
+        "source_owner_id": "logicguard"
+      },
+      {
+        "child_input_id": "binding:experimentguard:input:8",
+        "child_model_id": "model:experimentguard:attention-v7",
+        "mapping_id": "parent-mapping:binding:experimentguard:input:8",
+        "source_object_id": "gap:authoritative-enfr-bleu-unresolved",
+        "source_owner_id": "logicguard"
+      },
+      {
+        "child_input_id": "binding:logicguard:input:1",
+        "child_model_id": "model:logicguard:attention-v7",
+        "mapping_id": "parent-mapping:binding:logicguard:input:1",
+        "source_object_id": "event:abstract-reports-41.8",
+        "source_owner_id": "traceguard"
+      },
+      {
+        "child_input_id": "binding:logicguard:input:2",
+        "child_model_id": "model:logicguard:attention-v7",
+        "mapping_id": "parent-mapping:binding:logicguard:input:2",
+        "source_object_id": "event:prose-reports-41.0",
+        "source_owner_id": "traceguard"
+      },
+      {
+        "child_input_id": "binding:logicguard:input:3",
+        "child_model_id": "model:logicguard:attention-v7",
+        "mapping_id": "parent-mapping:binding:logicguard:input:3",
+        "source_object_id": "event:table-reports-41.8",
+        "source_owner_id": "traceguard"
+      },
+      {
+        "child_input_id": "binding:logicguard:input:4",
+        "child_model_id": "model:logicguard:attention-v7",
+        "mapping_id": "parent-mapping:binding:logicguard:input:4",
+        "source_object_id": "gap:trace-cannot-resolve-author-intent",
+        "source_owner_id": "traceguard"
+      },
+      {
+        "child_input_id": "binding:logicguard:input:5",
+        "child_model_id": "model:logicguard:attention-v7",
+        "mapping_id": "parent-mapping:binding:logicguard:input:5",
+        "source_object_id": "storyline:enfr-bleu-discrepancy",
+        "source_owner_id": "traceguard"
+      },
+      {
+        "child_input_id": "binding:sourceguard:input:1",
+        "child_model_id": "model:sourceguard:attention-v7",
+        "mapping_id": "parent-mapping:binding:sourceguard:input:1",
+        "source_object_id": "artifact:ms-tex",
+        "source_owner_id": "target-boundary"
+      },
+      {
+        "child_input_id": "binding:sourceguard:input:10",
+        "child_model_id": "model:sourceguard:attention-v7",
+        "mapping_id": "parent-mapping:binding:sourceguard:input:10",
+        "source_object_id": "artifact:source-figures-modalnet-23-png",
+        "source_owner_id": "target-boundary"
+      },
+      {
+        "child_input_id": "binding:sourceguard:input:11",
+        "child_model_id": "model:sourceguard:attention-v7",
+        "mapping_id": "parent-mapping:binding:sourceguard:input:11",
+        "source_object_id": "artifact:source-figures-modalnet-32-png",
+        "source_owner_id": "target-boundary"
+      },
+      {
+        "child_input_id": "binding:sourceguard:input:12",
+        "child_model_id": "model:sourceguard:attention-v7",
+        "mapping_id": "parent-mapping:binding:sourceguard:input:12",
+        "source_object_id": "artifact:source-introduction-tex",
+        "source_owner_id": "target-boundary"
+      },
+      {
+        "child_input_id": "binding:sourceguard:input:13",
+        "child_model_id": "model:sourceguard:attention-v7",
+        "mapping_id": "parent-mapping:binding:sourceguard:input:13",
+        "source_object_id": "artifact:source-model-architecture-tex",
+        "source_owner_id": "target-boundary"
+      },
+      {
+        "child_input_id": "binding:sourceguard:input:14",
+        "child_model_id": "model:sourceguard:attention-v7",
+        "mapping_id": "parent-mapping:binding:sourceguard:input:14",
+        "source_object_id": "artifact:source-nips-2017-sty",
+        "source_owner_id": "target-boundary"
+      },
+      {
+        "child_input_id": "binding:sourceguard:input:15",
+        "child_model_id": "model:sourceguard:attention-v7",
+        "mapping_id": "parent-mapping:binding:sourceguard:input:15",
+        "source_object_id": "artifact:source-parameter-attention-tex",
+        "source_owner_id": "target-boundary"
+      },
+      {
+        "child_input_id": "binding:sourceguard:input:16",
+        "child_model_id": "model:sourceguard:attention-v7",
+        "mapping_id": "parent-mapping:binding:sourceguard:input:16",
+        "source_object_id": "artifact:source-sqrt-d-trick-tex",
+        "source_owner_id": "target-boundary"
+      },
+      {
+        "child_input_id": "binding:sourceguard:input:17",
+        "child_model_id": "model:sourceguard:attention-v7",
+        "mapping_id": "parent-mapping:binding:sourceguard:input:17",
+        "source_object_id": "artifact:source-training-tex",
+        "source_owner_id": "target-boundary"
+      },
+      {
+        "child_input_id": "binding:sourceguard:input:18",
+        "child_model_id": "model:sourceguard:attention-v7",
+        "mapping_id": "parent-mapping:binding:sourceguard:input:18",
+        "source_object_id": "artifact:source-vis-anaphora-resolution-new-pdf",
+        "source_owner_id": "target-boundary"
+      },
+      {
+        "child_input_id": "binding:sourceguard:input:19",
+        "child_model_id": "model:sourceguard:attention-v7",
+        "mapping_id": "parent-mapping:binding:sourceguard:input:19",
+        "source_object_id": "artifact:source-vis-anaphora-resolution2-new-pdf",
+        "source_owner_id": "target-boundary"
+      },
+      {
+        "child_input_id": "binding:sourceguard:input:2",
+        "child_model_id": "model:sourceguard:attention-v7",
+        "mapping_id": "parent-mapping:binding:sourceguard:input:2",
+        "source_object_id": "artifact:paper-pdf",
+        "source_owner_id": "target-boundary"
+      },
+      {
+        "child_input_id": "binding:sourceguard:input:20",
+        "child_model_id": "model:sourceguard:attention-v7",
+        "mapping_id": "parent-mapping:binding:sourceguard:input:20",
+        "source_object_id": "artifact:source-vis-attending-to-head-new-pdf",
+        "source_owner_id": "target-boundary"
+      },
+      {
+        "child_input_id": "binding:sourceguard:input:21",
+        "child_model_id": "model:sourceguard:attention-v7",
+        "mapping_id": "parent-mapping:binding:sourceguard:input:21",
+        "source_object_id": "artifact:source-vis-attending-to-head2-new-pdf",
+        "source_owner_id": "target-boundary"
+      },
+      {
+        "child_input_id": "binding:sourceguard:input:22",
+        "child_model_id": "model:sourceguard:attention-v7",
+        "mapping_id": "parent-mapping:binding:sourceguard:input:22",
+        "source_object_id": "artifact:source-vis-making-more-difficult-new-pdf",
+        "source_owner_id": "target-boundary"
+      },
+      {
+        "child_input_id": "binding:sourceguard:input:23",
+        "child_model_id": "model:sourceguard:attention-v7",
+        "mapping_id": "parent-mapping:binding:sourceguard:input:23",
+        "source_object_id": "artifact:source-vis-making-more-difficult5-new-pdf",
+        "source_owner_id": "target-boundary"
+      },
+      {
+        "child_input_id": "binding:sourceguard:input:24",
+        "child_model_id": "model:sourceguard:attention-v7",
+        "mapping_id": "parent-mapping:binding:sourceguard:input:24",
+        "source_object_id": "artifact:source-visualizations-tex",
+        "source_owner_id": "target-boundary"
+      },
+      {
+        "child_input_id": "binding:sourceguard:input:25",
+        "child_model_id": "model:sourceguard:attention-v7",
+        "mapping_id": "parent-mapping:binding:sourceguard:input:25",
+        "source_object_id": "artifact:source-why-self-attention-tex",
+        "source_owner_id": "target-boundary"
+      },
+      {
+        "child_input_id": "binding:sourceguard:input:26",
+        "child_model_id": "model:sourceguard:attention-v7",
+        "mapping_id": "parent-mapping:binding:sourceguard:input:26",
+        "source_object_id": "paper:arxiv-1706.03762v7",
+        "source_owner_id": "target-boundary"
+      },
+      {
+        "child_input_id": "binding:sourceguard:input:27",
+        "child_model_id": "model:sourceguard:attention-v7",
+        "mapping_id": "parent-mapping:binding:sourceguard:input:27",
+        "source_object_id": "structure:abstract",
+        "source_owner_id": "target-boundary"
+      },
+      {
+        "child_input_id": "binding:sourceguard:input:28",
+        "child_model_id": "model:sourceguard:attention-v7",
+        "mapping_id": "parent-mapping:binding:sourceguard:input:28",
+        "source_object_id": "structure:paper-root",
+        "source_owner_id": "target-boundary"
+      },
+      {
+        "child_input_id": "binding:sourceguard:input:29",
+        "child_model_id": "model:sourceguard:attention-v7",
+        "mapping_id": "parent-mapping:binding:sourceguard:input:29",
+        "source_object_id": "structure:results-prose",
+        "source_owner_id": "target-boundary"
+      },
+      {
+        "child_input_id": "binding:sourceguard:input:3",
+        "child_model_id": "model:sourceguard:attention-v7",
+        "mapping_id": "parent-mapping:binding:sourceguard:input:3",
+        "source_object_id": "artifact:paper-source-tar",
+        "source_owner_id": "target-boundary"
+      },
+      {
+        "child_input_id": "binding:sourceguard:input:30",
+        "child_model_id": "model:sourceguard:attention-v7",
+        "mapping_id": "parent-mapping:binding:sourceguard:input:30",
+        "source_object_id": "structure:results-table",
+        "source_owner_id": "target-boundary"
+      },
+      {
+        "child_input_id": "binding:sourceguard:input:4",
+        "child_model_id": "model:sourceguard:attention-v7",
+        "mapping_id": "parent-mapping:binding:sourceguard:input:4",
+        "source_object_id": "artifact:results-tex",
+        "source_owner_id": "target-boundary"
+      },
+      {
+        "child_input_id": "binding:sourceguard:input:5",
+        "child_model_id": "model:sourceguard:attention-v7",
+        "mapping_id": "parent-mapping:binding:sourceguard:input:5",
+        "source_object_id": "artifact:source-background-tex",
+        "source_owner_id": "target-boundary"
+      },
+      {
+        "child_input_id": "binding:sourceguard:input:6",
+        "child_model_id": "model:sourceguard:attention-v7",
+        "mapping_id": "parent-mapping:binding:sourceguard:input:6",
+        "source_object_id": "artifact:source-figures-modalnet-19-png",
+        "source_owner_id": "target-boundary"
+      },
+      {
+        "child_input_id": "binding:sourceguard:input:7",
+        "child_model_id": "model:sourceguard:attention-v7",
+        "mapping_id": "parent-mapping:binding:sourceguard:input:7",
+        "source_object_id": "artifact:source-figures-modalnet-20-png",
+        "source_owner_id": "target-boundary"
+      },
+      {
+        "child_input_id": "binding:sourceguard:input:8",
+        "child_model_id": "model:sourceguard:attention-v7",
+        "mapping_id": "parent-mapping:binding:sourceguard:input:8",
+        "source_object_id": "artifact:source-figures-modalnet-21-png",
+        "source_owner_id": "target-boundary"
+      },
+      {
+        "child_input_id": "binding:sourceguard:input:9",
+        "child_model_id": "model:sourceguard:attention-v7",
+        "mapping_id": "parent-mapping:binding:sourceguard:input:9",
+        "source_object_id": "artifact:source-figures-modalnet-22-png",
+        "source_owner_id": "target-boundary"
+      },
+      {
+        "child_input_id": "binding:traceguard:input:1",
+        "child_model_id": "model:traceguard:attention-v7",
+        "mapping_id": "parent-mapping:binding:traceguard:input:1",
+        "source_object_id": "anchor:abstract-enfr-bleu-41.8",
+        "source_owner_id": "sourceguard"
+      },
+      {
+        "child_input_id": "binding:traceguard:input:2",
+        "child_model_id": "model:traceguard:attention-v7",
+        "mapping_id": "parent-mapping:binding:traceguard:input:2",
+        "source_object_id": "anchor:results-prose-enfr-bleu-41.0",
+        "source_owner_id": "sourceguard"
+      },
+      {
+        "child_input_id": "binding:traceguard:input:3",
+        "child_model_id": "model:traceguard:attention-v7",
+        "mapping_id": "parent-mapping:binding:traceguard:input:3",
+        "source_object_id": "anchor:results-table-enfr-bleu-41.8",
+        "source_owner_id": "sourceguard"
+      },
+      {
+        "child_input_id": "binding:traceguard:input:4",
+        "child_model_id": "model:traceguard:attention-v7",
+        "mapping_id": "parent-mapping:binding:traceguard:input:4",
+        "source_object_id": "gap:enfr-bleu-conflict",
+        "source_owner_id": "sourceguard"
+      },
+      {
+        "child_input_id": "binding:traceguard:input:5",
+        "child_model_id": "model:traceguard:attention-v7",
+        "mapping_id": "parent-mapping:binding:traceguard:input:5",
+        "source_object_id": "source:paper:arxiv-1706.03762v7",
+        "source_owner_id": "sourceguard"
+      }
+    ],
+    "child_model_ids": [
+      "model:sourceguard:attention-v7",
+      "model:traceguard:attention-v7",
+      "model:logicguard:attention-v7",
+      "model:experimentguard:attention-v7"
+    ],
+    "child_output_dispositions": [
+      {
+        "child_model_id": "model:sourceguard:attention-v7",
+        "child_output_id": "binding:sourceguard:output:1",
+        "consumer_member_ids": [
+          "traceguard"
+        ],
+        "disposition": "consumed_and_exposed",
+        "disposition_id": "parent-disposition:anchor:abstract-enfr-bleu-41.8",
+        "object_id": "anchor:abstract-enfr-bleu-41.8",
+        "owner_id": "sourceguard"
+      },
+      {
+        "child_model_id": "model:sourceguard:attention-v7",
+        "child_output_id": "binding:sourceguard:output:2",
+        "consumer_member_ids": [
+          "traceguard"
+        ],
+        "disposition": "consumed_and_exposed",
+        "disposition_id": "parent-disposition:anchor:results-prose-enfr-bleu-41.0",
+        "object_id": "anchor:results-prose-enfr-bleu-41.0",
+        "owner_id": "sourceguard"
+      },
+      {
+        "child_model_id": "model:sourceguard:attention-v7",
+        "child_output_id": "binding:sourceguard:output:3",
+        "consumer_member_ids": [
+          "traceguard"
+        ],
+        "disposition": "consumed_and_exposed",
+        "disposition_id": "parent-disposition:anchor:results-table-enfr-bleu-41.8",
+        "object_id": "anchor:results-table-enfr-bleu-41.8",
+        "owner_id": "sourceguard"
+      },
+      {
+        "child_model_id": "model:logicguard:attention-v7",
+        "child_output_id": "binding:logicguard:output:1",
+        "consumer_member_ids": [
+          "experimentguard"
+        ],
+        "disposition": "consumed_and_exposed",
+        "disposition_id": "parent-disposition:claim:abstract-enfr-bleu-41.8",
+        "object_id": "claim:abstract-enfr-bleu-41.8",
+        "owner_id": "logicguard"
+      },
+      {
+        "child_model_id": "model:logicguard:attention-v7",
+        "child_output_id": "binding:logicguard:output:2",
+        "consumer_member_ids": [
+          "experimentguard"
+        ],
+        "disposition": "consumed_and_exposed",
+        "disposition_id": "parent-disposition:claim:enfr-bleu-conflict-exists",
+        "object_id": "claim:enfr-bleu-conflict-exists",
+        "owner_id": "logicguard"
+      },
+      {
+        "child_model_id": "model:logicguard:attention-v7",
+        "child_output_id": "binding:logicguard:output:3",
+        "consumer_member_ids": [
+          "experimentguard"
+        ],
+        "disposition": "consumed_and_exposed",
+        "disposition_id": "parent-disposition:claim:prose-enfr-bleu-41.0",
+        "object_id": "claim:prose-enfr-bleu-41.0",
+        "owner_id": "logicguard"
+      },
+      {
+        "child_model_id": "model:logicguard:attention-v7",
+        "child_output_id": "binding:logicguard:output:4",
+        "consumer_member_ids": [
+          "experimentguard"
+        ],
+        "disposition": "consumed_and_exposed",
+        "disposition_id": "parent-disposition:claim:table-enfr-bleu-41.8",
+        "object_id": "claim:table-enfr-bleu-41.8",
+        "owner_id": "logicguard"
+      },
+      {
+        "child_model_id": "model:logicguard:attention-v7",
+        "child_output_id": "binding:logicguard:output:5",
+        "consumer_member_ids": [
+          "experimentguard"
+        ],
+        "disposition": "consumed_and_exposed",
+        "disposition_id": "parent-disposition:edge:abstract-supports-41.8",
+        "object_id": "edge:abstract-supports-41.8",
+        "owner_id": "logicguard"
+      },
+      {
+        "child_model_id": "model:logicguard:attention-v7",
+        "child_output_id": "binding:logicguard:output:6",
+        "consumer_member_ids": [
+          "experimentguard"
+        ],
+        "disposition": "consumed_and_exposed",
+        "disposition_id": "parent-disposition:edge:prose-conflicts-41.8",
+        "object_id": "edge:prose-conflicts-41.8",
+        "owner_id": "logicguard"
+      },
+      {
+        "child_model_id": "model:logicguard:attention-v7",
+        "child_output_id": "binding:logicguard:output:7",
+        "consumer_member_ids": [
+          "experimentguard"
+        ],
+        "disposition": "consumed_and_exposed",
+        "disposition_id": "parent-disposition:edge:table-supports-41.8",
+        "object_id": "edge:table-supports-41.8",
+        "owner_id": "logicguard"
+      },
+      {
+        "child_model_id": "model:traceguard:attention-v7",
+        "child_output_id": "binding:traceguard:output:1",
+        "consumer_member_ids": [
+          "logicguard"
+        ],
+        "disposition": "consumed_and_exposed",
+        "disposition_id": "parent-disposition:event:abstract-reports-41.8",
+        "object_id": "event:abstract-reports-41.8",
+        "owner_id": "traceguard"
+      },
+      {
+        "child_model_id": "model:traceguard:attention-v7",
+        "child_output_id": "binding:traceguard:output:2",
+        "consumer_member_ids": [
+          "logicguard"
+        ],
+        "disposition": "consumed_and_exposed",
+        "disposition_id": "parent-disposition:event:prose-reports-41.0",
+        "object_id": "event:prose-reports-41.0",
+        "owner_id": "traceguard"
+      },
+      {
+        "child_model_id": "model:traceguard:attention-v7",
+        "child_output_id": "binding:traceguard:output:3",
+        "consumer_member_ids": [
+          "logicguard"
+        ],
+        "disposition": "consumed_and_exposed",
+        "disposition_id": "parent-disposition:event:table-reports-41.8",
+        "object_id": "event:table-reports-41.8",
+        "owner_id": "traceguard"
+      },
+      {
+        "child_model_id": "model:experimentguard:attention-v7",
+        "child_output_id": "binding:experimentguard:output:1",
+        "consumer_member_ids": [],
+        "disposition": "exposed",
+        "disposition_id": "parent-disposition:experiment:check-version-history",
+        "object_id": "experiment:check-version-history",
+        "owner_id": "experimentguard"
+      },
+      {
+        "child_model_id": "model:experimentguard:attention-v7",
+        "child_output_id": "binding:experimentguard:output:2",
+        "consumer_member_ids": [],
+        "disposition": "exposed",
+        "disposition_id": "parent-disposition:experiment:compare-frozen-locators",
+        "object_id": "experiment:compare-frozen-locators",
+        "owner_id": "experimentguard"
+      },
+      {
+        "child_model_id": "model:logicguard:attention-v7",
+        "child_output_id": "binding:logicguard:output:8",
+        "consumer_member_ids": [
+          "experimentguard"
+        ],
+        "disposition": "consumed_and_exposed",
+        "disposition_id": "parent-disposition:gap:authoritative-enfr-bleu-unresolved",
+        "object_id": "gap:authoritative-enfr-bleu-unresolved",
+        "owner_id": "logicguard"
+      },
+      {
+        "child_model_id": "model:sourceguard:attention-v7",
+        "child_output_id": "binding:sourceguard:output:4",
+        "consumer_member_ids": [
+          "traceguard"
+        ],
+        "disposition": "consumed_and_exposed",
+        "disposition_id": "parent-disposition:gap:enfr-bleu-conflict",
+        "object_id": "gap:enfr-bleu-conflict",
+        "owner_id": "sourceguard"
+      },
+      {
+        "child_model_id": "model:experimentguard:attention-v7",
+        "child_output_id": "binding:experimentguard:output:3",
+        "consumer_member_ids": [],
+        "disposition": "exposed",
+        "disposition_id": "parent-disposition:gap:no-author-resolution-evidence",
+        "object_id": "gap:no-author-resolution-evidence",
+        "owner_id": "experimentguard"
+      },
+      {
+        "child_model_id": "model:traceguard:attention-v7",
+        "child_output_id": "binding:traceguard:output:4",
+        "consumer_member_ids": [
+          "logicguard"
+        ],
+        "disposition": "consumed_and_exposed",
+        "disposition_id": "parent-disposition:gap:trace-cannot-resolve-author-intent",
+        "object_id": "gap:trace-cannot-resolve-author-intent",
+        "owner_id": "traceguard"
+      },
+      {
+        "child_model_id": "model:experimentguard:attention-v7",
+        "child_output_id": "binding:experimentguard:output:4",
+        "consumer_member_ids": [],
+        "disposition": "exposed",
+        "disposition_id": "parent-disposition:hypothesis:reported-score-is-41.0",
+        "object_id": "hypothesis:reported-score-is-41.0",
+        "owner_id": "experimentguard"
+      },
+      {
+        "child_model_id": "model:experimentguard:attention-v7",
+        "child_output_id": "binding:experimentguard:output:5",
+        "consumer_member_ids": [],
+        "disposition": "exposed",
+        "disposition_id": "parent-disposition:hypothesis:reported-score-is-41.8",
+        "object_id": "hypothesis:reported-score-is-41.8",
+        "owner_id": "experimentguard"
+      },
+      {
+        "child_model_id": "model:sourceguard:attention-v7",
+        "child_output_id": "binding:sourceguard:output:5",
+        "consumer_member_ids": [
+          "traceguard"
+        ],
+        "disposition": "consumed_and_exposed",
+        "disposition_id": "parent-disposition:source:paper:arxiv-1706.03762v7",
+        "object_id": "source:paper:arxiv-1706.03762v7",
+        "owner_id": "sourceguard"
+      },
+      {
+        "child_model_id": "model:traceguard:attention-v7",
+        "child_output_id": "binding:traceguard:output:5",
+        "consumer_member_ids": [
+          "logicguard"
+        ],
+        "disposition": "consumed_and_exposed",
+        "disposition_id": "parent-disposition:storyline:enfr-bleu-discrepancy",
+        "object_id": "storyline:enfr-bleu-discrepancy",
+        "owner_id": "traceguard"
+      }
+    ],
+    "claim_boundaries": [
+      {
+        "claim_boundary": "SourceGuard identifies declared source roles, coverage, and exact locators; it does not decide factual truth or undocumented intent.",
+        "owner_id": "sourceguard"
+      },
+      {
+        "claim_boundary": "TraceGuard reconstructs the declared evidence-bound sequence; it does not infer undocumented causality, correction, or intent.",
+        "owner_id": "traceguard"
+      },
+      {
+        "claim_boundary": "LogicGuard licenses only the bounded conclusion supported by declared premises; factual truth and undocumented intent remain outside the model.",
+        "owner_id": "logicguard"
+      },
+      {
+        "claim_boundary": "ExperimentGuard recommends from the declared finite hypotheses and outcomes; it does not execute external experiments or choose factual truth.",
+        "owner_id": "experimentguard"
+      }
+    ],
+    "effect_fields": [
+      {
+        "effect": "freeze_source_identity",
+        "effect_id": "parent-effect:sourceguard:1",
+        "owner_id": "sourceguard"
+      },
+      {
+        "effect": "expose_value_variance",
+        "effect_id": "parent-effect:sourceguard:2",
+        "owner_id": "sourceguard"
+      },
+      {
+        "effect": "order_declared_occurrences",
+        "effect_id": "parent-effect:traceguard:1",
+        "owner_id": "traceguard"
+      },
+      {
+        "effect": "preserve_unresolved_variance",
+        "effect_id": "parent-effect:traceguard:2",
+        "owner_id": "traceguard"
+      },
+      {
+        "effect": "license_bounded_variance",
+        "effect_id": "parent-effect:logicguard:1",
+        "owner_id": "logicguard"
+      },
+      {
+        "effect": "enforce_scope_limits",
+        "effect_id": "parent-effect:logicguard:2",
+        "owner_id": "logicguard"
+      },
+      {
+        "effect": "compare_declared_values",
+        "effect_id": "parent-effect:experimentguard:1",
+        "owner_id": "experimentguard"
+      },
+      {
+        "effect": "preserve_unresolved_hypotheses",
+        "effect_id": "parent-effect:experimentguard:2",
+        "owner_id": "experimentguard"
+      }
+    ],
+    "handoffs": [
+      {
+        "consumer_input_id": "binding:traceguard:input:1",
+        "consumer_member_id": "traceguard",
+        "handoff_id": "parent-handoff:anchor:abstract-enfr-bleu-41.8:traceguard",
+        "object_id": "anchor:abstract-enfr-bleu-41.8",
+        "producer_member_id": "sourceguard",
+        "producer_output_id": "binding:sourceguard:output:1"
+      },
+      {
+        "consumer_input_id": "binding:traceguard:input:2",
+        "consumer_member_id": "traceguard",
+        "handoff_id": "parent-handoff:anchor:results-prose-enfr-bleu-41.0:traceguard",
+        "object_id": "anchor:results-prose-enfr-bleu-41.0",
+        "producer_member_id": "sourceguard",
+        "producer_output_id": "binding:sourceguard:output:2"
+      },
+      {
+        "consumer_input_id": "binding:traceguard:input:3",
+        "consumer_member_id": "traceguard",
+        "handoff_id": "parent-handoff:anchor:results-table-enfr-bleu-41.8:traceguard",
+        "object_id": "anchor:results-table-enfr-bleu-41.8",
+        "producer_member_id": "sourceguard",
+        "producer_output_id": "binding:sourceguard:output:3"
+      },
+      {
+        "consumer_input_id": "binding:experimentguard:input:1",
+        "consumer_member_id": "experimentguard",
+        "handoff_id": "parent-handoff:claim:abstract-enfr-bleu-41.8:experimentguard",
+        "object_id": "claim:abstract-enfr-bleu-41.8",
+        "producer_member_id": "logicguard",
+        "producer_output_id": "binding:logicguard:output:1"
+      },
+      {
+        "consumer_input_id": "binding:experimentguard:input:2",
+        "consumer_member_id": "experimentguard",
+        "handoff_id": "parent-handoff:claim:enfr-bleu-conflict-exists:experimentguard",
+        "object_id": "claim:enfr-bleu-conflict-exists",
+        "producer_member_id": "logicguard",
+        "producer_output_id": "binding:logicguard:output:2"
+      },
+      {
+        "consumer_input_id": "binding:experimentguard:input:3",
+        "consumer_member_id": "experimentguard",
+        "handoff_id": "parent-handoff:claim:prose-enfr-bleu-41.0:experimentguard",
+        "object_id": "claim:prose-enfr-bleu-41.0",
+        "producer_member_id": "logicguard",
+        "producer_output_id": "binding:logicguard:output:3"
+      },
+      {
+        "consumer_input_id": "binding:experimentguard:input:4",
+        "consumer_member_id": "experimentguard",
+        "handoff_id": "parent-handoff:claim:table-enfr-bleu-41.8:experimentguard",
+        "object_id": "claim:table-enfr-bleu-41.8",
+        "producer_member_id": "logicguard",
+        "producer_output_id": "binding:logicguard:output:4"
+      },
+      {
+        "consumer_input_id": "binding:experimentguard:input:5",
+        "consumer_member_id": "experimentguard",
+        "handoff_id": "parent-handoff:edge:abstract-supports-41.8:experimentguard",
+        "object_id": "edge:abstract-supports-41.8",
+        "producer_member_id": "logicguard",
+        "producer_output_id": "binding:logicguard:output:5"
+      },
+      {
+        "consumer_input_id": "binding:experimentguard:input:6",
+        "consumer_member_id": "experimentguard",
+        "handoff_id": "parent-handoff:edge:prose-conflicts-41.8:experimentguard",
+        "object_id": "edge:prose-conflicts-41.8",
+        "producer_member_id": "logicguard",
+        "producer_output_id": "binding:logicguard:output:6"
+      },
+      {
+        "consumer_input_id": "binding:experimentguard:input:7",
+        "consumer_member_id": "experimentguard",
+        "handoff_id": "parent-handoff:edge:table-supports-41.8:experimentguard",
+        "object_id": "edge:table-supports-41.8",
+        "producer_member_id": "logicguard",
+        "producer_output_id": "binding:logicguard:output:7"
+      },
+      {
+        "consumer_input_id": "binding:logicguard:input:1",
+        "consumer_member_id": "logicguard",
+        "handoff_id": "parent-handoff:event:abstract-reports-41.8:logicguard",
+        "object_id": "event:abstract-reports-41.8",
+        "producer_member_id": "traceguard",
+        "producer_output_id": "binding:traceguard:output:1"
+      },
+      {
+        "consumer_input_id": "binding:logicguard:input:2",
+        "consumer_member_id": "logicguard",
+        "handoff_id": "parent-handoff:event:prose-reports-41.0:logicguard",
+        "object_id": "event:prose-reports-41.0",
+        "producer_member_id": "traceguard",
+        "producer_output_id": "binding:traceguard:output:2"
+      },
+      {
+        "consumer_input_id": "binding:logicguard:input:3",
+        "consumer_member_id": "logicguard",
+        "handoff_id": "parent-handoff:event:table-reports-41.8:logicguard",
+        "object_id": "event:table-reports-41.8",
+        "producer_member_id": "traceguard",
+        "producer_output_id": "binding:traceguard:output:3"
+      },
+      {
+        "consumer_input_id": "binding:experimentguard:input:8",
+        "consumer_member_id": "experimentguard",
+        "handoff_id": "parent-handoff:gap:authoritative-enfr-bleu-unresolved:experimentguard",
+        "object_id": "gap:authoritative-enfr-bleu-unresolved",
+        "producer_member_id": "logicguard",
+        "producer_output_id": "binding:logicguard:output:8"
+      },
+      {
+        "consumer_input_id": "binding:traceguard:input:4",
+        "consumer_member_id": "traceguard",
+        "handoff_id": "parent-handoff:gap:enfr-bleu-conflict:traceguard",
+        "object_id": "gap:enfr-bleu-conflict",
+        "producer_member_id": "sourceguard",
+        "producer_output_id": "binding:sourceguard:output:4"
+      },
+      {
+        "consumer_input_id": "binding:logicguard:input:4",
+        "consumer_member_id": "logicguard",
+        "handoff_id": "parent-handoff:gap:trace-cannot-resolve-author-intent:logicguard",
+        "object_id": "gap:trace-cannot-resolve-author-intent",
+        "producer_member_id": "traceguard",
+        "producer_output_id": "binding:traceguard:output:4"
+      },
+      {
+        "consumer_input_id": "binding:traceguard:input:5",
+        "consumer_member_id": "traceguard",
+        "handoff_id": "parent-handoff:source:paper:arxiv-1706.03762v7:traceguard",
+        "object_id": "source:paper:arxiv-1706.03762v7",
+        "producer_member_id": "sourceguard",
+        "producer_output_id": "binding:sourceguard:output:5"
+      },
+      {
+        "consumer_input_id": "binding:logicguard:input:5",
+        "consumer_member_id": "logicguard",
+        "handoff_id": "parent-handoff:storyline:enfr-bleu-discrepancy:logicguard",
+        "object_id": "storyline:enfr-bleu-discrepancy",
+        "producer_member_id": "traceguard",
+        "producer_output_id": "binding:traceguard:output:5"
+      }
+    ],
+    "input_fields": [
+      {
+        "consumer_member_ids": [
+          "sourceguard"
+        ],
+        "field_id": "parent-input:artifact:ms-tex",
+        "object_id": "artifact:ms-tex",
+        "owner_id": "target-boundary"
+      },
+      {
+        "consumer_member_ids": [
+          "sourceguard"
+        ],
+        "field_id": "parent-input:artifact:paper-pdf",
+        "object_id": "artifact:paper-pdf",
+        "owner_id": "target-boundary"
+      },
+      {
+        "consumer_member_ids": [
+          "sourceguard"
+        ],
+        "field_id": "parent-input:artifact:paper-source-tar",
+        "object_id": "artifact:paper-source-tar",
+        "owner_id": "target-boundary"
+      },
+      {
+        "consumer_member_ids": [
+          "sourceguard"
+        ],
+        "field_id": "parent-input:artifact:results-tex",
+        "object_id": "artifact:results-tex",
+        "owner_id": "target-boundary"
+      },
+      {
+        "consumer_member_ids": [
+          "sourceguard"
+        ],
+        "field_id": "parent-input:artifact:source-background-tex",
+        "object_id": "artifact:source-background-tex",
+        "owner_id": "target-boundary"
+      },
+      {
+        "consumer_member_ids": [
+          "sourceguard"
+        ],
+        "field_id": "parent-input:artifact:source-figures-modalnet-19-png",
+        "object_id": "artifact:source-figures-modalnet-19-png",
+        "owner_id": "target-boundary"
+      },
+      {
+        "consumer_member_ids": [
+          "sourceguard"
+        ],
+        "field_id": "parent-input:artifact:source-figures-modalnet-20-png",
+        "object_id": "artifact:source-figures-modalnet-20-png",
+        "owner_id": "target-boundary"
+      },
+      {
+        "consumer_member_ids": [
+          "sourceguard"
+        ],
+        "field_id": "parent-input:artifact:source-figures-modalnet-21-png",
+        "object_id": "artifact:source-figures-modalnet-21-png",
+        "owner_id": "target-boundary"
+      },
+      {
+        "consumer_member_ids": [
+          "sourceguard"
+        ],
+        "field_id": "parent-input:artifact:source-figures-modalnet-22-png",
+        "object_id": "artifact:source-figures-modalnet-22-png",
+        "owner_id": "target-boundary"
+      },
+      {
+        "consumer_member_ids": [
+          "sourceguard"
+        ],
+        "field_id": "parent-input:artifact:source-figures-modalnet-23-png",
+        "object_id": "artifact:source-figures-modalnet-23-png",
+        "owner_id": "target-boundary"
+      },
+      {
+        "consumer_member_ids": [
+          "sourceguard"
+        ],
+        "field_id": "parent-input:artifact:source-figures-modalnet-32-png",
+        "object_id": "artifact:source-figures-modalnet-32-png",
+        "owner_id": "target-boundary"
+      },
+      {
+        "consumer_member_ids": [
+          "sourceguard"
+        ],
+        "field_id": "parent-input:artifact:source-introduction-tex",
+        "object_id": "artifact:source-introduction-tex",
+        "owner_id": "target-boundary"
+      },
+      {
+        "consumer_member_ids": [
+          "sourceguard"
+        ],
+        "field_id": "parent-input:artifact:source-model-architecture-tex",
+        "object_id": "artifact:source-model-architecture-tex",
+        "owner_id": "target-boundary"
+      },
+      {
+        "consumer_member_ids": [
+          "sourceguard"
+        ],
+        "field_id": "parent-input:artifact:source-nips-2017-sty",
+        "object_id": "artifact:source-nips-2017-sty",
+        "owner_id": "target-boundary"
+      },
+      {
+        "consumer_member_ids": [
+          "sourceguard"
+        ],
+        "field_id": "parent-input:artifact:source-parameter-attention-tex",
+        "object_id": "artifact:source-parameter-attention-tex",
+        "owner_id": "target-boundary"
+      },
+      {
+        "consumer_member_ids": [
+          "sourceguard"
+        ],
+        "field_id": "parent-input:artifact:source-sqrt-d-trick-tex",
+        "object_id": "artifact:source-sqrt-d-trick-tex",
+        "owner_id": "target-boundary"
+      },
+      {
+        "consumer_member_ids": [
+          "sourceguard"
+        ],
+        "field_id": "parent-input:artifact:source-training-tex",
+        "object_id": "artifact:source-training-tex",
+        "owner_id": "target-boundary"
+      },
+      {
+        "consumer_member_ids": [
+          "sourceguard"
+        ],
+        "field_id": "parent-input:artifact:source-vis-anaphora-resolution-new-pdf",
+        "object_id": "artifact:source-vis-anaphora-resolution-new-pdf",
+        "owner_id": "target-boundary"
+      },
+      {
+        "consumer_member_ids": [
+          "sourceguard"
+        ],
+        "field_id": "parent-input:artifact:source-vis-anaphora-resolution2-new-pdf",
+        "object_id": "artifact:source-vis-anaphora-resolution2-new-pdf",
+        "owner_id": "target-boundary"
+      },
+      {
+        "consumer_member_ids": [
+          "sourceguard"
+        ],
+        "field_id": "parent-input:artifact:source-vis-attending-to-head-new-pdf",
+        "object_id": "artifact:source-vis-attending-to-head-new-pdf",
+        "owner_id": "target-boundary"
+      },
+      {
+        "consumer_member_ids": [
+          "sourceguard"
+        ],
+        "field_id": "parent-input:artifact:source-vis-attending-to-head2-new-pdf",
+        "object_id": "artifact:source-vis-attending-to-head2-new-pdf",
+        "owner_id": "target-boundary"
+      },
+      {
+        "consumer_member_ids": [
+          "sourceguard"
+        ],
+        "field_id": "parent-input:artifact:source-vis-making-more-difficult-new-pdf",
+        "object_id": "artifact:source-vis-making-more-difficult-new-pdf",
+        "owner_id": "target-boundary"
+      },
+      {
+        "consumer_member_ids": [
+          "sourceguard"
+        ],
+        "field_id": "parent-input:artifact:source-vis-making-more-difficult5-new-pdf",
+        "object_id": "artifact:source-vis-making-more-difficult5-new-pdf",
+        "owner_id": "target-boundary"
+      },
+      {
+        "consumer_member_ids": [
+          "sourceguard"
+        ],
+        "field_id": "parent-input:artifact:source-visualizations-tex",
+        "object_id": "artifact:source-visualizations-tex",
+        "owner_id": "target-boundary"
+      },
+      {
+        "consumer_member_ids": [
+          "sourceguard"
+        ],
+        "field_id": "parent-input:artifact:source-why-self-attention-tex",
+        "object_id": "artifact:source-why-self-attention-tex",
+        "owner_id": "target-boundary"
+      },
+      {
+        "consumer_member_ids": [
+          "sourceguard"
+        ],
+        "field_id": "parent-input:paper:arxiv-1706.03762v7",
+        "object_id": "paper:arxiv-1706.03762v7",
+        "owner_id": "target-boundary"
+      },
+      {
+        "consumer_member_ids": [
+          "sourceguard"
+        ],
+        "field_id": "parent-input:structure:abstract",
+        "object_id": "structure:abstract",
+        "owner_id": "target-boundary"
+      },
+      {
+        "consumer_member_ids": [
+          "sourceguard"
+        ],
+        "field_id": "parent-input:structure:paper-root",
+        "object_id": "structure:paper-root",
+        "owner_id": "target-boundary"
+      },
+      {
+        "consumer_member_ids": [
+          "sourceguard"
+        ],
+        "field_id": "parent-input:structure:results-prose",
+        "object_id": "structure:results-prose",
+        "owner_id": "target-boundary"
+      },
+      {
+        "consumer_member_ids": [
+          "sourceguard"
+        ],
+        "field_id": "parent-input:structure:results-table",
+        "object_id": "structure:results-table",
+        "owner_id": "target-boundary"
+      }
+    ],
+    "output_fields": [
+      {
+        "consumer_member_ids": [
+          "traceguard"
+        ],
+        "disposition": "consumed_and_exposed",
+        "field_id": "parent-output:anchor:abstract-enfr-bleu-41.8",
+        "object_id": "anchor:abstract-enfr-bleu-41.8",
+        "owner_id": "sourceguard"
+      },
+      {
+        "consumer_member_ids": [
+          "traceguard"
+        ],
+        "disposition": "consumed_and_exposed",
+        "field_id": "parent-output:anchor:results-prose-enfr-bleu-41.0",
+        "object_id": "anchor:results-prose-enfr-bleu-41.0",
+        "owner_id": "sourceguard"
+      },
+      {
+        "consumer_member_ids": [
+          "traceguard"
+        ],
+        "disposition": "consumed_and_exposed",
+        "field_id": "parent-output:anchor:results-table-enfr-bleu-41.8",
+        "object_id": "anchor:results-table-enfr-bleu-41.8",
+        "owner_id": "sourceguard"
+      },
+      {
+        "consumer_member_ids": [
+          "experimentguard"
+        ],
+        "disposition": "consumed_and_exposed",
+        "field_id": "parent-output:claim:abstract-enfr-bleu-41.8",
+        "object_id": "claim:abstract-enfr-bleu-41.8",
+        "owner_id": "logicguard"
+      },
+      {
+        "consumer_member_ids": [
+          "experimentguard"
+        ],
+        "disposition": "consumed_and_exposed",
+        "field_id": "parent-output:claim:enfr-bleu-conflict-exists",
+        "object_id": "claim:enfr-bleu-conflict-exists",
+        "owner_id": "logicguard"
+      },
+      {
+        "consumer_member_ids": [
+          "experimentguard"
+        ],
+        "disposition": "consumed_and_exposed",
+        "field_id": "parent-output:claim:prose-enfr-bleu-41.0",
+        "object_id": "claim:prose-enfr-bleu-41.0",
+        "owner_id": "logicguard"
+      },
+      {
+        "consumer_member_ids": [
+          "experimentguard"
+        ],
+        "disposition": "consumed_and_exposed",
+        "field_id": "parent-output:claim:table-enfr-bleu-41.8",
+        "object_id": "claim:table-enfr-bleu-41.8",
+        "owner_id": "logicguard"
+      },
+      {
+        "consumer_member_ids": [
+          "experimentguard"
+        ],
+        "disposition": "consumed_and_exposed",
+        "field_id": "parent-output:edge:abstract-supports-41.8",
+        "object_id": "edge:abstract-supports-41.8",
+        "owner_id": "logicguard"
+      },
+      {
+        "consumer_member_ids": [
+          "experimentguard"
+        ],
+        "disposition": "consumed_and_exposed",
+        "field_id": "parent-output:edge:prose-conflicts-41.8",
+        "object_id": "edge:prose-conflicts-41.8",
+        "owner_id": "logicguard"
+      },
+      {
+        "consumer_member_ids": [
+          "experimentguard"
+        ],
+        "disposition": "consumed_and_exposed",
+        "field_id": "parent-output:edge:table-supports-41.8",
+        "object_id": "edge:table-supports-41.8",
+        "owner_id": "logicguard"
+      },
+      {
+        "consumer_member_ids": [
+          "logicguard"
+        ],
+        "disposition": "consumed_and_exposed",
+        "field_id": "parent-output:event:abstract-reports-41.8",
+        "object_id": "event:abstract-reports-41.8",
+        "owner_id": "traceguard"
+      },
+      {
+        "consumer_member_ids": [
+          "logicguard"
+        ],
+        "disposition": "consumed_and_exposed",
+        "field_id": "parent-output:event:prose-reports-41.0",
+        "object_id": "event:prose-reports-41.0",
+        "owner_id": "traceguard"
+      },
+      {
+        "consumer_member_ids": [
+          "logicguard"
+        ],
+        "disposition": "consumed_and_exposed",
+        "field_id": "parent-output:event:table-reports-41.8",
+        "object_id": "event:table-reports-41.8",
+        "owner_id": "traceguard"
+      },
+      {
+        "consumer_member_ids": [],
+        "disposition": "exposed",
+        "field_id": "parent-output:experiment:check-version-history",
+        "object_id": "experiment:check-version-history",
+        "owner_id": "experimentguard"
+      },
+      {
+        "consumer_member_ids": [],
+        "disposition": "exposed",
+        "field_id": "parent-output:experiment:compare-frozen-locators",
+        "object_id": "experiment:compare-frozen-locators",
+        "owner_id": "experimentguard"
+      },
+      {
+        "consumer_member_ids": [
+          "experimentguard"
+        ],
+        "disposition": "consumed_and_exposed",
+        "field_id": "parent-output:gap:authoritative-enfr-bleu-unresolved",
+        "object_id": "gap:authoritative-enfr-bleu-unresolved",
+        "owner_id": "logicguard"
+      },
+      {
+        "consumer_member_ids": [
+          "traceguard"
+        ],
+        "disposition": "consumed_and_exposed",
+        "field_id": "parent-output:gap:enfr-bleu-conflict",
+        "object_id": "gap:enfr-bleu-conflict",
+        "owner_id": "sourceguard"
+      },
+      {
+        "consumer_member_ids": [],
+        "disposition": "exposed",
+        "field_id": "parent-output:gap:no-author-resolution-evidence",
+        "object_id": "gap:no-author-resolution-evidence",
+        "owner_id": "experimentguard"
+      },
+      {
+        "consumer_member_ids": [
+          "logicguard"
+        ],
+        "disposition": "consumed_and_exposed",
+        "field_id": "parent-output:gap:trace-cannot-resolve-author-intent",
+        "object_id": "gap:trace-cannot-resolve-author-intent",
+        "owner_id": "traceguard"
+      },
+      {
+        "consumer_member_ids": [],
+        "disposition": "exposed",
+        "field_id": "parent-output:hypothesis:reported-score-is-41.0",
+        "object_id": "hypothesis:reported-score-is-41.0",
+        "owner_id": "experimentguard"
+      },
+      {
+        "consumer_member_ids": [],
+        "disposition": "exposed",
+        "field_id": "parent-output:hypothesis:reported-score-is-41.8",
+        "object_id": "hypothesis:reported-score-is-41.8",
+        "owner_id": "experimentguard"
+      },
+      {
+        "consumer_member_ids": [
+          "traceguard"
+        ],
+        "disposition": "consumed_and_exposed",
+        "field_id": "parent-output:source:paper:arxiv-1706.03762v7",
+        "object_id": "source:paper:arxiv-1706.03762v7",
+        "owner_id": "sourceguard"
+      },
+      {
+        "consumer_member_ids": [
+          "logicguard"
+        ],
+        "disposition": "consumed_and_exposed",
+        "field_id": "parent-output:storyline:enfr-bleu-discrepancy",
+        "object_id": "storyline:enfr-bleu-discrepancy",
+        "owner_id": "traceguard"
+      }
+    ],
+    "schema_version": "researchguard.external-domain-parent-function-block.v1",
+    "signature": "Input x State -> Set(Output x State)",
+    "state_fields": [
+      {
+        "child_model_id": "model:sourceguard:attention-v7",
+        "field_id": "parent-state:sourceguard",
+        "owner_id": "sourceguard",
+        "post_state_fingerprint": "sha256:4accb8b662520aaeec3e38305d621faedf91183da69263c62190a8703a9bed57",
+        "pre_state_fingerprint": "sha256:e522ef1a4cc7224d27c60b256b058caa00fdbd55c04c85e36cbedc9911e0005b"
+      },
+      {
+        "child_model_id": "model:traceguard:attention-v7",
+        "field_id": "parent-state:traceguard",
+        "owner_id": "traceguard",
+        "post_state_fingerprint": "sha256:89497eb94279acd013047ed3d2846c43a92c47c5c67b2e4d8c7db6dfd256716f",
+        "pre_state_fingerprint": "sha256:6d65c45ef876a5d367f453803fb794b147132c96f3c802018731cc6542142dff"
+      },
+      {
+        "child_model_id": "model:logicguard:attention-v7",
+        "field_id": "parent-state:logicguard",
+        "owner_id": "logicguard",
+        "post_state_fingerprint": "sha256:947c09b0f21e400f08c4653da4f5b5c06ecc77d258e813bf4fb2a61d49af95e4",
+        "pre_state_fingerprint": "sha256:c6693956af38a55a593965d9b6b7e71abed08c45b9b9d359c69327fa96868c80"
+      },
+      {
+        "child_model_id": "model:experimentguard:attention-v7",
+        "field_id": "parent-state:experimentguard",
+        "owner_id": "experimentguard",
+        "post_state_fingerprint": "sha256:3ba2ac08387815eed39ed4dab52cb2080755831f6935989c743da1c9eb547921",
+        "pre_state_fingerprint": "sha256:0b132d0526b8d96d379cb0287169bb558c1f3a26b1f9940d3dee425a6b5fb939"
+      }
+    ]
+  },
+  "schema_version": "researchguard.external-domain-dna-spec.v3",
+  "scope_authority_binding": {
+    "authority_fingerprint": "sha256:ef68b5cca910b4c027aa62405ccb6f637006e1e37adaf4dc338cbab8686ba103",
+    "authority_id": "scope-authority:attention-v7:reported-enfr-bleu-consistency",
+    "producer_descriptor_fingerprint": "sha256:01fa6d1f8f3c003e68623d3a435e9db3f600da223c9d593433456a0cfce20a81"
+  },
+  "structure_nodes": [
+    {
+      "artifact_ids": [
+        "artifact:paper-source-tar",
+        "artifact:paper-pdf",
+        "artifact:source-background-tex",
+        "artifact:source-figures-modalnet-19-png",
+        "artifact:source-figures-modalnet-20-png",
+        "artifact:source-figures-modalnet-21-png",
+        "artifact:source-figures-modalnet-22-png",
+        "artifact:source-figures-modalnet-23-png",
+        "artifact:source-figures-modalnet-32-png",
+        "artifact:source-introduction-tex",
+        "artifact:source-model-architecture-tex",
+        "artifact:source-nips-2017-sty",
+        "artifact:source-parameter-attention-tex",
+        "artifact:source-sqrt-d-trick-tex",
+        "artifact:source-training-tex",
+        "artifact:source-vis-anaphora-resolution2-new-pdf",
+        "artifact:source-vis-anaphora-resolution-new-pdf",
+        "artifact:source-vis-attending-to-head2-new-pdf",
+        "artifact:source-vis-attending-to-head-new-pdf",
+        "artifact:source-vis-making-more-difficult5-new-pdf",
+        "artifact:source-vis-making-more-difficult-new-pdf",
+        "artifact:source-visualizations-tex",
+        "artifact:source-why-self-attention-tex"
+      ],
+      "bound_object_ids": [
+        "claim:abstract-enfr-bleu-41.8",
+        "claim:enfr-bleu-conflict-exists",
+        "claim:prose-enfr-bleu-41.0",
+        "claim:table-enfr-bleu-41.8",
+        "edge:abstract-supports-41.8",
+        "edge:prose-conflicts-41.8",
+        "edge:table-supports-41.8",
+        "event:abstract-reports-41.8",
+        "event:prose-reports-41.0",
+        "event:table-reports-41.8",
+        "experiment:check-version-history",
+        "experiment:compare-frozen-locators",
+        "gap:authoritative-enfr-bleu-unresolved",
+        "gap:enfr-bleu-conflict",
+        "gap:no-author-resolution-evidence",
+        "gap:trace-cannot-resolve-author-intent",
+        "hypothesis:reported-score-is-41.0",
+        "hypothesis:reported-score-is-41.8",
+        "source:paper:arxiv-1706.03762v7",
+        "storyline:enfr-bleu-discrepancy"
+      ],
+      "kind": "paper",
+      "label": "Attention Is All You Need v7",
+      "locator": "source/ms.tex",
+      "member_ids": [
+        "sourceguard",
+        "traceguard",
+        "logicguard",
+        "experimentguard"
+      ],
+      "node_id": "structure:paper-root",
+      "parent_id": null,
+      "semantic_role": "target_document_root"
+    },
+    {
+      "artifact_ids": [
+        "artifact:ms-tex"
+      ],
+      "bound_object_ids": [
+        "anchor:abstract-enfr-bleu-41.8"
+      ],
+      "kind": "section",
+      "label": "Abstract",
+      "locator": "source/ms.tex:127",
+      "member_ids": [
+        "sourceguard",
+        "traceguard",
+        "logicguard"
+      ],
+      "node_id": "structure:abstract",
+      "parent_id": "structure:paper-root",
+      "semantic_role": "reported_value_abstract"
+    },
+    {
+      "artifact_ids": [
+        "artifact:results-tex"
+      ],
+      "bound_object_ids": [
+        "anchor:results-table-enfr-bleu-41.8"
+      ],
+      "kind": "table",
+      "label": "WMT results table",
+      "locator": "source/results.tex:4-28",
+      "member_ids": [
+        "sourceguard",
+        "traceguard",
+        "logicguard",
+        "experimentguard"
+      ],
+      "node_id": "structure:results-table",
+      "parent_id": "structure:paper-root",
+      "semantic_role": "reported_value_results_table"
+    },
+    {
+      "artifact_ids": [
+        "artifact:results-tex"
+      ],
+      "bound_object_ids": [
+        "anchor:results-prose-enfr-bleu-41.0"
+      ],
+      "kind": "paragraph",
+      "label": "WMT English-to-French explanatory prose",
+      "locator": "source/results.tex:39",
+      "member_ids": [
+        "sourceguard",
+        "traceguard",
+        "logicguard",
+        "experimentguard"
+      ],
+      "node_id": "structure:results-prose",
+      "parent_id": "structure:paper-root",
+      "semantic_role": "reported_value_results_prose"
+    }
+  ],
+  "target": {
+    "artifacts": [
+      {
+        "artifact_id": "artifact:paper-source-tar",
+        "byte_length": 1150988,
+        "disposition": "supporting_material",
+        "embedded": false,
+        "official_url": "https://arxiv.org/abs/1706.03762v7#material=attention-is-all-you-need-v7-source.tar",
+        "relative_path": "attention-is-all-you-need-v7-source.tar",
+        "role": "primary-author-source-archive",
+        "sha256": "2e7a7d9ee2520d22eb23dae0cb148e167be02a30d6cb3f11b1c67723194339c6"
+      },
+      {
+        "artifact_id": "artifact:paper-pdf",
+        "byte_length": 2215244,
+        "disposition": "supporting_material",
+        "embedded": false,
+        "official_url": "https://arxiv.org/abs/1706.03762v7#material=attention-is-all-you-need-v7.pdf",
+        "relative_path": "attention-is-all-you-need-v7.pdf",
+        "role": "primary-paper-pdf",
+        "sha256": "bdfaa68d8984f0dc02beaca527b76f207d99b666d31d1da728ee0728182df697"
+      },
+      {
+        "artifact_id": "artifact:source-background-tex",
+        "byte_length": 8376,
+        "disposition": "supporting_material",
+        "embedded": false,
+        "official_url": "https://arxiv.org/abs/1706.03762v7#material=source/background.tex",
+        "relative_path": "source/background.tex",
+        "role": "supporting-author-material",
+        "sha256": "4293e7032a2f4f653cb340854b23dae41a1801ea6b487270732db19723918618"
+      },
+      {
+        "artifact_id": "artifact:source-figures-modalnet-19-png",
+        "byte_length": 26323,
+        "disposition": "supporting_material",
+        "embedded": false,
+        "official_url": "https://arxiv.org/abs/1706.03762v7#material=source/Figures/ModalNet-19.png",
+        "relative_path": "source/Figures/ModalNet-19.png",
+        "role": "supporting-author-material",
+        "sha256": "6d40a44e2ec3f0cdab207c768a9085b6b908bbefa82c5af6613dc8233bee6a42"
+      },
+      {
+        "artifact_id": "artifact:source-figures-modalnet-20-png",
+        "byte_length": 65853,
+        "disposition": "supporting_material",
+        "embedded": false,
+        "official_url": "https://arxiv.org/abs/1706.03762v7#material=source/Figures/ModalNet-20.png",
+        "relative_path": "source/Figures/ModalNet-20.png",
+        "role": "supporting-author-material",
+        "sha256": "ba8a3ede5d40183ce8c18de249be60bec692646d53db108a3df51797a3c8634a"
+      },
+      {
+        "artifact_id": "artifact:source-figures-modalnet-21-png",
+        "byte_length": 159152,
+        "disposition": "supporting_material",
+        "embedded": false,
+        "official_url": "https://arxiv.org/abs/1706.03762v7#material=source/Figures/ModalNet-21.png",
+        "relative_path": "source/Figures/ModalNet-21.png",
+        "role": "supporting-author-material",
+        "sha256": "56d69ccc192b90c3b93e5e285ff892f74753f970103939b40291945e106e9f79"
+      },
+      {
+        "artifact_id": "artifact:source-figures-modalnet-22-png",
+        "byte_length": 25845,
+        "disposition": "supporting_material",
+        "embedded": false,
+        "official_url": "https://arxiv.org/abs/1706.03762v7#material=source/Figures/ModalNet-22.png",
+        "relative_path": "source/Figures/ModalNet-22.png",
+        "role": "supporting-author-material",
+        "sha256": "938988a43c0758e19cd57c4749b8859589cd0e5b8fe8dfc56e2fb35a915bb673"
+      },
+      {
+        "artifact_id": "artifact:source-figures-modalnet-23-png",
+        "byte_length": 10260,
+        "disposition": "supporting_material",
+        "embedded": false,
+        "official_url": "https://arxiv.org/abs/1706.03762v7#material=source/Figures/ModalNet-23.png",
+        "relative_path": "source/Figures/ModalNet-23.png",
+        "role": "supporting-author-material",
+        "sha256": "b6713b33692fc282e879c6f155eb4901dc16f795bca4adc160a8422123ccaa75"
+      },
+      {
+        "artifact_id": "artifact:source-figures-modalnet-32-png",
+        "byte_length": 51685,
+        "disposition": "supporting_material",
+        "embedded": false,
+        "official_url": "https://arxiv.org/abs/1706.03762v7#material=source/Figures/ModalNet-32.png",
+        "relative_path": "source/Figures/ModalNet-32.png",
+        "role": "supporting-author-material",
+        "sha256": "f9e73fa67da314706a08fb9ac9470ed719ecbba60fbc6a283515054bd4e992ff"
+      },
+      {
+        "artifact_id": "artifact:source-introduction-tex",
+        "byte_length": 5300,
+        "disposition": "supporting_material",
+        "embedded": false,
+        "official_url": "https://arxiv.org/abs/1706.03762v7#material=source/introduction.tex",
+        "relative_path": "source/introduction.tex",
+        "role": "supporting-author-material",
+        "sha256": "ece15efaec8325b6e88d2b90a3d7be0ee08b6b4c631d858877b806f862bd6553"
+      },
+      {
+        "artifact_id": "artifact:source-model-architecture-tex",
+        "byte_length": 17109,
+        "disposition": "supporting_material",
+        "embedded": false,
+        "official_url": "https://arxiv.org/abs/1706.03762v7#material=source/model_architecture.tex",
+        "relative_path": "source/model_architecture.tex",
+        "role": "supporting-author-material",
+        "sha256": "d524e853dc5f98bb482ee7289908b9640ee9e6ea38586c14c7c1ea0a5c0f5fdf"
+      },
+      {
+        "artifact_id": "artifact:ms-tex",
+        "byte_length": 17613,
+        "disposition": "modeled",
+        "embedded": false,
+        "official_url": "https://arxiv.org/abs/1706.03762v7#material=source/ms.tex",
+        "relative_path": "source/ms.tex",
+        "role": "modeled-author-source",
+        "sha256": "69a159fa848798bee868a9d394913745e3996ae274f2bc7cfc6d5fcd7a7438a0"
+      },
+      {
+        "artifact_id": "artifact:source-nips-2017-sty",
+        "byte_length": 10347,
+        "disposition": "supporting_material",
+        "embedded": false,
+        "official_url": "https://arxiv.org/abs/1706.03762v7#material=source/nips_2017.sty",
+        "relative_path": "source/nips_2017.sty",
+        "role": "supporting-author-material",
+        "sha256": "f1af9ca822eac10140e9e55ca2f20a59ce20605c3bc32670d9108de95da7ff01"
+      },
+      {
+        "artifact_id": "artifact:source-parameter-attention-tex",
+        "byte_length": 3489,
+        "disposition": "supporting_material",
+        "embedded": false,
+        "official_url": "https://arxiv.org/abs/1706.03762v7#material=source/parameter_attention.tex",
+        "relative_path": "source/parameter_attention.tex",
+        "role": "supporting-author-material",
+        "sha256": "c698e2bfec0a0acfa2a6447ceabc920aa4b631df1a291647b7124ae9688aff5d"
+      },
+      {
+        "artifact_id": "artifact:results-tex",
+        "byte_length": 11800,
+        "disposition": "modeled",
+        "embedded": false,
+        "official_url": "https://arxiv.org/abs/1706.03762v7#material=source/results.tex",
+        "relative_path": "source/results.tex",
+        "role": "modeled-author-source",
+        "sha256": "da5281baf549caad349c796d51404537674acb72baec0ef9509c95748499b4c8"
+      },
+      {
+        "artifact_id": "artifact:source-sqrt-d-trick-tex",
+        "byte_length": 2226,
+        "disposition": "supporting_material",
+        "embedded": false,
+        "official_url": "https://arxiv.org/abs/1706.03762v7#material=source/sqrt_d_trick.tex",
+        "relative_path": "source/sqrt_d_trick.tex",
+        "role": "supporting-author-material",
+        "sha256": "db2dfbf394ad8b07c882f77735838f4f2dfbe585b0b5c69ef361e43daa7c906d"
+      },
+      {
+        "artifact_id": "artifact:source-training-tex",
+        "byte_length": 4444,
+        "disposition": "supporting_material",
+        "embedded": false,
+        "official_url": "https://arxiv.org/abs/1706.03762v7#material=source/training.tex",
+        "relative_path": "source/training.tex",
+        "role": "supporting-author-material",
+        "sha256": "34fa70917e3f58d02743393ff651be8d679a27cd51a4027180a0efc5ddd913e1"
+      },
+      {
+        "artifact_id": "artifact:source-vis-anaphora-resolution2-new-pdf",
+        "byte_length": 308043,
+        "disposition": "supporting_material",
+        "embedded": false,
+        "official_url": "https://arxiv.org/abs/1706.03762v7#material=source/vis/anaphora_resolution2_new.pdf",
+        "relative_path": "source/vis/anaphora_resolution2_new.pdf",
+        "role": "supporting-author-material",
+        "sha256": "c0ae1f58eaeeb7638d35c81de72937385bc3646a6bf0107f51426c2544b860cd"
+      },
+      {
+        "artifact_id": "artifact:source-vis-anaphora-resolution-new-pdf",
+        "byte_length": 331169,
+        "disposition": "supporting_material",
+        "embedded": false,
+        "official_url": "https://arxiv.org/abs/1706.03762v7#material=source/vis/anaphora_resolution_new.pdf",
+        "relative_path": "source/vis/anaphora_resolution_new.pdf",
+        "role": "supporting-author-material",
+        "sha256": "adbd1c70e65ad463b8f405f805349144bef0aaa7efd9cb8da9874d2880fef348"
+      },
+      {
+        "artifact_id": "artifact:source-vis-attending-to-head2-new-pdf",
+        "byte_length": 295664,
+        "disposition": "supporting_material",
+        "embedded": false,
+        "official_url": "https://arxiv.org/abs/1706.03762v7#material=source/vis/attending_to_head2_new.pdf",
+        "relative_path": "source/vis/attending_to_head2_new.pdf",
+        "role": "supporting-author-material",
+        "sha256": "70e5f99d3dea638e1974c29f91a8fc394fa1d7862e9205044f339f911c69d6b3"
+      },
+      {
+        "artifact_id": "artifact:source-vis-attending-to-head-new-pdf",
+        "byte_length": 320083,
+        "disposition": "supporting_material",
+        "embedded": false,
+        "official_url": "https://arxiv.org/abs/1706.03762v7#material=source/vis/attending_to_head_new.pdf",
+        "relative_path": "source/vis/attending_to_head_new.pdf",
+        "role": "supporting-author-material",
+        "sha256": "f7e2a6931e8735af0fdd2ed71c219f769d7866edaf28ab19d3aebe9a0d032722"
+      },
+      {
+        "artifact_id": "artifact:source-vis-making-more-difficult5-new-pdf",
+        "byte_length": 364968,
+        "disposition": "supporting_material",
+        "embedded": false,
+        "official_url": "https://arxiv.org/abs/1706.03762v7#material=source/vis/making_more_difficult5_new.pdf",
+        "relative_path": "source/vis/making_more_difficult5_new.pdf",
+        "role": "supporting-author-material",
+        "sha256": "4533259d2f0e05bbbe5893d62af639c578d6e16c5077759a4645fae829a55d89"
+      },
+      {
+        "artifact_id": "artifact:source-vis-making-more-difficult-new-pdf",
+        "byte_length": 375911,
+        "disposition": "supporting_material",
+        "embedded": false,
+        "official_url": "https://arxiv.org/abs/1706.03762v7#material=source/vis/making_more_difficult_new.pdf",
+        "relative_path": "source/vis/making_more_difficult_new.pdf",
+        "role": "supporting-author-material",
+        "sha256": "99e0024b1019aee2c012d5ce1b75d4499a9ea8acf0d5ab22675f21f046cdc085"
+      },
+      {
+        "artifact_id": "artifact:source-visualizations-tex",
+        "byte_length": 1543,
+        "disposition": "supporting_material",
+        "embedded": false,
+        "official_url": "https://arxiv.org/abs/1706.03762v7#material=source/visualizations.tex",
+        "relative_path": "source/visualizations.tex",
+        "role": "supporting-author-material",
+        "sha256": "3833fb2220d95a20c1fe4f82264f8f95e2e7ea7f78383d8285a89cae9e6c2178"
+      },
+      {
+        "artifact_id": "artifact:source-why-self-attention-tex",
+        "byte_length": 7867,
+        "disposition": "supporting_material",
+        "embedded": false,
+        "official_url": "https://arxiv.org/abs/1706.03762v7#material=source/why_self_attention.tex",
+        "relative_path": "source/why_self_attention.tex",
+        "role": "supporting-author-material",
+        "sha256": "b0f2e5cb18558766558c02387cafa4813dcd00c980e3676e5fc249029b6acab8"
+      }
+    ],
+    "kind": "research-paper-and-author-source",
+    "material_inventory_policy": {
+      "excluded_relative_paths": [],
+      "include_regular_files": true,
+      "policy_id": "researchguard.closed-material-tree.v1",
+      "root_kind": "closed-directory-tree",
+      "symlink_policy": "reject"
+    },
+    "model_scope": {
+      "completion_status": "complete_within_declared_scope",
+      "excluded_semantic_region_ids": [
+        "semantic-region:attention-v7:claims-outside-reported-enfr-bleu"
+      ],
+      "expansion_frontier_ids": [
+        "frontier:attention-v7:recursive-semantic-inventory"
+      ],
+      "included_question_ids": [
+        "question:reported-enfr-bleu-consistency"
+      ],
+      "included_structure_node_ids": [
+        "structure:abstract",
+        "structure:results-table",
+        "structure:results-prose"
+      ],
+      "purpose": "Reconstruct and check the paper's reported English-to-French BLEU occurrences without claiming complete semantic coverage of the paper.",
+      "scope_id": "scope:attention-v7:reported-enfr-bleu-consistency",
+      "scope_kind": "bounded_research_question",
+      "whole_target_semantics_claimed": false
+    },
+    "official_url": "https://arxiv.org/abs/1706.03762v7",
+    "source_authorities": [
+      {
+        "coverage_ids": [
+          "artifact:ms-tex",
+          "artifact:paper-pdf",
+          "artifact:paper-source-tar",
+          "artifact:results-tex",
+          "artifact:source-background-tex",
+          "artifact:source-figures-modalnet-19-png",
+          "artifact:source-figures-modalnet-20-png",
+          "artifact:source-figures-modalnet-21-png",
+          "artifact:source-figures-modalnet-22-png",
+          "artifact:source-figures-modalnet-23-png",
+          "artifact:source-figures-modalnet-32-png",
+          "artifact:source-introduction-tex",
+          "artifact:source-model-architecture-tex",
+          "artifact:source-nips-2017-sty",
+          "artifact:source-parameter-attention-tex",
+          "artifact:source-sqrt-d-trick-tex",
+          "artifact:source-training-tex",
+          "artifact:source-vis-anaphora-resolution-new-pdf",
+          "artifact:source-vis-anaphora-resolution2-new-pdf",
+          "artifact:source-vis-attending-to-head-new-pdf",
+          "artifact:source-vis-attending-to-head2-new-pdf",
+          "artifact:source-vis-making-more-difficult-new-pdf",
+          "artifact:source-vis-making-more-difficult5-new-pdf",
+          "artifact:source-visualizations-tex",
+          "artifact:source-why-self-attention-tex",
+          "paper:arxiv-1706.03762v7",
+          "structure:abstract",
+          "structure:paper-root",
+          "structure:results-prose",
+          "structure:results-table"
+        ],
+        "role": "primary_author_source",
+        "source_id": "source:paper:arxiv-1706.03762v7"
+      }
+    ],
+    "target_id": "paper:arxiv-1706.03762v7",
+    "title": "Attention Is All You Need",
+    "version": "arXiv:1706.03762v7"
+  }
+}

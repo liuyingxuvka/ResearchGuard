@@ -12,7 +12,7 @@
       "known_bad": {"case_id": "bad:multimodal:unqualified-visual", "observation_path": "model-purpose-observation.yaml", "expected_native_status": "blocked", "mutation_id": "make-all-anchors-unusable", "expected_native_finding": "gaps:gap-visual"}
     }
   ],
-  "external_universe": {"gap_ids": ["gap-pdf-page", "gap-visual"], "target_unit_ids": []},
+  "external_universe": {"gap_ids": ["gap-pdf-page", "gap-visual"], "target_unit_ids": [], "source_role_ids": ["source-role:gap-pdf-page:independent_report", "source-role:gap-pdf-page:primary_source", "source-role:gap-visual:visual_evidence"], "lineage_slot_ids": [], "anchor_requirement_ids": ["anchor-figure", "anchor-report-page", "anchor-video-segment"], "handoff_ids": []},
   "claim_boundary": "Multimodal anchors need locators and supplied extraction input; SourceGuard does not perform OCR or media understanding.",
   "native_oracle_catalog_fingerprint": "2C01D891559625D9123F17E817B63B3E4E9323CA1C3EB81923B82D7DBDC79B15",
   "purpose_frozen": true,

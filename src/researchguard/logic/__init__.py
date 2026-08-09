@@ -23,6 +23,28 @@ from .execution_depth import (
     select_perturbation_plan,
 )
 from .argument_modeling import create_argument_model
+from .artifact_inventory import (
+    ARTIFACT_INVENTORY_SCHEMA,
+    RESOURCE_ROLES,
+    ArtifactInventory,
+    ArtifactResourceBinding,
+    ArtifactUnit,
+    artifact_inventory_purpose_fingerprint,
+    artifact_inventory_request_fingerprint,
+    artifact_inventory_subject_fingerprint,
+    replay_artifact_target_material,
+)
+from .blueprint import (
+    LOGIC_BLUEPRINT_SCHEMA,
+    ArtifactRealizationBinding,
+    LogicBlueprintGap,
+    LogicNativeDepthEvidence,
+    LogicBlueprintResult,
+    check_blueprint,
+    export_blueprint,
+    impact_blueprint,
+    reverse_trace_artifact,
+)
 from .citation_matrix import (
     ClaimSourceParagraphMatrix,
     ClaimSourceParagraphRow,
@@ -202,6 +224,11 @@ from .file_model_store import FileModelStore
 from .markdown_structure import markdown_to_model, markdown_to_model_dict
 from .model import (
     ArgumentBlock,
+    BlockInterfaceBinding,
+    block_interface_payload_fingerprint,
+    block_interface_receipt_payload,
+    block_interface_receipt_fingerprint,
+    interface_model_fingerprint,
     ArgumentCoverageUniverse,
     ClaimPerturbationCoverage,
     ClaimRoleCoverage,
@@ -563,6 +590,29 @@ __all__.extend(
         "normalize_duplicate_independence",
         "normalize_explicit_import_payload",
         "receipt_from_dict",
+    ]
+)
+
+__all__.extend(
+    [
+        "ARTIFACT_INVENTORY_SCHEMA",
+        "LOGIC_BLUEPRINT_SCHEMA",
+        "ArtifactInventory",
+        "ArtifactResourceBinding",
+        "ArtifactRealizationBinding",
+        "ArtifactUnit",
+        "RESOURCE_ROLES",
+        "artifact_inventory_purpose_fingerprint",
+        "artifact_inventory_request_fingerprint",
+        "artifact_inventory_subject_fingerprint",
+        "BlockInterfaceBinding",
+        "LogicBlueprintGap",
+        "LogicBlueprintResult",
+        "check_blueprint",
+        "export_blueprint",
+        "impact_blueprint",
+        "replay_artifact_target_material",
+        "reverse_trace_artifact",
     ]
 )
 

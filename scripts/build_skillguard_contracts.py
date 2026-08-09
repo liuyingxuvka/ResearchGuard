@@ -20,9 +20,112 @@ MEMBERS = (
 )
 UNIT_ID = "unit:researchguard-suite"
 VALIDATION_PLAN_PATH = ROOT / ".skillguard" / "researchguard-suite-validation-plan.json"
-RESEARCHGUARD_VERSION = "0.4.1"
+UNIT_TEST_MESH_PATH = ROOT / ".skillguard" / "test-mesh.json"
+UNIT_TEST_MESH_SCHEMA = "skillguard.test_mesh_manifest.current"
+UNIT_TEST_MESH_ID = "researchguard-suite-owner-receipt-mesh"
+UNIT_TEST_MESH_PROJECTION_ID = (
+    "projection:researchguard-suite-maintenance-definition"
+)
+TEST_MESH_MAINTENANCE_INPUTS = (
+    ".skillguard/test-mesh.json",
+    "scripts/check_researchguard_test_mesh.py",
+)
+RESEARCHGUARD_VERSION = "0.4.3"
 FLOWGUARD_VERSION = "0.68.2"
 SKILLGUARD_VERSION = "0.7.2"
+
+BLUEPRINT_COMPONENTS = {
+    "researchguard": {
+        "reference": "skills/researchguard/references/member-model-envelope.md",
+        "runtime": [
+            "src/researchguard/model_envelope.py",
+            "src/researchguard/domain_dna.py",
+            "src/researchguard/external_scope_authority.py",
+            "src/researchguard/routing.py",
+            "src/researchguard/admission.py",
+            "src/researchguard/cli.py",
+            "src/researchguard/suite.py",
+            "src/researchguard/target_authority.py",
+            "src/researchguard/experiment/owner_attestation.py",
+            "src/researchguard/logic/owner_attestation.py",
+            "src/researchguard/source/owner_attestation.py",
+            "src/researchguard/trace/owner_attestation.py",
+        ],
+        "tests": [
+            "tests/test_member_model_envelope.py",
+            "tests/test_guard_blueprint_integration.py",
+            "tests/test_external_domain_dna_real_paper.py",
+            "tests/test_external_scope_authority.py",
+        ],
+    },
+    "logicguard": {
+        "reference": "skills/logicguard/references/domain-blueprint-contract.md",
+        "runtime": [
+            "src/researchguard/target_authority.py",
+            "src/researchguard/model_envelope.py",
+            "src/researchguard/logic/owner_attestation.py",
+            "src/researchguard/logic/artifact_inventory.py",
+            "src/researchguard/logic/blueprint.py",
+            "src/researchguard/logic/model.py",
+            "src/researchguard/logic/validator.py",
+            "src/researchguard/logic/hierarchy.py",
+            "src/researchguard/logic/structured_artifact.py",
+            "src/researchguard/logic/execution_depth.py",
+            "src/researchguard/logic/mesh_invalidation.py",
+            "src/researchguard/logic/cli.py",
+        ],
+        "tests": [
+            "tests/logic/test_blueprint_interfaces.py",
+            "tests/logic/test_artifact_inventory.py",
+        ],
+    },
+    "sourceguard": {
+        "reference": "skills/sourceguard/references/information-blueprint.md",
+        "runtime": [
+            "src/researchguard/target_authority.py",
+            "src/researchguard/model_envelope.py",
+            "src/researchguard/source/owner_attestation.py",
+            "src/researchguard/source/blueprint.py",
+            "src/researchguard/source/schema.py",
+            "src/researchguard/source/graph.py",
+            "src/researchguard/source/depth.py",
+            "src/researchguard/source/guard_contract.py",
+            "src/researchguard/source/task_iteration.py",
+            "src/researchguard/source/handoff.py",
+            "src/researchguard/source/cli.py",
+        ],
+        "tests": ["tests/source/test_blueprint_graph.py"],
+    },
+    "traceguard": {
+        "reference": "skills/traceguard/references/trace-blueprint-contract.md",
+        "runtime": [
+            "src/researchguard/target_authority.py",
+            "src/researchguard/model_envelope.py",
+            "src/researchguard/trace/owner_attestation.py",
+            "src/researchguard/trace/blueprint.py",
+            "src/researchguard/trace/schema.py",
+            "src/researchguard/trace/inference/compiler.py",
+            "src/researchguard/trace/inference/projection.py",
+            "src/researchguard/trace/storyline_depth.py",
+            "src/researchguard/trace/task_iteration.py",
+            "src/researchguard/trace/cli.py",
+        ],
+        "tests": ["tests/trace/test_blueprint_hierarchy.py"],
+    },
+    "experimentguard": {
+        "reference": "skills/experimentguard/references/experiment-model-protocol.md",
+        "runtime": [
+            "src/researchguard/target_authority.py",
+            "src/researchguard/model_envelope.py",
+            "src/researchguard/experiment/owner_attestation.py",
+            "src/researchguard/experiment/blueprint.py",
+            "src/researchguard/experiment/schema.py",
+            "src/researchguard/experiment/engine.py",
+            "src/researchguard/experiment/cli.py",
+        ],
+        "tests": ["tests/experiment/test_blueprint_design.py"],
+    },
+}
 
 TEST_ARGS = {
     "researchguard": [
@@ -32,7 +135,10 @@ TEST_ARGS = {
         "tests/test_root_cli.py",
         "tests/test_skill_suite.py",
         "tests/test_install_researchguard.py",
+        "tests/test_prompt_bundles.py",
         "tests/test_zero_residuals.py",
+        "tests/test_external_domain_dna_real_paper.py",
+        "tests/test_external_scope_authority.py",
         "-q",
     ],
     "logicguard": ["-m", "pytest", "tests/logic", "-q"],
@@ -56,6 +162,9 @@ IMPLEMENTATION_PATHS = {
         "src/researchguard/__main__.py",
         "src/researchguard/admission.py",
         "src/researchguard/cli.py",
+        "src/researchguard/domain_dna.py",
+        "src/researchguard/external_scope_authority.py",
+        "src/researchguard/resources/external_domain_dna",
         "src/researchguard/routing.py",
         "src/researchguard/suite.py",
         "src/researchguard/logic/admission.py",
@@ -68,6 +177,7 @@ IMPLEMENTATION_PATHS = {
         ".flowguard/researchguard_skill_contract_model.py",
         ".flowguard/researchguard_skill_contract_model_common.py",
         "scripts/build_skillguard_contracts.py",
+        "scripts/compile_external_domain_dna_examples.py",
         "scripts/check_researchguard_suite.py",
         "scripts/check_zero_residuals.py",
         "scripts/install_researchguard.py",
@@ -76,12 +186,18 @@ IMPLEMENTATION_PATHS = {
         "tests/test_root_cli.py",
         "tests/test_skill_suite.py",
         "tests/test_install_researchguard.py",
+        "tests/test_external_domain_dna_real_paper.py",
+        "tests/test_external_scope_authority.py",
+        "tests/external_scope_authority_fixtures.py",
+        "tests/test_prompt_bundles.py",
         "tests/test_suite_model_currentness.py",
         "tests/test_zero_residuals.py",
         "tests/logic/test_task_iteration.py",
         "tests/source/test_task_iteration.py",
         "tests/trace/test_task_iteration.py",
         "tests/experiment/test_recommendation.py",
+        "models/external_domain_dna",
+        "pyproject.toml",
     ],
     "logicguard": [
         "skills/logicguard",
@@ -129,13 +245,48 @@ IMPLEMENTATION_PATHS = {
     ],
 }
 
-PROMPT_GOVERNANCE_PATHS = (
+PROMPT_MANIFEST_CHECKER_PATHS = (
     "researchguard/prompt_bundle_manifest.json",
     "scripts/check_prompt_bundles.py",
-    "tests/test_prompt_bundles.py",
 )
-for _member_paths in IMPLEMENTATION_PATHS.values():
-    _member_paths.extend(path for path in PROMPT_GOVERNANCE_PATHS if path not in _member_paths)
+
+
+def expected_unit_test_mesh_manifest() -> dict:
+    """Return the sole current TestMesh definition for this maintenance unit."""
+
+    return {
+        "schema_version": UNIT_TEST_MESH_SCHEMA,
+        "mesh_id": UNIT_TEST_MESH_ID,
+        "source_model_id": "researchguard.suite.validation_composition.current",
+        "profiles": [
+            {
+                "profile_id": "focused",
+                "closure_profile_id": "enforced",
+                "full_admission_required": False,
+            },
+            {
+                "profile_id": "full",
+                "closure_profile_id": "enforced",
+                "full_admission_required": True,
+            },
+        ],
+        "claim_boundary": (
+            "This one unit-level definition selects each ResearchGuard member's "
+            "existing enforced closure. One legitimate claimed run per member is "
+            "required before member-specific plan_only can freeze owners. It "
+            "declares no commands, source paths, aliases, fallback, execution "
+            "result, or receipt authority; full remains separately admitted."
+        ),
+    }
+
+
+def _write_unit_test_mesh_manifest() -> None:
+    UNIT_TEST_MESH_PATH.parent.mkdir(parents=True, exist_ok=True)
+    UNIT_TEST_MESH_PATH.write_text(
+        json.dumps(expected_unit_test_mesh_manifest(), ensure_ascii=False, indent=2)
+        + "\n",
+        encoding="utf-8",
+    )
 
 
 def _installed_version(distribution: str, expected: str) -> str:
@@ -171,6 +322,22 @@ def _skillguard_source_fingerprint() -> str:
     return f"sha256:{hashlib.sha256(encoded).hexdigest()}"
 
 
+def _unique_selectors(
+    selectors: list[dict[str, str]],
+) -> list[dict[str, str]]:
+    """Keep first-seen selector order while removing exact duplicate inputs."""
+
+    unique: list[dict[str, str]] = []
+    seen: set[tuple[tuple[str, str], ...]] = set()
+    for selector in selectors:
+        identity = tuple(sorted(selector.items()))
+        if identity in seen:
+            continue
+        seen.add(identity)
+        unique.append(selector)
+    return unique
+
+
 def check(
     member: str,
     *,
@@ -179,8 +346,9 @@ def check(
     args: list[str],
     selectors: list[dict[str, str]],
     depends: list[str],
-    obligation: str,
+    obligations: list[str],
     timeout: int,
+    coverage_rationale: str | None = None,
 ) -> dict:
     check_id = f"check:{member}:{kind}"
     route_id = f"route:researchguard:{member}"
@@ -194,7 +362,7 @@ def check(
         "command": command,
         "args": args,
         "cwd_token": "repository_root",
-        "input_selectors": selectors,
+        "input_selectors": _unique_selectors(selectors),
         "expected": {"exit_code": 0},
         "timeout_seconds": timeout,
         "evidence_class": "hard",
@@ -202,9 +370,9 @@ def check(
         "execution_owner_id": f"owner:researchguard:{member}:{kind}",
         "native_route_id": route_id,
         "depends_on_check_ids": depends,
-        "covers_obligation_ids": [obligation],
+        "covers_obligation_ids": list(obligations),
         "coverage_scope": "declared_obligations",
-        "coverage_rationale": (
+        "coverage_rationale": coverage_rationale or (
             "This check is the sole execution owner for its exact member obligation."
         ),
     }
@@ -216,9 +384,17 @@ def contract(member: str) -> dict:
     prompt_check_id = f"check:{member}:prompt-load"
     prompt_obligation = f"obligation:researchguard:{member}:prompt-load"
     native_obligation = f"obligation:researchguard:{member}:native-tests"
+    install_obligation = (
+        "obligation:researchguard:researchguard:consumer-install-transaction"
+    )
     deepening_check_id = f"check:{member}:task-model-closure"
     deepening_obligation = f"obligation:researchguard:{member}:task-model-closure"
     route_id = f"route:researchguard:{member}"
+    blueprint = BLUEPRINT_COMPONENTS[member]
+    blueprint_selectors = [
+        {"kind": "path", "path": path}
+        for path in [*blueprint["runtime"], *blueprint["tests"]]
+    ]
     checks = [
         check(
             member,
@@ -254,9 +430,14 @@ def contract(member: str) -> dict:
                     "kind": "path",
                     "path": ".flowguard/researchguard_skill_contract_model_common.py",
                 },
+                *[
+                    {"kind": "path", "path": path}
+                    for path in IMPLEMENTATION_PATHS[member]
+                    if path.startswith(".flowguard/")
+                ],
             ],
             depends=[],
-            obligation=contract_obligation,
+            obligations=[contract_obligation],
             timeout=60,
         ),
         check(
@@ -271,9 +452,11 @@ def contract(member: str) -> dict:
             ],
             selectors=[
                 {"kind": "subtree", "path": f"skills/{member}"},
-                {"kind": "path", "path": "researchguard/prompt_bundle_manifest.json"},
-                {"kind": "path", "path": "scripts/check_prompt_bundles.py"},
-                {"kind": "path", "path": "tests/test_prompt_bundles.py"},
+                {"kind": "path", "path": blueprint["reference"]},
+                *[
+                    {"kind": "path", "path": path}
+                    for path in PROMPT_MANIFEST_CHECKER_PATHS
+                ],
             ] + (
                 [
                     {"kind": "path", "path": "src/researchguard/admission.py"},
@@ -287,7 +470,7 @@ def contract(member: str) -> dict:
                 else []
             ),
             depends=[contract_check_id],
-            obligation=prompt_obligation,
+            obligations=[prompt_obligation],
             timeout=60,
         ),
         check(
@@ -305,10 +488,29 @@ def contract(member: str) -> dict:
                     "path": path,
                 }
                 for path in IMPLEMENTATION_PATHS[member]
-            ],
+                if not path.startswith(".flowguard/")
+            ] + blueprint_selectors,
             depends=[prompt_check_id],
-            obligation=native_obligation,
+            obligations=(
+                [native_obligation, install_obligation]
+                if member == "researchguard"
+                else [native_obligation]
+            ),
             timeout=900,
+            coverage_rationale=(
+                "This existing member-native owner runs the complete declared member "
+                "test suite once. Its exact blueprint code/test selectors cover native "
+                "qualification, qualification-first impact and reverse trace, persisted "
+                "fresh-process target-authority replay, and caller-forged/co-shrunk "
+                "self-attestation rejection without adding duplicate execution owners. "
+                + (
+                    "For the ResearchGuard umbrella, this same owner also proves the "
+                    "suite install transaction's total lock, package/consumer/manifest "
+                    "rollback, and cleanup-unconfirmed boundary."
+                    if member == "researchguard"
+                    else ""
+                )
+            ),
         ),
         check(
             member,
@@ -333,7 +535,7 @@ def contract(member: str) -> dict:
                 if (ROOT / path).exists()
             ],
             depends=[f"check:{member}:native-tests"],
-            obligation=deepening_obligation,
+            obligations=[deepening_obligation],
             timeout=900,
         ),
     ]
@@ -349,6 +551,16 @@ def contract(member: str) -> dict:
             "prohibited_prompt_tokens": ["SkillGuard", ".skillguard", "skillguard.py"],
             "release_manifest_path": "consumer-release.json",
         },
+        "projection_consumers": [
+            {
+                "consumer_id": UNIT_TEST_MESH_PROJECTION_ID,
+                "kind": "source_maintenance",
+                "input_selectors": [
+                    {"kind": "path", "path": path}
+                    for path in TEST_MESH_MAINTENANCE_INPUTS
+                ],
+            }
+        ],
         "model_id": f"researchguard.{member}.contract.current",
         "model_path": f".flowguard/{member}_skill_contract_model.py",
         "confirmed": True,
@@ -431,7 +643,18 @@ def contract(member: str) -> dict:
                 "strict model-closure checks; it does not replace their domain judgment."
             ),
         },
-        "implementation_paths": IMPLEMENTATION_PATHS[member],
+        "implementation_paths": list(
+            dict.fromkeys(
+                [
+                    *IMPLEMENTATION_PATHS[member],
+                    *PROMPT_MANIFEST_CHECKER_PATHS,
+                    *blueprint["runtime"],
+                    *blueprint["tests"],
+                    blueprint["reference"],
+                    *TEST_MESH_MAINTENANCE_INPUTS,
+                ]
+            )
+        ),
         "step_bindings": [
             {
                 "step_id": f"step:researchguard:{member}:contract",
@@ -479,6 +702,7 @@ def contract(member: str) -> dict:
                     contract_obligation,
                     prompt_obligation,
                     native_obligation,
+                    *([install_obligation] if member == "researchguard" else []),
                     deepening_obligation,
                 ],
             }
@@ -487,7 +711,18 @@ def contract(member: str) -> dict:
         "claim_boundary": (
             f"This contract covers the current {member} consumer projection, "
             f"native route, and member-owned tests inside ResearchGuard v{RESEARCHGUARD_VERSION}. "
-            "It does not prove source truth, unrun external work, installation, "
+            "The four exact native-blueprint evidence categories are selectors of the one "
+            "existing target-owned native-tests owner, so final validation does not repeat "
+            "the same member suite. Distinct model obligation ids "
+            "remain a later binding with the frozen FlowGuard self-DNA toolchain. "
+            + (
+                "The ResearchGuard native-tests owner covers installation transaction "
+                "behavior without claiming an installation executed or is current. "
+                if member == "researchguard"
+                else ""
+            )
+            +
+            "It does not prove source truth, unrun external work, installed currentness, "
             "publication, or future AI behavior."
         ),
     }
@@ -495,7 +730,6 @@ def contract(member: str) -> dict:
 
 def validation_plan() -> dict:
     skillguard_version = _installed_version("skillguard", SKILLGUARD_VERSION)
-    flowguard_version = _installed_version("flowguard", FLOWGUARD_VERSION)
     rows = []
     owner_ids: list[str] = []
     check_count = 0
@@ -531,13 +765,20 @@ def validation_plan() -> dict:
         raise ValueError("validation plan contains duplicate execution owners")
     return {
         "schema_version": "researchguard.skillguard_unit_validation_plan.v1",
-        "status": "frozen",
+        "status": "stale",
+        "execution_disposition": "not_executable",
+        "stale_reason_codes": [
+            "flowguard-0.68.2-plan-predates-native-blueprint-contracts",
+            "flowguard-toolchain-not-frozen",
+            "self-dna-binding-deferred",
+        ],
         "maintenance_unit_id": UNIT_ID,
         "member_skill_ids": list(MEMBERS),
         "toolchain": {
             "skillguard_version": skillguard_version,
             "skillguard_source_revision": _skillguard_source_fingerprint(),
-            "flowguard_version": flowguard_version,
+            "flowguard_version": FLOWGUARD_VERSION,
+            "flowguard_status": "stale_later_binding",
             "python_command": "python",
         },
         "private_roots": {
@@ -550,9 +791,10 @@ def validation_plan() -> dict:
         "cross_unit_receipt_reuse": False,
         "skillguard_adds_domain_route": False,
         "claim_boundary": (
-            "This freezes the exact same-unit owner inventory for the current local "
-            "maintenance change. It does not itself execute a check, activate a "
-            "consumer installation, publish a release, or retire predecessor repositories."
+            "This file preserves the pre-blueprint FlowGuard 0.68.2 validation-plan identity "
+            "as visibly stale and non-executable. Current native affected-only ownership "
+            "comes from each compiled contract content-impact plan; FlowGuard self-DNA "
+            "binding remains a later task after its toolchain is frozen."
         ),
     }
 
@@ -561,6 +803,7 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--write-validation-plan", action="store_true")
     args = parser.parse_args(argv)
+    _write_unit_test_mesh_manifest()
     for member in MEMBERS:
         control = ROOT / "skills" / member / ".skillguard"
         control.mkdir(parents=True, exist_ok=True)
@@ -579,6 +822,7 @@ def main(argv: list[str] | None = None) -> int:
             {
                 "unit": UNIT_ID,
                 "members": MEMBERS,
+                "test_mesh_manifest_written": True,
                 "validation_plan_written": args.write_validation_plan,
             }
         )

@@ -1,4 +1,4 @@
 interface:
   display_name: "ResearchGuard"
   short_description: "Route research work to the smallest sufficient Guard set"
-  default_prompt: "Use $researchguard only when research ownership is ambiguous or irreducibly cross-member: extract source-bound primary responsibilities plus context, read the compact admission index, let current contracts derive the unique minimum sufficient member set, reject over-selection, and require explicit order, dependencies, responsibilities, handoffs, field owners, and claim boundary for any necessary composition. Load only selected members; a composition plan is not native execution evidence."
+  default_prompt: "Use $researchguard only for ambiguous or cross-member ownership. Select the minimum native set from source-bound facts. For external-object member-domain DNA, load its conditional route; keep external admission separate from native parsing. Replay persistent anchor and immutable-receipt hashes; cache is not authority. Direct use is unverified, a different target needs a separate anchor, and no generic issuer or inline candidate-authoring path exists. The ResearchGuard repository software-DNA root is FlowGuard-owned."

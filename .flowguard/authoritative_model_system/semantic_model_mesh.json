@@ -1,0 +1,143 @@
+{
+  "schema_version": "flowguard.semantic_self_mesh.v3",
+  "mesh_id": "researchguard-software-dna-v1",
+  "claim_scope": "whole_current_researchguard_model_universe",
+  "derivation_base_snapshot_path": ".flowguard/project.toml:model_authority.observed_snapshot_path",
+  "derivation_base_snapshot_fingerprint": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+  "current_manifest_path": ".flowguard/model-regression-manifest.json",
+  "observed_base_added_model_ids": [
+    "authoritative_model_system",
+    "compositional_verification_kernel"
+  ],
+  "observed_base_removed_model_ids": [],
+  "declared_model_count": 5,
+  "semantic_universe_fingerprint": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+  "semantic_disposition_fingerprint": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+  "semantic_relation_fingerprint": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+  "semantic_model_status": "candidate_defined_not_verified",
+  "whole_system_completion_claim": "not_licensed_until_current_terminal_evidence",
+  "currentness_owner": "authoritative_model_system_revision",
+  "allowed_dispositions": [
+    "connected",
+    "intentional_leaf",
+    "delegated_or_supporting",
+    "scoped_out"
+  ],
+  "semantic_parents": [
+    {
+      "parent_id": "semantic-parent:software-root",
+      "purpose": "Sole structural parent for the researchguard software-DNA model universe."
+    }
+  ],
+  "models": [
+    {
+      "model_id": "authoritative_model_system",
+      "disposition": "connected",
+      "rationale": "Current researchguard model owner is attached to the software-DNA structural parent.",
+      "structural_parent_id": "semantic-parent:software-root",
+      "cross_boundary_parent_ids": [],
+      "consumer_ids": [
+        "claim:researchguard-software-dna-status"
+      ]
+    },
+    {
+      "model_id": "compositional_verification_kernel",
+      "disposition": "connected",
+      "rationale": "Current researchguard model owner is attached to the software-DNA structural parent.",
+      "structural_parent_id": "semantic-parent:software-root",
+      "cross_boundary_parent_ids": [],
+      "consumer_ids": [
+        "model:authoritative_model_system"
+      ]
+    },
+    {
+      "model_id": "researchguard_suite",
+      "disposition": "connected",
+      "rationale": "Current researchguard model owner is attached to the software-DNA structural parent.",
+      "structural_parent_id": "semantic-parent:software-root",
+      "cross_boundary_parent_ids": [],
+      "consumer_ids": [
+        "model:authoritative_model_system"
+      ]
+    },
+    {
+      "model_id": "hierarchical_model_mesh",
+      "disposition": "connected",
+      "rationale": "Current researchguard model owner is attached to the software-DNA structural parent.",
+      "structural_parent_id": "semantic-parent:software-root",
+      "cross_boundary_parent_ids": [],
+      "consumer_ids": [
+        "model:authoritative_model_system"
+      ]
+    },
+    {
+      "model_id": "model_test_code_alignment",
+      "disposition": "connected",
+      "rationale": "Current researchguard model owner is attached to the software-DNA structural parent.",
+      "structural_parent_id": "semantic-parent:software-root",
+      "cross_boundary_parent_ids": [],
+      "consumer_ids": [
+        "model:authoritative_model_system"
+      ]
+    }
+  ],
+  "required_terminal_evidence": [
+    "check:model-regression:authoritative_model_system",
+    "check:model-regression:compositional_verification_kernel",
+    "check:model-regression:researchguard_suite",
+    "check:model-regression:hierarchical_model_mesh",
+    "check:model-regression:model_test_code_alignment"
+  ],
+  "feedback_progress_contracts": [
+    {
+      "relation_id": "topology:authoritative_model_system:semantic-parent:software-root",
+      "contract_id": "progress:authoritative_model_system:software-root",
+      "contract_kind": "progress_measure",
+      "evidence_source_kind": "current_child_model_receipts",
+      "evidence_model_ids": [
+        "authoritative_model_system"
+      ],
+      "rationale": "Progress is established by the exact current native model-owner receipt."
+    },
+    {
+      "relation_id": "topology:compositional_verification_kernel:semantic-parent:software-root",
+      "contract_id": "progress:compositional_verification_kernel:software-root",
+      "contract_kind": "progress_measure",
+      "evidence_source_kind": "current_child_model_receipts",
+      "evidence_model_ids": [
+        "compositional_verification_kernel"
+      ],
+      "rationale": "Progress is established by the exact current native model-owner receipt."
+    },
+    {
+      "relation_id": "topology:researchguard_suite:semantic-parent:software-root",
+      "contract_id": "progress:researchguard_suite:software-root",
+      "contract_kind": "progress_measure",
+      "evidence_source_kind": "current_child_model_receipts",
+      "evidence_model_ids": [
+        "researchguard_suite"
+      ],
+      "rationale": "Progress is established by the exact current native model-owner receipt."
+    },
+    {
+      "relation_id": "topology:hierarchical_model_mesh:semantic-parent:software-root",
+      "contract_id": "progress:hierarchical_model_mesh:software-root",
+      "contract_kind": "progress_measure",
+      "evidence_source_kind": "current_child_model_receipts",
+      "evidence_model_ids": [
+        "hierarchical_model_mesh"
+      ],
+      "rationale": "Progress is established by the exact current native model-owner receipt."
+    },
+    {
+      "relation_id": "topology:model_test_code_alignment:semantic-parent:software-root",
+      "contract_id": "progress:model_test_code_alignment:software-root",
+      "contract_kind": "progress_measure",
+      "evidence_source_kind": "current_child_model_receipts",
+      "evidence_model_ids": [
+        "model_test_code_alignment"
+      ],
+      "rationale": "Progress is established by the exact current native model-owner receipt."
+    }
+  ]
+}

@@ -18,6 +18,7 @@ The case library is an internal route, not another installed skill.
 
 ## Conditional depth map
 
+- `route:trace-blueprint`: explicit investigation hierarchy, interface qualification, affected-only impact, reverse trace, or deterministic export → read `references/trace-blueprint-contract.md`. This is TraceGuard member-domain DNA; the sole ResearchGuard repository software-DNA root is FlowGuard-owned.
 - `trigger:task-iteration`: later evidence or a future event will test a prediction, a model miss appears, or a trace revision is needed → read `references/task-iteration.md`.
 - `trigger:depth-closure`: broad, complete, causal, deep, predictive, high-impact, robustness, or competing-storyline wording → read `references/depth-and-closure.md`.
 - `trigger:commands-handoffs`: actual CLI execution or SourceGuard/LogicGuard handoff construction → read `references/commands-and-handoffs.md`.
@@ -33,6 +34,10 @@ Use for event/evidence separation, temporal order, incidents, requirements histo
 ## Native closure
 
 Solver failure, unacceptable residuals, missing lineage, unresolved critical objects, ineffective critical perturbations, scope transfer, live alternatives, or unsupported predictive holdout blocks broad closure. `model_closed_for_task` is the only task-model closure. `progress_stalled`, `iteration_limit`, `external_input_required`, and `scope_excluded` remain visible. A self-report never substitutes for current inference and depth receipts.
+
+For a trace blueprint, TraceGuard's native-inventory owner must replay one externally admitted expected-target anchor, its persisted exact request contract, and raw stable-object bytes on issuance and serialized reload. Every interface receipt is resolved from immutable bytes against its exact producer/version, signature algorithm, signing key, public key, producer descriptor, result, model, and task. The submitted model/universe, caller-invented receipts, and process memory never define authority; a different target needs its own external anchor.
+
+Anchor and receipt locators and hashes are persistent evidence, not cache entries. Direct blueprint use without external admission remains unverified. TraceGuard exposes no public or generic target, attestation, or receipt issuer and no inline candidate-authoring shortcut.
 
 ## Output
 

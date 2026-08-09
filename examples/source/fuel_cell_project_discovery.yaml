@@ -26,12 +26,26 @@ guard_contract:
     - gap-location
     - gap-weak-signal
     target_unit_ids: []
+    source_role_ids:
+    - source-role:gap-execution:independent_report
+    - source-role:gap-execution:primary_source
+    - source-role:gap-execution:visual_evidence
+    - source-role:gap-independent:independent_report
+    - source-role:gap-independent:limiting_evidence
+    - source-role:gap-location:primary_source
+    - source-role:gap-location:visual_evidence
+    - source-role:gap-weak-signal:counter_evidence
+    - source-role:gap-weak-signal:independent_report
+    - source-role:gap-weak-signal:primary_source
+    lineage_slot_ids: []
+    anchor_requirement_ids: []
+    handoff_ids: []
   claim_boundary: Weak signals are source candidates, not deployment proof.
   native_oracle_catalog_fingerprint: 2C01D891559625D9123F17E817B63B3E4E9323CA1C3EB81923B82D7DBDC79B15
   purpose_frozen: true
   purpose_freeze_sequence: 1
   candidate_construction_sequence: 2
-candidate_contract_fingerprint: 1AF12F1FC5258485C5E3EC389AF085E744F5100C8C10228CEA313896EF0F0A5F
+candidate_contract_fingerprint: E3CFFB321E26E63163292CB8C50879FC3468BC545527943F42858EAC631A2754
 metadata:
   purpose: Investigate whether a fuel cell project is deployed or operating.
   repository: https://github.com/liuyingxuvka/ResearchGuard
@@ -249,8 +263,11 @@ actions:
   parameters: {}
 observations: []
 graph_edges:
-- source: src-company-pr
-  target: fuel-cell-deployment
-  edge_type: candidate_for
+- edge_id: edge-company-pr-candidate-deployment
+  source_id: src-company-pr
+  source_type: source
+  target_id: fuel-cell-deployment
+  target_type: lead
+  relation_type: candidate_for
   notes: Company claim opens source discovery lead.
 weights: {}

@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.4.3 - 2026-08-09
+
+- Complete the repository self-DNA spine with current model, code, test,
+  intent, and installation bindings while keeping external-object DNA scoped
+  to its declared target.
+
+## v0.4.2 - 2026-08-08
+
+- Promote the model-first domain-DNA blueprint spine with current model, code,
+  test, intent, and installation bindings.
+- Keep the external-object DNA route explicit about declared scope and current
+  qualification evidence.
+
 ## v0.4.1 - 2026-08-01
 
 - Replaced caller-authored applicability with source-bound task facts and

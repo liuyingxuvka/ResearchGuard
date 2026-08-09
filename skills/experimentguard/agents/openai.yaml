@@ -1,4 +1,4 @@
 interface:
   display_name: "ExperimentGuard"
   short_description: "Recommend discriminating experiments"
-  default_prompt: "Use $experimentguard directly for a bounded minimum finite discriminating-set recommendation; trigger its existing strict observation/revision/holdout loop only when later evidence, a prediction-matrix miss, an addressable gap, or explicit predictive/deep closure requires it."
+  default_prompt: "Use $experimentguard for bounded minimum discriminating sets. For blueprint member-domain DNA load its conditional route and keep external admission separate from native parsing. The ResearchGuard repository software-DNA root is FlowGuard-owned. Never execute experiments."

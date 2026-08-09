@@ -229,6 +229,104 @@ ACTION_TYPES = {
 }
 
 ACTION_STATUSES = {"proposed", "selected", "executed", "blocked", "completed", "rejected", "unknown"}
+BLUEPRINT_OUTPUT_DISPOSITIONS = {"excluded", "unsupported", "terminal"}
+
+GRAPH_OBJECT_TYPES = {
+    "lead",
+    "gap",
+    "search_action",
+    "source",
+    "anchor",
+    "observation",
+    "target_unit",
+    "source_role",
+    "claim_use",
+    "handoff",
+}
+GRAPH_RELATION_ENDPOINTS: dict[str, set[tuple[str, str]]] = {
+    "mentions": {("source", "anchor"), ("anchor", "claim_use")},
+    "supports": {("anchor", "gap"), ("anchor", "claim_use")},
+    "limits": {("anchor", "gap"), ("anchor", "claim_use")},
+    "rebuts": {("anchor", "claim_use")},
+    "cites": {("source", "source"), ("anchor", "source")},
+    "cited_by": {("source", "source")},
+    "same_entity_as": {("source", "source"), ("lead", "lead")},
+    "same_location_as": {("source", "source"), ("anchor", "anchor")},
+    "before": {("source", "source"), ("anchor", "anchor")},
+    "after": {("source", "source"), ("anchor", "anchor")},
+    "candidate_for": {("source", "lead"), ("source", "gap")},
+    "opens_gap": {("lead", "gap"), ("target_unit", "gap")},
+    "closes_gap": {("anchor", "gap")},
+    "generated_action": {("gap", "search_action"), ("lead", "search_action")},
+    "observation_from": {
+        ("search_action", "observation"),
+        ("observation", "source"),
+        ("observation", "anchor"),
+    },
+    "returns_source": {("search_action", "source")},
+    "contains_anchor": {("source", "anchor")},
+    "requires_role": {("gap", "source_role")},
+    "addresses": {("source_role", "search_action"), ("search_action", "gap")},
+    "qualifies": {("anchor", "gap")},
+    "consumed_by": {("anchor", "claim_use"), ("anchor", "handoff")},
+    "promoted_to_traceguard": {("anchor", "handoff"), ("source", "handoff")},
+    "promoted_to_logicguard": {("anchor", "handoff"), ("source", "handoff")},
+}
+
+
+@dataclass(frozen=True)
+class GraphEdge:
+    edge_id: str
+    source_id: str
+    source_type: str
+    target_id: str
+    target_type: str
+    relation_type: str
+    notes: str = ""
+
+    def __post_init__(self) -> None:
+        required = {
+            "edge_id": self.edge_id,
+            "source_id": self.source_id,
+            "source_type": self.source_type,
+            "target_id": self.target_id,
+            "target_type": self.target_type,
+            "relation_type": self.relation_type,
+        }
+        if any(not value.strip() for value in required.values()):
+            raise SchemaError("graph edge requires stable id, typed endpoints, and relation_type")
+        if self.source_type not in GRAPH_OBJECT_TYPES or self.target_type not in GRAPH_OBJECT_TYPES:
+            raise SchemaError("graph edge endpoint type is not current")
+        permitted = GRAPH_RELATION_ENDPOINTS.get(self.relation_type)
+        if permitted is None:
+            raise SchemaError(f"invalid graph relation type {self.relation_type!r}")
+        pair = (self.source_type, self.target_type)
+        if pair not in permitted:
+            raise SchemaError(
+                f"graph relation {self.relation_type!r} does not permit endpoint types {pair!r}"
+            )
+
+    @classmethod
+    def from_dict(cls, data: Mapping[str, Any]) -> "GraphEdge":
+        data = require_mapping(data, "graph_edge")
+        allowed = {"edge_id", "source_id", "source_type", "target_id", "target_type", "relation_type", "notes"}
+        unknown = sorted(set(data) - allowed)
+        if unknown:
+            raise SchemaError(f"graph_edge contains unknown current-schema fields {unknown!r}")
+        values = {key: as_string(data.get(key)) for key in allowed}
+        required = ("edge_id", "source_id", "source_type", "target_id", "target_type", "relation_type")
+        return cls(
+            edge_id=values["edge_id"],
+            source_id=values["source_id"],
+            source_type=values["source_type"],
+            target_id=values["target_id"],
+            target_type=values["target_type"],
+            relation_type=values["relation_type"],
+            notes=values["notes"],
+        )
+
+    def to_dict(self) -> dict[str, str]:
+        return asdict(self)
 
 
 def utc_now() -> str:
@@ -275,6 +373,13 @@ def as_bool(value: Any, default: bool = False) -> bool:
     if value is None:
         return default
     return bool(value)
+
+
+def optional_sha256(value: Any, field_name: str) -> str:
+    text = as_string(value)
+    if text and (not text.startswith("sha256:") or len(text) != 71):
+        raise SchemaError(f"{field_name} must be a sha256: fingerprint")
+    return text
 
 
 def list_of_strings(value: Any) -> list[str]:
@@ -325,6 +430,12 @@ class SourceRecord:
     can_support_structural_use: str = ""
     cannot_support_structural_use: str = ""
     notes: str = ""
+    content_fingerprint: str = ""
+    retrieval_request_fingerprint: str = ""
+    provider_id: str = ""
+    provider_revision: str = ""
+    retrieved_at: str = ""
+    unconsumed_output_disposition: str = ""
 
     @classmethod
     def from_dict(cls, data: Mapping[str, Any]) -> "SourceRecord":
@@ -351,6 +462,14 @@ class SourceRecord:
             can_support_structural_use=as_string(data.get("can_support_structural_use")),
             cannot_support_structural_use=as_string(data.get("cannot_support_structural_use")),
             notes=as_string(data.get("notes")),
+            content_fingerprint=optional_sha256(data.get("content_fingerprint"), "source.content_fingerprint"),
+            retrieval_request_fingerprint=optional_sha256(data.get("retrieval_request_fingerprint"), "source.retrieval_request_fingerprint"),
+            provider_id=as_string(data.get("provider_id")),
+            provider_revision=as_string(data.get("provider_revision")),
+            retrieved_at=as_string(data.get("retrieved_at")),
+            unconsumed_output_disposition=as_string(
+                data.get("unconsumed_output_disposition")
+            ),
         )
 
 
@@ -368,10 +487,18 @@ class EvidenceAnchor:
     specificity: float = 0.0
     supports: list[str] = field(default_factory=list)
     limits: list[str] = field(default_factory=list)
+    claim_use_ids: list[str] = field(default_factory=list)
+    handoff_ids: list[str] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
     usable_for_trace: bool = False
     usable_for_claim: bool = False
     notes: str = ""
+    anchor_content_fingerprint: str = ""
+    source_content_fingerprint: str = ""
+    extractor_id: str = ""
+    extractor_revision: str = ""
+    observation_fingerprint: str = ""
+    unconsumed_output_disposition: str = ""
 
     @classmethod
     def from_dict(cls, data: Mapping[str, Any]) -> "EvidenceAnchor":
@@ -395,10 +522,20 @@ class EvidenceAnchor:
             specificity=clamp01(data.get("specificity"), 0.0),
             supports=list_of_strings(data.get("supports")),
             limits=list_of_strings(data.get("limits")),
+            claim_use_ids=list_of_strings(data.get("claim_use_ids")),
+            handoff_ids=list_of_strings(data.get("handoff_ids")),
             warnings=list_of_strings(data.get("warnings")),
             usable_for_trace=as_bool(data.get("usable_for_trace"), False),
             usable_for_claim=as_bool(data.get("usable_for_claim"), False),
             notes=as_string(data.get("notes")),
+            anchor_content_fingerprint=optional_sha256(data.get("anchor_content_fingerprint"), "anchor.anchor_content_fingerprint"),
+            source_content_fingerprint=optional_sha256(data.get("source_content_fingerprint"), "anchor.source_content_fingerprint"),
+            extractor_id=as_string(data.get("extractor_id")),
+            extractor_revision=as_string(data.get("extractor_revision")),
+            observation_fingerprint=optional_sha256(data.get("observation_fingerprint"), "anchor.observation_fingerprint"),
+            unconsumed_output_disposition=as_string(
+                data.get("unconsumed_output_disposition")
+            ),
         )
 
 
@@ -623,6 +760,7 @@ class SearchAction:
     status: str = "proposed"
     parameters: dict[str, Any] = field(default_factory=dict)
     notes: str = ""
+    unconsumed_output_disposition: str = ""
 
     @classmethod
     def from_dict(cls, data: Mapping[str, Any]) -> "SearchAction":
@@ -649,6 +787,9 @@ class SearchAction:
             status=require_choice(data.get("status", "proposed"), ACTION_STATUSES, "action.status", "proposed"),
             parameters=dict(parameters),
             notes=as_string(data.get("notes")),
+            unconsumed_output_disposition=as_string(
+                data.get("unconsumed_output_disposition")
+            ),
         )
 
 
@@ -663,6 +804,8 @@ class Observation:
     new_gaps: list[Gap] = field(default_factory=list)
     contradictions: list[str] = field(default_factory=list)
     notes: str = ""
+    observation_fingerprint: str = ""
+    unconsumed_output_disposition: str = ""
 
     @classmethod
     def from_dict(cls, data: Mapping[str, Any]) -> "Observation":
@@ -680,6 +823,10 @@ class Observation:
             new_gaps=[Gap.from_dict(item) for item in list_of_mappings(data.get("new_gaps"), "observation.new_gaps")],
             contradictions=list_of_strings(data.get("contradictions")),
             notes=as_string(data.get("notes")),
+            observation_fingerprint=optional_sha256(data.get("observation_fingerprint"), "observation.observation_fingerprint"),
+            unconsumed_output_disposition=as_string(
+                data.get("unconsumed_output_disposition")
+            ),
         )
 
 
@@ -697,6 +844,12 @@ class SourceDepthPolicy:
     require_explicit_lineage: bool = True
     require_anchor_content: bool = True
     per_gap_portfolio_required: bool = True
+    required_gap_ids: list[str] = field(default_factory=list)
+    required_lineage_slot_ids: list[str] = field(default_factory=list)
+    required_anchor_requirement_ids: list[str] = field(default_factory=list)
+    required_handoff_ids: list[str] = field(default_factory=list)
+    known_good_case_ids: list[str] = field(default_factory=list)
+    known_bad_case_ids: list[str] = field(default_factory=list)
     coverage_floors: dict[str, float] = field(default_factory=dict)
     policy_origin: str = SOURCE_DEPTH_NATIVE_POLICY_ORIGIN
 
@@ -747,6 +900,12 @@ class SourceDepthPolicy:
             require_explicit_lineage=as_bool(data.get("require_explicit_lineage"), True),
             require_anchor_content=as_bool(data.get("require_anchor_content"), True),
             per_gap_portfolio_required=as_bool(data.get("per_gap_portfolio_required"), True),
+            required_gap_ids=list_of_strings(data.get("required_gap_ids")),
+            required_lineage_slot_ids=list_of_strings(data.get("required_lineage_slot_ids")),
+            required_anchor_requirement_ids=list_of_strings(data.get("required_anchor_requirement_ids")),
+            required_handoff_ids=list_of_strings(data.get("required_handoff_ids")),
+            known_good_case_ids=list_of_strings(data.get("known_good_case_ids")),
+            known_bad_case_ids=list_of_strings(data.get("known_bad_case_ids")),
             coverage_floors={str(key): clamp01(value, 1.0) for key, value in raw_floors.items()},
             policy_origin=SOURCE_DEPTH_NATIVE_POLICY_ORIGIN,
         )
@@ -926,7 +1085,14 @@ class SourceGuardModelContract:
         if unknown:
             raise SchemaError(f"guard_contract contains unknown fields {unknown!r}")
         external = require_mapping(data.get("external_universe") or {}, "guard_contract.external_universe")
-        external_allowed = {"gap_ids", "target_unit_ids"}
+        external_allowed = {
+            "gap_ids",
+            "target_unit_ids",
+            "source_role_ids",
+            "lineage_slot_ids",
+            "anchor_requirement_ids",
+            "handoff_ids",
+        }
         external_unknown = sorted(set(external).difference(external_allowed))
         if external_unknown:
             raise SchemaError(
@@ -946,6 +1112,10 @@ class SourceGuardModelContract:
             external_universe={
                 "gap_ids": list_of_strings(external.get("gap_ids")),
                 "target_unit_ids": list_of_strings(external.get("target_unit_ids")),
+                "source_role_ids": list_of_strings(external.get("source_role_ids")),
+                "lineage_slot_ids": list_of_strings(external.get("lineage_slot_ids")),
+                "anchor_requirement_ids": list_of_strings(external.get("anchor_requirement_ids")),
+                "handoff_ids": list_of_strings(external.get("handoff_ids")),
             },
             claim_boundary=as_string(data.get("claim_boundary")),
             native_oracle_catalog_fingerprint=as_string(
@@ -963,8 +1133,15 @@ class SourceGuardModelContract:
             "purpose": self.purpose,
             "prevented_failures": [item.to_dict() for item in self.prevented_failures],
             "external_universe": {
-                "gap_ids": list(self.external_universe.get("gap_ids", [])),
-                "target_unit_ids": list(self.external_universe.get("target_unit_ids", [])),
+                key: list(self.external_universe.get(key, []))
+                for key in (
+                    "gap_ids",
+                    "target_unit_ids",
+                    "source_role_ids",
+                    "lineage_slot_ids",
+                    "anchor_requirement_ids",
+                    "handoff_ids",
+                )
             },
             "claim_boundary": self.claim_boundary,
             "native_oracle_catalog_fingerprint": self.native_oracle_catalog_fingerprint,
@@ -985,7 +1162,7 @@ class BeliefState:
     gaps: list[Gap] = field(default_factory=list)
     actions: list[SearchAction] = field(default_factory=list)
     observations: list[Observation] = field(default_factory=list)
-    graph_edges: list[dict[str, Any]] = field(default_factory=list)
+    graph_edges: list[GraphEdge] = field(default_factory=list)
     weights: dict[str, float] = field(default_factory=dict)
     depth_policy: SourceDepthPolicy = field(default_factory=SourceDepthPolicy)
     generated_at: str = field(default_factory=utc_now)
@@ -1012,12 +1189,13 @@ class BeliefState:
             gaps=[Gap.from_dict(item) for item in list_of_mappings(data.get("gaps"), "gaps")],
             actions=[SearchAction.from_dict(item) for item in list_of_mappings(data.get("actions"), "actions")],
             observations=[Observation.from_dict(item) for item in list_of_mappings(data.get("observations"), "observations")],
-            graph_edges=[dict(require_mapping(item, "graph_edge")) for item in graph_edges],
+            graph_edges=[GraphEdge.from_dict(item) for item in graph_edges],
             weights={str(key): float(value) for key, value in weights.items()},
             depth_policy=SourceDepthPolicy.from_dict(data.get("depth_policy")),
             generated_at=as_string(data.get("generated_at"), utc_now()),
         )
         validate_model_guard_binding(state)
+        validate_graph_edges(state)
         return state
 
     def source_by_id(self) -> dict[str, SourceRecord]:
@@ -1031,6 +1209,49 @@ class BeliefState:
 
     def action_by_id(self) -> dict[str, SearchAction]:
         return {action.action_id: action for action in self.actions}
+
+    def graph_object_types(self) -> dict[str, str]:
+        result = {
+            **{item.lead_id: "lead" for item in self.leads},
+            **{item.gap_id: "gap" for item in self.gaps},
+            **{item.action_id: "search_action" for item in self.actions},
+            **{item.source_id: "source" for item in self.sources},
+            **{item.anchor_id: "anchor" for item in self.anchors},
+            **{item.observation_id: "observation" for item in self.observations},
+        }
+        for gap in self.gaps:
+            if gap.structure_unit_id:
+                result[gap.structure_unit_id] = "target_unit"
+            for role in gap.suggested_source_roles:
+                result[f"source-role:{gap.gap_id}:{role}"] = "source_role"
+        for anchor in self.anchors:
+            for claim_use in anchor.claim_use_ids:
+                result[claim_use] = "claim_use"
+            for handoff_id in anchor.handoff_ids:
+                result[handoff_id] = "handoff"
+        for handoff_id in self.metadata.get("handoff_ids", []):
+            result[str(handoff_id)] = "handoff"
+        return result
+
+
+def validate_graph_edges(state: BeliefState) -> None:
+    objects = state.graph_object_types()
+    edge_ids: set[str] = set()
+    for edge in state.graph_edges:
+        if edge.edge_id in edge_ids:
+            raise SchemaError(f"duplicate graph edge id {edge.edge_id!r}")
+        edge_ids.add(edge.edge_id)
+        for object_id, declared_type in (
+            (edge.source_id, edge.source_type),
+            (edge.target_id, edge.target_type),
+        ):
+            actual_type = objects.get(object_id)
+            if actual_type is None:
+                raise SchemaError(f"graph edge {edge.edge_id!r} references missing endpoint {object_id!r}")
+            if actual_type != declared_type:
+                raise SchemaError(
+                    f"graph edge {edge.edge_id!r} endpoint {object_id!r} declares {declared_type!r}, actual {actual_type!r}"
+                )
 
 
 def sourceguard_model_contract_fingerprint(contract: SourceGuardModelContract) -> str:
@@ -1051,6 +1272,10 @@ def build_sourceguard_model_contract(
     gap_ids: list[str],
     target_unit_ids: list[str],
     claim_boundary: str,
+    source_role_ids: list[str] | None = None,
+    lineage_slot_ids: list[str] | None = None,
+    anchor_requirement_ids: list[str] | None = None,
+    handoff_ids: list[str] | None = None,
     purpose_freeze_sequence: int = 1,
     candidate_construction_sequence: int = 2,
 ) -> SourceGuardModelContract:
@@ -1061,6 +1286,10 @@ def build_sourceguard_model_contract(
         external_universe={
             "gap_ids": sorted(set(gap_ids)),
             "target_unit_ids": sorted(set(target_unit_ids)),
+            "source_role_ids": sorted(set(source_role_ids or [])),
+            "lineage_slot_ids": sorted(set(lineage_slot_ids or [])),
+            "anchor_requirement_ids": sorted(set(anchor_requirement_ids or [])),
+            "handoff_ids": sorted(set(handoff_ids or [])),
         },
         claim_boundary=claim_boundary,
         purpose_frozen=True,
@@ -1136,6 +1365,18 @@ def validate_model_guard_binding(state: BeliefState) -> None:
     actual_units = sorted({gap.structure_unit_id for gap in state.gaps if gap.structure_unit_id})
     if declared_units != actual_units:
         raise SchemaError("guard_contract target-unit universe does not match the candidate model")
+    exact_optional_universes = {
+        "source_role_ids": sorted(
+            {f"source-role:{gap.gap_id}:{role}" for gap in state.gaps for role in gap.suggested_source_roles}
+        ),
+        "lineage_slot_ids": sorted({f"lineage:{source.lineage_id}" for source in state.sources if source.lineage_id}),
+        "anchor_requirement_ids": sorted(anchor.anchor_id for anchor in state.anchors),
+        "handoff_ids": sorted(str(item) for item in state.metadata.get("handoff_ids", [])),
+    }
+    for field_name, actual in exact_optional_universes.items():
+        declared = contract.external_universe.get(field_name, [])
+        if declared and declared != actual:
+            raise SchemaError(f"guard_contract {field_name} universe does not match the candidate model")
     expected_fingerprint = sourceguard_model_contract_fingerprint(contract)
     if state.candidate_contract_fingerprint != expected_fingerprint:
         raise SchemaError("candidate_contract_fingerprint does not match the frozen guard_contract")
@@ -1239,3 +1480,6 @@ class SourceDepthReceipt:
         "This receipt proves only native SourceGuard planning and supplied-observation processing. "
         "It does not prove source truth, extraction authenticity, validated events, or final argument support."
     )
+    deepest_proven_layer: str = "planning"
+    first_unresolved_gap: str = ""
+    affected_obligation_ids: list[str] = field(default_factory=list)

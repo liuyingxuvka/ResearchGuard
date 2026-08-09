@@ -8,6 +8,7 @@ native reactions.
 
 from __future__ import annotations
 
+import base64
 import hashlib
 import json
 import os
@@ -18,6 +19,12 @@ from typing import Any, Mapping
 import uuid
 
 import yaml
+
+
+PORTABLE_TARGET_PROOF_MATERIAL_SCHEMA = (
+    "researchguard.trace.portable_target_proof_material.v1"
+)
+PORTABLE_TARGET_PROOF_MATERIAL_ID = "traceguard:target-proof-material"
 
 
 class GuardPurposeContractError(ValueError):
@@ -257,10 +264,27 @@ def _normalize_task_contract(
 
 
 def _evaluation(path: Path):
-    from .evaluator import evaluate_model
     from .loader import load_model
 
     model = load_model(path)
+    return _evaluation_model(model)
+
+
+def _evaluation_model_data(data: Mapping[str, Any], *, label: str):
+    from .headers import check_model_header
+    from .schema import TraceGuardModel
+    from .validation import validate_references
+
+    value = deepcopy(dict(data))
+    check_model_header(value, label)
+    model = TraceGuardModel.from_dict(value)
+    validate_references(model)
+    return _evaluation_model(model)
+
+
+def _evaluation_model(model):
+    from .evaluator import evaluate_model
+
     return model, evaluate_model(model)
 
 
@@ -280,10 +304,14 @@ def _known_good_passes(path: Path) -> bool:
 
 
 def _bad_oracle_passes(failure_id: str, path: Path) -> bool:
+    model, result = _evaluation(path)
+    return _bad_oracle_passes_evaluation(failure_id, model, result)
+
+
+def _bad_oracle_passes_evaluation(failure_id: str, model, result) -> bool:
     from .evaluator import evaluate_model
     from .storyline_depth import evaluate_storyline_depth
 
-    model, result = _evaluation(path)
     receipt = result.storyline_depth
     payload = result.to_dict()
     if not receipt:
@@ -359,6 +387,76 @@ def _bad_oracle_passes(failure_id: str, path: Path) -> bool:
     return False
 
 
+def _proof_from_documents(
+    contract: Mapping[str, Any],
+    family: Mapping[str, Any],
+    *,
+    load_case,
+) -> dict[str, Any]:
+    normalized = _normalize_task_contract(contract, family_catalog=family)
+    good_row = normalized["known_good"]
+    good_model, good_result = _evaluation_model_data(
+        load_case(good_row), label=str(good_row["model_path"])
+    )
+    observations = [
+        {
+            "case_id": good_row["case_id"],
+            "case_kind": "known_good",
+            "native_oracle_id": "oracle:traceguard:known-good",
+            "passed": bool(
+                good_result.ok
+                and good_result.storyline_depth
+                and good_result.storyline_depth.closure_status == "PASS"
+                and good_result.storyline_depth.broad_claim_licensed
+                and not good_result.storyline_depth.critical_uncovered_ids
+                and not good_result.storyline_depth.critical_ineffective_ids
+                and not good_result.storyline_depth.sensitivity_mismatch_ids
+                and not good_result.storyline_depth.predictive_claim_licensed
+            ),
+        }
+    ]
+    del good_model
+    for row in normalized["known_bad_cases"]:
+        bad_model, bad_result = _evaluation_model_data(
+            load_case(row), label=str(row["model_path"])
+        )
+        observations.append(
+            {
+                "case_id": row["case_id"],
+                "case_kind": "known_bad",
+                "failure_id": row["failure_id"],
+                "native_oracle_id": row["native_oracle_id"],
+                "passed": _bad_oracle_passes_evaluation(
+                    str(row["failure_id"]), bad_model, bad_result
+                ),
+            }
+        )
+    passed = all(row["passed"] for row in observations)
+    receipt = {
+        "schema_version": "researchguard.trace.task_model_purpose_proof.v1",
+        "status": "passed" if passed else "blocked",
+        "contract_id": normalized["contract_id"],
+        "model_instance_id": normalized["model_instance_id"],
+        "contract_fingerprint": _canonical_fingerprint(normalized),
+        "family_catalog_fingerprint": _canonical_fingerprint(family),
+        "selected_failure_ids": list(normalized["selected_failure_ids"]),
+        "known_good_case_ids": [str(normalized["known_good"]["case_id"])],
+        "known_bad_case_ids": [
+            str(row["case_id"]) for row in normalized["known_bad_cases"]
+        ],
+        "known_good_count": 1,
+        "known_bad_count": len(normalized["known_bad_cases"]),
+        "observations": observations,
+        "claim_boundary": normalized["claim_boundary"],
+    }
+    if not passed:
+        raise GuardPurposeContractError(
+            "traceguard_task_purpose_native_proof_failed",
+            json.dumps(receipt, sort_keys=True),
+        )
+    return receipt
+
+
 def prove_task_guard_contract(
     contract_path: str | Path,
     *,
@@ -397,6 +495,8 @@ def prove_task_guard_contract(
         "contract_fingerprint": _canonical_fingerprint(contract),
         "family_catalog_fingerprint": _canonical_fingerprint(family),
         "selected_failure_ids": list(contract["selected_failure_ids"]),
+        "known_good_case_ids": [str(contract["known_good"]["case_id"])],
+        "known_bad_case_ids": [str(row["case_id"]) for row in contract["known_bad_cases"]],
         "known_good_count": 1,
         "known_bad_count": len(contract["known_bad_cases"]),
         "observations": observations,
@@ -430,6 +530,8 @@ def build_guard_purpose_binding(
         "purpose": str(contract["purpose"]),
         "claim_boundary": str(contract["claim_boundary"]),
         "selected_failure_ids": list(contract["selected_failure_ids"]),
+        "known_good_case_ids": list(proof_receipt["known_good_case_ids"]),
+        "known_bad_case_ids": list(proof_receipt["known_bad_case_ids"]),
         "contract_ref": contract_ref,
         "contract_fingerprint": str(proof_receipt["contract_fingerprint"]),
         "proof_receipt_fingerprint": _canonical_fingerprint(proof_receipt),
@@ -550,6 +652,174 @@ def bind_task_guard_purpose(
     return output
 
 
+def build_portable_target_contract_material(
+    model_data: Mapping[str, Any], *, candidate_path: str | Path
+) -> bytes:
+    """Freeze TraceGuard's exact task contract and good/bad case denominator."""
+
+    candidate = Path(candidate_path).resolve(strict=True)
+    rows = []
+    for path in required_task_guard_input_paths(
+        model_data, candidate_path=candidate
+    ):
+        body = path.read_bytes()
+        rows.append(
+            {
+                "relative_path": path.relative_to(candidate.parent).as_posix(),
+                "sha256": hashlib.sha256(body).hexdigest(),
+                "body_b64": base64.b64encode(body).decode("ascii"),
+            }
+        )
+    return (
+        json.dumps(
+            {
+                "schema_version": PORTABLE_TARGET_PROOF_MATERIAL_SCHEMA,
+                # Keep the portable proof tied to the candidate's logical
+                # filename, never to an exporter-specific temporary root.
+                "candidate_locator": candidate.name,
+                "files": rows,
+            },
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        )
+        + "\n"
+    ).encode("utf-8")
+
+
+def _verify_portable_target_contract_material(
+    material: bytes,
+    model_data: Mapping[str, Any],
+    *,
+    candidate_path: str | Path,
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    try:
+        raw = json.loads(material.decode("utf-8"))
+    except (UnicodeError, json.JSONDecodeError) as exc:
+        raise GuardPurposeContractError(
+            "traceguard_portable_target_material_invalid", "not-json"
+        ) from exc
+    if not isinstance(raw, Mapping) or set(raw) != {
+        "schema_version",
+        "candidate_locator",
+        "files",
+    }:
+        raise GuardPurposeContractError(
+            "traceguard_portable_target_material_invalid", "root-denominator"
+        )
+    if raw["schema_version"] != PORTABLE_TARGET_PROOF_MATERIAL_SCHEMA:
+        raise GuardPurposeContractError(
+            "traceguard_portable_target_material_invalid", "schema"
+        )
+    candidate = Path(candidate_path).resolve()
+    locator = Path(str(raw["candidate_locator"]))
+    if (
+        locator.is_absolute()
+        or ".." in locator.parts
+        or locator.as_posix() != candidate.name
+    ):
+        raise GuardPurposeContractError(
+            "traceguard_portable_target_material_invalid", "candidate-locator"
+        )
+    rows = raw["files"]
+    if not isinstance(rows, list):
+        raise GuardPurposeContractError(
+            "traceguard_portable_target_material_invalid", "file-denominator"
+        )
+    documents: dict[str, bytes] = {}
+    for row in rows:
+        if not isinstance(row, Mapping) or set(row) != {
+            "relative_path",
+            "sha256",
+            "body_b64",
+        }:
+            raise GuardPurposeContractError(
+                "traceguard_portable_target_material_invalid", "file-row"
+            )
+        relative = Path(str(row["relative_path"])).as_posix()
+        if Path(relative).is_absolute() or ".." in Path(relative).parts or relative in documents:
+            raise GuardPurposeContractError(
+                "traceguard_portable_target_material_invalid", "file-path"
+            )
+        try:
+            body = base64.b64decode(str(row["body_b64"]).encode("ascii"), validate=True)
+        except (UnicodeError, ValueError) as exc:
+            raise GuardPurposeContractError(
+                "traceguard_portable_target_material_invalid", "file-bytes"
+            ) from exc
+        if hashlib.sha256(body).hexdigest() != str(row["sha256"]):
+            raise GuardPurposeContractError(
+                "traceguard_portable_target_material_invalid", "file-fingerprint"
+            )
+        documents[relative] = body
+    metadata = model_data.get("metadata")
+    binding = metadata.get("guard_purpose_contract") if isinstance(metadata, Mapping) else None
+    if not isinstance(binding, Mapping):
+        raise GuardPurposeContractError(
+            "traceguard_guard_purpose_binding_missing", candidate.as_posix()
+        )
+    contract_ref = binding.get("contract_ref")
+    if not isinstance(contract_ref, str) or not contract_ref or Path(contract_ref).is_absolute():
+        raise GuardPurposeContractError(
+            "traceguard_task_purpose_contract_ref_invalid", str(contract_ref)
+        )
+    normalized_contract_ref = Path(contract_ref).as_posix()
+    contract_body = documents.get(normalized_contract_ref)
+    if contract_body is None:
+        raise GuardPurposeContractError(
+            "traceguard_portable_target_material_invalid", "contract-missing"
+        )
+    try:
+        contract_raw = json.loads(contract_body.decode("utf-8"))
+    except (UnicodeError, json.JSONDecodeError) as exc:
+        raise GuardPurposeContractError(
+            "traceguard_portable_target_material_invalid", "contract-json"
+        ) from exc
+    if not isinstance(contract_raw, Mapping):
+        raise GuardPurposeContractError(
+            "traceguard_portable_target_material_invalid", "contract-object"
+        )
+    family = load_family_guard_catalog()
+    contract = _normalize_task_contract(contract_raw, family_catalog=family)
+    contract_parent = Path(normalized_contract_ref).parent
+    required = {normalized_contract_ref}
+
+    def load_case(row: Mapping[str, Any]) -> dict[str, Any]:
+        relative = (contract_parent / str(row["model_path"])).as_posix()
+        if ".." in Path(relative).parts:
+            raise GuardPurposeContractError(
+                "traceguard_portable_target_material_invalid", "case-path"
+            )
+        required.add(relative)
+        body = documents.get(relative)
+        if body is None:
+            raise GuardPurposeContractError(
+                "traceguard_portable_target_material_invalid", f"case-missing:{relative}"
+            )
+        try:
+            data = yaml.safe_load(body.decode("utf-8"))
+        except (UnicodeError, yaml.YAMLError) as exc:
+            raise GuardPurposeContractError(
+                "traceguard_portable_target_material_invalid", f"case-unreadable:{relative}"
+            ) from exc
+        if not isinstance(data, dict):
+            raise GuardPurposeContractError(
+                "traceguard_portable_target_material_invalid", f"case-object:{relative}"
+            )
+        if canonical_candidate_fingerprint(data) != row["model_sha256"]:
+            raise GuardPurposeContractError(
+                "traceguard_task_purpose_case_stale", relative
+            )
+        return data
+
+    proof = _proof_from_documents(contract, family, load_case=load_case)
+    if set(documents) != required:
+        raise GuardPurposeContractError(
+            "traceguard_portable_target_material_invalid", "file-denominator-not-closed"
+        )
+    return dict(contract), proof
+
+
 def require_current_guard_purpose_binding(
     model_data: Mapping[str, Any],
     *,
@@ -585,11 +855,24 @@ def require_current_guard_purpose_binding(
             str(contract_ref),
         )
     candidate = Path(candidate_path).resolve()
-    contract_path = (candidate.parent / contract_ref).resolve()
-    raw = load_task_guard_contract(contract_path)
-    family = load_family_guard_catalog()
-    contract = _normalize_task_contract(raw, family_catalog=family)
-    proof = prove_task_guard_contract(contract_path)
+    from ..portable_material import portable_native_material_bytes_by_id
+
+    portable_material = portable_native_material_bytes_by_id(
+        member_id="traceguard",
+        material_id=PORTABLE_TARGET_PROOF_MATERIAL_ID,
+    )
+    if portable_material is None:
+        contract_path = (candidate.parent / contract_ref).resolve()
+        raw = load_task_guard_contract(contract_path)
+        family = load_family_guard_catalog()
+        contract = _normalize_task_contract(raw, family_catalog=family)
+        proof = prove_task_guard_contract(contract_path)
+    else:
+        contract, proof = _verify_portable_target_contract_material(
+            portable_material,
+            model_data,
+            candidate_path=candidate,
+        )
     expected = build_guard_purpose_binding(
         contract,
         proof,

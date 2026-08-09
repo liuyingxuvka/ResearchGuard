@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from typing import Any, Mapping
+from dataclasses import asdict, dataclass, field
+import hashlib
+import json
+from typing import Any, Literal, Mapping
 
 from .schema import SCHEMA_VERSION, STATE_UNDECIDED
 
@@ -124,6 +126,117 @@ class Edge:
 
 
 @dataclass
+class BlockInterfaceBinding:
+    child_block_id: str
+    child_output_claim_id: str
+    parent_block_id: str
+    parent_input_node_id: str
+    output_classification: str
+    input_classification: str
+    scope: str
+    payload_schema_id: str
+    refinement_id: str
+    consumer_status: Literal["consumed", "unresolved", "excluded", "terminal"]
+    consumed_fingerprint: str
+    parent_receipt_id: str
+    parent_receipt_fingerprint: str
+    producer_model_fingerprint: str
+    producer_result_fingerprint: str
+    producer_task_id: str
+    receipt_status: Literal["current", "stale", "failed", "not_run"]
+
+    def __post_init__(self) -> None:
+        required = (
+            self.child_block_id,
+            self.child_output_claim_id,
+            self.parent_block_id,
+            self.parent_input_node_id,
+            self.output_classification,
+            self.input_classification,
+            self.scope,
+            self.payload_schema_id,
+            self.refinement_id,
+            self.parent_receipt_id,
+            self.producer_model_fingerprint,
+            self.producer_result_fingerprint,
+            self.producer_task_id,
+        )
+        if any(not value.strip() for value in required):
+            raise ValueError("block interface binding identity fields are required")
+        if self.consumer_status == "consumed" and not self.consumed_fingerprint.startswith("sha256:"):
+            raise ValueError("consumed block interfaces require a sha256 fingerprint")
+        if self.receipt_status not in {"current", "stale", "failed", "not_run"}:
+            raise ValueError("block interface receipt status is not current")
+        for value in (
+            self.consumed_fingerprint,
+            self.parent_receipt_fingerprint,
+            self.producer_model_fingerprint,
+            self.producer_result_fingerprint,
+        ):
+            if not value.startswith("sha256:") or len(value) != 71:
+                raise ValueError("block interface fingerprints must be exact sha256 values")
+
+    def to_dict(self) -> dict[str, Any]:
+        return asdict(self)
+
+
+def _interface_digest(value: object) -> str:
+    body = json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    return "sha256:" + hashlib.sha256(body.encode("utf-8")).hexdigest()
+
+
+def interface_model_fingerprint(model: "LogicModel") -> str:
+    """Fingerprint the producer model without the receipts that bind it."""
+
+    material = model.canonical_dict()
+    material["block_interfaces"] = []
+    return _interface_digest(material)
+
+
+def block_interface_payload_fingerprint(
+    model: "LogicModel", binding: BlockInterfaceBinding
+) -> str:
+    child = model.nodes.get(binding.child_output_claim_id)
+    return _interface_digest(
+        {
+            "child_block_id": binding.child_block_id,
+            "child_output_claim": child.canonical_dict() if child else None,
+            "output_classification": binding.output_classification,
+            "payload_schema_id": binding.payload_schema_id,
+            "refinement_id": binding.refinement_id,
+            "scope": binding.scope,
+        }
+    )
+
+
+def block_interface_receipt_fingerprint(
+    model: "LogicModel", binding: BlockInterfaceBinding
+) -> str:
+    return _interface_digest(block_interface_receipt_payload(model, binding))
+
+
+def block_interface_receipt_payload(
+    model: "LogicModel", binding: BlockInterfaceBinding
+) -> dict[str, str]:
+    return {
+        "child_block_id": binding.child_block_id,
+        "child_output_claim_id": binding.child_output_claim_id,
+        "parent_block_id": binding.parent_block_id,
+        "parent_input_node_id": binding.parent_input_node_id,
+        "payload_schema_id": binding.payload_schema_id,
+        "refinement_id": binding.refinement_id,
+        "scope": binding.scope,
+        "consumer_status": binding.consumer_status,
+        "consumed_fingerprint": binding.consumed_fingerprint,
+        "parent_receipt_id": binding.parent_receipt_id,
+        "producer_model_fingerprint": binding.producer_model_fingerprint,
+        "producer_result_fingerprint": binding.producer_result_fingerprint,
+        "producer_task_id": binding.producer_task_id,
+        "receipt_status": binding.receipt_status,
+    }
+
+
+@dataclass
 class ArgumentBlock:
     id: str
     title: str = ""
@@ -193,6 +306,7 @@ class LogicModel:
     acceptance: dict[str, dict[str, Any]] = field(default_factory=dict)
     hierarchy: dict[str, list[str]] = field(default_factory=dict)
     blocks: dict[str, ArgumentBlock] = field(default_factory=dict)
+    block_interfaces: list[BlockInterfaceBinding] = field(default_factory=list)
     metadata: dict[str, Any] = field(default_factory=dict)
     schema_version: str = SCHEMA_VERSION
     _incoming_index: dict[str, list[Edge]] = field(default_factory=dict, init=False, repr=False)
@@ -267,6 +381,7 @@ class LogicModel:
             "acceptance": self.acceptance,
             "hierarchy": self.hierarchy,
             "blocks": {block_id: block.to_dict() for block_id, block in self.blocks.items()},
+            "block_interfaces": [item.to_dict() for item in self.block_interfaces],
         }
 
     def canonical_dict(self) -> dict[str, Any]:
@@ -315,6 +430,18 @@ class LogicModel:
                 block_id: self.blocks[block_id].to_dict()
                 for block_id in sorted(self.blocks)
             },
+            "block_interfaces": [
+                item.to_dict()
+                for item in sorted(
+                    self.block_interfaces,
+                    key=lambda item: (
+                        item.parent_block_id,
+                        item.parent_input_node_id,
+                        item.child_block_id,
+                        item.child_output_claim_id,
+                    ),
+                )
+            ],
         }
 
 
@@ -895,6 +1022,10 @@ class LogicDepthReceipt:
     target_contract_fingerprint: str = ""
     target_purpose: str = ""
     target_proof_receipt: dict[str, Any] = field(default_factory=dict)
+    artifact_inventory_fingerprint: str = ""
+    interface_receipt_refs: tuple[str, ...] = ()
+    deepest_proven_layer: str = "native-semantics"
+    first_unresolved_gap: str = ""
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -928,6 +1059,10 @@ class LogicDepthReceipt:
             "target_contract_fingerprint": self.target_contract_fingerprint,
             "target_purpose": self.target_purpose,
             "target_proof_receipt": dict(self.target_proof_receipt),
+            "artifact_inventory_fingerprint": self.artifact_inventory_fingerprint,
+            "interface_receipt_refs": list(self.interface_receipt_refs),
+            "deepest_proven_layer": self.deepest_proven_layer,
+            "first_unresolved_gap": self.first_unresolved_gap,
         }
 
 

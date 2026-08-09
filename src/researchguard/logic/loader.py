@@ -8,7 +8,7 @@ from typing import Any, Mapping
 
 import yaml
 
-from .model import ArgumentBlock, Edge, LogicModel, Node
+from .model import ArgumentBlock, BlockInterfaceBinding, Edge, LogicModel, Node
 from .schema import SCHEMA_VERSION
 from .validator import validate_model
 
@@ -131,6 +131,34 @@ def load_model_from_dict(raw: Mapping[str, Any], *, validate: bool = True) -> Lo
             nodes[parent].children = list(children)
 
     blocks = _parse_blocks(raw.get("blocks") or {})
+    interfaces_raw = raw.get("block_interfaces") or []
+    if not isinstance(interfaces_raw, list):
+        raise ModelLoadError("'block_interfaces' must be a list")
+    block_interfaces = []
+    for item in interfaces_raw:
+        if not isinstance(item, Mapping):
+            raise ModelLoadError("each block interface must be a mapping")
+        block_interfaces.append(
+            BlockInterfaceBinding(
+                child_block_id=str(item.get("child_block_id", "")),
+                child_output_claim_id=str(item.get("child_output_claim_id", "")),
+                parent_block_id=str(item.get("parent_block_id", "")),
+                parent_input_node_id=str(item.get("parent_input_node_id", "")),
+                output_classification=str(item.get("output_classification", "")),
+                input_classification=str(item.get("input_classification", "")),
+                scope=str(item.get("scope", "")),
+                payload_schema_id=str(item.get("payload_schema_id", "")),
+                refinement_id=str(item.get("refinement_id", "")),
+                consumer_status=str(item.get("consumer_status", "")),
+                consumed_fingerprint=str(item.get("consumed_fingerprint", "")),
+                parent_receipt_id=str(item.get("parent_receipt_id", "")),
+                parent_receipt_fingerprint=str(item.get("parent_receipt_fingerprint", "")),
+                producer_model_fingerprint=str(item.get("producer_model_fingerprint", "")),
+                producer_result_fingerprint=str(item.get("producer_result_fingerprint", "")),
+                producer_task_id=str(item.get("producer_task_id", "")),
+                receipt_status=str(item.get("receipt_status", "")),
+            )
+        )
 
     model = LogicModel(
         id=model_id,
@@ -141,6 +169,7 @@ def load_model_from_dict(raw: Mapping[str, Any], *, validate: bool = True) -> Lo
         acceptance={str(key): dict(value or {}) for key, value in dict(raw.get("acceptance") or {}).items()},
         hierarchy=hierarchy,
         blocks=blocks,
+        block_interfaces=block_interfaces,
         metadata=dict(model_info),
         schema_version=schema_version,
     )

@@ -9,10 +9,17 @@ from pathlib import Path
 from typing import Any
 
 from .evaluator import evaluate_model
+from .blueprint import (
+    TraceTargetUniverse,
+    check_blueprint,
+    export_blueprint,
+    impact_blueprint,
+    reverse_trace_output,
+)
 from .export_logicguard import render_logicguard_yaml
 from .inference.types import InferenceError
 from . import library as case_library
-from .loader import dump_yaml, load_model
+from .loader import dump_yaml, load_model, read_model_data
 from .purpose_contract import GuardPurposeContractError, bind_task_guard_purpose
 from .report import render_markdown, render_text
 from .schema import SchemaError
@@ -529,6 +536,49 @@ def cmd_library_depth(args: argparse.Namespace) -> int:
     return library_depth_main(argv)
 
 
+def cmd_blueprint(args: argparse.Namespace) -> int:
+    try:
+        model = load_model(args.model)
+        receipt = evaluate_model(
+            model, include_storyline_depth=False
+        ).inference_receipt
+        if args.blueprint_command in {"check", "export"}:
+            universe = TraceTargetUniverse.from_dict(read_model_data(args.universe))
+            payload = (
+                check_blueprint(model, receipt, universe, candidate_path=str(args.model)).to_dict()
+                if args.blueprint_command == "check"
+                else export_blueprint(model, receipt, universe, candidate_path=str(args.model))
+            )
+            status = payload.get("status") if args.blueprint_command == "check" else payload["check"]["status"]
+            _print_json(payload, pretty=args.pretty)
+            return 0 if status == "complete" else 3
+        if args.blueprint_command == "impact":
+            universe = TraceTargetUniverse.from_dict(read_model_data(args.universe))
+            payload = impact_blueprint(
+                model,
+                receipt,
+                args.changed_id,
+                universe,
+                candidate_path=str(args.model),
+            )
+        elif args.blueprint_command == "trace":
+            universe = TraceTargetUniverse.from_dict(read_model_data(args.universe))
+            payload = reverse_trace_output(
+                model,
+                receipt,
+                args.output_id,
+                universe,
+                candidate_path=str(args.model),
+            )
+        else:
+            raise ValueError("unknown blueprint operation")
+    except (OSError, SchemaError, ValueError, InferenceError) as exc:
+        _print_json({"ok": False, "error": str(exc)}, pretty=args.pretty)
+        return 2
+    _print_json(payload, pretty=args.pretty)
+    return 3 if payload.get("unknown_ownership") or payload.get("trace_status") not in (None, "complete") else 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="researchguard trace", description="TraceGuard evidence-to-trace evaluator")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -578,6 +628,27 @@ def build_parser() -> argparse.ArgumentParser:
     compare.add_argument("after")
     compare.add_argument("--pretty", action="store_true")
     compare.set_defaults(handler=cmd_compare)
+
+    blueprint = sub.add_parser("blueprint")
+    blueprint_sub = blueprint.add_subparsers(dest="blueprint_command", required=True)
+    for operation in ("check", "export"):
+        command = blueprint_sub.add_parser(operation)
+        command.add_argument("model")
+        command.add_argument("universe")
+        command.add_argument("--pretty", action="store_true")
+        command.set_defaults(handler=cmd_blueprint)
+    blueprint_impact = blueprint_sub.add_parser("impact")
+    blueprint_impact.add_argument("model")
+    blueprint_impact.add_argument("changed_id", nargs="+")
+    blueprint_impact.add_argument("--universe", required=True)
+    blueprint_impact.add_argument("--pretty", action="store_true")
+    blueprint_impact.set_defaults(handler=cmd_blueprint)
+    blueprint_trace = blueprint_sub.add_parser("trace")
+    blueprint_trace.add_argument("model")
+    blueprint_trace.add_argument("output_id")
+    blueprint_trace.add_argument("--universe", required=True)
+    blueprint_trace.add_argument("--pretty", action="store_true")
+    blueprint_trace.set_defaults(handler=cmd_blueprint)
 
     iterate = sub.add_parser("iterate")
     iteration_sub = iterate.add_subparsers(dest="iteration_command", required=True)

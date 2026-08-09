@@ -30,7 +30,7 @@
   "native_binding": {
     "route_id": "route:logicguard-authoritative-depth",
     "owner_callable": "researchguard.logic.validator:validate_model",
-    "owner_fingerprint": "fa6c2463c28622385d319a273f4cf90c11668d5d5596af24a38b5dac7c37cbcf",
+    "owner_fingerprint": "bfedf19ef077731a906b09c39f6a910bd7406c5dd6d157d89a65f551b6512f63",
     "validators": [
       {
         "validator_id": "logicguard-template-pack:purpose",

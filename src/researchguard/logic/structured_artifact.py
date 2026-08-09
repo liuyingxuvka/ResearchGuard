@@ -3,11 +3,12 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Iterable
 
 from .hierarchy import build_children_index, hierarchy_roots
 from .importance import importance_for_node
 from .model import LogicModel
+from .artifact_inventory import ArtifactInventory
 
 
 STRUCTURAL_NODE_TYPES = {"Document", "Section", "ArgumentBlock"}
@@ -50,19 +51,92 @@ class ArtifactMap:
     model_id: str
     artifact_kind: str
     blocks: tuple[ArtifactBlock, ...]
+    inventory_fingerprint: str = ""
+    missing_inventory_unit_ids: tuple[str, ...] = ()
+    parse_gap_unit_ids: tuple[str, ...] = ()
+    realization_binding_ids: tuple[str, ...] = ()
+    unrealized_argument_block_ids: tuple[str, ...] = ()
+    missing_interface_receipt_ids: tuple[str, ...] = ()
 
     def to_dict(self) -> dict[str, Any]:
         return {
             "model_id": self.model_id,
             "artifact_kind": self.artifact_kind,
             "blocks": [block.to_dict() for block in self.blocks],
+            "inventory_fingerprint": self.inventory_fingerprint,
+            "missing_inventory_unit_ids": list(self.missing_inventory_unit_ids),
+            "parse_gap_unit_ids": list(self.parse_gap_unit_ids),
+            "realization_binding_ids": list(self.realization_binding_ids),
+            "unrealized_argument_block_ids": list(self.unrealized_argument_block_ids),
+            "missing_interface_receipt_ids": list(self.missing_interface_receipt_ids),
         }
 
 
-def build_artifact_map(model: LogicModel) -> ArtifactMap:
+def build_artifact_map(
+    model: LogicModel,
+    *,
+    inventory: ArtifactInventory | None = None,
+    realizations: Iterable[object] = (),
+) -> ArtifactMap:
     artifact_kind = str(model.metadata.get("artifact_kind", "structured-artifact"))
     blocks = tuple(ordered_artifact_blocks(model, artifact_kind=artifact_kind))
-    return ArtifactMap(model.id, artifact_kind, blocks)
+    bindings = tuple(realizations)
+    bound_unit_ids = {
+        str(getattr(item, "artifact_unit_id", ""))
+        for item in bindings
+        if str(getattr(item, "artifact_unit_id", ""))
+    }
+    bound_block_ids = {
+        str(getattr(item, "argument_block_id", ""))
+        for item in bindings
+        if str(getattr(item, "argument_block_id", ""))
+    }
+    missing = (
+        tuple(sorted(item.unit_id for item in inventory.units if item.unit_id not in bound_unit_ids))
+        if inventory
+        else ()
+    )
+    parse_gaps = tuple(sorted(item.unit_id for item in inventory.units if item.parse_disposition == "unparsed")) if inventory else ()
+    receipt_resource_ids = (
+        {
+            resource.resource_id
+            for unit in inventory.units
+            for resource in unit.resources
+            if resource.role == "receipt"
+            and resource.required
+            and resource.disposition == "bound"
+        }
+        if inventory
+        else set()
+    )
+    required_receipt_ids = {
+        item.parent_receipt_id
+        for item in model.block_interfaces
+        if item.consumer_status == "consumed"
+    }
+    provided_receipt_ids = {
+        str(resource_id)
+        for item in bindings
+        for resource_id in getattr(item, "resource_ids", ())
+        if str(resource_id) in receipt_resource_ids
+        and str(resource_id) in required_receipt_ids
+    }
+    return ArtifactMap(
+        model.id,
+        artifact_kind,
+        blocks,
+        inventory.fingerprint if inventory else "",
+        missing,
+        parse_gaps,
+        tuple(
+            sorted(
+                f"realization:{getattr(item, 'artifact_unit_id', '')}->{getattr(item, 'argument_block_id', '')}"
+                for item in bindings
+            )
+        ),
+        tuple(sorted(set(model.blocks) - bound_block_ids)) if inventory else (),
+        tuple(sorted(required_receipt_ids - provided_receipt_ids)),
+    )
 
 
 def ordered_artifact_blocks(model: LogicModel, *, artifact_kind: str | None = None) -> list[ArtifactBlock]:

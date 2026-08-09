@@ -7,6 +7,22 @@ from collections import defaultdict, deque
 from .model import LogicModel
 
 
+def build_block_parent_index(model: LogicModel) -> dict[str, str]:
+    """Return the sole canonical parent for every argument block."""
+
+    parents: dict[str, str] = {}
+    for block_id, block in model.blocks.items():
+        if block.parent:
+            prior = parents.setdefault(block_id, block.parent)
+            if prior != block.parent:
+                raise ValueError(f"conflicting parent ownership for block {block_id!r}")
+        for child_id in block.child_blocks:
+            prior = parents.setdefault(child_id, block_id)
+            if prior != block_id:
+                raise ValueError(f"conflicting parent ownership for block {child_id!r}")
+    return parents
+
+
 def build_parent_index(model: LogicModel) -> dict[str, str]:
     parents: dict[str, str] = {}
     for parent, children in model.hierarchy.items():

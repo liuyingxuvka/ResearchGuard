@@ -8,6 +8,7 @@ from itertools import combinations
 
 from .schema import (
     ExperimentIterationReceipt,
+    ExperimentDesignBlock,
     ExperimentObservation,
     ExperimentRecommendation,
     ExperimentSpec,
@@ -62,6 +63,13 @@ def _unresolved(selected, pairs, predictions):
 
 
 def recommend_experiments(spec: ExperimentSpec) -> ExperimentRecommendation:
+    if spec.design_blocks:
+        from .blueprint import validate_design_identities
+
+        if validate_design_identities(spec):
+            return ExperimentRecommendation(
+                "blocked_invalid_input", (), (), (), "experiment_blueprint_identity_gap"
+            )
     candidates = tuple(sorted(spec.candidate_experiment_ids))
     predictions = _prediction_map(spec)
     if spec.maximum_experiment_count is not None and spec.maximum_experiment_count < 1:
@@ -93,6 +101,17 @@ def observe_experiments(spec: ExperimentSpec, observations: tuple[ExperimentObse
     construction = tuple(row for row in observations if row.role == "construction")
     holdouts = tuple(row for row in observations if row.role == "holdout")
     gaps: set[str] = set()
+    design_by_candidate: dict[str, list[ExperimentDesignBlock]] = {}
+    if spec.design_blocks:
+        from .blueprint import validate_design_identities
+
+        for block in spec.design_blocks:
+            if block.candidate_experiment_id:
+                design_by_candidate.setdefault(block.candidate_experiment_id, []).append(block)
+        gaps.update(
+            f"experiment-blueprint-{item.code}:{item.object_id}"
+            for item in validate_design_identities(spec)
+        )
     valid_construction: list[ExperimentObservation] = []
     unexpected: list[ExperimentObservation] = []
     for row in observations:
@@ -102,6 +121,16 @@ def observe_experiments(spec: ExperimentSpec, observations: tuple[ExperimentObse
         if row.status != "valid":
             gaps.add(f"observation-{row.status}:{row.experiment_id}")
             continue
+        if spec.design_blocks:
+            matches = design_by_candidate.get(row.experiment_id, [])
+            if len(matches) != 1:
+                gaps.add(f"observation-blueprint-candidate-missing:{row.experiment_id}")
+                continue
+            block = matches[0]
+            ports = {item.port_id: item.kind for item in block.ports}
+            if ports.get(row.observation_port_id) != "observation" or ports.get(row.outcome_port_id) != "outcome":
+                gaps.add(f"observation-port-mismatch:{row.experiment_id}")
+                continue
         if not any(mapping.get(row.experiment_id) == row.observed_outcome for mapping in predictions.values()):
             gaps.add(f"prediction-matrix-miss:{row.experiment_id}")
             unexpected.append(row)
@@ -157,6 +186,9 @@ def observe_experiments(spec: ExperimentSpec, observations: tuple[ExperimentObse
                 hypothesis_predictions=tuple(row for row in spec.hypothesis_predictions if row.hypothesis_id in active_ids),
                 candidate_experiment_ids=remaining_candidates,
                 maximum_experiment_count=spec.maximum_experiment_count,
+                design_root_id=spec.design_root_id,
+                design_blocks=spec.design_blocks,
+                target_universe=spec.target_universe,
             )
             recommendation = recommend_experiments(remaining)
         else:
@@ -213,6 +245,16 @@ def observe_experiments(spec: ExperimentSpec, observations: tuple[ExperimentObse
         "terminal": terminal,
     }
     receipt_fingerprint = _digest(receipt_material)
+    design_fingerprint = ""
+    deepest_proven_layer = "native-recommendation"
+    first_unresolved_gap = sorted(current)[0] if current else ""
+    if spec.design_blocks:
+        from .blueprint import check_blueprint
+
+        blueprint = check_blueprint(spec)
+        design_fingerprint = blueprint.model_fingerprint
+        deepest_proven_layer = blueprint.deepest_proven_layer
+        first_unresolved_gap = blueprint.first_unresolved_gap or first_unresolved_gap
     return ExperimentIterationReceipt(
         task_id=spec.task_id,
         iteration=spec.iteration,
@@ -234,6 +276,10 @@ def observe_experiments(spec: ExperimentSpec, observations: tuple[ExperimentObse
         terminal_reason=terminal,  # type: ignore[arg-type]
         progressed=progressed,
         receipt_fingerprint=receipt_fingerprint,
+        design_fingerprint=design_fingerprint,
+        affected_obligation_ids=tuple(sorted(spec.coverage_ids)),
+        deepest_proven_layer=deepest_proven_layer,
+        first_unresolved_gap=first_unresolved_gap,
     )
 
 

@@ -12,8 +12,28 @@ from .types import (
     FactorContribution,
     HypothesisProjection,
     InferenceSolution,
+    InferenceReceipt,
     TraceProjection,
 )
+
+
+def project_canonical_receipt_identity(receipt: InferenceReceipt) -> dict[str, object]:
+    """Expose canonical receipt identity without rescoring or solving again."""
+
+    return {
+        "receipt_id": receipt.receipt_id,
+        "model_fingerprint": receipt.model_fingerprint,
+        "problem_fingerprint": receipt.problem_fingerprint,
+        "solution_fingerprint": receipt.solution_fingerprint,
+        "solver_id": receipt.solver_id,
+        "solver_status": receipt.solver_status,
+        "contribution_factor_ids": sorted(item.factor_id for item in receipt.contributions),
+        "trace_projection_ids": sorted(item.trace_id for item in receipt.trace_projections),
+        "hypothesis_projection_ids": sorted(
+            item.hypothesis_id for item in receipt.hypothesis_projections
+        ),
+        "claim_boundary": receipt.claim_boundary,
+    }
 
 
 def _factor_ids(

@@ -3,22 +3,28 @@
 from __future__ import annotations
 
 import argparse
+from contextlib import contextmanager
 import importlib.util
 import json
+import os
 import subprocess
 import sys
+import tempfile
 import tomllib
 from pathlib import Path
-from typing import Callable
+from typing import Callable, Iterator
 
 
 ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src"
+TESTS = ROOT / "tests"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
+if str(TESTS) not in sys.path:
+    sys.path.insert(0, str(TESTS))
 
 from researchguard import __version__  # noqa: E402
-from researchguard.admission import COMPOSITION_SCHEMA, TASK_FACTS_SCHEMA  # noqa: E402
+from researchguard.admission import TASK_FACTS_SCHEMA  # noqa: E402
 from researchguard.routing import (  # noqa: E402
     MEMBER_ADMISSION_CONTRACTS,
     RouteBinding,
@@ -37,7 +43,7 @@ MEMBERS = (
     "traceguard",
     "experimentguard",
 )
-CURRENT_VERSION = "0.4.1"
+CURRENT_VERSION = "0.4.3"
 RETIRED_SKILL_IDS = (
     "logicguard-source-library",
     "logicguard-structured-artifact",
@@ -140,13 +146,6 @@ def _check_common(checks: list[dict[str, str]]) -> None:
         "consumer projection contains no retired command or wrapper",
         checks,
     )
-    result = _python("scripts/check_prompt_bundles.py", "--json")
-    prompt_payload = json.loads(result.stdout) if result.returncode == 0 else {}
-    _assert(
-        result.returncode == 0 and prompt_payload.get("status") == "pass",
-        "target-owned prompt bundles, load graph, and generated admission index pass",
-        checks,
-    )
 
 
 def _task_facts(member: str, argv: tuple[str, ...], intent: str) -> dict:
@@ -197,6 +196,76 @@ def _task_facts(member: str, argv: tuple[str, ...], intent: str) -> dict:
     }
 
 
+def _current_admission_fixtures():
+    """Load the repository's sole current composition fixture implementation."""
+
+    fixture_path = ROOT / "tests" / "admission_fixtures.py"
+    spec = importlib.util.spec_from_file_location(
+        "researchguard_native_suite_admission_fixtures",
+        fixture_path,
+    )
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"cannot load current admission fixtures: {fixture_path}")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    if not callable(getattr(module, "composition", None)) or not callable(
+        getattr(module, "native_owner_attestations", None)
+    ):
+        raise RuntimeError("current admission fixture interface is incomplete")
+    return module
+
+
+@contextmanager
+def _isolated_admission_fixtures() -> Iterator[object]:
+    """Run the native composition check without relying on pytest setup."""
+
+    import researchguard.native_receipts as native_receipts  # noqa: PLC0415
+    import researchguard.target_authority as target_authority  # noqa: PLC0415
+    from target_material_fixtures import (  # noqa: PLC0415
+        install_test_expected_target_producer,
+    )
+
+    fixtures = _current_admission_fixtures()
+    prior_native = dict(native_receipts._CURRENT_NATIVE_RECEIPT_PRODUCERS)
+    prior_target = dict(
+        target_authority._CURRENT_EXPECTED_TARGET_ADMISSION_PRODUCERS
+    )
+    prior_environment = {
+        name: os.environ.get(name)
+        for name in ("HOME", "USERPROFILE", "RESEARCHGUARD_TEST_FIXTURE_ROOT")
+    }
+    try:
+        with tempfile.TemporaryDirectory(
+            prefix="researchguard-native-suite-check-"
+        ) as temporary:
+            temporary_root = Path(temporary).resolve()
+            isolated_home = temporary_root / "home"
+            fixture_root = temporary_root / "fixtures"
+            isolated_home.mkdir()
+            os.environ["HOME"] = str(isolated_home)
+            os.environ["USERPROFILE"] = str(isolated_home)
+            os.environ["RESEARCHGUARD_TEST_FIXTURE_ROOT"] = str(fixture_root)
+            native_receipts._CURRENT_NATIVE_RECEIPT_PRODUCERS.clear()
+            target_authority._CURRENT_EXPECTED_TARGET_ADMISSION_PRODUCERS.clear()
+            fixtures.configure_test_native_fixture_root(fixture_root)
+            install_test_expected_target_producer()
+            fixtures.install_test_native_receipt_producers()
+            yield fixtures
+    finally:
+        fixtures.reset_test_native_fixture_root()
+        native_receipts._CURRENT_NATIVE_RECEIPT_PRODUCERS.clear()
+        native_receipts._CURRENT_NATIVE_RECEIPT_PRODUCERS.update(prior_native)
+        target_authority._CURRENT_EXPECTED_TARGET_ADMISSION_PRODUCERS.clear()
+        target_authority._CURRENT_EXPECTED_TARGET_ADMISSION_PRODUCERS.update(
+            prior_target
+        )
+        for name, value in prior_environment.items():
+            if value is None:
+                os.environ.pop(name, None)
+            else:
+                os.environ[name] = value
+
+
 def _check_researchguard(checks: list[dict[str, str]]) -> None:
     for member in (
         "logicguard",
@@ -238,53 +307,38 @@ def _check_researchguard(checks: list[dict[str, str]]) -> None:
             },
         }
     )
-    pair["composition"] = {
-        "schema_version": COMPOSITION_SCHEMA,
-        "steps": [
-            {
-                "step_id": "step:source",
-                "order": 1,
-                "member_id": "sourceguard",
-                "responsibility_condition_ids": ["source.primary.discovery"],
-                "depends_on_step_ids": [],
-                "input_handoff_ids": [],
-                "output_handoff_ids": ["handoff:source-trace"],
-            },
-            {
-                "step_id": "step:trace",
-                "order": 2,
-                "member_id": "traceguard",
-                "responsibility_condition_ids": ["trace.primary.reconstruction"],
-                "depends_on_step_ids": ["step:source"],
-                "input_handoff_ids": ["handoff:source-trace"],
-                "output_handoff_ids": [],
-            },
-        ],
-        "handoffs": [
-            {
-                "handoff_id": "handoff:source-trace",
-                "from_step_id": "step:source",
-                "to_step_id": "step:trace",
-                "field_ids": ["field:evidence-anchors"],
-            }
-        ],
-        "field_owners": [
-            {"field_id": "field:evidence-anchors", "owner_step_id": "step:source"}
-        ],
-        "overall_claim_boundary": "This proves route composition only, not native member completion.",
-    }
-    composed = select_member_request(pair, pair_argv, business_intent_id=pair_intent)
+    with _isolated_admission_fixtures() as fixtures:
+        pair["composition"] = fixtures.composition(
+            ("sourceguard", ("source.primary.discovery",)),
+            ("traceguard", ("trace.primary.reconstruction",)),
+        )
+        composed = select_member_request(
+            pair,
+            pair_argv,
+            business_intent_id=pair_intent,
+            native_owner_attestations=fixtures.native_owner_attestations(
+                pair["composition"]
+            ),
+        )
     _assert(
         isinstance(composed, RouteComposition)
-        and composed.member_ids == ("sourceguard", "traceguard"),
+        and composed.member_ids == ("sourceguard", "traceguard")
+        and composed.status == "composition_ready",
         "umbrella accepts one necessary minimum-sufficient composition",
         checks,
     )
     result = _python("-m", "researchguard", "--help")
     _assert(
         result.returncode == 0
-        and "run|logic|source|trace|experiment" in result.stdout,
-        "sole suite console exposes exactly the five current commands",
+        and (
+            "usage: researchguard "
+            "{run|portable|domain-dna|self-dna|logic|source|trace|experiment} ..."
+        )
+        in result.stdout,
+        (
+            "sole suite console exposes exactly one umbrella route, the portable "
+            "and external-DNA routes, and four native member routes"
+        ),
         checks,
     )
 

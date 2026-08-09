@@ -1,7 +1,7 @@
 # ResearchGuard
 
-**Current version:** `v0.4.1`
-**当前版本：** `v0.4.1`
+**Current version:** `v0.4.3`
+**当前版本：** `v0.4.3`
 
 ResearchGuard is one versioned research-quality guard suite with five direct
 Codex entrypoints:
@@ -48,7 +48,7 @@ All direct entries bind to the same native member owners used by the umbrella.
 There are no legacy Skill IDs, command wrappers, aliases, dual readers, or
 failure-triggered alternate routes.
 
-In v0.4.1 the umbrella accepts source-bound task facts instead of caller-set
+In v0.4.2 the umbrella accepts source-bound task facts instead of caller-set
 applicability. Current member contracts derive coverage, forbidden-condition
 dispositions, first actions, and first references. Direct requests skip the
 umbrella; ambiguous requests read one compact admission index and choose the

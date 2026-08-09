@@ -682,6 +682,59 @@ def revalidate_native_depth_receipt(
     )
 
 
+def affected_source_obligations(
+    state: BeliefState,
+    *,
+    changed_source_ids: Sequence[str] = (),
+    changed_anchor_ids: Sequence[str] = (),
+) -> dict[str, object]:
+    """Return the exact SourceGuard obligations that consume changed identities.
+
+    This is an impact projection only.  It deliberately does not mutate a gap,
+    rerun search, or broaden an unknown dependency into a run-all decision.
+    """
+
+    source_ids = set(changed_source_ids)
+    anchor_ids = set(changed_anchor_ids)
+    known_sources = state.source_by_id()
+    known_anchors = {anchor.anchor_id: anchor for anchor in state.anchors}
+    unknown_ids = sorted((source_ids - set(known_sources)) | (anchor_ids - set(known_anchors)))
+    for anchor in state.anchors:
+        if anchor.source_id in source_ids:
+            anchor_ids.add(anchor.anchor_id)
+    affected_gap_ids: set[str] = set()
+    affected_claim_use_ids: set[str] = set()
+    for anchor_id in anchor_ids:
+        anchor = known_anchors.get(anchor_id)
+        if anchor is not None:
+            affected_claim_use_ids.update(anchor.claim_use_ids)
+    for gap in state.gaps:
+        consumed_ids = {
+            *gap.closure_basis.source_ids,
+            *gap.closure_basis.anchor_ids,
+        }
+        if source_ids & consumed_ids or anchor_ids & consumed_ids:
+            affected_gap_ids.add(gap.gap_id)
+        if gap.qualification.source_id in source_ids or gap.qualification.anchor_id in anchor_ids:
+            affected_gap_ids.add(gap.gap_id)
+    stop_map = state.metadata.get("stop_decisions_by_gap", {})
+    if not isinstance(stop_map, Mapping):
+        stop_map = {}
+        unknown_ids.append("metadata:stop_decisions_by_gap")
+    return {
+        "changed_source_ids": sorted(source_ids),
+        "changed_anchor_ids": sorted(anchor_ids),
+        "affected_gap_ids": sorted(affected_gap_ids),
+        "affected_stop_decision_ids": sorted(
+            str(stop_map[gap_id]) for gap_id in affected_gap_ids if gap_id in stop_map
+        ),
+        "affected_claim_use_ids": sorted(affected_claim_use_ids),
+        "unaffected_gap_ids": sorted(set(state.gap_by_id()) - affected_gap_ids),
+        "unknown_dependency_ids": sorted(set(unknown_ids)),
+        "unknown_ownership": bool(unknown_ids),
+    }
+
+
 def run_search_iteration(
     baseline: BeliefState,
     prediction: SearchOutcomePrediction,
@@ -945,6 +998,7 @@ __all__ = [
     "compare_search_outcome",
     "derive_realized_search_outcome",
     "freeze_search_outcome_prediction",
+    "affected_source_obligations",
     "revalidate_native_depth_receipt",
     "review_search_candidate",
     "rollback_search_iteration",

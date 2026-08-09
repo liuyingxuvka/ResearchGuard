@@ -1,0 +1,12 @@
+{
+  "candidate_snapshot_fingerprint": "sha256:7ae3820179907529846da072f542f0949b87ff95aeac3d48bb847e46af9e3a75",
+  "expected_head_fingerprint": "sha256:7983bb3f0617428e68f08c43c433ede60f9c67ca3ab3761b43f02de4bd1194a3",
+  "fingerprint": "sha256:3001269e8aca3859c9dba37efccfd034ec9913c698191b0dc14b57b1eb32e224",
+  "next_generation": 15,
+  "previous_snapshot_fingerprint": "sha256:b02c4827f6da6115615a34a3241b5f38ee2c5f1efdfa4a397d5bb65dc96eff93",
+  "receipt_id": "activation:software-dna-root-final6-20260809",
+  "revision_set_fingerprint": "sha256:80822007e782b19dfe05c53499d1904c1b442250c1e83f39c985931bf28acef1",
+  "schema": "flowguard.model_activation_receipt.v1",
+  "subject_revision": "source-inventory:84e9b02d658fbc67b26ece3980d7eff80074987fd19f7b7173ddffce12b6373b",
+  "system_id": "flowguard"
+}

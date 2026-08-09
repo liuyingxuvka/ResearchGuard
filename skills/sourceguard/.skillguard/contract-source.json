@@ -22,6 +22,22 @@
     ],
     "release_manifest_path": "consumer-release.json"
   },
+  "projection_consumers": [
+    {
+      "consumer_id": "projection:researchguard-suite-maintenance-definition",
+      "kind": "source_maintenance",
+      "input_selectors": [
+        {
+          "kind": "path",
+          "path": ".skillguard/test-mesh.json"
+        },
+        {
+          "kind": "path",
+          "path": "scripts/check_researchguard_test_mesh.py"
+        }
+      ]
+    }
+  ],
   "model_id": "researchguard.sourceguard.contract.current",
   "model_path": ".flowguard/sourceguard_skill_contract_model.py",
   "confirmed": true,
@@ -118,7 +134,21 @@
     "tests/source",
     "researchguard/prompt_bundle_manifest.json",
     "scripts/check_prompt_bundles.py",
-    "tests/test_prompt_bundles.py"
+    "src/researchguard/target_authority.py",
+    "src/researchguard/model_envelope.py",
+    "src/researchguard/source/owner_attestation.py",
+    "src/researchguard/source/blueprint.py",
+    "src/researchguard/source/schema.py",
+    "src/researchguard/source/graph.py",
+    "src/researchguard/source/depth.py",
+    "src/researchguard/source/guard_contract.py",
+    "src/researchguard/source/task_iteration.py",
+    "src/researchguard/source/handoff.py",
+    "src/researchguard/source/cli.py",
+    "tests/source/test_blueprint_graph.py",
+    "skills/sourceguard/references/information-blueprint.md",
+    ".skillguard/test-mesh.json",
+    "scripts/check_researchguard_test_mesh.py"
   ],
   "step_bindings": [
     {
@@ -214,6 +244,10 @@
         {
           "kind": "path",
           "path": ".flowguard/researchguard_skill_contract_model_common.py"
+        },
+        {
+          "kind": "path",
+          "path": ".flowguard/sourceguard_content_anchor_oracle_model.py"
         }
       ],
       "expected": {
@@ -253,15 +287,15 @@
         },
         {
           "kind": "path",
+          "path": "skills/sourceguard/references/information-blueprint.md"
+        },
+        {
+          "kind": "path",
           "path": "researchguard/prompt_bundle_manifest.json"
         },
         {
           "kind": "path",
           "path": "scripts/check_prompt_bundles.py"
-        },
-        {
-          "kind": "path",
-          "path": "tests/test_prompt_bundles.py"
         }
       ],
       "expected": {
@@ -306,30 +340,6 @@
           "path": "src/researchguard/source"
         },
         {
-          "kind": "path",
-          "path": ".flowguard/researchguard_suite_model.py"
-        },
-        {
-          "kind": "path",
-          "path": ".flowguard/researchguard_suite_model.json"
-        },
-        {
-          "kind": "path",
-          "path": ".flowguard/run_researchguard_suite_model.py"
-        },
-        {
-          "kind": "path",
-          "path": ".flowguard/sourceguard_content_anchor_oracle_model.py"
-        },
-        {
-          "kind": "path",
-          "path": ".flowguard/sourceguard_skill_contract_model.py"
-        },
-        {
-          "kind": "path",
-          "path": ".flowguard/researchguard_skill_contract_model_common.py"
-        },
-        {
           "kind": "subtree",
           "path": "examples/source"
         },
@@ -339,15 +349,51 @@
         },
         {
           "kind": "path",
-          "path": "researchguard/prompt_bundle_manifest.json"
+          "path": "src/researchguard/target_authority.py"
         },
         {
           "kind": "path",
-          "path": "scripts/check_prompt_bundles.py"
+          "path": "src/researchguard/model_envelope.py"
         },
         {
           "kind": "path",
-          "path": "tests/test_prompt_bundles.py"
+          "path": "src/researchguard/source/owner_attestation.py"
+        },
+        {
+          "kind": "path",
+          "path": "src/researchguard/source/blueprint.py"
+        },
+        {
+          "kind": "path",
+          "path": "src/researchguard/source/schema.py"
+        },
+        {
+          "kind": "path",
+          "path": "src/researchguard/source/graph.py"
+        },
+        {
+          "kind": "path",
+          "path": "src/researchguard/source/depth.py"
+        },
+        {
+          "kind": "path",
+          "path": "src/researchguard/source/guard_contract.py"
+        },
+        {
+          "kind": "path",
+          "path": "src/researchguard/source/task_iteration.py"
+        },
+        {
+          "kind": "path",
+          "path": "src/researchguard/source/handoff.py"
+        },
+        {
+          "kind": "path",
+          "path": "src/researchguard/source/cli.py"
+        },
+        {
+          "kind": "path",
+          "path": "tests/source/test_blueprint_graph.py"
         }
       ],
       "expected": {
@@ -365,7 +411,7 @@
         "obligation:researchguard:sourceguard:native-tests"
       ],
       "coverage_scope": "declared_obligations",
-      "coverage_rationale": "This check is the sole execution owner for its exact member obligation."
+      "coverage_rationale": "This existing member-native owner runs the complete declared member test suite once. Its exact blueprint code/test selectors cover native qualification, qualification-first impact and reverse trace, persisted fresh-process target-authority replay, and caller-forged/co-shrunk self-attestation rejection without adding duplicate execution owners. "
     },
     {
       "check_id": "check:sourceguard:task-model-closure",
@@ -419,5 +465,5 @@
     }
   ],
   "judgment_rubrics": [],
-  "claim_boundary": "This contract covers the current sourceguard consumer projection, native route, and member-owned tests inside ResearchGuard v0.4.1. It does not prove source truth, unrun external work, installation, publication, or future AI behavior."
+  "claim_boundary": "This contract covers the current sourceguard consumer projection, native route, and member-owned tests inside ResearchGuard v0.4.3. The four exact native-blueprint evidence categories are selectors of the one existing target-owned native-tests owner, so final validation does not repeat the same member suite. Distinct model obligation ids remain a later binding with the frozen FlowGuard self-DNA toolchain. It does not prove source truth, unrun external work, installed currentness, publication, or future AI behavior."
 }

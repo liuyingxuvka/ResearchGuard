@@ -1,0 +1,81 @@
+{
+  "results": [
+    {
+      "candidate_ids": [], "candidate_set_exhausted": false, "candidate_set_fingerprint": "",
+      "comparison_boundary_id": "", "conclusion": "single_clear_path", "cost_detail_evidence_fingerprint": "",
+      "cost_dimensions": [], "cost_measurements": {}, "current": true,
+      "currentness_id": "sha256:a2a0ef7d708d2540638b171a6d8655876219a1f77327d83193104a4d7b401e99",
+      "detail_evidence_fingerprint": "sha256:ccea1baa0ec797ce58ccdfb72ae747dfec1d6307137b0c0cecd2b6937d5c236d",
+      "finding_ids": [], "fingerprint": "sha256:456959f26bdfe7819344d9b6a448a887369e55bef4fda811b5f3188caa4a178c",
+      "mode": "lightweight", "necessity_witness_set_fingerprint": "sha256:26374f38c46ea9615fd98ff4846a9042eb8835b29ed95652810375703eba1018",
+      "optimization_depth": "lightweight", "producer_id": "researchguard:path-quality-observer",
+      "result_id": "result:researchguard:path-quality:researchguard_suite", "rewrite_rule_ids": [], "rewrite_set_exhausted": false,
+      "rewrite_set_fingerprint": "", "schema_version": "flowguard.model-path-quality.v2", "selected_candidate_id": "",
+      "selected_candidate_lane": "", "subject_fingerprint": "sha256:fea44b138f03e1f09f99f409b8d07f2f3df24764d8378b4a3bfdb8d2dfabc188",
+      "trigger_evidence_fingerprint": "", "trigger_ids": [], "unresolved_ids": []
+    },
+    {
+      "candidate_ids": [], "candidate_set_exhausted": false, "candidate_set_fingerprint": "",
+      "comparison_boundary_id": "", "conclusion": "single_clear_path", "cost_detail_evidence_fingerprint": "",
+      "cost_dimensions": [], "cost_measurements": {}, "current": true,
+      "currentness_id": "sha256:a2a0ef7d708d2540638b171a6d8655876219a1f77327d83193104a4d7b401e99",
+      "detail_evidence_fingerprint": "sha256:9da0f9f581002fe4165d2c0a5518af4ff86b9b231a9f70b6ed1bc8676c11f3db",
+      "finding_ids": [], "fingerprint": "sha256:8adc8e7617b4f389d27a08e44df946cbc10ed2c81f2506e28b4ad4749829abb2",
+      "mode": "lightweight", "necessity_witness_set_fingerprint": "sha256:44ddf5799310bf279c054b0b7fd5bbe9c0c498aad77c2593869ae089fe77da62",
+      "optimization_depth": "lightweight", "producer_id": "researchguard:path-quality-observer",
+      "result_id": "result:researchguard:path-quality:hierarchical_model_mesh", "rewrite_rule_ids": [], "rewrite_set_exhausted": false,
+      "rewrite_set_fingerprint": "", "schema_version": "flowguard.model-path-quality.v2", "selected_candidate_id": "",
+      "selected_candidate_lane": "", "subject_fingerprint": "sha256:ebc690c7485afbadf3eb212b6477cea885d3efdb8dc41e6f6e0973c5c4327b09",
+      "trigger_evidence_fingerprint": "", "trigger_ids": [], "unresolved_ids": []
+    },
+    {
+      "candidate_ids": [], "candidate_set_exhausted": false, "candidate_set_fingerprint": "",
+      "comparison_boundary_id": "", "conclusion": "single_clear_path", "cost_detail_evidence_fingerprint": "",
+      "cost_dimensions": [], "cost_measurements": {}, "current": true,
+      "currentness_id": "sha256:a2a0ef7d708d2540638b171a6d8655876219a1f77327d83193104a4d7b401e99",
+      "detail_evidence_fingerprint": "sha256:c5882fac46422b3ce3f5c5894e6983c30ce0a362f067e5435353b82bd8d8d57c",
+      "finding_ids": [], "fingerprint": "sha256:34ea0905f5628e7d2193b5e49c38e1eaf64c5fa6ef5a000435babcaf91c94dbe",
+      "mode": "lightweight", "necessity_witness_set_fingerprint": "sha256:cb63550f2e42906f2cb2d238f126955c957be991a14883939be6a8030fe831ae",
+      "optimization_depth": "lightweight", "producer_id": "researchguard:path-quality-observer",
+      "result_id": "result:researchguard:path-quality:model_test_code_alignment", "rewrite_rule_ids": [], "rewrite_set_exhausted": false,
+      "rewrite_set_fingerprint": "", "schema_version": "flowguard.model-path-quality.v2", "selected_candidate_id": "",
+      "selected_candidate_lane": "", "subject_fingerprint": "sha256:e6280cbef5aec923c967cc4d80011a24e907aa42a6294a8b0827f25a2c7fa46c",
+      "trigger_evidence_fingerprint": "", "trigger_ids": [], "unresolved_ids": []
+    }
+  ],
+  "subjects": [
+    {
+      "boundary_id": "boundary:researchguard:researchguard_suite", "code_fingerprint": "sha256:a5abc3bf79b1d12a6b45cc0b43d536cbb7eb5538272518bc0945a0eaeee7a819",
+      "currentness_id": "sha256:a2a0ef7d708d2540638b171a6d8655876219a1f77327d83193104a4d7b401e99", "dependency_fingerprint": "sha256:9997847e5d8499f69d45a1f38f83fcf1a7134f19a1ff3e64cd82534dd75119a2",
+      "evidence_fingerprint": "sha256:31f91fb1b1ce1bd38a0f3c75c646ddc4a463af7a430f34367ae8c981c47fda26", "fingerprint": "sha256:fea44b138f03e1f09f99f409b8d07f2f3df24764d8378b4a3bfdb8d2dfabc188",
+      "intent_fingerprint": "sha256:abb4dbccfc243299200b68555e10637707118f1478d0e674f359090e83fffc0f", "model_fingerprint": "sha256:22c0e99b10acb68027deacdd834df43949a996663835cce5edcfbcfd6b38f871",
+      "model_id": "researchguard_suite", "normalized_facts_fingerprint": "sha256:64cabfec8493c4ac02bb1e29034485403e11c6bb2dbc519e0883f60bcf8642ce",
+      "obligation_fingerprint": "sha256:9e2376727f0f571875196e0f291a91c41fb49bb22262a4a4a4d8eb46b2b5d95d", "oracle_fingerprint": "sha256:7fa70ec0fd65671e8d8b726f7b29b5a275a0e941d4a1542aade7c327905d37c5",
+      "provider_fingerprint": "sha256:14e9208f4a8b32e83be6be90deee18a8d9f5e65a5bc843bf491880cfee4a91ba", "purpose_fingerprint": "sha256:710aaa21bc951e944979799ca57b740e9f6d698567fe25b7021b00e489fad8da",
+      "retained_element_inventory_fingerprint": "sha256:eb33cf8244da380da5bd252add446d6abd24c5930ae566d37393ce6631560d3f", "schema_version": "flowguard.model-path-quality.v2",
+      "test_fingerprint": "sha256:887ef0e840d0f50dfae0e28d21924f7b84a3004e08407a21090a85b49c27f761"
+    },
+    {
+      "boundary_id": "boundary:researchguard:hierarchical_model_mesh", "code_fingerprint": "sha256:8bf68ee1a39276902c594dc8d0e6b91ae9949fd56f11d08e3653e1e70839ae81",
+      "currentness_id": "sha256:a2a0ef7d708d2540638b171a6d8655876219a1f77327d83193104a4d7b401e99", "dependency_fingerprint": "sha256:e4efbc97629e8857c004bae1e54ab73fe0f7e1d2b2d22c5d704a112a8c7ad451",
+      "evidence_fingerprint": "sha256:31f91fb1b1ce1bd38a0f3c75c646ddc4a463af7a430f34367ae8c981c47fda26", "fingerprint": "sha256:ebc690c7485afbadf3eb212b6477cea885d3efdb8dc41e6f6e0973c5c4327b09",
+      "intent_fingerprint": "sha256:76a1354b8627cadfde9c9feaffd7dbaa517c438a9d3e7bf9a1219f1ab87aed2f", "model_fingerprint": "sha256:092d363e6a5a70cb35e6e10366f55cc17e0683bfad7ec6dffa49cbe0e9724426",
+      "model_id": "hierarchical_model_mesh", "normalized_facts_fingerprint": "sha256:eee04451b989c71e290a41ab6a2d5d0ea785e9cd07a733a59b795c2cce49ee7b",
+      "obligation_fingerprint": "sha256:f873445ba4827994077258f829bc404e7c2cc186dad2c29c0dada74b7fce04e8", "oracle_fingerprint": "sha256:81acb2cb2f74afbb961eed68dc08636fb5dbd4fc0ce92576ae908acf225da2c1",
+      "provider_fingerprint": "sha256:11d7dcbbd95f565abab9570be3a06ce6fe6f712bad470b73227b18fa89e3a98b", "purpose_fingerprint": "sha256:f0838bed0eccb4e642d0f465dbb8e9aa0fa9e52b5a721ad0b2d0e2cf053a81d7",
+      "retained_element_inventory_fingerprint": "sha256:b0b1d9f30f5b7128f2a6cb2a36aadc204e1c74f22e275533b1f1de8b3c8d3cb9", "schema_version": "flowguard.model-path-quality.v2",
+      "test_fingerprint": "sha256:8adba287d6a0f4726a4412003d42e569aa3624a4aea5f7ceb4e64562c71ca304"
+    },
+    {
+      "boundary_id": "boundary:researchguard:model_test_code_alignment", "code_fingerprint": "sha256:9e7f6c574e44cbe13fedba17cb10504dde9673b904d49bcaac11d552d75d8419",
+      "currentness_id": "sha256:a2a0ef7d708d2540638b171a6d8655876219a1f77327d83193104a4d7b401e99", "dependency_fingerprint": "sha256:230fc8ae5d546d48534ba6cb4624bf6c67faaeb2a0776050b2f733c646891db3",
+      "evidence_fingerprint": "sha256:31f91fb1b1ce1bd38a0f3c75c646ddc4a463af7a430f34367ae8c981c47fda26", "fingerprint": "sha256:e6280cbef5aec923c967cc4d80011a24e907aa42a6294a8b0827f25a2c7fa46c",
+      "intent_fingerprint": "sha256:b55710fccef36a0898fe7d5c8779b5133c82b19605584543abf6a19c62149f70", "model_fingerprint": "sha256:7866482485fb016c14a4604b312bcf420567cbfb1ab9f601481fc54ca84b8c33",
+      "model_id": "model_test_code_alignment", "normalized_facts_fingerprint": "sha256:21dcb23f08823b5ce48fbf79f9edf6075b5964e56f8de92a1ce49e34e4540e08",
+      "obligation_fingerprint": "sha256:9e10ac168e80490be1c2f8697a548ff28476a1cfaf747ae0527e15fc9ca07539", "oracle_fingerprint": "sha256:37b77d01029b7d07994603ab88054809c84c147dc267a33aa789693f33e8b2ab",
+      "provider_fingerprint": "sha256:4efa7c1fb5d8f202be11625b479f0765c5833d92477172f396ce835f69d3d100", "purpose_fingerprint": "sha256:5adf8c58d3a02abc46f80e81219d8c9daacd82a49a9e419de7c85055c5984ff3",
+      "retained_element_inventory_fingerprint": "sha256:aa225c51097a14648c96fed06b9875cdf5c4b0ebdbd088cbd31fe064adce1c2a", "schema_version": "flowguard.model-path-quality.v2",
+      "test_fingerprint": "sha256:8adba287d6a0f4726a4412003d42e569aa3624a4aea5f7ceb4e64562c71ca304"
+    }
+  ]
+}

@@ -10,8 +10,10 @@ Boundary: Dataclasses validate structure; they do not establish factual truth.
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from typing import Any
+from dataclasses import asdict, dataclass, field
+import hashlib
+import json
+from typing import Any, Mapping
 
 
 SCHEMA_ID = "researchguard.trace.model.v2"
@@ -43,6 +45,15 @@ VALIDATION_STATUSES = {
     "insufficient",
     "unknown",
 }
+TRACE_INTERFACE_DISPOSITIONS = {"consumed", "unresolved", "excluded"}
+TRACE_INTERFACE_PAIRS = {
+    ("source", "evidence_fact"),
+    ("evidence_fact", "event"),
+    ("event", "trace"),
+    ("trace", "hypothesis"),
+    ("hypothesis", "bounded_claim"),
+    ("hypothesis", "handoff"),
+}
 
 
 class SchemaError(ValueError):
@@ -71,6 +82,51 @@ def list_of_strings(value: Any) -> list[str]:
     return value
 
 
+def optional_sha256(value: Any, field_name: str) -> str:
+    text = "" if value is None else str(value)
+    if text and (not text.startswith("sha256:") or len(text) != 71):
+        raise SchemaError(f"{field_name} must be a sha256: fingerprint")
+    return text
+
+
+def semantic_object_fingerprint(value: Any) -> str:
+    """Fingerprint one native object's semantic fields, excluding display labels."""
+
+    payload = asdict(value)
+    payload.pop("object_fingerprint", None)
+    payload.pop("title", None)
+    payload.pop("notes", None)
+    body = json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+    return "sha256:" + hashlib.sha256(body.encode("utf-8")).hexdigest()
+
+
+def trace_model_fingerprint(model: "TraceGuardModel") -> str:
+    payload = asdict(model)
+    metadata = dict(payload.get("metadata", {}))
+    metadata.pop("display", None)
+    for key in list(metadata):
+        if str(key).startswith("display_"):
+            metadata.pop(key)
+    payload["metadata"] = metadata
+    body = json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+    return hashlib.sha256(body.encode("utf-8")).hexdigest()
+
+
+def trace_interface_model_fingerprint(model: "TraceGuardModel") -> str:
+    """Fingerprint the native producer model without interface receipt recursion."""
+
+    payload = asdict(model)
+    payload["interface_bindings"] = []
+    metadata = dict(payload.get("metadata", {}))
+    metadata.pop("display", None)
+    for key in list(metadata):
+        if str(key).startswith("display_") or str(key).startswith("guard_purpose"):
+            metadata.pop(key)
+    payload["metadata"] = metadata
+    body = json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+    return "sha256:" + hashlib.sha256(body.encode("utf-8")).hexdigest()
+
+
 @dataclass(frozen=True)
 class SourceRecord:
     source_id: str
@@ -89,6 +145,14 @@ class SourceRecord:
     language: str | None = None
     country: str | None = None
     notes: str | None = None
+    object_fingerprint: str = ""
+    source_revision: str = ""
+    content_fingerprint: str = ""
+    locator: str = ""
+    provider_id: str = ""
+    provider_revision: str = ""
+    retrieval_request_fingerprint: str = ""
+    unconsumed_output_disposition: str = ""
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "SourceRecord":
@@ -119,6 +183,17 @@ class SourceRecord:
             language=data.get("language"),
             country=data.get("country"),
             notes=data.get("notes"),
+            object_fingerprint=optional_sha256(data.get("object_fingerprint"), "source.object_fingerprint"),
+            source_revision=str(data.get("source_revision", "")),
+            content_fingerprint=optional_sha256(data.get("content_fingerprint"), "source.content_fingerprint"),
+            locator=str(data.get("locator", "")),
+            provider_id=str(data.get("provider_id", "")),
+            provider_revision=str(data.get("provider_revision", "")),
+            retrieval_request_fingerprint=optional_sha256(
+                data.get("retrieval_request_fingerprint"),
+                "source.retrieval_request_fingerprint",
+            ),
+            unconsumed_output_disposition=str(data.get("unconsumed_output_disposition", "")),
         )
 
 
@@ -142,6 +217,16 @@ class EvidenceItem:
     usable_as_trace_evidence: bool | None = None
     usable_as_project_evidence: bool | None = None
     importance: float = 0.5
+    object_fingerprint: str = ""
+    source_revision: str = ""
+    content_fingerprint: str = ""
+    normalizer_id: str = ""
+    normalizer_revision: str = ""
+    normalizer_fingerprint: str = ""
+    extractor_id: str = ""
+    extractor_revision: str = ""
+    extractor_fingerprint: str = ""
+    unconsumed_output_disposition: str = ""
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "EvidenceItem":
@@ -164,6 +249,16 @@ class EvidenceItem:
             warnings=list_of_strings(data.get("warnings", [])),
             usable_as_trace_evidence=data.get("usable_as_trace_evidence", data.get("usable_as_project_evidence")),
             usable_as_project_evidence=data.get("usable_as_project_evidence"),
+            object_fingerprint=optional_sha256(data.get("object_fingerprint"), "evidence.object_fingerprint"),
+            source_revision=str(data.get("source_revision", "")),
+            content_fingerprint=optional_sha256(data.get("content_fingerprint"), "evidence.content_fingerprint"),
+            normalizer_id=str(data.get("normalizer_id", "")),
+            normalizer_revision=str(data.get("normalizer_revision", "")),
+            normalizer_fingerprint=optional_sha256(data.get("normalizer_fingerprint"), "evidence.normalizer_fingerprint"),
+            extractor_id=str(data.get("extractor_id", "")),
+            extractor_revision=str(data.get("extractor_revision", "")),
+            extractor_fingerprint=optional_sha256(data.get("extractor_fingerprint"), "evidence.extractor_fingerprint"),
+            unconsumed_output_disposition=str(data.get("unconsumed_output_disposition", "")),
         )
 
 
@@ -179,6 +274,7 @@ class EntityMention:
     role: str | None = None
     confidence: float = 0.5
     notes: str | None = None
+    unconsumed_output_disposition: str = ""
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "EntityMention":
@@ -193,6 +289,7 @@ class EntityMention:
             role=data.get("role"),
             confidence=require01(data.get("confidence", 0.5), "entity.confidence"),
             notes=data.get("notes"),
+            unconsumed_output_disposition=str(data.get("unconsumed_output_disposition", "")),
         )
 
 
@@ -204,6 +301,7 @@ class EntityResolution:
     score: float
     reasons: list[str] = field(default_factory=list)
     blockers: list[str] = field(default_factory=list)
+    unconsumed_output_disposition: str = ""
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "EntityResolution":
@@ -217,6 +315,7 @@ class EntityResolution:
             score=require01(data.get("score", 0.0), "entity_resolution.score"),
             reasons=list_of_strings(data.get("reasons", [])),
             blockers=list_of_strings(data.get("blockers", [])),
+            unconsumed_output_disposition=str(data.get("unconsumed_output_disposition", "")),
         )
 
 
@@ -259,6 +358,7 @@ class LocationMention:
     geocoding_precision: str | None = None
     confidence: float = 0.5
     notes: str | None = None
+    unconsumed_output_disposition: str = ""
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "LocationMention":
@@ -277,6 +377,7 @@ class LocationMention:
             geocoding_precision=data.get("geocoding_precision"),
             confidence=require01(data.get("confidence", 0.5), "location.confidence"),
             notes=data.get("notes"),
+            unconsumed_output_disposition=str(data.get("unconsumed_output_disposition", "")),
         )
 
 
@@ -297,6 +398,12 @@ class EventCandidate:
     extraction_confidence: float = 0.5
     extraction_notes: str | None = None
     importance: float = 0.5
+    object_fingerprint: str = ""
+    extractor_id: str = ""
+    extractor_revision: str = ""
+    extractor_fingerprint: str = ""
+    unresolved_input_disposition: str = ""
+    unconsumed_output_disposition: str = ""
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "EventCandidate":
@@ -324,6 +431,12 @@ class EventCandidate:
             ),
             importance=require01(data.get("importance", 0.5), "event.importance"),
             extraction_notes=data.get("extraction_notes"),
+            object_fingerprint=optional_sha256(data.get("object_fingerprint"), "event.object_fingerprint"),
+            extractor_id=str(data.get("extractor_id", "")),
+            extractor_revision=str(data.get("extractor_revision", "")),
+            extractor_fingerprint=optional_sha256(data.get("extractor_fingerprint"), "event.extractor_fingerprint"),
+            unresolved_input_disposition=str(data.get("unresolved_input_disposition", "")),
+            unconsumed_output_disposition=str(data.get("unconsumed_output_disposition", "")),
         )
 
 
@@ -346,6 +459,12 @@ class TraceCandidate:
     downstream_consumer: str | None = None
     notes: str | None = None
     importance: float = 0.5
+    object_fingerprint: str = ""
+    normalizer_id: str = ""
+    normalizer_revision: str = ""
+    normalizer_fingerprint: str = ""
+    unresolved_input_disposition: str = ""
+    unconsumed_output_disposition: str = ""
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "TraceCandidate":
@@ -378,6 +497,12 @@ class TraceCandidate:
             conclusion_transfer_status=data.get("conclusion_transfer_status"),
             downstream_consumer=data.get("downstream_consumer"),
             notes=data.get("notes"),
+            object_fingerprint=optional_sha256(data.get("object_fingerprint"), "trace.object_fingerprint"),
+            normalizer_id=str(data.get("normalizer_id", "")),
+            normalizer_revision=str(data.get("normalizer_revision", "")),
+            normalizer_fingerprint=optional_sha256(data.get("normalizer_fingerprint"), "trace.normalizer_fingerprint"),
+            unresolved_input_disposition=str(data.get("unresolved_input_disposition", "")),
+            unconsumed_output_disposition=str(data.get("unconsumed_output_disposition", "")),
         )
 
 
@@ -399,6 +524,14 @@ class StorylineHypothesis:
     bounded_non_causal: bool = False
     alternative_out_of_scope_reason: str | None = None
     downstream_consumers: list[str] = field(default_factory=list)
+    bounded_claim_ids: list[str] = field(default_factory=list)
+    handoff_ids: list[str] = field(default_factory=list)
+    object_fingerprint: str = ""
+    normalizer_id: str = ""
+    normalizer_revision: str = ""
+    normalizer_fingerprint: str = ""
+    unresolved_input_disposition: str = ""
+    unconsumed_output_disposition: str = ""
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "StorylineHypothesis":
@@ -436,6 +569,14 @@ class StorylineHypothesis:
             bounded_non_causal=bool(data.get("bounded_non_causal", False)),
             alternative_out_of_scope_reason=data.get("alternative_out_of_scope_reason"),
             downstream_consumers=list_of_strings(data.get("downstream_consumers", [])),
+            bounded_claim_ids=list_of_strings(data.get("bounded_claim_ids", [])),
+            handoff_ids=list_of_strings(data.get("handoff_ids", [])),
+            object_fingerprint=optional_sha256(data.get("object_fingerprint"), "hypothesis.object_fingerprint"),
+            normalizer_id=str(data.get("normalizer_id", "")),
+            normalizer_revision=str(data.get("normalizer_revision", "")),
+            normalizer_fingerprint=optional_sha256(data.get("normalizer_fingerprint"), "hypothesis.normalizer_fingerprint"),
+            unresolved_input_disposition=str(data.get("unresolved_input_disposition", "")),
+            unconsumed_output_disposition=str(data.get("unconsumed_output_disposition", "")),
         )
 
 
@@ -446,6 +587,7 @@ class CausalMechanism:
     description: str
     evidence_ids: list[str] = field(default_factory=list)
     declared_relevance: float = 0.5
+    unconsumed_output_disposition: str = ""
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "CausalMechanism":
@@ -463,6 +605,7 @@ class CausalMechanism:
                 data.get("declared_relevance", 0.5),
                 "mechanism.declared_relevance",
             ),
+            unconsumed_output_disposition=str(data.get("unconsumed_output_disposition", "")),
         )
 
 
@@ -474,6 +617,7 @@ class ConfounderReview:
     status: str = "unresolved"
     evidence_ids: list[str] = field(default_factory=list)
     importance: float = 0.5
+    unconsumed_output_disposition: str = ""
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "ConfounderReview":
@@ -487,6 +631,7 @@ class ConfounderReview:
             status=status,
             evidence_ids=list_of_strings(data.get("evidence_ids", [])),
             importance=require01(data.get("importance", 0.5), "confounder.importance"),
+            unconsumed_output_disposition=str(data.get("unconsumed_output_disposition", "")),
         )
 
 
@@ -498,6 +643,7 @@ class HypothesisEvidenceLink:
     polarity: str
     declared_relevance: float = 1.0
     rationale: str | None = None
+    unconsumed_output_disposition: str = ""
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "HypothesisEvidenceLink":
@@ -514,6 +660,7 @@ class HypothesisEvidenceLink:
                 "hypothesis_evidence_link.declared_relevance",
             ),
             rationale=data.get("rationale"),
+            unconsumed_output_disposition=str(data.get("unconsumed_output_disposition", "")),
         )
 
 
@@ -524,6 +671,7 @@ class HypothesisRelation:
     right_hypothesis_id: str
     relation: str
     evidence_ids: list[str] = field(default_factory=list)
+    unconsumed_output_disposition: str = ""
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "HypothesisRelation":
@@ -536,6 +684,7 @@ class HypothesisRelation:
             right_hypothesis_id=str(data["right_hypothesis_id"]),
             relation=relation,
             evidence_ids=list_of_strings(data.get("evidence_ids", [])),
+            unconsumed_output_disposition=str(data.get("unconsumed_output_disposition", "")),
         )
 
 
@@ -547,6 +696,7 @@ class CausalScope:
     time_window: str | None = None
     location_ids: list[str] = field(default_factory=list)
     boundary_conditions: list[str] = field(default_factory=list)
+    unconsumed_output_disposition: str = ""
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "CausalScope":
@@ -559,6 +709,7 @@ class CausalScope:
             boundary_conditions=list_of_strings(
                 data.get("boundary_conditions", [])
             ),
+            unconsumed_output_disposition=str(data.get("unconsumed_output_disposition", "")),
         )
 
 
@@ -572,6 +723,7 @@ class CausalCandidate:
     confounder_ids: list[str] = field(default_factory=list)
     alternative_hypothesis_ids: list[str] = field(default_factory=list)
     scope_id: str | None = None
+    unconsumed_output_disposition: str = ""
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "CausalCandidate":
@@ -598,6 +750,7 @@ class CausalCandidate:
                 data.get("alternative_hypothesis_ids", [])
             ),
             scope_id=data.get("scope_id"),
+            unconsumed_output_disposition=str(data.get("unconsumed_output_disposition", "")),
         )
 
 
@@ -610,6 +763,7 @@ class EvidenceAblation:
     remove_evidence_ids: list[str] = field(default_factory=list)
     remove_event_ids: list[str] = field(default_factory=list)
     importance: float = 0.5
+    unconsumed_output_disposition: str = ""
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "EvidenceAblation":
@@ -625,6 +779,7 @@ class EvidenceAblation:
             remove_evidence_ids=list_of_strings(data.get("remove_evidence_ids", [])),
             remove_event_ids=list_of_strings(data.get("remove_event_ids", [])),
             importance=require01(data.get("importance", 0.5), "ablation.importance"),
+            unconsumed_output_disposition=str(data.get("unconsumed_output_disposition", "")),
         )
 
 
@@ -639,6 +794,7 @@ class ScenarioPerturbation:
     add_evidence_ids: list[str] = field(default_factory=list)
     add_event_ids: list[str] = field(default_factory=list)
     importance: float = 0.5
+    unconsumed_output_disposition: str = ""
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "ScenarioPerturbation":
@@ -661,6 +817,7 @@ class ScenarioPerturbation:
                 data.get("importance", 0.5),
                 "scenario_perturbation.importance",
             ),
+            unconsumed_output_disposition=str(data.get("unconsumed_output_disposition", "")),
         )
 
 
@@ -673,6 +830,7 @@ class ExpectedSensitivity:
     expected_direction: str
     minimum_absolute_change: float = 0.0
     rationale: str | None = None
+    unconsumed_output_disposition: str = ""
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "ExpectedSensitivity":
@@ -691,7 +849,149 @@ class ExpectedSensitivity:
             expected_direction=direction,
             minimum_absolute_change=minimum_change,
             rationale=data.get("rationale"),
+            unconsumed_output_disposition=str(data.get("unconsumed_output_disposition", "")),
         )
+
+
+@dataclass(frozen=True)
+class TraceInterfaceReceiptRef:
+    receipt_id: str
+    producer_kind: str
+    producer_id: str
+    result_fingerprint: str
+    model_fingerprint: str
+    task_id: str
+    status: str
+    receipt_fingerprint: str
+
+    def __post_init__(self) -> None:
+        if not all(
+            str(value).strip()
+            for value in (
+                self.receipt_id,
+                self.producer_kind,
+                self.producer_id,
+                self.task_id,
+            )
+        ):
+            raise SchemaError("trace interface receipt requires producer, result, model, and task identities")
+        for name, value in (
+            ("result_fingerprint", self.result_fingerprint),
+            ("model_fingerprint", self.model_fingerprint),
+            ("receipt_fingerprint", self.receipt_fingerprint),
+        ):
+            if not value.startswith("sha256:") or len(value) != 71:
+                raise SchemaError(f"trace interface receipt {name} must be an exact sha256 fingerprint")
+        if self.status not in {"current", "stale", "failed", "not_run"}:
+            raise SchemaError("trace interface receipt status is not current")
+
+    @property
+    def expected_fingerprint(self) -> str:
+        payload = self.to_dict()
+        payload.pop("receipt_fingerprint", None)
+        body = json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+        return "sha256:" + hashlib.sha256(body.encode("utf-8")).hexdigest()
+
+    @classmethod
+    def from_dict(cls, data: Mapping[str, Any]) -> "TraceInterfaceReceiptRef":
+        allowed = {
+            "receipt_id", "producer_kind", "producer_id", "result_fingerprint",
+            "model_fingerprint", "task_id", "status", "receipt_fingerprint",
+        }
+        if set(data) != allowed:
+            raise SchemaError("trace interface receipt contains unknown or missing current fields")
+        return cls(**{key: str(data.get(key, "")) for key in allowed})
+
+    def to_dict(self) -> dict[str, str]:
+        return asdict(self)
+
+
+@dataclass(frozen=True)
+class TraceInterfaceBinding:
+    binding_id: str
+    producer_kind: str
+    producer_id: str
+    consumer_kind: str
+    consumer_id: str
+    payload_schema_id: str
+    producer_object_fingerprint: str
+    consumer_object_fingerprint: str
+    receipt_refs: tuple[TraceInterfaceReceiptRef, ...] = ()
+    disposition: str = "consumed"
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> "TraceInterfaceBinding":
+        allowed = {
+            "binding_id", "producer_kind", "producer_id", "consumer_kind", "consumer_id",
+            "payload_schema_id", "producer_object_fingerprint", "consumer_object_fingerprint",
+            "receipt_refs", "disposition",
+        }
+        unknown = sorted(set(data) - allowed)
+        if unknown:
+            raise SchemaError(f"trace_interface contains unknown current-schema fields {unknown!r}")
+        pair = (str(data.get("producer_kind", "")), str(data.get("consumer_kind", "")))
+        if pair not in TRACE_INTERFACE_PAIRS:
+            raise SchemaError(f"invalid trace interface producer/consumer pair {pair!r}")
+        disposition = str(data.get("disposition", "consumed"))
+        if disposition not in TRACE_INTERFACE_DISPOSITIONS:
+            raise SchemaError(f"invalid trace interface disposition {disposition!r}")
+        binding_id = str(data.get("binding_id", ""))
+        producer_id = str(data.get("producer_id", ""))
+        consumer_id = str(data.get("consumer_id", ""))
+        payload_schema_id = str(data.get("payload_schema_id", ""))
+        if not all((binding_id, producer_id, consumer_id, payload_schema_id)):
+            raise SchemaError("trace interface requires stable binding, endpoint, and payload identities")
+        raw_receipts = data.get("receipt_refs", [])
+        if not isinstance(raw_receipts, (list, tuple)) or any(
+            not isinstance(item, Mapping) for item in raw_receipts
+        ):
+            raise SchemaError("trace_interface.receipt_refs must be a list of current receipt objects")
+        return cls(
+            binding_id=binding_id,
+            producer_kind=pair[0],
+            producer_id=producer_id,
+            consumer_kind=pair[1],
+            consumer_id=consumer_id,
+            payload_schema_id=payload_schema_id,
+            producer_object_fingerprint=optional_sha256(
+                data.get("producer_object_fingerprint"),
+                "trace_interface.producer_object_fingerprint",
+            ),
+            consumer_object_fingerprint=optional_sha256(
+                data.get("consumer_object_fingerprint"),
+                "trace_interface.consumer_object_fingerprint",
+            ),
+            receipt_refs=tuple(
+                TraceInterfaceReceiptRef.from_dict(item)
+                for item in raw_receipts
+            ),
+            disposition=disposition,
+        )
+
+
+def trace_interface_payload_fingerprint(
+    model: "TraceGuardModel", binding: TraceInterfaceBinding
+) -> str:
+    body = json.dumps(
+        {
+            "binding_id": binding.binding_id,
+            "producer_kind": binding.producer_kind,
+            "producer_id": binding.producer_id,
+            "consumer_kind": binding.consumer_kind,
+            "consumer_id": binding.consumer_id,
+            "payload_schema_id": binding.payload_schema_id,
+            "producer_object_fingerprint": trace_interface_endpoint_fingerprint(
+                model, binding.producer_kind, binding.producer_id
+            ),
+            "consumer_object_fingerprint": trace_interface_endpoint_fingerprint(
+                model, binding.consumer_kind, binding.consumer_id
+            ),
+        },
+        sort_keys=True,
+        separators=(",", ":"),
+        ensure_ascii=False,
+    )
+    return "sha256:" + hashlib.sha256(body.encode("utf-8")).hexdigest()
 
 
 @dataclass(frozen=True)
@@ -714,6 +1014,7 @@ class TraceGuardModel:
     evidence_ablations: tuple[EvidenceAblation, ...] = ()
     scenario_perturbations: tuple[ScenarioPerturbation, ...] = ()
     expected_sensitivities: tuple[ExpectedSensitivity, ...] = ()
+    interface_bindings: tuple[TraceInterfaceBinding, ...] = ()
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "TraceGuardModel":
@@ -744,6 +1045,7 @@ class TraceGuardModel:
             "evidence_ablations",
             "scenario_perturbations",
             "expected_sensitivities",
+            "interface_bindings",
         }
         retired = {
             "predicates",
@@ -839,6 +1141,10 @@ class TraceGuardModel:
                 ExpectedSensitivity.from_dict(item)
                 for item in data.get("expected_sensitivities", [])
             ),
+            interface_bindings=tuple(
+                TraceInterfaceBinding.from_dict(item)
+                for item in data.get("interface_bindings", [])
+            ),
         )
 
     @staticmethod
@@ -871,3 +1177,68 @@ class TraceGuardModel:
 
     def entity_by_id(self) -> dict[str, EntityMention]:
         return {item.mention_id: item for item in self.entities}
+
+    def trace_by_id(self) -> dict[str, TraceCandidate]:
+        return {item.trace_id: item for item in self.traces}
+
+    def hypothesis_by_id(self) -> dict[str, StorylineHypothesis]:
+        return {item.hypothesis_id: item for item in self.storyline_hypotheses}
+
+    def interface_by_id(self) -> dict[str, TraceInterfaceBinding]:
+        return {item.binding_id: item for item in self.interface_bindings}
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        for hypothesis in payload["storyline_hypotheses"]:
+            hypothesis.pop("evidence_ids", None)
+            hypothesis.pop("contradicting_evidence_ids", None)
+            hypothesis.pop("alternative_to", None)
+        return payload
+
+
+def trace_interface_endpoint_fingerprint(
+    model: TraceGuardModel,
+    kind: str,
+    object_id: str,
+) -> str:
+    """Return the current semantic identity consumed at one typed interface endpoint."""
+
+    native_by_kind = {
+        "source": model.source_by_id(),
+        "evidence_fact": model.evidence_by_id(),
+        "event": model.event_by_id(),
+        "trace": model.trace_by_id(),
+        "hypothesis": model.hypothesis_by_id(),
+    }
+    if kind in native_by_kind:
+        row = native_by_kind[kind].get(object_id)
+        return str(getattr(row, "object_fingerprint", "")) if row is not None else ""
+    if kind in {"bounded_claim", "handoff"}:
+        owner = next(
+            (
+                hypothesis
+                for hypothesis in model.storyline_hypotheses
+                if object_id
+                in (
+                    hypothesis.bounded_claim_ids
+                    if kind == "bounded_claim"
+                    else hypothesis.handoff_ids
+                )
+            ),
+            None,
+        )
+        if owner is None or not owner.object_fingerprint:
+            return ""
+        body = json.dumps(
+            {
+                "kind": kind,
+                "object_id": object_id,
+                "hypothesis_id": owner.hypothesis_id,
+                "hypothesis_object_fingerprint": owner.object_fingerprint,
+            },
+            sort_keys=True,
+            separators=(",", ":"),
+            ensure_ascii=False,
+        )
+        return "sha256:" + hashlib.sha256(body.encode("utf-8")).hexdigest()
+    return ""

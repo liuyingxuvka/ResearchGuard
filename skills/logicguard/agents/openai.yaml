@@ -1,4 +1,4 @@
 interface:
   display_name: "LogicGuard"
   short_description: "Audit and deepen argument structure"
-  default_prompt: "Use $logicguard by selecting one current internal route and loading only its declared references; trigger the existing strict prediction/depth/holdout loop only for non-trivial, broad, predictive, contradictory, model-miss, repeated-failure, or open-gap work, and never close while a native gap remains."
+  default_prompt: "Use $logicguard by selecting one current route and only its declared references. For domain blueprints keep external target admission separate from LogicGuard-native parsing; persistently replay the anchor, request, raw artifact, and immutable receipt locators/hashes without treating cache as authority. Direct unadmitted use is unverified, a different target needs a separate anchor, and no generic issuer or inline candidate-authoring path exists. This is member-domain DNA; the sole ResearchGuard repository software-DNA root is FlowGuard-owned."

@@ -47,6 +47,10 @@ direct ExperimentGuard request bypasses umbrella admission.
 
 ## Conditional Task-Local Experiment Iteration
 
+For explicit blueprint qualification, impact, trace, or export, use `route:experiment-blueprint` and read `references/experiment-model-protocol.md`. It is member-domain DNA; the ResearchGuard repository software-DNA root is FlowGuard-owned. Ordinary recommendations do not load it.
+
+External admission fixes the target and denominator before ExperimentGuard-native parsing. Replay persistent anchor and immutable-receipt hashes; cache is not authority. Direct use is unverified, and a different target needs a separate anchor. There is no generic issuer or inline candidate-authoring path.
+
 Trigger the existing task-local loop only when a recommendation is part of a
 larger non-trivial research task, a real observation arrives, the prediction
 matrix misses, an addressable discrimination gap remains, or the user requests

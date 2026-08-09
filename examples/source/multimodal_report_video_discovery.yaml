@@ -24,13 +24,23 @@ guard_contract:
     - gap-pdf-page
     - gap-visual
     target_unit_ids: []
+    source_role_ids:
+    - source-role:gap-pdf-page:independent_report
+    - source-role:gap-pdf-page:primary_source
+    - source-role:gap-visual:visual_evidence
+    lineage_slot_ids: []
+    anchor_requirement_ids:
+    - anchor-figure
+    - anchor-report-page
+    - anchor-video-segment
+    handoff_ids: []
   claim_boundary: Multimodal anchors need locators and supplied extraction input; SourceGuard does not perform OCR or media
     understanding.
   native_oracle_catalog_fingerprint: 2C01D891559625D9123F17E817B63B3E4E9323CA1C3EB81923B82D7DBDC79B15
   purpose_frozen: true
   purpose_freeze_sequence: 1
   candidate_construction_sequence: 2
-candidate_contract_fingerprint: 9CA840CE36EA3F0CEAF5EFFB04575FC089F30F31DB2D775999783E5F8A0D82B0
+candidate_contract_fingerprint: 1362BCD921224B29D591CA9C720BC97FD63FF60339DB0D36526D6E96A1586457
 metadata:
   purpose: Model report, image, and video source discovery needs without fake extraction.
   repository: https://github.com/liuyingxuvka/ResearchGuard

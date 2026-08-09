@@ -13,6 +13,7 @@ Read `references/source-model-protocol.md` under `route:source-model` for every 
 
 ## Conditional depth map
 
+- `route:information-blueprint`: explicit information-DNA, target-unit hierarchy, typed graph qualification, affected-only impact, reverse trace, or deterministic export → read `references/information-blueprint.md`. This is SourceGuard member-domain DNA; the sole ResearchGuard repository software-DNA root is FlowGuard-owned.
 - `trigger:retrieval-workflow`: plan or execute retrieval, qualify provider observations, update semantic state, or export a handoff → read `references/retrieval-workflow.md`.
 - `trigger:task-iteration`: a real observation will test a predicted search action, a model miss appears, or an addressable gap remains → read `references/task-iteration.md`.
 - `trigger:broad-depth-closure`: broad, complete, deep, final, high-impact, or gap-closure wording → read `references/broad-depth-and-closure.md`.
@@ -31,6 +32,10 @@ Use for source-role planning, evidence discovery, retrieval, provenance, lineage
 Search result is not evidence; source candidate is not evidence; locator is not semantic support; utility is not truth probability. An aggregate or neighboring receipt is not proof of an individual SourceGuard obligation. Each obligation needs its exact `evidence_ref`, bound to the current artifact with a lowercase content hash. Broad closure requires the current SourceGuard-owned purpose proof, depth receipt, complete target-unit/gap universe, per-gap direct/independent/counter coverage, lineage and content-bearing anchors, and no unresolved critical native gap. Planning-only, provider-unavailable, bounded, stale, skipped, or inaccessible work remains visible.
 
 Task-local closure is only `model_closed_for_task`. Other current terminals include `continue_iteration`, `progress_stalled`, `iteration_limit`, `external_input_required`, `provider_access_required`, and `finite_action_exhausted`. AI cannot close by reporting that it understands the source problem.
+
+For an information blueprint, SourceGuard's guard-contract/target parser must replay one externally admitted expected-target anchor, its persisted exact request contract, and raw target-tree bytes on issuance and serialized reload. It never copies the submitted graph/universe or process memory into authority. Every qualifying receipt is resolved from immutable bytes against its exact producer/version, signature algorithm, signing key, public key, and producer descriptor; co-shrunk rows, caller-invented receipts, and member-authored replacements cannot qualify, and a different target needs its own external anchor.
+
+Anchor and receipt locators and hashes are persistent evidence, not cache entries. Direct blueprint use without external admission remains unverified. SourceGuard exposes no public or generic target, attestation, or receipt issuer and no inline candidate-authoring shortcut.
 
 ## Output
 

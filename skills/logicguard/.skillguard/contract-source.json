@@ -22,6 +22,22 @@
     ],
     "release_manifest_path": "consumer-release.json"
   },
+  "projection_consumers": [
+    {
+      "consumer_id": "projection:researchguard-suite-maintenance-definition",
+      "kind": "source_maintenance",
+      "input_selectors": [
+        {
+          "kind": "path",
+          "path": ".skillguard/test-mesh.json"
+        },
+        {
+          "kind": "path",
+          "path": "scripts/check_researchguard_test_mesh.py"
+        }
+      ]
+    }
+  ],
   "model_id": "researchguard.logicguard.contract.current",
   "model_path": ".flowguard/logicguard_skill_contract_model.py",
   "confirmed": true,
@@ -118,7 +134,23 @@
     "tests/logic",
     "researchguard/prompt_bundle_manifest.json",
     "scripts/check_prompt_bundles.py",
-    "tests/test_prompt_bundles.py"
+    "src/researchguard/target_authority.py",
+    "src/researchguard/model_envelope.py",
+    "src/researchguard/logic/owner_attestation.py",
+    "src/researchguard/logic/artifact_inventory.py",
+    "src/researchguard/logic/blueprint.py",
+    "src/researchguard/logic/model.py",
+    "src/researchguard/logic/validator.py",
+    "src/researchguard/logic/hierarchy.py",
+    "src/researchguard/logic/structured_artifact.py",
+    "src/researchguard/logic/execution_depth.py",
+    "src/researchguard/logic/mesh_invalidation.py",
+    "src/researchguard/logic/cli.py",
+    "tests/logic/test_blueprint_interfaces.py",
+    "tests/logic/test_artifact_inventory.py",
+    "skills/logicguard/references/domain-blueprint-contract.md",
+    ".skillguard/test-mesh.json",
+    "scripts/check_researchguard_test_mesh.py"
   ],
   "step_bindings": [
     {
@@ -253,15 +285,15 @@
         },
         {
           "kind": "path",
+          "path": "skills/logicguard/references/domain-blueprint-contract.md"
+        },
+        {
+          "kind": "path",
           "path": "researchguard/prompt_bundle_manifest.json"
         },
         {
           "kind": "path",
           "path": "scripts/check_prompt_bundles.py"
-        },
-        {
-          "kind": "path",
-          "path": "tests/test_prompt_bundles.py"
         }
       ],
       "expected": {
@@ -314,40 +346,64 @@
           "path": "src/researchguard/logic_viewer"
         },
         {
-          "kind": "path",
-          "path": ".flowguard/researchguard_suite_model.py"
-        },
-        {
-          "kind": "path",
-          "path": ".flowguard/researchguard_suite_model.json"
-        },
-        {
-          "kind": "path",
-          "path": ".flowguard/run_researchguard_suite_model.py"
-        },
-        {
-          "kind": "path",
-          "path": ".flowguard/logicguard_skill_contract_model.py"
-        },
-        {
-          "kind": "path",
-          "path": ".flowguard/researchguard_skill_contract_model_common.py"
-        },
-        {
           "kind": "subtree",
           "path": "tests/logic"
         },
         {
           "kind": "path",
-          "path": "researchguard/prompt_bundle_manifest.json"
+          "path": "src/researchguard/target_authority.py"
         },
         {
           "kind": "path",
-          "path": "scripts/check_prompt_bundles.py"
+          "path": "src/researchguard/model_envelope.py"
         },
         {
           "kind": "path",
-          "path": "tests/test_prompt_bundles.py"
+          "path": "src/researchguard/logic/owner_attestation.py"
+        },
+        {
+          "kind": "path",
+          "path": "src/researchguard/logic/artifact_inventory.py"
+        },
+        {
+          "kind": "path",
+          "path": "src/researchguard/logic/blueprint.py"
+        },
+        {
+          "kind": "path",
+          "path": "src/researchguard/logic/model.py"
+        },
+        {
+          "kind": "path",
+          "path": "src/researchguard/logic/validator.py"
+        },
+        {
+          "kind": "path",
+          "path": "src/researchguard/logic/hierarchy.py"
+        },
+        {
+          "kind": "path",
+          "path": "src/researchguard/logic/structured_artifact.py"
+        },
+        {
+          "kind": "path",
+          "path": "src/researchguard/logic/execution_depth.py"
+        },
+        {
+          "kind": "path",
+          "path": "src/researchguard/logic/mesh_invalidation.py"
+        },
+        {
+          "kind": "path",
+          "path": "src/researchguard/logic/cli.py"
+        },
+        {
+          "kind": "path",
+          "path": "tests/logic/test_blueprint_interfaces.py"
+        },
+        {
+          "kind": "path",
+          "path": "tests/logic/test_artifact_inventory.py"
         }
       ],
       "expected": {
@@ -365,7 +421,7 @@
         "obligation:researchguard:logicguard:native-tests"
       ],
       "coverage_scope": "declared_obligations",
-      "coverage_rationale": "This check is the sole execution owner for its exact member obligation."
+      "coverage_rationale": "This existing member-native owner runs the complete declared member test suite once. Its exact blueprint code/test selectors cover native qualification, qualification-first impact and reverse trace, persisted fresh-process target-authority replay, and caller-forged/co-shrunk self-attestation rejection without adding duplicate execution owners. "
     },
     {
       "check_id": "check:logicguard:task-model-closure",
@@ -419,5 +475,5 @@
     }
   ],
   "judgment_rubrics": [],
-  "claim_boundary": "This contract covers the current logicguard consumer projection, native route, and member-owned tests inside ResearchGuard v0.4.1. It does not prove source truth, unrun external work, installation, publication, or future AI behavior."
+  "claim_boundary": "This contract covers the current logicguard consumer projection, native route, and member-owned tests inside ResearchGuard v0.4.3. The four exact native-blueprint evidence categories are selectors of the one existing target-owned native-tests owner, so final validation does not repeat the same member suite. Distinct model obligation ids remain a later binding with the frozen FlowGuard self-DNA toolchain. It does not prove source truth, unrun external work, installed currentness, publication, or future AI behavior."
 }

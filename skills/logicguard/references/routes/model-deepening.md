@@ -209,3 +209,5 @@ Missing declarations, late declarations, stale fingerprints, non-blocking bad ca
 
 `guard-model/verify.py` is the LogicGuard-native verifier. `guard-model/baseline-*.json` proves only family capability.
 <!-- END MANAGED PURPOSE AND BLOCKABILITY -->
+
+When deepening is also used to qualify a reconstructable artifact blueprint, load `../domain-blueprint-contract.md`. Preserve every newly exposed child output, parent input, realization binding, independent inventory unit, resource, and receipt in the affected denominator; depth cannot hide an unresolved leaf or shrink the inventory.

@@ -142,3 +142,5 @@ Missing declarations, late declarations, stale fingerprints, non-blocking bad ca
 
 `guard-model/verify.py` is the LogicGuard-native verifier. `guard-model/baseline-*.json` proves only family capability.
 <!-- END MANAGED PURPOSE AND BLOCKABILITY -->
+
+For explicit reconstruction or blueprint qualification, also load `../domain-blueprint-contract.md`. The argument model owns meaning; the independent artifact inventory owns the complete unit/resource denominator. Report structural and exact-content reconstruction separately.

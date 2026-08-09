@@ -1538,9 +1538,10 @@ class KbDesktopApp(tk.Tk):
         title = getattr(self, "_searching", "")
         return title
 
-    @searching.setter
-    def searching(self, value: str) -> None:
+    def _set_searching(self, value: str) -> None:
         self._searching = value
+
+    searching = searching.setter(_set_searching)
 
     def _section_row(self, x1: int, y1: int, x2: int, label: str, section: str, *, active: bool) -> None:
         u = self._u

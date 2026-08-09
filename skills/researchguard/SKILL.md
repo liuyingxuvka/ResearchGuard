@@ -7,15 +7,15 @@ description: Route a genuinely ambiguous or cross-member research request to the
 
 ## Purpose
 
-ResearchGuard owns suite-level classification and explicit handoff for four complete members: `logicguard`, `sourceguard`, `traceguard`, and `experimentguard`. It never duplicates member work or silently tries another member.
+ResearchGuard classifies and hands off across four independent native members: `logicguard`, `sourceguard`, `traceguard`, and `experimentguard`. It never duplicates work or silently tries another member.
 
 ## Narrow entry
 
-Use a member directly when the first action is clear. Direct entry bypasses this umbrella and reaches the same native owner.
+Use a member directly when the first action is clear.
 
-Use the umbrella only when the first action is genuinely ambiguous or the request mentions several member domains. Read `references/member-admission-index.md` under trigger `route:member-admission` before classification. Do not load the four member skills to decide the route.
+Use the umbrella only for an ambiguous first action or several member domains. Read `references/member-admission-index.md` under trigger `route:member-admission` before classification. Do not load the four member skills to decide the route.
 
-AI extracts one or more `primary_action` responsibility facts and optional context facts. Every fact has a stable id, current fact kind, statement, role, and exact request source span. AI does not set `applicable` or choose members. Each member's current contract derives its own positive, required, forbidden, first-action, and first-reference result. The router then selects the unique smallest set covering every primary responsibility.
+Extract source-spanned `primary_action` facts and optional context facts; do not set `applicable` or choose members. Current member contracts derive admission, and the router selects the unique smallest set covering every primary responsibility.
 
 Run:
 
@@ -23,7 +23,13 @@ Run:
 researchguard run --business-intent-id <intent-id> --task-facts <task-facts.json> -- <member arguments>
 ```
 
-If one member covers the whole request, use only that member; a larger composition is over-selection. If several irreducible responsibilities require several members, include one `researchguard.member-composition.v1` object declaring the exact member set, contiguous order, earlier-step dependencies, per-member condition responsibilities, input/output handoffs, one producing owner for every handed field, and an overall claim boundary. The umbrella emits `composition_ready`; it does not guess member arguments or claim that native work ran.
+One sufficient member is the whole route. Otherwise declare `researchguard.member-composition.v2` with exact members, order, dependencies, responsibilities, typed handoffs, field owners, and claim boundary. The umbrella emits only `composition_ready` or visible `composition_blocked`.
+
+For composed member blueprints, handoffs, affected impact, or reverse trace, trigger `route:member-model-envelope` and read `references/member-model-envelope.md`. This is transport between member-domain DNA, not repository software DNA; the sole ResearchGuard repository software-DNA root is FlowGuard-owned. Load no member blueprint unless that member is invoked.
+
+For portable DNA of an external paper, model, test system, or workflow, trigger `route:external-domain-dna` and read `references/external-domain-dna.md`. It owns signed scope, current native replay, coverage, qualification, exclusions, and recursive frontier.
+
+External admission fixes the target and denominator before member-native parsing. Replay persistent anchor and immutable-receipt hashes; cache is not authority. Direct use is unverified, and a different target needs a separate anchor. There is no generic issuer or inline candidate-authoring path.
 
 Missing or placeholder spans, stale fingerprints, unknown fact kinds, incomplete forbidden reviews, zero coverage, equal-minimum ambiguity, over-selection, or an incomplete composition block before member execution. There is no keyword, list-order, alias, `run all`, retry, or compatibility fallback.
 
@@ -38,7 +44,7 @@ Context alone does not create another responsibility. A source-bound primary res
 
 ## Selected-member depth
 
-The selected member—not the umbrella—owns task-local predictions, falsifiers, native observations, gap lineage, revision, holdout evidence, and closure. A statement that the model "understands" is never evidence. Open native gaps remain open or end visibly as stalled, limited, externally dependent, or scope-excluded.
+The selected member—not the umbrella—owns predictions, falsifiers, native observations, gap lineage, revision, holdout evidence, and closure. Claiming the model "understands" is not evidence. Native gaps stay open or end visibly as stalled, limited, externally dependent, or scope-excluded.
 
 ## Hard gates
 

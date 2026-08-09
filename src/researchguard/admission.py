@@ -5,19 +5,32 @@ from __future__ import annotations
 import hashlib
 import json
 import re
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, replace
 from typing import Any, Literal, Mapping, Sequence
+
+from .target_authority import (
+    ExpectedTargetAnchor,
+    _expected_target_receipt_payload,
+    _expected_target_result_material,
+    _publish_expected_target_admission,
+    _verify_expected_target_producer_signature,
+    content_addressed_request_id,
+    read_target_material_bytes,
+)
 
 
 TASK_FACTS_SCHEMA = "researchguard.task-facts.v1"
 ADMISSION_SCHEMA = "researchguard.member-admission-evidence.v2"
 ADMISSION_SET_SCHEMA = "researchguard.member-admission-set.v2"
 CONTRACT_SCHEMA = "researchguard.member-admission-contract.v2"
-COMPOSITION_SCHEMA = "researchguard.member-composition.v1"
+COMPOSITION_SCHEMA = "researchguard.member-composition.v2"
 FACT_ROLES = {"primary_action", "context"}
 FORBIDDEN_DISPOSITIONS = {"absent", "present", "unknown"}
 _SHA256_RE = re.compile(r"^sha256:[0-9a-f]{64}$")
 _PLACEHOLDER_QUOTES = {"placeholder", "todo", "tbd", "n/a", "unknown", "evidence"}
+EXPECTED_TARGET_ADMISSION_OWNER = "researchguard"
+EXPECTED_TARGET_ADMISSION_PRODUCER = "researchguard.admission.expected-target-anchor"
+EXPECTED_TARGET_ADMISSION_PRODUCER_VERSION = "1"
 
 
 def _exact_keys(raw: Mapping[str, Any], allowed: set[str], label: str) -> None:
@@ -214,6 +227,147 @@ class TaskFactPacket:
         }
 
 
+def _digest(value: object) -> str:
+    body = json.dumps(
+        value, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+    ).encode("utf-8")
+    return "sha256:" + hashlib.sha256(body).hexdigest()
+
+
+def _admit_expected_target_anchor(
+    packet: TaskFactPacket,
+    *,
+    task_id: str,
+    member_id: str,
+    target_request_id: str,
+    target_request_fingerprint: str,
+    target_id: str,
+    target_revision: str,
+    material_locator: str,
+    material_media_type: str = "application/json",
+    material_fingerprint: str = "",
+    admission_owner_id: str = EXPECTED_TARGET_ADMISSION_OWNER,
+    admission_producer_id: str = EXPECTED_TARGET_ADMISSION_PRODUCER,
+    admission_producer_version: str = EXPECTED_TARGET_ADMISSION_PRODUCER_VERSION,
+    admission_key_id: str,
+    admission_signature: str,
+) -> ExpectedTargetAnchor:
+    """Freeze one provider-neutral target before any member models it.
+
+    This is the sole current admission producer.  It binds source-backed task
+    facts and exact raw target bytes but deliberately does not interpret member
+    semantics.  Unavailable external bytes may be named by an exact supplied
+    fingerprint; their later replay remains visibly unverified.
+    """
+
+    task = str(task_id or "").strip()
+    member = str(member_id or "").strip()
+    target = str(target_id or "").strip()
+    locator = str(material_locator or "").strip()
+    media_type = str(material_media_type or "").strip()
+    request_fingerprint = str(target_request_fingerprint or "").strip()
+    revision = str(target_revision or "").strip()
+    if not all((task, member, target, locator, media_type)):
+        raise ValueError("expected target admission requires task, member, target, and locator")
+    if not _SHA256_RE.fullmatch(request_fingerprint):
+        raise ValueError("expected target admission request fingerprint must be exact")
+    if target_request_id != content_addressed_request_id(request_fingerprint):
+        raise ValueError("expected target admission request id is not content-addressed")
+    if not _SHA256_RE.fullmatch(revision):
+        raise ValueError("expected target admission revision must be exact")
+    body, replayed_fingerprint, _ = read_target_material_bytes(locator)
+    supplied_fingerprint = str(material_fingerprint or "").strip()
+    if body is not None:
+        if supplied_fingerprint and supplied_fingerprint != replayed_fingerprint:
+            raise ValueError("expected target admission raw material fingerprint mismatches bytes")
+        exact_material_fingerprint = replayed_fingerprint
+    else:
+        if not _SHA256_RE.fullmatch(supplied_fingerprint):
+            raise ValueError(
+                "unavailable expected target material requires an exact supplied fingerprint"
+            )
+        exact_material_fingerprint = supplied_fingerprint
+    result_material = _expected_target_result_material(
+        member_id=member,
+        task_id=task,
+        task_request_fingerprint=packet.request_fingerprint,
+        target_request_id=target_request_id,
+        target_request_fingerprint=request_fingerprint,
+        target_id=target,
+        target_revision=revision,
+        material_locator=locator,
+        material_media_type=media_type,
+        material_fingerprint=exact_material_fingerprint,
+        admission_owner_id=str(admission_owner_id or "").strip(),
+        admission_producer_id=str(admission_producer_id or "").strip(),
+        admission_producer_version=str(admission_producer_version or "").strip(),
+    )
+    admission_result_fingerprint = _digest(result_material)
+    anchor_id = (
+        "expected-target-anchor:"
+        + admission_result_fingerprint.removeprefix("sha256:")
+    )
+    admission_input_fingerprint = _digest(
+        {
+            "task_facts_fingerprint": packet.fingerprint(),
+            "result_material": result_material,
+        }
+    )
+    producer = (
+        str(admission_owner_id or "").strip(),
+        str(admission_producer_id or "").strip(),
+        str(admission_producer_version or "").strip(),
+    )
+    if not _verify_expected_target_producer_signature(
+        producer=producer,
+        anchor_id=anchor_id,
+        result_material=result_material,
+        admission_input_fingerprint=admission_input_fingerprint,
+        admission_result_fingerprint=admission_result_fingerprint,
+        admission_key_id=str(admission_key_id or "").strip(),
+        admission_signature=str(admission_signature or "").strip(),
+    ):
+        raise ValueError("expected target admission producer signature is invalid")
+    receipt_payload = _expected_target_receipt_payload(
+        anchor_id=anchor_id,
+        result_material=result_material,
+        admission_input_fingerprint=admission_input_fingerprint,
+        admission_result_fingerprint=admission_result_fingerprint,
+        admission_key_id=str(admission_key_id).strip(),
+        admission_signature=str(admission_signature).strip(),
+    )
+    receipt_locator, receipt_fingerprint, receipt_id = (
+        _publish_expected_target_admission(
+            receipt_payload=receipt_payload,
+            result_material=result_material,
+        )
+    )
+    value = ExpectedTargetAnchor(
+        anchor_id=anchor_id,
+        member_id=member,
+        task_id=task,
+        task_request_fingerprint=packet.request_fingerprint,
+        target_request_id=target_request_id,
+        target_request_fingerprint=request_fingerprint,
+        target_id=target,
+        target_revision=revision,
+        material_locator=locator,
+        material_media_type=media_type,
+        material_fingerprint=exact_material_fingerprint,
+        admission_owner_id=str(admission_owner_id or "").strip(),
+        admission_producer_id=str(admission_producer_id or "").strip(),
+        admission_producer_version=str(admission_producer_version or "").strip(),
+        admission_input_fingerprint=admission_input_fingerprint,
+        admission_result_fingerprint=admission_result_fingerprint,
+        admission_key_id=str(admission_key_id).strip(),
+        admission_signature=str(admission_signature).strip(),
+        receipt_id=receipt_id,
+        receipt_locator=receipt_locator,
+        receipt_fingerprint=receipt_fingerprint,
+    )
+    return replace(value, anchor_fingerprint=value.expected_fingerprint)
+
+
 def validate_contract(contract: Mapping[str, Any]) -> None:
     if contract.get("schema_version") != CONTRACT_SCHEMA:
         raise ValueError("member admission contract requires the current schema")
@@ -366,6 +520,9 @@ __all__ = [
     "COMPOSITION_SCHEMA",
     "TASK_FACTS_SCHEMA",
     "TaskFactPacket",
+    "EXPECTED_TARGET_ADMISSION_OWNER",
+    "EXPECTED_TARGET_ADMISSION_PRODUCER",
+    "EXPECTED_TARGET_ADMISSION_PRODUCER_VERSION",
     "contract_fact_kinds",
     "contract_fingerprint",
     "derive_member_admission_evidence",

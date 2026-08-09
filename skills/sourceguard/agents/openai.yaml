@@ -1,4 +1,4 @@
 interface:
   display_name: "SourceGuard"
   short_description: "Plan evidence discovery and qualify source use"
-  default_prompt: "Use $sourceguard by loading the source-model entry first and only the references triggered by retrieval, iteration, broad closure, commands, safe wording, or template work; start the strict search-model loop when a real observation, model miss, deep claim, or addressable gap requires it."
+  default_prompt: "Use $sourceguard by loading the source-model entry first and only triggered references. For information blueprints keep external target admission separate from SourceGuard-native parsing; persistently replay the anchor, request, raw target tree, and immutable receipt locators/hashes without treating cache as authority. Direct unadmitted use is unverified, a different target needs a separate anchor, and no generic issuer or inline candidate-authoring path exists. This is member-domain DNA; the sole ResearchGuard repository software-DNA root is FlowGuard-owned."

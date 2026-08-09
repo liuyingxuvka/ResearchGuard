@@ -137,3 +137,13 @@ def test_reused_evidence_fingerprint_is_rejected() -> None:
 def test_task_scope_is_mandatory() -> None:
     with pytest.raises(ValueError, match="task_id and purpose"):
         _spec(task_id="")
+
+
+def test_prediction_rows_must_cover_each_candidate_identity() -> None:
+    with pytest.raises(ValueError, match="candidate universe"):
+        _spec(
+            hypothesis_predictions=(
+                HypothesisPrediction("h1", {"e1": "up"}),
+                HypothesisPrediction("h2", {"e1": "down"}),
+            )
+        )

@@ -1,0 +1,9 @@
+[
+  {
+    "schema": "flowguard.revision_removal_disposition.v1",
+    "removed_id": "root:model:hierarchical_model_mesh",
+    "disposition": "retire",
+    "reason": "The legacy hierarchical model mesh root is retired because the current self-DNA manifest now owns the same model hierarchy through the authoritative model system and compositional verification kernel.",
+    "replacement_id": ""
+  }
+]

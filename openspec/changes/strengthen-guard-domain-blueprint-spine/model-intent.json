@@ -1,0 +1,55 @@
+{
+  "contributions": [
+    {
+      "schema": "flowguard.model_intent_contribution.v1",
+      "contribution_id": "intent:strengthen-guard-domain-blueprint-spine:preimplementation",
+      "source_kind": "design",
+      "source_ref": "openspec/changes/strengthen-guard-domain-blueprint-spine/design.md",
+      "source_fingerprint": "sha256:5ea8e4aa0923b8f371353b34a48fb3a25d4aef208b55d23f0737b0a16893bd09",
+      "subject_lane": "normative_target",
+      "subject_role": "design",
+      "lifecycle_state": "candidate",
+      "decision_state": "accepted",
+      "logical_model_id": "model:researchguard_suite",
+      "unresolved_owner_id": "",
+      "supersedes_contribution_ids": [],
+      "conflicts_with_contribution_ids": [],
+      "target_obligation_ids": [],
+      "target_state_ids": [],
+      "target_transition_ids": [],
+      "target_invariant_ids": [],
+      "target_relation_ids": [],
+      "desired_terminal_state_ids": [],
+      "target_output_ids": [],
+      "declared_consumer_ids": [],
+      "effective_revision": "change:strengthen-guard-domain-blueprint-spine",
+      "rationale": "The accepted OpenSpec design defines the pending native Guard domain-blueprint work; this preimplementation snapshot records the intent without claiming its implementation.",
+      "work_context_id": "",
+      "work_context_fingerprint": "",
+      "native_owner_id": "",
+      "fingerprint": "sha256:220d8ae695a8a1832297fba87152ddcb7b92defdb9e4b996afb2a9f566d5a7d9"
+    }
+  ],
+  "dispositions": [
+    {
+      "schema": "flowguard.model_intent_disposition.v1",
+      "contribution_id": "intent:strengthen-guard-domain-blueprint-spine:preimplementation",
+      "contribution_fingerprint": "sha256:220d8ae695a8a1832297fba87152ddcb7b92defdb9e4b996afb2a9f566d5a7d9",
+      "disposition": "deferred",
+      "changed_obligation_ids": [],
+      "changed_state_ids": [],
+      "changed_transition_ids": [],
+      "changed_invariant_ids": [],
+      "changed_relation_ids": [],
+      "scoped_gap_ids": [
+        "gap:guard-domain-blueprint-implementation-pending"
+      ],
+      "conflict_ids": [],
+      "unresolved_effect_ids": [],
+      "unreachable_terminal_state_ids": [],
+      "unconsumed_output_ids": [],
+      "reason": "Implementation is intentionally deferred to the OpenSpec apply phase; the current revision only refreshes observed project and planning authority.",
+      "fingerprint": "sha256:e550bc998aa7bd481e0f761ef7341cc7e2f032a25961bba0f8d5ff4cbe8c460d"
+    }
+  ]
+}

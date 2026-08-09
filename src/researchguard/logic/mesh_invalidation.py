@@ -202,9 +202,27 @@ def compute_overlay_invalidation(
     return MeshInvalidationReceipt.create(**values)
 
 
+def blueprint_dependency_impact(
+    changed_ids: Iterable[str], dependency_consumers: dict[str, Iterable[str]]
+) -> tuple[str, ...]:
+    """Close exact blueprint dependencies without widening to every mesh owner."""
+
+    affected = set(str(item) for item in changed_ids)
+    pending = list(affected)
+    while pending:
+        dependency_id = pending.pop()
+        for consumer_id in dependency_consumers.get(dependency_id, ()):
+            value = str(consumer_id)
+            if value not in affected:
+                affected.add(value)
+                pending.append(value)
+    return tuple(sorted(affected))
+
+
 __all__ = [
     "MeshDependencyDelta",
     "compute_overlay_invalidation",
     "diff_mesh_dependencies",
     "mesh_authority_dependency_keys",
+    "blueprint_dependency_impact",
 ]

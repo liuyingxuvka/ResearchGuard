@@ -24,12 +24,21 @@ guard_contract:
     - gap-baseline
     - gap-counter
     target_unit_ids: []
+    source_role_ids:
+    - source-role:gap-baseline:expert_analysis
+    - source-role:gap-baseline:historical_background
+    - source-role:gap-counter:counter_evidence
+    - source-role:gap-counter:limiting_evidence
+    lineage_slot_ids: []
+    anchor_requirement_ids:
+    - anchor-target-citation
+    handoff_ids: []
   claim_boundary: Citation candidates are not final claim support until modeled downstream.
   native_oracle_catalog_fingerprint: 2C01D891559625D9123F17E817B63B3E4E9323CA1C3EB81923B82D7DBDC79B15
   purpose_frozen: true
   purpose_freeze_sequence: 1
   candidate_construction_sequence: 2
-candidate_contract_fingerprint: 24C85CE24C8CB56E1749251900C1F7CFAF377F36B978FC5A9B1E2FB24F18F190
+candidate_contract_fingerprint: B06FED7ABFD86525D9135428F19B21396A78023AF7A5EEE1B70FC7517B192C97
 metadata:
   purpose: Expand paper lineage and find baseline or counterevidence sources.
   repository: https://github.com/liuyingxuvka/ResearchGuard
@@ -142,8 +151,11 @@ actions:
     role_hint: result_limitation
 observations: []
 graph_edges:
-- source: src-target-paper
-  target: anchor-target-citation
-  edge_type: mentions
+- edge_id: edge-source-anchor-target-citation
+  source_id: src-target-paper
+  source_type: source
+  target_id: anchor-target-citation
+  target_type: anchor
+  relation_type: mentions
   notes: Citation anchor comes from target paper.
 weights: {}

@@ -41,17 +41,17 @@ def test_catalog_inventory_digests_native_binding_and_commands() -> None:
         assert example.startswith("researchguard trace ")
 
 
-@pytest.mark.parametrize("case", json.loads(FIXTURE.read_text(encoding="utf-8"))["cases"])
-def test_fixture_selection_cases(case: dict) -> None:
-    receipt = select_template_pack(case["request"])
-    assert receipt["disposition"] == case["disposition"]
-    assert [item["profile_id"] for item in receipt["selected_profiles"]] == case["selected"]
-    if case["name"] == "strict-dominance":
-        assert receipt["suppressed_by"] == {"incident": "causal"}
-    if case["disposition"] in {"no_match", "ambiguous"}:
-        bundle = build_template_instance(case["request"])
-        assert bundle["model"] is None
-        assert bundle["instance_receipt"] is None
+def test_fixture_selection_cases() -> None:
+    for case in json.loads(FIXTURE.read_text(encoding="utf-8"))["cases"]:
+        receipt = select_template_pack(case["request"])
+        assert receipt["disposition"] == case["disposition"]
+        assert [item["profile_id"] for item in receipt["selected_profiles"]] == case["selected"]
+        if case["name"] == "strict-dominance":
+            assert receipt["suppressed_by"] == {"incident": "causal"}
+        if case["disposition"] in {"no_match", "ambiguous"}:
+            bundle = build_template_instance(case["request"])
+            assert bundle["model"] is None
+            assert bundle["instance_receipt"] is None
 
 
 def test_composition_is_deterministic_native_and_non_factual() -> None:

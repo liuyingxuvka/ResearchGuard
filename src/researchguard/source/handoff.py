@@ -89,9 +89,57 @@ def export_logicguard_source_candidates(belief_state: BeliefState) -> dict:
     }
 
 
+def affected_member_handoffs(
+    belief_state: BeliefState,
+    *,
+    gap_ids: list[str] | tuple[str, ...] = (),
+    claim_use_ids: list[str] | tuple[str, ...] = (),
+) -> dict[str, object]:
+    """Project exact handoff consumers without interpreting their payloads."""
+
+    by_gap = belief_state.metadata.get("member_handoffs_by_gap", {})
+    by_claim = belief_state.metadata.get("member_handoffs_by_claim_use", {})
+    invalid_maps = []
+    if not isinstance(by_gap, dict):
+        by_gap = {}
+        invalid_maps.append("member_handoffs_by_gap")
+    if not isinstance(by_claim, dict):
+        by_claim = {}
+        invalid_maps.append("member_handoffs_by_claim_use")
+    affected = {
+        str(handoff_id)
+        for gap_id in gap_ids
+        for handoff_id in by_gap.get(gap_id, [])
+    }
+    affected.update(
+        str(handoff_id)
+        for claim_use_id in claim_use_ids
+        for handoff_id in by_claim.get(claim_use_id, [])
+    )
+    declared = {str(item) for item in belief_state.metadata.get("handoff_ids", [])}
+    foreign = sorted(affected - declared)
+    return {
+        "affected_handoff_ids": sorted(affected & declared),
+        "unknown_handoff_ids": foreign,
+        "invalid_dependency_maps": invalid_maps,
+        "unknown_ownership": bool(foreign or invalid_maps),
+    }
+
+
 def render_traceguard_yaml(belief_state: BeliefState) -> str:
     return dump_yaml(export_traceguard_seed(belief_state))
 
 
 def render_logicguard_yaml(belief_state: BeliefState) -> str:
     return dump_yaml(export_logicguard_source_candidates(belief_state))
+
+
+__all__ = [
+    "LOGICGUARD_BOUNDARY",
+    "TRACEGUARD_BOUNDARY",
+    "affected_member_handoffs",
+    "export_logicguard_source_candidates",
+    "export_traceguard_seed",
+    "render_logicguard_yaml",
+    "render_traceguard_yaml",
+]

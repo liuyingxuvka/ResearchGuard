@@ -31,10 +31,16 @@ def build_contract_model(member: str) -> dict[str, Any]:
     contract_obligation = f"obligation:researchguard:{member}:consumer-contract"
     prompt_obligation = f"obligation:researchguard:{member}:prompt-load"
     native_obligation = f"obligation:researchguard:{member}:native-tests"
+    install_obligation = (
+        "obligation:researchguard:researchguard:consumer-install-transaction"
+    )
     deepening_obligation = f"obligation:researchguard:{member}:task-model-closure"
     contract_invariant = f"invariant:researchguard:{member}:consumer-contract"
     prompt_invariant = f"invariant:researchguard:{member}:prompt-load"
     native_invariant = f"invariant:researchguard:{member}:native-tests"
+    install_invariant = (
+        "invariant:researchguard:researchguard:consumer-install-transaction"
+    )
     deepening_invariant = f"invariant:researchguard:{member}:task-model-closure"
 
     return {
@@ -47,8 +53,15 @@ def build_contract_model(member: str) -> dict[str, Any]:
         "claim_boundary": (
             f"This model binds only the current {member} consumer projection and "
             "member-owned native regression route inside the unified ResearchGuard "
-            "maintenance unit. Installation, publication, and unrun work remain "
-            "outside this model."
+            "maintenance unit. "
+            + (
+                "For the ResearchGuard umbrella, native tests also own the suite "
+                "installation transaction behavior contract; that does not prove an "
+                "installation actually ran or is current. "
+                if member == "researchguard"
+                else ""
+            )
+            + "Publication and unrun work remain outside this model."
         ),
         "functions": [
             {
@@ -130,7 +143,13 @@ def build_contract_model(member: str) -> dict[str, Any]:
                 "terminal_kind": "blocked",
             },
         ],
-        "invariant_ids": [contract_invariant, prompt_invariant, native_invariant, deepening_invariant],
+        "invariant_ids": [
+            contract_invariant,
+            prompt_invariant,
+            native_invariant,
+            *([install_invariant] if member == "researchguard" else []),
+            deepening_invariant,
+        ],
         "obligations": [
             {
                 "obligation_id": contract_obligation,
@@ -160,5 +179,23 @@ def build_contract_model(member: str) -> dict[str, Any]:
                 "required": True,
                 "description": "The member-owned current native regression suite passes.",
             },
+            *(
+                [
+                    {
+                        "obligation_id": install_obligation,
+                        "invariant_id": install_invariant,
+                        "owner_step_ids": [tests_step],
+                        "required": True,
+                        "description": (
+                            "The ResearchGuard native-tests owner proves one suite-level "
+                            "installation lock and verified rollback of the Python package, "
+                            "all activated consumers, and the suite manifest, with "
+                            "cleanup_unconfirmed preserved when restoration cannot be proven."
+                        ),
+                    }
+                ]
+                if member == "researchguard"
+                else []
+            ),
         ],
     }

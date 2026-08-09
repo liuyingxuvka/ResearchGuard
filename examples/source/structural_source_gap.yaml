@@ -24,12 +24,18 @@ guard_contract:
     - gap-structural-method-bridge
     target_unit_ids:
     - chapter_3.technology_summary
+    source_role_ids:
+    - source-role:gap-structural-method-bridge:bridge_evidence
+    - source-role:gap-structural-method-bridge:method_source
+    lineage_slot_ids: []
+    anchor_requirement_ids: []
+    handoff_ids: []
   claim_boundary: Source discovery and evidence-depth only; factual truth remains downstream.
   native_oracle_catalog_fingerprint: 2C01D891559625D9123F17E817B63B3E4E9323CA1C3EB81923B82D7DBDC79B15
   purpose_frozen: true
   purpose_freeze_sequence: 1
   candidate_construction_sequence: 2
-candidate_contract_fingerprint: 352DE43025889640F394F92873175F1AB8E2D0F011C18C13014B224ED8ABA86F
+candidate_contract_fingerprint: 9B0E11E5A8E67C63EFF8B3E95BBF20F95195329EA9CB89524626C04C5D2CCDCB
 metadata:
   purpose: Demonstrate a structural contribution source gap.
   repository: https://github.com/liuyingxuvka/ResearchGuard

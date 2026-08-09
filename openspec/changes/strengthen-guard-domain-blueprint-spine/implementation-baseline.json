@@ -1,0 +1,33 @@
+{
+  "schema_version": "researchguard.guard-domain-blueprint-implementation-baseline.v1",
+  "source_commit": "964a2e81e6660a77e0013205e4e076fda8418e24",
+  "python_identity": "Python 3.12.10",
+  "package_identity": "researchguard 0.4.1",
+  "maintained_skill_ids": [
+    "researchguard",
+    "logicguard",
+    "sourceguard",
+    "traceguard",
+    "experimentguard"
+  ],
+  "native_member_ids": [
+    "logicguard",
+    "sourceguard",
+    "traceguard",
+    "experimentguard"
+  ],
+  "native_schema_ids": {
+    "logicguard": "researchguard.logic.model-store.v1",
+    "sourceguard": "researchguard.source.model_guard_contract.v2",
+    "traceguard": "researchguard.trace.model.v2",
+    "experimentguard": "researchguard.experiment.task-spec.v2"
+  },
+  "prompt_bundle_manifest_sha256": "d64298fd184ba051f9e4159fca4a39b27e2b1fbc7512dfef3c6ac487f138aa5d",
+  "observed_flowguard_snapshot": "31947568d2df99910a14a026413366b50865737c3b287d80ca2ad2ee42ced1a3",
+  "authority_notes": [
+    "Current implementation authority is the repository source at source_commit, not the separately installed package projection.",
+    "The current OpenSpec bases are openspec/specs/researchguard-member-model-loops/spec.md and openspec/specs/researchguard-narrow-entry-loading/spec.md; historical exact-one and v0.1.x changes are non-authoritative.",
+    "Peer-owned .flowguard evidence, project records, model-system revisions, activations, and snapshots are excluded from phases 1-8 and remain read-only.",
+    "Normal runtime accepts only the current schemas introduced by this change; no compatibility reader, converter, alias, dual output, retry, or fallback is authorized."
+  ]
+}

@@ -1,0 +1,369 @@
+{
+  "accepted_revision_fingerprint": "sha256:ac1b91a6dec4e2a7a034021ba651946c855a7483ed84c3e42d8aa5b6e70a7afd",
+  "accepted_revision_schema": "flowguard.model_revision_set.v4",
+  "added_model_ids": [
+    "hierarchical_model_mesh",
+    "model_test_code_alignment"
+  ],
+  "affected_closure": {
+    "affected_ids": [
+      "coverage:code_contracts:contract:purpose:hierarchical_model_mesh",
+      "coverage:code_contracts:contract:purpose:model_test_code_alignment",
+      "coverage:model_instances:hierarchical_model_mesh",
+      "coverage:model_instances:model_test_code_alignment",
+      "coverage:tests_evidence:check:model-regression:hierarchical_model_mesh",
+      "coverage:tests_evidence:check:model-regression:model_test_code_alignment",
+      "coverage:tests_evidence:check:model-regression:researchguard-suite",
+      "coverage:tests_evidence:check:model-regression:researchguard_suite",
+      "coverage:universe",
+      "model_instance:model:hierarchical_model_mesh",
+      "model_instance:model:model_test_code_alignment",
+      "model_instance:model:researchguard_suite",
+      "model_relation:relation:model-realizes-purpose:hierarchical_model_mesh",
+      "model_relation:relation:model-realizes-purpose:model_test_code_alignment",
+      "model_relation:relation:model-realizes-purpose:researchguard_suite",
+      "model_relation:relation:system-contains:hierarchical_model_mesh",
+      "model_relation:relation:system-contains:model_test_code_alignment",
+      "model_relation:relation:system-contains:researchguard_suite",
+      "parent_closure:purpose:hierarchical_model_mesh",
+      "parent_closure:purpose:model_test_code_alignment",
+      "parent_closure:purpose:researchguard_suite",
+      "parent_closure:system:flowguard:model-regression-manifest",
+      "root:model:hierarchical_model_mesh",
+      "root:model:researchguard_suite",
+      "system_property:subject_revision"
+    ],
+    "edge_ids": [
+      "model_relation:relation:model-realizes-purpose:hierarchical_model_mesh",
+      "model_relation:relation:model-realizes-purpose:model_test_code_alignment",
+      "model_relation:relation:model-realizes-purpose:researchguard_suite",
+      "model_relation:relation:system-contains:hierarchical_model_mesh",
+      "model_relation:relation:system-contains:model_test_code_alignment",
+      "model_relation:relation:system-contains:researchguard_suite"
+    ],
+    "fingerprint": "sha256:5a8e845dafb37e0b79d84db10988ac9966a73483dd77c7a341dd282171ce76d2",
+    "owner_bindings": [
+      {
+        "affected_id": "coverage:code_contracts:contract:purpose:hierarchical_model_mesh",
+        "owner_route": "model_mesh_maintenance"
+      },
+      {
+        "affected_id": "coverage:code_contracts:contract:purpose:model_test_code_alignment",
+        "owner_route": "model_mesh_maintenance"
+      },
+      {
+        "affected_id": "coverage:model_instances:hierarchical_model_mesh",
+        "owner_route": "model_mesh_maintenance"
+      },
+      {
+        "affected_id": "coverage:model_instances:model_test_code_alignment",
+        "owner_route": "model_mesh_maintenance"
+      },
+      {
+        "affected_id": "coverage:tests_evidence:check:model-regression:hierarchical_model_mesh",
+        "owner_route": "model_mesh_maintenance"
+      },
+      {
+        "affected_id": "coverage:tests_evidence:check:model-regression:model_test_code_alignment",
+        "owner_route": "model_mesh_maintenance"
+      },
+      {
+        "affected_id": "coverage:tests_evidence:check:model-regression:researchguard-suite",
+        "owner_route": "model_mesh_maintenance"
+      },
+      {
+        "affected_id": "coverage:tests_evidence:check:model-regression:researchguard_suite",
+        "owner_route": "model_mesh_maintenance"
+      },
+      {
+        "affected_id": "coverage:universe",
+        "owner_route": "model_mesh_maintenance"
+      },
+      {
+        "affected_id": "model_instance:model:hierarchical_model_mesh",
+        "owner_route": "model_test_alignment"
+      },
+      {
+        "affected_id": "model_instance:model:model_test_code_alignment",
+        "owner_route": "model_test_alignment"
+      },
+      {
+        "affected_id": "model_instance:model:researchguard_suite",
+        "owner_route": "model_test_alignment"
+      },
+      {
+        "affected_id": "model_relation:relation:model-realizes-purpose:hierarchical_model_mesh",
+        "owner_route": "model_mesh_maintenance"
+      },
+      {
+        "affected_id": "model_relation:relation:model-realizes-purpose:model_test_code_alignment",
+        "owner_route": "model_mesh_maintenance"
+      },
+      {
+        "affected_id": "model_relation:relation:model-realizes-purpose:researchguard_suite",
+        "owner_route": "model_mesh_maintenance"
+      },
+      {
+        "affected_id": "model_relation:relation:system-contains:hierarchical_model_mesh",
+        "owner_route": "model_mesh_maintenance"
+      },
+      {
+        "affected_id": "model_relation:relation:system-contains:model_test_code_alignment",
+        "owner_route": "model_mesh_maintenance"
+      },
+      {
+        "affected_id": "model_relation:relation:system-contains:researchguard_suite",
+        "owner_route": "model_mesh_maintenance"
+      },
+      {
+        "affected_id": "parent_closure:purpose:hierarchical_model_mesh",
+        "owner_route": "model_test_alignment"
+      },
+      {
+        "affected_id": "parent_closure:purpose:model_test_code_alignment",
+        "owner_route": "model_test_alignment"
+      },
+      {
+        "affected_id": "parent_closure:purpose:researchguard_suite",
+        "owner_route": "model_test_alignment"
+      },
+      {
+        "affected_id": "parent_closure:system:flowguard:model-regression-manifest",
+        "owner_route": "model_mesh_maintenance"
+      },
+      {
+        "affected_id": "root:model:hierarchical_model_mesh",
+        "owner_route": "model_mesh_maintenance"
+      },
+      {
+        "affected_id": "root:model:researchguard_suite",
+        "owner_route": "model_mesh_maintenance"
+      },
+      {
+        "affected_id": "system_property:subject_revision",
+        "owner_route": "model_mesh_maintenance"
+      }
+    ]
+  },
+  "affected_closure_fingerprint": "sha256:5a8e845dafb37e0b79d84db10988ac9966a73483dd77c7a341dd282171ce76d2",
+  "base_effective_intent_view_fingerprint": "",
+  "base_model_count": 1,
+  "base_model_ids": [
+    "researchguard_suite"
+  ],
+  "base_snapshot_fingerprint": "sha256:31947568d2df99910a14a026413366b50865737c3b287d80ca2ad2ee42ced1a3",
+  "base_snapshot_id": "snapshot:researchguard:guard-domain-blueprint-preimplementation",
+  "blockers": [],
+  "candidate_model_count": 3,
+  "candidate_model_ids": [
+    "hierarchical_model_mesh",
+    "model_test_code_alignment",
+    "researchguard_suite"
+  ],
+  "candidate_model_owner_count": 3,
+  "candidate_model_owner_ids": [
+    "model-obligation:hierarchical_model_mesh",
+    "model-obligation:model_test_code_alignment",
+    "model-obligation:researchguard_suite"
+  ],
+  "candidate_model_owner_inventory_fingerprint": "sha256:40747c026fc229d1340986cc0d57f81a6a49adb5c2389d17c062706cb9ee0753",
+  "candidate_model_owners": [
+    {
+      "logical_model_id": "hierarchical_model_mesh",
+      "model_owner_id": "model-obligation:hierarchical_model_mesh",
+      "realization_relation_fingerprint": "sha256:dcdb0c145d00b7b328ed19dad16301452f5d35b0861daaef5dbf3095ca7aee2b",
+      "realization_relation_id": "relation:model-realizes-purpose:hierarchical_model_mesh"
+    },
+    {
+      "logical_model_id": "model_test_code_alignment",
+      "model_owner_id": "model-obligation:model_test_code_alignment",
+      "realization_relation_fingerprint": "sha256:1897a12f65ee64cb755155e0e89ce554da39ba1ea83695c08d0e70b3795af869",
+      "realization_relation_id": "relation:model-realizes-purpose:model_test_code_alignment"
+    },
+    {
+      "logical_model_id": "researchguard_suite",
+      "model_owner_id": "model-obligation:researchguard_suite",
+      "realization_relation_fingerprint": "sha256:a5fd80300401d3fbc4215e2210c650c3a2b6e8130b89914675a5a7488dfe8159",
+      "realization_relation_id": "relation:model-realizes-purpose:researchguard_suite"
+    }
+  ],
+  "candidate_snapshot_fingerprint": "sha256:a2a0ef7d708d2540638b171a6d8655876219a1f77327d83193104a4d7b401e99",
+  "candidate_snapshot_id": "researchguard-blueprint-v1-current-20260809",
+  "change_present": true,
+  "changed_entity_ids": [
+    "coverage:code_contracts:contract:purpose:hierarchical_model_mesh",
+    "coverage:code_contracts:contract:purpose:model_test_code_alignment",
+    "coverage:model_instances:hierarchical_model_mesh",
+    "coverage:model_instances:model_test_code_alignment",
+    "coverage:tests_evidence:check:model-regression:hierarchical_model_mesh",
+    "coverage:tests_evidence:check:model-regression:model_test_code_alignment",
+    "coverage:tests_evidence:check:model-regression:researchguard-suite",
+    "coverage:tests_evidence:check:model-regression:researchguard_suite",
+    "coverage:universe",
+    "model_instance:model:hierarchical_model_mesh",
+    "model_instance:model:model_test_code_alignment",
+    "model_instance:model:researchguard_suite",
+    "model_relation:relation:model-realizes-purpose:hierarchical_model_mesh",
+    "model_relation:relation:model-realizes-purpose:model_test_code_alignment",
+    "model_relation:relation:model-realizes-purpose:researchguard_suite",
+    "model_relation:relation:system-contains:hierarchical_model_mesh",
+    "model_relation:relation:system-contains:model_test_code_alignment",
+    "model_relation:relation:system-contains:researchguard_suite",
+    "parent_closure:purpose:hierarchical_model_mesh",
+    "parent_closure:purpose:model_test_code_alignment",
+    "parent_closure:purpose:researchguard_suite",
+    "parent_closure:system:flowguard:model-regression-manifest",
+    "root:model:hierarchical_model_mesh",
+    "root:model:researchguard_suite"
+  ],
+  "changed_model_ids": [
+    "hierarchical_model_mesh",
+    "model_test_code_alignment",
+    "researchguard_suite"
+  ],
+  "claim_boundary": "This is a read-only preview derived from the sole observed authority and one stable live manifest candidate. It writes no snapshot, receipt, revision set, lease, lock, or pointer; runs no model or validation owner; and supplies no acceptance, activation, release, or completion evidence.",
+  "intent_input_identity_fingerprint": "sha256:4a76d588509c69848f6275631fe9c7eace757d36b0b5b65dfda3e52887bc0889",
+  "intent_mode": "bootstrap_required",
+  "models_executed": false,
+  "observed_head_fingerprint": "sha256:52d17f5ee5f0b63e447ed6436f2c087a5a9fdd467aba8808eb9549700de67936",
+  "ok": true,
+  "removed_model_ids": [],
+  "replaced_model_ids": [
+    "researchguard_suite"
+  ],
+  "requested_snapshot_id": "researchguard-blueprint-v1-current-20260809",
+  "required_command": "model-revision-intent-bootstrap",
+  "required_intent_input_kinds": [
+    "receipt_id",
+    "rationale",
+    "claim_boundary",
+    "current_design_contributions",
+    "legacy_entry_dispositions"
+  ],
+  "required_legacy_intent_entries": [
+    {
+      "contribution_fingerprint": "sha256:220d8ae695a8a1832297fba87152ddcb7b92defdb9e4b996afb2a9f566d5a7d9",
+      "contribution_id": "intent:strengthen-guard-domain-blueprint-spine:preimplementation",
+      "generation": 6,
+      "revision_set_fingerprint": "sha256:ac1b91a6dec4e2a7a034021ba651946c855a7483ed84c3e42d8aa5b6e70a7afd",
+      "schema": "flowguard.legacy_intent_audit_entry.v1"
+    }
+  ],
+  "required_legacy_intent_entry_count": 1,
+  "required_legacy_intent_entry_inventory_fingerprint": "sha256:736e3712f960cc20fb2af73b4e5963e73ff7c452c279bd0ce7baac1bced67e2c",
+  "required_owner_routes": [
+    "model_mesh_maintenance",
+    "model_test_alignment"
+  ],
+  "required_transition_predecessor_count": 0,
+  "required_transition_predecessor_inventory_fingerprint": "",
+  "required_transition_predecessors": [],
+  "root": "C:\\Users\\liu_y\\Documents\\ResearchGuard",
+  "schema": "flowguard.model_revision_plan.v2",
+  "snapshot_diff": {
+    "added_ids": [
+      "coverage:code_contracts:contract:purpose:hierarchical_model_mesh",
+      "coverage:code_contracts:contract:purpose:model_test_code_alignment",
+      "coverage:model_instances:hierarchical_model_mesh",
+      "coverage:model_instances:model_test_code_alignment",
+      "coverage:tests_evidence:check:model-regression:hierarchical_model_mesh",
+      "coverage:tests_evidence:check:model-regression:model_test_code_alignment",
+      "coverage:tests_evidence:check:model-regression:researchguard_suite",
+      "model_instance:model:hierarchical_model_mesh",
+      "model_instance:model:model_test_code_alignment",
+      "model_relation:relation:model-realizes-purpose:hierarchical_model_mesh",
+      "model_relation:relation:model-realizes-purpose:model_test_code_alignment",
+      "model_relation:relation:system-contains:hierarchical_model_mesh",
+      "model_relation:relation:system-contains:model_test_code_alignment",
+      "parent_closure:purpose:hierarchical_model_mesh",
+      "parent_closure:purpose:model_test_code_alignment",
+      "root:model:hierarchical_model_mesh"
+    ],
+    "changed_commitment_ids": [],
+    "changed_contract_ids": [],
+    "changed_coverage_ids": [
+      "coverage:code_contracts:contract:purpose:hierarchical_model_mesh",
+      "coverage:code_contracts:contract:purpose:model_test_code_alignment",
+      "coverage:model_instances:hierarchical_model_mesh",
+      "coverage:model_instances:model_test_code_alignment",
+      "coverage:tests_evidence:check:model-regression:hierarchical_model_mesh",
+      "coverage:tests_evidence:check:model-regression:model_test_code_alignment",
+      "coverage:tests_evidence:check:model-regression:researchguard-suite",
+      "coverage:tests_evidence:check:model-regression:researchguard_suite",
+      "coverage:universe"
+    ],
+    "changed_field_ids": [],
+    "changed_gap_ids": [],
+    "changed_owner_artifact_ids": [
+      "parent_closure:purpose:hierarchical_model_mesh",
+      "parent_closure:purpose:model_test_code_alignment",
+      "parent_closure:purpose:researchguard_suite",
+      "parent_closure:system:flowguard:model-regression-manifest"
+    ],
+    "changed_relation_ids": [
+      "relation:model-realizes-purpose:hierarchical_model_mesh",
+      "relation:model-realizes-purpose:model_test_code_alignment",
+      "relation:model-realizes-purpose:researchguard_suite",
+      "relation:system-contains:hierarchical_model_mesh",
+      "relation:system-contains:model_test_code_alignment",
+      "relation:system-contains:researchguard_suite"
+    ],
+    "changed_root_ids": [
+      "root:model:hierarchical_model_mesh",
+      "root:model:researchguard_suite"
+    ],
+    "changed_side_effect_ids": [],
+    "changed_source_surface_ids": [],
+    "changed_system_property_ids": [
+      "system_property:subject_revision"
+    ],
+    "changed_test_ids": [],
+    "fingerprint_changed_ids": [
+      "coverage:universe",
+      "model_instance:model:researchguard_suite",
+      "model_relation:relation:model-realizes-purpose:researchguard_suite",
+      "model_relation:relation:system-contains:researchguard_suite",
+      "parent_closure:purpose:researchguard_suite",
+      "parent_closure:system:flowguard:model-regression-manifest"
+    ],
+    "members": [
+      {
+        "base_instance_fingerprint": "",
+        "candidate_instance_fingerprint": "sha256:092d363e6a5a70cb35e6e10366f55cc17e0683bfad7ec6dffa49cbe0e9724426",
+        "changed_element_ids": [
+          "model_instance:model:hierarchical_model_mesh"
+        ],
+        "member_id": "hierarchical_model_mesh",
+        "operation": "add",
+        "schema": "flowguard.model_revision_member.v1"
+      },
+      {
+        "base_instance_fingerprint": "",
+        "candidate_instance_fingerprint": "sha256:7866482485fb016c14a4604b312bcf420567cbfb1ab9f601481fc54ca84b8c33",
+        "changed_element_ids": [
+          "model_instance:model:model_test_code_alignment"
+        ],
+        "member_id": "model_test_code_alignment",
+        "operation": "add",
+        "schema": "flowguard.model_revision_member.v1"
+      },
+      {
+        "base_instance_fingerprint": "sha256:5fb52fdcfd3d36c837d859a7bdcc4adae74498d5401b364e773df4afa48ad211",
+        "candidate_instance_fingerprint": "sha256:22c0e99b10acb68027deacdd834df43949a996663835cce5edcfbcfd6b38f871",
+        "changed_element_ids": [
+          "model_instance:model:researchguard_suite"
+        ],
+        "member_id": "researchguard_suite",
+        "operation": "replace",
+        "schema": "flowguard.model_revision_member.v1"
+      }
+    ],
+    "removed_ids": [
+      "coverage:tests_evidence:check:model-regression:researchguard-suite",
+      "root:model:researchguard_suite"
+    ]
+  },
+  "snapshot_diff_fingerprint": "sha256:ce74f3bea73f711c2358d07a546a4d402a478b1c719bf5f6e81fcaf762510aff",
+  "status": "pass",
+  "writes_performed": false
+}

@@ -21,8 +21,28 @@ from .model_mesh_test_support import (
 )
 
 
-MESH_FAULT_POINTS = FileModelMeshStore._MESH_COMMIT_FAULT_POINTS
-CATALOG_FAULT_POINTS = FileModelMeshStore._CATALOG_COMMIT_FAULT_POINTS
+MESH_FAULT_POINTS = (
+    "after_lock",
+    "after_journal",
+    "after_shards",
+    "after_snapshot",
+    "after_invalidation_receipt",
+    "after_commit_receipt",
+    "after_child_catalog_snapshot",
+    "after_catalog_manifest",
+    "after_mesh_manifest",
+    "after_terminal_journal",
+)
+CATALOG_FAULT_POINTS = (
+    "catalog_after_lock",
+    "catalog_after_journal",
+    "catalog_after_overlay",
+    "catalog_after_shards",
+    "catalog_after_snapshot",
+    "catalog_after_receipt",
+    "catalog_after_manifest",
+    "catalog_after_terminal_journal",
+)
 
 
 def injecting(target):
@@ -45,7 +65,21 @@ def begin_first(store, snapshots, *, key="faulted-first"):
     return transaction
 
 
-@pytest.mark.parametrize("fault_point", MESH_FAULT_POINTS)
+@pytest.mark.parametrize(
+    "fault_point",
+    (
+        "after_lock",
+        "after_journal",
+        "after_shards",
+        "after_snapshot",
+        "after_invalidation_receipt",
+        "after_commit_receipt",
+        "after_child_catalog_snapshot",
+        "after_catalog_manifest",
+        "after_mesh_manifest",
+        "after_terminal_journal",
+    ),
+)
 def test_every_mesh_publication_fault_recovers_to_old_or_complete_new_head(
     tmp_path, fault_point
 ) -> None:
@@ -80,7 +114,19 @@ def test_every_mesh_publication_fault_recovers_to_old_or_complete_new_head(
         assert recovery
 
 
-@pytest.mark.parametrize("fault_point", CATALOG_FAULT_POINTS)
+@pytest.mark.parametrize(
+    "fault_point",
+    (
+        "catalog_after_lock",
+        "catalog_after_journal",
+        "catalog_after_overlay",
+        "catalog_after_shards",
+        "catalog_after_snapshot",
+        "catalog_after_receipt",
+        "catalog_after_manifest",
+        "catalog_after_terminal_journal",
+    ),
+)
 def test_every_catalog_publication_fault_recovers_without_mutating_mesh_authority(
     tmp_path, fault_point
 ) -> None:

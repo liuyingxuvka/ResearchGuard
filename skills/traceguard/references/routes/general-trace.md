@@ -13,3 +13,5 @@ Before candidate construction, freeze one target-local `traceguard.task_model_pu
 For substantive work use layered trace cards: lead, event fact, sequence, mechanism, evidence, counter, boundary, progression, and handoff. Report coverage and keep event fact, explanation, execution/follow-through, outcome/impact, stakeholder signal, counter/delay/non-occurrence, future trigger, and safe wording separate. A clean single storyline is not required when alternatives remain live.
 
 Causal exploration requires typed mechanism, link evidence, confounder disposition, competing alternative, scope, and counterfactual boundary. Chronology and causal words in source text create no causal atom.
+
+For explicit investigation-blueprint work, also load `../trace-blueprint-contract.md`. Project the current native identities and canonical receipt; do not create a parallel hierarchy authority or inference path.

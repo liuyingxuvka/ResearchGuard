@@ -1486,6 +1486,9 @@ def _build_native_depth_analysis(
     budget: int = 6,
     requested_claim_scope_ids: Iterable[str] | None = None,
     result: EvaluationResult | None = None,
+    artifact_inventory: object | None = None,
+    artifact_binding_unit_ids: Iterable[str] = (),
+    interface_receipt_refs: Iterable[str] = (),
 ) -> LogicDepthReceipt:
     # Mesh evaluation already owns an exact native result for every pinned
     # model.  Reuse it when supplied instead of evaluating the same immutable
@@ -1570,6 +1573,30 @@ def _build_native_depth_analysis(
         )
         if not row.applicable_node_ids and row.status != "pass":
             gaps.append(f"claim_perturbation_set_missing:{row.claim_id}")
+    inventory_fingerprint = ""
+    if artifact_inventory is not None:
+        inventory_fingerprint = str(getattr(artifact_inventory, "fingerprint", ""))
+        bound_units = set(str(item) for item in artifact_binding_unit_ids)
+        for unit in getattr(artifact_inventory, "units", ()):
+            if unit.unit_id not in bound_units:
+                gaps.append(f"artifact_inventory_unit_unbound:{unit.unit_id}")
+            if unit.parse_disposition == "unparsed":
+                gaps.append(f"artifact_inventory_parse_gap:{unit.unit_id}")
+    receipt_refs = tuple(sorted(set(str(item) for item in interface_receipt_refs if str(item))))
+    required_receipt_refs = {
+        item.parent_receipt_id
+        for item in model.block_interfaces
+        if item.consumer_status == "consumed"
+    }
+    supplied_receipt_refs = set(receipt_refs)
+    gaps.extend(
+        f"leaf_interface_receipt_missing:{receipt_id}"
+        for receipt_id in sorted(required_receipt_refs - supplied_receipt_refs)
+    )
+    gaps.extend(
+        f"leaf_interface_receipt_foreign:{receipt_id}"
+        for receipt_id in sorted(supplied_receipt_refs - required_receipt_refs)
+    )
     gaps = list(dict.fromkeys(gaps))
     status = "blocked" if gaps else "pass"
     broad_claim_licensed = status == "pass"
@@ -1611,6 +1638,10 @@ def _build_native_depth_analysis(
         claim_perturbation_coverage=claim_perturbations,
         requested_claim_scope="complete",
         covered_claim_scope=covered_claim_scope,
+        artifact_inventory_fingerprint=inventory_fingerprint,
+        interface_receipt_refs=receipt_refs,
+        deepest_proven_layer=("native-semantics" if gaps else "native-semantics-and-blueprint-inputs"),
+        first_unresolved_gap=gaps[0] if gaps else "",
     )
 
 
@@ -1621,16 +1652,36 @@ def build_logic_depth_receipt(
     guard_contract: str | Path,
     budget: int = 6,
     requested_claim_scope_ids: Iterable[str] | None = None,
+    artifact_inventory: object | None = None,
+    artifact_binding_unit_ids: Iterable[str] = (),
+    interface_receipt_refs: Iterable[str] = (),
 ) -> LogicDepthReceipt:
     """Issue the public receipt only after current target-purpose proof passes."""
 
-    from .guard_model_contract import verify_target_contract
-
-    proof = verify_target_contract(
-        target_root=target_root,
-        contract_path=guard_contract,
-        expected_target_skill_id="logicguard",
+    from ..portable_material import portable_native_material_bytes_by_id
+    from .guard_model_contract import (
+        PORTABLE_TARGET_PROOF_MATERIAL_ID,
+        verify_portable_target_contract_material,
+        verify_target_contract,
     )
+
+    portable_material = portable_native_material_bytes_by_id(
+        member_id="logicguard",
+        material_id=PORTABLE_TARGET_PROOF_MATERIAL_ID,
+    )
+    if portable_material is None:
+        proof = verify_target_contract(
+            target_root=target_root,
+            contract_path=guard_contract,
+            expected_target_skill_id="logicguard",
+        )
+    else:
+        proof = verify_portable_target_contract_material(
+            portable_material,
+            target_root=target_root,
+            contract_path=guard_contract,
+            expected_target_skill_id="logicguard",
+        )
     comparison_model = copy.deepcopy(model)
     comparison_model.metadata.pop("source_path", None)
     if model_fingerprint(comparison_model) != proof["native_model_fingerprint"]:
@@ -1641,6 +1692,9 @@ def build_logic_depth_receipt(
         model,
         budget=budget,
         requested_claim_scope_ids=requested_claim_scope_ids,
+        artifact_inventory=artifact_inventory,
+        artifact_binding_unit_ids=artifact_binding_unit_ids,
+        interface_receipt_refs=interface_receipt_refs,
     )
     return replace(
         native,

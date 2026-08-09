@@ -1,0 +1,18 @@
+{
+  "schema_version": "skillguard.test_mesh_manifest.current",
+  "mesh_id": "researchguard-suite-owner-receipt-mesh",
+  "source_model_id": "researchguard.suite.validation_composition.current",
+  "profiles": [
+    {
+      "profile_id": "focused",
+      "closure_profile_id": "enforced",
+      "full_admission_required": false
+    },
+    {
+      "profile_id": "full",
+      "closure_profile_id": "enforced",
+      "full_admission_required": true
+    }
+  ],
+  "claim_boundary": "This one unit-level definition selects each ResearchGuard member's existing enforced closure. One legitimate claimed run per member is required before member-specific plan_only can freeze owners. It declares no commands, source paths, aliases, fallback, execution result, or receipt authority; full remains separately admitted."
+}

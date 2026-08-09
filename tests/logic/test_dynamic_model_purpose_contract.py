@@ -57,6 +57,17 @@ def _model(model_id: str = "current-model") -> dict:
             {"source": "L1", "target": "C0", "type": "qualifies"},
             {"source": "R1", "target": "C0", "type": "attacks"},
         ],
+        "blocks": {
+            "B_MAIN": {
+                "parent": None,
+                "root_claim": "C0",
+                "member_nodes": ["C0", "E1", "W1", "A1", "L1", "R1"],
+                "internal_nodes": ["E1", "W1", "L1"],
+                "output_claims": ["C0"],
+                "local_assumptions": ["A1"],
+                "local_rebuttals": ["R1"],
+            }
+        },
     }
 
 
@@ -71,6 +82,16 @@ def _bad_missing(model: dict, node_id: str) -> dict:
     for collection in ("target_units", "model_cards"):
         for row in value["model"][collection]:
             row["node_ids"] = [item for item in row["node_ids"] if item != node_id]
+    for block in value.get("blocks", {}).values():
+        for field in (
+            "member_nodes",
+            "input_nodes",
+            "internal_nodes",
+            "output_claims",
+            "local_assumptions",
+            "local_rebuttals",
+        ):
+            block[field] = [item for item in block.get(field, []) if item != node_id]
     return value
 
 
@@ -103,7 +124,13 @@ def _failure(failure_id: str, code: str, good: str, bad: str) -> dict:
     }
 
 
-def _prepare(tmp_path: Path, *, multiple: bool = False, bad_actually_blocks: bool = True) -> tuple[Path, Path]:
+def _prepare(
+    tmp_path: Path,
+    *,
+    multiple: bool = False,
+    bad_actually_blocks: bool = True,
+    frozen_at: str | None = None,
+) -> tuple[Path, Path]:
     good = _model()
     _write(tmp_path / ".logicguard/cases/good.json", good)
     support_bad = _bad_missing(good, "E1") if bad_actually_blocks else good
@@ -133,10 +160,26 @@ def _prepare(tmp_path: Path, *, multiple: bool = False, bad_actually_blocks: boo
         target_root=tmp_path,
         declaration_path=declaration,
         output_path=contract,
+        frozen_at=frozen_at,
     )
     _write(tmp_path / "models/current.json", good)
     bind_target_candidate(target_root=tmp_path, contract_path=contract)
     return contract, tmp_path / "models/current.json"
+
+
+def test_explicit_freeze_time_makes_equivalent_target_contracts_reproducible(
+    tmp_path: Path,
+) -> None:
+    frozen_at = "2026-01-01T00:00:00+00:00"
+    first_contract, first_candidate = _prepare(
+        tmp_path / "first", frozen_at=frozen_at
+    )
+    second_contract, second_candidate = _prepare(
+        tmp_path / "second", frozen_at=frozen_at
+    )
+
+    assert first_contract.read_bytes() == second_contract.read_bytes()
+    assert first_candidate.read_bytes() == second_candidate.read_bytes()
 
 
 @pytest.mark.parametrize("multiple", [False, True])

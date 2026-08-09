@@ -1,0 +1,51 @@
+{
+  "contributions": [],
+  "dispositions": [],
+  "effective_intent_transitions": [
+    {
+      "schema": "flowguard.effective_intent_transition.v1",
+      "prior_contribution_id": "intent:strengthen-guard-domain-blueprint-spine:model:authoritative_model_system:self-dna-20260809",
+      "prior_contribution_fingerprint": "sha256:861e118ac1ad5021c36c5a4879abeca49d3069d66ef8b8d821192fbaead2b1d2",
+      "action": "retain",
+      "replacement_contribution_ids": [],
+      "reason": "Retain every accepted current intent contribution while refreshing only the authoritative model input inventory after authority activation.",
+      "fingerprint": "sha256:2a041576f77e98729c6985d71f62df46a1edd5d874f0715a6dddbc47e2a98abc"
+    },
+    {
+      "schema": "flowguard.effective_intent_transition.v1",
+      "prior_contribution_id": "intent:strengthen-guard-domain-blueprint-spine:model:compositional_verification_kernel:self-dna-20260809",
+      "prior_contribution_fingerprint": "sha256:a58a7431a348cf00bbec8e6eb6991fb86deb21e54d310c587aba140ae802ba49",
+      "action": "retain",
+      "replacement_contribution_ids": [],
+      "reason": "Retain every accepted current intent contribution while refreshing only the authoritative model input inventory after authority activation.",
+      "fingerprint": "sha256:7382c54e9cab54c45b25eda09cd8eec32b92cd8609c5cf58b139076d8498f1c0"
+    },
+    {
+      "schema": "flowguard.effective_intent_transition.v1",
+      "prior_contribution_id": "intent:strengthen-guard-domain-blueprint-spine:model:hierarchical_model_mesh:source-refresh-20260809",
+      "prior_contribution_fingerprint": "sha256:234c7f8f43708fd5e95fee37dd42a7a2708bc7af939352e5c297d782256303a2",
+      "action": "retain",
+      "replacement_contribution_ids": [],
+      "reason": "Retain every accepted current intent contribution while refreshing only the authoritative model input inventory after authority activation.",
+      "fingerprint": "sha256:a9e5b76bf5df07c09935e05961e68e31c92387122a2c556d0d976a8d1cc193f5"
+    },
+    {
+      "schema": "flowguard.effective_intent_transition.v1",
+      "prior_contribution_id": "intent:strengthen-guard-domain-blueprint-spine:model:model_test_code_alignment:source-refresh-20260809",
+      "prior_contribution_fingerprint": "sha256:5bfb6ba7793b0e89c718aee9c56c7037838829d6569d6824d01637a9a7564ccc",
+      "action": "retain",
+      "replacement_contribution_ids": [],
+      "reason": "Retain every accepted current intent contribution while refreshing only the authoritative model input inventory after authority activation.",
+      "fingerprint": "sha256:a28332da035200c99ca25785801624dc80248fd491fcf6a35a6f0a39c5680887"
+    },
+    {
+      "schema": "flowguard.effective_intent_transition.v1",
+      "prior_contribution_id": "intent:strengthen-guard-domain-blueprint-spine:model:researchguard_suite:source-refresh-20260809",
+      "prior_contribution_fingerprint": "sha256:2c98d8161768ca4318f488de5acdc18bdadd5be612415074f1583287ce841c9e",
+      "action": "retain",
+      "replacement_contribution_ids": [],
+      "reason": "Retain every accepted current intent contribution while refreshing only the authoritative model input inventory after authority activation.",
+      "fingerprint": "sha256:8565239c33899c70cb2e540b8d53f6fd28dced9c03ce94919473cdf7696684fe"
+    }
+  ]
+}

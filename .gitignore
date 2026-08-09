@@ -13,7 +13,7 @@ venv/
 .local/
 work/
 tmp/
+.flowguard/evidence/
 *.log
 *.bak
 *.tmp
-

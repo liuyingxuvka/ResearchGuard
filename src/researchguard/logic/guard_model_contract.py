@@ -8,12 +8,13 @@ there is no cross-Skill reader or alternate runtime root.
 from __future__ import annotations
 
 import argparse
+import base64
 from copy import deepcopy
 from datetime import datetime, timezone
 import hashlib
 import json
 import os
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any, Mapping
 
 import yaml
@@ -25,6 +26,10 @@ TARGET_DECLARATION_SCHEMA = (
 TARGET_CONTRACT_SCHEMA = "researchguard.logic.target_model_purpose_contract.v1"
 TARGET_BINDING_SCHEMA = "researchguard.logic.target_model_purpose_binding.v1"
 TARGET_PROOF_SCHEMA = "researchguard.logic.target_model_purpose_proof.v1"
+PORTABLE_TARGET_PROOF_MATERIAL_SCHEMA = (
+    "researchguard.logic.portable_target_proof_material.v1"
+)
+PORTABLE_TARGET_PROOF_MATERIAL_ID = "logicguard:target-proof-material"
 TARGET_ROLE = "target_model_instance"
 TARGET_SKILL_ID = "logicguard"
 TARGET_AUTHORING_ORDER = [
@@ -68,6 +73,23 @@ def _load_document(path: Path) -> dict[str, Any]:
     return value
 
 
+def _load_document_bytes(*, relative_path: str, body: bytes) -> dict[str, Any]:
+    try:
+        if Path(relative_path).suffix.lower() in {".yaml", ".yml"}:
+            value = yaml.safe_load(body.decode("utf-8"))
+        else:
+            value = json.loads(body.decode("utf-8"))
+    except (UnicodeError, json.JSONDecodeError, yaml.YAMLError) as exc:
+        raise GuardModelContractError(
+            f"cannot load portable target document {relative_path}: {exc}"
+        ) from exc
+    if not isinstance(value, dict):
+        raise GuardModelContractError(
+            f"portable target document {relative_path} must contain one object"
+        )
+    return value
+
+
 def _write_document_atomic(path: Path, value: Mapping[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_suffix(path.suffix + ".tmp")
@@ -90,14 +112,20 @@ def _inside(
     *,
     must_exist: bool,
 ) -> Path:
+    resolved_root = Path(root).resolve()
     candidate = Path(relative_or_absolute)
-    path = (
-        candidate.resolve()
-        if candidate.is_absolute()
-        else (root / candidate).resolve()
-    )
+    if candidate.is_absolute():
+        path = candidate.resolve()
+    else:
+        cwd_candidate = candidate.resolve()
+        try:
+            cwd_candidate.relative_to(resolved_root)
+        except ValueError:
+            path = (resolved_root / candidate).resolve()
+        else:
+            path = cwd_candidate
     try:
-        path.relative_to(root)
+        path.relative_to(resolved_root)
     except ValueError as exc:
         raise GuardModelContractError(
             f"logicguard_blocked:target-path-escape:{relative_or_absolute}"
@@ -186,8 +214,13 @@ def freeze_target_contract(
     target_root: str | Path,
     declaration_path: str | Path,
     output_path: str | Path,
+    frozen_at: str | None = None,
 ) -> dict[str, Any]:
-    """Freeze the AI purpose declaration before the candidate exists."""
+    """Freeze the AI purpose declaration before the candidate exists.
+
+    ``frozen_at`` is an explicit clock value for reproducible compilers and
+    fixtures. Ordinary callers omit it and record the current UTC instant.
+    """
 
     root = Path(target_root).resolve(strict=True)
     declaration_file = _inside(root, declaration_path, must_exist=True)
@@ -310,6 +343,23 @@ def freeze_target_contract(
             }
         )
 
+    if frozen_at is None:
+        effective_frozen_at = datetime.now(timezone.utc).isoformat()
+    else:
+        try:
+            parsed_frozen_at = datetime.fromisoformat(
+                str(frozen_at).replace("Z", "+00:00")
+            )
+        except ValueError as exc:
+            raise GuardModelContractError(
+                "target purpose frozen_at must be an ISO-8601 timestamp"
+            ) from exc
+        if parsed_frozen_at.tzinfo is None:
+            raise GuardModelContractError(
+                "target purpose frozen_at must include a timezone"
+            )
+        effective_frozen_at = parsed_frozen_at.isoformat()
+
     contract: dict[str, Any] = {
         "schema_version": TARGET_CONTRACT_SCHEMA,
         "contract_role": TARGET_ROLE,
@@ -320,7 +370,7 @@ def freeze_target_contract(
         "native_route_id": route,
         "declared_by": "ai",
         "declaration_status": "frozen",
-        "frozen_at": datetime.now(timezone.utc).isoformat(),
+        "frozen_at": effective_frozen_at,
         "prevented_failure_purpose": purpose,
         "claim_boundary": boundary,
         "candidate_relative_path": candidate_file.relative_to(root).as_posix(),
@@ -562,17 +612,15 @@ def _evaluate_document(
     )
 
 
-def verify_target_contract(
+def _verify_loaded_target_contract(
+    contract: Mapping[str, Any],
     *,
-    target_root: str | Path,
-    contract_path: str | Path,
-    expected_target_skill_id: str | None = None,
+    load_relative_document,
+    relative_file_sha256,
+    expected_target_skill_id: str | None,
 ) -> dict[str, Any]:
-    root = Path(target_root).resolve(strict=True)
-    _path, contract = load_target_contract(
-        target_root=root,
-        contract_path=contract_path,
-    )
+    """Run the one LogicGuard target-proof engine over an exact document set."""
+
     target = str(contract["target_skill_id"])
     if (
         expected_target_skill_id is not None
@@ -582,12 +630,7 @@ def verify_target_contract(
             "logicguard_blocked:foreign-target-identity: target contract "
             "belongs to another skill"
         )
-    candidate_file = _inside(
-        root,
-        str(contract["candidate_relative_path"]),
-        must_exist=True,
-    )
-    candidate = _load_document(candidate_file)
+    candidate = load_relative_document(str(contract["candidate_relative_path"]))
     binding = _validate_target_candidate_binding(contract, candidate)
     candidate_status, candidate_findings, native_fingerprint = (
         _evaluate_document(candidate)
@@ -598,21 +641,23 @@ def verify_target_contract(
         failure_id = str(failure["failure_id"])
         oracle = failure["oracle"]
         finding_code = str(oracle["finding_code"])
-        good_file = _inside(
-            root,
-            str(failure["known_good_relative_path"]),
-            must_exist=True,
-        )
-        bad_file = _inside(
-            root,
-            str(failure["known_bad_relative_path"]),
-            must_exist=True,
-        )
+        good_relative = str(failure["known_good_relative_path"])
+        bad_relative = str(failure["known_bad_relative_path"])
+        if relative_file_sha256(good_relative) != failure["known_good_sha256"]:
+            raise GuardModelContractError(
+                "logicguard_blocked:target-proof-case-stale:"
+                f"{failure_id}:known_good"
+            )
+        if relative_file_sha256(bad_relative) != failure["known_bad_sha256"]:
+            raise GuardModelContractError(
+                "logicguard_blocked:target-proof-case-stale:"
+                f"{failure_id}:known_bad"
+            )
         good_status, good_findings, _ = _evaluate_document(
-            _load_document(good_file)
+            load_relative_document(good_relative)
         )
         bad_status, bad_findings, _ = _evaluate_document(
-            _load_document(bad_file)
+            load_relative_document(bad_relative)
         )
 
         def fires(findings: list[str]) -> bool:
@@ -674,6 +719,252 @@ def verify_target_contract(
         "proofed_failure_count": len(proofs),
         "selectable_modes": [],
     }
+
+
+def verify_target_contract(
+    *,
+    target_root: str | Path,
+    contract_path: str | Path,
+    expected_target_skill_id: str | None = None,
+) -> dict[str, Any]:
+    root = Path(target_root).resolve(strict=True)
+    _path, contract = load_target_contract(
+        target_root=root,
+        contract_path=contract_path,
+    )
+
+    def load_relative(relative_path: str) -> dict[str, Any]:
+        return _load_document(_inside(root, relative_path, must_exist=True))
+
+    def hash_relative(relative_path: str) -> str:
+        return _file_sha256(_inside(root, relative_path, must_exist=True))
+
+    return _verify_loaded_target_contract(
+        contract,
+        load_relative_document=load_relative,
+        relative_file_sha256=hash_relative,
+        expected_target_skill_id=expected_target_skill_id,
+    )
+
+
+def build_portable_target_contract_material(
+    *, target_root: str | Path, contract_path: str | Path
+) -> bytes:
+    """Freeze the closed LogicGuard proof-file denominator for portable replay."""
+
+    root = Path(target_root).resolve(strict=True)
+    contract_file, contract = load_target_contract(
+        target_root=root,
+        contract_path=contract_path,
+    )
+    required_paths = {
+        contract_file.relative_to(root).as_posix(),
+        str(contract["candidate_relative_path"]),
+    }
+    for failure in contract["prevented_failure_classes"]:
+        required_paths.add(str(failure["known_good_relative_path"]))
+        required_paths.add(str(failure["known_bad_relative_path"]))
+    rows: list[dict[str, Any]] = []
+    for relative_path in sorted(required_paths):
+        path = _inside(root, relative_path, must_exist=True)
+        body = path.read_bytes()
+        rows.append(
+            {
+                "relative_path": path.relative_to(root).as_posix(),
+                "media_type": (
+                    "application/yaml"
+                    if path.suffix.lower() in {".yaml", ".yml"}
+                    else "application/json"
+                ),
+                "sha256": hashlib.sha256(body).hexdigest(),
+                "body_b64": base64.b64encode(body).decode("ascii"),
+            }
+        )
+    return _canonical_bytes(
+        {
+            "schema_version": PORTABLE_TARGET_PROOF_MATERIAL_SCHEMA,
+            "target_root_locator": "portable-target-root",
+            "guard_contract_locator": contract_file.relative_to(root).as_posix(),
+            "files": rows,
+        }
+    )
+
+
+def _portable_relative_path(value: object) -> str:
+    text = str(value).strip().replace("\\", "/")
+    path = PurePosixPath(text)
+    if not text or path.is_absolute() or ".." in path.parts or "." in path.parts:
+        raise GuardModelContractError(
+            f"logicguard_blocked:portable-target-path-invalid:{text}"
+        )
+    return path.as_posix()
+
+
+def _validate_portable_contract_document(
+    contract: Mapping[str, Any], documents: Mapping[str, bytes]
+) -> set[str]:
+    if (
+        contract.get("schema_version") != TARGET_CONTRACT_SCHEMA
+        or contract.get("contract_role") != TARGET_ROLE
+    ):
+        raise GuardModelContractError(
+            "logicguard_blocked:wrong-contract-role: portable target authority is not a target-model contract"
+        )
+    if (
+        contract.get("declared_by") != "ai"
+        or contract.get("declaration_status") != "frozen"
+    ):
+        raise GuardModelContractError(
+            "portable target purpose contract is not an AI-authored frozen authority"
+        )
+    if contract.get("candidate_requires_contract_fingerprint") is not True:
+        raise GuardModelContractError(
+            "portable target candidate must bind the frozen contract fingerprint"
+        )
+    if contract.get("authoring_order") != TARGET_AUTHORING_ORDER:
+        raise GuardModelContractError(
+            "portable target purpose-before-candidate authoring order is invalid"
+        )
+    if contract.get("selectable_modes") != []:
+        raise GuardModelContractError("portable target model purpose has no selectable mode")
+    for field in (
+        "contract_id",
+        "model_id",
+        "target_skill_id",
+        "native_owner_id",
+        "native_route_id",
+        "prevented_failure_purpose",
+        "claim_boundary",
+        "candidate_relative_path",
+    ):
+        _require_text(contract, field, where="portable target contract")
+    _require_logicguard_target(str(contract["target_skill_id"]))
+    if str(contract.get("contract_fingerprint", "")) != _target_contract_fingerprint(contract):
+        raise GuardModelContractError(
+            "logicguard_blocked:target-contract-stale: portable target contract fingerprint differs"
+        )
+    failures = contract.get("prevented_failure_classes")
+    if not isinstance(failures, list) or not failures:
+        raise GuardModelContractError("portable target contract requires failures")
+    required = {_portable_relative_path(contract["candidate_relative_path"])}
+    seen: set[str] = set()
+    for index, raw in enumerate(failures):
+        where = f"portable target contract failure[{index}]"
+        if not isinstance(raw, Mapping):
+            raise GuardModelContractError(f"{where} must be an object")
+        failure_id = _require_text(raw, "failure_id", where=where)
+        if failure_id in seen:
+            raise GuardModelContractError("portable target failure ids must be unique")
+        seen.add(failure_id)
+        _require_text(raw, "title", where=where)
+        _require_text(raw, "block_when", where=where)
+        oracle = raw.get("oracle")
+        if not isinstance(oracle, Mapping):
+            raise GuardModelContractError(f"{where} requires one native oracle")
+        if _require_text(oracle, "kind", where=f"{where}.oracle") not in SUPPORTED_ORACLES:
+            raise GuardModelContractError("portable target oracle kind is unsupported")
+        _require_text(oracle, "finding_code", where=f"{where}.oracle")
+        for prefix in ("known_good", "known_bad"):
+            relative = _portable_relative_path(
+                _require_text(raw, f"{prefix}_relative_path", where=where)
+            )
+            expected_hash = _require_text(raw, f"{prefix}_sha256", where=where)
+            body = documents.get(relative)
+            if body is None or hashlib.sha256(body).hexdigest() != expected_hash:
+                raise GuardModelContractError(
+                    "logicguard_blocked:target-proof-case-stale:"
+                    f"{failure_id}:{prefix}"
+                )
+            required.add(relative)
+    return required
+
+
+def verify_portable_target_contract_material(
+    material: bytes,
+    *,
+    target_root: str | Path,
+    contract_path: str | Path,
+    expected_target_skill_id: str | None = None,
+) -> dict[str, Any]:
+    """Replay the native LogicGuard proof without local target files."""
+
+    try:
+        raw = json.loads(material.decode("utf-8"))
+    except (UnicodeError, json.JSONDecodeError) as exc:
+        raise GuardModelContractError("portable target proof material is not JSON") from exc
+    if not isinstance(raw, Mapping) or set(raw) != {
+        "schema_version",
+        "target_root_locator",
+        "guard_contract_locator",
+        "files",
+    }:
+        raise GuardModelContractError("portable target proof material has an invalid root denominator")
+    if raw.get("schema_version") != PORTABLE_TARGET_PROOF_MATERIAL_SCHEMA:
+        raise GuardModelContractError("portable target proof material schema is not current")
+    if raw["target_root_locator"] != "portable-target-root":
+        raise GuardModelContractError("portable target proof locator binding differs")
+    try:
+        contract_relative = _portable_relative_path(raw["guard_contract_locator"])
+        expected_root = Path(target_root).resolve()
+        requested_contract = _inside(
+            expected_root, contract_path, must_exist=False
+        )
+        requested_relative = requested_contract.relative_to(expected_root).as_posix()
+    except ValueError as exc:
+        raise GuardModelContractError("portable target contract escapes its root") from exc
+    if requested_relative != contract_relative:
+        raise GuardModelContractError("portable target proof locator binding differs")
+    rows = raw["files"]
+    if not isinstance(rows, list) or not rows:
+        raise GuardModelContractError("portable target proof material has no files")
+    documents: dict[str, bytes] = {}
+    for row in rows:
+        if not isinstance(row, Mapping) or set(row) != {
+            "relative_path",
+            "media_type",
+            "sha256",
+            "body_b64",
+        }:
+            raise GuardModelContractError("portable target proof file denominator is invalid")
+        relative = _portable_relative_path(row["relative_path"])
+        if relative in documents:
+            raise GuardModelContractError("portable target proof file identity is duplicated")
+        try:
+            body = base64.b64decode(str(row["body_b64"]).encode("ascii"), validate=True)
+        except (UnicodeError, ValueError) as exc:
+            raise GuardModelContractError("portable target proof file bytes are invalid") from exc
+        if hashlib.sha256(body).hexdigest() != str(row["sha256"]):
+            raise GuardModelContractError("portable target proof file fingerprint differs")
+        documents[relative] = body
+    contract_body = documents.get(contract_relative)
+    if contract_body is None:
+        raise GuardModelContractError("portable target contract file is missing")
+    contract = _load_document_bytes(relative_path=contract_relative, body=contract_body)
+    required = _validate_portable_contract_document(contract, documents)
+    required.add(contract_relative)
+    if set(documents) != required:
+        raise GuardModelContractError("portable target proof file denominator is not closed")
+
+    def load_relative(relative_path: str) -> dict[str, Any]:
+        normalized = _portable_relative_path(relative_path)
+        body = documents.get(normalized)
+        if body is None:
+            raise GuardModelContractError(f"portable target proof file is missing:{normalized}")
+        return _load_document_bytes(relative_path=normalized, body=body)
+
+    def hash_relative(relative_path: str) -> str:
+        normalized = _portable_relative_path(relative_path)
+        body = documents.get(normalized)
+        if body is None:
+            raise GuardModelContractError(f"portable target proof file is missing:{normalized}")
+        return hashlib.sha256(body).hexdigest()
+
+    return _verify_loaded_target_contract(
+        contract,
+        load_relative_document=load_relative,
+        relative_file_sha256=hash_relative,
+        expected_target_skill_id=expected_target_skill_id,
+    )
 
 
 def main(argv: list[str] | None = None) -> int:

@@ -20,6 +20,13 @@ import yaml
 from researchguard import __version__
 
 from .depth import apply_observation_and_replan
+from .blueprint import (
+    InformationTargetUniverse,
+    check_blueprint,
+    export_blueprint,
+    impact_blueprint,
+    reverse_trace_claim_use,
+)
 from .guard_contract import load_target_contract, prove_target_model_contract
 from .handoff import export_logicguard_source_candidates, export_traceguard_seed
 from .loader import load_model, validate_model, write_yaml
@@ -280,6 +287,35 @@ def build_parser() -> argparse.ArgumentParser:
     compare.add_argument("--before-model-contract", required=True)
     compare.add_argument("--after-model-contract", required=True)
     compare.add_argument("--pretty", action="store_true")
+
+    blueprint = sub.add_parser(
+        "blueprint",
+        help="Check, inspect impact, reverse trace, or export the native information blueprint.",
+    )
+    blueprint_sub = blueprint.add_subparsers(dest="blueprint_command", required=True)
+    blueprint_check = blueprint_sub.add_parser("check")
+    blueprint_check.add_argument("model")
+    blueprint_check.add_argument("--model-contract", required=True)
+    blueprint_check.add_argument("--universe", required=True)
+    blueprint_check.add_argument("--pretty", action="store_true")
+    blueprint_impact = blueprint_sub.add_parser("impact")
+    blueprint_impact.add_argument("model")
+    blueprint_impact.add_argument("--model-contract", required=True)
+    blueprint_impact.add_argument("--changed-id", action="append", required=True)
+    blueprint_impact.add_argument("--universe", required=True)
+    blueprint_impact.add_argument("--pretty", action="store_true")
+    blueprint_trace = blueprint_sub.add_parser("trace")
+    blueprint_trace.add_argument("model")
+    blueprint_trace.add_argument("--model-contract", required=True)
+    blueprint_trace.add_argument("--claim-use-id", required=True)
+    blueprint_trace.add_argument("--universe", required=True)
+    blueprint_trace.add_argument("--pretty", action="store_true")
+    blueprint_export = blueprint_sub.add_parser("export")
+    blueprint_export.add_argument("model")
+    blueprint_export.add_argument("--model-contract", required=True)
+    blueprint_export.add_argument("--universe", required=True)
+    blueprint_export.add_argument("--output", required=True)
+    blueprint_export.add_argument("--pretty", action="store_true")
     return parser
 
 
@@ -660,7 +696,55 @@ def run(args: argparse.Namespace) -> int:
             args.pretty,
         )
         return 0
+    if args.command == "blueprint":
+        model = load_model(args.model, args.model_contract)
+        if args.blueprint_command == "check":
+            result = check_blueprint(model, _load_information_universe(args.universe), contract_path=args.model_contract)
+            _json_out(result.to_dict(), args.pretty)
+            return 0 if result.status == "complete" else 3
+        if args.blueprint_command == "impact":
+            payload = impact_blueprint(
+                model,
+                args.changed_id,
+                _load_information_universe(args.universe),
+                contract_path=args.model_contract,
+            )
+            _json_out(payload, args.pretty)
+            return 3 if payload["unknown_ownership"] else 0
+        if args.blueprint_command == "trace":
+            payload = reverse_trace_claim_use(
+                model,
+                args.claim_use_id,
+                _load_information_universe(args.universe),
+                contract_path=args.model_contract,
+            )
+            _json_out(payload, args.pretty)
+            return 0 if payload["trace_status"] == "complete" else 3
+        if args.blueprint_command == "export":
+            _require_new_outputs(
+                inputs=[args.model, args.model_contract, args.universe],
+                outputs=[args.output],
+            )
+            payload = export_blueprint(model, _load_information_universe(args.universe), contract_path=args.model_contract)
+            _write_json(args.output, payload)
+            _json_out(
+                {
+                    "ok": payload["check"]["status"] == "complete",
+                    "output": args.output,
+                    "blueprint_fingerprint": payload["check"]["blueprint_fingerprint"],
+                    "claim_boundary": payload["check"]["claim_boundary"],
+                },
+                args.pretty,
+            )
+            return 0 if payload["check"]["status"] == "complete" else 3
     raise ValueError(f"Unknown command {args.command!r}")
+
+
+def _load_information_universe(path: str | Path) -> InformationTargetUniverse:
+    raw = yaml.safe_load(Path(path).read_text(encoding="utf-8"))
+    if not isinstance(raw, Mapping):
+        raise ValueError("information target universe must contain an object")
+    return InformationTargetUniverse.from_dict(raw)
 
 
 def _load_json_object(path: str | Path) -> dict[str, Any]:

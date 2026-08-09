@@ -30,7 +30,7 @@
   "native_binding": {
     "route_id": "route:logicguard-authoritative-depth",
     "owner_callable": "researchguard.logic.execution_depth:build_logic_depth_receipt",
-    "owner_fingerprint": "715d09963a835881494ce90311a2cd8591de98a67b69803e072e314c112bb29d",
+    "owner_fingerprint": "32b2c9ac677dd0ec4d03a478191e04b1a852c879a81a97bbf1af8942bbbb108f",
     "validators": [
       {
         "validator_id": "logicguard-template-pack:execution-package",

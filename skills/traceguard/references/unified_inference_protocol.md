@@ -129,3 +129,5 @@ responds to declared changes.
 
 It does not by itself establish factual truth, statistically identify causal
 effects, predict an intervention, or license final prose.
+
+When a trace blueprint is requested, the blueprint may project this receipt's identities, contributions, alternatives, and bounded causal status. It must verify current model/problem fingerprints and cannot rescore, reinterpret solver failure, or substitute an authored pass receipt. See `trace-blueprint-contract.md`.

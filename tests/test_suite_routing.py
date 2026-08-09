@@ -2,7 +2,12 @@ from __future__ import annotations
 
 from copy import deepcopy
 
-from admission_fixtures import composition, member_task_facts, task_facts
+from admission_fixtures import (
+    composition,
+    member_task_facts,
+    native_owner_attestations,
+    task_facts,
+)
 from researchguard import MEMBER_IDS, SUITE_ID, __version__
 from researchguard.routing import (
     RouteBinding,
@@ -13,17 +18,26 @@ from researchguard.routing import (
     create_handoff,
     select_member_request,
 )
-from researchguard.suite import suite_identity
+from researchguard.suite import governed_file_manifest, suite_identity
 
 
 def test_suite_identity_is_single_and_complete() -> None:
     identity = suite_identity()
     assert identity["suite_id"] == SUITE_ID
-    assert identity["version"] == __version__ == "0.4.1"
+    assert identity["version"] == __version__ == "0.4.3"
     assert identity["members"] == list(MEMBER_IDS)
     assert identity["distribution"] == "researchguard"
     assert identity["console_script"] == "researchguard"
     assert identity["fingerprint"].startswith("sha256:")
+
+
+def test_suite_identity_does_not_hash_its_generated_dna_back_into_itself() -> None:
+    paths = {path for path, _fingerprint in governed_file_manifest()}
+
+    assert "domain_dna.py" in paths
+    assert not any(
+        path.startswith("resources/external_domain_dna/") for path in paths
+    )
 
 
 def test_direct_member_binding_skips_umbrella() -> None:
@@ -115,7 +129,12 @@ def test_irreducible_pair_requires_and_accepts_declarative_composition() -> None
         additional_primary_kinds=("trace.temporal_reconstruction",),
         composition=plan,
     )
-    result = select_member_request(facts, argv, business_intent_id=intent)
+    result = select_member_request(
+        facts,
+        argv,
+        business_intent_id=intent,
+        native_owner_attestations=native_owner_attestations(plan),
+    )
     assert isinstance(result, RouteComposition)
     assert result.member_ids == ("sourceguard", "traceguard")
     assert result.status == "composition_ready"
@@ -139,7 +158,12 @@ def test_irreducible_three_member_set_is_supported_without_run_all() -> None:
         ),
         composition=plan,
     )
-    result = select_member_request(facts, argv, business_intent_id=intent)
+    result = select_member_request(
+        facts,
+        argv,
+        business_intent_id=intent,
+        native_owner_attestations=native_owner_attestations(plan),
+    )
     assert isinstance(result, RouteComposition)
     assert result.member_ids == ("sourceguard", "traceguard", "logicguard")
 

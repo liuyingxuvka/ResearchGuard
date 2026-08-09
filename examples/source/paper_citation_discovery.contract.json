@@ -12,7 +12,7 @@
       "known_bad": {"case_id": "bad:paper-citation:unqualified-baseline", "observation_path": "model-purpose-observation.yaml", "expected_native_status": "blocked", "mutation_id": "make-all-anchors-unusable", "expected_native_finding": "gaps:gap-baseline"}
     }
   ],
-  "external_universe": {"gap_ids": ["gap-baseline", "gap-counter"], "target_unit_ids": []},
+  "external_universe": {"gap_ids": ["gap-baseline", "gap-counter"], "target_unit_ids": [], "source_role_ids": ["source-role:gap-baseline:expert_analysis", "source-role:gap-baseline:historical_background", "source-role:gap-counter:counter_evidence", "source-role:gap-counter:limiting_evidence"], "lineage_slot_ids": [], "anchor_requirement_ids": ["anchor-target-citation"], "handoff_ids": []},
   "claim_boundary": "Citation candidates are not final claim support until modeled downstream.",
   "native_oracle_catalog_fingerprint": "2C01D891559625D9123F17E817B63B3E4E9323CA1C3EB81923B82D7DBDC79B15",
   "purpose_frozen": true,

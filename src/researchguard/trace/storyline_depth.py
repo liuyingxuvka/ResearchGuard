@@ -23,6 +23,7 @@ from .schema import (
     TraceCandidate,
     TraceGuardModel,
     clamp01,
+    trace_model_fingerprint,
 )
 from .stage_model import ORDERED_STAGE_INDEX, stage_for_event
 
@@ -149,6 +150,13 @@ class StorylineDepthReceipt:
     predictive_claim_licensed: bool
     closure_status: str
     claim_boundary: str
+    hierarchy_fingerprint: str = ""
+    interface_fingerprint: str = ""
+    affected_object_ids: tuple[str, ...] = ()
+    live_alternative_ids: tuple[str, ...] = ()
+    causal_boundaries: tuple[dict[str, Any], ...] = ()
+    deepest_proven_layer: str = ""
+    first_unresolved_gap: str = ""
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -183,12 +191,18 @@ class StorylineDepthReceipt:
             "predictive_claim_licensed": self.predictive_claim_licensed,
             "closure_status": self.closure_status,
             "claim_boundary": self.claim_boundary,
+            "hierarchy_fingerprint": self.hierarchy_fingerprint,
+            "interface_fingerprint": self.interface_fingerprint,
+            "affected_object_ids": list(self.affected_object_ids),
+            "live_alternative_ids": list(self.live_alternative_ids),
+            "causal_boundaries": list(self.causal_boundaries),
+            "deepest_proven_layer": self.deepest_proven_layer,
+            "first_unresolved_gap": self.first_unresolved_gap,
         }
 
 
 def _model_fingerprint(model: TraceGuardModel) -> str:
-    payload = json.dumps(asdict(model), sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
-    return hashlib.sha256(payload).hexdigest()
+    return trace_model_fingerprint(model)
 
 
 def _canonical_sha256(value: object) -> str:
@@ -1983,6 +1997,61 @@ def evaluate_storyline_depth(
         "untested_count": len(candidates) - len(executed_ids),
         "critical_uncovered_count": len(critical_uncovered),
     }
+    from .blueprint import hierarchy_fingerprint, interface_fingerprint
+
+    inference_receipt = baseline_result.inference_receipt
+    live_alternative_ids = tuple(
+        sorted(
+            item.hypothesis_id
+            for item in inference_receipt.hypothesis_projections
+            if item.live
+        )
+    )
+    hypothesis_by_id = {item.hypothesis_id: item for item in hypotheses}
+    causal_boundaries = tuple(
+        {
+            "hypothesis_id": item.hypothesis_id,
+            "native_causal_status": item.causal_status,
+            "alternative_ids": sorted(
+                hypothesis_by_id.get(item.hypothesis_id).alternative_to
+                if hypothesis_by_id.get(item.hypothesis_id)
+                else ()
+            ),
+            "confounder_ids": sorted(
+                hypothesis_by_id.get(item.hypothesis_id).confounder_ids
+                if hypothesis_by_id.get(item.hypothesis_id)
+                else ()
+            ),
+            "claim_boundary": item.claim_boundary,
+            "formal_causal_identification_licensed": False,
+        }
+        for item in inference_receipt.hypothesis_projections
+    )
+    affected_object_ids = {
+        str(row.get("object_id", ""))
+        for row in object_depth_rows
+        if row.get("status") != "pass" and row.get("object_id")
+    }
+    for effect in effects:
+        affected_object_ids.update(
+            value
+            for value in (
+                effect.perturbation.target_hypothesis_id,
+                effect.perturbation.target_trace_id,
+                effect.perturbation.target_event_id,
+                effect.perturbation.target_evidence_id,
+            )
+            if value
+        )
+    first_unresolved_gap = (
+        str(
+            unresolved[0].get("gap_id")
+            or unresolved[0].get("finding_id")
+            or _canonical_sha256(unresolved[0])[:20]
+        )
+        if unresolved
+        else ""
+    )
     receipt_id = f"traceguard-depth:{fingerprint[:16]}"
     return StorylineDepthReceipt(
         schema_version="researchguard.trace.storyline_depth.v2",
@@ -2049,4 +2118,13 @@ def evaluate_storyline_depth(
             "executed perturbations, and covered claim scope. "
             "It does not prove factual truth, causal identification, calibrated probability, or future real-world outcomes."
         ),
+        hierarchy_fingerprint=hierarchy_fingerprint(model),
+        interface_fingerprint=interface_fingerprint(model),
+        affected_object_ids=tuple(sorted(affected_object_ids)),
+        live_alternative_ids=live_alternative_ids,
+        causal_boundaries=causal_boundaries,
+        deepest_proven_layer=(
+            "native-storyline-depth" if closure_status == "PASS" else "native-inference-receipt"
+        ),
+        first_unresolved_gap=first_unresolved_gap,
     )

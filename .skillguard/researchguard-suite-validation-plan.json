@@ -1,6 +1,12 @@
 {
   "schema_version": "researchguard.skillguard_unit_validation_plan.v1",
-  "status": "frozen",
+  "status": "stale",
+  "execution_disposition": "not_executable",
+  "stale_reason_codes": [
+    "flowguard-0.68.2-plan-predates-native-blueprint-contracts",
+    "flowguard-toolchain-not-frozen",
+    "self-dna-binding-deferred"
+  ],
   "maintenance_unit_id": "unit:researchguard-suite",
   "member_skill_ids": [
     "researchguard",
@@ -11,8 +17,9 @@
   ],
   "toolchain": {
     "skillguard_version": "0.7.2",
-    "skillguard_source_revision": "sha256:831992b5d53f92ab901abea09008047e09e7863d9ffa61ef039b929829552830",
+    "skillguard_source_revision": "sha256:a34718b6832e25679e0dddd48a1ae05183aa6686167f48d5a15b03e958607f2a",
     "flowguard_version": "0.68.2",
+    "flowguard_status": "stale_later_binding",
     "python_command": "python"
   },
   "private_roots": {
@@ -22,8 +29,8 @@
   "members": [
     {
       "member_skill_id": "researchguard",
-      "contract_hash": "3F6C537A64FE1A20ED9D465900C8F82E9BC1927D50D4C2E1AB35A220BC809B3C",
-      "manifest_hash": "8AD95CC2837B72BC0B2720448C52FE65DD84338A050E5F617D66F91A4079AE8C",
+      "contract_hash": "1DBF9C21C824D9DB53ECF4FEA3001D2B70986233EAC736C0F2731A555220449B",
+      "manifest_hash": "C8A61D621BB05D67D6B485E31A2848B8D01A5128504F04F08DD1DDB9A75F2556",
       "checks": [
         {
           "check_id": "check:researchguard:consumer-contract",
@@ -63,8 +70,8 @@
     },
     {
       "member_skill_id": "logicguard",
-      "contract_hash": "A0E02B6246063067CA2FE6A3571B2C6C7FA35930F8CEE0A7526018CBD201405C",
-      "manifest_hash": "D8FA7750D178C2A734273830C0717C02D35B60A51D15BC7C2A60F555BF363C11",
+      "contract_hash": "E574F57120B18A4E71DB4DEC0E599C193E2FC467BC93D74A76CCF721754DD8A5",
+      "manifest_hash": "ECACD66F17DB6B8CD8AD44AEE1AC46BBB03EE5A98B09CE79AE37FC1DA22BEA10",
       "checks": [
         {
           "check_id": "check:logicguard:consumer-contract",
@@ -104,8 +111,8 @@
     },
     {
       "member_skill_id": "sourceguard",
-      "contract_hash": "12ECBC398E25C698302D9D4454FE8D0459FADD70398739B6A72FAB99840A8C34",
-      "manifest_hash": "D68854B5E67100028CDE1001C9CB610C6FA1B18A0F42C42F675C8011B1731CDA",
+      "contract_hash": "84DA8C1F8334F2B2248516240153C98DE84B8F09ED04C5A08A5035A9F1600E4D",
+      "manifest_hash": "18521EB874E9C7B4EFF7035D64493EB3E1DEFF4FC1B079AFD3212565B9372D78",
       "checks": [
         {
           "check_id": "check:sourceguard:consumer-contract",
@@ -145,8 +152,8 @@
     },
     {
       "member_skill_id": "traceguard",
-      "contract_hash": "1D5BBD26911D52F1D33F2B7506ECDC9DAD4A26AAF8EAB55E0F422D8FE7D7D42A",
-      "manifest_hash": "DBBF79ADE3CF9AFB73A0D73607E6BF60A2CC260902E2DCF52AAF33A5A7997097",
+      "contract_hash": "32DFF5C23CAA48E90FE19D6915445BA94865E67DC124A1A6A29F36690C296855",
+      "manifest_hash": "410C99FFA8CB0220D1F4395C47F29B944809F6BD286E530E52129665746250E7",
       "checks": [
         {
           "check_id": "check:traceguard:consumer-contract",
@@ -186,8 +193,8 @@
     },
     {
       "member_skill_id": "experimentguard",
-      "contract_hash": "E91D1EDD46D0196F69BA67B53F370E4A769C1701157B191F003D4DF139B090E1",
-      "manifest_hash": "DD31B49D68E35F3BBD9D6385D284A1825DA0D10E0B9B08F32AA0106D56351004",
+      "contract_hash": "3BFDA561D42AC249C89F7C678FD7EA2D1CE9D9BB7A942B08329F32A3CF73D43D",
+      "manifest_hash": "F1EE82E874DA0D45B254785D7C5371FE509DE48BA536A9035EF579DA862699CA",
       "checks": [
         {
           "check_id": "check:experimentguard:consumer-contract",
@@ -230,5 +237,5 @@
   "check_count": 20,
   "cross_unit_receipt_reuse": false,
   "skillguard_adds_domain_route": false,
-  "claim_boundary": "This freezes the exact same-unit owner inventory for the current local maintenance change. It does not itself execute a check, activate a consumer installation, publish a release, or retire predecessor repositories."
+  "claim_boundary": "This file preserves the pre-blueprint FlowGuard 0.68.2 validation-plan identity as visibly stale and non-executable. Current native affected-only ownership comes from each compiled contract content-impact plan; FlowGuard self-DNA binding remains a later task after its toolchain is frozen."
 }

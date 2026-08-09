@@ -297,6 +297,26 @@ def apply_observation(belief_state: BeliefState, observation: Observation) -> Be
             "target_unit_ids": sorted(
                 {gap.structure_unit_id for gap in successor.gaps if gap.structure_unit_id}
             ),
+            "source_role_ids": sorted(
+                {
+                    f"source-role:{gap.gap_id}:{role}"
+                    for gap in successor.gaps
+                    for role in gap.suggested_source_roles
+                }
+            ),
+            "lineage_slot_ids": sorted(
+                {
+                    f"lineage:{source.lineage_id}"
+                    for source in successor.sources
+                    if source.lineage_id
+                }
+            ),
+            "anchor_requirement_ids": sorted(
+                anchor.anchor_id for anchor in successor.anchors
+            ),
+            "handoff_ids": sorted(
+                str(item) for item in successor.metadata.get("handoff_ids", [])
+            ),
         },
         candidate_construction_sequence=frozen_contract.candidate_construction_sequence + 1,
     )

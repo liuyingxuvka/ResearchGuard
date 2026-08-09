@@ -1,0 +1,880 @@
+{
+  "authority": {
+    "authority_id": "scope-authority:attention-v7:reported-enfr-bleu-consistency",
+    "authority_revision": "1",
+    "provenance": {
+      "issued_at": "2026-08-05T00:00:00Z",
+      "origin_id": "contract:attention-v7:reported-enfr-bleu-consistency",
+      "origin_kind": "external_contract",
+      "request_fingerprint": "sha256:fed99f99ab7d16ae40b84bbc1376950f73fd16d78135d06af4a7b49b6a54efa0"
+    },
+    "scope": {
+      "anchor_obligations": [
+        {
+          "anchor_id": "anchor:abstract-enfr-bleu-41.8",
+          "artifact_id": "artifact:ms-tex",
+          "claim_id": "claim:reported-enfr-bleu",
+          "expected_structure_kind": "section",
+          "expected_value": "41.8",
+          "role": "reported_value_in_abstract",
+          "selector": {
+            "fingerprint": "sha256:749738eb19495a2ab3588629199533e0b073614cd2428a5dabbf22714c4dbdbf",
+            "locator": "source/ms.tex:127",
+            "occurrence_id": "occurrence:attention-v7:abstract-enfr-bleu",
+            "parameters": {
+              "line_number": 127,
+              "value_group": "value",
+              "value_pattern": "(?P<value>41\\.[08])"
+            },
+            "selector_kind": "line_pattern"
+          },
+          "source_id": "source:paper:arxiv-1706.03762v7",
+          "structure_node_id": "structure:abstract"
+        },
+        {
+          "anchor_id": "anchor:results-table-enfr-bleu-41.8",
+          "artifact_id": "artifact:results-tex",
+          "claim_id": "claim:reported-enfr-bleu",
+          "expected_structure_kind": "table",
+          "expected_value": "41.8",
+          "role": "reported_value_in_results_table",
+          "selector": {
+            "fingerprint": "sha256:99e536ea4c447a538b6405230070167befbc4ffebbd7188eddfccc50b0c3b444",
+            "locator": "source/results.tex:26",
+            "occurrence_id": "occurrence:attention-v7:results-table-enfr-bleu",
+            "parameters": {
+              "line_number": 26,
+              "value_group": "value",
+              "value_pattern": "(?P<value>41\\.[08])"
+            },
+            "selector_kind": "line_pattern"
+          },
+          "source_id": "source:paper:arxiv-1706.03762v7",
+          "structure_node_id": "structure:results-table"
+        },
+        {
+          "anchor_id": "anchor:results-prose-enfr-bleu-41.0",
+          "artifact_id": "artifact:results-tex",
+          "claim_id": "claim:reported-enfr-bleu",
+          "expected_structure_kind": "paragraph",
+          "expected_value": "41.0",
+          "role": "reported_value_in_results_prose",
+          "selector": {
+            "fingerprint": "sha256:f5911f7dae5150c266b2026df96e2125bd3567ca97bb73b3b872e0c71335cd18",
+            "locator": "source/results.tex:39",
+            "occurrence_id": "occurrence:attention-v7:results-prose-enfr-bleu",
+            "parameters": {
+              "line_number": 39,
+              "value_group": "value",
+              "value_pattern": "(?P<value>41\\.[08])"
+            },
+            "selector_kind": "line_pattern"
+          },
+          "source_id": "source:paper:arxiv-1706.03762v7",
+          "structure_node_id": "structure:results-prose"
+        }
+      ],
+      "completion_status": "complete_within_declared_scope",
+      "cross_member_handoffs": [
+        {
+          "consumer_member_ids": [
+            "traceguard"
+          ],
+          "object_id": "anchor:abstract-enfr-bleu-41.8",
+          "producer_member_id": "sourceguard"
+        },
+        {
+          "consumer_member_ids": [
+            "traceguard"
+          ],
+          "object_id": "anchor:results-prose-enfr-bleu-41.0",
+          "producer_member_id": "sourceguard"
+        },
+        {
+          "consumer_member_ids": [
+            "traceguard"
+          ],
+          "object_id": "anchor:results-table-enfr-bleu-41.8",
+          "producer_member_id": "sourceguard"
+        },
+        {
+          "consumer_member_ids": [
+            "traceguard"
+          ],
+          "object_id": "gap:enfr-bleu-conflict",
+          "producer_member_id": "sourceguard"
+        },
+        {
+          "consumer_member_ids": [
+            "traceguard"
+          ],
+          "object_id": "source:paper:arxiv-1706.03762v7",
+          "producer_member_id": "sourceguard"
+        },
+        {
+          "consumer_member_ids": [
+            "logicguard"
+          ],
+          "object_id": "event:abstract-reports-41.8",
+          "producer_member_id": "traceguard"
+        },
+        {
+          "consumer_member_ids": [
+            "logicguard"
+          ],
+          "object_id": "event:prose-reports-41.0",
+          "producer_member_id": "traceguard"
+        },
+        {
+          "consumer_member_ids": [
+            "logicguard"
+          ],
+          "object_id": "event:table-reports-41.8",
+          "producer_member_id": "traceguard"
+        },
+        {
+          "consumer_member_ids": [
+            "logicguard"
+          ],
+          "object_id": "gap:trace-cannot-resolve-author-intent",
+          "producer_member_id": "traceguard"
+        },
+        {
+          "consumer_member_ids": [
+            "logicguard"
+          ],
+          "object_id": "storyline:enfr-bleu-discrepancy",
+          "producer_member_id": "traceguard"
+        },
+        {
+          "consumer_member_ids": [
+            "experimentguard"
+          ],
+          "object_id": "claim:abstract-enfr-bleu-41.8",
+          "producer_member_id": "logicguard"
+        },
+        {
+          "consumer_member_ids": [
+            "experimentguard"
+          ],
+          "object_id": "claim:enfr-bleu-conflict-exists",
+          "producer_member_id": "logicguard"
+        },
+        {
+          "consumer_member_ids": [
+            "experimentguard"
+          ],
+          "object_id": "claim:prose-enfr-bleu-41.0",
+          "producer_member_id": "logicguard"
+        },
+        {
+          "consumer_member_ids": [
+            "experimentguard"
+          ],
+          "object_id": "claim:table-enfr-bleu-41.8",
+          "producer_member_id": "logicguard"
+        },
+        {
+          "consumer_member_ids": [
+            "experimentguard"
+          ],
+          "object_id": "edge:abstract-supports-41.8",
+          "producer_member_id": "logicguard"
+        },
+        {
+          "consumer_member_ids": [
+            "experimentguard"
+          ],
+          "object_id": "edge:prose-conflicts-41.8",
+          "producer_member_id": "logicguard"
+        },
+        {
+          "consumer_member_ids": [
+            "experimentguard"
+          ],
+          "object_id": "edge:table-supports-41.8",
+          "producer_member_id": "logicguard"
+        },
+        {
+          "consumer_member_ids": [
+            "experimentguard"
+          ],
+          "object_id": "gap:authoritative-enfr-bleu-unresolved",
+          "producer_member_id": "logicguard"
+        },
+        {
+          "consumer_member_ids": [],
+          "object_id": "experiment:check-version-history",
+          "producer_member_id": "experimentguard"
+        },
+        {
+          "consumer_member_ids": [],
+          "object_id": "experiment:compare-frozen-locators",
+          "producer_member_id": "experimentguard"
+        },
+        {
+          "consumer_member_ids": [],
+          "object_id": "gap:no-author-resolution-evidence",
+          "producer_member_id": "experimentguard"
+        },
+        {
+          "consumer_member_ids": [],
+          "object_id": "hypothesis:reported-score-is-41.0",
+          "producer_member_id": "experimentguard"
+        },
+        {
+          "consumer_member_ids": [],
+          "object_id": "hypothesis:reported-score-is-41.8",
+          "producer_member_id": "experimentguard"
+        }
+      ],
+      "excluded_semantic_region_ids": [
+        "semantic-region:attention-v7:claims-outside-reported-enfr-bleu"
+      ],
+      "expansion_frontier_ids": [
+        "frontier:attention-v7:recursive-semantic-inventory"
+      ],
+      "included_question_ids": [
+        "question:reported-enfr-bleu-consistency"
+      ],
+      "included_structure_node_ids": [
+        "structure:abstract",
+        "structure:results-table",
+        "structure:results-prose"
+      ],
+      "member_obligations": [
+        {
+          "member_id": "sourceguard",
+          "required_input_object_ids": [
+            "artifact:ms-tex",
+            "artifact:paper-pdf",
+            "artifact:paper-source-tar",
+            "artifact:results-tex",
+            "artifact:source-background-tex",
+            "artifact:source-figures-modalnet-19-png",
+            "artifact:source-figures-modalnet-20-png",
+            "artifact:source-figures-modalnet-21-png",
+            "artifact:source-figures-modalnet-22-png",
+            "artifact:source-figures-modalnet-23-png",
+            "artifact:source-figures-modalnet-32-png",
+            "artifact:source-introduction-tex",
+            "artifact:source-model-architecture-tex",
+            "artifact:source-nips-2017-sty",
+            "artifact:source-parameter-attention-tex",
+            "artifact:source-sqrt-d-trick-tex",
+            "artifact:source-training-tex",
+            "artifact:source-vis-anaphora-resolution-new-pdf",
+            "artifact:source-vis-anaphora-resolution2-new-pdf",
+            "artifact:source-vis-attending-to-head-new-pdf",
+            "artifact:source-vis-attending-to-head2-new-pdf",
+            "artifact:source-vis-making-more-difficult-new-pdf",
+            "artifact:source-vis-making-more-difficult5-new-pdf",
+            "artifact:source-visualizations-tex",
+            "artifact:source-why-self-attention-tex",
+            "paper:arxiv-1706.03762v7",
+            "structure:abstract",
+            "structure:paper-root",
+            "structure:results-prose",
+            "structure:results-table"
+          ],
+          "required_output_kinds": [
+            {
+              "kind": "source_role",
+              "object_ids": [
+                "source:paper:arxiv-1706.03762v7"
+              ]
+            },
+            {
+              "kind": "claim_anchor",
+              "object_ids": [
+                "anchor:abstract-enfr-bleu-41.8",
+                "anchor:results-prose-enfr-bleu-41.0",
+                "anchor:results-table-enfr-bleu-41.8"
+              ]
+            },
+            {
+              "kind": "gap",
+              "object_ids": [
+                "gap:enfr-bleu-conflict"
+              ]
+            }
+          ],
+          "required_output_object_ids": [
+            "anchor:abstract-enfr-bleu-41.8",
+            "anchor:results-prose-enfr-bleu-41.0",
+            "anchor:results-table-enfr-bleu-41.8",
+            "gap:enfr-bleu-conflict",
+            "source:paper:arxiv-1706.03762v7"
+          ]
+        },
+        {
+          "member_id": "traceguard",
+          "required_input_object_ids": [
+            "anchor:abstract-enfr-bleu-41.8",
+            "anchor:results-prose-enfr-bleu-41.0",
+            "anchor:results-table-enfr-bleu-41.8",
+            "gap:enfr-bleu-conflict",
+            "source:paper:arxiv-1706.03762v7"
+          ],
+          "required_output_kinds": [
+            {
+              "kind": "ordered_event",
+              "object_ids": [
+                "event:abstract-reports-41.8",
+                "event:prose-reports-41.0",
+                "event:table-reports-41.8"
+              ]
+            },
+            {
+              "kind": "storyline",
+              "object_ids": [
+                "storyline:enfr-bleu-discrepancy"
+              ]
+            },
+            {
+              "kind": "gap",
+              "object_ids": [
+                "gap:trace-cannot-resolve-author-intent"
+              ]
+            }
+          ],
+          "required_output_object_ids": [
+            "event:abstract-reports-41.8",
+            "event:prose-reports-41.0",
+            "event:table-reports-41.8",
+            "gap:trace-cannot-resolve-author-intent",
+            "storyline:enfr-bleu-discrepancy"
+          ]
+        },
+        {
+          "member_id": "logicguard",
+          "required_input_object_ids": [
+            "event:abstract-reports-41.8",
+            "event:prose-reports-41.0",
+            "event:table-reports-41.8",
+            "gap:trace-cannot-resolve-author-intent",
+            "storyline:enfr-bleu-discrepancy"
+          ],
+          "required_output_kinds": [
+            {
+              "kind": "claim",
+              "object_ids": [
+                "claim:abstract-enfr-bleu-41.8",
+                "claim:enfr-bleu-conflict-exists",
+                "claim:prose-enfr-bleu-41.0",
+                "claim:table-enfr-bleu-41.8"
+              ]
+            },
+            {
+              "kind": "argument_edge",
+              "object_ids": [
+                "edge:abstract-supports-41.8",
+                "edge:prose-conflicts-41.8",
+                "edge:table-supports-41.8"
+              ]
+            },
+            {
+              "kind": "gap",
+              "object_ids": [
+                "gap:authoritative-enfr-bleu-unresolved"
+              ]
+            }
+          ],
+          "required_output_object_ids": [
+            "claim:abstract-enfr-bleu-41.8",
+            "claim:enfr-bleu-conflict-exists",
+            "claim:prose-enfr-bleu-41.0",
+            "claim:table-enfr-bleu-41.8",
+            "edge:abstract-supports-41.8",
+            "edge:prose-conflicts-41.8",
+            "edge:table-supports-41.8",
+            "gap:authoritative-enfr-bleu-unresolved"
+          ]
+        },
+        {
+          "member_id": "experimentguard",
+          "required_input_object_ids": [
+            "claim:abstract-enfr-bleu-41.8",
+            "claim:enfr-bleu-conflict-exists",
+            "claim:prose-enfr-bleu-41.0",
+            "claim:table-enfr-bleu-41.8",
+            "edge:abstract-supports-41.8",
+            "edge:prose-conflicts-41.8",
+            "edge:table-supports-41.8",
+            "gap:authoritative-enfr-bleu-unresolved"
+          ],
+          "required_output_kinds": [
+            {
+              "kind": "hypothesis",
+              "object_ids": [
+                "hypothesis:reported-score-is-41.0",
+                "hypothesis:reported-score-is-41.8"
+              ]
+            },
+            {
+              "kind": "experiment",
+              "object_ids": [
+                "experiment:check-version-history",
+                "experiment:compare-frozen-locators"
+              ]
+            },
+            {
+              "kind": "gap",
+              "object_ids": [
+                "gap:no-author-resolution-evidence"
+              ]
+            }
+          ],
+          "required_output_object_ids": [
+            "experiment:check-version-history",
+            "experiment:compare-frozen-locators",
+            "gap:no-author-resolution-evidence",
+            "hypothesis:reported-score-is-41.0",
+            "hypothesis:reported-score-is-41.8"
+          ]
+        }
+      ],
+      "purpose": "Reconstruct and check the paper's reported English-to-French BLEU occurrences without claiming complete semantic coverage of the paper.",
+      "scope_id": "scope:attention-v7:reported-enfr-bleu-consistency",
+      "scope_kind": "bounded_research_question",
+      "scope_limits": [
+        "The model licenses the existence of a textual conflict, not a correction to 41.8 or 41.0."
+      ],
+      "structure_obligations": [
+        {
+          "kind": "paper",
+          "locator": "source/ms.tex",
+          "node_id": "structure:paper-root",
+          "parent_id": null,
+          "required_artifact_ids": [
+            "artifact:paper-source-tar",
+            "artifact:paper-pdf",
+            "artifact:source-background-tex",
+            "artifact:source-figures-modalnet-19-png",
+            "artifact:source-figures-modalnet-20-png",
+            "artifact:source-figures-modalnet-21-png",
+            "artifact:source-figures-modalnet-22-png",
+            "artifact:source-figures-modalnet-23-png",
+            "artifact:source-figures-modalnet-32-png",
+            "artifact:source-introduction-tex",
+            "artifact:source-model-architecture-tex",
+            "artifact:source-nips-2017-sty",
+            "artifact:source-parameter-attention-tex",
+            "artifact:source-sqrt-d-trick-tex",
+            "artifact:source-training-tex",
+            "artifact:source-vis-anaphora-resolution2-new-pdf",
+            "artifact:source-vis-anaphora-resolution-new-pdf",
+            "artifact:source-vis-attending-to-head2-new-pdf",
+            "artifact:source-vis-attending-to-head-new-pdf",
+            "artifact:source-vis-making-more-difficult5-new-pdf",
+            "artifact:source-vis-making-more-difficult-new-pdf",
+            "artifact:source-visualizations-tex",
+            "artifact:source-why-self-attention-tex"
+          ],
+          "required_bound_object_ids": [
+            "claim:abstract-enfr-bleu-41.8",
+            "claim:enfr-bleu-conflict-exists",
+            "claim:prose-enfr-bleu-41.0",
+            "claim:table-enfr-bleu-41.8",
+            "edge:abstract-supports-41.8",
+            "edge:prose-conflicts-41.8",
+            "edge:table-supports-41.8",
+            "event:abstract-reports-41.8",
+            "event:prose-reports-41.0",
+            "event:table-reports-41.8",
+            "experiment:check-version-history",
+            "experiment:compare-frozen-locators",
+            "gap:authoritative-enfr-bleu-unresolved",
+            "gap:enfr-bleu-conflict",
+            "gap:no-author-resolution-evidence",
+            "gap:trace-cannot-resolve-author-intent",
+            "hypothesis:reported-score-is-41.0",
+            "hypothesis:reported-score-is-41.8",
+            "source:paper:arxiv-1706.03762v7",
+            "storyline:enfr-bleu-discrepancy"
+          ],
+          "required_member_ids": [
+            "sourceguard",
+            "traceguard",
+            "logicguard",
+            "experimentguard"
+          ],
+          "semantic_role": "target_document_root"
+        },
+        {
+          "kind": "section",
+          "locator": "source/ms.tex:127",
+          "node_id": "structure:abstract",
+          "parent_id": "structure:paper-root",
+          "required_artifact_ids": [
+            "artifact:ms-tex"
+          ],
+          "required_bound_object_ids": [
+            "anchor:abstract-enfr-bleu-41.8"
+          ],
+          "required_member_ids": [
+            "sourceguard",
+            "traceguard",
+            "logicguard"
+          ],
+          "semantic_role": "reported_value_abstract"
+        },
+        {
+          "kind": "table",
+          "locator": "source/results.tex:4-28",
+          "node_id": "structure:results-table",
+          "parent_id": "structure:paper-root",
+          "required_artifact_ids": [
+            "artifact:results-tex"
+          ],
+          "required_bound_object_ids": [
+            "anchor:results-table-enfr-bleu-41.8"
+          ],
+          "required_member_ids": [
+            "sourceguard",
+            "traceguard",
+            "logicguard",
+            "experimentguard"
+          ],
+          "semantic_role": "reported_value_results_table"
+        },
+        {
+          "kind": "paragraph",
+          "locator": "source/results.tex:39",
+          "node_id": "structure:results-prose",
+          "parent_id": "structure:paper-root",
+          "required_artifact_ids": [
+            "artifact:results-tex"
+          ],
+          "required_bound_object_ids": [
+            "anchor:results-prose-enfr-bleu-41.0"
+          ],
+          "required_member_ids": [
+            "sourceguard",
+            "traceguard",
+            "logicguard",
+            "experimentguard"
+          ],
+          "semantic_role": "reported_value_results_prose"
+        }
+      ],
+      "whole_target_semantics_claimed": false
+    },
+    "target": {
+      "artifacts": [
+        {
+          "artifact_id": "artifact:paper-source-tar",
+          "byte_length": 1150988,
+          "disposition": "supporting_material",
+          "embedded": false,
+          "official_url": "https://arxiv.org/abs/1706.03762v7#material=attention-is-all-you-need-v7-source.tar",
+          "relative_path": "attention-is-all-you-need-v7-source.tar",
+          "role": "primary-author-source-archive",
+          "sha256": "2e7a7d9ee2520d22eb23dae0cb148e167be02a30d6cb3f11b1c67723194339c6"
+        },
+        {
+          "artifact_id": "artifact:paper-pdf",
+          "byte_length": 2215244,
+          "disposition": "supporting_material",
+          "embedded": false,
+          "official_url": "https://arxiv.org/abs/1706.03762v7#material=attention-is-all-you-need-v7.pdf",
+          "relative_path": "attention-is-all-you-need-v7.pdf",
+          "role": "primary-paper-pdf",
+          "sha256": "bdfaa68d8984f0dc02beaca527b76f207d99b666d31d1da728ee0728182df697"
+        },
+        {
+          "artifact_id": "artifact:source-background-tex",
+          "byte_length": 8376,
+          "disposition": "supporting_material",
+          "embedded": false,
+          "official_url": "https://arxiv.org/abs/1706.03762v7#material=source/background.tex",
+          "relative_path": "source/background.tex",
+          "role": "supporting-author-material",
+          "sha256": "4293e7032a2f4f653cb340854b23dae41a1801ea6b487270732db19723918618"
+        },
+        {
+          "artifact_id": "artifact:source-figures-modalnet-19-png",
+          "byte_length": 26323,
+          "disposition": "supporting_material",
+          "embedded": false,
+          "official_url": "https://arxiv.org/abs/1706.03762v7#material=source/Figures/ModalNet-19.png",
+          "relative_path": "source/Figures/ModalNet-19.png",
+          "role": "supporting-author-material",
+          "sha256": "6d40a44e2ec3f0cdab207c768a9085b6b908bbefa82c5af6613dc8233bee6a42"
+        },
+        {
+          "artifact_id": "artifact:source-figures-modalnet-20-png",
+          "byte_length": 65853,
+          "disposition": "supporting_material",
+          "embedded": false,
+          "official_url": "https://arxiv.org/abs/1706.03762v7#material=source/Figures/ModalNet-20.png",
+          "relative_path": "source/Figures/ModalNet-20.png",
+          "role": "supporting-author-material",
+          "sha256": "ba8a3ede5d40183ce8c18de249be60bec692646d53db108a3df51797a3c8634a"
+        },
+        {
+          "artifact_id": "artifact:source-figures-modalnet-21-png",
+          "byte_length": 159152,
+          "disposition": "supporting_material",
+          "embedded": false,
+          "official_url": "https://arxiv.org/abs/1706.03762v7#material=source/Figures/ModalNet-21.png",
+          "relative_path": "source/Figures/ModalNet-21.png",
+          "role": "supporting-author-material",
+          "sha256": "56d69ccc192b90c3b93e5e285ff892f74753f970103939b40291945e106e9f79"
+        },
+        {
+          "artifact_id": "artifact:source-figures-modalnet-22-png",
+          "byte_length": 25845,
+          "disposition": "supporting_material",
+          "embedded": false,
+          "official_url": "https://arxiv.org/abs/1706.03762v7#material=source/Figures/ModalNet-22.png",
+          "relative_path": "source/Figures/ModalNet-22.png",
+          "role": "supporting-author-material",
+          "sha256": "938988a43c0758e19cd57c4749b8859589cd0e5b8fe8dfc56e2fb35a915bb673"
+        },
+        {
+          "artifact_id": "artifact:source-figures-modalnet-23-png",
+          "byte_length": 10260,
+          "disposition": "supporting_material",
+          "embedded": false,
+          "official_url": "https://arxiv.org/abs/1706.03762v7#material=source/Figures/ModalNet-23.png",
+          "relative_path": "source/Figures/ModalNet-23.png",
+          "role": "supporting-author-material",
+          "sha256": "b6713b33692fc282e879c6f155eb4901dc16f795bca4adc160a8422123ccaa75"
+        },
+        {
+          "artifact_id": "artifact:source-figures-modalnet-32-png",
+          "byte_length": 51685,
+          "disposition": "supporting_material",
+          "embedded": false,
+          "official_url": "https://arxiv.org/abs/1706.03762v7#material=source/Figures/ModalNet-32.png",
+          "relative_path": "source/Figures/ModalNet-32.png",
+          "role": "supporting-author-material",
+          "sha256": "f9e73fa67da314706a08fb9ac9470ed719ecbba60fbc6a283515054bd4e992ff"
+        },
+        {
+          "artifact_id": "artifact:source-introduction-tex",
+          "byte_length": 5300,
+          "disposition": "supporting_material",
+          "embedded": false,
+          "official_url": "https://arxiv.org/abs/1706.03762v7#material=source/introduction.tex",
+          "relative_path": "source/introduction.tex",
+          "role": "supporting-author-material",
+          "sha256": "ece15efaec8325b6e88d2b90a3d7be0ee08b6b4c631d858877b806f862bd6553"
+        },
+        {
+          "artifact_id": "artifact:source-model-architecture-tex",
+          "byte_length": 17109,
+          "disposition": "supporting_material",
+          "embedded": false,
+          "official_url": "https://arxiv.org/abs/1706.03762v7#material=source/model_architecture.tex",
+          "relative_path": "source/model_architecture.tex",
+          "role": "supporting-author-material",
+          "sha256": "d524e853dc5f98bb482ee7289908b9640ee9e6ea38586c14c7c1ea0a5c0f5fdf"
+        },
+        {
+          "artifact_id": "artifact:ms-tex",
+          "byte_length": 17613,
+          "disposition": "modeled",
+          "embedded": false,
+          "official_url": "https://arxiv.org/abs/1706.03762v7#material=source/ms.tex",
+          "relative_path": "source/ms.tex",
+          "role": "modeled-author-source",
+          "sha256": "69a159fa848798bee868a9d394913745e3996ae274f2bc7cfc6d5fcd7a7438a0"
+        },
+        {
+          "artifact_id": "artifact:source-nips-2017-sty",
+          "byte_length": 10347,
+          "disposition": "supporting_material",
+          "embedded": false,
+          "official_url": "https://arxiv.org/abs/1706.03762v7#material=source/nips_2017.sty",
+          "relative_path": "source/nips_2017.sty",
+          "role": "supporting-author-material",
+          "sha256": "f1af9ca822eac10140e9e55ca2f20a59ce20605c3bc32670d9108de95da7ff01"
+        },
+        {
+          "artifact_id": "artifact:source-parameter-attention-tex",
+          "byte_length": 3489,
+          "disposition": "supporting_material",
+          "embedded": false,
+          "official_url": "https://arxiv.org/abs/1706.03762v7#material=source/parameter_attention.tex",
+          "relative_path": "source/parameter_attention.tex",
+          "role": "supporting-author-material",
+          "sha256": "c698e2bfec0a0acfa2a6447ceabc920aa4b631df1a291647b7124ae9688aff5d"
+        },
+        {
+          "artifact_id": "artifact:results-tex",
+          "byte_length": 11800,
+          "disposition": "modeled",
+          "embedded": false,
+          "official_url": "https://arxiv.org/abs/1706.03762v7#material=source/results.tex",
+          "relative_path": "source/results.tex",
+          "role": "modeled-author-source",
+          "sha256": "da5281baf549caad349c796d51404537674acb72baec0ef9509c95748499b4c8"
+        },
+        {
+          "artifact_id": "artifact:source-sqrt-d-trick-tex",
+          "byte_length": 2226,
+          "disposition": "supporting_material",
+          "embedded": false,
+          "official_url": "https://arxiv.org/abs/1706.03762v7#material=source/sqrt_d_trick.tex",
+          "relative_path": "source/sqrt_d_trick.tex",
+          "role": "supporting-author-material",
+          "sha256": "db2dfbf394ad8b07c882f77735838f4f2dfbe585b0b5c69ef361e43daa7c906d"
+        },
+        {
+          "artifact_id": "artifact:source-training-tex",
+          "byte_length": 4444,
+          "disposition": "supporting_material",
+          "embedded": false,
+          "official_url": "https://arxiv.org/abs/1706.03762v7#material=source/training.tex",
+          "relative_path": "source/training.tex",
+          "role": "supporting-author-material",
+          "sha256": "34fa70917e3f58d02743393ff651be8d679a27cd51a4027180a0efc5ddd913e1"
+        },
+        {
+          "artifact_id": "artifact:source-vis-anaphora-resolution2-new-pdf",
+          "byte_length": 308043,
+          "disposition": "supporting_material",
+          "embedded": false,
+          "official_url": "https://arxiv.org/abs/1706.03762v7#material=source/vis/anaphora_resolution2_new.pdf",
+          "relative_path": "source/vis/anaphora_resolution2_new.pdf",
+          "role": "supporting-author-material",
+          "sha256": "c0ae1f58eaeeb7638d35c81de72937385bc3646a6bf0107f51426c2544b860cd"
+        },
+        {
+          "artifact_id": "artifact:source-vis-anaphora-resolution-new-pdf",
+          "byte_length": 331169,
+          "disposition": "supporting_material",
+          "embedded": false,
+          "official_url": "https://arxiv.org/abs/1706.03762v7#material=source/vis/anaphora_resolution_new.pdf",
+          "relative_path": "source/vis/anaphora_resolution_new.pdf",
+          "role": "supporting-author-material",
+          "sha256": "adbd1c70e65ad463b8f405f805349144bef0aaa7efd9cb8da9874d2880fef348"
+        },
+        {
+          "artifact_id": "artifact:source-vis-attending-to-head2-new-pdf",
+          "byte_length": 295664,
+          "disposition": "supporting_material",
+          "embedded": false,
+          "official_url": "https://arxiv.org/abs/1706.03762v7#material=source/vis/attending_to_head2_new.pdf",
+          "relative_path": "source/vis/attending_to_head2_new.pdf",
+          "role": "supporting-author-material",
+          "sha256": "70e5f99d3dea638e1974c29f91a8fc394fa1d7862e9205044f339f911c69d6b3"
+        },
+        {
+          "artifact_id": "artifact:source-vis-attending-to-head-new-pdf",
+          "byte_length": 320083,
+          "disposition": "supporting_material",
+          "embedded": false,
+          "official_url": "https://arxiv.org/abs/1706.03762v7#material=source/vis/attending_to_head_new.pdf",
+          "relative_path": "source/vis/attending_to_head_new.pdf",
+          "role": "supporting-author-material",
+          "sha256": "f7e2a6931e8735af0fdd2ed71c219f769d7866edaf28ab19d3aebe9a0d032722"
+        },
+        {
+          "artifact_id": "artifact:source-vis-making-more-difficult5-new-pdf",
+          "byte_length": 364968,
+          "disposition": "supporting_material",
+          "embedded": false,
+          "official_url": "https://arxiv.org/abs/1706.03762v7#material=source/vis/making_more_difficult5_new.pdf",
+          "relative_path": "source/vis/making_more_difficult5_new.pdf",
+          "role": "supporting-author-material",
+          "sha256": "4533259d2f0e05bbbe5893d62af639c578d6e16c5077759a4645fae829a55d89"
+        },
+        {
+          "artifact_id": "artifact:source-vis-making-more-difficult-new-pdf",
+          "byte_length": 375911,
+          "disposition": "supporting_material",
+          "embedded": false,
+          "official_url": "https://arxiv.org/abs/1706.03762v7#material=source/vis/making_more_difficult_new.pdf",
+          "relative_path": "source/vis/making_more_difficult_new.pdf",
+          "role": "supporting-author-material",
+          "sha256": "99e0024b1019aee2c012d5ce1b75d4499a9ea8acf0d5ab22675f21f046cdc085"
+        },
+        {
+          "artifact_id": "artifact:source-visualizations-tex",
+          "byte_length": 1543,
+          "disposition": "supporting_material",
+          "embedded": false,
+          "official_url": "https://arxiv.org/abs/1706.03762v7#material=source/visualizations.tex",
+          "relative_path": "source/visualizations.tex",
+          "role": "supporting-author-material",
+          "sha256": "3833fb2220d95a20c1fe4f82264f8f95e2e7ea7f78383d8285a89cae9e6c2178"
+        },
+        {
+          "artifact_id": "artifact:source-why-self-attention-tex",
+          "byte_length": 7867,
+          "disposition": "supporting_material",
+          "embedded": false,
+          "official_url": "https://arxiv.org/abs/1706.03762v7#material=source/why_self_attention.tex",
+          "relative_path": "source/why_self_attention.tex",
+          "role": "supporting-author-material",
+          "sha256": "b0f2e5cb18558766558c02387cafa4813dcd00c980e3676e5fc249029b6acab8"
+        }
+      ],
+      "kind": "research-paper-and-author-source",
+      "material_inventory_policy": {
+        "excluded_relative_paths": [],
+        "include_regular_files": true,
+        "policy_id": "researchguard.closed-material-tree.v1",
+        "root_kind": "closed-directory-tree",
+        "symlink_policy": "reject"
+      },
+      "official_url": "https://arxiv.org/abs/1706.03762v7",
+      "source_authorities": [
+        {
+          "coverage_ids": [
+            "artifact:ms-tex",
+            "artifact:paper-pdf",
+            "artifact:paper-source-tar",
+            "artifact:results-tex",
+            "artifact:source-background-tex",
+            "artifact:source-figures-modalnet-19-png",
+            "artifact:source-figures-modalnet-20-png",
+            "artifact:source-figures-modalnet-21-png",
+            "artifact:source-figures-modalnet-22-png",
+            "artifact:source-figures-modalnet-23-png",
+            "artifact:source-figures-modalnet-32-png",
+            "artifact:source-introduction-tex",
+            "artifact:source-model-architecture-tex",
+            "artifact:source-nips-2017-sty",
+            "artifact:source-parameter-attention-tex",
+            "artifact:source-sqrt-d-trick-tex",
+            "artifact:source-training-tex",
+            "artifact:source-vis-anaphora-resolution-new-pdf",
+            "artifact:source-vis-anaphora-resolution2-new-pdf",
+            "artifact:source-vis-attending-to-head-new-pdf",
+            "artifact:source-vis-attending-to-head2-new-pdf",
+            "artifact:source-vis-making-more-difficult-new-pdf",
+            "artifact:source-vis-making-more-difficult5-new-pdf",
+            "artifact:source-visualizations-tex",
+            "artifact:source-why-self-attention-tex",
+            "paper:arxiv-1706.03762v7",
+            "structure:abstract",
+            "structure:paper-root",
+            "structure:results-prose",
+            "structure:results-table"
+          ],
+          "role": "primary_author_source",
+          "source_id": "source:paper:arxiv-1706.03762v7"
+        }
+      ],
+      "target_id": "paper:arxiv-1706.03762v7",
+      "title": "Attention Is All You Need",
+      "version": "arXiv:1706.03762v7"
+    }
+  },
+  "authority_fingerprint": "sha256:ef68b5cca910b4c027aa62405ccb6f637006e1e37adaf4dc338cbab8686ba103",
+  "authority_signature": "rsa-pkcs1v15-sha256:60a4195ed88fdff8756199ab0c634261ed8a8199937e336d28336b97d7827d7bea18871341853fe01100380fa9d914909994029d2a3e720b129126e459ba73523ce1b0778c2601f3c4f265e41869f844edbe80f79af217629f1d6bf70d9432145edc70617fa2258bda695b5c2e2f8b3a6154d6323bcf99a28a26f8a17d9f009e6817cbc64351ab94ccb5062bdb3c5c2262aa54768208cdc61dfa0e5b56fcdcb790dd2fc836ed65f849c1b7388752ecab5d1f6dde8b972fb5bf2bd847f3ba357a17f0ae140ec60cc45a43df94f994a131e0ac1ffff3e715053a6675c6107035f26d5fe8e053f249f6b0a056a170a48811b76ba4860624dd808310313d5baf44c9",
+  "producer_descriptor": {
+    "producer_id": "researchguard.tests.external-scope-authority",
+    "producer_version": "1",
+    "public_exponent": 65537,
+    "public_modulus_hex": "b3d0315c2195f01b4b06d794f09951344498b7dfe7f652c97847ee5abab8090432179c5fa5e42f13843710ff63418f2ab6bb79c042870300658810f5ad7a8d8c5b434483b0482bcc27de962181c08e7fc87e924d21057752e3e7f4e71547d49c1b8b2dd6728695bb790490e8a4a56f628a5ba08d8a22fe2b8e31ee53b99312d55b1ac076dd8cd746bec9eaa9bea2ffca573c3d5584f1384f18b64a4878c7095730a952c3d0d63b963bb22837024cd6be82246fd8bf4f046f26f1b3019786a5e088a3163a39643dc1a7de1fb82caab0200b22663cf1305eef645c11fa4aa76fab07f4a8b5c0b908352d67e10442dfce0d33c41f3559a832fa8caa93da73596ddf",
+    "signature_algorithm": "rsa-pkcs1v15-sha256",
+    "signing_key_id": "researchguard-test-external-scope-authority-2026-01"
+  },
+  "producer_descriptor_fingerprint": "sha256:01fa6d1f8f3c003e68623d3a435e9db3f600da223c9d593433456a0cfce20a81",
+  "schema_version": "researchguard.external-scope-authority.v1"
+}

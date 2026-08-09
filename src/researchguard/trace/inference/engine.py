@@ -34,6 +34,7 @@ def _receipt_payload(
     policy: InferencePolicy,
 ) -> dict[str, object]:
     return {
+        "model_fingerprint": str(problem.metadata.get("model_fingerprint", "")),
         "problem_fingerprint": problem.problem_fingerprint,
         "solution_fingerprint": solution.solution_fingerprint,
         "atom_values_fingerprint": fingerprint(solution.atom_values),
@@ -100,6 +101,7 @@ def verify_inference_receipt(receipt: InferenceReceipt) -> None:
         if not set(binding_ids) <= constraint_set:
             raise ValueError("projection references detached hard constraints")
     identity_payload = {
+        "model_fingerprint": receipt.model_fingerprint,
         "problem_fingerprint": receipt.problem_fingerprint,
         "solution_fingerprint": receipt.solution_fingerprint,
         "atom_values_fingerprint": receipt.atom_values_fingerprint,
@@ -250,6 +252,7 @@ def infer_model(
     )
     receipt = InferenceReceipt(
         receipt_id=f"traceguard-inference-{fingerprint(receipt_payload)[:24]}",
+        model_fingerprint=str(receipt_payload["model_fingerprint"]),
         problem_fingerprint=problem.problem_fingerprint,
         solution_fingerprint=solution.solution_fingerprint,
         atom_values_fingerprint=str(receipt_payload["atom_values_fingerprint"]),

@@ -1,4 +1,4 @@
 interface:
   display_name: "TraceGuard"
   short_description: "Stress-test timelines and competing storylines"
-  default_prompt: "Use $traceguard by selecting the general or case-library route and loading only its triggered references; enter the strict canonical inference, perturbation, revision, and disjoint-holdout loop for non-trivial, broad, causal, predictive, contradictory, model-miss, repeated-failure, or open-gap work."
+  default_prompt: "Use $traceguard by selecting the general or case-library route and only triggered references. For trace blueprints keep external target admission separate from TraceGuard-native parsing; persistently replay the anchor, request, raw inventory, and immutable receipt locators/hashes without treating cache as authority. Direct unadmitted use is unverified, a different target needs a separate anchor, and no generic issuer or inline candidate-authoring path exists. This is member-domain DNA; the sole ResearchGuard repository software-DNA root is FlowGuard-owned."

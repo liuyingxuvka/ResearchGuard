@@ -22,6 +22,22 @@
     ],
     "release_manifest_path": "consumer-release.json"
   },
+  "projection_consumers": [
+    {
+      "consumer_id": "projection:researchguard-suite-maintenance-definition",
+      "kind": "source_maintenance",
+      "input_selectors": [
+        {
+          "kind": "path",
+          "path": ".skillguard/test-mesh.json"
+        },
+        {
+          "kind": "path",
+          "path": "scripts/check_researchguard_test_mesh.py"
+        }
+      ]
+    }
+  ],
   "model_id": "researchguard.researchguard.contract.current",
   "model_path": ".flowguard/researchguard_skill_contract_model.py",
   "confirmed": true,
@@ -111,6 +127,9 @@
     "src/researchguard/__main__.py",
     "src/researchguard/admission.py",
     "src/researchguard/cli.py",
+    "src/researchguard/domain_dna.py",
+    "src/researchguard/external_scope_authority.py",
+    "src/researchguard/resources/external_domain_dna",
     "src/researchguard/routing.py",
     "src/researchguard/suite.py",
     "src/researchguard/logic/admission.py",
@@ -123,6 +142,7 @@
     ".flowguard/researchguard_skill_contract_model.py",
     ".flowguard/researchguard_skill_contract_model_common.py",
     "scripts/build_skillguard_contracts.py",
+    "scripts/compile_external_domain_dna_examples.py",
     "scripts/check_researchguard_suite.py",
     "scripts/check_zero_residuals.py",
     "scripts/install_researchguard.py",
@@ -131,15 +151,31 @@
     "tests/test_root_cli.py",
     "tests/test_skill_suite.py",
     "tests/test_install_researchguard.py",
+    "tests/test_external_domain_dna_real_paper.py",
+    "tests/test_external_scope_authority.py",
+    "tests/external_scope_authority_fixtures.py",
+    "tests/test_prompt_bundles.py",
     "tests/test_suite_model_currentness.py",
     "tests/test_zero_residuals.py",
     "tests/logic/test_task_iteration.py",
     "tests/source/test_task_iteration.py",
     "tests/trace/test_task_iteration.py",
     "tests/experiment/test_recommendation.py",
+    "models/external_domain_dna",
+    "pyproject.toml",
     "researchguard/prompt_bundle_manifest.json",
     "scripts/check_prompt_bundles.py",
-    "tests/test_prompt_bundles.py"
+    "src/researchguard/model_envelope.py",
+    "src/researchguard/target_authority.py",
+    "src/researchguard/experiment/owner_attestation.py",
+    "src/researchguard/logic/owner_attestation.py",
+    "src/researchguard/source/owner_attestation.py",
+    "src/researchguard/trace/owner_attestation.py",
+    "tests/test_member_model_envelope.py",
+    "tests/test_guard_blueprint_integration.py",
+    "skills/researchguard/references/member-model-envelope.md",
+    ".skillguard/test-mesh.json",
+    "scripts/check_researchguard_test_mesh.py"
   ],
   "step_bindings": [
     {
@@ -274,15 +310,15 @@
         },
         {
           "kind": "path",
+          "path": "skills/researchguard/references/member-model-envelope.md"
+        },
+        {
+          "kind": "path",
           "path": "researchguard/prompt_bundle_manifest.json"
         },
         {
           "kind": "path",
           "path": "scripts/check_prompt_bundles.py"
-        },
-        {
-          "kind": "path",
-          "path": "tests/test_prompt_bundles.py"
         },
         {
           "kind": "path",
@@ -341,7 +377,10 @@
         "tests/test_root_cli.py",
         "tests/test_skill_suite.py",
         "tests/test_install_researchguard.py",
+        "tests/test_prompt_bundles.py",
         "tests/test_zero_residuals.py",
+        "tests/test_external_domain_dna_real_paper.py",
+        "tests/test_external_scope_authority.py",
         "-q"
       ],
       "cwd_token": "repository_root",
@@ -365,6 +404,18 @@
         {
           "kind": "path",
           "path": "src/researchguard/cli.py"
+        },
+        {
+          "kind": "path",
+          "path": "src/researchguard/domain_dna.py"
+        },
+        {
+          "kind": "path",
+          "path": "src/researchguard/external_scope_authority.py"
+        },
+        {
+          "kind": "subtree",
+          "path": "src/researchguard/resources/external_domain_dna"
         },
         {
           "kind": "path",
@@ -392,27 +443,11 @@
         },
         {
           "kind": "path",
-          "path": ".flowguard/researchguard_suite_model.py"
-        },
-        {
-          "kind": "path",
-          "path": ".flowguard/researchguard_suite_model.json"
-        },
-        {
-          "kind": "path",
-          "path": ".flowguard/run_researchguard_suite_model.py"
-        },
-        {
-          "kind": "path",
-          "path": ".flowguard/researchguard_skill_contract_model.py"
-        },
-        {
-          "kind": "path",
-          "path": ".flowguard/researchguard_skill_contract_model_common.py"
-        },
-        {
-          "kind": "path",
           "path": "scripts/build_skillguard_contracts.py"
+        },
+        {
+          "kind": "path",
+          "path": "scripts/compile_external_domain_dna_examples.py"
         },
         {
           "kind": "path",
@@ -448,6 +483,22 @@
         },
         {
           "kind": "path",
+          "path": "tests/test_external_domain_dna_real_paper.py"
+        },
+        {
+          "kind": "path",
+          "path": "tests/test_external_scope_authority.py"
+        },
+        {
+          "kind": "path",
+          "path": "tests/external_scope_authority_fixtures.py"
+        },
+        {
+          "kind": "path",
+          "path": "tests/test_prompt_bundles.py"
+        },
+        {
+          "kind": "path",
           "path": "tests/test_suite_model_currentness.py"
         },
         {
@@ -471,16 +522,44 @@
           "path": "tests/experiment/test_recommendation.py"
         },
         {
-          "kind": "path",
-          "path": "researchguard/prompt_bundle_manifest.json"
+          "kind": "subtree",
+          "path": "models/external_domain_dna"
         },
         {
           "kind": "path",
-          "path": "scripts/check_prompt_bundles.py"
+          "path": "pyproject.toml"
         },
         {
           "kind": "path",
-          "path": "tests/test_prompt_bundles.py"
+          "path": "src/researchguard/model_envelope.py"
+        },
+        {
+          "kind": "path",
+          "path": "src/researchguard/target_authority.py"
+        },
+        {
+          "kind": "path",
+          "path": "src/researchguard/experiment/owner_attestation.py"
+        },
+        {
+          "kind": "path",
+          "path": "src/researchguard/logic/owner_attestation.py"
+        },
+        {
+          "kind": "path",
+          "path": "src/researchguard/source/owner_attestation.py"
+        },
+        {
+          "kind": "path",
+          "path": "src/researchguard/trace/owner_attestation.py"
+        },
+        {
+          "kind": "path",
+          "path": "tests/test_member_model_envelope.py"
+        },
+        {
+          "kind": "path",
+          "path": "tests/test_guard_blueprint_integration.py"
         }
       ],
       "expected": {
@@ -495,10 +574,11 @@
         "check:researchguard:prompt-load"
       ],
       "covers_obligation_ids": [
-        "obligation:researchguard:researchguard:native-tests"
+        "obligation:researchguard:researchguard:native-tests",
+        "obligation:researchguard:researchguard:consumer-install-transaction"
       ],
       "coverage_scope": "declared_obligations",
-      "coverage_rationale": "This check is the sole execution owner for its exact member obligation."
+      "coverage_rationale": "This existing member-native owner runs the complete declared member test suite once. Its exact blueprint code/test selectors cover native qualification, qualification-first impact and reverse trace, persisted fresh-process target-authority replay, and caller-forged/co-shrunk self-attestation rejection without adding duplicate execution owners. For the ResearchGuard umbrella, this same owner also proves the suite install transaction's total lock, package/consumer/manifest rollback, and cleanup-unconfirmed boundary."
     },
     {
       "check_id": "check:researchguard:task-model-closure",
@@ -562,10 +642,11 @@
         "obligation:researchguard:researchguard:consumer-contract",
         "obligation:researchguard:researchguard:prompt-load",
         "obligation:researchguard:researchguard:native-tests",
+        "obligation:researchguard:researchguard:consumer-install-transaction",
         "obligation:researchguard:researchguard:task-model-closure"
       ]
     }
   ],
   "judgment_rubrics": [],
-  "claim_boundary": "This contract covers the current researchguard consumer projection, native route, and member-owned tests inside ResearchGuard v0.4.1. It does not prove source truth, unrun external work, installation, publication, or future AI behavior."
+  "claim_boundary": "This contract covers the current researchguard consumer projection, native route, and member-owned tests inside ResearchGuard v0.4.3. The four exact native-blueprint evidence categories are selectors of the one existing target-owned native-tests owner, so final validation does not repeat the same member suite. Distinct model obligation ids remain a later binding with the frozen FlowGuard self-DNA toolchain. The ResearchGuard native-tests owner covers installation transaction behavior without claiming an installation executed or is current. It does not prove source truth, unrun external work, installed currentness, publication, or future AI behavior."
 }

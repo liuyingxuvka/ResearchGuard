@@ -24,12 +24,17 @@ guard_contract:
     gap_ids:
     - gap-independent-1
     target_unit_ids: []
+    source_role_ids:
+    - source-role:gap-independent-1:independent_report
+    lineage_slot_ids: []
+    anchor_requirement_ids: []
+    handoff_ids: []
   claim_boundary: This starter model supports search planning only and cannot license broad source support or gap closure.
   native_oracle_catalog_fingerprint: 2C01D891559625D9123F17E817B63B3E4E9323CA1C3EB81923B82D7DBDC79B15
   purpose_frozen: true
   purpose_freeze_sequence: 1
   candidate_construction_sequence: 2
-candidate_contract_fingerprint: 26F9A068BE6F25BA01AC35F06CA0418C24801B06ED7C2D9FDB46ED8FA87ACA00
+candidate_contract_fingerprint: D5EFD8D1BAA4B166A84DAAE6AADB0CC5880DDD98D225E62256822F701A63A4C7
 metadata:
   purpose: Starter SourceGuard belief state
   repository: https://github.com/liuyingxuvka/ResearchGuard

@@ -168,28 +168,24 @@ def test_fixture_inventory_is_exact_sorted_and_unique() -> None:
         assert case["kind"] == entry["kind"]
 
 
-@pytest.mark.parametrize(
-    "entry",
-    FIXTURE_ENTRIES,
-    ids=[entry["case_id"] for entry in FIXTURE_ENTRIES],
-)
 def test_every_governed_fixture_reaches_exact_terminal(
-    entry: dict[str, Any], tmp_path: Path
+    tmp_path: Path,
 ) -> None:
-    case = _read_json(FIXTURE_ROOT / entry["path"])
-    if case["kind"] == "request":
-        _assert_request_case(case)
-        return
+    for entry in FIXTURE_ENTRIES:
+        case = _read_json(FIXTURE_ROOT / entry["path"])
+        if case["kind"] == "request":
+            _assert_request_case(case)
+            continue
 
-    root = _mutated_catalog(tmp_path, case)
-    if case["kind"] == "catalog_mutation":
-        with pytest.raises(CatalogValidationError) as caught:
-            load_catalog(root)
-        assert _finding_codes(caught.value.findings) == case["expected"]["finding_codes"]
-        return
+        root = _mutated_catalog(tmp_path, case)
+        if case["kind"] == "catalog_mutation":
+            with pytest.raises(CatalogValidationError) as caught:
+                load_catalog(root)
+            assert _finding_codes(caught.value.findings) == case["expected"]["finding_codes"]
+            continue
 
-    assert case["kind"] == "catalog_request_mutation"
-    _assert_request_case(case, load_catalog(root))
+        assert case["kind"] == "catalog_request_mutation"
+        _assert_request_case(case, load_catalog(root))
 
 
 def test_catalog_identity_inventory_and_native_bindings_are_deterministic() -> None:

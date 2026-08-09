@@ -24,6 +24,7 @@ Multiple unclear internal routes remain in `route:general-argument` until one fi
 
 ## Conditional depth map
 
+- `route:domain-blueprint`: explicit reconstruction blueprint, block interface, independent artifact inventory, affected-only impact, reverse trace, or deterministic export → read `references/domain-blueprint-contract.md`. This is LogicGuard member-domain DNA; the sole ResearchGuard repository software-DNA root is FlowGuard-owned.
 - `trigger:task-model-maturation`: a non-trivial model change, new observation, prediction request, model miss, contradiction, repeated failure, or open addressable gap → read `references/task-model-maturation.md`.
 - `trigger:broad-depth-closure`: broad, complete, robust, final, high-impact, release-facing, or comprehensive wording → read `references/broad-depth-and-closure.md`.
 - `trigger:structural-contribution`: a hierarchical artifact whose units must support parents, downstream consumers, or conclusions → read `references/structural-contribution.md`.
@@ -41,6 +42,10 @@ Use LogicGuard for structural reasoning, important writing audits, conclusion to
 ## Native closure
 
 Important conclusions remain blocked by missing support, warrant, assumption, boundary, opposition, perturbation, target-unit/card coverage, or current native receipts. `model_closed_for_task` is the only task-model closure. `progress_stalled`, `iteration_limit`, `external_input_required`, and `scope_excluded` remain visible non-closure terminals. No self-report substitutes for target-native evidence.
+
+For a domain blueprint, LogicGuard's artifact parser must replay one externally admitted expected-target anchor, its persisted exact request contract, and raw artifact-material bytes on issuance and serialized reload. The submitted inventory and process memory never define the denominator. Every qualifying receipt is resolved from immutable bytes against its exact producer/version, signature algorithm, signing key, public key, and producer descriptor; a co-shrunk inventory, caller-invented receipt, or member-authored replacement cannot qualify, and a different target needs its own external anchor.
+
+Anchor and receipt locators and hashes are persistent evidence, not cache entries. Direct blueprint use without external admission remains unverified. LogicGuard exposes no public or generic target, attestation, or receipt issuer and no inline candidate-authoring shortcut.
 
 ## Output
 
