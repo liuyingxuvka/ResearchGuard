@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.4.5 - 2026-08-10
+
+- Repair native external-object receipt identity so independently authored
+  target paths cannot collide under one receipt id.
+- Refresh the portable composition bundle and its member bindings for the
+  current patch identity.
+- Keep the target-neutral DNA route explicit about trust boundaries and
+  preserve the no-reconstruction routine path.
+
 ## v0.4.4 - 2026-08-10
 
 - Refresh the repository self-DNA and model-regression identity for the patch release.

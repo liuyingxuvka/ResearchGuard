@@ -1318,10 +1318,10 @@
       "member_id": "traceguard",
       "model_id": "model:traceguard:attention-v7",
       "native_binding": {
-        "behavior_manifest_fingerprint": "sha256:dab1676fd45ee1cc7ff39927f985ff9bc2e97f2ec810a85a37ddcbfdb57b480c",
-        "behavior_manifest_id": "member-behavior-manifest:traceguard:dab1676fd45ee1cc7ff39927f985ff9bc2e97f2ec810a85a37ddcbfdb57b480c",
+        "behavior_manifest_fingerprint": "sha256:414a14e93c62de362416fc803b9247bfc4ee928be5046fe6426ad080fa6e3ce5",
+        "behavior_manifest_id": "member-behavior-manifest:traceguard:414a14e93c62de362416fc803b9247bfc4ee928be5046fe6426ad080fa6e3ce5",
         "domain_behavior_id": "traceguard.investigation-reconstruction",
-        "envelope_fingerprint": "sha256:2865083a8a89b0a536e7509abd080630fee043e20ae4be7a076a85eecab7812b",
+        "envelope_fingerprint": "sha256:174c8b7f07fcea77fb59cd00877308d8e040a16617494cd856666e87a992b948",
         "envelope_id": "envelope:traceguard",
         "expected_target_anchor_fingerprint": "sha256:7da5613220b9429e791e3bc33367996ec57b3917ccc88e220abaa816eaf4052a",
         "expected_target_anchor_id": "expected-target-anchor:c0306385c23f1000dcfb853005e3c42b5bc3dfa5d0a2e96a77980673b116e1a1",

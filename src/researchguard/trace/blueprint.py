@@ -1368,9 +1368,37 @@ def _trace_native_receipt_expectations(
         )
     )
     purpose = model.metadata.get("guard_purpose_contract", {})
+    # The universe id is scoped to a target model, not globally unique.  Bind
+    # the purpose receipt identity to the admitted target anchor so two
+    # independently authored targets cannot collide in the immutable receipt
+    # authority merely because they use the same local universe label.
+    purpose_input_fingerprint = _digest(purpose)
+    purpose_result_fingerprint = _digest(
+        {
+            "known_good_case_ids": list(universe.known_good_case_ids),
+            "known_bad_case_ids": list(universe.known_bad_case_ids),
+            "selected_failure_ids": sorted(
+                purpose.get("selected_failure_ids", [])
+                if isinstance(purpose, Mapping)
+                else []
+            ),
+        }
+    )
+    purpose_identity = _digest(
+        {
+            "universe_id": universe.universe_id,
+            "expected_target_anchor_id": anchor.anchor_id,
+            "expected_target_anchor_fingerprint": anchor.anchor_fingerprint,
+            "native_model_id": task_id,
+            "model_fingerprint": trace_model_fingerprint(model),
+            "input_fingerprint": purpose_input_fingerprint,
+            "result_fingerprint": purpose_result_fingerprint,
+        }
+    )
+    purpose_receipt_id = f"trace-purpose:{universe.universe_id}:{purpose_identity}"
     result.append(
         native_receipt_expectation(
-            receipt_id=f"trace-purpose:{universe.universe_id}",
+            receipt_id=purpose_receipt_id,
             member_id="traceguard",
             native_owner_id="traceguard.native-purpose",
             checker_id="researchguard.trace.native-purpose",
@@ -1387,18 +1415,8 @@ def _trace_native_receipt_expectations(
                     "expected_target_anchor_id": anchor.anchor_id,
                 }
             ),
-            input_fingerprint=_digest(purpose),
-            result_fingerprint=_digest(
-                {
-                    "known_good_case_ids": list(universe.known_good_case_ids),
-                    "known_bad_case_ids": list(universe.known_bad_case_ids),
-                    "selected_failure_ids": sorted(
-                        purpose.get("selected_failure_ids", [])
-                        if isinstance(purpose, Mapping)
-                        else []
-                    ),
-                }
-            ),
+            input_fingerprint=purpose_input_fingerprint,
+            result_fingerprint=purpose_result_fingerprint,
         )
     )
     return tuple(result)

@@ -578,9 +578,33 @@ def attach_trace_receipts(model, inference_receipt, universe):
         )
     )
     purpose = model.metadata.get("guard_purpose_contract", {})
+    purpose_input_fingerprint = trace_blueprint._digest(purpose)
+    purpose_result_fingerprint = trace_blueprint._digest(
+        {
+            "known_good_case_ids": list(universe.known_good_case_ids),
+            "known_bad_case_ids": list(universe.known_bad_case_ids),
+            "selected_failure_ids": sorted(
+                purpose.get("selected_failure_ids", [])
+                if isinstance(purpose, Mapping)
+                else []
+            ),
+        }
+    )
+    purpose_identity = trace_blueprint._digest(
+        {
+            "universe_id": universe.universe_id,
+            "expected_target_anchor_id": anchor.anchor_id,
+            "expected_target_anchor_fingerprint": anchor.anchor_fingerprint,
+            "native_model_id": task_id,
+            "model_fingerprint": trace_model_fingerprint(model),
+            "input_fingerprint": purpose_input_fingerprint,
+            "result_fingerprint": purpose_result_fingerprint,
+        }
+    )
+    purpose_receipt_id = f"trace-purpose:{universe.universe_id}:{purpose_identity}"
     refs.append(
         signed_native_receipt(
-            receipt_id=f"trace-purpose:{universe.universe_id}",
+            receipt_id=purpose_receipt_id,
             member_id="traceguard",
             native_owner_id="traceguard.native-purpose",
             checker_id="researchguard.trace.native-purpose",
@@ -596,18 +620,8 @@ def attach_trace_receipts(model, inference_receipt, universe):
                     "expected_target_anchor_id": anchor.anchor_id,
                 }
             ),
-            input_fingerprint=trace_blueprint._digest(purpose),
-            result_fingerprint=trace_blueprint._digest(
-                {
-                    "known_good_case_ids": list(universe.known_good_case_ids),
-                    "known_bad_case_ids": list(universe.known_bad_case_ids),
-                    "selected_failure_ids": sorted(
-                        purpose.get("selected_failure_ids", [])
-                        if isinstance(purpose, Mapping)
-                        else []
-                    ),
-                }
-            ),
+            input_fingerprint=purpose_input_fingerprint,
+            result_fingerprint=purpose_result_fingerprint,
         )
     )
     return replace(universe, native_receipt_refs=tuple(refs))
