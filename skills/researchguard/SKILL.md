@@ -47,9 +47,9 @@ only `composition_ready` or visible `composition_blocked`.
 
 For composed blueprints, handoffs, impact, or reverse trace, trigger
 `route:member-model-envelope` and read
-`references/member-model-envelope.md`. This is transport between
-member-domain DNA, not repository software DNA; the sole ResearchGuard
-ResearchGuard repository software-DNA root is FlowGuard-owned. Load no member blueprint
+`references/member-model-envelope.md`. This transports member-domain DNA, not
+repository software DNA; the ResearchGuard software-DNA root is FlowGuard-owned.
+Load no member blueprint
 unless invoked.
 
 For portable DNA of an external paper, model, test system, or workflow, trigger
@@ -63,8 +63,8 @@ different target needs a separate anchor; there is no generic issuer or inline
 candidate-authoring path.
 
 There are two DNA layers: member-domain DNA for an external paper, model, test
-system, or workflow, and the separate ResearchGuard repository software-DNA
-root owned by FlowGuard. Member output is not software-DNA evidence until it is
+system, or workflow, and the separate ResearchGuard repository software-DNA root
+owned by FlowGuard. Member output is not software-DNA evidence until it is
 bound to exact current code and test owners. External qualification is target
 neutral and adapter-selected; self-DNA exposes static, semantic, code-binding,
 and test-binding states, with stale FlowGuard qualification shown as a blocker.

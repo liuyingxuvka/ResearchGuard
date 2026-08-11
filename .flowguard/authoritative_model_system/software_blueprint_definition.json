@@ -163,8 +163,8 @@
         "model_source_fingerprint": "sha256:a5abc3bf79b1d12a6b45cc0b43d536cbb7eb5538272518bc0945a0eaeee7a819",
         "runner_path": ".flowguard/researchguard_suite/run_checks.py",
         "runner_source_fingerprint": "sha256:611e3bcbe9eebc31230d4822a2be8e984fa9064baf464e478863965a267051a7",
-        "purpose_declaration_fingerprint": "sha256:8ee7fea899af71499ff1ffb927774ebbf034c84f92a81c07d7d4a02b7549deb0",
-        "purpose_closure_fingerprint": "sha256:cd8844f7c13c3d82cc170110974a3087ae0b6d7ae4d245182e30fdbf6da75dbc"
+        "purpose_declaration_fingerprint": "sha256:369b53c0e93e0cdf2783cc864803acf7c9b0c857042dc73625f4d3809548be1c",
+        "purpose_closure_fingerprint": "sha256:cc210989a06e75b1c0e562cc83b80f4afa8854de62b79e5a6a69c2d8743c24cc"
       }
     },
     {

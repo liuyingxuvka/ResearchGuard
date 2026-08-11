@@ -1,8 +1,8 @@
 [flowguard]
 repository = "https://github.com/liuyingxuvka/FlowGuard"
-adopted_package_version = "0.68.10"
+adopted_package_version = "0.68.11"
 schema_version = "1.0"
-last_verified_at = "2026-08-11T01:12:47+00:00"
+last_verified_at = "2026-08-11T12:12:45+00:00"
 last_verified_by = "FlowGuard project-upgrade"
 agents_path = "AGENTS.md"
 
@@ -15,12 +15,12 @@ require_model_update_for_behavior_changes = true
 
 [model_authority]
 system_id = "flowguard"
-observed_snapshot_path = ".flowguard/model-mesh/snapshots/e8d98b661e1045de42d1ac445dc2e75191c12bafb995eb70e89736033c301263.json"
-observed_snapshot_fingerprint = "sha256:e8d98b661e1045de42d1ac445dc2e75191c12bafb995eb70e89736033c301263"
-subject_revision = "source-inventory:73432885c6dee8e45794cf7663de730058695a52f19f7c7e0923ad88b809f533"
+observed_snapshot_path = ".flowguard/model-mesh/snapshots/b64cf36c6817a0d08ed3ccd190f4d21a6558b535781c12ae838c36fc456e9fbc.json"
+observed_snapshot_fingerprint = "sha256:b64cf36c6817a0d08ed3ccd190f4d21a6558b535781c12ae838c36fc456e9fbc"
+subject_revision = "source-inventory:9b406d85c6769e84d798f30de3b2cebf085bfefd2d5ace764560cf331d8bde6e"
 coverage_status = "complete_within_declared_boundary"
-generation = 32
-accepted_revision_set_fingerprint = "sha256:84a79aa633b24e4db42b67a91d18005150e0c1c16ba957cd96eb749c48d4e97a"
-previous_snapshot_fingerprint = "sha256:c18407971aba22431818c5355fe3d10156b125ec13c4dc74fb64f48372cbce10"
-activation_receipt_fingerprint = "sha256:300e8fb4cef523b079c7f5ea84461742d02997fd42fbd09c7bf55acd49d8caf8"
-head_fingerprint = "sha256:6c2140e39e0eb66326e181daa6b1f553cdbc7d7df7d568f4c419ad8b3c805e8f"
+generation = 33
+accepted_revision_set_fingerprint = "sha256:01376ec392d7c4fded9c1f44d776810f0a7b6f8ad4dd5f0a9b71e7e0522c5a49"
+previous_snapshot_fingerprint = "sha256:e8d98b661e1045de42d1ac445dc2e75191c12bafb995eb70e89736033c301263"
+activation_receipt_fingerprint = "sha256:bb54806f00b7896bc0d9cb58d252b13b30d8b587f517f06d6f22778343ea7296"
+head_fingerprint = "sha256:e11114a3a2139f83e8e1d7dee0420d0980991a1b90dcaf603a712ddd89ddb530"

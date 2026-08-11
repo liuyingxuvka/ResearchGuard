@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.4.7 - 2026-08-11
+
+- Keep the ResearchGuard suite DNA in its native directory: models, bindings,
+  and test evidence remain directly inspectable without a standalone bundle.
+- Refresh the suite self-model and consumer projections after the FlowGuard
+  0.68.11 upgrade.
+
 ## v0.4.6 - 2026-08-10
 
 - Synchronize the ResearchGuard package and five maintained skill projections
