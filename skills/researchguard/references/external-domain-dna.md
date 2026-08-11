@@ -1,6 +1,12 @@
 # External-domain DNA
 
-Load this reference only when ResearchGuard must build, inspect, deepen, export, impact-check, or reverse-trace a portable model of one external paper, model description, test workflow, or other research object. This is member-domain DNA joined by composition transport. It is not the ResearchGuard repository software-DNA root, which remains FlowGuard-owned.
+Load this reference only when ResearchGuard must validate, deepen, impact-check,
+or reverse-trace a model of one external paper, model description, test
+workflow, or other research object. This is member-domain DNA joined by
+composition transport. It is not the ResearchGuard repository software-DNA
+root, which remains FlowGuard-owned. The canonical source lives under
+`models/external_domain_dna`; the ResearchGuard console deliberately exposes
+no standalone domain-DNA build/inspect/export/materialization route.
 
 ## What qualifies
 
@@ -10,17 +16,12 @@ Before any external-object projection, require one exact current four-member por
 
 External admission fixes which target and denominator are in scope; member-native parsing separately determines what those admitted bytes mean. Anchor and immutable receipt locators/hashes are persistent and are replayed without treating process memory or a cache as authority. Direct member use without external admission is unverified, and a different target requires a separately admitted anchor. Production exposes no public or generic target, attestation, or receipt issuer and no inline candidate-authoring shortcut. Impact and reverse trace admit exactly one current closed composition replay over resolved evidence before returning ordinary output.
 
-Build with the explicit composition:
-
-```powershell
-researchguard domain-dna build <spec.json> <dna.json> --native-composition <portable-composition.json> [--scope-authority <signed-authority.json>] [--material-root <closed-root>]
-```
-
-Inspect compactly, adding independently held trust roots only when available:
-
-```powershell
-researchguard domain-dna inspect <dna.json> [--trusted-artifact-sha256 <sha256>] [--trusted-producer-descriptor-fingerprint <sha256>] [--trusted-scope-authority-fingerprint <sha256> | --trusted-scope-authority-producer-descriptor-fingerprint <sha256>] [--material-root <closed-root>] [--member <id> | --behavior <id> | --object <id> | --impact <id> | --reverse <id> | --scope <id>]
-```
+The public console does not build or materialize external DNA.  Internal
+native tests and the canonical compiler call the `researchguard.domain_dna`
+module directly with one explicit four-member composition and, when needed,
+one independently supplied scope-authority record.  Consumers should treat
+the resulting bytes as an input artifact and use the module's qualification,
+impact, and reverse helpers only inside an explicitly bounded integration.
 
 ## Scope before completeness
 
@@ -45,5 +46,12 @@ Recursive deepening consumes one frontier by explicitly adding the next question
 - Authority-required-but-missing objects remain queryable. Impact reports them in the affected authority gap set, and reverse returns `reverse_incomplete` with the authority gap instead of treating the absent candidate object as unknown.
 - Within one supplied portable bundle, each `(member_id, receipt_id)` occurs once and its carried reference must equal its signed carried bytes. That is a single-bundle statement. Unless the caller also supplies a shared immutable authority or transparency log, one isolated bundle cannot prove that the producer did not publish a different receipt under the same identity in another isolated bundle.
 - The process-local native replay cache is bounded and keyed by the complete bundle bytes plus the normalized exact trust set. It caches no target material result, writes nothing, survives no process, and supplies no stale fallback.
+
+The external-object DNA is independent from ResearchGuard's own software DNA.
+Its adapter is target-neutral and may describe a paper, model, test workflow,
+or non-Python system, but it never assumes that a member blueprint can
+enumerate the repository that produced it. ResearchGuard's self-DNA check
+consumes FlowGuard's current qualification and remains blocked when any
+static, semantic, code-binding, or test-binding identity is stale.
 
 The external DNA can guide another AI through compact member, behavior, object, scope, impact, and reverse queries. The full portable evidence stays in the artifact rather than being injected into the default prompt, preventing token waste while preserving drill-down depth.

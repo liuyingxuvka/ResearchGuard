@@ -29,8 +29,8 @@
   "members": [
     {
       "member_skill_id": "researchguard",
-      "contract_hash": "1DBF9C21C824D9DB53ECF4FEA3001D2B70986233EAC736C0F2731A555220449B",
-      "manifest_hash": "C8A61D621BB05D67D6B485E31A2848B8D01A5128504F04F08DD1DDB9A75F2556",
+      "contract_hash": "A6224B5BF869F710025F52731DD247449F469D73188A79F39C9FC2554B50114C",
+      "manifest_hash": "4E2B62370DFCC7DADC1A8ED501217E0D678770B3C415E3DE876B829E4EEB7A0C",
       "checks": [
         {
           "check_id": "check:researchguard:consumer-contract",
@@ -70,8 +70,8 @@
     },
     {
       "member_skill_id": "logicguard",
-      "contract_hash": "E574F57120B18A4E71DB4DEC0E599C193E2FC467BC93D74A76CCF721754DD8A5",
-      "manifest_hash": "ECACD66F17DB6B8CD8AD44AEE1AC46BBB03EE5A98B09CE79AE37FC1DA22BEA10",
+      "contract_hash": "37AC72A463CC420DF1DC47DD68F29B6FCEF16C0B3A583209EE5981E6D6DFF46A",
+      "manifest_hash": "47067586E3CDBBA50CBA09FF72D9836962EF57A45ECD76C6B2D2131BF346BE4C",
       "checks": [
         {
           "check_id": "check:logicguard:consumer-contract",
@@ -111,8 +111,8 @@
     },
     {
       "member_skill_id": "sourceguard",
-      "contract_hash": "84DA8C1F8334F2B2248516240153C98DE84B8F09ED04C5A08A5035A9F1600E4D",
-      "manifest_hash": "18521EB874E9C7B4EFF7035D64493EB3E1DEFF4FC1B079AFD3212565B9372D78",
+      "contract_hash": "36180B58CF2929A796439C62C25D033582C64AE7035375DD3319608656DA1AE6",
+      "manifest_hash": "428074A99B695159D5E1EDBC4CBFC3FEE34F3F1030CAB6D461321CFDA41C69C8",
       "checks": [
         {
           "check_id": "check:sourceguard:consumer-contract",
@@ -152,8 +152,8 @@
     },
     {
       "member_skill_id": "traceguard",
-      "contract_hash": "32DFF5C23CAA48E90FE19D6915445BA94865E67DC124A1A6A29F36690C296855",
-      "manifest_hash": "410C99FFA8CB0220D1F4395C47F29B944809F6BD286E530E52129665746250E7",
+      "contract_hash": "AC12FDE8F92A88EBE0EDFBACF662A4085028E3F80E262F8AA8D04B26A7327037",
+      "manifest_hash": "9934D7EAE190A29A02B74D3B003EE64EF9B7E6D6F6E2EEC17B480EE47FD78006",
       "checks": [
         {
           "check_id": "check:traceguard:consumer-contract",
@@ -193,8 +193,8 @@
     },
     {
       "member_skill_id": "experimentguard",
-      "contract_hash": "3BFDA561D42AC249C89F7C678FD7EA2D1CE9D9BB7A942B08329F32A3CF73D43D",
-      "manifest_hash": "F1EE82E874DA0D45B254785D7C5371FE509DE48BA536A9035EF579DA862699CA",
+      "contract_hash": "2C5B96826593EF2F69A5B7F9C69B9A011A2B57D96CC483B032579B8EB92188A3",
+      "manifest_hash": "99E8F82C8728993D909AA8188E3735C25EFA1FC10E64922C0935AC3A62C89CB2",
       "checks": [
         {
           "check_id": "check:experimentguard:consumer-contract",

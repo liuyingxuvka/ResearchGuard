@@ -56,7 +56,6 @@ NATIVE_BUNDLE_PATH = REPOSITORY / "models" / "external_domain_dna" / "canonical-
 TRUST_ROOTS_PATH = REPOSITORY / "models" / "external_domain_dna" / "canonical-native-trust-roots.json"
 SCOPE_AUTHORITY_PATH = REPOSITORY / "models" / "external_domain_dna" / "attention-is-all-you-need-v7.authority.json"
 SCOPE_AUTHORITY_TRUST_ROOTS_PATH = REPOSITORY / "models" / "external_domain_dna" / "canonical-scope-authority-trust-roots.json"
-RESOURCE_ROOT = REPOSITORY / "src" / "researchguard" / "resources" / "external_domain_dna"
 
 
 def _digest(value: object) -> str:
@@ -799,14 +798,6 @@ def main() -> int:
     _write_json(TRUST_ROOTS_PATH, trust_roots)
     _write_json(
         SCOPE_AUTHORITY_TRUST_ROOTS_PATH,
-        [authority_record["producer_descriptor_fingerprint"]],
-    )
-    _write_json(RESOURCE_ROOT / MODEL_PATH.name, spec)
-    _write_json(RESOURCE_ROOT / SCOPE_AUTHORITY_PATH.name, authority_record)
-    (RESOURCE_ROOT / NATIVE_BUNDLE_PATH.name).write_bytes(native_bundle)
-    _write_json(RESOURCE_ROOT / TRUST_ROOTS_PATH.name, trust_roots)
-    _write_json(
-        RESOURCE_ROOT / SCOPE_AUTHORITY_TRUST_ROOTS_PATH.name,
         [authority_record["producer_descriptor_fingerprint"]],
     )
     return 0

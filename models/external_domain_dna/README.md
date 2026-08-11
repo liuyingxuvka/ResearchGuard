@@ -16,19 +16,12 @@ $env:RESEARCHGUARD_EXTERNAL_DNA_PAPER_ROOT = "<frozen-root>"
 python scripts/compile_external_domain_dna_examples.py
 ```
 
-Build a consumer DNA artifact against the same frozen material root:
-
-```powershell
-researchguard domain-dna build attention-is-all-you-need-v7.json attention-v7.dna.json --native-composition canonical-native-composition.json --scope-authority attention-is-all-you-need-v7.authority.json --material-root <frozen-root>
-```
-
-Inspect without loading the full evidence into the prompt:
-
-```powershell
-researchguard domain-dna inspect attention-v7.dna.json --scope scope:attention-v7:reported-enfr-bleu-consistency
-researchguard domain-dna inspect attention-v7.dna.json --behavior logicguard.argument-artifact-qualification
-researchguard domain-dna inspect attention-v7.dna.json --impact anchor:results-prose-enfr-bleu-41.0
-researchguard domain-dna inspect attention-v7.dna.json --reverse hypothesis:reported-score-is-41.8
-```
+The four files above are the single canonical source for this example.  They
+are deliberately kept under `models/external_domain_dna`; no second copy is
+installed as `researchguard.resources.external_domain_dna`, and the
+ResearchGuard console has no public `domain-dna` build/inspect or generic
+export/materialization route.  Native tests and the compiler use the
+domain-DNA module directly, so all validation remains tied to the current
+source tree and its explicit frozen material root.
 
 Bundle-only inspection proves at most self-consistency. A carried scope authority is still untrusted until the caller explicitly supplies its exact authority fingerprint or producer-descriptor fingerprint. `dna_qualified` additionally requires the complete authority-derived current material root, every trusted artifact hash, native-member producer trust, scope-authority trust, and complete authority-obligation coverage.

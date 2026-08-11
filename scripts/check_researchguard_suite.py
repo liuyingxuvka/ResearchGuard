@@ -43,7 +43,7 @@ MEMBERS = (
     "traceguard",
     "experimentguard",
 )
-CURRENT_VERSION = "0.4.3"
+CURRENT_VERSION = "0.4.6"
 RETIRED_SKILL_IDS = (
     "logicguard-source-library",
     "logicguard-structured-artifact",
@@ -332,12 +332,12 @@ def _check_researchguard(checks: list[dict[str, str]]) -> None:
         result.returncode == 0
         and (
             "usage: researchguard "
-            "{run|portable|domain-dna|self-dna|logic|source|trace|experiment} ..."
+            "{run|self-dna|logic|source|trace|experiment} ..."
         )
         in result.stdout,
         (
-            "sole suite console exposes exactly one umbrella route, the portable "
-            "and external-DNA routes, and four native member routes"
+            "sole suite console exposes one umbrella route, a read-only self-DNA "
+            "audit, and four native member routes"
         ),
         checks,
     )

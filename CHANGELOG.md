@@ -1,5 +1,27 @@
 # Changelog
 
+## v0.4.6 - 2026-08-10
+
+- Synchronize the ResearchGuard package and five maintained skill projections
+  with the current provider-neutral DNA boundary.
+- Refresh self-DNA, object-DNA qualification, code/test bindings, and current
+  model evidence for the patch release; historical receipts remain immutable.
+
+## v0.4.5 - 2026-08-10
+
+- Repair native external-object receipt identity so independently authored
+  target paths cannot collide under one receipt id.
+- Refresh the portable composition bundle and its member bindings for the
+  current patch identity.
+- Keep the target-neutral DNA route explicit about trust boundaries and
+  preserve the no-reconstruction routine path.
+
+## v0.4.4 - 2026-08-10
+
+- Refresh the repository self-DNA and model-regression identity for the patch release.
+- Regenerate the maintained SkillGuard contracts from the current source version.
+- Keep external-object DNA target-scoped and preserve the explicit no-reconstruction routine path.
+
 ## v0.4.3 - 2026-08-09
 
 - Complete the repository self-DNA spine with current model, code, test,

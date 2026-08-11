@@ -4,7 +4,10 @@ This module is deliberately a thin adapter.  ResearchGuard does not define a
 second software-blueprint format and it does not turn its member-domain DNA
 into a repository authority.  The only authority is the current FlowGuard
 self-blueprint API.  Ordinary ResearchGuard commands never call this module;
-``self-dna`` is an explicit, whole-repository operation.
+``self-dna`` is an explicit, read-only whole-repository operation.  The
+standalone materialization/export path is intentionally not part of the
+ResearchGuard console; FlowGuard remains the sole owner of any canonical
+software-blueprint projection.
 """
 
 from __future__ import annotations
@@ -12,6 +15,7 @@ from __future__ import annotations
 import argparse
 import importlib.metadata
 import json
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -83,6 +87,11 @@ def _blocked(root: Path, code: str, message: str, *, exc: Exception | None = Non
             "gap_count": 1,
         },
         "gap": {"code": code, "message": message},
+        "dna_qualification": {
+            "status": "blocked",
+            "qualified": False,
+            "reasons": [code],
+        },
     }
     if exc is not None:
         payload["gap"]["exception"] = f"{type(exc).__name__}: {exc}"
@@ -105,12 +114,21 @@ def _run_build(root: Path) -> tuple[dict[str, Any], Any | None]:
         return _blocked(root, "flowguard_self_blueprint_input_invalid", "The current FlowGuard self-blueprint inputs are invalid or unavailable.", exc=exc), None
 
     ledger = bundle.readiness_ledger.to_dict()
+    qualification = getattr(bundle, "dna_qualification", None)
+    if qualification is None:
+        return _blocked(
+            root,
+            "flowguard_dna_qualification_missing",
+            "The current FlowGuard self-blueprint did not expose its provider-neutral DNA qualification contract.",
+        ), None
+    qualification_payload = qualification.to_dict()
+    qualified = bool(qualification.qualified)
     payload = {
         "report_kind": REPORT_KIND,
         "software_id": "researchguard",
         "target_kind": "software",
-        "status": "ready" if bundle.ok else "not_ready",
-        "ok": bool(bundle.ok),
+        "status": "ready" if bundle.ok and qualified else "not_ready",
+        "ok": bool(bundle.ok and qualified),
         "root": str(root),
         "claim_boundary": (
             "This is the FlowGuard repository software-DNA boundary. The four "
@@ -119,17 +137,10 @@ def _run_build(root: Path) -> tuple[dict[str, Any], Any | None]:
         ),
         "flowguard": _package_identity(),
         "readiness": ledger,
+        "dna_qualification": qualification_payload,
         "bundle": bundle.to_dict(),
     }
     return payload, bundle
-
-
-def _outside_repository(root: Path, output: Path) -> bool:
-    try:
-        output.resolve().relative_to(root.resolve())
-    except ValueError:
-        return True
-    return False
 
 
 def check(root: str | Path, *, compact: bool = False) -> tuple[dict[str, Any], int]:
@@ -154,54 +165,31 @@ def check(root: str | Path, *, compact: bool = False) -> tuple[dict[str, Any], i
     return payload, 0 if payload.get("ok") else 1
 
 
-def export(root: str | Path, output: str | Path) -> tuple[dict[str, Any], int]:
-    root_path = Path(root).resolve()
-    output_path = Path(output).resolve()
-    if not _outside_repository(root_path, output_path):
-        return _blocked(root_path, "self_dna_export_inside_repository", "Canonical self-DNA must be materialized outside the repository it describes."), 1
-    payload, bundle = _run_build(root_path)
-    if bundle is None or not bundle.ok:
-        return payload, 1
-    try:
-        from flowguard.implementation_blueprint import (
-            project_canonical_software_blueprint,
-            verify_materialized_project_blueprint_projection,
-            write_canonical_blueprint_projection,
-        )
-
-        projection = project_canonical_software_blueprint(bundle)
-        written = write_canonical_blueprint_projection(projection, output_path)
-        verification = verify_materialized_project_blueprint_projection(output_path, bundle)
-        if not verification.ok:
-            return _blocked(root_path, "self_dna_export_materialization_invalid", "FlowGuard did not verify the isolated canonical self-DNA materialization."), 1
-        payload["export"] = {
-            "status": "complete",
-            "output": str(output_path),
-            "projection_fingerprint": projection.fingerprint,
-            "written_paths": [str(path) for path in written],
-            "isolated_import_verified": True,
-        }
-        return payload, 0
-    except (ImportError, AttributeError, OSError, ValueError) as exc:
-        return _blocked(root_path, "self_dna_export_failed", "The current FlowGuard export API could not materialize and verify the external self-DNA.", exc=exc), 1
-
-
 def main(argv: list[str] | None = None) -> int:
+    raw_args = list(sys.argv[1:] if argv is None else argv)
+    if not raw_args or raw_args[0] in {"-h", "--help"}:
+        parser = argparse.ArgumentParser(prog="researchguard self-dna")
+        parser.add_argument("command", choices=("check",))
+        parser.add_argument("--root", default=".")
+        parser.add_argument("--compact", action="store_true")
+        parser.print_help()
+        return 0 if raw_args and raw_args[0] in {"-h", "--help"} else 2
+    if raw_args[0] != "check":
+        payload = _blocked(
+            Path(".").resolve(),
+            "unknown-self-dna-operation",
+            "Only the read-only self-dna check operation is public; standalone materialization is retired.",
+        )
+        print(json.dumps(payload, ensure_ascii=False, sort_keys=True, indent=2))
+        return 2
     parser = argparse.ArgumentParser(prog="researchguard self-dna")
-    sub = parser.add_subparsers(dest="command", required=True)
-    check_parser = sub.add_parser("check", help="audit the FlowGuard-owned repository self-DNA")
-    check_parser.add_argument("--root", default=".")
-    check_parser.add_argument("--compact", action="store_true")
-    export_parser = sub.add_parser("export", help="materialize self-DNA outside the repository")
-    export_parser.add_argument("--root", default=".")
-    export_parser.add_argument("--output", required=True)
-    args = parser.parse_args(argv)
-    if args.command == "check":
-        payload, code = check(args.root, compact=args.compact)
-    else:
-        payload, code = export(args.root, args.output)
+    parser.add_argument("command", choices=("check",), help="audit the FlowGuard-owned repository self-DNA")
+    parser.add_argument("--root", default=".")
+    parser.add_argument("--compact", action="store_true")
+    args = parser.parse_args(raw_args)
+    payload, code = check(args.root, compact=args.compact)
     print(json.dumps(payload, ensure_ascii=False, sort_keys=True, indent=2))
     return code
 
 
-__all__ = ["check", "export", "main"]
+__all__ = ["check", "main"]

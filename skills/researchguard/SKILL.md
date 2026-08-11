@@ -7,31 +7,71 @@ description: Route a genuinely ambiguous or cross-member research request to the
 
 ## Purpose
 
-ResearchGuard classifies and hands off across four independent native members: `logicguard`, `sourceguard`, `traceguard`, and `experimentguard`. It never duplicates work or silently tries another member.
+ResearchGuard routes across four independent native members—`logicguard`,
+`sourceguard`, `traceguard`, and `experimentguard`—without duplicate work or
+silent retries.
 
-## Narrow entry
+## Entrypoint Scope
 
-Use a member directly when the first action is clear.
+Use a member directly when its first action is clear. Use the umbrella only for
+an ambiguous first action or several domains. Read
+`references/member-admission-index.md` at `route:member-admission`; do not load
+member skills to classify.
 
-Use the umbrella only for an ambiguous first action or several member domains. Read `references/member-admission-index.md` under trigger `route:member-admission` before classification. Do not load the four member skills to decide the route.
+Extract source-spanned `primary_action` and context facts only. Contracts derive
+admission and the router selects the unique smallest set covering each primary
+responsibility.
 
-Extract source-spanned `primary_action` facts and optional context facts; do not set `applicable` or choose members. Current member contracts derive admission, and the router selects the unique smallest set covering every primary responsibility.
+## Use When
 
-Run:
+Use the umbrella for an ambiguous first action or several member
+responsibilities.
+
+## Do Not Use When
+
+Use a direct member route when one native owner is clear; never use the umbrella
+as a retry or broad scan.
+
+## Required Workflow
+
+Run the suite console:
 
 ```powershell
 researchguard run --business-intent-id <intent-id> --task-facts <task-facts.json> -- <member arguments>
 ```
 
-One sufficient member is the whole route. Otherwise declare `researchguard.member-composition.v2` with exact members, order, dependencies, responsibilities, typed handoffs, field owners, and claim boundary. The umbrella emits only `composition_ready` or visible `composition_blocked`.
+One sufficient member is the whole route. Otherwise declare
+`researchguard.member-composition.v2` with exact members, order, dependencies,
+responsibilities, typed handoffs, field owners, and one claim boundary. Emit
+only `composition_ready` or visible `composition_blocked`.
 
-For composed member blueprints, handoffs, affected impact, or reverse trace, trigger `route:member-model-envelope` and read `references/member-model-envelope.md`. This is transport between member-domain DNA, not repository software DNA; the sole ResearchGuard repository software-DNA root is FlowGuard-owned. Load no member blueprint unless that member is invoked.
+For composed blueprints, handoffs, impact, or reverse trace, trigger
+`route:member-model-envelope` and read
+`references/member-model-envelope.md`. This is transport between
+member-domain DNA, not repository software DNA; the sole ResearchGuard
+ResearchGuard repository software-DNA root is FlowGuard-owned. Load no member blueprint
+unless invoked.
 
-For portable DNA of an external paper, model, test system, or workflow, trigger `route:external-domain-dna` and read `references/external-domain-dna.md`. It owns signed scope, current native replay, coverage, qualification, exclusions, and recursive frontier.
+For portable DNA of an external paper, model, test system, or workflow, trigger
+`route:external-domain-dna` and read
+`references/external-domain-dna.md`. It owns signed scope,
+current replay, coverage, qualification, exclusions, and recursive frontier.
 
-External admission fixes the target and denominator before member-native parsing. Replay persistent anchor and immutable-receipt hashes; cache is not authority. Direct use is unverified, and a different target needs a separate anchor. There is no generic issuer or inline candidate-authoring path.
+External admission fixes the target and denominator before member parsing. Replay
+the persistent anchor and immutable-receipt hashes; cache is not authority. A
+different target needs a separate anchor; there is no generic issuer or inline
+candidate-authoring path.
 
-Missing or placeholder spans, stale fingerprints, unknown fact kinds, incomplete forbidden reviews, zero coverage, equal-minimum ambiguity, over-selection, or an incomplete composition block before member execution. There is no keyword, list-order, alias, `run all`, retry, or compatibility fallback.
+There are two DNA layers: member-domain DNA for an external paper, model, test
+system, or workflow, and the separate ResearchGuard repository software-DNA
+root owned by FlowGuard. Member output is not software-DNA evidence until it is
+bound to exact current code and test owners. External qualification is target
+neutral and adapter-selected; self-DNA exposes static, semantic, code-binding,
+and test-binding states, with stale FlowGuard qualification shown as a blocker.
+
+Missing spans, stale fingerprints, unknown facts, incomplete forbidden reviews,
+zero coverage, equal minima, over-selection, or incomplete composition block
+before execution. No keyword, list-order, alias, `run all`, retry, or fallback.
 
 ## Member boundary
 
@@ -46,7 +86,7 @@ Context alone does not create another responsibility. A source-bound primary res
 
 The selected member—not the umbrella—owns predictions, falsifiers, native observations, gap lineage, revision, holdout evidence, and closure. Claiming the model "understands" is not evidence. Native gaps stay open or end visibly as stalled, limited, externally dependent, or scope-excluded.
 
-## Hard gates
+## Hard Gates
 
 - one exact member owns each native execution, while the umbrella may coordinate only the minimum sufficient set;
 - direct and umbrella entry bind the same native owner and primary path;
@@ -56,6 +96,8 @@ The selected member—not the umbrella—owns predictions, falsifiers, native ob
 - recursion, ambiguity, over-selection, unknown inputs, invalid composition, and member failure remain visible;
 - no member result is upgraded by another member.
 
-## Output
+## Output Requirements
 
-Report the selected member or minimum sufficient set, declared order and responsibilities, evidence, failures, blockers, skipped checks, loaded references, residual risk, typed handoffs, field owners, terminal reason, and claim boundary.
+Report the selected set, order, responsibilities, evidence, failures, blockers,
+skips, loaded references, residual risk, typed handoffs, field owners, terminal
+reason, and claim boundary.

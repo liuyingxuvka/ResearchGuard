@@ -31,8 +31,11 @@
     "src/researchguard/trace/task_iteration.py",
     "src/researchguard/trace/inference/contradiction_core.py",
     "src/researchguard/logic/minimal_sets.py",
+    "src/researchguard/self_dna.py",
+    "src/researchguard/domain_dna.py",
     "src/researchguard/experiment/*.py",
     "skills/*guard/SKILL.md",
+    "skills/*guard/references/*.md",
     "skills/*guard/agents/openai.yaml",
     "tests/source/test_stop_decision.py",
     "tests/trace/test_contradiction_core.py",
@@ -131,7 +134,8 @@
       "mutation_policy": "none",
       "input_globs": [
         ".flowguard/compositional_verification_kernel/model.py",
-        ".flowguard/compositional_verification_kernel/run_checks.py"
+        ".flowguard/compositional_verification_kernel/run_checks.py",
+        ".flowguard/authoritative_model_system/software_blueprint_definition.json"
       ],
       "intent_source_inputs": [
         "openspec/changes/strengthen-guard-domain-blueprint-spine/design.md"
@@ -216,8 +220,11 @@
         "src/researchguard/trace/task_iteration.py",
         "src/researchguard/trace/inference/contradiction_core.py",
         "src/researchguard/logic/minimal_sets.py",
+        "src/researchguard/self_dna.py",
+        "src/researchguard/domain_dna.py",
         "src/researchguard/experiment/*.py",
         "skills/*guard/SKILL.md",
+        "skills/*guard/references/*.md",
         "skills/*guard/agents/openai.yaml",
         "tests/source/test_stop_decision.py",
         "tests/trace/test_contradiction_core.py",
@@ -240,7 +247,7 @@
       "model_kind": "executable_workflow",
       "purpose_closure": {
         "schema_version": "flowguard.model_purpose_closure.v1",
-        "model_instance_id": "regression:researchguard_suite:0.4.3",
+        "model_instance_id": "regression:researchguard_suite:0.4.6",
         "reusable_model_type_id": "researchguard_suite",
         "task_intent_id": "researchguard-regression:suite-route-and-decision-members",
         "declaration_phase": "before_candidate",
@@ -294,8 +301,8 @@
         ],
         "model_sha256": "sha256:a5abc3bf79b1d12a6b45cc0b43d536cbb7eb5538272518bc0945a0eaeee7a819",
         "runner_sha256": "sha256:611e3bcbe9eebc31230d4822a2be8e984fa9064baf464e478863965a267051a7",
-        "declaration_fingerprint": "sha256:5562f70c0a96ef24ee6ffd4ff6f66a2a382858b82e98a412880e175142b9205c",
-        "closure_fingerprint": "sha256:c5f33af5003cf5f96db296a5ebaf62eb4f9109beb1ee729cb9cb19cc77a4fb8d"
+        "declaration_fingerprint": "sha256:8ee7fea899af71499ff1ffb927774ebbf034c84f92a81c07d7d4a02b7549deb0",
+        "closure_fingerprint": "sha256:cd8844f7c13c3d82cc170110974a3087ae0b6d7ae4d245182e30fdbf6da75dbc"
       }
     },
     {
@@ -312,6 +319,7 @@
       "input_globs": [
         ".flowguard/hierarchical_model_mesh/model.py",
         ".flowguard/hierarchical_model_mesh/run_checks.py",
+        ".flowguard/authoritative_model_system/software_blueprint_definition.json",
         "openspec/changes/strengthen-guard-domain-blueprint-spine/design.md"
       ],
       "intent_source_inputs": [
@@ -389,6 +397,7 @@
       "input_globs": [
         ".flowguard/model_test_code_alignment/model.py",
         ".flowguard/model_test_code_alignment/run_checks.py",
+        ".flowguard/authoritative_model_system/software_blueprint_definition.json",
         "openspec/changes/strengthen-guard-domain-blueprint-spine/design.md"
       ],
       "intent_source_inputs": [

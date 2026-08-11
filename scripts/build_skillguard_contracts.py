@@ -30,7 +30,7 @@ TEST_MESH_MAINTENANCE_INPUTS = (
     ".skillguard/test-mesh.json",
     "scripts/check_researchguard_test_mesh.py",
 )
-RESEARCHGUARD_VERSION = "0.4.3"
+RESEARCHGUARD_VERSION = "0.4.6"
 FLOWGUARD_VERSION = "0.68.2"
 SKILLGUARD_VERSION = "0.7.2"
 
@@ -164,7 +164,6 @@ IMPLEMENTATION_PATHS = {
         "src/researchguard/cli.py",
         "src/researchguard/domain_dna.py",
         "src/researchguard/external_scope_authority.py",
-        "src/researchguard/resources/external_domain_dna",
         "src/researchguard/routing.py",
         "src/researchguard/suite.py",
         "src/researchguard/logic/admission.py",

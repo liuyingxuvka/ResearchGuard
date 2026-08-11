@@ -163,8 +163,8 @@
         "model_source_fingerprint": "sha256:a5abc3bf79b1d12a6b45cc0b43d536cbb7eb5538272518bc0945a0eaeee7a819",
         "runner_path": ".flowguard/researchguard_suite/run_checks.py",
         "runner_source_fingerprint": "sha256:611e3bcbe9eebc31230d4822a2be8e984fa9064baf464e478863965a267051a7",
-        "purpose_declaration_fingerprint": "sha256:5562f70c0a96ef24ee6ffd4ff6f66a2a382858b82e98a412880e175142b9205c",
-        "purpose_closure_fingerprint": "sha256:c5f33af5003cf5f96db296a5ebaf62eb4f9109beb1ee729cb9cb19cc77a4fb8d"
+        "purpose_declaration_fingerprint": "sha256:8ee7fea899af71499ff1ffb927774ebbf034c84f92a81c07d7d4a02b7549deb0",
+        "purpose_closure_fingerprint": "sha256:cd8844f7c13c3d82cc170110974a3087ae0b6d7ae4d245182e30fdbf6da75dbc"
       }
     },
     {
@@ -313,7 +313,6 @@
     "src/researchguard/native_receipts.py": "researchguard_suite",
     "src/researchguard/portable_material.py": "researchguard_suite",
     "src/researchguard/resources/__init__.py": "researchguard_suite",
-    "src/researchguard/resources/external_domain_dna/__init__.py": "researchguard_suite",
     "src/researchguard/routing.py": "researchguard_suite",
     "src/researchguard/self_dna.py": "authoritative_model_system",
     "src/researchguard/source/__init__.py": "researchguard_suite",

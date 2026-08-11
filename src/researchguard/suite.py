@@ -13,9 +13,6 @@ from .model_envelope import HANDOFF_FIELD_CONTRACT_SCHEMA, MEMBER_MODEL_ENVELOPE
 _PACKAGE_ROOT = Path(__file__).resolve().parent
 _IGNORED_PARTS = {"__pycache__"}
 _IGNORED_SUFFIXES = {".pyc", ".pyo"}
-_CONTENT_ADDRESSED_RESOURCE_ROOTS = {
-    ("resources", "external_domain_dna"),
-}
 
 
 def governed_file_manifest() -> tuple[tuple[str, str], ...]:
@@ -29,15 +26,6 @@ def governed_file_manifest() -> tuple[tuple[str, str], ...]:
         if any(part in _IGNORED_PARTS for part in relative.parts):
             continue
         if path.suffix.lower() in _IGNORED_SUFFIXES:
-            continue
-        if any(
-            relative.parts[: len(root_parts)] == root_parts
-            for root_parts in _CONTENT_ADDRESSED_RESOURCE_ROOTS
-        ):
-            # These generated model packages carry their own exact content
-            # fingerprints and embed the suite identity they were produced
-            # against. Including them here would create a self-referential
-            # hash whose value changes every time the same model is rebuilt.
             continue
         digest = hashlib.sha256(path.read_bytes()).hexdigest()
         rows.append((relative.as_posix(), digest))

@@ -17,7 +17,6 @@ import zipfile
 import pytest
 
 import researchguard.domain_dna as domain_dna_module
-from researchguard.cli import main
 from researchguard.domain_dna import (
     ExternalDomainDnaError,
     MEMBER_BEHAVIOR_IDS,
@@ -1226,28 +1225,12 @@ def test_generic_nonpaper_consistent_workflow_uses_the_same_native_path(tmp_path
     assert "line_number" not in source_input["extraction_requests"][0]
 
 
-def test_cli_clean_wheel_packaging_and_zero_bespoke_domain_evaluator_residuals(
-    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+def test_wheel_packaging_and_zero_bespoke_domain_evaluator_residuals(
+    tmp_path: Path,
 ) -> None:
     bundle = _export_paper()
-    spec_path = tmp_path / "spec.json"
     bundle_path = tmp_path / "domain-dna.json"
-    spec_path.write_text(json.dumps(_spec()), encoding="utf-8")
-    assert main(
-        [
-            "domain-dna",
-            "build",
-            str(spec_path),
-            str(bundle_path),
-            "--native-composition",
-            str(NATIVE_COMPOSITION_PATH),
-            "--scope-authority",
-            str(SCOPE_AUTHORITY_PATH),
-            "--material-root",
-            str(PAPER_ROOT),
-        ]
-    ) == 0
-    assert json.loads(capsys.readouterr().out)["export_status"] == "external_domain_dna_exported"
+    bundle_path.write_bytes(bundle)
 
     for member_id in MEMBER_IDS:
         assert not (REPOSITORY / "src" / "researchguard" / member_id.removesuffix("guard") / "domain_dna.py").exists()
@@ -1294,13 +1277,7 @@ def test_cli_clean_wheel_packaging_and_zero_bespoke_domain_evaluator_residuals(
             trusted_artifact_sha256=sys.argv[5].split(','),
             trusted_producer_descriptor_fingerprints=sys.argv[6].split(','),
         )
-        from importlib.resources import files
-        resources = files('researchguard.resources.external_domain_dna')
-        assert resources.joinpath('attention-is-all-you-need-v7.json').is_file()
-        assert resources.joinpath('canonical-native-composition.json').is_file()
-        assert resources.joinpath('attention-is-all-you-need-v7.authority.json').is_file()
-        assert resources.joinpath('canonical-scope-authority-trust-roots.json').is_file()
-        assert resources.joinpath('README.md').is_file()
+        assert not (installed / 'researchguard' / 'resources' / 'external_domain_dna').exists()
         print(json.dumps(result, sort_keys=True))
         """
     )

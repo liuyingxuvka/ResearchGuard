@@ -1,8 +1,8 @@
 [flowguard]
 repository = "https://github.com/liuyingxuvka/FlowGuard"
-adopted_package_version = "0.68.9"
+adopted_package_version = "0.68.10"
 schema_version = "1.0"
-last_verified_at = "2026-08-09T12:50:59+00:00"
+last_verified_at = "2026-08-11T01:12:47+00:00"
 last_verified_by = "FlowGuard project-upgrade"
 agents_path = "AGENTS.md"
 
@@ -15,12 +15,12 @@ require_model_update_for_behavior_changes = true
 
 [model_authority]
 system_id = "flowguard"
-observed_snapshot_path = ".flowguard/model-mesh/snapshots/abfd0c143b471e60ebeb75249312df6ebd1f88b664ba976db52557a4c7c628eb.json"
-observed_snapshot_fingerprint = "sha256:abfd0c143b471e60ebeb75249312df6ebd1f88b664ba976db52557a4c7c628eb"
-subject_revision = "source-inventory:56168c3c448446c89c1b6ed8f1be3681e4db9d9488f4aded6c07a6dad2ac6610"
+observed_snapshot_path = ".flowguard/model-mesh/snapshots/e8d98b661e1045de42d1ac445dc2e75191c12bafb995eb70e89736033c301263.json"
+observed_snapshot_fingerprint = "sha256:e8d98b661e1045de42d1ac445dc2e75191c12bafb995eb70e89736033c301263"
+subject_revision = "source-inventory:73432885c6dee8e45794cf7663de730058695a52f19f7c7e0923ad88b809f533"
 coverage_status = "complete_within_declared_boundary"
-generation = 22
-accepted_revision_set_fingerprint = "sha256:5969dbbd7e94edaf1655f7b0237cead9f7a7699ccb50657dfea176ae6f578010"
-previous_snapshot_fingerprint = "sha256:7141ec34ed291f080e941d11718cca33baf2bce2b314aced29e78d8114adc854"
-activation_receipt_fingerprint = "sha256:cecd8c84df083200acac625ceac1df9d82bf1adf2b38182f76c616e2dc854183"
-head_fingerprint = "sha256:c59e9ab826bb8386b012ddf0a191daa5df510728ec1b4d6372d1d537c88386ea"
+generation = 32
+accepted_revision_set_fingerprint = "sha256:84a79aa633b24e4db42b67a91d18005150e0c1c16ba957cd96eb749c48d4e97a"
+previous_snapshot_fingerprint = "sha256:c18407971aba22431818c5355fe3d10156b125ec13c4dc74fb64f48372cbce10"
+activation_receipt_fingerprint = "sha256:300e8fb4cef523b079c7f5ea84461742d02997fd42fbd09c7bf55acd49d8caf8"
+head_fingerprint = "sha256:6c2140e39e0eb66326e181daa6b1f553cdbc7d7df7d568f4c419ad8b3c805e8f"

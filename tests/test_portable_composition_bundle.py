@@ -373,7 +373,7 @@ def test_four_member_bundle_is_deterministic_bundle_only_and_atomic(
                 raise RuntimeError(f"fresh handoff tried to read compiler temporary material: {candidate}")
 
         sys.addaudithook(reject_repository_reads)
-        from researchguard.cli import main
+        from researchguard.routing import project_portable_composition_bundle
         from researchguard.native_receipts import _CURRENT_NATIVE_RECEIPT_PRODUCERS
         from researchguard.target_authority import _CURRENT_EXPECTED_TARGET_ADMISSION_PRODUCERS
 
@@ -383,10 +383,32 @@ def test_four_member_bundle_is_deterministic_bundle_only_and_atomic(
         assert _PORTABLE_NATIVE_MATERIALS.get() is None
         import researchguard
         assert installed_site in Path(researchguard.__file__).resolve().parents
-        exit_code = main(["portable", str(bundle_path), *sys.argv[4:]])
+        trusted = []
+        query_kind = None
+        object_id = ""
+        remaining = sys.argv[4:]
+        for index in range(0, len(remaining), 2):
+            option, value = remaining[index : index + 2]
+            if option == "--trusted-producer-descriptor-fingerprint":
+                trusted.append(value)
+            elif option == "--behavior":
+                query_kind, object_id = "behavior", value
+            else:
+                raise AssertionError(f"unexpected projection option: {option}")
+        projection = project_portable_composition_bundle(
+            bundle_path.read_bytes(),
+            trusted_producer_descriptor_fingerprints=trusted,
+            query_kind=query_kind,
+            object_id=object_id,
+        )
+        print(json.dumps(projection, sort_keys=True))
         assert _CURRENT_NATIVE_RECEIPT_PRODUCERS == {}
         assert _CURRENT_EXPECTED_TARGET_ADMISSION_PRODUCERS == {}
-        raise SystemExit(exit_code)
+        raise SystemExit(
+            0
+            if projection["status"] == "handoff_qualified"
+            else 3
+        )
         """
     )
     environment = os.environ.copy()
