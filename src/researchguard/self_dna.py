@@ -83,6 +83,11 @@ def _blocked(root: Path, code: str, message: str, *, exc: Exception | None = Non
             "gap_count": 1,
         },
         "gap": {"code": code, "message": message},
+        "dna_qualification": {
+            "status": "blocked",
+            "qualified": False,
+            "reasons": [code],
+        },
     }
     if exc is not None:
         payload["gap"]["exception"] = f"{type(exc).__name__}: {exc}"
@@ -105,12 +110,21 @@ def _run_build(root: Path) -> tuple[dict[str, Any], Any | None]:
         return _blocked(root, "flowguard_self_blueprint_input_invalid", "The current FlowGuard self-blueprint inputs are invalid or unavailable.", exc=exc), None
 
     ledger = bundle.readiness_ledger.to_dict()
+    qualification = getattr(bundle, "dna_qualification", None)
+    if qualification is None:
+        return _blocked(
+            root,
+            "flowguard_dna_qualification_missing",
+            "The current FlowGuard self-blueprint did not expose its provider-neutral DNA qualification contract.",
+        ), None
+    qualification_payload = qualification.to_dict()
+    qualified = bool(qualification.qualified)
     payload = {
         "report_kind": REPORT_KIND,
         "software_id": "researchguard",
         "target_kind": "software",
-        "status": "ready" if bundle.ok else "not_ready",
-        "ok": bool(bundle.ok),
+        "status": "ready" if bundle.ok and qualified else "not_ready",
+        "ok": bool(bundle.ok and qualified),
         "root": str(root),
         "claim_boundary": (
             "This is the FlowGuard repository software-DNA boundary. The four "
@@ -119,6 +133,7 @@ def _run_build(root: Path) -> tuple[dict[str, Any], Any | None]:
         ),
         "flowguard": _package_identity(),
         "readiness": ledger,
+        "dna_qualification": qualification_payload,
         "bundle": bundle.to_dict(),
     }
     return payload, bundle
@@ -169,9 +184,23 @@ def export(root: str | Path, output: str | Path) -> tuple[dict[str, Any], int]:
             write_canonical_blueprint_projection,
         )
 
-        projection = project_canonical_software_blueprint(bundle)
+        # The FlowGuard self wrapper carries the exact typed project bundle in
+        # ``project_bundle``.  The wrapper itself is a reporting facade and is
+        # intentionally not accepted by the canonical exporter; passing it
+        # would make a successful self-DNA check fail at export time.
+        project_bundle = getattr(bundle, "project_bundle", None)
+        if project_bundle is None:
+            return _blocked(
+                root_path,
+                "flowguard_project_bundle_missing",
+                "The current FlowGuard self-blueprint did not expose its exact typed project bundle.",
+            ), 1
+        projection = project_canonical_software_blueprint(project_bundle)
         written = write_canonical_blueprint_projection(projection, output_path)
-        verification = verify_materialized_project_blueprint_projection(output_path, bundle)
+        verification = verify_materialized_project_blueprint_projection(
+            output_path,
+            project_bundle,
+        )
         if not verification.ok:
             return _blocked(root_path, "self_dna_export_materialization_invalid", "FlowGuard did not verify the isolated canonical self-DNA materialization."), 1
         payload["export"] = {

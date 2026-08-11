@@ -30,7 +30,7 @@ TEST_MESH_MAINTENANCE_INPUTS = (
     ".skillguard/test-mesh.json",
     "scripts/check_researchguard_test_mesh.py",
 )
-RESEARCHGUARD_VERSION = "0.4.5"
+RESEARCHGUARD_VERSION = "0.4.6"
 FLOWGUARD_VERSION = "0.68.2"
 SKILLGUARD_VERSION = "0.7.2"
 

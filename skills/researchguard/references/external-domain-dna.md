@@ -46,4 +46,11 @@ Recursive deepening consumes one frontier by explicitly adding the next question
 - Within one supplied portable bundle, each `(member_id, receipt_id)` occurs once and its carried reference must equal its signed carried bytes. That is a single-bundle statement. Unless the caller also supplies a shared immutable authority or transparency log, one isolated bundle cannot prove that the producer did not publish a different receipt under the same identity in another isolated bundle.
 - The process-local native replay cache is bounded and keyed by the complete bundle bytes plus the normalized exact trust set. It caches no target material result, writes nothing, survives no process, and supplies no stale fallback.
 
+The external-object DNA is independent from ResearchGuard's own software DNA.
+Its adapter is target-neutral and may describe a paper, model, test workflow,
+or non-Python system, but it never assumes that a member blueprint can
+enumerate the repository that produced it. ResearchGuard's self-DNA check
+consumes FlowGuard's current qualification and remains blocked when any
+static, semantic, code-binding, or test-binding identity is stale.
+
 The external DNA can guide another AI through compact member, behavior, object, scope, impact, and reverse queries. The full portable evidence stays in the artifact rather than being injected into the default prompt, preventing token waste while preserving drill-down depth.

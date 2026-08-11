@@ -24,7 +24,7 @@ from researchguard.suite import governed_file_manifest, suite_identity
 def test_suite_identity_is_single_and_complete() -> None:
     identity = suite_identity()
     assert identity["suite_id"] == SUITE_ID
-    assert identity["version"] == __version__ == "0.4.5"
+    assert identity["version"] == __version__ == "0.4.6"
     assert identity["members"] == list(MEMBER_IDS)
     assert identity["distribution"] == "researchguard"
     assert identity["console_script"] == "researchguard"

@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.4.6 - 2026-08-10
+
+- Synchronize the ResearchGuard package and five maintained skill projections
+  with the current provider-neutral DNA boundary.
+- Refresh self-DNA, object-DNA qualification, code/test bindings, and current
+  model evidence for the patch release; historical receipts remain immutable.
+
 ## v0.4.5 - 2026-08-10
 
 - Repair native external-object receipt identity so independently authored
