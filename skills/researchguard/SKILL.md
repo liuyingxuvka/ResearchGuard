@@ -13,19 +13,17 @@ silent retries.
 
 ## Entrypoint Scope
 
-Use a member directly when its first action is clear. Use the umbrella only for
-an ambiguous first action or several domains. Read
+Use a member directly when its action is clear. Use the umbrella only for
+ambiguity or several domains. Read
 `references/member-admission-index.md` at `route:member-admission`; do not load
 member skills to classify.
 
-Extract source-spanned `primary_action` and context facts only. Contracts derive
-admission and the router selects the unique smallest set covering each primary
-responsibility.
+Extract `primary_action` and context facts only. Contracts derive admission;
+the router selects the unique smallest set covering each responsibility.
 
 ## Use When
 
-Use the umbrella for an ambiguous first action or several member
-responsibilities.
+Use the umbrella for ambiguity or several member responsibilities.
 
 ## Do Not Use When
 
@@ -52,7 +50,7 @@ repository software DNA; the ResearchGuard software-DNA root is FlowGuard-owned.
 Load no member blueprint
 unless invoked.
 
-For portable DNA of an external paper, model, test system, or workflow, trigger
+For directory-native DNA of an external paper, model, test system, or workflow, trigger
 `route:external-domain-dna` and read
 `references/external-domain-dna.md`. It owns signed scope,
 current replay, coverage, qualification, exclusions, and recursive frontier.
@@ -64,14 +62,18 @@ candidate-authoring path.
 
 There are two DNA layers: member-domain DNA for an external paper, model, test
 system, or workflow, and the separate ResearchGuard repository software-DNA root
-owned by FlowGuard. Member output is not software-DNA evidence until it is
-bound to exact current code and test owners. External qualification is target
-neutral and adapter-selected; self-DNA exposes static, semantic, code-binding,
-and test-binding states, with stale FlowGuard qualification shown as a blocker.
+owned by FlowGuard. Member output becomes software-DNA evidence only when bound
+to exact current code and test owners. External qualification is target-neutral
+and adapter-selected; self-DNA exposes static, semantic, code-binding, and
+test-binding states, with stale FlowGuard qualification as a blocker.
+
+The target's native directory is the DNA authority. A member composition is only
+an in-memory working projection; it never replaces the directory, models, tests,
+or evidence bindings.
 
 Missing spans, stale fingerprints, unknown facts, incomplete forbidden reviews,
 zero coverage, equal minima, over-selection, or incomplete composition block
-before execution. No keyword, list-order, alias, `run all`, retry, or fallback.
+execution. No keyword, list-order, alias, `run all`, retry, or fallback.
 
 ## Member boundary
 
@@ -80,11 +82,13 @@ before execution. No keyword, list-order, alias, `run all`, retry, or fallback.
 - TraceGuard owns temporal reconstruction, competing storylines, execution/effect chains, counter-scenarios, and bounded causal narratives.
 - ExperimentGuard owns recommendation-only minimum finite experiment sets over declared hypotheses and outcomes.
 
-Context alone does not create another responsibility. A source-bound primary responsibility does. Necessary multi-member work uses the declared composition and typed handoffs; a handoff never executes the target member automatically.
+Context alone creates no responsibility; a source-bound primary responsibility does. Multi-member work uses the declared composition and typed handoffs; a handoff never executes a member automatically.
 
 ## Selected-member depth
 
-The selected member—not the umbrella—owns predictions, falsifiers, native observations, gap lineage, revision, holdout evidence, and closure. Claiming the model "understands" is not evidence. Native gaps stay open or end visibly as stalled, limited, externally dependent, or scope-excluded.
+The selected member—not the umbrella—owns predictions, falsifiers, observations,
+gap lineage, revision, holdouts, and closure. “Understands” is not evidence;
+native gaps stay open or end visibly as stalled, limited, external, or excluded.
 
 ## Hard Gates
 
@@ -98,6 +102,5 @@ The selected member—not the umbrella—owns predictions, falsifiers, native ob
 
 ## Output Requirements
 
-Report the selected set, order, responsibilities, evidence, failures, blockers,
-skips, loaded references, residual risk, typed handoffs, field owners, terminal
-reason, and claim boundary.
+Report the selected set/order, responsibilities, evidence, failures, blockers,
+skips, references, risk, typed handoffs, field owners, terminal reason, and claim boundary.

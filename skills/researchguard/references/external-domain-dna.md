@@ -1,12 +1,14 @@
-# External-domain DNA
+# External-domain DNA (directory-native)
 
 Load this reference only when ResearchGuard must validate, deepen, impact-check,
 or reverse-trace a model of one external paper, model description, test
-workflow, or other research object. This is member-domain DNA joined by
-composition transport. It is not the ResearchGuard repository software-DNA
-root, which remains FlowGuard-owned. The canonical source lives under
-`models/external_domain_dna`; the ResearchGuard console deliberately exposes
-no standalone domain-DNA build/inspect/export/materialization route.
+workflow, or other research object. This is member-domain DNA joined by a
+bounded in-memory composition. It is not the ResearchGuard repository
+software-DNA root, which remains FlowGuard-owned. The canonical source lives
+under `models/external_domain_dna` and the supplied target directory; model
+files, tests, code bindings, and evidence locators are the DNA. The in-memory
+composition is only a query/replay view. It must not be written as a
+standalone DNA package or treated as a replacement for the directory.
 
 ## What qualifies
 
@@ -16,12 +18,12 @@ Before any external-object projection, require one exact current four-member por
 
 External admission fixes which target and denominator are in scope; member-native parsing separately determines what those admitted bytes mean. Anchor and immutable receipt locators/hashes are persistent and are replayed without treating process memory or a cache as authority. Direct member use without external admission is unverified, and a different target requires a separately admitted anchor. Production exposes no public or generic target, attestation, or receipt issuer and no inline candidate-authoring shortcut. Impact and reverse trace admit exactly one current closed composition replay over resolved evidence before returning ordinary output.
 
-The public console does not build or materialize external DNA.  Internal
-native tests and the canonical compiler call the `researchguard.domain_dna`
-module directly with one explicit four-member composition and, when needed,
-one independently supplied scope-authority record.  Consumers should treat
-the resulting bytes as an input artifact and use the module's qualification,
-impact, and reverse helpers only inside an explicitly bounded integration.
+The public console does not build or materialize an external DNA package.
+Internal native checks call the `researchguard.domain_dna` module with one
+explicit four-member composition and, when needed, one independently supplied
+scope-authority record. Consumers should keep the target directory in place,
+use the model/test/evidence bindings from that directory, and use the module's
+qualification, impact, and reverse helpers only as bounded in-memory views.
 
 ## Scope before completeness
 
@@ -54,4 +56,7 @@ enumerate the repository that produced it. ResearchGuard's self-DNA check
 consumes FlowGuard's current qualification and remains blocked when any
 static, semantic, code-binding, or test-binding identity is stale.
 
-The external DNA can guide another AI through compact member, behavior, object, scope, impact, and reverse queries. The full portable evidence stays in the artifact rather than being injected into the default prompt, preventing token waste while preserving drill-down depth.
+The directory-native DNA can guide another AI through compact member,
+behavior, object, scope, impact, and reverse queries. Full evidence stays in
+the declared model/test/evidence files and is loaded only for a requested
+drill-down, preventing token waste while preserving depth.

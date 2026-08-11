@@ -123,12 +123,21 @@ def _run_build(root: Path) -> tuple[dict[str, Any], Any | None]:
         ), None
     qualification_payload = qualification.to_dict()
     qualified = bool(qualification.qualified)
+    from .software_dna import check_software_dna_contract
+
+    software_dna = check_software_dna_contract(root)
+    if not software_dna.get("ready", False):
+        return _blocked(
+            root,
+            "software_dna_contract_not_ready",
+            "The native ResearchGuard root/member model, code, test, or evidence bindings are incomplete.",
+        ), None
     payload = {
         "report_kind": REPORT_KIND,
         "software_id": "researchguard",
         "target_kind": "software",
         "status": "ready" if bundle.ok and qualified else "not_ready",
-        "ok": bool(bundle.ok and qualified),
+        "ok": bool(bundle.ok and qualified and software_dna.get("ready", False)),
         "root": str(root),
         "claim_boundary": (
             "This is the FlowGuard repository software-DNA boundary. The four "
@@ -138,6 +147,7 @@ def _run_build(root: Path) -> tuple[dict[str, Any], Any | None]:
         "flowguard": _package_identity(),
         "readiness": ledger,
         "dna_qualification": qualification_payload,
+        "software_dna": software_dna,
         "bundle": bundle.to_dict(),
     }
     return payload, bundle
@@ -150,7 +160,7 @@ def check(root: str | Path, *, compact: bool = False) -> tuple[dict[str, Any], i
         readiness = payload.get("readiness", {})
         payload = {
             key: payload[key]
-            for key in ("report_kind", "software_id", "target_kind", "status", "ok", "flowguard")
+            for key in ("report_kind", "software_id", "target_kind", "status", "ok", "flowguard", "software_dna")
             if key in payload
         }
         payload["readiness"] = {

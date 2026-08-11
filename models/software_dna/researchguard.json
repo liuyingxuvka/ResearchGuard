@@ -1,0 +1,138 @@
+{
+  "schema_version": "researchguard.software-dna-contract.v1",
+  "dna_id": "software-dna:researchguard",
+  "system_model_id": "researchguard-suite",
+  "claim_boundary": "This native model is the ResearchGuard repository DNA: it binds the suite root to its four domain members, their public interfaces, code owners, test owners, and current FlowGuard evidence. It does not claim that an arbitrary external target has been qualified; each external target requires its own target-owned adapter, authority, and evidence.",
+  "denominator": {
+    "included_roots": [
+      ".flowguard",
+      "models",
+      "openspec",
+      "scripts",
+      "skills",
+      "src/researchguard",
+      "tests"
+    ],
+    "excluded_runtime_outputs": [
+      ".flowguard/evidence",
+      ".flowguard/model-mesh",
+      "**/__pycache__"
+    ]
+  },
+  "external_target_adapters": [
+    {
+      "adapter_id": "paper",
+      "selector_kinds": ["paper", "manuscript", "citation_graph"],
+      "claim_boundary": "A paper target is modeled as an evidence-backed artifact hierarchy; semantic truth remains outside the structural blueprint."
+    },
+    {
+      "adapter_id": "structured_model",
+      "selector_kinds": ["model", "dataset", "schema"],
+      "claim_boundary": "A structured model target requires its own material snapshot, expected-target authority, and native replay receipts."
+    },
+    {
+      "adapter_id": "test_workflow",
+      "selector_kinds": ["workflow", "testbench", "procedure"],
+      "claim_boundary": "A test or procedure target is modeled without executing an external system unless the target-owned route explicitly supplies an execution owner."
+    },
+    {
+      "adapter_id": "generic_file_tree",
+      "selector_kinds": ["directory", "file", "manifest"],
+      "claim_boundary": "A bounded native file tree can be modeled only when its source, authority, and evidence are independently supplied."
+    }
+  ],
+  "models": [
+    {
+      "model_id": "researchguard-suite",
+      "parent_model_id": "",
+      "child_model_ids": ["logicguard", "sourceguard", "traceguard", "experimentguard"],
+      "public_input_ids": ["logicguard_status", "sourceguard_status", "traceguard_status", "experimentguard_status"],
+      "public_output_ids": ["researchguard_self_dna_status"],
+      "function_blocks": [
+        {
+          "block_id": "block:researchguard-suite:check",
+          "signature": {
+            "input": ["logicguard_status", "sourceguard_status", "traceguard_status", "experimentguard_status"],
+            "state": ["native_model_directory"],
+            "effect": ["read_current_flowguard_authority"],
+            "output": ["researchguard_self_dna_status"],
+            "completion": ["all_child_outputs_bound"]
+          },
+          "code_owner": {"path": "src/researchguard/self_dna.py", "symbol": "check"},
+          "test_binding": {"path": "tests/test_software_dna.py", "node_id": "test_repository_software_dna_contract", "oracle": "root_and_four_members_are_bound"},
+          "evidence_binding": {"path": ".flowguard/project.toml", "owner_id": "flowguard-project-authority", "claim": "current native project pointer"}
+        }
+      ]
+    },
+    {
+      "model_id": "logicguard",
+      "parent_model_id": "researchguard-suite",
+      "child_model_ids": [],
+      "public_input_ids": ["logic_target_material"],
+      "public_output_ids": ["logicguard_status"],
+      "function_blocks": [
+        {
+          "block_id": "block:logicguard:blueprint",
+          "signature": {"input": ["logic_target_material"], "state": ["logic_model"], "effect": ["bind_claim_interfaces"], "output": ["logicguard_status"], "completion": ["logic_blueprint_checked"]},
+          "code_owner": {"path": "src/researchguard/logic/blueprint.py", "symbol": "check_blueprint"},
+          "test_binding": {"path": "tests/logic/test_blueprint_interfaces.py", "node_id": "test_child_output_closes_exact_parent_input", "oracle": "logic_interfaces_close"},
+          "evidence_binding": {"path": ".flowguard/researchguard_suite_model.json", "owner_id": "logicguard-native-model", "claim": "logic member model evidence"}
+        }
+      ]
+    },
+    {
+      "model_id": "sourceguard",
+      "parent_model_id": "researchguard-suite",
+      "child_model_ids": [],
+      "public_input_ids": ["source_target_material"],
+      "public_output_ids": ["sourceguard_status"],
+      "function_blocks": [
+        {
+          "block_id": "block:sourceguard:blueprint",
+          "signature": {"input": ["source_target_material"], "state": ["source_graph"], "effect": ["bind_source_lineage"], "output": ["sourceguard_status"], "completion": ["source_blueprint_checked"]},
+          "code_owner": {"path": "src/researchguard/source/blueprint.py", "symbol": "check_blueprint"},
+          "test_binding": {"path": "tests/source/test_blueprint_graph.py", "node_id": "test_complete_information_blueprint_closes_every_typed_interface", "oracle": "source_interfaces_close"},
+          "evidence_binding": {"path": ".flowguard/researchguard_suite_model.json", "owner_id": "sourceguard-native-model", "claim": "source member model evidence"}
+        }
+      ]
+    },
+    {
+      "model_id": "traceguard",
+      "parent_model_id": "researchguard-suite",
+      "child_model_ids": [],
+      "public_input_ids": ["trace_target_material"],
+      "public_output_ids": ["traceguard_status"],
+      "function_blocks": [
+        {
+          "block_id": "block:traceguard:blueprint",
+          "signature": {"input": ["trace_target_material"], "state": ["trace_hierarchy"], "effect": ["bind_trace_interfaces"], "output": ["traceguard_status"], "completion": ["trace_blueprint_checked"]},
+          "code_owner": {"path": "src/researchguard/trace/blueprint.py", "symbol": "check_blueprint"},
+          "test_binding": {"path": "tests/trace/test_blueprint_hierarchy.py", "node_id": "test_current_blueprint_has_deterministic_complete_hierarchy", "oracle": "trace_interfaces_close"},
+          "evidence_binding": {"path": ".flowguard/researchguard_suite_model.json", "owner_id": "traceguard-native-model", "claim": "trace member model evidence"}
+        }
+      ]
+    },
+    {
+      "model_id": "experimentguard",
+      "parent_model_id": "researchguard-suite",
+      "child_model_ids": [],
+      "public_input_ids": ["experiment_target_material"],
+      "public_output_ids": ["experimentguard_status"],
+      "function_blocks": [
+        {
+          "block_id": "block:experimentguard:blueprint",
+          "signature": {"input": ["experiment_target_material"], "state": ["experiment_design"], "effect": ["bind_experiment_interfaces"], "output": ["experimentguard_status"], "completion": ["experiment_blueprint_checked"]},
+          "code_owner": {"path": "src/researchguard/experiment/blueprint.py", "symbol": "check_blueprint"},
+          "test_binding": {"path": "tests/experiment/test_blueprint_design.py", "node_id": "test_complete_blueprint_is_rooted_deterministic_and_external", "oracle": "experiment_interfaces_close"},
+          "evidence_binding": {"path": ".flowguard/researchguard_suite_model.json", "owner_id": "experimentguard-native-model", "claim": "experiment member model evidence"}
+        }
+      ]
+    }
+  ],
+  "child_interface_bindings": [
+    {"child_model_id": "logicguard", "child_output_id": "logicguard_status", "parent_input_id": "logicguard_status", "disposition": "consumed_by_suite_root"},
+    {"child_model_id": "sourceguard", "child_output_id": "sourceguard_status", "parent_input_id": "sourceguard_status", "disposition": "consumed_by_suite_root"},
+    {"child_model_id": "traceguard", "child_output_id": "traceguard_status", "parent_input_id": "traceguard_status", "disposition": "consumed_by_suite_root"},
+    {"child_model_id": "experimentguard", "child_output_id": "experimentguard_status", "parent_input_id": "experimentguard_status", "disposition": "consumed_by_suite_root"}
+  ]
+}

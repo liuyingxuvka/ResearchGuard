@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.4.8 - 2026-08-11
+
+- Keep the ResearchGuard suite DNA in its native directory: models, code/test
+  bindings, and evidence stay inspectable and versioned in place.
+- Refresh the self-DNA and external-object blueprint after the FlowGuard
+  provider update without emitting a standalone transport bundle.
+- Regenerate the five consumer contracts and install projection for the new
+  patch identity.
+
 ## v0.4.7 - 2026-08-11
 
 - Keep the ResearchGuard suite DNA in its native directory: models, bindings,

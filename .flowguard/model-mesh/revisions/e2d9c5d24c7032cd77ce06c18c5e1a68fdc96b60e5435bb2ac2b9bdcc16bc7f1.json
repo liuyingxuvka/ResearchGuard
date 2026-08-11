@@ -1,0 +1,955 @@
+{
+  "added_ids": [],
+  "affected_closure_fingerprint": "sha256:3347671dd07795438cc7d832c11e41ea21433829afd8aaba4e5a9d36b56ef44f",
+  "affected_closure_ids": [
+    "coverage:universe",
+    "model_instance:model:researchguard_suite",
+    "model_relation:relation:model-realizes-purpose:researchguard_suite",
+    "model_relation:relation:system-contains:researchguard_suite",
+    "parent_closure:purpose:researchguard_suite",
+    "parent_closure:system:flowguard:model-regression-manifest",
+    "system_property:subject_revision"
+  ],
+  "affected_edge_ids": [
+    "model_relation:relation:model-realizes-purpose:researchguard_suite",
+    "model_relation:relation:system-contains:researchguard_suite"
+  ],
+  "affected_owner_bindings": [
+    {
+      "affected_id": "coverage:universe",
+      "owner_route": "model_mesh_maintenance"
+    },
+    {
+      "affected_id": "model_instance:model:researchguard_suite",
+      "owner_route": "model_test_alignment"
+    },
+    {
+      "affected_id": "model_relation:relation:model-realizes-purpose:researchguard_suite",
+      "owner_route": "model_mesh_maintenance"
+    },
+    {
+      "affected_id": "model_relation:relation:system-contains:researchguard_suite",
+      "owner_route": "model_mesh_maintenance"
+    },
+    {
+      "affected_id": "parent_closure:purpose:researchguard_suite",
+      "owner_route": "model_test_alignment"
+    },
+    {
+      "affected_id": "parent_closure:system:flowguard:model-regression-manifest",
+      "owner_route": "model_mesh_maintenance"
+    },
+    {
+      "affected_id": "system_property:subject_revision",
+      "owner_route": "model_mesh_maintenance"
+    }
+  ],
+  "base_snapshot_fingerprint": "sha256:47955a608c5425366285085816d8c82e1deb2268a0e0c94ddc891ccfca92969e",
+  "candidate_snapshot_fingerprint": "sha256:176d23cb787c79ed7665b29aab19ce5c2ff391cb4a751351b807016fe59e2271",
+  "changed_commitment_ids": [],
+  "changed_contract_ids": [],
+  "changed_coverage_ids": [
+    "coverage:universe"
+  ],
+  "changed_field_ids": [],
+  "changed_gap_ids": [],
+  "changed_owner_artifact_ids": [],
+  "changed_relation_ids": [
+    "relation:model-realizes-purpose:researchguard_suite",
+    "relation:system-contains:researchguard_suite"
+  ],
+  "changed_root_ids": [],
+  "changed_side_effect_ids": [],
+  "changed_source_surface_ids": [],
+  "changed_system_property_ids": [
+    "system_property:subject_revision"
+  ],
+  "changed_test_ids": [],
+  "completed_evidence_refs": [
+    {
+      "affected_closure_fingerprint": "sha256:3347671dd07795438cc7d832c11e41ea21433829afd8aaba4e5a9d36b56ef44f",
+      "candidate_snapshot_fingerprint": "sha256:176d23cb787c79ed7665b29aab19ce5c2ff391cb4a751351b807016fe59e2271",
+      "covered_affected_ids": [
+        "coverage:universe",
+        "model_relation:relation:model-realizes-purpose:researchguard_suite",
+        "model_relation:relation:system-contains:researchguard_suite",
+        "parent_closure:system:flowguard:model-regression-manifest",
+        "system_property:subject_revision"
+      ],
+      "current": true,
+      "eligible": true,
+      "environment_fingerprint": "sha256:34a9053890709c27c83a631c979424a3b97ac172b024ec65041e7954cde0c02e",
+      "obligation_ids": [
+        "coverage:universe",
+        "model_relation:relation:model-realizes-purpose:researchguard_suite",
+        "model_relation:relation:system-contains:researchguard_suite",
+        "parent_closure:system:flowguard:model-regression-manifest",
+        "system_property:subject_revision"
+      ],
+      "owner_route": "model_mesh_maintenance",
+      "receipt_fingerprint": "sha256:c15a1aaf19e99122b3d4ad7507ec2e18ae6c263a926d299d65005a7cc023e738",
+      "receipt_id": "receipt:validation-owner:model_mesh_maintenance:ff9495fcc17514f6ecad1c938e85e0d1",
+      "schema": "flowguard.model_revision_evidence.v2",
+      "status": "pass",
+      "subject_fingerprint": "sha256:176d23cb787c79ed7665b29aab19ce5c2ff391cb4a751351b807016fe59e2271",
+      "toolchain_fingerprint": "sha256:719a12d4c662c8292302bd5d044e11c1072d017209709cd88f55c013b6f0b43d"
+    },
+    {
+      "affected_closure_fingerprint": "sha256:3347671dd07795438cc7d832c11e41ea21433829afd8aaba4e5a9d36b56ef44f",
+      "candidate_snapshot_fingerprint": "sha256:176d23cb787c79ed7665b29aab19ce5c2ff391cb4a751351b807016fe59e2271",
+      "covered_affected_ids": [
+        "model_instance:model:researchguard_suite",
+        "parent_closure:purpose:researchguard_suite"
+      ],
+      "current": true,
+      "eligible": true,
+      "environment_fingerprint": "sha256:34a9053890709c27c83a631c979424a3b97ac172b024ec65041e7954cde0c02e",
+      "obligation_ids": [
+        "model_instance:model:researchguard_suite",
+        "parent_closure:purpose:researchguard_suite"
+      ],
+      "owner_route": "model_test_alignment",
+      "receipt_fingerprint": "sha256:eb580acb95b8fe71cf0f4b25a3b6cec6f5689a5bce0173e4f5f45ffaaa137fc3",
+      "receipt_id": "receipt:validation-owner:model_test_alignment:8cd522ee97dd9424968f772badbdc9b0",
+      "schema": "flowguard.model_revision_evidence.v2",
+      "status": "pass",
+      "subject_fingerprint": "sha256:176d23cb787c79ed7665b29aab19ce5c2ff391cb4a751351b807016fe59e2271",
+      "toolchain_fingerprint": "sha256:de9e6a1177eea958593374553dd238cc3a1fd31d4125771dec7735cc29ba7b6e"
+    }
+  ],
+  "current_effective_intent_view": {
+    "active_contributions": [
+      {
+        "conflicts_with_contribution_ids": [],
+        "contribution_id": "intent:strengthen-guard-domain-blueprint-spine:model:authoritative_model_system:patch-0.4.5-20260810",
+        "decision_state": "accepted",
+        "declared_consumer_ids": [],
+        "desired_terminal_state_ids": [],
+        "effective_revision": "change:strengthen-guard-domain-blueprint-spine",
+        "fingerprint": "sha256:aaab0d86d9eaf1b8e8a43bfa43a5c9c052df0be969824753720f5bde780abaac",
+        "lifecycle_state": "candidate",
+        "logical_model_id": "model:authoritative_model_system",
+        "native_owner_id": "",
+        "rationale": "Refresh the current ResearchGuard software-DNA owner identity for release 0.4.5 while preserving the accepted domain behavior, intent lineage, and exact relation ownership.",
+        "schema": "flowguard.model_intent_contribution.v1",
+        "source_fingerprint": "sha256:185423da1b71aef060a3ac330a97beddcf01ac828c28367ff9cfdcb90318ef9f",
+        "source_kind": "design",
+        "source_ref": "openspec/changes/strengthen-guard-domain-blueprint-spine/design.md",
+        "subject_lane": "normative_target",
+        "subject_role": "design",
+        "supersedes_contribution_ids": [
+          "intent:strengthen-guard-domain-blueprint-spine:model:authoritative_model_system:selfblueprint-refresh-0.4.4-20260810"
+        ],
+        "target_invariant_ids": [],
+        "target_obligation_ids": [],
+        "target_output_ids": [],
+        "target_relation_ids": [
+          "relation:model-realizes-purpose:authoritative_model_system",
+          "relation:system-contains:authoritative_model_system"
+        ],
+        "target_state_ids": [],
+        "target_transition_ids": [],
+        "unresolved_owner_id": "",
+        "work_context_fingerprint": "",
+        "work_context_id": ""
+      },
+      {
+        "conflicts_with_contribution_ids": [],
+        "contribution_id": "intent:strengthen-guard-domain-blueprint-spine:model:compositional_verification_kernel:patch-0.4.5-20260810",
+        "decision_state": "accepted",
+        "declared_consumer_ids": [],
+        "desired_terminal_state_ids": [],
+        "effective_revision": "change:strengthen-guard-domain-blueprint-spine",
+        "fingerprint": "sha256:73758504eb7d6028f853f82ea71b53b3952cab4f65a2e3bd496d11d1da8afd5f",
+        "lifecycle_state": "candidate",
+        "logical_model_id": "model:compositional_verification_kernel",
+        "native_owner_id": "",
+        "rationale": "Refresh the current ResearchGuard software-DNA owner identity for release 0.4.5 while preserving the accepted domain behavior, intent lineage, and exact relation ownership.",
+        "schema": "flowguard.model_intent_contribution.v1",
+        "source_fingerprint": "sha256:185423da1b71aef060a3ac330a97beddcf01ac828c28367ff9cfdcb90318ef9f",
+        "source_kind": "design",
+        "source_ref": "openspec/changes/strengthen-guard-domain-blueprint-spine/design.md",
+        "subject_lane": "normative_target",
+        "subject_role": "design",
+        "supersedes_contribution_ids": [
+          "intent:strengthen-guard-domain-blueprint-spine:model:compositional_verification_kernel:selfblueprint-refresh-0.4.4-20260810"
+        ],
+        "target_invariant_ids": [],
+        "target_obligation_ids": [],
+        "target_output_ids": [],
+        "target_relation_ids": [
+          "relation:system-contains:compositional_verification_kernel"
+        ],
+        "target_state_ids": [],
+        "target_transition_ids": [],
+        "unresolved_owner_id": "",
+        "work_context_fingerprint": "",
+        "work_context_id": ""
+      },
+      {
+        "conflicts_with_contribution_ids": [],
+        "contribution_id": "intent:strengthen-guard-domain-blueprint-spine:model:hierarchical_model_mesh:patch-0.4.5-20260810",
+        "decision_state": "accepted",
+        "declared_consumer_ids": [],
+        "desired_terminal_state_ids": [],
+        "effective_revision": "change:strengthen-guard-domain-blueprint-spine",
+        "fingerprint": "sha256:9667ea49dba223ddee503358185cbb3810c7425fd0e120c7e11e014353c4ee1e",
+        "lifecycle_state": "candidate",
+        "logical_model_id": "model:hierarchical_model_mesh",
+        "native_owner_id": "",
+        "rationale": "Refresh the current ResearchGuard software-DNA owner identity for release 0.4.5 while preserving the accepted domain behavior, intent lineage, and exact relation ownership.",
+        "schema": "flowguard.model_intent_contribution.v1",
+        "source_fingerprint": "sha256:185423da1b71aef060a3ac330a97beddcf01ac828c28367ff9cfdcb90318ef9f",
+        "source_kind": "design",
+        "source_ref": "openspec/changes/strengthen-guard-domain-blueprint-spine/design.md",
+        "subject_lane": "normative_target",
+        "subject_role": "design",
+        "supersedes_contribution_ids": [
+          "intent:strengthen-guard-domain-blueprint-spine:model:hierarchical_model_mesh:selfblueprint-refresh-0.4.4-20260810"
+        ],
+        "target_invariant_ids": [],
+        "target_obligation_ids": [],
+        "target_output_ids": [],
+        "target_relation_ids": [
+          "relation:system-contains:hierarchical_model_mesh"
+        ],
+        "target_state_ids": [],
+        "target_transition_ids": [],
+        "unresolved_owner_id": "",
+        "work_context_fingerprint": "",
+        "work_context_id": ""
+      },
+      {
+        "conflicts_with_contribution_ids": [],
+        "contribution_id": "intent:strengthen-guard-domain-blueprint-spine:model:model_test_code_alignment:patch-0.4.5-20260810",
+        "decision_state": "accepted",
+        "declared_consumer_ids": [],
+        "desired_terminal_state_ids": [],
+        "effective_revision": "change:strengthen-guard-domain-blueprint-spine",
+        "fingerprint": "sha256:40545590b162e536260b7287ecb7e8da9e854bf5bed47244e4d2110802d77041",
+        "lifecycle_state": "candidate",
+        "logical_model_id": "model:model_test_code_alignment",
+        "native_owner_id": "",
+        "rationale": "Refresh the current ResearchGuard software-DNA owner identity for release 0.4.5 while preserving the accepted domain behavior, intent lineage, and exact relation ownership.",
+        "schema": "flowguard.model_intent_contribution.v1",
+        "source_fingerprint": "sha256:185423da1b71aef060a3ac330a97beddcf01ac828c28367ff9cfdcb90318ef9f",
+        "source_kind": "design",
+        "source_ref": "openspec/changes/strengthen-guard-domain-blueprint-spine/design.md",
+        "subject_lane": "normative_target",
+        "subject_role": "design",
+        "supersedes_contribution_ids": [
+          "intent:strengthen-guard-domain-blueprint-spine:model:model_test_code_alignment:selfblueprint-refresh-0.4.4-20260810"
+        ],
+        "target_invariant_ids": [],
+        "target_obligation_ids": [],
+        "target_output_ids": [],
+        "target_relation_ids": [
+          "relation:system-contains:model_test_code_alignment"
+        ],
+        "target_state_ids": [],
+        "target_transition_ids": [],
+        "unresolved_owner_id": "",
+        "work_context_fingerprint": "",
+        "work_context_id": ""
+      },
+      {
+        "conflicts_with_contribution_ids": [],
+        "contribution_id": "intent:strengthen-guard-domain-blueprint-spine:model:researchguard_suite:release-0.4.8-20260811",
+        "decision_state": "accepted",
+        "declared_consumer_ids": [],
+        "desired_terminal_state_ids": [],
+        "effective_revision": "change:strengthen-guard-domain-blueprint-spine",
+        "fingerprint": "sha256:46f8c1b2cf76baea2221a4476a8aaf22e8ff05c689b954334379e3f40c11b650",
+        "lifecycle_state": "candidate",
+        "logical_model_id": "model:researchguard_suite",
+        "native_owner_id": "",
+        "rationale": "Refresh the current ResearchGuard software-DNA owner identity for release 0.4.8 and FlowGuard 0.68.12 while preserving accepted domain behavior and exact relation ownership.",
+        "schema": "flowguard.model_intent_contribution.v1",
+        "source_fingerprint": "sha256:185423da1b71aef060a3ac330a97beddcf01ac828c28367ff9cfdcb90318ef9f",
+        "source_kind": "design",
+        "source_ref": "openspec/changes/strengthen-guard-domain-blueprint-spine/design.md",
+        "subject_lane": "normative_target",
+        "subject_role": "design",
+        "supersedes_contribution_ids": [
+          "intent:strengthen-guard-domain-blueprint-spine:model:researchguard_suite:patch-0.4.5-20260810"
+        ],
+        "target_invariant_ids": [],
+        "target_obligation_ids": [],
+        "target_output_ids": [],
+        "target_relation_ids": [
+          "relation:model-realizes-purpose:researchguard_suite",
+          "relation:system-contains:researchguard_suite"
+        ],
+        "target_state_ids": [],
+        "target_transition_ids": [],
+        "unresolved_owner_id": "",
+        "work_context_fingerprint": "",
+        "work_context_id": ""
+      }
+    ],
+    "base_effective_intent_view_fingerprint": "sha256:1981142c62276809eb67faf5edb7a1cf690d9d4f9ab0fabbabacfb96ef334f90",
+    "bootstrap_receipt": null,
+    "candidate_snapshot_fingerprint": "sha256:176d23cb787c79ed7665b29aab19ce5c2ff391cb4a751351b807016fe59e2271",
+    "fingerprint": "sha256:04e76e7f7ccf3d2ebcce66b6709d7c4306a319a88892e27abae934a3430948e7",
+    "model_owner_ids": [
+      "model-obligation:authoritative_model_system",
+      "model-obligation:compositional_verification_kernel",
+      "model-obligation:hierarchical_model_mesh",
+      "model-obligation:model_test_code_alignment",
+      "model-obligation:researchguard_suite"
+    ],
+    "owner_bindings": [
+      {
+        "contribution_ids": [
+          "intent:strengthen-guard-domain-blueprint-spine:model:authoritative_model_system:patch-0.4.5-20260810"
+        ],
+        "fingerprint": "sha256:5197a5fb946b6772187686db14267f1986f75b06031c30637f992bff8f073b2c",
+        "logical_model_id": "authoritative_model_system",
+        "model_owner_id": "model-obligation:authoritative_model_system",
+        "realization_relation_fingerprint": "sha256:f3e8648b536699a10c4d654e23388db5f3a8a164afc370bf172cb353e0e2ceeb",
+        "realization_relation_id": "relation:model-realizes-purpose:authoritative_model_system",
+        "schema": "flowguard.effective_intent_owner_binding.v1"
+      },
+      {
+        "contribution_ids": [
+          "intent:strengthen-guard-domain-blueprint-spine:model:compositional_verification_kernel:patch-0.4.5-20260810"
+        ],
+        "fingerprint": "sha256:4440b13969325ed463d37870f2c2efb6a9d9cc7e77d8a48ed257d1472aa45128",
+        "logical_model_id": "compositional_verification_kernel",
+        "model_owner_id": "model-obligation:compositional_verification_kernel",
+        "realization_relation_fingerprint": "sha256:f1d078b42c993244e41dd5921558b21da0ed5daf4961da2af39b9b7d11815b5b",
+        "realization_relation_id": "relation:model-realizes-purpose:compositional_verification_kernel",
+        "schema": "flowguard.effective_intent_owner_binding.v1"
+      },
+      {
+        "contribution_ids": [
+          "intent:strengthen-guard-domain-blueprint-spine:model:hierarchical_model_mesh:patch-0.4.5-20260810"
+        ],
+        "fingerprint": "sha256:0b520212e41ac2fe5945f0acf2da7b4f877564de913da4c5f517d2525648a2b8",
+        "logical_model_id": "hierarchical_model_mesh",
+        "model_owner_id": "model-obligation:hierarchical_model_mesh",
+        "realization_relation_fingerprint": "sha256:58626d74b22208885df0df7433d7307986087a8918890bfe5d69573995fd6563",
+        "realization_relation_id": "relation:model-realizes-purpose:hierarchical_model_mesh",
+        "schema": "flowguard.effective_intent_owner_binding.v1"
+      },
+      {
+        "contribution_ids": [
+          "intent:strengthen-guard-domain-blueprint-spine:model:model_test_code_alignment:patch-0.4.5-20260810"
+        ],
+        "fingerprint": "sha256:f09c6f75c4d5073be6627cc9f44287a68b1cef9108145efed05fb705e6daa3d8",
+        "logical_model_id": "model_test_code_alignment",
+        "model_owner_id": "model-obligation:model_test_code_alignment",
+        "realization_relation_fingerprint": "sha256:58fffb62d9a09d1a4ce053729a561c9433d506448e233a6e426bcea101f119d5",
+        "realization_relation_id": "relation:model-realizes-purpose:model_test_code_alignment",
+        "schema": "flowguard.effective_intent_owner_binding.v1"
+      },
+      {
+        "contribution_ids": [
+          "intent:strengthen-guard-domain-blueprint-spine:model:researchguard_suite:release-0.4.8-20260811"
+        ],
+        "fingerprint": "sha256:14c80a817319a63e19eae784eca5c8aa3deb1454782a0e231462fea864a65e6c",
+        "logical_model_id": "researchguard_suite",
+        "model_owner_id": "model-obligation:researchguard_suite",
+        "realization_relation_fingerprint": "sha256:433a8408131eedb4be3309fa34563fc40bd7f0c1a9227ef1f90aa6c56effe63d",
+        "realization_relation_id": "relation:model-realizes-purpose:researchguard_suite",
+        "schema": "flowguard.effective_intent_owner_binding.v1"
+      }
+    ],
+    "schema": "flowguard.current_effective_intent_view.v1",
+    "subject_lane": "observed_implementation",
+    "system_id": "flowguard",
+    "transitions": [
+      {
+        "action": "retain",
+        "fingerprint": "sha256:6354e9b349d9116e8f19abd2800cb44049990b1acfd24a8860862e8ab42062d9",
+        "prior_contribution_fingerprint": "sha256:aaab0d86d9eaf1b8e8a43bfa43a5c9c052df0be969824753720f5bde780abaac",
+        "prior_contribution_id": "intent:strengthen-guard-domain-blueprint-spine:model:authoritative_model_system:patch-0.4.5-20260810",
+        "reason": "Retain the accepted current ResearchGuard intent; this revision refreshes only native software-DNA evidence.",
+        "replacement_contribution_ids": [],
+        "schema": "flowguard.effective_intent_transition.v1"
+      },
+      {
+        "action": "retain",
+        "fingerprint": "sha256:ac2afec5985ed5ccd52261ff935dffa864f88e6a87c8fc11167c14e8d4347d35",
+        "prior_contribution_fingerprint": "sha256:73758504eb7d6028f853f82ea71b53b3952cab4f65a2e3bd496d11d1da8afd5f",
+        "prior_contribution_id": "intent:strengthen-guard-domain-blueprint-spine:model:compositional_verification_kernel:patch-0.4.5-20260810",
+        "reason": "Retain the accepted current ResearchGuard intent; this revision refreshes only native software-DNA evidence.",
+        "replacement_contribution_ids": [],
+        "schema": "flowguard.effective_intent_transition.v1"
+      },
+      {
+        "action": "retain",
+        "fingerprint": "sha256:03aff88d71bfb354f1698b965d788846249704daac120b49d267447e2984b0c0",
+        "prior_contribution_fingerprint": "sha256:9667ea49dba223ddee503358185cbb3810c7425fd0e120c7e11e014353c4ee1e",
+        "prior_contribution_id": "intent:strengthen-guard-domain-blueprint-spine:model:hierarchical_model_mesh:patch-0.4.5-20260810",
+        "reason": "Retain the accepted current ResearchGuard intent; this revision refreshes only native software-DNA evidence.",
+        "replacement_contribution_ids": [],
+        "schema": "flowguard.effective_intent_transition.v1"
+      },
+      {
+        "action": "retain",
+        "fingerprint": "sha256:20cc6b32ab37115c089202d5890a42cc6a27ddfc7e927f6e520ad9140559d233",
+        "prior_contribution_fingerprint": "sha256:40545590b162e536260b7287ecb7e8da9e854bf5bed47244e4d2110802d77041",
+        "prior_contribution_id": "intent:strengthen-guard-domain-blueprint-spine:model:model_test_code_alignment:patch-0.4.5-20260810",
+        "reason": "Retain the accepted current ResearchGuard intent; this revision refreshes only native software-DNA evidence.",
+        "replacement_contribution_ids": [],
+        "schema": "flowguard.effective_intent_transition.v1"
+      },
+      {
+        "action": "supersede",
+        "fingerprint": "sha256:d32664f0a3763ca5a06dd02d05ad5ea43d351955c7f4afe510fa62b0364c704f",
+        "prior_contribution_fingerprint": "sha256:c920627a91bfd648ceedd42e2f14858c468c467e587ae1aa939412196e9ac903",
+        "prior_contribution_id": "intent:strengthen-guard-domain-blueprint-spine:model:researchguard_suite:patch-0.4.5-20260810",
+        "reason": "Supersede the prior 0.4.5 ResearchGuard owner identity with the exact current 0.4.8 model, code, and evidence bindings.",
+        "replacement_contribution_ids": [
+          "intent:strengthen-guard-domain-blueprint-spine:model:researchguard_suite:release-0.4.8-20260811"
+        ],
+        "schema": "flowguard.effective_intent_transition.v1"
+      }
+    ],
+    "verified_source_identities": [
+      {
+        "authority_kind": "project_file",
+        "contribution_id": "intent:strengthen-guard-domain-blueprint-spine:model:authoritative_model_system:patch-0.4.5-20260810",
+        "fingerprint": "sha256:a9c756b06aeaea88924f2d0417d0bb508325022c9a161f9820abdd3219bd6400",
+        "native_owner_id": "",
+        "resolved_project_ref": "openspec/changes/strengthen-guard-domain-blueprint-spine/design.md",
+        "schema": "flowguard.model_intent_source_identity.v1",
+        "source_fingerprint": "sha256:185423da1b71aef060a3ac330a97beddcf01ac828c28367ff9cfdcb90318ef9f",
+        "source_ref": "openspec/changes/strengthen-guard-domain-blueprint-spine/design.md",
+        "work_context_artifact_id": "",
+        "work_context_fingerprint": "",
+        "work_context_id": ""
+      },
+      {
+        "authority_kind": "project_file",
+        "contribution_id": "intent:strengthen-guard-domain-blueprint-spine:model:compositional_verification_kernel:patch-0.4.5-20260810",
+        "fingerprint": "sha256:31c36d9fc762a7b391831e2a1e722fc95562e2b2babb9996b8f83a01fbdefa32",
+        "native_owner_id": "",
+        "resolved_project_ref": "openspec/changes/strengthen-guard-domain-blueprint-spine/design.md",
+        "schema": "flowguard.model_intent_source_identity.v1",
+        "source_fingerprint": "sha256:185423da1b71aef060a3ac330a97beddcf01ac828c28367ff9cfdcb90318ef9f",
+        "source_ref": "openspec/changes/strengthen-guard-domain-blueprint-spine/design.md",
+        "work_context_artifact_id": "",
+        "work_context_fingerprint": "",
+        "work_context_id": ""
+      },
+      {
+        "authority_kind": "project_file",
+        "contribution_id": "intent:strengthen-guard-domain-blueprint-spine:model:hierarchical_model_mesh:patch-0.4.5-20260810",
+        "fingerprint": "sha256:0c000131e95fec19e6c8d530476722056c7fe8337c292c27812190fa240e7ce9",
+        "native_owner_id": "",
+        "resolved_project_ref": "openspec/changes/strengthen-guard-domain-blueprint-spine/design.md",
+        "schema": "flowguard.model_intent_source_identity.v1",
+        "source_fingerprint": "sha256:185423da1b71aef060a3ac330a97beddcf01ac828c28367ff9cfdcb90318ef9f",
+        "source_ref": "openspec/changes/strengthen-guard-domain-blueprint-spine/design.md",
+        "work_context_artifact_id": "",
+        "work_context_fingerprint": "",
+        "work_context_id": ""
+      },
+      {
+        "authority_kind": "project_file",
+        "contribution_id": "intent:strengthen-guard-domain-blueprint-spine:model:model_test_code_alignment:patch-0.4.5-20260810",
+        "fingerprint": "sha256:b02cff3fbc580830084574879d547aa188a33930fe075ce4fae371ea80f98ad8",
+        "native_owner_id": "",
+        "resolved_project_ref": "openspec/changes/strengthen-guard-domain-blueprint-spine/design.md",
+        "schema": "flowguard.model_intent_source_identity.v1",
+        "source_fingerprint": "sha256:185423da1b71aef060a3ac330a97beddcf01ac828c28367ff9cfdcb90318ef9f",
+        "source_ref": "openspec/changes/strengthen-guard-domain-blueprint-spine/design.md",
+        "work_context_artifact_id": "",
+        "work_context_fingerprint": "",
+        "work_context_id": ""
+      },
+      {
+        "authority_kind": "project_file",
+        "contribution_id": "intent:strengthen-guard-domain-blueprint-spine:model:researchguard_suite:release-0.4.8-20260811",
+        "fingerprint": "sha256:fb9c344e15db80c0db1cb2b2c1ba8e85b40820d29765119e30aeb7298fbdb1f7",
+        "native_owner_id": "",
+        "resolved_project_ref": "openspec/changes/strengthen-guard-domain-blueprint-spine/design.md",
+        "schema": "flowguard.model_intent_source_identity.v1",
+        "source_fingerprint": "sha256:185423da1b71aef060a3ac330a97beddcf01ac828c28367ff9cfdcb90318ef9f",
+        "source_ref": "openspec/changes/strengthen-guard-domain-blueprint-spine/design.md",
+        "work_context_artifact_id": "",
+        "work_context_fingerprint": "",
+        "work_context_id": ""
+      }
+    ]
+  },
+  "decision_reason": "Refresh the ResearchGuard observed model authority for FlowGuard 0.68.12 provider identity and current v0.4.8 software-DNA source; no new product behavior intent.",
+  "expected_head_fingerprint": "sha256:5659fbafadec6af99ebd56a2fb7c1ae8e2a90a244c0f3e73b46b0d941b718307",
+  "fingerprint": "sha256:e2d9c5d24c7032cd77ce06c18c5e1a68fdc96b60e5435bb2ac2b9bdcc16bc7f1",
+  "fingerprint_changed_ids": [
+    "coverage:universe",
+    "model_instance:model:researchguard_suite",
+    "model_relation:relation:model-realizes-purpose:researchguard_suite",
+    "model_relation:relation:system-contains:researchguard_suite"
+  ],
+  "implementation_bundle_fingerprint": "",
+  "intent_conflict_ids": [],
+  "intent_contribution_inventory_fingerprint": "sha256:39280e4b9f2cf0dc530d07c2475268c9946bd7ef06f5ab60b55ccd4fe94d78e9",
+  "intent_contributions": [
+    {
+      "conflicts_with_contribution_ids": [],
+      "contribution_id": "intent:strengthen-guard-domain-blueprint-spine:model:researchguard_suite:release-0.4.8-20260811",
+      "decision_state": "accepted",
+      "declared_consumer_ids": [],
+      "desired_terminal_state_ids": [],
+      "effective_revision": "change:strengthen-guard-domain-blueprint-spine",
+      "fingerprint": "sha256:46f8c1b2cf76baea2221a4476a8aaf22e8ff05c689b954334379e3f40c11b650",
+      "lifecycle_state": "candidate",
+      "logical_model_id": "model:researchguard_suite",
+      "native_owner_id": "",
+      "rationale": "Refresh the current ResearchGuard software-DNA owner identity for release 0.4.8 and FlowGuard 0.68.12 while preserving accepted domain behavior and exact relation ownership.",
+      "schema": "flowguard.model_intent_contribution.v1",
+      "source_fingerprint": "sha256:185423da1b71aef060a3ac330a97beddcf01ac828c28367ff9cfdcb90318ef9f",
+      "source_kind": "design",
+      "source_ref": "openspec/changes/strengthen-guard-domain-blueprint-spine/design.md",
+      "subject_lane": "normative_target",
+      "subject_role": "design",
+      "supersedes_contribution_ids": [
+        "intent:strengthen-guard-domain-blueprint-spine:model:researchguard_suite:patch-0.4.5-20260810"
+      ],
+      "target_invariant_ids": [],
+      "target_obligation_ids": [],
+      "target_output_ids": [],
+      "target_relation_ids": [
+        "relation:model-realizes-purpose:researchguard_suite",
+        "relation:system-contains:researchguard_suite"
+      ],
+      "target_state_ids": [],
+      "target_transition_ids": [],
+      "unresolved_owner_id": "",
+      "work_context_fingerprint": "",
+      "work_context_id": ""
+    }
+  ],
+  "intent_dispositions": [
+    {
+      "changed_invariant_ids": [],
+      "changed_obligation_ids": [],
+      "changed_relation_ids": [
+        "relation:model-realizes-purpose:researchguard_suite",
+        "relation:system-contains:researchguard_suite"
+      ],
+      "changed_state_ids": [],
+      "changed_transition_ids": [],
+      "conflict_ids": [],
+      "contribution_fingerprint": "sha256:46f8c1b2cf76baea2221a4476a8aaf22e8ff05c689b954334379e3f40c11b650",
+      "contribution_id": "intent:strengthen-guard-domain-blueprint-spine:model:researchguard_suite:release-0.4.8-20260811",
+      "disposition": "accepted",
+      "fingerprint": "sha256:204b972e62ed6adc6ec827632fd684e4194e25e2278be179eb668074969594c2",
+      "reason": "Accept the current 0.4.8 model and evidence refresh for this owner, mapping each exact changed semantic relation without changing declared product behavior.",
+      "schema": "flowguard.model_intent_disposition.v1",
+      "scoped_gap_ids": [],
+      "unconsumed_output_ids": [],
+      "unreachable_terminal_state_ids": [],
+      "unresolved_effect_ids": []
+    }
+  ],
+  "intent_unresolved_ids": [],
+  "members": [
+    {
+      "base_instance_fingerprint": "sha256:f19514baad5fe86965fc5eb4f6333941a2f47b2770aaef17f39271d549353835",
+      "candidate_instance_fingerprint": "sha256:1b6b659672c54580a80e164a44b6ea4ff95aeb9cc086ab0302bb6d78aea79c91",
+      "changed_element_ids": [
+        "model_instance:model:researchguard_suite"
+      ],
+      "member_id": "researchguard_suite",
+      "operation": "replace",
+      "schema": "flowguard.model_revision_member.v1"
+    }
+  ],
+  "no_declared_intent_evidence_fingerprints": [],
+  "no_declared_intent_rationale": "",
+  "no_declared_intent_rationale_id": "",
+  "originating_activation_receipt_fingerprint": "",
+  "originating_revision_set_fingerprint": "",
+  "path_quality_result_set_fingerprint": "sha256:c568b5371b254849a6acc500c279dcef488e30468671c1208afff0d6fdde9dda",
+  "path_quality_results": [
+    {
+      "candidate_ids": [],
+      "candidate_set_exhausted": false,
+      "candidate_set_fingerprint": "",
+      "comparison_boundary_id": "",
+      "conclusion": "single_clear_path",
+      "cost_detail_evidence_fingerprint": "sha256:c30d4455b9c2ccc609e6cf4c8d29e815d89eb9eadcf025a762b89fe083ae9546",
+      "cost_dimensions": [
+        "branches",
+        "payload_bytes",
+        "states",
+        "steps",
+        "transitions",
+        "validations"
+      ],
+      "cost_measurements": {
+        "branches": 0.0,
+        "payload_bytes": 5620.0,
+        "states": 2.0,
+        "steps": 1.0,
+        "transitions": 1.0,
+        "validations": 5.0
+      },
+      "current": true,
+      "currentness_id": "sha256:176d23cb787c79ed7665b29aab19ce5c2ff391cb4a751351b807016fe59e2271",
+      "detail_evidence_fingerprint": "sha256:2a5927538f6be85964e2f801a0f522e675e0c321f860f23864d30589627c000b",
+      "finding_ids": [],
+      "fingerprint": "sha256:edd1608243dc1859b87260957a2f05c3e52936a8335ac1b7dc8a14bcd2effca7",
+      "mode": "lightweight",
+      "necessity_witness_set_fingerprint": "sha256:a07d8f1848a1cc8fb927862ea34ca484cb1f6edb59f7af217c53d2cf18da59e1",
+      "optimization_depth": "lightweight",
+      "producer_id": "flowguard-self-path-quality",
+      "result_id": "path-quality:hierarchical_model_mesh:64d30589627c000b",
+      "rewrite_rule_ids": [],
+      "rewrite_set_exhausted": false,
+      "rewrite_set_fingerprint": "",
+      "schema_version": "flowguard.model-path-quality.v2",
+      "selected_candidate_id": "",
+      "selected_candidate_lane": "",
+      "subject_fingerprint": "sha256:2c24aaee6b1fd6dab63e06ccb27e6d36b611ca9005ab64c727fd12a13b39eca7",
+      "trigger_evidence_fingerprint": "",
+      "trigger_ids": [],
+      "unresolved_ids": []
+    },
+    {
+      "candidate_ids": [],
+      "candidate_set_exhausted": false,
+      "candidate_set_fingerprint": "",
+      "comparison_boundary_id": "",
+      "conclusion": "single_clear_path",
+      "cost_detail_evidence_fingerprint": "sha256:e35a882993f1df1021b187e5341920d7a003fdfaa8c6ae52c7a4a9d28ae18e68",
+      "cost_dimensions": [
+        "branches",
+        "payload_bytes",
+        "states",
+        "steps",
+        "transitions",
+        "validations"
+      ],
+      "cost_measurements": {
+        "branches": 0.0,
+        "payload_bytes": 5775.0,
+        "states": 2.0,
+        "steps": 1.0,
+        "transitions": 1.0,
+        "validations": 6.0
+      },
+      "current": true,
+      "currentness_id": "sha256:176d23cb787c79ed7665b29aab19ce5c2ff391cb4a751351b807016fe59e2271",
+      "detail_evidence_fingerprint": "sha256:e5877c16348f002805605fc166cf534e170371f920dbd8114dbf80364e893ccc",
+      "finding_ids": [],
+      "fingerprint": "sha256:1776d18e886cc8678c71fa0c21bcef80c395f7d90a2f1a5d82d4c983bf571d8c",
+      "mode": "lightweight",
+      "necessity_witness_set_fingerprint": "sha256:b7f8c7e8614f297a1c13245838d19aab3d7e658c2102f39f4fbfa9db33d45300",
+      "optimization_depth": "lightweight",
+      "producer_id": "flowguard-self-path-quality",
+      "result_id": "path-quality:researchguard_suite:4dbf80364e893ccc",
+      "rewrite_rule_ids": [],
+      "rewrite_set_exhausted": false,
+      "rewrite_set_fingerprint": "",
+      "schema_version": "flowguard.model-path-quality.v2",
+      "selected_candidate_id": "",
+      "selected_candidate_lane": "",
+      "subject_fingerprint": "sha256:4f61a554c126b6a816654e3f95dae1807a7054b5fe0bd49a66ec37d47775b8d9",
+      "trigger_evidence_fingerprint": "",
+      "trigger_ids": [],
+      "unresolved_ids": []
+    },
+    {
+      "candidate_ids": [],
+      "candidate_set_exhausted": false,
+      "candidate_set_fingerprint": "",
+      "comparison_boundary_id": "",
+      "conclusion": "single_clear_path",
+      "cost_detail_evidence_fingerprint": "sha256:da0961ebfc6355ddd2361f6234946bc14902aa11561a33a793d3074f3229a9d4",
+      "cost_dimensions": [
+        "branches",
+        "payload_bytes",
+        "states",
+        "steps",
+        "transitions",
+        "validations"
+      ],
+      "cost_measurements": {
+        "branches": 0.0,
+        "payload_bytes": 5196.0,
+        "states": 2.0,
+        "steps": 1.0,
+        "transitions": 1.0,
+        "validations": 3.0
+      },
+      "current": true,
+      "currentness_id": "sha256:176d23cb787c79ed7665b29aab19ce5c2ff391cb4a751351b807016fe59e2271",
+      "detail_evidence_fingerprint": "sha256:cf4d2968fad33c869a8c90f7466ebe9b956702763181b161cc1439f95407392e",
+      "finding_ids": [],
+      "fingerprint": "sha256:c9b60b316769ca73b33e9b8b60bcf24750ac122db6b261a76b00183de771e3ac",
+      "mode": "lightweight",
+      "necessity_witness_set_fingerprint": "sha256:9b1db72ac0b0a1f407d2db0f4eee37e714ea8a4c7c9130a079fb6fcc0aeace1a",
+      "optimization_depth": "lightweight",
+      "producer_id": "flowguard-self-path-quality",
+      "result_id": "path-quality:compositional_verification_kernel:cc1439f95407392e",
+      "rewrite_rule_ids": [],
+      "rewrite_set_exhausted": false,
+      "rewrite_set_fingerprint": "",
+      "schema_version": "flowguard.model-path-quality.v2",
+      "selected_candidate_id": "",
+      "selected_candidate_lane": "",
+      "subject_fingerprint": "sha256:c0ef42b65ea5205e9470c765f892e2b126a895d79985f1c4080a0656514f615b",
+      "trigger_evidence_fingerprint": "",
+      "trigger_ids": [],
+      "unresolved_ids": []
+    },
+    {
+      "candidate_ids": [],
+      "candidate_set_exhausted": false,
+      "candidate_set_fingerprint": "",
+      "comparison_boundary_id": "",
+      "conclusion": "single_clear_path",
+      "cost_detail_evidence_fingerprint": "sha256:e18ff17f11483a96f6772017163a0b8c5b6acfc3ddca9bb2832347bd09099c7e",
+      "cost_dimensions": [
+        "branches",
+        "payload_bytes",
+        "states",
+        "steps",
+        "transitions",
+        "validations"
+      ],
+      "cost_measurements": {
+        "branches": 0.0,
+        "payload_bytes": 5690.0,
+        "states": 2.0,
+        "steps": 1.0,
+        "transitions": 1.0,
+        "validations": 5.0
+      },
+      "current": true,
+      "currentness_id": "sha256:176d23cb787c79ed7665b29aab19ce5c2ff391cb4a751351b807016fe59e2271",
+      "detail_evidence_fingerprint": "sha256:b62a1834a65fd3aabb83bb7f605ccd778385c1d0d47c5ebf4be3cd3600250d4d",
+      "finding_ids": [],
+      "fingerprint": "sha256:13fd99ad7bdadeeb599b52e17d2a6a2ab814bb59c27abfc5d6a32ff3451a701d",
+      "mode": "lightweight",
+      "necessity_witness_set_fingerprint": "sha256:784ab250cb37290415da8cd1d4d41e110b5034f87a95032e7b21ed1fe9843157",
+      "optimization_depth": "lightweight",
+      "producer_id": "flowguard-self-path-quality",
+      "result_id": "path-quality:model_test_code_alignment:4be3cd3600250d4d",
+      "rewrite_rule_ids": [],
+      "rewrite_set_exhausted": false,
+      "rewrite_set_fingerprint": "",
+      "schema_version": "flowguard.model-path-quality.v2",
+      "selected_candidate_id": "",
+      "selected_candidate_lane": "",
+      "subject_fingerprint": "sha256:d28c5edf3b16a0d16dabe6794338a57509087d6370307bea590b497520146adf",
+      "trigger_evidence_fingerprint": "",
+      "trigger_ids": [],
+      "unresolved_ids": []
+    },
+    {
+      "candidate_ids": [],
+      "candidate_set_exhausted": false,
+      "candidate_set_fingerprint": "",
+      "comparison_boundary_id": "",
+      "conclusion": "single_clear_path",
+      "cost_detail_evidence_fingerprint": "sha256:50dbd9b6c0b73ba090bd24302f907f17fd7641e87ab0ac9d91625e591ed4b8ea",
+      "cost_dimensions": [
+        "branches",
+        "payload_bytes",
+        "states",
+        "steps",
+        "transitions",
+        "validations"
+      ],
+      "cost_measurements": {
+        "branches": 0.0,
+        "payload_bytes": 9337.0,
+        "states": 4.0,
+        "steps": 3.0,
+        "transitions": 3.0,
+        "validations": 3.0
+      },
+      "current": true,
+      "currentness_id": "sha256:176d23cb787c79ed7665b29aab19ce5c2ff391cb4a751351b807016fe59e2271",
+      "detail_evidence_fingerprint": "sha256:eb0967d508ade03db2ac4beffe36424f471336804ff662ad95e0bb23ab1d9ef6",
+      "finding_ids": [],
+      "fingerprint": "sha256:c72f95bf83311092d84d6d471a6facf6bb91687acd3b4136d5eb1e3de0167191",
+      "mode": "lightweight",
+      "necessity_witness_set_fingerprint": "sha256:2a9a3da07f104beff4993223314ecb2ff55f63e83733bff3078613ad4b0bf371",
+      "optimization_depth": "lightweight",
+      "producer_id": "flowguard-self-path-quality",
+      "result_id": "path-quality:authoritative_model_system:95e0bb23ab1d9ef6",
+      "rewrite_rule_ids": [],
+      "rewrite_set_exhausted": false,
+      "rewrite_set_fingerprint": "",
+      "schema_version": "flowguard.model-path-quality.v2",
+      "selected_candidate_id": "",
+      "selected_candidate_lane": "",
+      "subject_fingerprint": "sha256:efd96d9f9c877942140f365a096717f1774121b01052a2874e92a7ece876a157",
+      "trigger_evidence_fingerprint": "",
+      "trigger_ids": [],
+      "unresolved_ids": []
+    }
+  ],
+  "path_quality_subjects": [
+    {
+      "boundary_id": "model-boundary:authoritative_model_system",
+      "code_fingerprint": "sha256:83a91e5f1e72fdf5d42ef327be15ef669772449005ed1b90a7459f301a5d4f8c",
+      "currentness_id": "sha256:176d23cb787c79ed7665b29aab19ce5c2ff391cb4a751351b807016fe59e2271",
+      "dependency_fingerprint": "sha256:2ee4affd60f61a2d432d6e5f2a20abf10ffedaf3827b055c5904e0985e20cf06",
+      "evidence_fingerprint": "sha256:3f8b0001613a988f69c27b560252dc2cdf849ccb808159b883949f746bf47290",
+      "fingerprint": "sha256:efd96d9f9c877942140f365a096717f1774121b01052a2874e92a7ece876a157",
+      "intent_fingerprint": "sha256:5bfbb969db4323d148373ebf146b2db0299045a0fbefce5332fe8b2e96d2b09b",
+      "model_fingerprint": "sha256:6b944aea6cfe23580aac538fa96a1ebbe57013328f5dc3d7017968d270269e7d",
+      "model_id": "authoritative_model_system",
+      "normalized_facts_fingerprint": "sha256:1e3df5a3e92f1d09b5d957809e72d6730a8a4a26408604813e6992231d1db411",
+      "obligation_fingerprint": "sha256:75d6751c0d2aa3cabcdb672bd2327cc95a8e39ba2a8e280cf9864ac8e66b80cc",
+      "oracle_fingerprint": "sha256:05b05ceda8a9fe14c40dfba5197219d4bb9cfbc3b2e8de6c86374fedc74adb37",
+      "provider_fingerprint": "sha256:1ba9fc7b4c447dc878747a852ff8e776c1036910b2404e28c9b1ee14f46642e2",
+      "purpose_fingerprint": "sha256:e05edb8124e4e243dfbd760ca264a686abaa6e81617094b7785be0a752efdd2c",
+      "retained_element_inventory_fingerprint": "sha256:fb8e1398b5e4db9ad8cdcea99718976582debf34b21d048b66f1e59c03084f6b",
+      "schema_version": "flowguard.model-path-quality.v2",
+      "test_fingerprint": "sha256:7755825803d750650b313f8c8b4303acc2d5db4f74142ab7f10b948612b331bf"
+    },
+    {
+      "boundary_id": "model-boundary:compositional_verification_kernel",
+      "code_fingerprint": "sha256:e91e64574ff8a860c706a75728d7b1daa88d058dc571c70582852fbe3b3455f4",
+      "currentness_id": "sha256:176d23cb787c79ed7665b29aab19ce5c2ff391cb4a751351b807016fe59e2271",
+      "dependency_fingerprint": "sha256:2d4dab8cbdf71493d60a611f6ddb6441cb9ecd1fde8a846b009f7104c008e8f5",
+      "evidence_fingerprint": "sha256:d7cbb8e930ef29078abe2cb4d191de038f4984c4f6a69e667e0f982e0625a01e",
+      "fingerprint": "sha256:c0ef42b65ea5205e9470c765f892e2b126a895d79985f1c4080a0656514f615b",
+      "intent_fingerprint": "sha256:3f77e649d7c59d8c3bd681464c9df88b07df001a349f9a060ed40dce86136146",
+      "model_fingerprint": "sha256:bf38d597a4e8bb6d092ec0ff529fd4546f48963c7cb92e66025073dfb0751fa1",
+      "model_id": "compositional_verification_kernel",
+      "normalized_facts_fingerprint": "sha256:734ec700f484a0f21208b7ee102f5997b80efd6177f1fa2a0ab6a745f8759fed",
+      "obligation_fingerprint": "sha256:4745c86b73af99d429af7995e6f1e72f53639d0c197440bbcd1ed9039b718bb8",
+      "oracle_fingerprint": "sha256:84c7e531e694babcec0861fa979fdff8a85d85b44fa5ea3579507f0d20907d1e",
+      "provider_fingerprint": "sha256:d8c9bd02d9b1e5b15ff00363850ac4f8f8ded351a9a0230daea4b4685bb42d60",
+      "purpose_fingerprint": "sha256:be0dc0e17ffa29c9f3274c21d97b0c932bf52efa4971bc7add782a1b91f644de",
+      "retained_element_inventory_fingerprint": "sha256:e8f9bac282c799d88a31125b9ab863495995092c76d7dd6f3389164d1cd8a246",
+      "schema_version": "flowguard.model-path-quality.v2",
+      "test_fingerprint": "sha256:986d8665211177d8549d55be9e990651170695b47fbd89a1946d5632211315fc"
+    },
+    {
+      "boundary_id": "model-boundary:hierarchical_model_mesh",
+      "code_fingerprint": "sha256:8bf68ee1a39276902c594dc8d0e6b91ae9949fd56f11d08e3653e1e70839ae81",
+      "currentness_id": "sha256:176d23cb787c79ed7665b29aab19ce5c2ff391cb4a751351b807016fe59e2271",
+      "dependency_fingerprint": "sha256:12b90268bcc58a71065508a0155e24150ddc06cc0a0cc171d41da43e2160d978",
+      "evidence_fingerprint": "sha256:9d19df4ac1fe280389658d4c7de75079b686bd2256f436a4636b2c92924e1c62",
+      "fingerprint": "sha256:2c24aaee6b1fd6dab63e06ccb27e6d36b611ca9005ab64c727fd12a13b39eca7",
+      "intent_fingerprint": "sha256:89304f587673f41595ea8519d747232ac02b9ddae5edb8a2333ad247cbaae337",
+      "model_fingerprint": "sha256:b45ee9eff53b9e4e4883aea3cffa49f1c607713b486f16887df220a006a48288",
+      "model_id": "hierarchical_model_mesh",
+      "normalized_facts_fingerprint": "sha256:b6913e42fb0ea82f0d574d190a5fe28c9a1309b22acd22ab652f561ca0b984f3",
+      "obligation_fingerprint": "sha256:d3a3431c5945c69cfb1c9c598347b12bc75d232ae9f768e3c9be0cfb4532671d",
+      "oracle_fingerprint": "sha256:be1b0ecf2f26969fb6647e24a37b818d7e53bc9b1995f3294687e4fdc001a231",
+      "provider_fingerprint": "sha256:7b5934b667956cf35dcb7405540d8e94f566acae3d1c5bd1bbebf197e005bf08",
+      "purpose_fingerprint": "sha256:8f4c0401e08db56f0b77d9382a557ccf2acec366e8c4fc3342668c64adef62ae",
+      "retained_element_inventory_fingerprint": "sha256:6c921629829579fbaaed2c3760e90a31f72defc6b1fce59940c1e14f4b38ad82",
+      "schema_version": "flowguard.model-path-quality.v2",
+      "test_fingerprint": "sha256:87c079112c48e0050c7a7b132ce61e8d6f79f3a7f171d97978e047f8b8f64d25"
+    },
+    {
+      "boundary_id": "model-boundary:model_test_code_alignment",
+      "code_fingerprint": "sha256:9e7f6c574e44cbe13fedba17cb10504dde9673b904d49bcaac11d552d75d8419",
+      "currentness_id": "sha256:176d23cb787c79ed7665b29aab19ce5c2ff391cb4a751351b807016fe59e2271",
+      "dependency_fingerprint": "sha256:8e8e82cd2ce601b000c253cdcbfd3128b22bbc598527fcd5b2a54136f62b85d4",
+      "evidence_fingerprint": "sha256:10fab8546c811341b21734282f8d6cbc7ba8c7a28ef36c8f6caa53ed882befcf",
+      "fingerprint": "sha256:d28c5edf3b16a0d16dabe6794338a57509087d6370307bea590b497520146adf",
+      "intent_fingerprint": "sha256:4f5fd6c71d7f0db50322e3568b6a01ef53abd420502e34855d92e8e1a6b81b9b",
+      "model_fingerprint": "sha256:e4fa4f2bdf72270b894e51c29811b3573dc05a712afd115a75c96bdb301f8f07",
+      "model_id": "model_test_code_alignment",
+      "normalized_facts_fingerprint": "sha256:71bfe49f02e67dbbbf1455af7ce0ca1f5ed3629f29b0b8490cc0d7a1a1ac8cf5",
+      "obligation_fingerprint": "sha256:2b3520cde96f7cb2764685058589f14d8d333c33d1282af3c8b6079a03012f66",
+      "oracle_fingerprint": "sha256:a3edfda3b5575927fe2bfe57cd213cf06280390fb726b0fe69583312a352d757",
+      "provider_fingerprint": "sha256:3ea567bd5964ba84e2a08febd41ea242963dcfe4cf8e162c9551e6f15085bb78",
+      "purpose_fingerprint": "sha256:e3fc4ce1a7f2d3bfbb73b3bf5af435a0ab5c5822f408aa0498018c2057369b50",
+      "retained_element_inventory_fingerprint": "sha256:b39c733bd694133f0a93bea19ffeb695201bef8f780c7ca3a94922dd996a47e8",
+      "schema_version": "flowguard.model-path-quality.v2",
+      "test_fingerprint": "sha256:87c079112c48e0050c7a7b132ce61e8d6f79f3a7f171d97978e047f8b8f64d25"
+    },
+    {
+      "boundary_id": "model-boundary:researchguard_suite",
+      "code_fingerprint": "sha256:a5abc3bf79b1d12a6b45cc0b43d536cbb7eb5538272518bc0945a0eaeee7a819",
+      "currentness_id": "sha256:176d23cb787c79ed7665b29aab19ce5c2ff391cb4a751351b807016fe59e2271",
+      "dependency_fingerprint": "sha256:9786f562ba77c466c4fc7edca9b50cdccf9694f6f87a2036f5d8dee54730f497",
+      "evidence_fingerprint": "sha256:c1cda82dfcebc03a0519d41aecdf0ee31890d5e56bd41dcfbc3cba724f88d06e",
+      "fingerprint": "sha256:4f61a554c126b6a816654e3f95dae1807a7054b5fe0bd49a66ec37d47775b8d9",
+      "intent_fingerprint": "sha256:1a2357528af769f36d56de2dfcb2c6bbbf75806e5dd5356f3150d4031f07ae58",
+      "model_fingerprint": "sha256:1b6b659672c54580a80e164a44b6ea4ff95aeb9cc086ab0302bb6d78aea79c91",
+      "model_id": "researchguard_suite",
+      "normalized_facts_fingerprint": "sha256:5a4dabf552f8105c1a64de5eb994d8b3e320f9148318d4e41fcf555ce43d1468",
+      "obligation_fingerprint": "sha256:ae50a9a8476f4d1212bc51998bd48ddfd19112c8a6bcb198b7d98b1c9c181d15",
+      "oracle_fingerprint": "sha256:838e4a0dc031293b9177a2a272d73fa42c0caf61a3aedd6dd34b2e7feb2ab855",
+      "provider_fingerprint": "sha256:f3ddb52365df9c8362fc4a5ff7b5c8ec9b9fdb09e5f2d11cdaa4f35d22d22fcc",
+      "purpose_fingerprint": "sha256:cc210989a06e75b1c0e562cc83b80f4afa8854de62b79e5a6a69c2d8743c24cc",
+      "retained_element_inventory_fingerprint": "sha256:31b9db042cfe3cf82bc6ca11f61edef899141e426c2533012ad9fe063c8338b6",
+      "schema_version": "flowguard.model-path-quality.v2",
+      "test_fingerprint": "sha256:ec5b61071120bfaa24e3df7163f787771dff02b9db42ec55c168c166f885c73d"
+    }
+  ],
+  "prediction_replay_refs": [],
+  "removal_dispositions": [],
+  "removed_ids": [],
+  "required_evidence_refs": [
+    {
+      "affected_closure_fingerprint": "sha256:3347671dd07795438cc7d832c11e41ea21433829afd8aaba4e5a9d36b56ef44f",
+      "candidate_snapshot_fingerprint": "sha256:176d23cb787c79ed7665b29aab19ce5c2ff391cb4a751351b807016fe59e2271",
+      "covered_affected_ids": [
+        "coverage:universe",
+        "model_relation:relation:model-realizes-purpose:researchguard_suite",
+        "model_relation:relation:system-contains:researchguard_suite",
+        "parent_closure:system:flowguard:model-regression-manifest",
+        "system_property:subject_revision"
+      ],
+      "current": true,
+      "eligible": true,
+      "environment_fingerprint": "sha256:34a9053890709c27c83a631c979424a3b97ac172b024ec65041e7954cde0c02e",
+      "obligation_ids": [
+        "coverage:universe",
+        "model_relation:relation:model-realizes-purpose:researchguard_suite",
+        "model_relation:relation:system-contains:researchguard_suite",
+        "parent_closure:system:flowguard:model-regression-manifest",
+        "system_property:subject_revision"
+      ],
+      "owner_route": "model_mesh_maintenance",
+      "receipt_fingerprint": "sha256:c15a1aaf19e99122b3d4ad7507ec2e18ae6c263a926d299d65005a7cc023e738",
+      "receipt_id": "receipt:validation-owner:model_mesh_maintenance:ff9495fcc17514f6ecad1c938e85e0d1",
+      "schema": "flowguard.model_revision_evidence.v2",
+      "status": "required",
+      "subject_fingerprint": "sha256:176d23cb787c79ed7665b29aab19ce5c2ff391cb4a751351b807016fe59e2271",
+      "toolchain_fingerprint": "sha256:719a12d4c662c8292302bd5d044e11c1072d017209709cd88f55c013b6f0b43d"
+    },
+    {
+      "affected_closure_fingerprint": "sha256:3347671dd07795438cc7d832c11e41ea21433829afd8aaba4e5a9d36b56ef44f",
+      "candidate_snapshot_fingerprint": "sha256:176d23cb787c79ed7665b29aab19ce5c2ff391cb4a751351b807016fe59e2271",
+      "covered_affected_ids": [
+        "model_instance:model:researchguard_suite",
+        "parent_closure:purpose:researchguard_suite"
+      ],
+      "current": true,
+      "eligible": true,
+      "environment_fingerprint": "sha256:34a9053890709c27c83a631c979424a3b97ac172b024ec65041e7954cde0c02e",
+      "obligation_ids": [
+        "model_instance:model:researchguard_suite",
+        "parent_closure:purpose:researchguard_suite"
+      ],
+      "owner_route": "model_test_alignment",
+      "receipt_fingerprint": "sha256:eb580acb95b8fe71cf0f4b25a3b6cec6f5689a5bce0173e4f5f45ffaaa137fc3",
+      "receipt_id": "receipt:validation-owner:model_test_alignment:8cd522ee97dd9424968f772badbdc9b0",
+      "schema": "flowguard.model_revision_evidence.v2",
+      "status": "required",
+      "subject_fingerprint": "sha256:176d23cb787c79ed7665b29aab19ce5c2ff391cb4a751351b807016fe59e2271",
+      "toolchain_fingerprint": "sha256:de9e6a1177eea958593374553dd238cc3a1fd31d4125771dec7735cc29ba7b6e"
+    }
+  ],
+  "required_path_quality_model_ids": [
+    "authoritative_model_system",
+    "compositional_verification_kernel",
+    "hierarchical_model_mesh",
+    "model_test_code_alignment",
+    "researchguard_suite"
+  ],
+  "revision_set_id": "researchguard-v048-provider-refresh-20260811",
+  "rollback_contract_fingerprint": "",
+  "schema": "flowguard.model_revision_set.v5",
+  "snapshot_diff_fingerprint": "sha256:f460ff7ea847eb67e8102eed16535ffb5c62f4467a81535f83ea7b81396c334c",
+  "status": "accepted",
+  "task_id": "refresh-flowguard-06812"
+}
