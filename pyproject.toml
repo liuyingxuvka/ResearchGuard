@@ -60,7 +60,6 @@ include = ["researchguard*"]
 "researchguard.logic_viewer" = ["assets/*"]
 "researchguard.source" = ["template_pack_catalog.json"]
 "researchguard.trace" = ["template_pack_catalog.json", "guard_model/*.json"]
-"researchguard.resources.external_domain_dna" = ["*.json", "*.md"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

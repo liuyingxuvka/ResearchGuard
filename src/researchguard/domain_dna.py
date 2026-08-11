@@ -1168,6 +1168,8 @@ def _validate_spec(raw: object) -> Mapping[str, object]:
             raise ExternalDomainDnaError(
                 f"{member_id} external-object DNA requires one exact current native receipt"
             )
+        for native_receipt_id in native_receipt_ids:
+            _register(object_owners, native_receipt_id, f"{member_id} native receipt")
         for route_role, entrypoint in MEMBER_NATIVE_ROUTES[member_id].items():
             _register(object_owners, entrypoint, f"{member_id} code:{route_role}")
         model_id = _text(model["model_id"], f"{member_id} model id")
@@ -1493,6 +1495,15 @@ def _validate_spec(raw: object) -> Mapping[str, object]:
     graph_edges: list[tuple[str, str, str]] = []
     graph_edges.append(("parent-admission", target_id, parent_block_id))
     graph_edges.append(("target-model-scope", target_id, scope_id))
+    for input_field in _rows(parent["input_fields"], "parent input fields"):
+        source_object_id = _text(input_field["object_id"], "parent input object id")
+        graph_edges.append(
+            (
+                f"parent-input:{source_object_id}",
+                source_object_id,
+                parent_block_id,
+            )
+        )
     for object_id in excluded_semantic_ids:
         graph_edges.append((f"scope-exclusion:{object_id}", scope_id, object_id))
     for object_id in frontier_ids:
@@ -1564,6 +1575,22 @@ def _validate_spec(raw: object) -> Mapping[str, object]:
             evidence_id = str(evidence["evidence_id"])
             graph_edges.append(
                 (f"evidence-model:{member_id}:{evidence_id}", evidence_id, model_id)
+            )
+            producer_id = str(evidence["producer_entrypoint"])
+            subject_id = str(evidence["subject_id"])
+            graph_edges.append(
+                (
+                    f"evidence-producer:{member_id}:{evidence_id}",
+                    producer_id,
+                    evidence_id,
+                )
+            )
+            graph_edges.append(
+                (
+                    f"evidence-subject:{member_id}:{evidence_id}",
+                    evidence_id,
+                    subject_id,
+                )
             )
         for row in _rows(model["bindings"], f"{member_id} bindings"):
             object_id = str(row["object_id"])
@@ -2858,6 +2885,17 @@ def _graph(
             "to_id": scope_id, "relation": "declares_bounded_model_scope",
         }
     )
+    for input_field in _rows(parent["input_fields"], "parent input fields"):
+        source_object_id = str(input_field["object_id"])
+        objects.add(source_object_id)
+        edges.append(
+            {
+                "edge_id": f"parent-input:{source_object_id}",
+                "from_id": source_object_id,
+                "to_id": str(parent["block_id"]),
+                "relation": "parent_consumes_external_input",
+            }
+        )
     for object_id in excluded_semantic_ids:
         edges.append(
             {
@@ -2980,12 +3018,32 @@ def _graph(
         for evidence in _rows(model["evidence_bindings"], f"{member_id} evidence bindings"):
             evidence_id = str(evidence["evidence_id"])
             objects.add(evidence_id)
+            producer_id = str(evidence["producer_entrypoint"])
+            subject_id = str(evidence["subject_id"])
+            objects.add(producer_id)
+            objects.add(subject_id)
             edges.append(
                 {
                     "edge_id": f"evidence-model:{member_id}:{evidence_id}",
                     "from_id": evidence_id, "to_id": model_id,
                     "relation": "evidence_supports_model",
                 }
+            )
+            edges.extend(
+                (
+                    {
+                        "edge_id": f"evidence-producer:{member_id}:{evidence_id}",
+                        "from_id": producer_id,
+                        "to_id": evidence_id,
+                        "relation": "evidence_produced_by_current_route",
+                    },
+                    {
+                        "edge_id": f"evidence-subject:{member_id}:{evidence_id}",
+                        "from_id": evidence_id,
+                        "to_id": subject_id,
+                        "relation": "evidence_binds_subject",
+                    },
+                )
             )
         for row in _rows(model["bindings"], f"{member_id} bindings"):
             if row["direction"] == "input_to_model":

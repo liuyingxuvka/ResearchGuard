@@ -23,10 +23,8 @@ from .domain_dna import (  # noqa: E402
     EXTERNAL_DOMAIN_DNA_SPEC_SCHEMA,
     build_external_domain_parent_function_block,
     derive_external_domain_native_bindings,
-    export_external_domain_dna,
     external_domain_dna_impact,
     external_domain_dna_reverse,
-    project_external_domain_dna,
     qualify_external_domain_dna,
 )
 from .external_scope_authority import (  # noqa: E402
@@ -57,11 +55,9 @@ __all__ = [
     "build_external_domain_parent_function_block",
     "assemble_external_scope_authority_record",
     "derive_external_domain_native_bindings",
-    "export_external_domain_dna",
     "external_domain_dna_impact",
     "external_domain_dna_reverse",
     "external_scope_authority_signing_payload",
-    "project_external_domain_dna",
     "qualify_external_domain_dna",
     "validate_external_scope_authority_record",
 ]

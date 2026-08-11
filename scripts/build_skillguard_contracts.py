@@ -164,7 +164,6 @@ IMPLEMENTATION_PATHS = {
         "src/researchguard/cli.py",
         "src/researchguard/domain_dna.py",
         "src/researchguard/external_scope_authority.py",
-        "src/researchguard/resources/external_domain_dna",
         "src/researchguard/routing.py",
         "src/researchguard/suite.py",
         "src/researchguard/logic/admission.py",

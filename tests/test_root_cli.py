@@ -12,10 +12,28 @@ from admission_fixtures import (
 from researchguard.cli import main
 
 
-def test_root_cli_has_exact_eight_commands(capsys) -> None:
+def test_root_cli_has_only_current_public_commands(capsys) -> None:
     assert main(["--help"]) == 0
     output = capsys.readouterr().out
-    assert "{run|portable|domain-dna|self-dna|logic|source|trace|experiment}" in output
+    assert "{run|self-dna|logic|source|trace|experiment}" in output
+    assert "portable" not in output
+    assert "domain-dna" not in output
+    assert "self-dna export" not in output
+
+
+def test_retired_standalone_routes_are_unknown_commands(capsys) -> None:
+    assert main(["portable", "bundle.json"]) == 2
+    portable = json.loads(capsys.readouterr().out)
+    assert portable["code"] == "unknown-command"
+    assert main(["domain-dna", "inspect", "bundle.json"]) == 2
+    domain_dna = json.loads(capsys.readouterr().out)
+    assert domain_dna["code"] == "unknown-command"
+
+
+def test_self_dna_export_is_retired_without_materialization(capsys) -> None:
+    assert main(["self-dna", "export", "--output", "outside.json"]) == 2
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["gap"]["code"] == "unknown-self-dna-operation"
 
 
 def test_umbrella_without_task_facts_returns_typed_gap(capsys) -> None:

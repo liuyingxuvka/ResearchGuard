@@ -313,7 +313,6 @@
     "src/researchguard/native_receipts.py": "researchguard_suite",
     "src/researchguard/portable_material.py": "researchguard_suite",
     "src/researchguard/resources/__init__.py": "researchguard_suite",
-    "src/researchguard/resources/external_domain_dna/__init__.py": "researchguard_suite",
     "src/researchguard/routing.py": "researchguard_suite",
     "src/researchguard/self_dna.py": "authoritative_model_system",
     "src/researchguard/source/__init__.py": "researchguard_suite",
