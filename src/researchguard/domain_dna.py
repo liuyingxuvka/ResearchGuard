@@ -144,7 +144,7 @@ def _compute_portable_native_context(
     """Replay the four real member blueprints and expose only bound identities.
 
     The portable-composition qualifier is the one semantic admission path.  It
-    reconstructs each full MemberModelEnvelope, validates the expected-target
+    replays each full MemberModelEnvelope, validates the expected-target
     authority, owner attestation, behavior manifest and native receipts, and
     invokes the member-owned behavior replay (which invokes the current native
     blueprint checker).  External-domain projection runs only after that path.
@@ -2185,7 +2185,7 @@ def _evaluate_scope_authority(
 def _verify_target_materials(
     target: Mapping[str, object], resolved_root: Path
 ) -> list[dict[str, object]]:
-    """Reopen and verify the complete declared material denominator."""
+    """Read and verify the complete declared material denominator."""
 
     if not resolved_root.is_dir() or resolved_root.is_symlink():
         raise ExternalDomainDnaError("material root must be one real directory")
@@ -2247,7 +2247,12 @@ def export_external_domain_dna(
     scope_authority_record: bytes | Mapping[str, object] | None = None,
     material_root: Path | None = None,
 ) -> bytes:
-    """Export one target model only after all four native blueprints replay."""
+    """Build one bounded transport projection after all four native blueprints replay.
+
+    The returned bytes are transport evidence only. The admitted target
+    directory, model files, tests, bindings, and evidence remain the DNA
+    authority; this helper never replaces them or creates a second authority.
+    """
 
     canonical_spec = _canonical(spec)
     if not isinstance(canonical_spec, Mapping):

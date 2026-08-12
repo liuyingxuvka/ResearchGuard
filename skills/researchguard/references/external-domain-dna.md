@@ -35,7 +35,11 @@ Qualification reports six separate states: `material_inventory_verified`, `membe
 
 A complete closed-directory inventory answers “which bytes were admitted?” It does not answer “were all claims or meanings modeled?” For a bounded question, keep `whole_target_semantics_claimed=false`, name the excluded semantic region, and keep at least one expansion frontier. The canonical Attention Is All You Need example therefore means: all 25 frozen material files are accounted for, and the reported English-to-French BLEU consistency question is deeply modeled. It does not claim to be the complete semantic DNA of the whole paper.
 
-Recursive deepening consumes one frontier by explicitly adding the next question, structure nodes, member inputs, member-owned outputs, bindings, good/bad cases, and evidence. Rebuild the parent mapping and rerun native qualification. Never remove a frontier merely to make the model look complete.
+Recursive deepening consumes one frontier by explicitly adding the next question,
+structure nodes, member inputs, member-owned outputs, bindings, good/bad cases,
+and evidence. Derive the parent mapping from the admitted directory and rerun
+native qualification. Never remove a frontier merely to make the model look
+complete.
 
 ## Binding and failure rules
 

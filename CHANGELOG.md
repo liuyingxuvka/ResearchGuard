@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.4.9 - 2026-08-12
+
+- Keep the ResearchGuard suite directory as its native DNA: models,
+  code/test bindings, and current evidence remain inspectable in place.
+- Keep external-object DNA as an explicit target projection while avoiding a
+  standalone package for the suite's own DNA.
+- Refresh the five maintained consumer contracts and patch identities.
+
 ## v0.4.8 - 2026-08-11
 
 - Keep the ResearchGuard suite DNA in its native directory: models, code/test

@@ -163,8 +163,8 @@
         "model_source_fingerprint": "sha256:a5abc3bf79b1d12a6b45cc0b43d536cbb7eb5538272518bc0945a0eaeee7a819",
         "runner_path": ".flowguard/researchguard_suite/run_checks.py",
         "runner_source_fingerprint": "sha256:611e3bcbe9eebc31230d4822a2be8e984fa9064baf464e478863965a267051a7",
-        "purpose_declaration_fingerprint": "sha256:e7a56814a9c25a0ab95b65e9781636e421955c68413b12727c6f5c6f645f6a9f",
-        "purpose_closure_fingerprint": "sha256:80d3152e6110b5bb2ab1d977832aecbc211f95390b9dcee7059a8496870320f4"
+        "purpose_declaration_fingerprint": "sha256:e4287fc15c920091209c5c4f5fdc8ae2008c18c2fe882965024c566706d952b6",
+        "purpose_closure_fingerprint": "sha256:22c51df8a4a591e3fc791971ac8d7b7584f7e52097fb4459318e154f2efa9500"
       }
     },
     {
@@ -314,9 +314,9 @@
     "src/researchguard/portable_material.py": "researchguard_suite",
     "src/researchguard/resources/__init__.py": "researchguard_suite",
     "src/researchguard/routing.py": "researchguard_suite",
-  "src/researchguard/self_dna.py": "authoritative_model_system",
-  "src/researchguard/software_dna.py": "authoritative_model_system",
-  "src/researchguard/source/__init__.py": "researchguard_suite",
+    "src/researchguard/self_dna.py": "authoritative_model_system",
+    "src/researchguard/software_dna.py": "authoritative_model_system",
+    "src/researchguard/source/__init__.py": "researchguard_suite",
     "src/researchguard/source/admission.py": "researchguard_suite",
     "src/researchguard/source/blueprint.py": "researchguard_suite",
     "src/researchguard/source/cli.py": "researchguard_suite",

@@ -24,7 +24,10 @@ The existing FlowGuard observed snapshot contains one suite-level model whose bo
 - Keep prompt entry shells small by loading blueprint guidance only for a selected member and operation.
 - Add one later FlowGuard repository software-DNA root with four recursively decomposed member subtrees that bind the new capability to code, tests, intent, resources, and topology without becoming a member-domain authority.
 - Make software-DNA readiness explicit across seven independently checkable layers and expose the first unresolved layer instead of reducing understanding to one score.
-- Keep ordinary work affected-only while reserving whole-repository materialization for explicit software-DNA qualification, canonical export, architecture reduction, and release gates.
+- Keep ordinary work affected-only while reserving whole-repository inspection for
+  explicit software-DNA qualification, architecture reduction, and release
+  gates. The native directory remains the DNA; transport projections are not a
+  second authority.
 - Keep implementation, SkillGuard maintenance, installation, release, and archive evidence as separate freshness stages.
 
 **Non-Goals:**
@@ -32,7 +35,9 @@ The existing FlowGuard observed snapshot contains one suite-level model whose bo
 - A shared cross-Guard node ontology, scoring model, solver, confidence number, closure algorithm, or universal domain payload.
 - An umbrella interpretation of LogicGuard, SourceGuard, TraceGuard, or ExperimentGuard results.
 - Automatic sibling invocation, `run all`, retry, alias, compatibility reader, legacy parser, or fallback route.
-- Exact reconstruction of prose, page layout, external source files, physical apparatus, or every target resource unless the owning native blueprint explicitly binds that material.
+- Exact claims about prose, page layout, external source files, physical
+  apparatus, or every target resource require an owning native blueprint and
+  explicit bindings; an unbound resource remains a visible gap.
 - Replacing SourceGuard with LogicGuard's source library, replacing TraceGuard with a formal SCM, or replacing ExperimentGuard with PhysicsGuard or external execution infrastructure.
 - Treating the FlowGuard self-model, prompt text, a generic SkillGuard contract, or an export projection as native semantic proof.
 - Five overlapping whole-repository blueprints, one for each maintained skill surface, or a single opaque member child that does not decompose into concrete behavior owners.
@@ -139,20 +144,29 @@ A model cannot prove completeness by counting its own contents. Each native blue
 
 Qualification reports the longest exact-current complete layer prefix and the first unresolved gap. Later material never hides an earlier incomplete layer.
 
-### 5. Separate structural reconstruction from content/resource reconstruction
+### 5. Separate structural coverage from content/resource coverage
 
-Blueprint export is deterministic and member-native. It can support a reconstruction claim only for material explicitly represented and bound.
+Blueprint projections are deterministic and member-native. They support a
+coverage claim only for material explicitly represented and bound; the admitted
+target directory and its model/test/evidence files remain the DNA authority.
 
-- LogicGuard distinguishes structural artifact reconstruction from exact prose/layout/resource reconstruction.
-- SourceGuard reconstructs the search, qualification, source/anchor, and claim-use graph; raw source content remains bound by an external or library reference plus fingerprint.
-- TraceGuard reconstructs the trace graph, alternatives, bounded causal relations, and narrative obligations; it does not infer missing source content.
-- ExperimentGuard reconstructs the declared design, procedure, ports, and recommendation rationale; external apparatus and execution remain owned externally.
+- LogicGuard distinguishes structural artifact coverage from exact
+  prose/layout/resource coverage.
+- SourceGuard derives the search, qualification, source/anchor, and claim-use
+  graph; raw source content remains bound by an external or library reference
+  plus fingerprint.
+- TraceGuard derives the trace graph, alternatives, bounded causal relations,
+  and narrative obligations; it does not infer missing source content.
+- ExperimentGuard derives the declared design, procedure, ports, and
+  recommendation rationale; external apparatus and execution remain owned
+  externally.
 
 ### 6. Derive affected-only invalidation from exact consumed identities
 
 Every parent, consumer, receipt, handoff, and exported projection records the exact fingerprints it consumed. A changed fingerprint invalidates its direct consumers and transitive declared dependents. Unrelated branches retain exact-current evidence. Unknown dependency ownership blocks affected-confidence claims and does not authorize broad execution.
 
-ResearchGuard performs this only over envelope and handoff topology. Each member performs native impact inside its own payload boundary.
+ResearchGuard performs this only over envelope and handoff topology. Each
+member performs native impact inside its own payload boundary.
 
 ### 7. Provide four member-native blueprint operations
 

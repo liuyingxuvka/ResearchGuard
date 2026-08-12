@@ -2370,7 +2370,7 @@ def _portable_topology_gaps(
 def _portable_route_composition(
     raw: Mapping[str, object],
 ) -> RouteComposition:
-    """Reconstruct the exact public composition projection for canonical replay."""
+    """Deserialize the exact public composition projection for canonical replay."""
 
     fields = {
         "status",

@@ -5,9 +5,11 @@ second software-blueprint format and it does not turn its member-domain DNA
 into a repository authority.  The only authority is the current FlowGuard
 self-blueprint API.  Ordinary ResearchGuard commands never call this module;
 ``self-dna`` is an explicit, read-only whole-repository operation.  The
-standalone materialization/export path is intentionally not part of the
+standalone software-DNA materialization is intentionally not part of the
 ResearchGuard console; FlowGuard remains the sole owner of any canonical
-software-blueprint projection.
+software-blueprint projection. Target-domain transport helpers, when called
+explicitly by an adapter, remain evidence projections and never replace the
+admitted native directory.
 """
 
 from __future__ import annotations
@@ -188,7 +190,7 @@ def main(argv: list[str] | None = None) -> int:
         payload = _blocked(
             Path(".").resolve(),
             "unknown-self-dna-operation",
-            "Only the read-only self-dna check operation is public; standalone materialization is retired.",
+            "Only the read-only self-dna check operation is public; the native directory and its bound models are the software-DNA authority.",
         )
         print(json.dumps(payload, ensure_ascii=False, sort_keys=True, indent=2))
         return 2

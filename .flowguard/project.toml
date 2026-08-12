@@ -1,8 +1,8 @@
 [flowguard]
 repository = "https://github.com/liuyingxuvka/FlowGuard"
-adopted_package_version = "0.68.12"
+adopted_package_version = "0.68.13"
 schema_version = "1.0"
-last_verified_at = "2026-08-11T12:12:45+00:00"
+last_verified_at = "2026-08-12T07:24:51+00:00"
 last_verified_by = "FlowGuard project-upgrade"
 agents_path = "AGENTS.md"
 
@@ -15,12 +15,12 @@ require_model_update_for_behavior_changes = true
 
 [model_authority]
 system_id = "flowguard"
-observed_snapshot_path = ".flowguard/model-mesh/snapshots/c9942789f206734985487d2b1165e91db23da396b2c24b99e7d47802707fa31e.json"
-observed_snapshot_fingerprint = "sha256:c9942789f206734985487d2b1165e91db23da396b2c24b99e7d47802707fa31e"
-subject_revision = "source-inventory:7db7b8e9798238f95884f5dd4b45eec90e86aed7234b392aa554818ab0236899"
+observed_snapshot_path = ".flowguard/model-mesh/snapshots/03439dfc55e35a2959455b83e24849b7fef7bea2bb2b46dff46ad7cb1b34c4f8.json"
+observed_snapshot_fingerprint = "sha256:03439dfc55e35a2959455b83e24849b7fef7bea2bb2b46dff46ad7cb1b34c4f8"
+subject_revision = "source-inventory:538fde74332a31554d6c6674fa36829ebb2a465bbf8b51730f01f760f2744f1b"
 coverage_status = "complete_within_declared_boundary"
-generation = 37
-accepted_revision_set_fingerprint = "sha256:752bcb62011d2df549ade6a8c2cb53fcb630d816516f6c8dbddd6422bb7d4c84"
-previous_snapshot_fingerprint = "sha256:176d23cb787c79ed7665b29aab19ce5c2ff391cb4a751351b807016fe59e2271"
-activation_receipt_fingerprint = "sha256:9c0c541eca7b30ff9a88171bba5c435f541b7a14169faf78b1e09b4d66e2897c"
-head_fingerprint = "sha256:8da05d84fe9564afd8a09edbfd49736ba19b923bf58010609c73e857ade99ea8"
+generation = 40
+accepted_revision_set_fingerprint = "sha256:19a468e37e4edd74fb288395c0ac8183b12f8c28d3f672fb65efc45851ca9fbc"
+previous_snapshot_fingerprint = "sha256:bbaea15f87a6b6590125d62eba8ff183317d4d82c02714d0e361ac63ec02d298"
+activation_receipt_fingerprint = "sha256:5cc1a378a95408bcbf3f85eca96f09cb780b998b60c145b1f586155a78cdaf02"
+head_fingerprint = "sha256:03ada485beb8ed0c310a634dc7e380c81fc96223da9debc5c00714f9721b3cf3"
