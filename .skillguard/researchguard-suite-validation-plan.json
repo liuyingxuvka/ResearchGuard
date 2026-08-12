@@ -1,11 +1,9 @@
 {
   "schema_version": "researchguard.skillguard_unit_validation_plan.v1",
-  "status": "stale",
-  "execution_disposition": "not_executable",
+  "status": "current_not_run",
+  "execution_disposition": "not_run",
   "stale_reason_codes": [
-    "flowguard-0.68.2-plan-predates-native-blueprint-contracts",
-    "flowguard-toolchain-not-frozen",
-    "self-dna-binding-deferred"
+    "maintenance-unit-validation-not-run"
   ],
   "maintenance_unit_id": "unit:researchguard-suite",
   "member_skill_ids": [
@@ -18,8 +16,8 @@
   "toolchain": {
     "skillguard_version": "0.7.2",
     "skillguard_source_revision": "sha256:a34718b6832e25679e0dddd48a1ae05183aa6686167f48d5a15b03e958607f2a",
-    "flowguard_version": "0.68.2",
-    "flowguard_status": "stale_later_binding",
+    "flowguard_version": "0.68.14",
+    "flowguard_status": "current_not_run",
     "python_command": "python"
   },
   "private_roots": {
@@ -237,5 +235,5 @@
   "check_count": 20,
   "cross_unit_receipt_reuse": false,
   "skillguard_adds_domain_route": false,
-  "claim_boundary": "This file preserves the pre-blueprint FlowGuard 0.68.2 validation-plan identity as visibly stale and non-executable. Current native affected-only ownership comes from each compiled contract content-impact plan; FlowGuard self-DNA binding remains a later task after its toolchain is frozen."
+  "claim_boundary": "This file records the current FlowGuard 0.68.14 toolchain and remains visibly non-executable until one explicitly owned maintenance-unit validation runs. Current native affected-only ownership comes from each compiled contract content-impact plan; no compatibility or fallback route is implied."
 }

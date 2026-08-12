@@ -110,7 +110,7 @@ def test_static_test_mesh_audit_covers_five_members_and_twenty_exact_owners() ->
         for row in result["installation_boundaries"]
     )
 
-def test_legacy_validation_plan_remains_stale_and_non_executable() -> None:
+def test_validation_plan_is_current_but_not_run_without_a_maintenance_owner() -> None:
     plan = json.loads(
         (
             ROOT
@@ -118,9 +118,9 @@ def test_legacy_validation_plan_remains_stale_and_non_executable() -> None:
             / "researchguard-suite-validation-plan.json"
         ).read_text(encoding="utf-8")
     )
-    assert plan["status"] == "stale"
-    assert plan["execution_disposition"] == "not_executable"
-    assert plan["toolchain"]["flowguard_status"] == "stale_later_binding"
+    assert plan["status"] == "current_not_run"
+    assert plan["execution_disposition"] == "not_run"
+    assert plan["toolchain"]["flowguard_status"] == "current_not_run"
 
 
 @pytest.mark.parametrize(

@@ -30,8 +30,15 @@ TEST_MESH_MAINTENANCE_INPUTS = (
     ".skillguard/test-mesh.json",
     "scripts/check_researchguard_test_mesh.py",
 )
-RESEARCHGUARD_VERSION = "0.4.10"
-FLOWGUARD_VERSION = "0.68.2"
+RESEARCHGUARD_VERSION = "0.4.11"
+
+# Freshness inputs for the integration owner; the builder does not copy or
+# regenerate the native software-DNA model.
+RESEARCHGUARD_SOFTWARE_DNA_INPUTS = (
+    "models/software_dna/researchguard.json",
+    "src/researchguard/software_dna.py",
+)
+FLOWGUARD_VERSION = "0.68.14"
 SKILLGUARD_VERSION = "0.7.2"
 
 BLUEPRINT_COMPONENTS = {
@@ -764,20 +771,16 @@ def validation_plan() -> dict:
         raise ValueError("validation plan contains duplicate execution owners")
     return {
         "schema_version": "researchguard.skillguard_unit_validation_plan.v1",
-        "status": "stale",
-        "execution_disposition": "not_executable",
-        "stale_reason_codes": [
-            "flowguard-0.68.2-plan-predates-native-blueprint-contracts",
-            "flowguard-toolchain-not-frozen",
-            "self-dna-binding-deferred",
-        ],
+        "status": "current_not_run",
+        "execution_disposition": "not_run",
+        "stale_reason_codes": ["maintenance-unit-validation-not-run"],
         "maintenance_unit_id": UNIT_ID,
         "member_skill_ids": list(MEMBERS),
         "toolchain": {
             "skillguard_version": skillguard_version,
             "skillguard_source_revision": _skillguard_source_fingerprint(),
             "flowguard_version": FLOWGUARD_VERSION,
-            "flowguard_status": "stale_later_binding",
+            "flowguard_status": "current_not_run",
             "python_command": "python",
         },
         "private_roots": {
@@ -790,10 +793,10 @@ def validation_plan() -> dict:
         "cross_unit_receipt_reuse": False,
         "skillguard_adds_domain_route": False,
         "claim_boundary": (
-            "This file preserves the pre-blueprint FlowGuard 0.68.2 validation-plan identity "
-            "as visibly stale and non-executable. Current native affected-only ownership "
-            "comes from each compiled contract content-impact plan; FlowGuard self-DNA "
-            "binding remains a later task after its toolchain is frozen."
+            "This file records the current FlowGuard 0.68.14 toolchain and remains visibly "
+            "non-executable until one explicitly owned maintenance-unit validation runs. "
+            "Current native affected-only ownership comes from each compiled contract "
+            "content-impact plan; no compatibility or fallback route is implied."
         ),
     }
 

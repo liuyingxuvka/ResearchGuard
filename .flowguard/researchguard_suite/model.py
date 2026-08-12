@@ -9,6 +9,7 @@ import sys
 
 FLOWGUARD_MODEL_MARKER = "flowguard-executable-model"
 MODEL_PATH = Path(__file__).resolve().parents[1] / "researchguard_suite_model.py"
+SOFTWARE_DNA_PATH = Path(__file__).resolve().parents[2] / "models" / "software_dna" / "researchguard.json"
 
 
 def load_suite_model():
@@ -28,4 +29,13 @@ def scenarios():
     return load_suite_model().scenarios()
 
 
-__all__ = ["FLOWGUARD_MODEL_MARKER", "load_suite_model", "scenarios"]
+def software_dna_report():
+    """Read the native software-DNA contract without creating a projection."""
+
+    sys.path.insert(0, str(MODEL_PATH.parents[1] / "src"))
+    from researchguard.software_dna import check_software_dna_contract
+
+    return check_software_dna_contract(SOFTWARE_DNA_PATH.parents[2])
+
+
+__all__ = ["FLOWGUARD_MODEL_MARKER", "SOFTWARE_DNA_PATH", "load_suite_model", "scenarios", "software_dna_report"]

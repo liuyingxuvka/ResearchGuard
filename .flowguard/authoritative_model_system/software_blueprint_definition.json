@@ -160,11 +160,11 @@
         "purpose_source_id": ".flowguard/model-regression-manifest.json#model:researchguard_suite:purpose-declaration",
         "purpose_source_owner_id": "model-purpose-declaration:researchguard_suite",
         "model_path": ".flowguard/researchguard_suite/model.py",
-        "model_source_fingerprint": "sha256:a5abc3bf79b1d12a6b45cc0b43d536cbb7eb5538272518bc0945a0eaeee7a819",
+        "model_source_fingerprint": "sha256:99604927108a5013b862e7ea2487699c5267bb66b07449e07b21c9c67a15d86e",
         "runner_path": ".flowguard/researchguard_suite/run_checks.py",
-        "runner_source_fingerprint": "sha256:611e3bcbe9eebc31230d4822a2be8e984fa9064baf464e478863965a267051a7",
-        "purpose_declaration_fingerprint": "sha256:e4287fc15c920091209c5c4f5fdc8ae2008c18c2fe882965024c566706d952b6",
-        "purpose_closure_fingerprint": "sha256:22c51df8a4a591e3fc791971ac8d7b7584f7e52097fb4459318e154f2efa9500"
+        "runner_source_fingerprint": "sha256:2ee754b840a2b8f264136c6aae42d74de800b67ab6ce798a81e58536238c10b2",
+        "purpose_declaration_fingerprint": "sha256:f704ba41885a1796e025a038695c6c0abd6fb3d36ff817fdf127de0260e483b9",
+        "purpose_closure_fingerprint": "sha256:b053f074934fc3d252244630860645c94a5b6154fb52a86899e96b26e332e531"
       }
     },
     {

@@ -16,6 +16,24 @@ Refresh author maintenance for the four ResearchGuard consumer skills without ch
   - parent `researchguard.suite.route-authority.current`
 - OpenSpec context is read-only planning context for FlowGuard and is not a model, test owner, receipt, or product-runtime authority.
 
+## Software-DNA integration boundary
+
+- The one source-native software-DNA authority is
+  `models/software_dna/researchguard.json`. It contains one repository root,
+  four recursively decomposed member subtrees, a provider-neutral inventory
+  contract, exact forward/reverse indexes, affected-only closure, and seven
+  readiness layers.
+- `src/researchguard/software_dna.py` independently enumerates the repository
+  boundary before reading surface-owner bindings. Unknown adapters, parse
+  failures, duplicate owners, dangling edges, and unknown impact ids block;
+  no Python-only subset, caller path list, retry, alias, or fallback is allowed.
+- FlowGuard consumes that report read-only through the suite model runner. It
+  remains the sole canonical projection owner; member-domain DNA and SkillGuard
+  contracts are not copied into the repository root model.
+- The imported FlowGuard 0.68.14 source checkout must be clean before applying
+  its project-upgrade or generating new FlowGuard/SkillGuard evidence. A dirty
+  peer checkout leaves those writes visibly blocked.
+
 ## Existing ownership
 
 - FunctionBlocks: each member model owns its consumer-contract validator and native-test validator.

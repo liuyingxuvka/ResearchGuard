@@ -69,7 +69,14 @@ def _empty_layers(*, status: str = "not_run", gap: str = "") -> list[dict[str, A
     ]
 
 
-def _blocked(root: Path, code: str, message: str, *, exc: Exception | None = None) -> dict[str, Any]:
+def _blocked(
+    root: Path,
+    code: str,
+    message: str,
+    *,
+    exc: Exception | None = None,
+    software_dna: dict[str, Any] | None = None,
+) -> dict[str, Any]:
     payload: dict[str, Any] = {
         "report_kind": REPORT_KIND,
         "software_id": "researchguard",
@@ -95,25 +102,37 @@ def _blocked(root: Path, code: str, message: str, *, exc: Exception | None = Non
             "reasons": [code],
         },
     }
+    if software_dna is not None:
+        payload["software_dna"] = software_dna
     if exc is not None:
         payload["gap"]["exception"] = f"{type(exc).__name__}: {exc}"
     return payload
 
 
 def _run_build(root: Path) -> tuple[dict[str, Any], Any | None]:
+    from .software_dna import check_software_dna_contract
+
+    software_dna = check_software_dna_contract(root)
+    if not software_dna.get("ready", False):
+        return _blocked(
+            root,
+            "software_dna_contract_not_ready",
+            "The native ResearchGuard root/member model, provider-neutral inventory, or bindings are incomplete.",
+            software_dna=software_dna,
+        ), None
     try:
         from flowguard.self_blueprint import (
             FlowGuardSelfBlueprintError,
             build_flowguard_self_blueprint,
         )
     except (ImportError, AttributeError) as exc:
-        return _blocked(root, "flowguard_toolchain_unavailable", "The current FlowGuard self-blueprint API cannot be imported.", exc=exc), None
+        return _blocked(root, "flowguard_toolchain_unavailable", "The current FlowGuard self-blueprint API cannot be imported.", exc=exc, software_dna=software_dna), None
     try:
         bundle = build_flowguard_self_blueprint(root)
     except FlowGuardSelfBlueprintError as exc:
-        return _blocked(root, "flowguard_self_blueprint_not_ready", "FlowGuard rejected the current project authority, definition, inventory, or model evidence; no local substitute is used.", exc=exc), None
+        return _blocked(root, "flowguard_self_blueprint_not_ready", "FlowGuard rejected the current project authority, definition, inventory, or model evidence; no local substitute is used.", exc=exc, software_dna=software_dna), None
     except (OSError, ValueError) as exc:
-        return _blocked(root, "flowguard_self_blueprint_input_invalid", "The current FlowGuard self-blueprint inputs are invalid or unavailable.", exc=exc), None
+        return _blocked(root, "flowguard_self_blueprint_input_invalid", "The current FlowGuard self-blueprint inputs are invalid or unavailable.", exc=exc, software_dna=software_dna), None
 
     ledger = bundle.readiness_ledger.to_dict()
     qualification = getattr(bundle, "dna_qualification", None)
@@ -122,18 +141,10 @@ def _run_build(root: Path) -> tuple[dict[str, Any], Any | None]:
             root,
             "flowguard_dna_qualification_missing",
             "The current FlowGuard self-blueprint did not expose its provider-neutral DNA qualification contract.",
+            software_dna=software_dna,
         ), None
     qualification_payload = qualification.to_dict()
     qualified = bool(qualification.qualified)
-    from .software_dna import check_software_dna_contract
-
-    software_dna = check_software_dna_contract(root)
-    if not software_dna.get("ready", False):
-        return _blocked(
-            root,
-            "software_dna_contract_not_ready",
-            "The native ResearchGuard root/member model, code, test, or evidence bindings are incomplete.",
-        ), None
     payload = {
         "report_kind": REPORT_KIND,
         "software_id": "researchguard",
@@ -174,6 +185,19 @@ def check(root: str | Path, *, compact: bool = False) -> tuple[dict[str, Any], i
             payload["gap"] = readiness["gap"]
         if "gap" in payload:
             payload["gap"] = payload["gap"]
+        if isinstance(payload.get("software_dna"), dict):
+            software_dna = payload["software_dna"]
+            local_readiness = software_dna.get("readiness", {})
+            payload["software_dna"] = {
+                key: software_dna[key]
+                for key in ("schema_version", "dna_id", "status", "ready", "counts")
+                if key in software_dna
+            }
+            payload["software_dna"]["readiness"] = {
+                key: local_readiness.get(key)
+                for key in ("status", "deepest_proven_layer", "first_gap", "gap_count")
+                if key in local_readiness
+            }
     return payload, 0 if payload.get("ok") else 1
 
 

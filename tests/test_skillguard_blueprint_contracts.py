@@ -222,14 +222,14 @@ def test_blueprint_evidence_categories_are_real_pytest_nodes(member: str) -> Non
         assert test_name in result.stdout
 
 
-def test_stale_flowguard_validation_plan_is_visible_but_not_executable() -> None:
+def test_current_flowguard_validation_plan_is_visible_but_not_run() -> None:
     plan = json.loads(
         (ROOT / ".skillguard" / "researchguard-suite-validation-plan.json").read_text(
             encoding="utf-8"
         )
     )
-    assert plan["status"] == "stale"
-    assert plan["execution_disposition"] == "not_executable"
-    assert plan["toolchain"]["flowguard_version"] == "0.68.2"
-    assert plan["toolchain"]["flowguard_status"] == "stale_later_binding"
-    assert "self-dna-binding-deferred" in plan["stale_reason_codes"]
+    assert plan["status"] == "current_not_run"
+    assert plan["execution_disposition"] == "not_run"
+    assert plan["toolchain"]["flowguard_version"] == "0.68.14"
+    assert plan["toolchain"]["flowguard_status"] == "current_not_run"
+    assert "maintenance-unit-validation-not-run" in plan["stale_reason_codes"]

@@ -14,7 +14,20 @@ from flowguard import (
 )
 
 FLOWGUARD_MODEL_MARKER = "flowguard-executable-model"
-CURRENT_RESEARCHGUARD_VERSION = "0.4.10"
+CURRENT_RESEARCHGUARD_VERSION = "0.4.11"
+
+# The executable route model consumes the native software-DNA root only for
+# explicit self-DNA qualification; member-domain blueprints remain opaque
+# native owners and are not copied into this FlowGuard model.
+SOFTWARE_DNA_MODEL_PATH = "models/software_dna/researchguard.json"
+SOFTWARE_DNA_ROOT_MODEL_ID = "researchguard-suite"
+SOFTWARE_DNA_MEMBER_MODEL_IDS = (
+    "logicguard",
+    "sourceguard",
+    "traceguard",
+    "experimentguard",
+)
+SOFTWARE_DNA_READINESS_LAYER_COUNT = 7
 
 
 MEMBER_BY_INTENT = {

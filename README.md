@@ -1,7 +1,7 @@
 # ResearchGuard
 
-**Current version:** `v0.4.9`
-**当前版本：** `v0.4.9`
+**Current version:** `v0.4.11`
+**当前版本：** `v0.4.11`
 
 ResearchGuard is one versioned research-quality guard suite with five direct
 Codex entrypoints:
@@ -18,6 +18,16 @@ All five entrypoints use one `researchguard` Python distribution, one suite
 version, and one suite fingerprint. A selected member failure is terminal.
 ResearchGuard does not retry through another member, silently downgrade, or
 load legacy package formats.
+
+The explicit `researchguard self-dna check` operation reads one native
+repository software-DNA root with four recursively decomposed member
+subtrees. It independently enumerates Python, declarative, workflow, text,
+and resource surfaces, binds every admitted item to one owner, and reports
+seven readiness layers plus deterministic forward, reverse, and affected-only
+indexes. Generated receipts and canonical projections stay outside the
+denominator. CI resolves FlowGuard from the single immutable public commit
+declared in `pyproject.toml`; this does not alter the already published
+`v0.4.10` tag or release.
 
 The first release was `v0.1.0`.
 

@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.4.11 - 2026-08-12
+
+- Add one repository-native software-DNA root with four recursively decomposed
+  member subtrees, an independently enumerated provider-neutral denominator,
+  exact forward/reverse indexes, affected-only closure, and seven readiness
+  layers.
+- Make CI resolve the public FlowGuard authority from one immutable Git commit;
+  the already published v0.4.10 tag and release remain unchanged.
+
 ## v0.4.9 - 2026-08-12
 
 - Keep the ResearchGuard suite directory as its native DNA: models,

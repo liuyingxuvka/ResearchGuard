@@ -66,6 +66,12 @@ def _check_topology() -> list[str]:
         "no_compatibility_reader",
         "no_fallback_route",
         "no_dual_output",
+        "one_repository_software_dna_root",
+        "four_recursive_member_subtrees",
+        "provider_neutral_denominator",
+        "seven_readiness_layers",
+        "bidirectional_affected_indexes",
+        "unknown_impact_blocks_without_full_scan",
         "mesh_store_uses_researchguard_package_identity",
         "predecessor_distribution_state_cannot_change_fingerprint",
         "no_predecessor_distribution_query",
@@ -76,10 +82,27 @@ def _check_topology() -> list[str]:
     return findings
 
 
+def _check_software_dna() -> dict[str, object]:
+    sys.path.insert(0, str(ROOT / "src"))
+    from researchguard.software_dna import check_software_dna_contract
+
+    report = check_software_dna_contract(ROOT)
+    return {
+        "status": report.get("status"),
+        "ready": report.get("ready"),
+        "readiness": report.get("readiness", {}),
+        "counts": report.get("counts", {}),
+        "claim_boundary": "The runner consumes the native repository self-DNA report read-only; FlowGuard remains the canonical projection owner.",
+    }
+
+
 def main() -> int:
     model = _load_model()
     report = review_scenarios(model.scenarios())
     findings = _check_topology()
+    software_dna = _check_software_dna()
+    if not software_dna.get("ready"):
+        findings.append("native software-DNA contract is not ready")
     print(report.format_text(max_counterexamples=3))
     print(
         json.dumps(
@@ -88,6 +111,7 @@ def main() -> int:
                 "status": "pass" if report.ok and not findings else "blocked",
                 "scenario_count": len(model.scenarios()),
                 "topology_findings": findings,
+                "software_dna": software_dna,
                 "claim_boundary": (
                     "This proves the declared route/topology scenarios over the "
                     "current model only; native member tests remain required."

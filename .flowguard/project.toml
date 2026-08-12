@@ -1,8 +1,8 @@
 [flowguard]
 repository = "https://github.com/liuyingxuvka/FlowGuard"
-adopted_package_version = "0.68.13"
+adopted_package_version = "0.68.14"
 schema_version = "1.0"
-last_verified_at = "2026-08-12T07:24:51+00:00"
+last_verified_at = "2026-08-12T19:06:05+00:00"
 last_verified_by = "FlowGuard project-upgrade"
 agents_path = "AGENTS.md"
 
@@ -15,12 +15,12 @@ require_model_update_for_behavior_changes = true
 
 [model_authority]
 system_id = "flowguard"
-observed_snapshot_path = ".flowguard/model-mesh/snapshots/a9c5fe6fbc7e8b5f39952ff8ab96e882a95c36ac8995da542a0a6a98aa4e2ff0.json"
-observed_snapshot_fingerprint = "sha256:a9c5fe6fbc7e8b5f39952ff8ab96e882a95c36ac8995da542a0a6a98aa4e2ff0"
-subject_revision = "source-inventory:7a5f43e632f9e0ecba25f8b593330b247fd663641b0210a783fdb65fe85666da"
+observed_snapshot_path = ".flowguard/model-mesh/snapshots/1ee1a583d258e38725c6d94056f0cbd6bd30246028ff8179149884ac94ac7302.json"
+observed_snapshot_fingerprint = "sha256:1ee1a583d258e38725c6d94056f0cbd6bd30246028ff8179149884ac94ac7302"
+subject_revision = "source-inventory:f93a5189545117fe96c0e166624e0e47266597f13960b1c0afcb2aabec7136bf"
 coverage_status = "complete_within_declared_boundary"
-generation = 39
-accepted_revision_set_fingerprint = "sha256:8f1cc89a42134043424718a9826d0b995b7e5e3c1da1c8f46b5784ed20cedaea"
-previous_snapshot_fingerprint = "sha256:d6190abe4f53a5a3b965abc50b2133c2328c3b8114f5939519c4cb9e119ae893"
-activation_receipt_fingerprint = "sha256:6727bf1dd1ff83e5bdfadf586b9a6612031dff64664951a8c0c2c2a16aa60106"
-head_fingerprint = "sha256:648a185c163366b24cbd732d1e481eb36399597024d393c9da00d632da792f47"
+generation = 40
+accepted_revision_set_fingerprint = "sha256:348d60b05aadfa94fff928905725a91d731db4d4248a5c308d349174b4707cc4"
+previous_snapshot_fingerprint = "sha256:a9c5fe6fbc7e8b5f39952ff8ab96e882a95c36ac8995da542a0a6a98aa4e2ff0"
+activation_receipt_fingerprint = "sha256:5165247f82f38638a3c2233fd20406894fb41aff3c882d1809076e0834e65c5d"
+head_fingerprint = "sha256:60fe90c327d7d003992e14cf9f4fd0c10e2421a5122d627877012361b81bb8f8"

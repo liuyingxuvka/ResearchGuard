@@ -14,6 +14,8 @@
     ".flowguard/researchguard_suite_model.py",
     ".flowguard/researchguard_suite_model.json",
     ".flowguard/run_researchguard_suite_model.py",
+    "models/software_dna/researchguard.json",
+    "src/researchguard/software_dna.py",
     "src/researchguard/__init__.py",
     "src/researchguard/cli.py",
     "src/researchguard/routing.py",
@@ -200,10 +202,12 @@
       "input_globs": [
         ".flowguard/researchguard_suite/model.py",
         ".flowguard/researchguard_suite/run_checks.py",
-        ".flowguard/researchguard_suite_model.py",
-        ".flowguard/researchguard_suite_model.json",
-        ".flowguard/run_researchguard_suite_model.py",
-        "src/researchguard/__init__.py",
+    ".flowguard/researchguard_suite_model.py",
+    ".flowguard/researchguard_suite_model.json",
+    ".flowguard/run_researchguard_suite_model.py",
+    "models/software_dna/researchguard.json",
+    "src/researchguard/software_dna.py",
+    "src/researchguard/__init__.py",
         "src/researchguard/cli.py",
         "src/researchguard/routing.py",
         "src/researchguard/logic/admission.py",
@@ -247,7 +251,7 @@
       "model_kind": "executable_workflow",
       "purpose_closure": {
         "schema_version": "flowguard.model_purpose_closure.v1",
-        "model_instance_id": "regression:researchguard_suite:0.4.10",
+        "model_instance_id": "regression:researchguard_suite:0.4.11",
         "reusable_model_type_id": "researchguard_suite",
         "task_intent_id": "researchguard-regression:suite-route-and-decision-members",
         "declaration_phase": "before_candidate",
@@ -299,10 +303,10 @@
           "check:model-regression:researchguard_suite",
           "check:researchguard:native-suite"
         ],
-        "model_sha256": "sha256:a5abc3bf79b1d12a6b45cc0b43d536cbb7eb5538272518bc0945a0eaeee7a819",
-        "runner_sha256": "sha256:611e3bcbe9eebc31230d4822a2be8e984fa9064baf464e478863965a267051a7",
-        "declaration_fingerprint": "sha256:974fd8947d0ea8eb4b800105e4b87e5e64dd71e2bb5de616ba3c710239ee1053",
-        "closure_fingerprint": "sha256:0ac2867ecadd146f007d783b9eb8332defc6a9f2f8752ca323bd07b0027d8e28"
+        "model_sha256": "sha256:99604927108a5013b862e7ea2487699c5267bb66b07449e07b21c9c67a15d86e",
+        "runner_sha256": "sha256:2ee754b840a2b8f264136c6aae42d74de800b67ab6ce798a81e58536238c10b2",
+        "declaration_fingerprint": "sha256:f704ba41885a1796e025a038695c6c0abd6fb3d36ff817fdf127de0260e483b9",
+        "closure_fingerprint": "sha256:b053f074934fc3d252244630860645c94a5b6154fb52a86899e96b26e332e531"
       }
     },
     {
