@@ -66,6 +66,7 @@ def _run_child(model_id: str, *, parent_output: Path | None = None) -> tuple[dic
 def _case_ids() -> tuple[str, ...]:
     return (
         model.KNOWN_GOOD_CASE_ID,
+        f"boundary:{model.MODEL_ID}",
         *model.KNOWN_BAD_CASE_IDS,
     )
 
@@ -142,8 +143,12 @@ def _write_native_results(
             accepted = native_returncode == 0 and len(child_ids) == len(model.CHILD_MODEL_IDS)
             finding_id = ""
             raw_payload["probe"] = "native_suite_and_children"
+        elif index == 1:
+            accepted = native_returncode == 0
+            finding_id = ""
+            raw_payload["probe"] = "boundary_parent_contract"
         else:
-            failure_id, accepted, probe = probes[index - 1]
+            failure_id, accepted, probe = probes[index - 2]
             finding_id = failure_id
             raw_payload.update({"probe": probe, "protected_failure_id": failure_id, "probe_observed": accepted})
         raw = output_dir / f"researchguard-suite-raw-{index}.json"
