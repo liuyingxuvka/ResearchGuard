@@ -6,69 +6,53 @@
     "boundary_id": "researchguard-software-boundary-v2",
     "production_patterns": [
       "src/**/*.py",
-      "src/*.py",
       "scripts/**/*.py",
-      "scripts/*.py",
       ".flowguard/models/**/*.py",
-      ".flowguard/models/*.py",
-      ".flowguard/verification/**/*.py",
-      ".flowguard/verification/*.py"
+      ".flowguard/verification/**/*.py"
     ],
     "build_patterns": [],
     "config_patterns": [
       ".github/**/*",
-      ".github/*",
       ".gitignore",
       ".skillguard/**/*",
-      ".skillguard/*",
       ".flowguard/project.toml",
+      ".flowguard/layout.toml",
       "pyproject.toml",
       "AGENTS.md"
     ],
     "schema_patterns": [
       "src/**/*.json",
-      "src/*.json",
       "models/**/*",
-      "models/*",
       ".flowguard/models/**/*.json",
-      ".flowguard/models/*.json",
       ".flowguard/structure/*.json",
-      ".flowguard/project.toml",
-      ".skillguard/**/*.json",
-      ".skillguard/*.json"
+      "researchguard/prompt_bundle_manifest.json"
     ],
     "data_patterns": [
       "examples/**/*",
-      "examples/*",
-      "migration/**/*",
-      "migration/*"
+      "migration/**/*"
     ],
     "asset_patterns": [
       "skills/**/*",
-      "skills/*",
       "docs/**/*",
-      "docs/*",
       "references/**/*",
-      "references/*",
       "resources/**/*",
-      "resources/*",
       ".codex/**/*",
       "openspec/**/*",
-      "openspec/*",
       "README.md",
       "CHANGELOG.md",
-      "LICENSE"
+      "LICENSE",
+      "src/researchguard/logic_template_packs/catalog/README.md",
+      "src/researchguard/logic_viewer/assets/*.png",
+      "src/researchguard/logic_viewer/assets/*.ico"
     ],
     "migration_patterns": [],
     "test_oracle_patterns": [
-      "tests/**/*",
-      "tests/*"
+      "tests/**/*"
     ],
     "generated_patterns": [
       ".flowguard/evidence/**/*",
-      ".flowguard/evidence/*",
       ".flowguard/history/**/*",
-      ".flowguard/history/*"
+      "implementation-round2-evidence/**/*"
     ],
     "external_patterns": []
   },
@@ -85,9 +69,8 @@
   "scoped_out_patterns": [
     ".codex/**/*",
     ".flowguard/evidence/**/*",
-    ".flowguard/evidence/*",
     ".flowguard/history/**/*",
-    ".flowguard/history/*"
+    "implementation-round2-evidence/**/*"
   ],
   "bounded_dynamic_prefixes": [
     "getattr",

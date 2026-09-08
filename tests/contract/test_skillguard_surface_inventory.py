@@ -29,7 +29,12 @@ def _copy_member(tmp_path: Path, member: str = "logicguard") -> Path:
     return target
 
 
-@pytest.mark.parametrize("member", MEMBERS)
+# Keep this finite set literal so the FlowGuard test-inventory adapter can
+# prove the complete parameter universe without executing pytest discovery.
+@pytest.mark.parametrize(
+    "member",
+    ("experimentguard", "logicguard", "researchguard", "sourceguard", "traceguard"),
+)
 def test_current_generated_inventory_has_exact_structural_and_semantic_closure(member: str) -> None:
     mapping, inventory = build_member(ROOT, member, SCANNER)
     skill = ROOT / "skills" / member
