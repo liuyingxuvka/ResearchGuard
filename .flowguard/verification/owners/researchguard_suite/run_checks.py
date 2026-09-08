@@ -161,7 +161,7 @@ def _write_native_results(
                 outcome=outcome,
                 observed_status=observed,
                 observed_finding_codes=() if not finding_id else (finding_id,),
-                executed_dimensions=("input", "state", "output", "effect", "order", "completion"),
+                executed_dimensions=(("input", "error", "decision", "retry", "timeout", "completion") if index == 1 else ("input", "state", "output", "effect", "order", "completion")),
                 oracle_results=tuple(
                     {
                         "dimension": dimension,
@@ -169,7 +169,7 @@ def _write_native_results(
                         "status": observed,
                         "ok": accepted,
                     }
-                    for dimension in ("input", "state", "output", "effect", "order", "completion")
+                    for dimension in (("input", "error", "decision", "retry", "timeout", "completion") if index == 1 else ("input", "state", "output", "effect", "order", "completion"))
                 ),
                 result_artifact_fingerprint=raw_hash,
                 input_fingerprint=input_fp or raw_hash,
@@ -336,3 +336,4 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
