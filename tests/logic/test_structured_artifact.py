@@ -76,3 +76,17 @@ def test_structure_audit_flags_material_temporal_boundaries() -> None:
 
     assert "source_date_after_coverage" in codes
     assert "undated_current_state_source" in codes
+
+
+def test_structure_audit_requires_cross_unit_contribution_binding() -> None:
+    model = _artifact_model()
+    request = {
+        "units": [
+            {"unit_id": "u1", "parent_unit_id": None, "claim_ids": ["C2"], "placement": "body",
+             "progression_relation": "establishes", "predecessor_unit_ids": []},
+            {"unit_id": "u2", "parent_unit_id": "u1", "claim_ids": ["C1"], "placement": "body",
+             "progression_relation": "concludes", "predecessor_unit_ids": ["u1"]},
+        ]
+    }
+    codes = {finding.code for finding in audit_structure(model, request).findings}
+    assert "missing_parent_contribution" in codes

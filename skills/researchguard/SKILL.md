@@ -7,9 +7,9 @@ description: Route a genuinely ambiguous or cross-member research request to the
 
 ## Purpose
 
-ResearchGuard routes across four independent native members—`logicguard`,
+ResearchGuard routes ambiguity across four native members—`logicguard`,
 `sourceguard`, `traceguard`, and `experimentguard`—without duplicate work or
-silent retries.
+retries.
 
 ## Entrypoint Scope
 
@@ -20,10 +20,6 @@ member skills to classify.
 
 Extract `primary_action` and context facts only. Contracts derive admission;
 the router selects the unique smallest set covering each responsibility.
-
-## Use When
-
-Use the umbrella for ambiguity or several member responsibilities.
 
 ## Do Not Use When
 
@@ -60,16 +56,9 @@ the persistent anchor and immutable-receipt hashes; cache is not authority. A
 different target needs a separate anchor; there is no generic issuer or inline
 candidate-authoring path.
 
-There are two DNA layers: member-domain DNA for an external paper, model, test
-system, or workflow, and the separate ResearchGuard repository software-DNA root
-owned by FlowGuard. Member output becomes software-DNA evidence only when bound
-to exact current code and test owners. External qualification is target-neutral
-and adapter-selected; self-DNA exposes static, semantic, code-binding, and
-test-binding states, with stale FlowGuard qualification as a blocker.
-
-The target's native directory is the DNA authority. A member composition is only
-an in-memory working projection; it never replaces the directory, models, tests,
-or evidence bindings.
+Member-domain DNA is conditional. The separate ResearchGuard repository software-DNA root is FlowGuard-owned; only exact current code and test-owner
+bindings can qualify member output. The target's native directory remains the
+DNA authority, and a composition is only an in-memory working projection.
 
 Missing spans, stale fingerprints, unknown facts, incomplete forbidden reviews,
 zero coverage, equal minima, over-selection, or incomplete composition block

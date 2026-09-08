@@ -11,6 +11,7 @@ from researchguard.logic import (
     load_model_from_dict,
     paragraph_blueprint,
     synthesize_artifact_plan,
+    model_fingerprint,
 )
 
 
@@ -104,7 +105,14 @@ def test_paragraph_blueprint_can_include_citation_matrix() -> None:
 def test_synthesis_items_include_citation_matrix_handoff() -> None:
     model = load_model_from_dict(_model_dict())
 
-    plan = synthesize_artifact_plan(model, target_goal="draft the cautious conclusion", profile="report", max_items=1)
+    plan = synthesize_artifact_plan(model, selection_request={
+        "schema": "researchguard.logic.synthesis-request.v1", "request_id": "req", "target_id": "artifact",
+        "target_goal": "draft the cautious conclusion", "artifact_kind": "report", "reader_id": "reader",
+        "model_id": model.id, "model_fingerprint": model_fingerprint(model), "body_unit_order": ["u1"],
+        "max_body_units": 1, "units": [{"unit_id": "u1", "parent_unit_id": None, "reader_question": "What?",
+        "unit_job": "State conclusion", "claim_ids": ["C1"], "predecessor_unit_ids": [],
+        "progression_relation": "concludes", "editorial_prominence": "lead", "placement": "body",
+        "placement_reason": "required", "required": True}], "source_branch_bindings": []})
     item = plan.selected_items[0]
 
     assert item.node_id == "C1"

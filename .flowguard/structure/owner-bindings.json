@@ -1,0 +1,106 @@
+{
+  "schema": "flowguard.native_owner_model_bindings.v1",
+  "system_id": "flowguard",
+  "candidate_model_ids": [
+    "authoritative_model_system",
+    "compositional_verification_kernel",
+    "hierarchical_model_mesh",
+    "model_test_code_alignment",
+    "researchguard_suite",
+    "logic_synthesis",
+    "logic_selection_contract",
+    "argument_support_closure",
+    "discourse_structure",
+    "trace_domain_export"
+  ],
+  "bindings": [
+    {
+      "owner_route": "model_mesh_maintenance",
+      "model_ids": [
+        "hierarchical_model_mesh"
+      ],
+      "protected_failure_ids": [
+        "researchguard:hierarchical_model_mesh:root-unique",
+        "researchguard:hierarchical_model_mesh:parent-unique",
+        "researchguard:hierarchical_model_mesh:support-nonstructural",
+        "researchguard:hierarchical_model_mesh:child-evidence-exact",
+        "researchguard:hierarchical_model_mesh:loop-progress-current"
+      ]
+    },
+    {
+      "owner_route": "model_test_alignment",
+      "model_ids": [
+        "model_test_code_alignment"
+      ],
+      "protected_failure_ids": [
+        "researchguard:model_test_code_alignment:model-code-owner",
+        "researchguard:model_test_code_alignment:code-boundary",
+        "researchguard:model_test_code_alignment:test-owner",
+        "researchguard:model_test_code_alignment:io-oracle",
+        "researchguard:model_test_code_alignment:parent-not-leaf"
+      ]
+    },
+    {
+      "owner_route": "logic_synthesis",
+      "model_ids": [
+        "logic_synthesis"
+      ],
+      "protected_failure_ids": [
+        "researchguard:logic_synthesis:selection-request-required",
+        "researchguard:logic_synthesis:candidate-ledger-truncated",
+        "researchguard:logic_synthesis:omit-delivered-to-body",
+        "researchguard:logic_synthesis:foreign-support-closes-claim"
+      ]
+    },
+    {
+      "owner_route": "logic_selection_contract",
+      "model_ids": [
+        "logic_selection_contract"
+      ],
+      "protected_failure_ids": [
+        "researchguard:logic_selection_contract:legacy-top-n-fallback",
+        "researchguard:logic_selection_contract:body-order-incomplete",
+        "researchguard:logic_selection_contract:model-fingerprint-mismatch",
+        "researchguard:logic_selection_contract:binding-identity-invalid"
+      ]
+    },
+    {
+      "owner_route": "argument_support_closure",
+      "model_ids": [
+        "argument_support_closure"
+      ],
+      "protected_failure_ids": [
+        "researchguard:argument_support_closure:missing-selected-claim-support",
+        "researchguard:argument_support_closure:foreign-claim-support",
+        "researchguard:argument_support_closure:missing-argument-role",
+        "researchguard:argument_support_closure:cycle-not-terminated"
+      ]
+    },
+    {
+      "owner_route": "discourse_structure",
+      "model_ids": [
+        "discourse_structure"
+      ],
+      "protected_failure_ids": [
+        "researchguard:discourse_structure:missing-parent-contribution",
+        "researchguard:discourse_structure:missing-downstream-consumer",
+        "researchguard:discourse_structure:missing-sibling-progression",
+        "researchguard:discourse_structure:unrecovered-conclusion-obligation",
+        "researchguard:discourse_structure:missing-structure-input"
+      ]
+    },
+    {
+      "owner_route": "trace_domain_export",
+      "model_ids": [
+        "trace_domain_export"
+      ],
+      "protected_failure_ids": [
+        "researchguard:trace_domain_export:domain-proposition-missing",
+        "researchguard:trace_domain_export:mechanism-reference-missing",
+        "researchguard:trace_domain_export:audit-context-promoted-to-domain",
+        "researchguard:trace_domain_export:temporal-order-promoted-to-causality"
+      ]
+    }
+  ],
+  "claim_boundary": "Current role-shape owner declaration for the ten registered model IDs. This declaration licenses neither an observed authority snapshot nor installation or release readiness."
+}

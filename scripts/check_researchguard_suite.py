@@ -44,7 +44,7 @@ MEMBERS = (
     "traceguard",
     "experimentguard",
 )
-CURRENT_VERSION = "0.4.11"
+CURRENT_VERSION = "0.5.0"
 RETIRED_SKILL_IDS = (
     "logicguard-source-library",
     "logicguard-structured-artifact",
@@ -85,7 +85,7 @@ def _assert(condition: bool, message: str, checks: list[dict[str, str]]) -> None
 
 
 def _suite_model_version() -> str:
-    model_path = ROOT / ".flowguard" / "researchguard_suite_model.py"
+    model_path = ROOT / ".flowguard" / "models" / "owners" / "researchguard_suite" / "model.py"
     spec = importlib.util.spec_from_file_location(
         "researchguard_suite_currentness_model",
         model_path,
@@ -95,12 +95,19 @@ def _suite_model_version() -> str:
     module = importlib.util.module_from_spec(spec)
     sys.modules[spec.name] = module
     spec.loader.exec_module(module)
-    return str(module.CURRENT_RESEARCHGUARD_VERSION)
+    for attribute in ("CURRENT_RESEARCHGUARD_VERSION", "MODEL_VERSION", "VERSION"):
+        value = getattr(module, attribute, None)
+        if isinstance(value, str) and value:
+            return value
+    # Current owner wrappers intentionally expose the registered model graph,
+    # while the version lives in the canonical model-definition artifact.
+    # Read that artifact instead of importing the retired flat model path.
+    return _json_model_version()
 
 
 def _json_model_version() -> str:
     payload = json.loads(
-        (ROOT / ".flowguard" / "researchguard_suite_model.json").read_text(
+        (ROOT / ".flowguard" / "models" / "researchguard_suite" / "model-definition.json").read_text(
             encoding="utf-8"
         )
     )

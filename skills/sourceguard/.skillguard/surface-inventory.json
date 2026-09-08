@@ -1,0 +1,1064 @@
+{
+  "schema_version": "skillguard.surface_inventory.v1",
+  "inventory_id": "inventory:researchguard:sourceguard:surfaces",
+  "target_skill_id": "sourceguard",
+  "source_kind": "target-owned-full-source-discovery",
+  "source_paths": [
+    ".skillguard/contract-source.json",
+    "SKILL.md",
+    "agents/openai.yaml",
+    "references/broad-depth-and-closure.md",
+    "references/commands.md",
+    "references/information-blueprint.md",
+    "references/retrieval-workflow.md",
+    "references/safe-output.md",
+    "references/source-model-protocol.md",
+    "references/task-iteration.md",
+    "references/validated-template-pack.md",
+    "scripts/sourceguard_closure_check.py"
+  ],
+  "observed_surface_ids": [
+    "route:researchguard:sourceguard"
+  ],
+  "owner_ids": [
+    "owner:researchguard:sourceguard"
+  ],
+  "rows": [
+    {
+      "surface_id": "route:researchguard:sourceguard",
+      "kind": "route",
+      "name": "sourceguard native route",
+      "disposition": "governed",
+      "intent_id": "intent:researchguard:sourceguard",
+      "owner_id": "owner:researchguard:sourceguard",
+      "route_id": "route:researchguard:sourceguard",
+      "function_id": "function:researchguard:sourceguard",
+      "required_check_ids": [
+        "check:sourceguard:consumer-contract",
+        "check:sourceguard:native-tests",
+        "check:sourceguard:prompt-load",
+        "check:sourceguard:task-model-closure"
+      ],
+      "adequacy_check_ids": [
+        "check:sourceguard:consumer-contract",
+        "check:sourceguard:native-tests",
+        "check:sourceguard:prompt-load",
+        "check:sourceguard:task-model-closure"
+      ],
+      "evidence_subject_ids": [
+        "subject:researchguard:sourceguard:consumer-contract",
+        "subject:researchguard:sourceguard:native-tests",
+        "subject:researchguard:sourceguard:prompt-load",
+        "subject:researchguard:sourceguard:task-model-closure"
+      ]
+    }
+  ],
+  "current_obligation_ids": [
+    "obligation:researchguard:sourceguard:consumer-contract",
+    "obligation:researchguard:sourceguard:native-tests",
+    "obligation:researchguard:sourceguard:prompt-load",
+    "obligation:researchguard:sourceguard:task-model-closure"
+  ],
+  "model_obligations": [
+    {
+      "obligation_id": "obligation:researchguard:sourceguard:consumer-contract",
+      "disposition": "governed",
+      "surface_ids": [
+        "artifact:agents/openai.yaml",
+        "config:.skillguard/contract-source.json",
+        "template:SKILL.md",
+        "template:references/broad-depth-and-closure.md",
+        "template:references/commands.md",
+        "template:references/information-blueprint.md",
+        "template:references/retrieval-workflow.md",
+        "template:references/safe-output.md",
+        "template:references/source-model-protocol.md",
+        "template:references/task-iteration.md",
+        "template:references/validated-template-pack.md"
+      ],
+      "reason": "Explicit member author rules bind these source surfaces to this compiled obligation.",
+      "proof_ref": ".skillguard/surface-semantic-map.json#decision_rules"
+    },
+    {
+      "obligation_id": "obligation:researchguard:sourceguard:native-tests",
+      "disposition": "governed",
+      "surface_ids": [
+        "api:scripts/sourceguard_closure_check.py:check",
+        "api:scripts/sourceguard_closure_check.py:main",
+        "component:scripts/sourceguard_closure_check.py",
+        "config:.skillguard/contract-source.json",
+        "fault:scripts/sourceguard_closure_check.py:check",
+        "script:scripts/sourceguard_closure_check.py",
+        "template:references/broad-depth-and-closure.md",
+        "template:references/information-blueprint.md",
+        "template:references/retrieval-workflow.md",
+        "template:references/source-model-protocol.md",
+        "template:references/task-iteration.md",
+        "template:references/validated-template-pack.md",
+        "ui:scripts/sourceguard_closure_check.py:check"
+      ],
+      "reason": "Explicit member author rules bind these source surfaces to this compiled obligation.",
+      "proof_ref": ".skillguard/surface-semantic-map.json#decision_rules"
+    },
+    {
+      "obligation_id": "obligation:researchguard:sourceguard:prompt-load",
+      "disposition": "governed",
+      "surface_ids": [
+        "artifact:agents/openai.yaml",
+        "config:.skillguard/contract-source.json",
+        "template:SKILL.md",
+        "template:references/broad-depth-and-closure.md",
+        "template:references/commands.md",
+        "template:references/information-blueprint.md",
+        "template:references/retrieval-workflow.md",
+        "template:references/safe-output.md",
+        "template:references/source-model-protocol.md",
+        "template:references/task-iteration.md",
+        "template:references/validated-template-pack.md"
+      ],
+      "reason": "Explicit member author rules bind these source surfaces to this compiled obligation.",
+      "proof_ref": ".skillguard/surface-semantic-map.json#decision_rules"
+    },
+    {
+      "obligation_id": "obligation:researchguard:sourceguard:task-model-closure",
+      "disposition": "governed",
+      "surface_ids": [
+        "api:scripts/sourceguard_closure_check.py:check",
+        "api:scripts/sourceguard_closure_check.py:main",
+        "component:scripts/sourceguard_closure_check.py",
+        "config:.skillguard/contract-source.json",
+        "fault:scripts/sourceguard_closure_check.py:check",
+        "script:scripts/sourceguard_closure_check.py",
+        "template:references/broad-depth-and-closure.md",
+        "template:references/information-blueprint.md",
+        "template:references/retrieval-workflow.md",
+        "template:references/source-model-protocol.md",
+        "template:references/task-iteration.md",
+        "template:references/validated-template-pack.md",
+        "ui:scripts/sourceguard_closure_check.py:check"
+      ],
+      "reason": "Explicit member author rules bind these source surfaces to this compiled obligation.",
+      "proof_ref": ".skillguard/surface-semantic-map.json#decision_rules"
+    }
+  ],
+  "full_surface_ids": [
+    "api:scripts/sourceguard_closure_check.py:check",
+    "api:scripts/sourceguard_closure_check.py:main",
+    "artifact:agents/openai.yaml",
+    "component:scripts/sourceguard_closure_check.py",
+    "config:.skillguard/contract-source.json",
+    "fault:scripts/sourceguard_closure_check.py:check",
+    "script:scripts/sourceguard_closure_check.py",
+    "template:SKILL.md",
+    "template:references/broad-depth-and-closure.md",
+    "template:references/commands.md",
+    "template:references/information-blueprint.md",
+    "template:references/retrieval-workflow.md",
+    "template:references/safe-output.md",
+    "template:references/source-model-protocol.md",
+    "template:references/task-iteration.md",
+    "template:references/validated-template-pack.md",
+    "ui:scripts/sourceguard_closure_check.py:check"
+  ],
+  "full_surfaces": [
+    {
+      "surface_id": "api:scripts/sourceguard_closure_check.py:check",
+      "kind": "api",
+      "name": "scripts.sourceguard_closure_check.check",
+      "source_path": "scripts/sourceguard_closure_check.py",
+      "source_fingerprint": "sha256:acb9ee07fdebbf86f78f94d9f0581925b95f0b903acf63c70ca09df1619bd8d6",
+      "function_id": "scripts.sourceguard_closure_check.check",
+      "route_id": "api:scripts.sourceguard_closure_check.check",
+      "review_group_id": "group:surface:28454172d4f583e0321a7e15",
+      "review_granularity": "surface",
+      "model_obligation_ids": [
+        "obligation:researchguard:sourceguard:native-tests",
+        "obligation:researchguard:sourceguard:task-model-closure"
+      ],
+      "disposition": "governed",
+      "owner_id": "owner:researchguard:sourceguard",
+      "intent_id": "intent:sourceguard:e60f68187786de6a651f607d",
+      "obligation_ids": [
+        "obligation:researchguard:sourceguard:native-tests",
+        "obligation:researchguard:sourceguard:task-model-closure"
+      ],
+      "required_check_ids": [
+        "check:sourceguard:native-tests",
+        "check:sourceguard:task-model-closure"
+      ],
+      "adequacy_check_ids": [
+        "check:sourceguard:consumer-contract",
+        "check:sourceguard:native-tests",
+        "check:sourceguard:task-model-closure"
+      ],
+      "execution_owner_ids": [
+        "owner:researchguard:sourceguard:consumer-contract",
+        "owner:researchguard:sourceguard:native-tests",
+        "owner:researchguard:sourceguard:task-model-closure"
+      ],
+      "evidence_subject_ids": [
+        "subject:researchguard:sourceguard:consumer-contract",
+        "subject:researchguard:sourceguard:native-tests",
+        "subject:researchguard:sourceguard:task-model-closure"
+      ],
+      "lifecycle_phase": "native-consumer-runtime",
+      "consumer_exposure": "declared-member-skill",
+      "write_authority": "target-owned-native-route"
+    },
+    {
+      "surface_id": "api:scripts/sourceguard_closure_check.py:main",
+      "kind": "api",
+      "name": "scripts.sourceguard_closure_check.main",
+      "source_path": "scripts/sourceguard_closure_check.py",
+      "source_fingerprint": "sha256:acb9ee07fdebbf86f78f94d9f0581925b95f0b903acf63c70ca09df1619bd8d6",
+      "function_id": "scripts.sourceguard_closure_check.main",
+      "route_id": "api:scripts.sourceguard_closure_check.main",
+      "review_group_id": "group:surface:a4f2497ad1aa6d58c6d597c9",
+      "review_granularity": "surface",
+      "model_obligation_ids": [
+        "obligation:researchguard:sourceguard:native-tests",
+        "obligation:researchguard:sourceguard:task-model-closure"
+      ],
+      "disposition": "governed",
+      "owner_id": "owner:researchguard:sourceguard",
+      "intent_id": "intent:sourceguard:e60f68187786de6a651f607d",
+      "obligation_ids": [
+        "obligation:researchguard:sourceguard:native-tests",
+        "obligation:researchguard:sourceguard:task-model-closure"
+      ],
+      "required_check_ids": [
+        "check:sourceguard:native-tests",
+        "check:sourceguard:task-model-closure"
+      ],
+      "adequacy_check_ids": [
+        "check:sourceguard:consumer-contract",
+        "check:sourceguard:native-tests",
+        "check:sourceguard:task-model-closure"
+      ],
+      "execution_owner_ids": [
+        "owner:researchguard:sourceguard:consumer-contract",
+        "owner:researchguard:sourceguard:native-tests",
+        "owner:researchguard:sourceguard:task-model-closure"
+      ],
+      "evidence_subject_ids": [
+        "subject:researchguard:sourceguard:consumer-contract",
+        "subject:researchguard:sourceguard:native-tests",
+        "subject:researchguard:sourceguard:task-model-closure"
+      ],
+      "lifecycle_phase": "native-consumer-runtime",
+      "consumer_exposure": "declared-member-skill",
+      "write_authority": "target-owned-native-route"
+    },
+    {
+      "surface_id": "artifact:agents/openai.yaml",
+      "kind": "artifact",
+      "name": "agents/openai.yaml",
+      "source_path": "agents/openai.yaml",
+      "source_fingerprint": "sha256:5d3886b359f8356d2febf64d29be7baafee6d785857bfed2590c10767c1d408a",
+      "function_id": "artifact:agents/openai.yaml",
+      "route_id": "artifact:agents/openai.yaml",
+      "review_group_id": "group:surface:d9efd0b752469e1fc3464d11",
+      "review_granularity": "surface",
+      "model_obligation_ids": [
+        "obligation:researchguard:sourceguard:consumer-contract",
+        "obligation:researchguard:sourceguard:prompt-load"
+      ],
+      "disposition": "governed",
+      "owner_id": "owner:researchguard:sourceguard",
+      "intent_id": "intent:sourceguard:fe0e1cdbff0640369ade4093",
+      "obligation_ids": [
+        "obligation:researchguard:sourceguard:consumer-contract",
+        "obligation:researchguard:sourceguard:prompt-load"
+      ],
+      "required_check_ids": [
+        "check:sourceguard:consumer-contract",
+        "check:sourceguard:prompt-load"
+      ],
+      "adequacy_check_ids": [
+        "check:sourceguard:consumer-contract",
+        "check:sourceguard:prompt-load",
+        "check:sourceguard:task-model-closure"
+      ],
+      "execution_owner_ids": [
+        "owner:researchguard:sourceguard:consumer-contract",
+        "owner:researchguard:sourceguard:prompt-load",
+        "owner:researchguard:sourceguard:task-model-closure"
+      ],
+      "evidence_subject_ids": [
+        "subject:researchguard:sourceguard:consumer-contract",
+        "subject:researchguard:sourceguard:prompt-load",
+        "subject:researchguard:sourceguard:task-model-closure"
+      ],
+      "lifecycle_phase": "native-consumer-runtime",
+      "consumer_exposure": "declared-member-skill",
+      "write_authority": "target-owned-native-route"
+    },
+    {
+      "surface_id": "component:scripts/sourceguard_closure_check.py",
+      "kind": "component",
+      "name": "scripts.sourceguard_closure_check.__private_components__",
+      "source_path": "scripts/sourceguard_closure_check.py",
+      "source_fingerprint": "sha256:acb9ee07fdebbf86f78f94d9f0581925b95f0b903acf63c70ca09df1619bd8d6",
+      "function_id": "component:scripts.sourceguard_closure_check",
+      "route_id": "component:scripts.sourceguard_closure_check",
+      "review_group_id": "group:component:800badf05fc0cd66e248c77b",
+      "review_granularity": "component",
+      "component_members": [
+        "_finding",
+        "_load_json",
+        "_open_statuses",
+        "_run"
+      ],
+      "model_obligation_ids": [
+        "obligation:researchguard:sourceguard:native-tests",
+        "obligation:researchguard:sourceguard:task-model-closure"
+      ],
+      "disposition": "governed",
+      "owner_id": "owner:researchguard:sourceguard",
+      "intent_id": "intent:sourceguard:e60f68187786de6a651f607d",
+      "obligation_ids": [
+        "obligation:researchguard:sourceguard:native-tests",
+        "obligation:researchguard:sourceguard:task-model-closure"
+      ],
+      "required_check_ids": [
+        "check:sourceguard:native-tests",
+        "check:sourceguard:task-model-closure"
+      ],
+      "adequacy_check_ids": [
+        "check:sourceguard:consumer-contract",
+        "check:sourceguard:native-tests",
+        "check:sourceguard:task-model-closure"
+      ],
+      "execution_owner_ids": [
+        "owner:researchguard:sourceguard:consumer-contract",
+        "owner:researchguard:sourceguard:native-tests",
+        "owner:researchguard:sourceguard:task-model-closure"
+      ],
+      "evidence_subject_ids": [
+        "subject:researchguard:sourceguard:consumer-contract",
+        "subject:researchguard:sourceguard:native-tests",
+        "subject:researchguard:sourceguard:task-model-closure"
+      ],
+      "lifecycle_phase": "native-consumer-runtime",
+      "consumer_exposure": "declared-member-skill",
+      "write_authority": "target-owned-native-route"
+    },
+    {
+      "surface_id": "config:.skillguard/contract-source.json",
+      "kind": "config",
+      "name": ".skillguard/contract-source.json",
+      "source_path": ".skillguard/contract-source.json",
+      "source_fingerprint": "sha256:bf01cf4c2259fd8b6a83765345541509512a0ca91bd3a08115279cb997f2d2f6",
+      "function_id": "config:.skillguard/contract-source.json",
+      "route_id": "config:.skillguard/contract-source.json",
+      "review_group_id": "group:surface:10513a60240614296b758ebb",
+      "review_granularity": "surface",
+      "model_obligation_ids": [
+        "obligation:researchguard:sourceguard:consumer-contract",
+        "obligation:researchguard:sourceguard:native-tests",
+        "obligation:researchguard:sourceguard:prompt-load",
+        "obligation:researchguard:sourceguard:task-model-closure"
+      ],
+      "disposition": "governed",
+      "owner_id": "owner:researchguard:sourceguard",
+      "intent_id": "intent:sourceguard:90cb0467ab75e156b4230ae9",
+      "obligation_ids": [
+        "obligation:researchguard:sourceguard:consumer-contract",
+        "obligation:researchguard:sourceguard:native-tests",
+        "obligation:researchguard:sourceguard:prompt-load",
+        "obligation:researchguard:sourceguard:task-model-closure"
+      ],
+      "required_check_ids": [
+        "check:sourceguard:consumer-contract",
+        "check:sourceguard:native-tests",
+        "check:sourceguard:prompt-load",
+        "check:sourceguard:task-model-closure"
+      ],
+      "adequacy_check_ids": [
+        "check:sourceguard:consumer-contract",
+        "check:sourceguard:native-tests",
+        "check:sourceguard:prompt-load",
+        "check:sourceguard:task-model-closure"
+      ],
+      "execution_owner_ids": [
+        "owner:researchguard:sourceguard:consumer-contract",
+        "owner:researchguard:sourceguard:native-tests",
+        "owner:researchguard:sourceguard:prompt-load",
+        "owner:researchguard:sourceguard:task-model-closure"
+      ],
+      "evidence_subject_ids": [
+        "subject:researchguard:sourceguard:consumer-contract",
+        "subject:researchguard:sourceguard:native-tests",
+        "subject:researchguard:sourceguard:prompt-load",
+        "subject:researchguard:sourceguard:task-model-closure"
+      ],
+      "lifecycle_phase": "author-maintenance",
+      "consumer_exposure": "excluded-author-contract",
+      "write_authority": "author-contract-only"
+    },
+    {
+      "surface_id": "fault:scripts/sourceguard_closure_check.py:check",
+      "kind": "fault",
+      "name": "scripts.sourceguard_closure_check.check",
+      "source_path": "scripts/sourceguard_closure_check.py",
+      "source_fingerprint": "sha256:acb9ee07fdebbf86f78f94d9f0581925b95f0b903acf63c70ca09df1619bd8d6",
+      "function_id": "scripts.sourceguard_closure_check.check",
+      "route_id": "fault:scripts.sourceguard_closure_check.check",
+      "review_group_id": "group:component:800badf05fc0cd66e248c77b",
+      "review_granularity": "component",
+      "model_obligation_ids": [
+        "obligation:researchguard:sourceguard:native-tests",
+        "obligation:researchguard:sourceguard:task-model-closure"
+      ],
+      "disposition": "governed",
+      "owner_id": "owner:researchguard:sourceguard",
+      "intent_id": "intent:sourceguard:e60f68187786de6a651f607d",
+      "obligation_ids": [
+        "obligation:researchguard:sourceguard:native-tests",
+        "obligation:researchguard:sourceguard:task-model-closure"
+      ],
+      "required_check_ids": [
+        "check:sourceguard:native-tests",
+        "check:sourceguard:task-model-closure"
+      ],
+      "adequacy_check_ids": [
+        "check:sourceguard:consumer-contract",
+        "check:sourceguard:native-tests",
+        "check:sourceguard:task-model-closure"
+      ],
+      "execution_owner_ids": [
+        "owner:researchguard:sourceguard:consumer-contract",
+        "owner:researchguard:sourceguard:native-tests",
+        "owner:researchguard:sourceguard:task-model-closure"
+      ],
+      "evidence_subject_ids": [
+        "subject:researchguard:sourceguard:consumer-contract",
+        "subject:researchguard:sourceguard:native-tests",
+        "subject:researchguard:sourceguard:task-model-closure"
+      ],
+      "lifecycle_phase": "native-consumer-runtime",
+      "consumer_exposure": "declared-member-skill",
+      "write_authority": "target-owned-native-route"
+    },
+    {
+      "surface_id": "script:scripts/sourceguard_closure_check.py",
+      "kind": "script",
+      "name": "scripts/sourceguard_closure_check.py",
+      "source_path": "scripts/sourceguard_closure_check.py",
+      "source_fingerprint": "sha256:acb9ee07fdebbf86f78f94d9f0581925b95f0b903acf63c70ca09df1619bd8d6",
+      "function_id": "scripts.sourceguard_closure_check.main",
+      "route_id": "entry:scripts/sourceguard_closure_check.py",
+      "review_group_id": "group:surface:f62bd099ee6643600bcf615f",
+      "review_granularity": "surface",
+      "model_obligation_ids": [
+        "obligation:researchguard:sourceguard:native-tests",
+        "obligation:researchguard:sourceguard:task-model-closure"
+      ],
+      "disposition": "governed",
+      "owner_id": "owner:researchguard:sourceguard",
+      "intent_id": "intent:sourceguard:e60f68187786de6a651f607d",
+      "obligation_ids": [
+        "obligation:researchguard:sourceguard:native-tests",
+        "obligation:researchguard:sourceguard:task-model-closure"
+      ],
+      "required_check_ids": [
+        "check:sourceguard:native-tests",
+        "check:sourceguard:task-model-closure"
+      ],
+      "adequacy_check_ids": [
+        "check:sourceguard:consumer-contract",
+        "check:sourceguard:native-tests",
+        "check:sourceguard:task-model-closure"
+      ],
+      "execution_owner_ids": [
+        "owner:researchguard:sourceguard:consumer-contract",
+        "owner:researchguard:sourceguard:native-tests",
+        "owner:researchguard:sourceguard:task-model-closure"
+      ],
+      "evidence_subject_ids": [
+        "subject:researchguard:sourceguard:consumer-contract",
+        "subject:researchguard:sourceguard:native-tests",
+        "subject:researchguard:sourceguard:task-model-closure"
+      ],
+      "lifecycle_phase": "native-consumer-runtime",
+      "consumer_exposure": "declared-member-skill",
+      "write_authority": "target-owned-native-route"
+    },
+    {
+      "surface_id": "template:SKILL.md",
+      "kind": "template",
+      "name": "SKILL.md",
+      "source_path": "SKILL.md",
+      "source_fingerprint": "sha256:d2f6401932766ccfe64d175b19ff9033d15d30d1304ef0c62bd78936de9829c4",
+      "function_id": "template:SKILL.md",
+      "route_id": "template:SKILL.md",
+      "review_group_id": "group:surface:45d8dca86b7e8a7dd698b75b",
+      "review_granularity": "surface",
+      "model_obligation_ids": [
+        "obligation:researchguard:sourceguard:consumer-contract",
+        "obligation:researchguard:sourceguard:prompt-load"
+      ],
+      "disposition": "governed",
+      "owner_id": "owner:researchguard:sourceguard",
+      "intent_id": "intent:sourceguard:fe0e1cdbff0640369ade4093",
+      "obligation_ids": [
+        "obligation:researchguard:sourceguard:consumer-contract",
+        "obligation:researchguard:sourceguard:prompt-load"
+      ],
+      "required_check_ids": [
+        "check:sourceguard:consumer-contract",
+        "check:sourceguard:prompt-load"
+      ],
+      "adequacy_check_ids": [
+        "check:sourceguard:consumer-contract",
+        "check:sourceguard:prompt-load",
+        "check:sourceguard:task-model-closure"
+      ],
+      "execution_owner_ids": [
+        "owner:researchguard:sourceguard:consumer-contract",
+        "owner:researchguard:sourceguard:prompt-load",
+        "owner:researchguard:sourceguard:task-model-closure"
+      ],
+      "evidence_subject_ids": [
+        "subject:researchguard:sourceguard:consumer-contract",
+        "subject:researchguard:sourceguard:prompt-load",
+        "subject:researchguard:sourceguard:task-model-closure"
+      ],
+      "lifecycle_phase": "native-consumer-runtime",
+      "consumer_exposure": "declared-member-skill",
+      "write_authority": "target-owned-native-route"
+    },
+    {
+      "surface_id": "template:references/broad-depth-and-closure.md",
+      "kind": "template",
+      "name": "references/broad-depth-and-closure.md",
+      "source_path": "references/broad-depth-and-closure.md",
+      "source_fingerprint": "sha256:8a3bcd40d171fa75343b5e944fa39be2e56398895b827832dc52db1b79adc405",
+      "function_id": "template:references/broad-depth-and-closure.md",
+      "route_id": "template:references/broad-depth-and-closure.md",
+      "review_group_id": "group:surface:2a1f78cfb888b903e123957c",
+      "review_granularity": "surface",
+      "model_obligation_ids": [
+        "obligation:researchguard:sourceguard:consumer-contract",
+        "obligation:researchguard:sourceguard:native-tests",
+        "obligation:researchguard:sourceguard:prompt-load",
+        "obligation:researchguard:sourceguard:task-model-closure"
+      ],
+      "disposition": "governed",
+      "owner_id": "owner:researchguard:sourceguard",
+      "intent_id": "intent:sourceguard:dd5f9164514acc92c5b96f86",
+      "obligation_ids": [
+        "obligation:researchguard:sourceguard:consumer-contract",
+        "obligation:researchguard:sourceguard:native-tests",
+        "obligation:researchguard:sourceguard:prompt-load",
+        "obligation:researchguard:sourceguard:task-model-closure"
+      ],
+      "required_check_ids": [
+        "check:sourceguard:consumer-contract",
+        "check:sourceguard:native-tests",
+        "check:sourceguard:prompt-load",
+        "check:sourceguard:task-model-closure"
+      ],
+      "adequacy_check_ids": [
+        "check:sourceguard:consumer-contract",
+        "check:sourceguard:native-tests",
+        "check:sourceguard:prompt-load",
+        "check:sourceguard:task-model-closure"
+      ],
+      "execution_owner_ids": [
+        "owner:researchguard:sourceguard:consumer-contract",
+        "owner:researchguard:sourceguard:native-tests",
+        "owner:researchguard:sourceguard:prompt-load",
+        "owner:researchguard:sourceguard:task-model-closure"
+      ],
+      "evidence_subject_ids": [
+        "subject:researchguard:sourceguard:consumer-contract",
+        "subject:researchguard:sourceguard:native-tests",
+        "subject:researchguard:sourceguard:prompt-load",
+        "subject:researchguard:sourceguard:task-model-closure"
+      ],
+      "lifecycle_phase": "native-consumer-runtime",
+      "consumer_exposure": "declared-member-skill",
+      "write_authority": "target-owned-native-route"
+    },
+    {
+      "surface_id": "template:references/commands.md",
+      "kind": "template",
+      "name": "references/commands.md",
+      "source_path": "references/commands.md",
+      "source_fingerprint": "sha256:d072cef526db35e6370ea0fb6dcb2cc0fb1fcd67c1937508585345e4a6a73f4d",
+      "function_id": "template:references/commands.md",
+      "route_id": "template:references/commands.md",
+      "review_group_id": "group:surface:caeb036aedbd15c588458812",
+      "review_granularity": "surface",
+      "model_obligation_ids": [
+        "obligation:researchguard:sourceguard:consumer-contract",
+        "obligation:researchguard:sourceguard:prompt-load"
+      ],
+      "disposition": "governed",
+      "owner_id": "owner:researchguard:sourceguard",
+      "intent_id": "intent:sourceguard:fe0e1cdbff0640369ade4093",
+      "obligation_ids": [
+        "obligation:researchguard:sourceguard:consumer-contract",
+        "obligation:researchguard:sourceguard:prompt-load"
+      ],
+      "required_check_ids": [
+        "check:sourceguard:consumer-contract",
+        "check:sourceguard:prompt-load"
+      ],
+      "adequacy_check_ids": [
+        "check:sourceguard:consumer-contract",
+        "check:sourceguard:prompt-load",
+        "check:sourceguard:task-model-closure"
+      ],
+      "execution_owner_ids": [
+        "owner:researchguard:sourceguard:consumer-contract",
+        "owner:researchguard:sourceguard:prompt-load",
+        "owner:researchguard:sourceguard:task-model-closure"
+      ],
+      "evidence_subject_ids": [
+        "subject:researchguard:sourceguard:consumer-contract",
+        "subject:researchguard:sourceguard:prompt-load",
+        "subject:researchguard:sourceguard:task-model-closure"
+      ],
+      "lifecycle_phase": "native-consumer-runtime",
+      "consumer_exposure": "declared-member-skill",
+      "write_authority": "target-owned-native-route"
+    },
+    {
+      "surface_id": "template:references/information-blueprint.md",
+      "kind": "template",
+      "name": "references/information-blueprint.md",
+      "source_path": "references/information-blueprint.md",
+      "source_fingerprint": "sha256:dfb837ad8c3cef1cd78ef4d8fe2907559657777fefbbee561cdef25934286aed",
+      "function_id": "template:references/information-blueprint.md",
+      "route_id": "template:references/information-blueprint.md",
+      "review_group_id": "group:surface:952348174a8187dcd8803442",
+      "review_granularity": "surface",
+      "model_obligation_ids": [
+        "obligation:researchguard:sourceguard:consumer-contract",
+        "obligation:researchguard:sourceguard:native-tests",
+        "obligation:researchguard:sourceguard:prompt-load",
+        "obligation:researchguard:sourceguard:task-model-closure"
+      ],
+      "disposition": "governed",
+      "owner_id": "owner:researchguard:sourceguard",
+      "intent_id": "intent:sourceguard:dd5f9164514acc92c5b96f86",
+      "obligation_ids": [
+        "obligation:researchguard:sourceguard:consumer-contract",
+        "obligation:researchguard:sourceguard:native-tests",
+        "obligation:researchguard:sourceguard:prompt-load",
+        "obligation:researchguard:sourceguard:task-model-closure"
+      ],
+      "required_check_ids": [
+        "check:sourceguard:consumer-contract",
+        "check:sourceguard:native-tests",
+        "check:sourceguard:prompt-load",
+        "check:sourceguard:task-model-closure"
+      ],
+      "adequacy_check_ids": [
+        "check:sourceguard:consumer-contract",
+        "check:sourceguard:native-tests",
+        "check:sourceguard:prompt-load",
+        "check:sourceguard:task-model-closure"
+      ],
+      "execution_owner_ids": [
+        "owner:researchguard:sourceguard:consumer-contract",
+        "owner:researchguard:sourceguard:native-tests",
+        "owner:researchguard:sourceguard:prompt-load",
+        "owner:researchguard:sourceguard:task-model-closure"
+      ],
+      "evidence_subject_ids": [
+        "subject:researchguard:sourceguard:consumer-contract",
+        "subject:researchguard:sourceguard:native-tests",
+        "subject:researchguard:sourceguard:prompt-load",
+        "subject:researchguard:sourceguard:task-model-closure"
+      ],
+      "lifecycle_phase": "native-consumer-runtime",
+      "consumer_exposure": "declared-member-skill",
+      "write_authority": "target-owned-native-route"
+    },
+    {
+      "surface_id": "template:references/retrieval-workflow.md",
+      "kind": "template",
+      "name": "references/retrieval-workflow.md",
+      "source_path": "references/retrieval-workflow.md",
+      "source_fingerprint": "sha256:61a68a8faeea7b95cddbb5d00eb86b4f447f2f4576296583d181aa50c085ce7d",
+      "function_id": "template:references/retrieval-workflow.md",
+      "route_id": "template:references/retrieval-workflow.md",
+      "review_group_id": "group:surface:36f6f747cb3ebe4e236cb492",
+      "review_granularity": "surface",
+      "model_obligation_ids": [
+        "obligation:researchguard:sourceguard:consumer-contract",
+        "obligation:researchguard:sourceguard:native-tests",
+        "obligation:researchguard:sourceguard:prompt-load",
+        "obligation:researchguard:sourceguard:task-model-closure"
+      ],
+      "disposition": "governed",
+      "owner_id": "owner:researchguard:sourceguard",
+      "intent_id": "intent:sourceguard:dd5f9164514acc92c5b96f86",
+      "obligation_ids": [
+        "obligation:researchguard:sourceguard:consumer-contract",
+        "obligation:researchguard:sourceguard:native-tests",
+        "obligation:researchguard:sourceguard:prompt-load",
+        "obligation:researchguard:sourceguard:task-model-closure"
+      ],
+      "required_check_ids": [
+        "check:sourceguard:consumer-contract",
+        "check:sourceguard:native-tests",
+        "check:sourceguard:prompt-load",
+        "check:sourceguard:task-model-closure"
+      ],
+      "adequacy_check_ids": [
+        "check:sourceguard:consumer-contract",
+        "check:sourceguard:native-tests",
+        "check:sourceguard:prompt-load",
+        "check:sourceguard:task-model-closure"
+      ],
+      "execution_owner_ids": [
+        "owner:researchguard:sourceguard:consumer-contract",
+        "owner:researchguard:sourceguard:native-tests",
+        "owner:researchguard:sourceguard:prompt-load",
+        "owner:researchguard:sourceguard:task-model-closure"
+      ],
+      "evidence_subject_ids": [
+        "subject:researchguard:sourceguard:consumer-contract",
+        "subject:researchguard:sourceguard:native-tests",
+        "subject:researchguard:sourceguard:prompt-load",
+        "subject:researchguard:sourceguard:task-model-closure"
+      ],
+      "lifecycle_phase": "native-consumer-runtime",
+      "consumer_exposure": "declared-member-skill",
+      "write_authority": "target-owned-native-route"
+    },
+    {
+      "surface_id": "template:references/safe-output.md",
+      "kind": "template",
+      "name": "references/safe-output.md",
+      "source_path": "references/safe-output.md",
+      "source_fingerprint": "sha256:567f5c7f4d0297d45d03e67b182efeb352201cd7337a7e04c20a69538f5ec332",
+      "function_id": "template:references/safe-output.md",
+      "route_id": "template:references/safe-output.md",
+      "review_group_id": "group:surface:4a07c71b4adc019f0d02687c",
+      "review_granularity": "surface",
+      "model_obligation_ids": [
+        "obligation:researchguard:sourceguard:consumer-contract",
+        "obligation:researchguard:sourceguard:prompt-load"
+      ],
+      "disposition": "governed",
+      "owner_id": "owner:researchguard:sourceguard",
+      "intent_id": "intent:sourceguard:fe0e1cdbff0640369ade4093",
+      "obligation_ids": [
+        "obligation:researchguard:sourceguard:consumer-contract",
+        "obligation:researchguard:sourceguard:prompt-load"
+      ],
+      "required_check_ids": [
+        "check:sourceguard:consumer-contract",
+        "check:sourceguard:prompt-load"
+      ],
+      "adequacy_check_ids": [
+        "check:sourceguard:consumer-contract",
+        "check:sourceguard:prompt-load",
+        "check:sourceguard:task-model-closure"
+      ],
+      "execution_owner_ids": [
+        "owner:researchguard:sourceguard:consumer-contract",
+        "owner:researchguard:sourceguard:prompt-load",
+        "owner:researchguard:sourceguard:task-model-closure"
+      ],
+      "evidence_subject_ids": [
+        "subject:researchguard:sourceguard:consumer-contract",
+        "subject:researchguard:sourceguard:prompt-load",
+        "subject:researchguard:sourceguard:task-model-closure"
+      ],
+      "lifecycle_phase": "native-consumer-runtime",
+      "consumer_exposure": "declared-member-skill",
+      "write_authority": "target-owned-native-route"
+    },
+    {
+      "surface_id": "template:references/source-model-protocol.md",
+      "kind": "template",
+      "name": "references/source-model-protocol.md",
+      "source_path": "references/source-model-protocol.md",
+      "source_fingerprint": "sha256:2210fbcd73a57039199b498a975b3a76f33db9c5d9441bd4bdf6c193cc760ba3",
+      "function_id": "template:references/source-model-protocol.md",
+      "route_id": "template:references/source-model-protocol.md",
+      "review_group_id": "group:surface:4560a7f042261f66bd3b77c3",
+      "review_granularity": "surface",
+      "model_obligation_ids": [
+        "obligation:researchguard:sourceguard:consumer-contract",
+        "obligation:researchguard:sourceguard:native-tests",
+        "obligation:researchguard:sourceguard:prompt-load",
+        "obligation:researchguard:sourceguard:task-model-closure"
+      ],
+      "disposition": "governed",
+      "owner_id": "owner:researchguard:sourceguard",
+      "intent_id": "intent:sourceguard:dd5f9164514acc92c5b96f86",
+      "obligation_ids": [
+        "obligation:researchguard:sourceguard:consumer-contract",
+        "obligation:researchguard:sourceguard:native-tests",
+        "obligation:researchguard:sourceguard:prompt-load",
+        "obligation:researchguard:sourceguard:task-model-closure"
+      ],
+      "required_check_ids": [
+        "check:sourceguard:consumer-contract",
+        "check:sourceguard:native-tests",
+        "check:sourceguard:prompt-load",
+        "check:sourceguard:task-model-closure"
+      ],
+      "adequacy_check_ids": [
+        "check:sourceguard:consumer-contract",
+        "check:sourceguard:native-tests",
+        "check:sourceguard:prompt-load",
+        "check:sourceguard:task-model-closure"
+      ],
+      "execution_owner_ids": [
+        "owner:researchguard:sourceguard:consumer-contract",
+        "owner:researchguard:sourceguard:native-tests",
+        "owner:researchguard:sourceguard:prompt-load",
+        "owner:researchguard:sourceguard:task-model-closure"
+      ],
+      "evidence_subject_ids": [
+        "subject:researchguard:sourceguard:consumer-contract",
+        "subject:researchguard:sourceguard:native-tests",
+        "subject:researchguard:sourceguard:prompt-load",
+        "subject:researchguard:sourceguard:task-model-closure"
+      ],
+      "lifecycle_phase": "native-consumer-runtime",
+      "consumer_exposure": "declared-member-skill",
+      "write_authority": "target-owned-native-route"
+    },
+    {
+      "surface_id": "template:references/task-iteration.md",
+      "kind": "template",
+      "name": "references/task-iteration.md",
+      "source_path": "references/task-iteration.md",
+      "source_fingerprint": "sha256:36fb77792b1bf71a36e01ef259aa1fd3d33b0f1420ffa5502715d3b0ea22decf",
+      "function_id": "template:references/task-iteration.md",
+      "route_id": "template:references/task-iteration.md",
+      "review_group_id": "group:surface:809ce1156abc5a1e1791d5fc",
+      "review_granularity": "surface",
+      "model_obligation_ids": [
+        "obligation:researchguard:sourceguard:consumer-contract",
+        "obligation:researchguard:sourceguard:native-tests",
+        "obligation:researchguard:sourceguard:prompt-load",
+        "obligation:researchguard:sourceguard:task-model-closure"
+      ],
+      "disposition": "governed",
+      "owner_id": "owner:researchguard:sourceguard",
+      "intent_id": "intent:sourceguard:dd5f9164514acc92c5b96f86",
+      "obligation_ids": [
+        "obligation:researchguard:sourceguard:consumer-contract",
+        "obligation:researchguard:sourceguard:native-tests",
+        "obligation:researchguard:sourceguard:prompt-load",
+        "obligation:researchguard:sourceguard:task-model-closure"
+      ],
+      "required_check_ids": [
+        "check:sourceguard:consumer-contract",
+        "check:sourceguard:native-tests",
+        "check:sourceguard:prompt-load",
+        "check:sourceguard:task-model-closure"
+      ],
+      "adequacy_check_ids": [
+        "check:sourceguard:consumer-contract",
+        "check:sourceguard:native-tests",
+        "check:sourceguard:prompt-load",
+        "check:sourceguard:task-model-closure"
+      ],
+      "execution_owner_ids": [
+        "owner:researchguard:sourceguard:consumer-contract",
+        "owner:researchguard:sourceguard:native-tests",
+        "owner:researchguard:sourceguard:prompt-load",
+        "owner:researchguard:sourceguard:task-model-closure"
+      ],
+      "evidence_subject_ids": [
+        "subject:researchguard:sourceguard:consumer-contract",
+        "subject:researchguard:sourceguard:native-tests",
+        "subject:researchguard:sourceguard:prompt-load",
+        "subject:researchguard:sourceguard:task-model-closure"
+      ],
+      "lifecycle_phase": "native-consumer-runtime",
+      "consumer_exposure": "declared-member-skill",
+      "write_authority": "target-owned-native-route"
+    },
+    {
+      "surface_id": "template:references/validated-template-pack.md",
+      "kind": "template",
+      "name": "references/validated-template-pack.md",
+      "source_path": "references/validated-template-pack.md",
+      "source_fingerprint": "sha256:9129046a39c30230416e3333cb2b83c7d4f3fb4515aa9b0c5e6d8393a75b9ce1",
+      "function_id": "template:references/validated-template-pack.md",
+      "route_id": "template:references/validated-template-pack.md",
+      "review_group_id": "group:surface:89e914963ae4efc7acd320e1",
+      "review_granularity": "surface",
+      "model_obligation_ids": [
+        "obligation:researchguard:sourceguard:consumer-contract",
+        "obligation:researchguard:sourceguard:native-tests",
+        "obligation:researchguard:sourceguard:prompt-load",
+        "obligation:researchguard:sourceguard:task-model-closure"
+      ],
+      "disposition": "governed",
+      "owner_id": "owner:researchguard:sourceguard",
+      "intent_id": "intent:sourceguard:dd5f9164514acc92c5b96f86",
+      "obligation_ids": [
+        "obligation:researchguard:sourceguard:consumer-contract",
+        "obligation:researchguard:sourceguard:native-tests",
+        "obligation:researchguard:sourceguard:prompt-load",
+        "obligation:researchguard:sourceguard:task-model-closure"
+      ],
+      "required_check_ids": [
+        "check:sourceguard:consumer-contract",
+        "check:sourceguard:native-tests",
+        "check:sourceguard:prompt-load",
+        "check:sourceguard:task-model-closure"
+      ],
+      "adequacy_check_ids": [
+        "check:sourceguard:consumer-contract",
+        "check:sourceguard:native-tests",
+        "check:sourceguard:prompt-load",
+        "check:sourceguard:task-model-closure"
+      ],
+      "execution_owner_ids": [
+        "owner:researchguard:sourceguard:consumer-contract",
+        "owner:researchguard:sourceguard:native-tests",
+        "owner:researchguard:sourceguard:prompt-load",
+        "owner:researchguard:sourceguard:task-model-closure"
+      ],
+      "evidence_subject_ids": [
+        "subject:researchguard:sourceguard:consumer-contract",
+        "subject:researchguard:sourceguard:native-tests",
+        "subject:researchguard:sourceguard:prompt-load",
+        "subject:researchguard:sourceguard:task-model-closure"
+      ],
+      "lifecycle_phase": "native-consumer-runtime",
+      "consumer_exposure": "declared-member-skill",
+      "write_authority": "target-owned-native-route"
+    },
+    {
+      "surface_id": "ui:scripts/sourceguard_closure_check.py:check",
+      "kind": "ui",
+      "name": "scripts.sourceguard_closure_check.check",
+      "source_path": "scripts/sourceguard_closure_check.py",
+      "source_fingerprint": "sha256:acb9ee07fdebbf86f78f94d9f0581925b95f0b903acf63c70ca09df1619bd8d6",
+      "function_id": "scripts.sourceguard_closure_check.check",
+      "route_id": "ui:scripts.sourceguard_closure_check.check",
+      "review_group_id": "group:surface:682de7aa65bbd7f4cdea33a2",
+      "review_granularity": "surface",
+      "model_obligation_ids": [
+        "obligation:researchguard:sourceguard:native-tests",
+        "obligation:researchguard:sourceguard:task-model-closure"
+      ],
+      "disposition": "governed",
+      "owner_id": "owner:researchguard:sourceguard",
+      "intent_id": "intent:sourceguard:e60f68187786de6a651f607d",
+      "obligation_ids": [
+        "obligation:researchguard:sourceguard:native-tests",
+        "obligation:researchguard:sourceguard:task-model-closure"
+      ],
+      "required_check_ids": [
+        "check:sourceguard:native-tests",
+        "check:sourceguard:task-model-closure"
+      ],
+      "adequacy_check_ids": [
+        "check:sourceguard:consumer-contract",
+        "check:sourceguard:native-tests",
+        "check:sourceguard:task-model-closure"
+      ],
+      "execution_owner_ids": [
+        "owner:researchguard:sourceguard:consumer-contract",
+        "owner:researchguard:sourceguard:native-tests",
+        "owner:researchguard:sourceguard:task-model-closure"
+      ],
+      "evidence_subject_ids": [
+        "subject:researchguard:sourceguard:consumer-contract",
+        "subject:researchguard:sourceguard:native-tests",
+        "subject:researchguard:sourceguard:task-model-closure"
+      ],
+      "lifecycle_phase": "native-consumer-runtime",
+      "consumer_exposure": "declared-member-skill",
+      "write_authority": "target-owned-native-route"
+    }
+  ],
+  "surface_category_dispositions": {
+    "command": {
+      "disposition": "not_applicable_proven",
+      "reason": "Current skill-root scan contains no command surfaces; this says nothing about native package surfaces outside that root.",
+      "proof_ref": ".skillguard/surface-inventory.json#full_discovery_fingerprint"
+    },
+    "api": {
+      "disposition": "governed",
+      "reason": "Current skill-root scan contains explicitly mapped api surfaces; this says nothing about native package surfaces outside that root.",
+      "proof_ref": ".skillguard/surface-inventory.json#full_discovery_fingerprint"
+    },
+    "script": {
+      "disposition": "governed",
+      "reason": "Current skill-root scan contains explicitly mapped script surfaces; this says nothing about native package surfaces outside that root.",
+      "proof_ref": ".skillguard/surface-inventory.json#full_discovery_fingerprint"
+    },
+    "route": {
+      "disposition": "not_applicable_proven",
+      "reason": "Current skill-root scan contains no route surfaces; this says nothing about native package surfaces outside that root.",
+      "proof_ref": ".skillguard/surface-inventory.json#full_discovery_fingerprint"
+    },
+    "template": {
+      "disposition": "governed",
+      "reason": "Current skill-root scan contains explicitly mapped template surfaces; this says nothing about native package surfaces outside that root.",
+      "proof_ref": ".skillguard/surface-inventory.json#full_discovery_fingerprint"
+    },
+    "config": {
+      "disposition": "governed",
+      "reason": "Current skill-root scan contains explicitly mapped config surfaces; this says nothing about native package surfaces outside that root.",
+      "proof_ref": ".skillguard/surface-inventory.json#full_discovery_fingerprint"
+    },
+    "installer": {
+      "disposition": "not_applicable_proven",
+      "reason": "Current skill-root scan contains no installer surfaces; this says nothing about native package surfaces outside that root.",
+      "proof_ref": ".skillguard/surface-inventory.json#full_discovery_fingerprint"
+    },
+    "ui": {
+      "disposition": "governed",
+      "reason": "Current skill-root scan contains explicitly mapped ui surfaces; this says nothing about native package surfaces outside that root.",
+      "proof_ref": ".skillguard/surface-inventory.json#full_discovery_fingerprint"
+    },
+    "effect": {
+      "disposition": "not_applicable_proven",
+      "reason": "Current skill-root scan contains no effect surfaces; this says nothing about native package surfaces outside that root.",
+      "proof_ref": ".skillguard/surface-inventory.json#full_discovery_fingerprint"
+    },
+    "fault": {
+      "disposition": "governed",
+      "reason": "Current skill-root scan contains explicitly mapped fault surfaces; this says nothing about native package surfaces outside that root.",
+      "proof_ref": ".skillguard/surface-inventory.json#full_discovery_fingerprint"
+    },
+    "recovery": {
+      "disposition": "not_applicable_proven",
+      "reason": "Current skill-root scan contains no recovery surfaces; this says nothing about native package surfaces outside that root.",
+      "proof_ref": ".skillguard/surface-inventory.json#full_discovery_fingerprint"
+    },
+    "artifact": {
+      "disposition": "governed",
+      "reason": "Current skill-root scan contains explicitly mapped artifact surfaces; this says nothing about native package surfaces outside that root.",
+      "proof_ref": ".skillguard/surface-inventory.json#full_discovery_fingerprint"
+    },
+    "provider": {
+      "disposition": "not_applicable_proven",
+      "reason": "Current skill-root scan contains no provider surfaces; this says nothing about native package surfaces outside that root.",
+      "proof_ref": ".skillguard/surface-inventory.json#full_discovery_fingerprint"
+    },
+    "component": {
+      "disposition": "governed",
+      "reason": "Current skill-root scan contains explicitly mapped component surfaces; this says nothing about native package surfaces outside that root.",
+      "proof_ref": ".skillguard/surface-inventory.json#full_discovery_fingerprint"
+    }
+  },
+  "full_discovery_fingerprint": "sha256:3b25e4f8c94fac2490cef9f919eb6987f643905bb99605da63180bfcc10920c5",
+  "adequacy_check_ids": [
+    "check:sourceguard:consumer-contract",
+    "check:sourceguard:native-tests",
+    "check:sourceguard:prompt-load",
+    "check:sourceguard:task-model-closure"
+  ],
+  "model_deepening_check_id": "check:sourceguard:task-model-closure",
+  "claim_boundary": "The declared member skill root is the source-discovery boundary. Its native package is separately bound by the contract's implementation paths and check inputs. This author map proves neither native check execution nor domain correctness, installation, release, or future AI behavior.",
+  "inventory_hash": "sha256:40e1e1225879bf57d42e494d66a41f2198b34b8b42e09759c51007a197240a1b"
+}

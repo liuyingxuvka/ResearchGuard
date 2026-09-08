@@ -3,8 +3,12 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
+
 from researchguard.software_dna import (
     READINESS_LAYERS,
+    REPOSITORY_BOUNDARY_FILES,
+    REPOSITORY_BOUNDARY_ROOTS,
     _readiness,
     build_provider_neutral_inventory,
     check_software_dna_contract,
@@ -54,8 +58,70 @@ def test_generated_runtime_outputs_cannot_enter_the_denominator() -> None:
 
     assert not any(path.startswith(".flowguard/evidence/") for path in paths)
     assert not any(path.startswith(".flowguard/model-mesh/") for path in paths)
+    assert not any(path.startswith(".flowguard/history/") for path in paths)
+    assert not any(path.startswith(".flowguard/models/authority/") for path in paths)
     assert not any("/__pycache__/" in f"/{path}/" for path in paths)
     assert "models/software_dna/researchguard.json" in paths
+    assert ".flowguard/models/researchguard_suite/model-definition.json" in paths
+
+
+@pytest.mark.parametrize(
+    "runtime_root",
+    (".flowguard/evidence", ".flowguard/history", ".flowguard/models/authority"),
+)
+def test_current_layout_runtime_outputs_do_not_change_source_inventory(
+    tmp_path: Path, runtime_root: str
+) -> None:
+    for relative in REPOSITORY_BOUNDARY_ROOTS:
+        (tmp_path / relative).mkdir(parents=True, exist_ok=True)
+    for relative in REPOSITORY_BOUNDARY_FILES:
+        (tmp_path / relative).write_text("", encoding="utf-8")
+    source_model = tmp_path / ".flowguard/models/current-model.json"
+    source_model.parent.mkdir(parents=True, exist_ok=True)
+    source_model.write_text('{"contract": "current"}', encoding="utf-8")
+    baseline = build_provider_neutral_inventory(tmp_path)
+    assert baseline["ready"] is True
+
+    runtime_file = tmp_path / runtime_root / "receipt.json"
+    runtime_file.parent.mkdir(parents=True, exist_ok=True)
+    runtime_file.write_text("invalid historical or generated JSON", encoding="utf-8")
+    with_runtime = build_provider_neutral_inventory(tmp_path)
+    assert with_runtime["ready"] is True
+    assert with_runtime["inventory_fingerprint"] == baseline["inventory_fingerprint"]
+
+    # The nearby executable-model source remains in the denominator: the
+    # runtime exclusion must not expand to the entire current models role.
+    source_model.write_text("invalid current source JSON", encoding="utf-8")
+    broken_source = build_provider_neutral_inventory(tmp_path)
+    assert broken_source["ready"] is False
+    assert any(
+        gap["code"] == "inventory_parse_error"
+        and gap["path"] == ".flowguard/models/current-model.json"
+        for gap in broken_source["gaps"]
+    )
+
+
+def test_suite_topology_evidence_uses_the_current_model_resource() -> None:
+    payload = json.loads(Path("models/software_dna/researchguard.json").read_text(encoding="utf-8"))
+    topology_path = ".flowguard/models/researchguard_suite/model-definition.json"
+    expected_blocks = {
+        "block:researchguard-suite:route",
+        "block:logicguard:boundary",
+        "block:sourceguard:boundary",
+        "block:traceguard:boundary",
+        "block:experimentguard:boundary",
+    }
+    bound_blocks = {
+        block["block_id"]
+        for model in payload["models"]
+        for block in model["function_blocks"]
+        if block["evidence_binding"]["path"] == topology_path
+    }
+    assert bound_blocks == expected_blocks
+    topology = json.loads(Path(topology_path).read_text(encoding="utf-8"))
+    assert topology["software_dna"]["model_path"] == "models/software_dna/researchguard.json"
+    assert topology["software_dna"]["root_model_id"] == "researchguard-suite"
+    assert topology["software_dna"]["readiness_layer_count"] == len(READINESS_LAYERS)
 
 
 def test_canonical_pointer_is_external_and_not_self_fingerprinted() -> None:

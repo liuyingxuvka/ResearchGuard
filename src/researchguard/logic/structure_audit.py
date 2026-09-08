@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 import re
-from typing import Any
+from typing import Any, Mapping
 
 from .importance import importance_for_node
 from .model import LogicModel
@@ -51,9 +51,22 @@ class StructureAuditReport:
         return "\n".join(lines) + "\n"
 
 
-def audit_structure(model: LogicModel) -> StructureAuditReport:
+def audit_structure(model: LogicModel, selection_request: Mapping[str, Any] | Any | None = None) -> StructureAuditReport:
     blocks = [block for block in ordered_artifact_blocks(model) if block.node_type in {"Section", "ArgumentBlock"}]
     findings: list[StructureFinding] = []
+    if selection_request is None:
+        findings.append(
+            StructureFinding(
+                "coverage_gap",
+                "error",
+                (),
+                "No current selection request was supplied, so cross-unit contribution flow cannot be audited.",
+                "Provide the current selection request; a model-only artifact scan is local diagnostics, not a complete synthesis audit.",
+                {"scope": "local_only"},
+            )
+        )
+    else:
+        findings.extend(_audit_unit_contributions(model, selection_request))
     findings.extend(_missing_handoffs(model, blocks))
     findings.extend(_late_limitations(model, blocks))
     findings.extend(_overloaded_blocks(model, blocks))
@@ -61,6 +74,215 @@ def audit_structure(model: LogicModel) -> StructureAuditReport:
     findings.extend(_duplicate_claims(model, blocks))
     findings.extend(_temporal_context_findings(model, blocks))
     return StructureAuditReport(model.id, tuple(_dedupe(findings)))
+
+
+def _audit_unit_contributions(model: LogicModel, request: Mapping[str, Any] | Any) -> list[StructureFinding]:
+    """Check the cross-block contribution declared by the A03 unit request.
+
+    A local support edge only proves local support. It does not prove that a
+    unit advances the selected artifact argument or is consumed downstream.
+    """
+    raw_units = request.get("units", ()) if isinstance(request, Mapping) else getattr(request, "units", ())
+    if isinstance(raw_units, Mapping) or not isinstance(raw_units, (list, tuple)) or not raw_units:
+        return [StructureFinding("coverage_gap", "error", (),
+            "No structured argument units were supplied for cross-block contribution audit.",
+            "Provide the current selection request with complete unit, parent, and downstream bindings.", {})]
+    units = [dict(item) if isinstance(item, Mapping) else item.to_dict() for item in raw_units]
+    by_id: dict[str, dict[str, Any]] = {}
+    findings: list[StructureFinding] = []
+    for index, unit in enumerate(units):
+        unit_id = str(unit.get("unit_id", "") or "")
+        if not unit_id:
+            findings.append(StructureFinding(
+                "coverage_gap", "error", (f"unit[{index}]",),
+                "A structured argument unit has no stable identifier.",
+                "Supply a unique unit_id for every unit.", {},
+            ))
+            continue
+        if unit_id in by_id:
+            findings.append(StructureFinding(
+                "duplicate_unit", "error", (unit_id,),
+                "The current composition contains more than one unit with the same identifier.",
+                "Assign each unit a unique identifier before auditing contribution flow.", {},
+            ))
+            continue
+        by_id[unit_id] = unit
+
+    raw_order = request.get("body_unit_order", ()) if isinstance(request, Mapping) else getattr(request, "body_unit_order", ())
+    body_order = tuple(str(value) for value in raw_order if str(value)) if isinstance(raw_order, (list, tuple)) else ()
+    if not body_order:
+        # An order is required for a complete cross-unit audit.  The supplied
+        # list is used only to make diagnostics deterministic; it is never a
+        # success substitute for the explicit order validated by synthesis.
+        body_order = tuple(
+            str(unit.get("unit_id", ""))
+            for unit in units
+            if str(unit.get("unit_id", "")) and str(unit.get("placement", "")) == "body"
+        )
+        findings.append(StructureFinding(
+            "coverage_gap", "error", (),
+            "The composition does not provide an explicit body_unit_order.",
+            "Provide the current reader-selected body order so sibling and downstream obligations can be checked.",
+            {"derived_order_for_diagnostics": list(body_order)},
+        ))
+    order_index = {unit_id: index for index, unit_id in enumerate(body_order)}
+    body_ids = {unit_id for unit_id, unit in by_id.items() if str(unit.get("placement", "")) == "body"}
+    unknown_order_ids = sorted(set(body_order).difference(by_id))
+    if unknown_order_ids:
+        findings.append(StructureFinding(
+            "coverage_gap", "error", tuple(unknown_order_ids),
+            "The body order references units that are absent from the current composition.",
+            "Use each admitted body unit exactly once in body_unit_order.",
+            {"unknown_unit_ids": unknown_order_ids},
+        ))
+    if set(body_order) != body_ids:
+        findings.append(StructureFinding(
+            "coverage_gap", "error", tuple(sorted(body_ids)),
+            "The explicit body order does not cover exactly the body units in the composition.",
+            "Reconcile body_unit_order with unit placement before reviewing contribution flow.",
+            {"body_unit_ids": sorted(body_ids), "body_unit_order": list(body_order)},
+        ))
+
+    root_claim = model.root_claim
+    consumers: dict[str, list[str]] = {unit_id: [] for unit_id in by_id}
+    for unit in by_id.values():
+        unit_id = str(unit.get("unit_id", ""))
+        for predecessor in unit.get("predecessor_unit_ids", ()) if isinstance(unit.get("predecessor_unit_ids", ()), (list, tuple)) else ():
+            if str(predecessor) in consumers:
+                consumers[str(predecessor)].append(unit_id)
+    # Only native model relationships prove that one unit contributes to or
+    # consumes another.  Caller-provided strings such as ``contributes_to``
+    # and ``parent_unit_ids`` are intentionally ignored.
+    def _claims(unit: Mapping[str, Any]) -> set[str]:
+        values = unit.get("claim_ids", ())
+        return {str(value) for value in values} if isinstance(values, (list, tuple, set)) else set()
+
+    def _related(left: Mapping[str, Any], right: Mapping[str, Any]) -> bool:
+        left_claims, right_claims = _claims(left), _claims(right)
+        if not left_claims or not right_claims:
+            return False
+        forward = {"supports", "depends_on", "refines", "derives", "aggregates", "explains", "contextualizes", "qualifies", "attacks", "undercuts", "contradicts"}
+        reverse_dependency = {"depends_on", "refines", "derives", "aggregates", "explains", "contextualizes"}
+        for edge in model.edges:
+            if edge.source in left_claims and edge.target in right_claims and edge.type in forward:
+                return True
+            if edge.source in right_claims and edge.target in left_claims and edge.type in reverse_dependency:
+                return True
+        return False
+
+    for unit in by_id.values():
+        unit_id = str(unit.get("unit_id", ""))
+        claim_ids = _claims(unit)
+        parent_id = str(unit.get("parent_unit_id", "") or "")
+        if parent_id and parent_id not in by_id:
+            findings.append(StructureFinding("missing_parent_contribution", "error", (unit_id,),
+                "The unit names a parent unit that is absent from the current composition.",
+                "Bind the unit to an existing parent unit or explicitly make it a root unit.", {"parent_unit_id": parent_id}))
+        if parent_id in by_id:
+            parent_claims = _claims(by_id[parent_id])
+            if not _related(unit, by_id[parent_id]):
+                findings.append(StructureFinding("missing_parent_contribution", "error", (parent_id, unit_id),
+                    "The unit has local claims but no declared or modeled contribution to its parent unit.",
+                    "Add a real native relation between a child claim and a parent claim; a caller string cannot substitute for that relation.",
+                    {"parent_unit_id": parent_id, "claim_ids": sorted(claim_ids), "parent_claim_ids": sorted(parent_claims)}))
+        placement = str(unit.get("placement", "") or "")
+
+        if root_claim and root_claim in claim_ids and (placement != "body" or str(unit.get("progression_relation", "")) != "concludes"):
+            findings.append(StructureFinding("unrecovered_conclusion_obligation", "error", (unit_id,),
+                "The model root conclusion is not recovered by a concluding body unit.",
+                "Place the root claim in a body unit with progression_relation=concludes.", {"root_claim": root_claim, "placement": placement}))
+
+    # Siblings are checked per parent.  The first unit in each parent group is
+    # allowed to have no predecessor; every subsequent body sibling needs an
+    # earlier sibling and a native relation proving why it follows.
+    sibling_groups: dict[str, list[dict[str, Any]]] = {}
+    for unit in by_id.values():
+        if str(unit.get("placement", "")) != "body":
+            continue
+        parent_id = str(unit.get("parent_unit_id", "") or "<root>")
+        sibling_groups.setdefault(parent_id, []).append(unit)
+    for parent_id, siblings in sibling_groups.items():
+        siblings.sort(key=lambda row: (order_index.get(str(row.get("unit_id", "")), 10**9), str(row.get("unit_id", ""))))
+        for position, unit in enumerate(siblings):
+            if position == 0:
+                continue
+            unit_id = str(unit.get("unit_id", ""))
+            predecessors = {str(value) for value in unit.get("predecessor_unit_ids", ())} if isinstance(unit.get("predecessor_unit_ids", ()), (list, tuple, set)) else set()
+            earlier_siblings = {str(row.get("unit_id", "")) for row in siblings[:position]}
+            valid_predecessors = predecessors.intersection(earlier_siblings)
+            if not valid_predecessors or not any(_related(by_id[pred], unit) for pred in valid_predecessors):
+                findings.append(StructureFinding("missing_sibling_progression", "error", (parent_id, unit_id),
+                    "A body sibling has no earlier sibling with a native relation explaining its position.",
+                    "Declare an earlier sibling predecessor and connect the corresponding claims with a valid model relation.",
+                    {"parent_unit_id": parent_id, "earlier_sibling_ids": sorted(earlier_siblings), "predecessor_unit_ids": sorted(predecessors)}))
+
+    # A body unit must have a visible later consumer unless it is the explicit
+    # conclusion.  Merely naming a predecessor does not establish consumption.
+    for unit_id, unit in by_id.items():
+        if str(unit.get("placement", "")) != "body":
+            continue
+        claim_ids = _claims(unit)
+        is_conclusion = str(unit.get("progression_relation", "")) == "concludes" and (not root_claim or root_claim in claim_ids)
+        if is_conclusion:
+            continue
+        later_consumers = []
+        for candidate_id, candidate in by_id.items():
+            if candidate_id == unit_id or str(candidate.get("placement", "")) != "body":
+                continue
+            if order_index.get(candidate_id, 10**9) <= order_index.get(unit_id, -1):
+                continue
+            predecessors = candidate.get("predecessor_unit_ids", ())
+            if isinstance(predecessors, (list, tuple, set)) and unit_id in {str(value) for value in predecessors} and _related(unit, candidate):
+                later_consumers.append(candidate_id)
+        if not later_consumers:
+            findings.append(StructureFinding("missing_downstream_consumer", "error", (unit_id,),
+                "A body unit is not consumed by a later body unit through a native model relation and is not the concluding unit.",
+                "Bind it to a later visible consumer with predecessor_unit_ids and a valid cross-unit claim relation.",
+                {"unit_id": unit_id, "progression_relation": unit.get("progression_relation", "")}))
+
+    if root_claim and not any(root_claim in _claims(unit) and str(unit.get("placement", "")) == "body" and str(unit.get("progression_relation", "")) == "concludes" for unit in by_id.values()):
+        findings.append(StructureFinding("unrecovered_conclusion_obligation", "error", (),
+            "The selected unit request does not contain the model root conclusion.",
+            "Add the root claim to the concluding unit or provide a native disposition for the conclusion obligation.", {"root_claim": root_claim}))
+
+    # A child obligation is also an ancestor obligation.  Keep this explicit
+    # in the report so a grandchild gap cannot be mistaken for a local repair:
+    # every real parent on the path remains non-closed until the descendant is
+    # repaired.  This is deliberately derived from the validated parent graph
+    # and never from caller strings such as ``parent_unit_ids``.
+    blocking_units = {
+        affected
+        for finding in findings
+        if finding.severity in {"error", "critical"}
+        for affected in finding.affected_blocks
+        if affected in by_id
+    }
+    ancestors: dict[str, tuple[str, ...]] = {}
+    for unit_id in by_id:
+        path: list[str] = []
+        cursor = str(by_id[unit_id].get("parent_unit_id", "") or "")
+        seen: set[str] = set()
+        while cursor in by_id and cursor not in seen:
+            path.append(cursor)
+            seen.add(cursor)
+            cursor = str(by_id[cursor].get("parent_unit_id", "") or "")
+        ancestors[unit_id] = tuple(path)
+    propagated: set[tuple[str, str]] = set()
+    for blocked in sorted(blocking_units):
+        for ancestor in ancestors.get(blocked, ()):
+            key = (ancestor, blocked)
+            if key in propagated:
+                continue
+            propagated.add(key)
+            findings.append(StructureFinding(
+                "ancestor_nonclosure",
+                "error",
+                (ancestor, blocked),
+                "A descendant unit has an unresolved contribution obligation, so each real ancestor remains non-closed.",
+                "Repair the descendant's native contribution and re-run the complete parent-to-root audit.",
+                {"ancestor_unit_id": ancestor, "blocked_descendant_unit_id": blocked},
+            ))
+    return findings
 
 
 def _missing_handoffs(model: LogicModel, blocks: list[ArtifactBlock]) -> list[StructureFinding]:

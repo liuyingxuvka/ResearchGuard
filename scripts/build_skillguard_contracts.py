@@ -30,7 +30,7 @@ TEST_MESH_MAINTENANCE_INPUTS = (
     ".skillguard/test-mesh.json",
     "scripts/check_researchguard_test_mesh.py",
 )
-RESEARCHGUARD_VERSION = "0.4.11"
+RESEARCHGUARD_VERSION = "0.5.0"
 
 # Freshness inputs for the integration owner; the builder does not copy or
 # regenerate the native software-DNA model.
@@ -38,7 +38,7 @@ RESEARCHGUARD_SOFTWARE_DNA_INPUTS = (
     "models/software_dna/researchguard.json",
     "src/researchguard/software_dna.py",
 )
-FLOWGUARD_VERSION = "0.68.14"
+FLOWGUARD_VERSION = "0.69.0"
 SKILLGUARD_VERSION = "0.7.2"
 
 BLUEPRINT_COMPONENTS = {
@@ -146,6 +146,7 @@ TEST_ARGS = {
         "tests/test_zero_residuals.py",
         "tests/test_external_domain_dna_real_paper.py",
         "tests/test_external_scope_authority.py",
+        "tests/contract/test_skillguard_surface_inventory.py",
         "-q",
     ],
     "logicguard": ["-m", "pytest", "tests/logic", "-q"],
@@ -156,7 +157,13 @@ TEST_ARGS = {
 
 ITERATION_TEST_ARGS = {
     "researchguard": ["-m", "pytest", "tests/experiment", "tests/logic", "tests/source", "tests/trace", "-q"],
-    "logicguard": ["-m", "pytest", "tests/logic/test_task_iteration.py", "-q"],
+    "logicguard": [
+        "-m",
+        "pytest",
+        "tests/logic/test_task_iteration.py",
+        "tests/logic/test_synthesis_native_closure.py",
+        "-q",
+    ],
     "sourceguard": ["-m", "pytest", "tests/source/test_task_iteration.py", "-q"],
     "traceguard": ["-m", "pytest", "tests/trace/test_task_iteration.py", "-q"],
     "experimentguard": ["-m", "pytest", "tests/experiment/test_recommendation.py", "-q"],
@@ -177,12 +184,14 @@ IMPLEMENTATION_PATHS = {
         "src/researchguard/source/admission.py",
         "src/researchguard/trace/admission.py",
         "src/researchguard/experiment/admission.py",
-        ".flowguard/researchguard_suite_model.py",
-        ".flowguard/researchguard_suite_model.json",
-        ".flowguard/run_researchguard_suite_model.py",
-        ".flowguard/researchguard_skill_contract_model.py",
-        ".flowguard/researchguard_skill_contract_model_common.py",
+        ".flowguard/models/researchguard_suite_model.py",
+        ".flowguard/models/researchguard_suite/model-definition.json",
+        ".flowguard/verification/run_researchguard_suite_model.py",
+        ".flowguard/models/researchguard_skill_contract_model.py",
+        ".flowguard/models/researchguard_skill_contract_model_common.py",
         "scripts/build_skillguard_contracts.py",
+        "scripts/author/build_skillguard_surface_inventory.py",
+        "tests/contract/test_skillguard_surface_inventory.py",
         "scripts/compile_external_domain_dna_examples.py",
         "scripts/check_researchguard_suite.py",
         "scripts/check_zero_residuals.py",
@@ -210,43 +219,43 @@ IMPLEMENTATION_PATHS = {
         "src/researchguard/logic",
         "src/researchguard/logic_template_packs",
         "src/researchguard/logic_viewer",
-        ".flowguard/researchguard_suite_model.py",
-        ".flowguard/researchguard_suite_model.json",
-        ".flowguard/run_researchguard_suite_model.py",
-        ".flowguard/logicguard_skill_contract_model.py",
-        ".flowguard/researchguard_skill_contract_model_common.py",
+        ".flowguard/models/researchguard_suite_model.py",
+        ".flowguard/models/researchguard_suite/model-definition.json",
+        ".flowguard/verification/run_researchguard_suite_model.py",
+        ".flowguard/models/logicguard_skill_contract_model.py",
+        ".flowguard/models/researchguard_skill_contract_model_common.py",
         "tests/logic",
     ],
     "sourceguard": [
         "skills/sourceguard",
         "src/researchguard/source",
-        ".flowguard/researchguard_suite_model.py",
-        ".flowguard/researchguard_suite_model.json",
-        ".flowguard/run_researchguard_suite_model.py",
-        ".flowguard/sourceguard_content_anchor_oracle_model.py",
-        ".flowguard/sourceguard_skill_contract_model.py",
-        ".flowguard/researchguard_skill_contract_model_common.py",
+        ".flowguard/models/researchguard_suite_model.py",
+        ".flowguard/models/researchguard_suite/model-definition.json",
+        ".flowguard/verification/run_researchguard_suite_model.py",
+        ".flowguard/models/sourceguard_content_anchor_oracle_model.py",
+        ".flowguard/models/sourceguard_skill_contract_model.py",
+        ".flowguard/models/researchguard_skill_contract_model_common.py",
         "examples/source",
         "tests/source",
     ],
     "traceguard": [
         "skills/traceguard",
         "src/researchguard/trace",
-        ".flowguard/researchguard_suite_model.py",
-        ".flowguard/researchguard_suite_model.json",
-        ".flowguard/run_researchguard_suite_model.py",
-        ".flowguard/traceguard_skill_contract_model.py",
-        ".flowguard/researchguard_skill_contract_model_common.py",
+        ".flowguard/models/researchguard_suite_model.py",
+        ".flowguard/models/researchguard_suite/model-definition.json",
+        ".flowguard/verification/run_researchguard_suite_model.py",
+        ".flowguard/models/traceguard_skill_contract_model.py",
+        ".flowguard/models/researchguard_skill_contract_model_common.py",
         "tests/trace",
     ],
     "experimentguard": [
         "skills/experimentguard",
         "src/researchguard/experiment",
-        ".flowguard/researchguard_suite_model.py",
-        ".flowguard/researchguard_suite_model.json",
-        ".flowguard/run_researchguard_suite_model.py",
-        ".flowguard/experimentguard_skill_contract_model.py",
-        ".flowguard/researchguard_skill_contract_model_common.py",
+        ".flowguard/models/researchguard_suite_model.py",
+        ".flowguard/models/researchguard_suite/model-definition.json",
+        ".flowguard/verification/run_researchguard_suite_model.py",
+        ".flowguard/models/experimentguard_skill_contract_model.py",
+        ".flowguard/models/researchguard_skill_contract_model_common.py",
         "tests/experiment",
     ],
 }
@@ -418,23 +427,23 @@ def contract(member: str) -> dict:
                 {"kind": "path", "path": "scripts/check_researchguard_suite.py"},
                 {
                     "kind": "path",
-                    "path": ".flowguard/researchguard_suite_model.py",
+                    "path": ".flowguard/models/researchguard_suite_model.py",
                 },
                 {
                     "kind": "path",
-                    "path": ".flowguard/researchguard_suite_model.json",
+                    "path": ".flowguard/models/researchguard_suite/model-definition.json",
                 },
                 {
                     "kind": "path",
-                    "path": ".flowguard/run_researchguard_suite_model.py",
+                    "path": ".flowguard/verification/run_researchguard_suite_model.py",
                 },
                 {
                     "kind": "path",
-                    "path": f".flowguard/{member}_skill_contract_model.py",
+                    "path": f".flowguard/models/{member}_skill_contract_model.py",
                 },
                 {
                     "kind": "path",
-                    "path": ".flowguard/researchguard_skill_contract_model_common.py",
+                    "path": ".flowguard/models/researchguard_skill_contract_model_common.py",
                 },
                 *[
                     {"kind": "path", "path": path}
@@ -568,7 +577,7 @@ def contract(member: str) -> dict:
             }
         ],
         "model_id": f"researchguard.{member}.contract.current",
-        "model_path": f".flowguard/{member}_skill_contract_model.py",
+        "model_path": f".flowguard/models/{member}_skill_contract_model.py",
         "confirmed": True,
         "integration_mode": "native-integrated",
         "native_route_owner": f"owner:researchguard:{member}",
@@ -622,6 +631,16 @@ def contract(member: str) -> dict:
                 deepening_check_id,
             ],
             "model_deepening_check_id": deepening_check_id,
+            "surface_inventory": {
+                "path": ".skillguard/surface-inventory.json",
+                "adequacy_check_ids": [
+                    contract_check_id,
+                    prompt_check_id,
+                    f"check:{member}:native-tests",
+                    deepening_check_id,
+                ],
+                "model_deepening_check_id": deepening_check_id,
+            },
             "skillguard_adds_domain_route": False,
             "enforcement_level": "enforced",
             "required_closure_profiles": ["enforced"],
@@ -793,7 +812,7 @@ def validation_plan() -> dict:
         "cross_unit_receipt_reuse": False,
         "skillguard_adds_domain_route": False,
         "claim_boundary": (
-            "This file records the current FlowGuard 0.68.14 toolchain and remains visibly "
+            "This file records the current FlowGuard 0.69.0 toolchain and remains visibly "
             "non-executable until one explicitly owned maintenance-unit validation runs. "
             "Current native affected-only ownership comes from each compiled contract "
             "content-impact plan; no compatibility or fallback route is implied."

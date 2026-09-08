@@ -157,7 +157,7 @@ def test_consumer_install_transaction_reuses_the_researchguard_native_owner() ->
     ]
     assert obligation_id in payload["closure_profiles"][0]["required_obligation_ids"]
 
-    model_path = ROOT / ".flowguard/researchguard_skill_contract_model_common.py"
+    model_path = ROOT / ".flowguard/models/researchguard_skill_contract_model_common.py"
     spec = importlib.util.spec_from_file_location(
         "researchguard_contract_model_common_under_test", model_path
     )

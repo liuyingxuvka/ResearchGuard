@@ -6,7 +6,8 @@ solve, or import facade modules.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+import copy
 
 from .diagnostics import Contradiction, Diagnostic, Gap
 from .entity_resolution import EntityScore
@@ -67,6 +68,16 @@ class TraceEvaluation:
     weakest_link: str = ""
     conclusion_transfer_status: str = ""
     downstream_consumer: str = ""
+    domain_proposition: str = ""
+    domain_mechanism_refs: tuple[str, ...] = ()
+    domain_assumption_refs: tuple[str, ...] = ()
+    object_scope: tuple[str, ...] = ()
+    material_alternatives: tuple[str, ...] = ()
+    domain_boundaries: tuple[str, ...] = ()
+    native_causal_license: str = "not_licensed"
+    domain_gaps: tuple[str, ...] = ()
+    domain_candidate_propositions: tuple[str, ...] = ()
+    audit_context: dict[str, object] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, object]:
         return {
@@ -91,6 +102,16 @@ class TraceEvaluation:
             "weakest_link": self.weakest_link,
             "conclusion_transfer_status": self.conclusion_transfer_status,
             "downstream_consumer": self.downstream_consumer,
+            "domain_proposition": self.domain_proposition,
+            "domain_mechanism_refs": list(self.domain_mechanism_refs),
+            "domain_assumption_refs": list(self.domain_assumption_refs),
+            "object_scope": list(self.object_scope),
+            "material_alternatives": list(self.material_alternatives),
+            "domain_boundaries": list(self.domain_boundaries),
+            "native_causal_license": self.native_causal_license,
+            "domain_gaps": list(self.domain_gaps),
+            "domain_candidate_propositions": list(self.domain_candidate_propositions),
+            "audit_context": copy.deepcopy(self.audit_context),
         }
 
 

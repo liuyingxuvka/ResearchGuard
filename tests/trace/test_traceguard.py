@@ -193,7 +193,9 @@ def test_report_and_logicguard_export_include_boundaries(tmp_path: Path) -> None
     )
     exported = yaml.safe_load(bundle.read_text(encoding="utf-8"))
     claim = exported["claims"][0]
-    assert {"claim", "evidence", "warrant", "assumption", "limitation", "scope"} <= set(claim)
+    assert {"domain_proposition", "evidence", "domain_mechanism_refs", "limitation", "object_scope", "audit_context"} <= set(claim)
+    assert "warrant" not in claim
+    assert "safe_wording" in claim["audit_context"]
     assert exported["handoffs"][0]["claim_id"] == "claim_trace_rhine_h2"
     assert exported["consolidation_findings"]
 

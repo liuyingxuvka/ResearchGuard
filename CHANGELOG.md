@@ -1,6 +1,6 @@
 # Changelog
 
-## v0.4.11 - 2026-08-12
+## v0.5.0 - 2026-08-12
 
 - Add one repository-native software-DNA root with four recursively decomposed
   member subtrees, an independently enumerated provider-neutral denominator,

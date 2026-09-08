@@ -1,0 +1,353 @@
+[flowguard_layout]
+schema = "flowguard.project_layout.v3"
+version = 3
+authority = "current"
+canonical_root = ".flowguard"
+project_identity = "https://github.com/liuyingxuvka/FlowGuard"
+project_identity_fingerprint = "sha256:679b44c3f8a1524c9ad0b94bf53f88d53207fda549edc5f4819a8be07685c9ef"
+model_authority_pointer = ".flowguard/project.toml#model_authority"
+model_authority_fingerprint = "sha256:172d819f0a9ca21f80c90a6647a3e5bb29ea80621096d37bde0deb18ef8d33f1"
+non_authority_roots = ["evidence", "history"]
+
+[roots]
+behavior = "behavior"  # current_effective_intent_and_behavior_contracts
+models = "models"  # current_executable_model_authority
+structure = "structure"  # surface_ownership_and_code_binding_maps
+verification = "verification"  # test_and_check_definitions
+evidence = "evidence"  # immutable_execution_evidence
+history = "history"  # explicit_historical_context
+
+[role_authority]
+behavior = "current"
+models = "current"
+structure = "current"
+verification = "current"
+evidence = "non_authority"
+history = "non_authority"
+
+[inventory]
+schema = "flowguard.project_layout_shape.v1"
+mode = "exact"
+fingerprint = "sha256:7a05b0d0bcdfb90c52f0835ca6333d6d41df345a430f9814cae7555185df8b7c"
+member_count = 64
+role_fingerprints = {behavior = "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945", evidence = "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945", history = "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945", models = "sha256:1f8e0ef1f4990016b81dc8f92060e6685109eedeb47a1f0f4830627f027bba0b", structure = "sha256:483f5cfc186669693b1c27bf1941c11fc1f9fb44d0e3820fa9b855bd88fde7de", verification = "sha256:c8be200dbd17b4ca9539a731ea32b29025f434718091c0a0bd73b38b390d4dfc"}
+
+[[inventory.members]]
+path = "models"
+role = "models"
+kind = "directory"
+
+[[inventory.members]]
+path = "models/authority"
+role = "models"
+kind = "directory"
+
+[[inventory.members]]
+path = "models/experimentguard_skill_contract_model.py"
+role = "models"
+kind = "file"
+
+[[inventory.members]]
+path = "models/logicguard_skill_contract_model.py"
+role = "models"
+kind = "file"
+
+[[inventory.members]]
+path = "models/owners"
+role = "models"
+kind = "directory"
+
+[[inventory.members]]
+path = "models/owners/argument_support_closure"
+role = "models"
+kind = "directory"
+
+[[inventory.members]]
+path = "models/owners/argument_support_closure/model.py"
+role = "models"
+kind = "file"
+
+[[inventory.members]]
+path = "models/owners/authoritative_model_system"
+role = "models"
+kind = "directory"
+
+[[inventory.members]]
+path = "models/owners/authoritative_model_system/model.py"
+role = "models"
+kind = "file"
+
+[[inventory.members]]
+path = "models/owners/authoritative_model_system/semantic_model_mesh.json"
+role = "models"
+kind = "file"
+
+[[inventory.members]]
+path = "models/owners/authoritative_model_system/software_blueprint_definition.json"
+role = "models"
+kind = "file"
+
+[[inventory.members]]
+path = "models/owners/compositional_verification_kernel"
+role = "models"
+kind = "directory"
+
+[[inventory.members]]
+path = "models/owners/compositional_verification_kernel/model.py"
+role = "models"
+kind = "file"
+
+[[inventory.members]]
+path = "models/owners/discourse_structure"
+role = "models"
+kind = "directory"
+
+[[inventory.members]]
+path = "models/owners/discourse_structure/model.py"
+role = "models"
+kind = "file"
+
+[[inventory.members]]
+path = "models/owners/hierarchical_model_mesh"
+role = "models"
+kind = "directory"
+
+[[inventory.members]]
+path = "models/owners/hierarchical_model_mesh/model.py"
+role = "models"
+kind = "file"
+
+[[inventory.members]]
+path = "models/owners/logic_selection_contract"
+role = "models"
+kind = "directory"
+
+[[inventory.members]]
+path = "models/owners/logic_selection_contract/model.py"
+role = "models"
+kind = "file"
+
+[[inventory.members]]
+path = "models/owners/logic_synthesis"
+role = "models"
+kind = "directory"
+
+[[inventory.members]]
+path = "models/owners/logic_synthesis/model.py"
+role = "models"
+kind = "file"
+
+[[inventory.members]]
+path = "models/owners/model_test_code_alignment"
+role = "models"
+kind = "directory"
+
+[[inventory.members]]
+path = "models/owners/model_test_code_alignment/model.py"
+role = "models"
+kind = "file"
+
+[[inventory.members]]
+path = "models/owners/researchguard_suite"
+role = "models"
+kind = "directory"
+
+[[inventory.members]]
+path = "models/owners/researchguard_suite/model.py"
+role = "models"
+kind = "file"
+
+[[inventory.members]]
+path = "models/owners/trace_domain_export"
+role = "models"
+kind = "directory"
+
+[[inventory.members]]
+path = "models/owners/trace_domain_export/model.py"
+role = "models"
+kind = "file"
+
+[[inventory.members]]
+path = "models/regression-manifest.json"
+role = "models"
+kind = "file"
+
+[[inventory.members]]
+path = "models/researchguard_skill_contract_model.py"
+role = "models"
+kind = "file"
+
+[[inventory.members]]
+path = "models/researchguard_skill_contract_model_common.py"
+role = "models"
+kind = "file"
+
+[[inventory.members]]
+path = "models/researchguard_skillguard_maintenance_model.py"
+role = "models"
+kind = "file"
+
+[[inventory.members]]
+path = "models/researchguard_suite"
+role = "models"
+kind = "directory"
+
+[[inventory.members]]
+path = "models/researchguard_suite/model-definition.json"
+role = "models"
+kind = "file"
+
+[[inventory.members]]
+path = "models/researchguard_suite_model.py"
+role = "models"
+kind = "file"
+
+[[inventory.members]]
+path = "models/sourceguard_content_anchor_oracle_model.py"
+role = "models"
+kind = "file"
+
+[[inventory.members]]
+path = "models/sourceguard_skill_contract_model.py"
+role = "models"
+kind = "file"
+
+[[inventory.members]]
+path = "models/traceguard_skill_contract_model.py"
+role = "models"
+kind = "file"
+
+[[inventory.members]]
+path = "structure"
+role = "structure"
+kind = "directory"
+
+[[inventory.members]]
+path = "structure/owner-bindings.json"
+role = "structure"
+kind = "file"
+
+[[inventory.members]]
+path = "structure/project-definition.json"
+role = "structure"
+kind = "file"
+
+[[inventory.members]]
+path = "verification"
+role = "verification"
+kind = "directory"
+
+[[inventory.members]]
+path = "verification/owners"
+role = "verification"
+kind = "directory"
+
+[[inventory.members]]
+path = "verification/owners/argument_support_closure"
+role = "verification"
+kind = "directory"
+
+[[inventory.members]]
+path = "verification/owners/argument_support_closure/run_checks.py"
+role = "verification"
+kind = "file"
+
+[[inventory.members]]
+path = "verification/owners/authoritative_model_system"
+role = "verification"
+kind = "directory"
+
+[[inventory.members]]
+path = "verification/owners/authoritative_model_system/run_checks.py"
+role = "verification"
+kind = "file"
+
+[[inventory.members]]
+path = "verification/owners/compositional_verification_kernel"
+role = "verification"
+kind = "directory"
+
+[[inventory.members]]
+path = "verification/owners/compositional_verification_kernel/run_checks.py"
+role = "verification"
+kind = "file"
+
+[[inventory.members]]
+path = "verification/owners/discourse_structure"
+role = "verification"
+kind = "directory"
+
+[[inventory.members]]
+path = "verification/owners/discourse_structure/run_checks.py"
+role = "verification"
+kind = "file"
+
+[[inventory.members]]
+path = "verification/owners/hierarchical_model_mesh"
+role = "verification"
+kind = "directory"
+
+[[inventory.members]]
+path = "verification/owners/hierarchical_model_mesh/run_checks.py"
+role = "verification"
+kind = "file"
+
+[[inventory.members]]
+path = "verification/owners/logic_selection_contract"
+role = "verification"
+kind = "directory"
+
+[[inventory.members]]
+path = "verification/owners/logic_selection_contract/run_checks.py"
+role = "verification"
+kind = "file"
+
+[[inventory.members]]
+path = "verification/owners/logic_synthesis"
+role = "verification"
+kind = "directory"
+
+[[inventory.members]]
+path = "verification/owners/logic_synthesis/run_checks.py"
+role = "verification"
+kind = "file"
+
+[[inventory.members]]
+path = "verification/owners/model_test_code_alignment"
+role = "verification"
+kind = "directory"
+
+[[inventory.members]]
+path = "verification/owners/model_test_code_alignment/run_checks.py"
+role = "verification"
+kind = "file"
+
+[[inventory.members]]
+path = "verification/owners/researchguard_suite"
+role = "verification"
+kind = "directory"
+
+[[inventory.members]]
+path = "verification/owners/researchguard_suite/run_checks.py"
+role = "verification"
+kind = "file"
+
+[[inventory.members]]
+path = "verification/owners/trace_domain_export"
+role = "verification"
+kind = "directory"
+
+[[inventory.members]]
+path = "verification/owners/trace_domain_export/run_checks.py"
+role = "verification"
+kind = "file"
+
+[[inventory.members]]
+path = "verification/run_researchguard_skillguard_maintenance_model.py"
+role = "verification"
+kind = "file"
+
+[[inventory.members]]
+path = "verification/run_researchguard_suite_model.py"
+role = "verification"
+kind = "file"

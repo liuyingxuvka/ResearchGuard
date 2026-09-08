@@ -2,7 +2,37 @@ from __future__ import annotations
 
 import pytest
 
-from researchguard.logic import adapt_delivery, load_model_from_dict, synthesize_artifact_plan
+from researchguard.logic import adapt_delivery, load_model_from_dict, model_fingerprint, synthesize_artifact_plan
+
+
+def _request(model, *, goal="Create a report", artifact_kind="report", claims=("C0",), placement="body", max_body_units=2, branches=()):
+    units = [{
+        "unit_id": "u1",
+        "parent_unit_id": None,
+        "reader_question": "What is the answer?",
+        "unit_job": "State and bound the selected claim.",
+        "claim_ids": list(claims),
+        "predecessor_unit_ids": [],
+        "progression_relation": "concludes",
+        "editorial_prominence": "lead",
+        "placement": placement,
+        "placement_reason": "Required for the requested artifact.",
+        "required": True,
+    }]
+    normalized_branches = []
+    for branch in branches:
+        value = dict(branch)
+        value.setdefault("claim_ids", list(claims))
+        value.setdefault("anchor_node_id", "C0")
+        normalized_branches.append(value)
+    return {
+        "schema": "researchguard.logic.synthesis-request.v1",
+        "request_id": "req-1", "target_id": "artifact-1", "target_goal": goal,
+        "artifact_kind": artifact_kind, "reader_id": "reader-1", "model_id": model.id,
+        "model_fingerprint": model_fingerprint(model), "body_unit_order": ["u1"] if placement == "body" else [],
+        "max_body_units": max_body_units, "units": units,
+        "source_branch_bindings": normalized_branches,
+    }
 
 
 def test_synthesis_requires_goal() -> None:
@@ -13,8 +43,9 @@ def test_synthesis_requires_goal() -> None:
         }
     )
 
-    with pytest.raises(ValueError, match="target_goal"):
-        synthesize_artifact_plan(model, target_goal="")
+    plan = synthesize_artifact_plan(model, selection_request={})
+    assert plan.status == "blocked_invalid_request"
+    assert any("target_goal" in gap for gap in plan.open_gaps)
 
 
 def test_synthesis_prioritizes_importance_and_marks_missing_support() -> None:
@@ -28,13 +59,12 @@ def test_synthesis_prioritizes_importance_and_marks_missing_support() -> None:
         }
     )
 
-    plan = synthesize_artifact_plan(model, target_goal="Create an executive report", max_items=1)
+    plan = synthesize_artifact_plan(model, selection_request=_request(model, goal="Create an executive report"))
 
-    assert plan.selected_items[0].node_id == "C0"
-    assert plan.selected_items[0].treatment == "deep"
-    assert plan.omitted_items[0].node_id == "C1"
-    assert plan.omitted_items[0].treatment == "omit"
-    assert any("evidence" in addition.lower() for addition in plan.missing_additions)
+    assert plan.units[0].claim_ids == ("C0",)
+    assert plan.candidate_dispositions[0].placement == "body"
+    assert plan.candidate_dispositions[1].placement == "omit"
+    assert plan.status == "blocked_support_gap"
 
 
 def test_synthesis_assigns_treatment_guidance() -> None:
@@ -51,18 +81,16 @@ def test_synthesis_assigns_treatment_guidance() -> None:
         }
     )
 
-    plan = synthesize_artifact_plan(model, target_goal="Create a report", max_items=3)
+    plan = synthesize_artifact_plan(model, selection_request=_request(model, claims=("C0",)))
 
-    treatments = {item.node_id: item.treatment for item in (*plan.selected_items, *plan.omitted_items)}
-    assert treatments["C0"] == "deep"
-    assert treatments["W1"] == "deep"
-    assert treatments["E1"] == "normal"
-    assert treatments["K1"] == "omit"
-    assert treatments["C1"] == "omit"
+    dispositions = {item.candidate_id: item.placement for item in plan.candidate_dispositions}
+    assert dispositions["C0"] == "body"
+    assert dispositions["W1"] == "appendix"
+    assert dispositions["E1"] == "appendix"
+    assert dispositions["K1"] == "omit"
+    assert dispositions["C1"] == "omit"
 
-    tight_plan = synthesize_artifact_plan(model, target_goal="Create a very short report", max_items=1)
-    tight_treatments = {item.node_id: item.treatment for item in tight_plan.omitted_items}
-    assert tight_treatments["W1"] == "appendix"
+    assert plan.units[0].research_importance["C0"] == 0.95
 
 
 def test_delivery_guidance_avoids_internal_labels() -> None:
@@ -75,15 +103,17 @@ def test_delivery_guidance_avoids_internal_labels() -> None:
             },
         }
     )
-    plan = synthesize_artifact_plan(model, target_goal="Create a presentation", profile="presentation")
+    plan = synthesize_artifact_plan(model, selection_request=_request(model, artifact_kind="presentation"))
     guidance = adapt_delivery(plan)
     text = "\n".join(item.suggested_text for item in guidance.suggestions)
     traces = "\n".join(item.trace for item in guidance.suggestions)
 
+    assert guidance.status == "blocked_support_gap"
+    assert guidance.suggestions == ()
     assert "missing_handoff" not in text
     assert "core_claim" not in text
-    assert "Limited to validated range." in text
-    assert "treatment=deep" in traces
+    assert "Limited to validated range." not in text
+    assert "prominence=lead" not in traces
 
 
 def test_synthesis_can_preserve_source_branch_candidates() -> None:
@@ -96,9 +126,10 @@ def test_synthesis_can_preserve_source_branch_candidates() -> None:
         }
     )
     plan = synthesize_artifact_plan(
-        model,
-        target_goal="Create a measured flow plausibility briefing",
-        max_items=1,
+        model, selection_request=_request(model, goal="Create a measured flow plausibility briefing", branches=({
+            "branch_id": "BR1", "source_id": "paper-a", "claim_ids": ["C0"], "destination_unit_id": "u1",
+            "current_native_evidence_ref": "ev-1"
+        },)),
         source_branches=[
             {
                 "branch_id": "BR1",
@@ -114,11 +145,9 @@ def test_synthesis_can_preserve_source_branch_candidates() -> None:
         ],
     )
 
-    assert plan.selected_items[0].node_type == "SourceBranch"
-    assert plan.selected_items[0].branch_id == "BR1"
-    assert plan.selected_items[0].anchor_node_id == "C3"
-    assert plan.selected_items[0].temporal_role == "covered_period"
-    assert "covered period" in plan.selected_items[0].temporal_caveat.lower()
+    assert plan.units[0].source_branch_ids == ("BR1",)
+    assert plan.candidate_dispositions[0].candidate_id == "source_branch:paper-a:BR1"
+    assert plan.candidate_dispositions[0].placement == "body"
 
 
 def test_temporal_context_does_not_override_importance_but_guides_delivery() -> None:
@@ -139,9 +168,7 @@ def test_temporal_context_does_not_override_importance_but_guides_delivery() -> 
         }
     )
     plan = synthesize_artifact_plan(
-        model,
-        target_goal="Create a report",
-        max_items=1,
+        model, selection_request=_request(model),
         source_branches=[
             {
                 "branch_id": "BR-new",
@@ -155,6 +182,7 @@ def test_temporal_context_does_not_override_importance_but_guides_delivery() -> 
     )
     guidance = adapt_delivery(plan, profile="report")
 
-    assert plan.selected_items[0].node_id == "C0"
-    assert plan.selected_items[0].temporal_role == "historical"
-    assert "2018-2020" in guidance.suggestions[0].suggested_text
+    assert plan.units[0].claim_ids == ("C0",)
+    assert plan.selected_items[0].temporal_role in {"historical", "source_dated"}
+    assert guidance.status == "blocked_support_gap"
+    assert guidance.suggestions == ()

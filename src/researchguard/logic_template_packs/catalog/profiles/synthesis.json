@@ -32,7 +32,7 @@
   "native_binding": {
     "route_id": "route:researchguard.logic:artifact-synthesis",
     "owner_callable": "researchguard.logic.synthesis:synthesize_artifact_plan",
-    "owner_fingerprint": "34b9c6bf687be28f91c88077ba349df00d671d77eeb4b9352139b764a32604a8",
+    "owner_fingerprint": "28c54a585d69e4b9fe4b6b4fcaaf2bf0833b569d2504d611613e337e28c98ef2",
     "validators": [
       {
         "validator_id": "logicguard-template-pack:synthesis",

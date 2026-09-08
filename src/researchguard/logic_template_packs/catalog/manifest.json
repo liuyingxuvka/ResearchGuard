@@ -59,8 +59,8 @@
       "profile_id": "researchguard.logic.synthesis",
       "family": "synthesis",
       "path": "profiles/synthesis.json",
-      "sha256": "50dae76a2e8cfa295d37d6bf7ac0652b65da75917111e017e5d03f6947d7f821"
+      "sha256": "aff71e7c5cd44291b840845d48f8630b41ca3e1ad35f964e9dbe4b401945333f"
     }
   ],
-  "catalog_digest": "574e4a3ab176ad4a92899b68c321a86a1fa3bdc2e44b0bc61bebefe28a720c1b"
+  "catalog_digest": "1941c631036ddcab7c5d5110425dd5d2eabd195f4359f7403782924e7952c83d"
 }

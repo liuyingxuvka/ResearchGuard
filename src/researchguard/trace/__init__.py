@@ -26,6 +26,13 @@ from .blueprint import (
 )
 from .handoff import ConsolidationFinding, TraceHandoff, derive_trace_handoffs, review_trace_consolidation
 from .loader import load_model
+from .export_logicguard import (
+    LOGICGUARD_HANDOFF_EXPORT_VERSION,
+    LOGICGUARD_HANDOFF_SCHEMA,
+    logicguard_bundle,
+    render_logicguard_yaml,
+    validate_logicguard_bundle,
+)
 from .storyline_depth import (
     HypothesisSnapshot,
     PerturbationEffect,
@@ -38,6 +45,8 @@ from .storyline_depth import (
 
 __all__ = [
     "ConsolidationFinding",
+    "LOGICGUARD_HANDOFF_EXPORT_VERSION",
+    "LOGICGUARD_HANDOFF_SCHEMA",
     "TRACE_BLUEPRINT_SCHEMA",
     "TraceBlueprintGap",
     "TraceBlueprintResult",
@@ -51,6 +60,9 @@ __all__ = [
     "StorylineAlternative",
     "StorylineDepthReceipt",
     "derive_trace_handoffs",
+    "logicguard_bundle",
+    "render_logicguard_yaml",
+    "validate_logicguard_bundle",
     "check_blueprint",
     "export_blueprint",
     "evaluate_model",

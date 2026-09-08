@@ -1,0 +1,847 @@
+{
+  "schema_version": "flowguard.model_regression_manifest.v4",
+  "governed_input_globs": [
+    ".flowguard/models/owners/authoritative_model_system/model.py",
+    ".flowguard/verification/owners/authoritative_model_system/run_checks.py",
+    ".flowguard/models/owners/compositional_verification_kernel/model.py",
+    ".flowguard/verification/owners/compositional_verification_kernel/run_checks.py",
+    ".flowguard/models/owners/hierarchical_model_mesh/model.py",
+    ".flowguard/verification/owners/hierarchical_model_mesh/run_checks.py",
+    ".flowguard/models/owners/model_test_code_alignment/model.py",
+    ".flowguard/verification/owners/model_test_code_alignment/run_checks.py",
+    ".flowguard/models/owners/logic_synthesis/model.py",
+    ".flowguard/verification/owners/logic_synthesis/run_checks.py",
+    ".flowguard/models/owners/logic_selection_contract/model.py",
+    ".flowguard/verification/owners/logic_selection_contract/run_checks.py",
+    ".flowguard/models/owners/argument_support_closure/model.py",
+    ".flowguard/verification/owners/argument_support_closure/run_checks.py",
+    ".flowguard/models/owners/discourse_structure/model.py",
+    ".flowguard/verification/owners/discourse_structure/run_checks.py",
+    ".flowguard/models/owners/trace_domain_export/model.py",
+    ".flowguard/verification/owners/trace_domain_export/run_checks.py",
+    ".flowguard/models/owners/researchguard_suite/model.py",
+    ".flowguard/verification/owners/researchguard_suite/run_checks.py",
+    ".flowguard/models/researchguard_suite_model.py",
+    ".flowguard/models/researchguard_suite/model-definition.json",
+    ".flowguard/verification/run_researchguard_suite_model.py",
+    "models/software_dna/researchguard.json",
+    "src/researchguard/software_dna.py",
+    "src/researchguard/__init__.py",
+    "src/researchguard/cli.py",
+    "src/researchguard/routing.py",
+    "src/researchguard/logic/admission.py",
+    "src/researchguard/logic/cli.py",
+    "src/researchguard/logic/execution_depth.py",
+    "src/researchguard/logic/task_iteration.py",
+    "src/researchguard/source/admission.py",
+    "src/researchguard/source/cli.py",
+    "src/researchguard/source/task_iteration.py",
+    "src/researchguard/source/stop_decision.py",
+    "src/researchguard/trace/admission.py",
+    "src/researchguard/trace/cli.py",
+    "src/researchguard/trace/storyline_depth.py",
+    "src/researchguard/trace/task_iteration.py",
+    "src/researchguard/trace/inference/contradiction_core.py",
+    "src/researchguard/logic/minimal_sets.py",
+    "src/researchguard/self_dna.py",
+    "src/researchguard/domain_dna.py",
+    "src/researchguard/experiment/*.py",
+    "skills/*guard/SKILL.md",
+    "skills/*guard/references/*.md",
+    "skills/*guard/agents/openai.yaml",
+    "tests/source/test_stop_decision.py",
+    "tests/trace/test_contradiction_core.py",
+    "tests/logic/test_minimal_sets.py",
+    "tests/experiment/test_recommendation.py",
+    "tests/logic/test_task_iteration.py",
+    "tests/source/test_task_iteration.py",
+    "tests/trace/test_task_iteration.py",
+    "tests/test_root_cli.py",
+    "tests/test_suite_routing.py",
+    "tests/test_suite_model_currentness.py"
+  ],
+  "snapshot_only_input_globs": [
+    ".flowguard/models/authority/snapshots/*.json",
+    ".flowguard/models/authority/revisions/*.json"
+  ],
+  "shared_input_groups": [],
+  "models": [
+    {
+      "model_id": "authoritative_model_system",
+      "model_path": ".flowguard/models/owners/authoritative_model_system/model.py",
+      "runner": [
+        "{python}",
+        ".flowguard/verification/owners/authoritative_model_system/run_checks.py"
+      ],
+      "tier": "full",
+      "timeout_seconds": 120,
+      "shard_safe": true,
+      "mutation_policy": "none",
+      "input_globs": [
+        ".flowguard/models/owners/authoritative_model_system/model.py",
+        ".flowguard/verification/owners/authoritative_model_system/run_checks.py",
+        ".flowguard/structure/project-definition.json",
+        ".flowguard/models/owners/authoritative_model_system/semantic_model_mesh.json",
+        ".flowguard/models/regression-manifest.json"
+      ],
+      "intent_source_inputs": [
+        "openspec/changes/strengthen-guard-domain-blueprint-spine/design.md"
+      ],
+      "expected_artifacts": [],
+      "exclusion_reason": "",
+      "distribution_policy": "required_public",
+      "absence_reason": "",
+      "model_kind": "executable_workflow",
+      "purpose_closure": {
+        "schema_version": "flowguard.model_purpose_closure.v1",
+        "model_instance_id": "regression:authoritative_model_system:current",
+        "reusable_model_type_id": "authoritative_model_system",
+        "task_intent_id": "researchguard-regression:authoritative_model_system",
+        "declaration_phase": "before_candidate",
+        "guarded_purpose": "Keep the researchguard authoritative_model_system model owner bound to its declared interface, failures, and current evidence.",
+        "protected_failure_ids": [
+          "researchguard:authoritative_model_system:definition-missing",
+          "researchguard:authoritative_model_system:binding-missing",
+          "researchguard:authoritative_model_system:evidence-stale"
+        ],
+        "claim_boundary": "This closure covers only the current researchguard authoritative_model_system model owner and its native runner; domain truth and release claims remain separate evidence.",
+        "adoption_scope": "current_candidate_only",
+        "known_good_case_id": "native:authoritative_model_system:current-good",
+        "failure_bindings": [
+          {
+            "failure_id": "researchguard:authoritative_model_system:definition-missing",
+            "known_bad_case_id": "native:authoritative_model_system:definition-missing",
+            "oracle_id": "native:authoritative_model_system:run-checks"
+          },
+          {
+            "failure_id": "researchguard:authoritative_model_system:binding-missing",
+            "known_bad_case_id": "native:authoritative_model_system:binding-missing",
+            "oracle_id": "native:authoritative_model_system:run-checks"
+          },
+          {
+            "failure_id": "researchguard:authoritative_model_system:evidence-stale",
+            "known_bad_case_id": "native:authoritative_model_system:evidence-stale",
+            "oracle_id": "native:authoritative_model_system:run-checks"
+          }
+        ],
+        "evidence_check_ids": [
+          "check:model-regression:authoritative_model_system"
+        ],
+        "model_sha256": "sha256:a08802cfd3e4373a81914281931147c47c5b669ba75708a4cef801c255cc39d3",
+        "runner_sha256": "sha256:f17e64c51f01d28e4013d20865ea039cb124fe27f044b317477e7bfbc5cff65a",
+        "declaration_fingerprint": "sha256:734cefa96ddddfa9e614673516569f28bf2d584a5d8a53b6cca816ee001d8966",
+        "closure_fingerprint": "sha256:f74ee6d6eda54913fe48e4c29360055dbea52df32f3d928b3199ed606fe1aa7a"
+      }
+    },
+    {
+      "model_id": "compositional_verification_kernel",
+      "model_path": ".flowguard/models/owners/compositional_verification_kernel/model.py",
+      "runner": [
+        "{python}",
+        ".flowguard/verification/owners/compositional_verification_kernel/run_checks.py"
+      ],
+      "tier": "focused",
+      "timeout_seconds": 120,
+      "shard_safe": true,
+      "mutation_policy": "none",
+      "input_globs": [
+        ".flowguard/models/owners/compositional_verification_kernel/model.py",
+        ".flowguard/verification/owners/compositional_verification_kernel/run_checks.py",
+        ".flowguard/structure/project-definition.json"
+      ],
+      "intent_source_inputs": [
+        "openspec/changes/strengthen-guard-domain-blueprint-spine/design.md"
+      ],
+      "expected_artifacts": [],
+      "exclusion_reason": "",
+      "distribution_policy": "required_public",
+      "absence_reason": "",
+      "model_kind": "executable_workflow",
+      "purpose_closure": {
+        "schema_version": "flowguard.model_purpose_closure.v1",
+        "model_instance_id": "regression:compositional_verification_kernel:current",
+        "reusable_model_type_id": "compositional_verification_kernel",
+        "task_intent_id": "researchguard-regression:compositional_verification_kernel",
+        "declaration_phase": "before_candidate",
+        "guarded_purpose": "Keep the researchguard compositional_verification_kernel model owner bound to its declared interface, failures, and current evidence.",
+        "protected_failure_ids": [
+          "researchguard:compositional_verification_kernel:definition-missing",
+          "researchguard:compositional_verification_kernel:binding-missing",
+          "researchguard:compositional_verification_kernel:evidence-stale"
+        ],
+        "claim_boundary": "This closure covers only the current researchguard compositional_verification_kernel model owner and its native runner; domain truth and release claims remain separate evidence.",
+        "adoption_scope": "current_candidate_only",
+        "known_good_case_id": "native:compositional_verification_kernel:current-good",
+        "failure_bindings": [
+          {
+            "failure_id": "researchguard:compositional_verification_kernel:definition-missing",
+            "known_bad_case_id": "native:compositional_verification_kernel:definition-missing",
+            "oracle_id": "native:compositional_verification_kernel:run-checks"
+          },
+          {
+            "failure_id": "researchguard:compositional_verification_kernel:binding-missing",
+            "known_bad_case_id": "native:compositional_verification_kernel:binding-missing",
+            "oracle_id": "native:compositional_verification_kernel:run-checks"
+          },
+          {
+            "failure_id": "researchguard:compositional_verification_kernel:evidence-stale",
+            "known_bad_case_id": "native:compositional_verification_kernel:evidence-stale",
+            "oracle_id": "native:compositional_verification_kernel:run-checks"
+          }
+        ],
+        "evidence_check_ids": [
+          "check:model-regression:compositional_verification_kernel"
+        ],
+        "model_sha256": "sha256:4d008f62db5c74b5e8f01cd3bcd1633f52f34f6813cdd7855065a69127ddaa83",
+        "runner_sha256": "sha256:8e9635a18b0d72071b34975f2f93ec0918ff596f5ab2a7100d249681481a0680",
+        "declaration_fingerprint": "sha256:74303de2caf0ddb5897249a954e44933ab40ed8e05f55c034c73c4efa7d669c4",
+        "closure_fingerprint": "sha256:72bb3ac9916fc85b9c8de0beccef61509e7e55220c08b1d7f0f2deff2fecd630"
+      }
+    },
+    {
+      "model_id": "researchguard_suite",
+      "model_path": ".flowguard/models/owners/researchguard_suite/model.py",
+      "runner": [
+        "{python}",
+        ".flowguard/verification/owners/researchguard_suite/run_checks.py"
+      ],
+      "tier": "full",
+      "timeout_seconds": 120,
+      "shard_safe": true,
+      "mutation_policy": "none",
+      "input_globs": [
+        ".flowguard/models/owners/researchguard_suite/model.py",
+        ".flowguard/verification/owners/researchguard_suite/run_checks.py",
+        ".flowguard/models/owners/authoritative_model_system/semantic_model_mesh.json",
+        ".flowguard/models/researchguard_suite_model.py",
+        ".flowguard/models/researchguard_suite/model-definition.json",
+        ".flowguard/verification/run_researchguard_suite_model.py",
+        "models/software_dna/researchguard.json",
+        "src/researchguard/software_dna.py",
+        "src/researchguard/__init__.py",
+        "src/researchguard/cli.py",
+        "src/researchguard/routing.py",
+        "src/researchguard/logic/admission.py",
+        "src/researchguard/logic/cli.py",
+        "src/researchguard/logic/execution_depth.py",
+        "src/researchguard/logic/task_iteration.py",
+        "src/researchguard/source/admission.py",
+        "src/researchguard/source/cli.py",
+        "src/researchguard/source/task_iteration.py",
+        "src/researchguard/source/stop_decision.py",
+        "src/researchguard/trace/admission.py",
+        "src/researchguard/trace/cli.py",
+        "src/researchguard/trace/storyline_depth.py",
+        "src/researchguard/trace/task_iteration.py",
+        "src/researchguard/trace/inference/contradiction_core.py",
+        "src/researchguard/logic/minimal_sets.py",
+        "src/researchguard/self_dna.py",
+        "src/researchguard/domain_dna.py",
+        "src/researchguard/experiment/*.py",
+        "skills/*guard/SKILL.md",
+        "skills/*guard/references/*.md",
+        "skills/*guard/agents/openai.yaml",
+        "tests/source/test_stop_decision.py",
+        "tests/trace/test_contradiction_core.py",
+        "tests/logic/test_minimal_sets.py",
+        "tests/experiment/test_recommendation.py",
+        "tests/logic/test_task_iteration.py",
+        "tests/source/test_task_iteration.py",
+        "tests/trace/test_task_iteration.py",
+        "tests/test_root_cli.py",
+        "tests/test_suite_routing.py",
+        "tests/test_suite_model_currentness.py"
+      ],
+      "intent_source_inputs": [
+        "openspec/changes/strengthen-guard-domain-blueprint-spine/design.md"
+      ],
+      "expected_artifacts": [],
+      "exclusion_reason": "",
+      "distribution_policy": "required_public",
+      "absence_reason": "",
+      "model_kind": "executable_workflow",
+      "purpose_closure": {
+        "schema_version": "flowguard.model_purpose_closure.v1",
+        "model_instance_id": "regression:researchguard_suite:0.5.0",
+        "reusable_model_type_id": "researchguard_suite",
+        "task_intent_id": "researchguard-regression:suite-route-and-decision-members",
+        "declaration_phase": "before_candidate",
+        "guarded_purpose": "Prevent unproven or ambiguous member admission, alternate-success retries, stale suite identity, premature member model closure, or experiment execution claims from being accepted as current ResearchGuard behavior.",
+        "protected_failure_ids": [
+          "researchguard:ambiguous-or-recursive-route",
+          "researchguard:unproven-member-admission",
+          "researchguard:alternate-success-after-member-failure",
+          "researchguard:stale-suite-identity",
+          "researchguard:premature-member-model-closure",
+          "researchguard:experiment-execution-overclaim"
+        ],
+        "claim_boundary": "This closure covers only the registered finite ResearchGuard route, identity, handoff, and recommendation-boundary scenarios; member-native factual claims require separate evidence.",
+        "adoption_scope": "current_candidate_only",
+        "known_good_case_id": "native-runner:researchguard-suite:declared-route-scenarios",
+        "failure_bindings": [
+          {
+            "failure_id": "researchguard:ambiguous-or-recursive-route",
+            "known_bad_case_id": "scenario:rg03-or-rg06",
+            "oracle_id": "native:researchguard-suite:run-checks"
+          },
+          {
+            "failure_id": "researchguard:unproven-member-admission",
+            "known_bad_case_id": "scenario:rg03-rg10-rg11",
+            "oracle_id": "native:researchguard-suite:run-checks"
+          },
+          {
+            "failure_id": "researchguard:alternate-success-after-member-failure",
+            "known_bad_case_id": "scenario:rg04",
+            "oracle_id": "native:researchguard-suite:run-checks"
+          },
+          {
+            "failure_id": "researchguard:stale-suite-identity",
+            "known_bad_case_id": "native:researchguard-suite:currentness-mismatch",
+            "oracle_id": "native:researchguard-suite:currentness-check"
+          },
+          {
+            "failure_id": "researchguard:premature-member-model-closure",
+            "known_bad_case_id": "native:member-task-iteration:strict-closure",
+            "oracle_id": "native:researchguard:member-task-iteration-tests"
+          },
+          {
+            "failure_id": "researchguard:experiment-execution-overclaim",
+            "known_bad_case_id": "native:experimentguard:recommendation-boundary",
+            "oracle_id": "native:experimentguard:tests"
+          }
+        ],
+        "evidence_check_ids": [
+          "check:model-regression:researchguard_suite",
+          "check:researchguard:native-suite"
+        ],
+        "model_sha256": "sha256:22976dc1c1afff087047811457eccc78665705366e7919b0d0bad48db31a5516",
+        "runner_sha256": "sha256:106b50ea458cf70d50b6c4f22348c1d193435b10bf370a1e073f5831940d6bc5",
+        "declaration_fingerprint": "sha256:772cda947c6d3d10f1062ce974ef4ea41b4555ab8cbf528c21502176c6e19ff9",
+        "closure_fingerprint": "sha256:12d95c4fd02493498c9533592ed3c5628de32102c3c7062de98016886f03b668"
+      }
+    },
+    {
+      "model_id": "hierarchical_model_mesh",
+      "model_path": ".flowguard/models/owners/hierarchical_model_mesh/model.py",
+      "runner": [
+        "{python}",
+        ".flowguard/verification/owners/hierarchical_model_mesh/run_checks.py"
+      ],
+      "tier": "full",
+      "timeout_seconds": 120,
+      "shard_safe": true,
+      "mutation_policy": "none",
+      "input_globs": [
+        ".flowguard/models/owners/hierarchical_model_mesh/model.py",
+        ".flowguard/verification/owners/hierarchical_model_mesh/run_checks.py",
+        ".flowguard/structure/project-definition.json",
+        "openspec/changes/strengthen-guard-domain-blueprint-spine/design.md"
+      ],
+      "intent_source_inputs": [
+        "openspec/changes/strengthen-guard-domain-blueprint-spine/design.md"
+      ],
+      "expected_artifacts": [],
+      "exclusion_reason": "",
+      "distribution_policy": "required_public",
+      "absence_reason": "",
+      "model_kind": "executable_workflow",
+      "purpose_closure": {
+        "schema_version": "flowguard.model_purpose_closure.v1",
+        "model_instance_id": "regression:hierarchical_model_mesh:current",
+        "reusable_model_type_id": "hierarchical_model_mesh",
+        "task_intent_id": "researchguard-regression:hierarchical-model-mesh",
+        "declaration_phase": "before_candidate",
+        "guarded_purpose": "Require one current structural parent, explicit support edges, exact child evidence, and finite progress for the ResearchGuard project model mesh.",
+        "protected_failure_ids": [
+          "researchguard:hierarchical_model_mesh:root-unique",
+          "researchguard:hierarchical_model_mesh:parent-unique",
+          "researchguard:hierarchical_model_mesh:support-nonstructural",
+          "researchguard:hierarchical_model_mesh:child-evidence-exact",
+          "researchguard:hierarchical_model_mesh:loop-progress-current"
+        ],
+        "claim_boundary": "This closure proves only the checked-in hierarchical_model_mesh model and native runner reject its finite declared failures; target runtime truth, installation, and release require separate evidence.",
+        "adoption_scope": "current_candidate_only",
+        "known_good_case_id": "native:hierarchical_model_mesh:good-current",
+        "failure_bindings": [
+          {
+            "failure_id": "researchguard:hierarchical_model_mesh:root-unique",
+            "known_bad_case_id": "case:hierarchical_model_mesh:root-unique:bad",
+            "oracle_id": "native:hierarchical_model_mesh:run-checks"
+          },
+          {
+            "failure_id": "researchguard:hierarchical_model_mesh:parent-unique",
+            "known_bad_case_id": "case:hierarchical_model_mesh:parent-unique:bad",
+            "oracle_id": "native:hierarchical_model_mesh:run-checks"
+          },
+          {
+            "failure_id": "researchguard:hierarchical_model_mesh:support-nonstructural",
+            "known_bad_case_id": "case:hierarchical_model_mesh:support-nonstructural:bad",
+            "oracle_id": "native:hierarchical_model_mesh:run-checks"
+          },
+          {
+            "failure_id": "researchguard:hierarchical_model_mesh:child-evidence-exact",
+            "known_bad_case_id": "case:hierarchical_model_mesh:child-evidence-exact:bad",
+            "oracle_id": "native:hierarchical_model_mesh:run-checks"
+          },
+          {
+            "failure_id": "researchguard:hierarchical_model_mesh:loop-progress-current",
+            "known_bad_case_id": "case:hierarchical_model_mesh:loop-progress-current:bad",
+            "oracle_id": "native:hierarchical_model_mesh:run-checks"
+          }
+        ],
+        "evidence_check_ids": [
+          "check:model-regression:hierarchical_model_mesh"
+        ],
+        "model_sha256": "sha256:fea4a7f5816212d906c3882bd98aa935272cbd7d1cb2197df4b1d963d6cfecf0",
+        "runner_sha256": "sha256:a003b38f7a2db48864fbfa0cd96783b0976caf922a9a7f73f6660bb9012830fe",
+        "declaration_fingerprint": "sha256:d06b226fe0d7cbe55ad73ad6d6f2703d00d559b39eadce4e5218b30ad9a18bc4",
+        "closure_fingerprint": "sha256:4e5959e3719d641ddd84d288d11a01c21096e8a0dd3e9c817ea26c86de8499c6"
+      }
+    },
+    {
+      "model_id": "model_test_code_alignment",
+      "model_path": ".flowguard/models/owners/model_test_code_alignment/model.py",
+      "runner": [
+        "{python}",
+        ".flowguard/verification/owners/model_test_code_alignment/run_checks.py"
+      ],
+      "tier": "full",
+      "timeout_seconds": 120,
+      "shard_safe": true,
+      "mutation_policy": "none",
+      "input_globs": [
+        ".flowguard/models/owners/model_test_code_alignment/model.py",
+        ".flowguard/verification/owners/model_test_code_alignment/run_checks.py",
+        ".flowguard/structure/project-definition.json",
+        "openspec/changes/strengthen-guard-domain-blueprint-spine/design.md"
+      ],
+      "intent_source_inputs": [
+        "openspec/changes/strengthen-guard-domain-blueprint-spine/design.md"
+      ],
+      "expected_artifacts": [],
+      "exclusion_reason": "",
+      "distribution_policy": "required_public",
+      "absence_reason": "",
+      "model_kind": "executable_workflow",
+      "purpose_closure": {
+        "schema_version": "flowguard.model_purpose_closure.v1",
+        "model_instance_id": "regression:model_test_code_alignment:current",
+        "reusable_model_type_id": "model_test_code_alignment",
+        "task_intent_id": "researchguard-regression:model-test-code-alignment",
+        "declaration_phase": "before_candidate",
+        "guarded_purpose": "Require bidirectional model/code/test contracts with exact ownership and no parent receipt promoted to a leaf.",
+        "protected_failure_ids": [
+          "researchguard:model_test_code_alignment:model-code-owner",
+          "researchguard:model_test_code_alignment:code-boundary",
+          "researchguard:model_test_code_alignment:test-owner",
+          "researchguard:model_test_code_alignment:io-oracle",
+          "researchguard:model_test_code_alignment:parent-not-leaf"
+        ],
+        "claim_boundary": "This closure proves only the checked-in model_test_code_alignment model and native runner reject its finite declared failures; target runtime truth, installation, and release require separate evidence.",
+        "adoption_scope": "current_candidate_only",
+        "known_good_case_id": "native:model_test_code_alignment:good-current",
+        "failure_bindings": [
+          {
+            "failure_id": "researchguard:model_test_code_alignment:model-code-owner",
+            "known_bad_case_id": "case:model_test_code_alignment:model-code-owner:bad",
+            "oracle_id": "native:model_test_code_alignment:run-checks"
+          },
+          {
+            "failure_id": "researchguard:model_test_code_alignment:code-boundary",
+            "known_bad_case_id": "case:model_test_code_alignment:code-boundary:bad",
+            "oracle_id": "native:model_test_code_alignment:run-checks"
+          },
+          {
+            "failure_id": "researchguard:model_test_code_alignment:test-owner",
+            "known_bad_case_id": "case:model_test_code_alignment:test-owner:bad",
+            "oracle_id": "native:model_test_code_alignment:run-checks"
+          },
+          {
+            "failure_id": "researchguard:model_test_code_alignment:io-oracle",
+            "known_bad_case_id": "case:model_test_code_alignment:io-oracle:bad",
+            "oracle_id": "native:model_test_code_alignment:run-checks"
+          },
+          {
+            "failure_id": "researchguard:model_test_code_alignment:parent-not-leaf",
+            "known_bad_case_id": "case:model_test_code_alignment:parent-not-leaf:bad",
+            "oracle_id": "native:model_test_code_alignment:run-checks"
+          }
+        ],
+        "evidence_check_ids": [
+          "check:model-regression:model_test_code_alignment"
+        ],
+        "model_sha256": "sha256:56a73efb4dbd9e2ba8cce8099c3b8d028127806b81048b990d058675a3dfcecd",
+        "runner_sha256": "sha256:5ba65c304923b84ec058fe72244c4982d51c2208d86f6729f076450f59dbbb6f",
+        "declaration_fingerprint": "sha256:3c2e518dc49af5b7a16ecfca37491c42748f193fa04c11d48dff86cf7d36c8b4",
+        "closure_fingerprint": "sha256:7a35e489d12d698b31ffec18a47d6f73bb4095e6efcf11782d046eba6c4ab9bf"
+      }
+    },
+    {
+      "model_id": "logic_synthesis",
+      "model_path": ".flowguard/models/owners/logic_synthesis/model.py",
+      "runner": [
+        "{python}",
+        ".flowguard/verification/owners/logic_synthesis/run_checks.py"
+      ],
+      "tier": "focused",
+      "timeout_seconds": 120,
+      "shard_safe": true,
+      "mutation_policy": "none",
+      "input_globs": [
+        ".flowguard/models/owners/logic_synthesis/model.py",
+        ".flowguard/verification/owners/logic_synthesis/run_checks.py",
+        "src/researchguard/logic/synthesis.py",
+        "tests/logic/test_artifact_synthesis.py"
+      ],
+      "intent_source_inputs": [
+        "openspec/changes/repair-argument-to-reader-composition/design.md"
+      ],
+      "expected_artifacts": [],
+      "exclusion_reason": "",
+      "distribution_policy": "required_public",
+      "absence_reason": "",
+      "model_kind": "executable_workflow",
+      "purpose_closure": {
+        "schema_version": "flowguard.model_purpose_closure.v1",
+        "model_instance_id": "regression:logic_synthesis:current",
+        "reusable_model_type_id": "logic_synthesis",
+        "task_intent_id": "researchguard-regression:logic_synthesis",
+        "declaration_phase": "before_candidate",
+        "guarded_purpose": "Keep synthesis selection, complete candidate accounting, omit delivery, and claim-local support bound to their native owner.",
+        "protected_failure_ids": [
+          "researchguard:logic_synthesis:selection-request-required",
+          "researchguard:logic_synthesis:candidate-ledger-truncated",
+          "researchguard:logic_synthesis:omit-delivered-to-body",
+          "researchguard:logic_synthesis:foreign-support-closes-claim"
+        ],
+        "claim_boundary": "Current LogicGuard synthesis contract failures only; native argument evidence and reader quality remain separate.",
+        "adoption_scope": "current_candidate_only",
+        "known_good_case_id": "native:logic_synthesis:current-good",
+        "failure_bindings": [
+          {
+            "failure_id": "researchguard:logic_synthesis:selection-request-required",
+            "known_bad_case_id": "case:logic_synthesis:selection-request-required",
+            "oracle_id": "native:logic_synthesis:run-checks"
+          },
+          {
+            "failure_id": "researchguard:logic_synthesis:candidate-ledger-truncated",
+            "known_bad_case_id": "case:logic_synthesis:candidate-ledger-truncated",
+            "oracle_id": "native:logic_synthesis:run-checks"
+          },
+          {
+            "failure_id": "researchguard:logic_synthesis:omit-delivered-to-body",
+            "known_bad_case_id": "case:logic_synthesis:omit-delivered-to-body",
+            "oracle_id": "native:logic_synthesis:run-checks"
+          },
+          {
+            "failure_id": "researchguard:logic_synthesis:foreign-support-closes-claim",
+            "known_bad_case_id": "case:logic_synthesis:foreign-support-closes-claim",
+            "oracle_id": "native:logic_synthesis:run-checks"
+          }
+        ],
+        "evidence_check_ids": [
+          "check:model-regression:logic_synthesis"
+        ],
+        "model_sha256": "sha256:8e23f04b89fad9e3c698f4fefc7958a2ee11bef01d6bd4a3d8b3bd54a98524ea",
+        "runner_sha256": "sha256:b7035c5e133e9f628dd84366c70018494c6df0219c7087cf05742a5451d83de8",
+        "declaration_fingerprint": "sha256:ca486a3e359cb321dc39fa090116f38fdfac2baa111c740e250388966eb4ed5f",
+        "closure_fingerprint": "sha256:15ddbd557960f597b71b11571d3f5cc4a589de5acc217f22d39fce926fbf0410"
+      }
+    },
+    {
+      "model_id": "logic_selection_contract",
+      "model_path": ".flowguard/models/owners/logic_selection_contract/model.py",
+      "runner": [
+        "{python}",
+        ".flowguard/verification/owners/logic_selection_contract/run_checks.py"
+      ],
+      "tier": "focused",
+      "timeout_seconds": 120,
+      "shard_safe": true,
+      "mutation_policy": "none",
+      "input_globs": [
+        ".flowguard/models/owners/logic_selection_contract/model.py",
+        ".flowguard/verification/owners/logic_selection_contract/run_checks.py",
+        "src/researchguard/logic/synthesis_contract.py",
+        "tests/logic/test_synthesis_contract.py"
+      ],
+      "intent_source_inputs": [
+        "openspec/changes/repair-argument-to-reader-composition/design.md"
+      ],
+      "expected_artifacts": [],
+      "exclusion_reason": "",
+      "distribution_policy": "required_public",
+      "absence_reason": "",
+      "model_kind": "executable_workflow",
+      "purpose_closure": {
+        "schema_version": "flowguard.model_purpose_closure.v1",
+        "model_instance_id": "regression:logic_selection_contract:current",
+        "reusable_model_type_id": "logic_selection_contract",
+        "task_intent_id": "researchguard-regression:logic_selection_contract",
+        "declaration_phase": "before_candidate",
+        "guarded_purpose": "Keep the explicit synthesis request schema, identities, graph, budget and source bindings current.",
+        "protected_failure_ids": [
+          "researchguard:logic_selection_contract:legacy-top-n-fallback",
+          "researchguard:logic_selection_contract:body-order-incomplete",
+          "researchguard:logic_selection_contract:model-fingerprint-mismatch",
+          "researchguard:logic_selection_contract:binding-identity-invalid"
+        ],
+        "claim_boundary": "Current synthesis request identity and graph contract only; editorial composition remains caller-owned.",
+        "adoption_scope": "current_candidate_only",
+        "known_good_case_id": "native:logic_selection_contract:current-good",
+        "failure_bindings": [
+          {
+            "failure_id": "researchguard:logic_selection_contract:legacy-top-n-fallback",
+            "known_bad_case_id": "case:logic_selection_contract:legacy-top-n-fallback",
+            "oracle_id": "native:logic_selection_contract:run-checks"
+          },
+          {
+            "failure_id": "researchguard:logic_selection_contract:body-order-incomplete",
+            "known_bad_case_id": "case:logic_selection_contract:body-order-incomplete",
+            "oracle_id": "native:logic_selection_contract:run-checks"
+          },
+          {
+            "failure_id": "researchguard:logic_selection_contract:model-fingerprint-mismatch",
+            "known_bad_case_id": "case:logic_selection_contract:model-fingerprint-mismatch",
+            "oracle_id": "native:logic_selection_contract:run-checks"
+          },
+          {
+            "failure_id": "researchguard:logic_selection_contract:binding-identity-invalid",
+            "known_bad_case_id": "case:logic_selection_contract:binding-identity-invalid",
+            "oracle_id": "native:logic_selection_contract:run-checks"
+          }
+        ],
+        "evidence_check_ids": [
+          "check:model-regression:logic_selection_contract"
+        ],
+        "model_sha256": "sha256:dfac767d01cbbc9917fdb799d1b63796eff34329dfdf9ea81f7992d70d4a5fa8",
+        "runner_sha256": "sha256:f15feab197a2fc1e914223477ffe24437982eff1c56e2a17adcf697d7b41eb32",
+        "declaration_fingerprint": "sha256:60695de9d10ddcda4768b4dbd5bd009b4928c2099f7fad2a34773232479876a9",
+        "closure_fingerprint": "sha256:fce66bbb9c4b05c03e36ef129ec0bf60b9ade24b99d00fca62d65a82dd799344"
+      }
+    },
+    {
+      "model_id": "argument_support_closure",
+      "model_path": ".flowguard/models/owners/argument_support_closure/model.py",
+      "runner": [
+        "{python}",
+        ".flowguard/verification/owners/argument_support_closure/run_checks.py"
+      ],
+      "tier": "focused",
+      "timeout_seconds": 120,
+      "shard_safe": true,
+      "mutation_policy": "none",
+      "input_globs": [
+        ".flowguard/models/owners/argument_support_closure/model.py",
+        ".flowguard/verification/owners/argument_support_closure/run_checks.py",
+        "src/researchguard/logic/execution_depth.py",
+        "tests/logic/test_execution_depth.py"
+      ],
+      "intent_source_inputs": [
+        "openspec/changes/repair-argument-to-reader-composition/design.md"
+      ],
+      "expected_artifacts": [],
+      "exclusion_reason": "",
+      "distribution_policy": "required_public",
+      "absence_reason": "",
+      "model_kind": "executable_workflow",
+      "purpose_closure": {
+        "schema_version": "flowguard.model_purpose_closure.v1",
+        "model_instance_id": "regression:argument_support_closure:current",
+        "reusable_model_type_id": "argument_support_closure",
+        "task_intent_id": "researchguard-regression:argument_support_closure",
+        "declaration_phase": "before_candidate",
+        "guarded_purpose": "Keep selected claim support, argument roles, alternatives and graph termination bound to the native depth owner.",
+        "protected_failure_ids": [
+          "researchguard:argument_support_closure:missing-selected-claim-support",
+          "researchguard:argument_support_closure:foreign-claim-support",
+          "researchguard:argument_support_closure:missing-argument-role",
+          "researchguard:argument_support_closure:cycle-not-terminated"
+        ],
+        "claim_boundary": "Selected LogicGuard claim support closure only; source truth and native evaluation remain separate.",
+        "adoption_scope": "current_candidate_only",
+        "known_good_case_id": "native:argument_support_closure:current-good",
+        "failure_bindings": [
+          {
+            "failure_id": "researchguard:argument_support_closure:missing-selected-claim-support",
+            "known_bad_case_id": "case:argument_support_closure:missing-selected-claim-support",
+            "oracle_id": "native:argument_support_closure:run-checks"
+          },
+          {
+            "failure_id": "researchguard:argument_support_closure:foreign-claim-support",
+            "known_bad_case_id": "case:argument_support_closure:foreign-claim-support",
+            "oracle_id": "native:argument_support_closure:run-checks"
+          },
+          {
+            "failure_id": "researchguard:argument_support_closure:missing-argument-role",
+            "known_bad_case_id": "case:argument_support_closure:missing-argument-role",
+            "oracle_id": "native:argument_support_closure:run-checks"
+          },
+          {
+            "failure_id": "researchguard:argument_support_closure:cycle-not-terminated",
+            "known_bad_case_id": "case:argument_support_closure:cycle-not-terminated",
+            "oracle_id": "native:argument_support_closure:run-checks"
+          }
+        ],
+        "evidence_check_ids": [
+          "check:model-regression:argument_support_closure"
+        ],
+        "model_sha256": "sha256:10fed2e6b8078b0d23fe65fe1543f76e024421d41d2d1fb8aaa9d9543a3d518a",
+        "runner_sha256": "sha256:727431c496d37f84dc48862528a26f8855e256e4a7af0c8178e0f3d671013a68",
+        "declaration_fingerprint": "sha256:84cf5129e4a9ef383398f55484794257a1bd7136622c1c190c2fb2b6d0aab972",
+        "closure_fingerprint": "sha256:487a5ea1dfa7066c8faf38ee59693ddd1e5876110dd4cb3d569604afacf744ad"
+      }
+    },
+    {
+      "model_id": "discourse_structure",
+      "model_path": ".flowguard/models/owners/discourse_structure/model.py",
+      "runner": [
+        "{python}",
+        ".flowguard/verification/owners/discourse_structure/run_checks.py"
+      ],
+      "tier": "focused",
+      "timeout_seconds": 120,
+      "shard_safe": true,
+      "mutation_policy": "none",
+      "input_globs": [
+        ".flowguard/models/owners/discourse_structure/model.py",
+        ".flowguard/verification/owners/discourse_structure/run_checks.py",
+        "src/researchguard/logic/structure_audit.py",
+        "tests/logic/test_structured_artifact.py"
+      ],
+      "intent_source_inputs": [
+        "openspec/changes/repair-argument-to-reader-composition/design.md"
+      ],
+      "expected_artifacts": [],
+      "exclusion_reason": "",
+      "distribution_policy": "required_public",
+      "absence_reason": "",
+      "model_kind": "executable_workflow",
+      "purpose_closure": {
+        "schema_version": "flowguard.model_purpose_closure.v1",
+        "model_instance_id": "regression:discourse_structure:current",
+        "reusable_model_type_id": "discourse_structure",
+        "task_intent_id": "researchguard-regression:discourse_structure",
+        "declaration_phase": "before_candidate",
+        "guarded_purpose": "Keep parent contribution, downstream use, sibling progression and conclusion recovery connected across discourse blocks.",
+        "protected_failure_ids": [
+          "researchguard:discourse_structure:missing-parent-contribution",
+          "researchguard:discourse_structure:missing-downstream-consumer",
+          "researchguard:discourse_structure:missing-sibling-progression",
+          "researchguard:discourse_structure:unrecovered-conclusion-obligation",
+          "researchguard:discourse_structure:missing-structure-input"
+        ],
+        "claim_boundary": "Cross-block structural contribution checks only; prose coherence remains a reader review responsibility.",
+        "adoption_scope": "current_candidate_only",
+        "known_good_case_id": "native:discourse_structure:current-good",
+        "failure_bindings": [
+          {
+            "failure_id": "researchguard:discourse_structure:missing-parent-contribution",
+            "known_bad_case_id": "case:discourse_structure:missing-parent-contribution",
+            "oracle_id": "native:discourse_structure:run-checks"
+          },
+          {
+            "failure_id": "researchguard:discourse_structure:missing-downstream-consumer",
+            "known_bad_case_id": "case:discourse_structure:missing-downstream-consumer",
+            "oracle_id": "native:discourse_structure:run-checks"
+          },
+          {
+            "failure_id": "researchguard:discourse_structure:missing-sibling-progression",
+            "known_bad_case_id": "case:discourse_structure:missing-sibling-progression",
+            "oracle_id": "native:discourse_structure:run-checks"
+          },
+          {
+            "failure_id": "researchguard:discourse_structure:unrecovered-conclusion-obligation",
+            "known_bad_case_id": "case:discourse_structure:unrecovered-conclusion-obligation",
+            "oracle_id": "native:discourse_structure:run-checks"
+          },
+          {
+            "failure_id": "researchguard:discourse_structure:missing-structure-input",
+            "known_bad_case_id": "case:discourse_structure:missing-structure-input",
+            "oracle_id": "native:discourse_structure:run-checks"
+          }
+        ],
+        "evidence_check_ids": [
+          "check:model-regression:discourse_structure"
+        ],
+        "model_sha256": "sha256:7b1fc003ac45990fd546dacf789a3874d1eda778eddde00415b78724ebd30f20",
+        "runner_sha256": "sha256:4dd9c70e1d4fa60c1c4025dd2f84854db5d1f4875f742c51f4d1661eb802456d",
+        "declaration_fingerprint": "sha256:6808b065969869de22781fc8bbb026a0a60fbf23b9eb0184752e6453d8e61814",
+        "closure_fingerprint": "sha256:da65105239377299c12e1900e7138e6239aaafe3742bd528b1193afecf2f53d9"
+      }
+    },
+    {
+      "model_id": "trace_domain_export",
+      "model_path": ".flowguard/models/owners/trace_domain_export/model.py",
+      "runner": [
+        "{python}",
+        ".flowguard/verification/owners/trace_domain_export/run_checks.py"
+      ],
+      "tier": "focused",
+      "timeout_seconds": 120,
+      "shard_safe": true,
+      "mutation_policy": "none",
+      "input_globs": [
+        ".flowguard/models/owners/trace_domain_export/model.py",
+        ".flowguard/verification/owners/trace_domain_export/run_checks.py",
+        "src/researchguard/trace/export_logicguard.py",
+        "src/researchguard/trace/results.py",
+        "tests/trace/test_traceguard.py"
+      ],
+      "intent_source_inputs": [
+        "openspec/changes/repair-argument-to-reader-composition/design.md"
+      ],
+      "expected_artifacts": [],
+      "exclusion_reason": "",
+      "distribution_policy": "required_public",
+      "absence_reason": "",
+      "model_kind": "executable_workflow",
+      "purpose_closure": {
+        "schema_version": "flowguard.model_purpose_closure.v1",
+        "model_instance_id": "regression:trace_domain_export:current",
+        "reusable_model_type_id": "trace_domain_export",
+        "task_intent_id": "researchguard-regression:trace_domain_export",
+        "declaration_phase": "before_candidate",
+        "guarded_purpose": "Keep TraceGuard domain proposition and mechanism evidence separate from audit context during LogicGuard export.",
+        "protected_failure_ids": [
+          "researchguard:trace_domain_export:domain-proposition-missing",
+          "researchguard:trace_domain_export:mechanism-reference-missing",
+          "researchguard:trace_domain_export:audit-context-promoted-to-domain",
+          "researchguard:trace_domain_export:temporal-order-promoted-to-causality"
+        ],
+        "claim_boundary": "Trace-to-Logic domain fields and audit context only; TraceGuard solver status remains native evidence.",
+        "adoption_scope": "current_candidate_only",
+        "known_good_case_id": "native:trace_domain_export:current-good",
+        "failure_bindings": [
+          {
+            "failure_id": "researchguard:trace_domain_export:domain-proposition-missing",
+            "known_bad_case_id": "case:trace_domain_export:domain-proposition-missing",
+            "oracle_id": "native:trace_domain_export:run-checks"
+          },
+          {
+            "failure_id": "researchguard:trace_domain_export:mechanism-reference-missing",
+            "known_bad_case_id": "case:trace_domain_export:mechanism-reference-missing",
+            "oracle_id": "native:trace_domain_export:run-checks"
+          },
+          {
+            "failure_id": "researchguard:trace_domain_export:audit-context-promoted-to-domain",
+            "known_bad_case_id": "case:trace_domain_export:audit-context-promoted-to-domain",
+            "oracle_id": "native:trace_domain_export:run-checks"
+          },
+          {
+            "failure_id": "researchguard:trace_domain_export:temporal-order-promoted-to-causality",
+            "known_bad_case_id": "case:trace_domain_export:temporal-order-promoted-to-causality",
+            "oracle_id": "native:trace_domain_export:run-checks"
+          }
+        ],
+        "evidence_check_ids": [
+          "check:model-regression:trace_domain_export"
+        ],
+        "model_sha256": "sha256:f6c83309380d2f66ec0f34298b1c469fb3016b72163173e12e83e2703b891328",
+        "runner_sha256": "sha256:70d35fd36317b1fc84b0ad5ba160319896201d24222bc5b667b87deec0dbfd66",
+        "declaration_fingerprint": "sha256:e872e2b4a45a0434e8bcf39b1f042e73971fc7219d295de9da36b7863c659f94",
+        "closure_fingerprint": "sha256:32774cb34e5a467c111f7f07b3f9bfcb43ab77e72e75399eeded1ff8df657232"
+      }
+    }
+  ]
+}

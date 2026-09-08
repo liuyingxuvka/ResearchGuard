@@ -300,6 +300,11 @@ def build_parser() -> argparse.ArgumentParser:
     structure_markdown.set_defaults(func=_cmd_structure_from_markdown)
     structure_audit = structure_sub.add_parser("audit", help="Run structure-flow diagnostics.")
     structure_audit.add_argument("model")
+    structure_audit.add_argument(
+        "--selection-request",
+        default="",
+        help="Optional JSON file containing the current synthesis selection request.",
+    )
     structure_audit.add_argument("--json", action="store_true")
     structure_audit.add_argument("--output")
     structure_audit.set_defaults(func=_cmd_structure_audit)
@@ -323,11 +328,9 @@ def build_parser() -> argparse.ArgumentParser:
             command.add_argument("--artifact-unit-id", required=True)
         command.set_defaults(func=handler)
 
-    synthesize = sub.add_parser("synthesize", help="Create an importance-aware target artifact story plan.")
+    synthesize = sub.add_parser("synthesize", help="Validate an explicit target artifact unit request.")
     synthesize.add_argument("model")
-    synthesize.add_argument("--goal", required=True)
-    synthesize.add_argument("--profile", default="presentation", choices=["presentation", "paper", "report"])
-    synthesize.add_argument("--max-items", type=int, default=8)
+    synthesize.add_argument("--selection-request", required=True, help="JSON file containing researchguard.logic.synthesis-request.v1.")
     synthesize.add_argument("--library-root", default="", help="Optional source library root for branch candidates.")
     synthesize.add_argument("--source-id", default="", help="Optional source id to load branch candidates from.")
     synthesize.add_argument("--project", default="", help="Optional project id to filter source branch candidates.")
@@ -804,7 +807,8 @@ def _cmd_structure_from_markdown(args: argparse.Namespace) -> int:
 
 def _cmd_structure_audit(args: argparse.Namespace) -> int:
     model = load_model(args.model)
-    report = audit_structure(model)
+    selection_request = _load_json_object(args.selection_request) if args.selection_request else None
+    report = audit_structure(model, selection_request)
     payload: Any = report.to_dict() if args.json or (args.output and args.output.endswith(".json")) else report.to_markdown()
     if args.output:
         _write(args.output, payload)
@@ -867,7 +871,9 @@ def _cmd_blueprint_export(args: argparse.Namespace) -> int:
 
 def _cmd_synthesize(args: argparse.Namespace) -> int:
     model = load_model(args.model)
+    selection_request = _load_json_object(args.selection_request)
     source_branches = ()
+    library = None
     if args.library_root:
         library = SourceLibrary(args.library_root)
         branches = library.list_deepening_branches(args.source_id, project_id=args.project)
@@ -877,13 +883,17 @@ def _cmd_synthesize(args: argparse.Namespace) -> int:
         source_branches = tuple(branches)
     plan = synthesize_artifact_plan(
         model,
-        target_goal=args.goal,
-        profile=args.profile,
-        max_items=args.max_items,
+        selection_request=selection_request,
         source_branches=source_branches,
+        source_library=library,
+        native_mesh_overlay=(
+            selection_request.get("native_mesh_overlay_ref")
+            if isinstance(selection_request, dict)
+            else None
+        ),
     )
     if args.delivery:
-        guidance = adapt_delivery(plan, profile=args.profile)
+        guidance = adapt_delivery(plan, profile=plan.profile)
         payload = {
             "plan": plan.to_dict(),
             "delivery": guidance.to_dict(),
@@ -894,7 +904,7 @@ def _cmd_synthesize(args: argparse.Namespace) -> int:
         _write(args.output, payload)
     else:
         print(json.dumps(payload, indent=2) if isinstance(payload, dict) else payload)
-    return 0
+    return 0 if plan.status == "research_handoff_ready" else 3
 
 
 def _cmd_argument_create(args: argparse.Namespace) -> int:

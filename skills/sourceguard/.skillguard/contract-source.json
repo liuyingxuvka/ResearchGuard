@@ -39,7 +39,7 @@
     }
   ],
   "model_id": "researchguard.sourceguard.contract.current",
-  "model_path": ".flowguard/sourceguard_skill_contract_model.py",
+  "model_path": ".flowguard/models/sourceguard_skill_contract_model.py",
   "confirmed": true,
   "integration_mode": "native-integrated",
   "native_route_owner": "owner:researchguard:sourceguard",
@@ -95,6 +95,16 @@
       "check:sourceguard:task-model-closure"
     ],
     "model_deepening_check_id": "check:sourceguard:task-model-closure",
+    "surface_inventory": {
+      "path": ".skillguard/surface-inventory.json",
+      "adequacy_check_ids": [
+        "check:sourceguard:consumer-contract",
+        "check:sourceguard:prompt-load",
+        "check:sourceguard:native-tests",
+        "check:sourceguard:task-model-closure"
+      ],
+      "model_deepening_check_id": "check:sourceguard:task-model-closure"
+    },
     "skillguard_adds_domain_route": false,
     "enforcement_level": "enforced",
     "required_closure_profiles": [
@@ -124,12 +134,12 @@
   "implementation_paths": [
     "skills/sourceguard",
     "src/researchguard/source",
-    ".flowguard/researchguard_suite_model.py",
-    ".flowguard/researchguard_suite_model.json",
-    ".flowguard/run_researchguard_suite_model.py",
-    ".flowguard/sourceguard_content_anchor_oracle_model.py",
-    ".flowguard/sourceguard_skill_contract_model.py",
-    ".flowguard/researchguard_skill_contract_model_common.py",
+    ".flowguard/models/researchguard_suite_model.py",
+    ".flowguard/models/researchguard_suite/model-definition.json",
+    ".flowguard/verification/run_researchguard_suite_model.py",
+    ".flowguard/models/sourceguard_content_anchor_oracle_model.py",
+    ".flowguard/models/sourceguard_skill_contract_model.py",
+    ".flowguard/models/researchguard_skill_contract_model_common.py",
     "examples/source",
     "tests/source",
     "researchguard/prompt_bundle_manifest.json",
@@ -227,27 +237,27 @@
         },
         {
           "kind": "path",
-          "path": ".flowguard/researchguard_suite_model.py"
+          "path": ".flowguard/models/researchguard_suite_model.py"
         },
         {
           "kind": "path",
-          "path": ".flowguard/researchguard_suite_model.json"
+          "path": ".flowguard/models/researchguard_suite/model-definition.json"
         },
         {
           "kind": "path",
-          "path": ".flowguard/run_researchguard_suite_model.py"
+          "path": ".flowguard/verification/run_researchguard_suite_model.py"
         },
         {
           "kind": "path",
-          "path": ".flowguard/sourceguard_skill_contract_model.py"
+          "path": ".flowguard/models/sourceguard_skill_contract_model.py"
         },
         {
           "kind": "path",
-          "path": ".flowguard/researchguard_skill_contract_model_common.py"
+          "path": ".flowguard/models/researchguard_skill_contract_model_common.py"
         },
         {
           "kind": "path",
-          "path": ".flowguard/sourceguard_content_anchor_oracle_model.py"
+          "path": ".flowguard/models/sourceguard_content_anchor_oracle_model.py"
         }
       ],
       "expected": {
@@ -465,5 +475,5 @@
     }
   ],
   "judgment_rubrics": [],
-  "claim_boundary": "This contract covers the current sourceguard consumer projection, native route, and member-owned tests inside ResearchGuard v0.4.11. The four exact native-blueprint evidence categories are selectors of the one existing target-owned native-tests owner, so final validation does not repeat the same member suite. Distinct model obligation ids remain a later binding with the frozen FlowGuard self-DNA toolchain. It does not prove source truth, unrun external work, installed currentness, publication, or future AI behavior."
+  "claim_boundary": "This contract covers the current sourceguard consumer projection, native route, and member-owned tests inside ResearchGuard v0.5.0. The four exact native-blueprint evidence categories are selectors of the one existing target-owned native-tests owner, so final validation does not repeat the same member suite. Distinct model obligation ids remain a later binding with the frozen FlowGuard self-DNA toolchain. It does not prove source truth, unrun external work, installed currentness, publication, or future AI behavior."
 }

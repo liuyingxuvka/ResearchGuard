@@ -1,0 +1,384 @@
+{
+  "schema_version": "skillguard.surface_inventory.v1",
+  "inventory_id": "inventory:researchguard:experimentguard:surfaces",
+  "target_skill_id": "experimentguard",
+  "source_kind": "target-owned-full-source-discovery",
+  "source_paths": [
+    ".skillguard/contract-source.json",
+    "SKILL.md",
+    "agents/openai.yaml",
+    "references/experiment-model-protocol.md"
+  ],
+  "observed_surface_ids": [
+    "route:researchguard:experimentguard"
+  ],
+  "owner_ids": [
+    "owner:researchguard:experimentguard"
+  ],
+  "rows": [
+    {
+      "surface_id": "route:researchguard:experimentguard",
+      "kind": "route",
+      "name": "experimentguard native route",
+      "disposition": "governed",
+      "intent_id": "intent:researchguard:experimentguard",
+      "owner_id": "owner:researchguard:experimentguard",
+      "route_id": "route:researchguard:experimentguard",
+      "function_id": "function:researchguard:experimentguard",
+      "required_check_ids": [
+        "check:experimentguard:consumer-contract",
+        "check:experimentguard:native-tests",
+        "check:experimentguard:prompt-load",
+        "check:experimentguard:task-model-closure"
+      ],
+      "adequacy_check_ids": [
+        "check:experimentguard:consumer-contract",
+        "check:experimentguard:native-tests",
+        "check:experimentguard:prompt-load",
+        "check:experimentguard:task-model-closure"
+      ],
+      "evidence_subject_ids": [
+        "subject:researchguard:experimentguard:consumer-contract",
+        "subject:researchguard:experimentguard:native-tests",
+        "subject:researchguard:experimentguard:prompt-load",
+        "subject:researchguard:experimentguard:task-model-closure"
+      ]
+    }
+  ],
+  "current_obligation_ids": [
+    "obligation:researchguard:experimentguard:consumer-contract",
+    "obligation:researchguard:experimentguard:native-tests",
+    "obligation:researchguard:experimentguard:prompt-load",
+    "obligation:researchguard:experimentguard:task-model-closure"
+  ],
+  "model_obligations": [
+    {
+      "obligation_id": "obligation:researchguard:experimentguard:consumer-contract",
+      "disposition": "governed",
+      "surface_ids": [
+        "artifact:agents/openai.yaml",
+        "config:.skillguard/contract-source.json",
+        "template:SKILL.md",
+        "template:references/experiment-model-protocol.md"
+      ],
+      "reason": "Explicit member author rules bind these source surfaces to this compiled obligation.",
+      "proof_ref": ".skillguard/surface-semantic-map.json#decision_rules"
+    },
+    {
+      "obligation_id": "obligation:researchguard:experimentguard:native-tests",
+      "disposition": "governed",
+      "surface_ids": [
+        "config:.skillguard/contract-source.json",
+        "template:references/experiment-model-protocol.md"
+      ],
+      "reason": "Explicit member author rules bind these source surfaces to this compiled obligation.",
+      "proof_ref": ".skillguard/surface-semantic-map.json#decision_rules"
+    },
+    {
+      "obligation_id": "obligation:researchguard:experimentguard:prompt-load",
+      "disposition": "governed",
+      "surface_ids": [
+        "artifact:agents/openai.yaml",
+        "config:.skillguard/contract-source.json",
+        "template:SKILL.md",
+        "template:references/experiment-model-protocol.md"
+      ],
+      "reason": "Explicit member author rules bind these source surfaces to this compiled obligation.",
+      "proof_ref": ".skillguard/surface-semantic-map.json#decision_rules"
+    },
+    {
+      "obligation_id": "obligation:researchguard:experimentguard:task-model-closure",
+      "disposition": "governed",
+      "surface_ids": [
+        "config:.skillguard/contract-source.json",
+        "template:references/experiment-model-protocol.md"
+      ],
+      "reason": "Explicit member author rules bind these source surfaces to this compiled obligation.",
+      "proof_ref": ".skillguard/surface-semantic-map.json#decision_rules"
+    }
+  ],
+  "full_surface_ids": [
+    "artifact:agents/openai.yaml",
+    "config:.skillguard/contract-source.json",
+    "template:SKILL.md",
+    "template:references/experiment-model-protocol.md"
+  ],
+  "full_surfaces": [
+    {
+      "surface_id": "artifact:agents/openai.yaml",
+      "kind": "artifact",
+      "name": "agents/openai.yaml",
+      "source_path": "agents/openai.yaml",
+      "source_fingerprint": "sha256:d020aa2e4a8ff8167d6b929b2713001846a8f6839d3e30d1a73383e3accab535",
+      "function_id": "artifact:agents/openai.yaml",
+      "route_id": "artifact:agents/openai.yaml",
+      "review_group_id": "group:surface:d9efd0b752469e1fc3464d11",
+      "review_granularity": "surface",
+      "model_obligation_ids": [
+        "obligation:researchguard:experimentguard:consumer-contract",
+        "obligation:researchguard:experimentguard:prompt-load"
+      ],
+      "disposition": "governed",
+      "owner_id": "owner:researchguard:experimentguard",
+      "intent_id": "intent:experimentguard:02aa2aef48a9ed841ca6b123",
+      "obligation_ids": [
+        "obligation:researchguard:experimentguard:consumer-contract",
+        "obligation:researchguard:experimentguard:prompt-load"
+      ],
+      "required_check_ids": [
+        "check:experimentguard:consumer-contract",
+        "check:experimentguard:prompt-load"
+      ],
+      "adequacy_check_ids": [
+        "check:experimentguard:consumer-contract",
+        "check:experimentguard:prompt-load",
+        "check:experimentguard:task-model-closure"
+      ],
+      "execution_owner_ids": [
+        "owner:researchguard:experimentguard:consumer-contract",
+        "owner:researchguard:experimentguard:prompt-load",
+        "owner:researchguard:experimentguard:task-model-closure"
+      ],
+      "evidence_subject_ids": [
+        "subject:researchguard:experimentguard:consumer-contract",
+        "subject:researchguard:experimentguard:prompt-load",
+        "subject:researchguard:experimentguard:task-model-closure"
+      ],
+      "lifecycle_phase": "native-consumer-runtime",
+      "consumer_exposure": "declared-member-skill",
+      "write_authority": "target-owned-native-route"
+    },
+    {
+      "surface_id": "config:.skillguard/contract-source.json",
+      "kind": "config",
+      "name": ".skillguard/contract-source.json",
+      "source_path": ".skillguard/contract-source.json",
+      "source_fingerprint": "sha256:d545fb399f35af7efca9ac5657a432d6c6c909fb78443b4ef0743ad2e6675926",
+      "function_id": "config:.skillguard/contract-source.json",
+      "route_id": "config:.skillguard/contract-source.json",
+      "review_group_id": "group:surface:10513a60240614296b758ebb",
+      "review_granularity": "surface",
+      "model_obligation_ids": [
+        "obligation:researchguard:experimentguard:consumer-contract",
+        "obligation:researchguard:experimentguard:native-tests",
+        "obligation:researchguard:experimentguard:prompt-load",
+        "obligation:researchguard:experimentguard:task-model-closure"
+      ],
+      "disposition": "governed",
+      "owner_id": "owner:researchguard:experimentguard",
+      "intent_id": "intent:experimentguard:1ba2b7b283a1d06cfd3a7c70",
+      "obligation_ids": [
+        "obligation:researchguard:experimentguard:consumer-contract",
+        "obligation:researchguard:experimentguard:native-tests",
+        "obligation:researchguard:experimentguard:prompt-load",
+        "obligation:researchguard:experimentguard:task-model-closure"
+      ],
+      "required_check_ids": [
+        "check:experimentguard:consumer-contract",
+        "check:experimentguard:native-tests",
+        "check:experimentguard:prompt-load",
+        "check:experimentguard:task-model-closure"
+      ],
+      "adequacy_check_ids": [
+        "check:experimentguard:consumer-contract",
+        "check:experimentguard:native-tests",
+        "check:experimentguard:prompt-load",
+        "check:experimentguard:task-model-closure"
+      ],
+      "execution_owner_ids": [
+        "owner:researchguard:experimentguard:consumer-contract",
+        "owner:researchguard:experimentguard:native-tests",
+        "owner:researchguard:experimentguard:prompt-load",
+        "owner:researchguard:experimentguard:task-model-closure"
+      ],
+      "evidence_subject_ids": [
+        "subject:researchguard:experimentguard:consumer-contract",
+        "subject:researchguard:experimentguard:native-tests",
+        "subject:researchguard:experimentguard:prompt-load",
+        "subject:researchguard:experimentguard:task-model-closure"
+      ],
+      "lifecycle_phase": "author-maintenance",
+      "consumer_exposure": "excluded-author-contract",
+      "write_authority": "author-contract-only"
+    },
+    {
+      "surface_id": "template:SKILL.md",
+      "kind": "template",
+      "name": "SKILL.md",
+      "source_path": "SKILL.md",
+      "source_fingerprint": "sha256:e669c705c7f70957afeab5808c5a0db2e63d7941799a6b3d1fff75f3ceb46b8d",
+      "function_id": "template:SKILL.md",
+      "route_id": "template:SKILL.md",
+      "review_group_id": "group:surface:45d8dca86b7e8a7dd698b75b",
+      "review_granularity": "surface",
+      "model_obligation_ids": [
+        "obligation:researchguard:experimentguard:consumer-contract",
+        "obligation:researchguard:experimentguard:prompt-load"
+      ],
+      "disposition": "governed",
+      "owner_id": "owner:researchguard:experimentguard",
+      "intent_id": "intent:experimentguard:02aa2aef48a9ed841ca6b123",
+      "obligation_ids": [
+        "obligation:researchguard:experimentguard:consumer-contract",
+        "obligation:researchguard:experimentguard:prompt-load"
+      ],
+      "required_check_ids": [
+        "check:experimentguard:consumer-contract",
+        "check:experimentguard:prompt-load"
+      ],
+      "adequacy_check_ids": [
+        "check:experimentguard:consumer-contract",
+        "check:experimentguard:prompt-load",
+        "check:experimentguard:task-model-closure"
+      ],
+      "execution_owner_ids": [
+        "owner:researchguard:experimentguard:consumer-contract",
+        "owner:researchguard:experimentguard:prompt-load",
+        "owner:researchguard:experimentguard:task-model-closure"
+      ],
+      "evidence_subject_ids": [
+        "subject:researchguard:experimentguard:consumer-contract",
+        "subject:researchguard:experimentguard:prompt-load",
+        "subject:researchguard:experimentguard:task-model-closure"
+      ],
+      "lifecycle_phase": "native-consumer-runtime",
+      "consumer_exposure": "declared-member-skill",
+      "write_authority": "target-owned-native-route"
+    },
+    {
+      "surface_id": "template:references/experiment-model-protocol.md",
+      "kind": "template",
+      "name": "references/experiment-model-protocol.md",
+      "source_path": "references/experiment-model-protocol.md",
+      "source_fingerprint": "sha256:41c3ee3c735b3aedd31c0b621f6316a099750577d9ebafaf1137776d8aaeca7a",
+      "function_id": "template:references/experiment-model-protocol.md",
+      "route_id": "template:references/experiment-model-protocol.md",
+      "review_group_id": "group:surface:d75b4d439e45a68020911274",
+      "review_granularity": "surface",
+      "model_obligation_ids": [
+        "obligation:researchguard:experimentguard:consumer-contract",
+        "obligation:researchguard:experimentguard:native-tests",
+        "obligation:researchguard:experimentguard:prompt-load",
+        "obligation:researchguard:experimentguard:task-model-closure"
+      ],
+      "disposition": "governed",
+      "owner_id": "owner:researchguard:experimentguard",
+      "intent_id": "intent:experimentguard:7e74b85719624626622dcea1",
+      "obligation_ids": [
+        "obligation:researchguard:experimentguard:consumer-contract",
+        "obligation:researchguard:experimentguard:native-tests",
+        "obligation:researchguard:experimentguard:prompt-load",
+        "obligation:researchguard:experimentguard:task-model-closure"
+      ],
+      "required_check_ids": [
+        "check:experimentguard:consumer-contract",
+        "check:experimentguard:native-tests",
+        "check:experimentguard:prompt-load",
+        "check:experimentguard:task-model-closure"
+      ],
+      "adequacy_check_ids": [
+        "check:experimentguard:consumer-contract",
+        "check:experimentguard:native-tests",
+        "check:experimentguard:prompt-load",
+        "check:experimentguard:task-model-closure"
+      ],
+      "execution_owner_ids": [
+        "owner:researchguard:experimentguard:consumer-contract",
+        "owner:researchguard:experimentguard:native-tests",
+        "owner:researchguard:experimentguard:prompt-load",
+        "owner:researchguard:experimentguard:task-model-closure"
+      ],
+      "evidence_subject_ids": [
+        "subject:researchguard:experimentguard:consumer-contract",
+        "subject:researchguard:experimentguard:native-tests",
+        "subject:researchguard:experimentguard:prompt-load",
+        "subject:researchguard:experimentguard:task-model-closure"
+      ],
+      "lifecycle_phase": "native-consumer-runtime",
+      "consumer_exposure": "declared-member-skill",
+      "write_authority": "target-owned-native-route"
+    }
+  ],
+  "surface_category_dispositions": {
+    "command": {
+      "disposition": "not_applicable_proven",
+      "reason": "Current skill-root scan contains no command surfaces; this says nothing about native package surfaces outside that root.",
+      "proof_ref": ".skillguard/surface-inventory.json#full_discovery_fingerprint"
+    },
+    "api": {
+      "disposition": "not_applicable_proven",
+      "reason": "Current skill-root scan contains no api surfaces; this says nothing about native package surfaces outside that root.",
+      "proof_ref": ".skillguard/surface-inventory.json#full_discovery_fingerprint"
+    },
+    "script": {
+      "disposition": "not_applicable_proven",
+      "reason": "Current skill-root scan contains no script surfaces; this says nothing about native package surfaces outside that root.",
+      "proof_ref": ".skillguard/surface-inventory.json#full_discovery_fingerprint"
+    },
+    "route": {
+      "disposition": "not_applicable_proven",
+      "reason": "Current skill-root scan contains no route surfaces; this says nothing about native package surfaces outside that root.",
+      "proof_ref": ".skillguard/surface-inventory.json#full_discovery_fingerprint"
+    },
+    "template": {
+      "disposition": "governed",
+      "reason": "Current skill-root scan contains explicitly mapped template surfaces; this says nothing about native package surfaces outside that root.",
+      "proof_ref": ".skillguard/surface-inventory.json#full_discovery_fingerprint"
+    },
+    "config": {
+      "disposition": "governed",
+      "reason": "Current skill-root scan contains explicitly mapped config surfaces; this says nothing about native package surfaces outside that root.",
+      "proof_ref": ".skillguard/surface-inventory.json#full_discovery_fingerprint"
+    },
+    "installer": {
+      "disposition": "not_applicable_proven",
+      "reason": "Current skill-root scan contains no installer surfaces; this says nothing about native package surfaces outside that root.",
+      "proof_ref": ".skillguard/surface-inventory.json#full_discovery_fingerprint"
+    },
+    "ui": {
+      "disposition": "not_applicable_proven",
+      "reason": "Current skill-root scan contains no ui surfaces; this says nothing about native package surfaces outside that root.",
+      "proof_ref": ".skillguard/surface-inventory.json#full_discovery_fingerprint"
+    },
+    "effect": {
+      "disposition": "not_applicable_proven",
+      "reason": "Current skill-root scan contains no effect surfaces; this says nothing about native package surfaces outside that root.",
+      "proof_ref": ".skillguard/surface-inventory.json#full_discovery_fingerprint"
+    },
+    "fault": {
+      "disposition": "not_applicable_proven",
+      "reason": "Current skill-root scan contains no fault surfaces; this says nothing about native package surfaces outside that root.",
+      "proof_ref": ".skillguard/surface-inventory.json#full_discovery_fingerprint"
+    },
+    "recovery": {
+      "disposition": "not_applicable_proven",
+      "reason": "Current skill-root scan contains no recovery surfaces; this says nothing about native package surfaces outside that root.",
+      "proof_ref": ".skillguard/surface-inventory.json#full_discovery_fingerprint"
+    },
+    "artifact": {
+      "disposition": "governed",
+      "reason": "Current skill-root scan contains explicitly mapped artifact surfaces; this says nothing about native package surfaces outside that root.",
+      "proof_ref": ".skillguard/surface-inventory.json#full_discovery_fingerprint"
+    },
+    "provider": {
+      "disposition": "not_applicable_proven",
+      "reason": "Current skill-root scan contains no provider surfaces; this says nothing about native package surfaces outside that root.",
+      "proof_ref": ".skillguard/surface-inventory.json#full_discovery_fingerprint"
+    },
+    "component": {
+      "disposition": "not_applicable_proven",
+      "reason": "Current skill-root scan contains no component surfaces; this says nothing about native package surfaces outside that root.",
+      "proof_ref": ".skillguard/surface-inventory.json#full_discovery_fingerprint"
+    }
+  },
+  "full_discovery_fingerprint": "sha256:3bc277b11074f0df961e6eb0f5c7c5a9946b4a08d1d1ea3d8811d2115586a3a0",
+  "adequacy_check_ids": [
+    "check:experimentguard:consumer-contract",
+    "check:experimentguard:native-tests",
+    "check:experimentguard:prompt-load",
+    "check:experimentguard:task-model-closure"
+  ],
+  "model_deepening_check_id": "check:experimentguard:task-model-closure",
+  "claim_boundary": "The declared member skill root is the source-discovery boundary. Its native package is separately bound by the contract's implementation paths and check inputs. This author map proves neither native check execution nor domain correctness, installation, release, or future AI behavior.",
+  "inventory_hash": "sha256:ff3e6bd87c00b919c06b2fb1c5b6fb92d89b7a4c771ab093a20687bd9573db84"
+}

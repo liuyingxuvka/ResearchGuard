@@ -15,6 +15,7 @@ from __future__ import annotations
 import ast
 import hashlib
 import json
+import os
 from collections import Counter, deque
 from pathlib import Path
 import tomllib
@@ -54,6 +55,8 @@ REPOSITORY_BOUNDARY_FILES = (
 )
 GENERATED_RUNTIME_PREFIXES = (
     ".flowguard/evidence/",
+    ".flowguard/history/",
+    ".flowguard/models/authority/",
     ".flowguard/model-mesh/",
     ".flowguard/receipts/",
     ".flowguard/exports/",
@@ -286,7 +289,22 @@ def _candidate_paths(root: Path) -> tuple[Path, ...]:
     for relative in REPOSITORY_BOUNDARY_ROOTS:
         directory = root / relative
         if directory.is_dir():
-            candidates.update(path for path in directory.rglob("*") if path.is_file())
+            # Prune only the fixed non-source boundaries before descending.
+            # Historical receipts and generated authority projections can be
+            # large; enumerating them first would make a source-only check
+            # depend on the size and availability of unrelated run history.
+            for current, directories, files in os.walk(directory, followlinks=False):
+                current_path = Path(current)
+                directories[:] = [
+                    name
+                    for name in directories
+                    if not _is_excluded(_normalise_relative(current_path / name, root) + "/")
+                ]
+                candidates.update(
+                    current_path / name
+                    for name in files
+                    if not _is_excluded(_normalise_relative(current_path / name, root))
+                )
     return tuple(sorted(candidates, key=lambda path: _normalise_relative(path, root)))
 
 

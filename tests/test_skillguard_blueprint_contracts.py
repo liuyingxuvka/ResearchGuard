@@ -230,6 +230,6 @@ def test_current_flowguard_validation_plan_is_visible_but_not_run() -> None:
     )
     assert plan["status"] == "current_not_run"
     assert plan["execution_disposition"] == "not_run"
-    assert plan["toolchain"]["flowguard_version"] == "0.68.14"
+    assert plan["toolchain"]["flowguard_version"] == "0.69.0"
     assert plan["toolchain"]["flowguard_status"] == "current_not_run"
     assert "maintenance-unit-validation-not-run" in plan["stale_reason_codes"]

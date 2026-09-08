@@ -1,0 +1,473 @@
+{
+  "schema_version": "skillguard.surface_semantic_map.v1",
+  "map_id": "map:researchguard:traceguard:surface-semantics",
+  "target_skill_id": "traceguard",
+  "source_discovery_fingerprint": "sha256:9405d4ec24f8a177da4c0cfb0665f24f1dc62372b40e8bffc84cc5a2d5878276",
+  "full_surface_ids": [
+    "api:scripts/traceguard_closure_check.py:check",
+    "api:scripts/traceguard_closure_check.py:main",
+    "api:scripts/traceguard_library_closure_check.py:check",
+    "api:scripts/traceguard_library_closure_check.py:main",
+    "artifact:agents/openai.yaml",
+    "component:scripts/traceguard_closure_check.py",
+    "component:scripts/traceguard_library_closure_check.py",
+    "config:.skillguard/contract-source.json",
+    "fault:scripts/traceguard_closure_check.py:check",
+    "fault:scripts/traceguard_library_closure_check.py:check",
+    "script:scripts/traceguard_closure_check.py",
+    "script:scripts/traceguard_library_closure_check.py",
+    "template:SKILL.md",
+    "template:references/commands-and-handoffs.md",
+    "template:references/depth-and-closure.md",
+    "template:references/routes/case-library.md",
+    "template:references/routes/general-trace.md",
+    "template:references/safe-output.md",
+    "template:references/task-iteration.md",
+    "template:references/trace-blueprint-contract.md",
+    "template:references/unified_inference_protocol.md",
+    "template:references/validated-template-pack.md",
+    "ui:scripts/traceguard_closure_check.py:check",
+    "ui:scripts/traceguard_library_closure_check.py:check"
+  ],
+  "current_obligation_ids": [
+    "obligation:researchguard:traceguard:consumer-contract",
+    "obligation:researchguard:traceguard:native-tests",
+    "obligation:researchguard:traceguard:prompt-load",
+    "obligation:researchguard:traceguard:task-model-closure"
+  ],
+  "decision_rules": [
+    {
+      "rule_id": "decision:traceguard:complete-target-declaration",
+      "model_obligation_ids": [
+        "obligation:researchguard:traceguard:consumer-contract",
+        "obligation:researchguard:traceguard:native-tests",
+        "obligation:researchguard:traceguard:prompt-load",
+        "obligation:researchguard:traceguard:task-model-closure"
+      ],
+      "source_paths": [
+        ".skillguard/contract-source.json"
+      ],
+      "reason": "The exact target contract declares every current member obligation, including the umbrella installation transaction where applicable.",
+      "proof_ref": ".skillguard/contract-source.json#closure_profiles"
+    },
+    {
+      "rule_id": "decision:traceguard:consumer-prompt",
+      "model_obligation_ids": [
+        "obligation:researchguard:traceguard:consumer-contract",
+        "obligation:researchguard:traceguard:prompt-load"
+      ],
+      "source_paths": [
+        "SKILL.md",
+        "agents/openai.yaml",
+        "references/commands-and-handoffs.md",
+        "references/depth-and-closure.md",
+        "references/routes/case-library.md",
+        "references/routes/general-trace.md",
+        "references/safe-output.md",
+        "references/task-iteration.md",
+        "references/trace-blueprint-contract.md",
+        "references/unified_inference_protocol.md",
+        "references/validated-template-pack.md"
+      ],
+      "reason": "These explicit consumer entry and reference files define the member boundary and its selected prompt loading.",
+      "proof_ref": ".skillguard/contract-source.json#closure_profiles"
+    },
+    {
+      "rule_id": "decision:traceguard:native-closure-boundary",
+      "model_obligation_ids": [
+        "obligation:researchguard:traceguard:native-tests",
+        "obligation:researchguard:traceguard:task-model-closure"
+      ],
+      "source_paths": [
+        "references/depth-and-closure.md",
+        "references/task-iteration.md",
+        "references/trace-blueprint-contract.md",
+        "references/unified_inference_protocol.md",
+        "references/validated-template-pack.md",
+        "scripts/traceguard_closure_check.py",
+        "scripts/traceguard_library_closure_check.py"
+      ],
+      "reason": "These explicit protocol references and closure adapters describe or execute native model closure; native target tests own its meaning.",
+      "proof_ref": ".skillguard/contract-source.json#closure_profiles"
+    }
+  ],
+  "surface_bindings": [
+    {
+      "surface_id": "api:scripts/traceguard_closure_check.py:check",
+      "model_obligation_ids": [
+        "obligation:researchguard:traceguard:native-tests",
+        "obligation:researchguard:traceguard:task-model-closure"
+      ],
+      "rule_ids": [
+        "decision:traceguard:native-closure-boundary"
+      ],
+      "decision": "explicit-author-rule"
+    },
+    {
+      "surface_id": "api:scripts/traceguard_closure_check.py:main",
+      "model_obligation_ids": [
+        "obligation:researchguard:traceguard:native-tests",
+        "obligation:researchguard:traceguard:task-model-closure"
+      ],
+      "rule_ids": [
+        "decision:traceguard:native-closure-boundary"
+      ],
+      "decision": "explicit-author-rule"
+    },
+    {
+      "surface_id": "api:scripts/traceguard_library_closure_check.py:check",
+      "model_obligation_ids": [
+        "obligation:researchguard:traceguard:native-tests",
+        "obligation:researchguard:traceguard:task-model-closure"
+      ],
+      "rule_ids": [
+        "decision:traceguard:native-closure-boundary"
+      ],
+      "decision": "explicit-author-rule"
+    },
+    {
+      "surface_id": "api:scripts/traceguard_library_closure_check.py:main",
+      "model_obligation_ids": [
+        "obligation:researchguard:traceguard:native-tests",
+        "obligation:researchguard:traceguard:task-model-closure"
+      ],
+      "rule_ids": [
+        "decision:traceguard:native-closure-boundary"
+      ],
+      "decision": "explicit-author-rule"
+    },
+    {
+      "surface_id": "artifact:agents/openai.yaml",
+      "model_obligation_ids": [
+        "obligation:researchguard:traceguard:consumer-contract",
+        "obligation:researchguard:traceguard:prompt-load"
+      ],
+      "rule_ids": [
+        "decision:traceguard:consumer-prompt"
+      ],
+      "decision": "explicit-author-rule"
+    },
+    {
+      "surface_id": "component:scripts/traceguard_closure_check.py",
+      "model_obligation_ids": [
+        "obligation:researchguard:traceguard:native-tests",
+        "obligation:researchguard:traceguard:task-model-closure"
+      ],
+      "rule_ids": [
+        "decision:traceguard:native-closure-boundary"
+      ],
+      "decision": "explicit-author-component-group-closure"
+    },
+    {
+      "surface_id": "component:scripts/traceguard_library_closure_check.py",
+      "model_obligation_ids": [
+        "obligation:researchguard:traceguard:native-tests",
+        "obligation:researchguard:traceguard:task-model-closure"
+      ],
+      "rule_ids": [
+        "decision:traceguard:native-closure-boundary"
+      ],
+      "decision": "explicit-author-component-group-closure"
+    },
+    {
+      "surface_id": "config:.skillguard/contract-source.json",
+      "model_obligation_ids": [
+        "obligation:researchguard:traceguard:consumer-contract",
+        "obligation:researchguard:traceguard:native-tests",
+        "obligation:researchguard:traceguard:prompt-load",
+        "obligation:researchguard:traceguard:task-model-closure"
+      ],
+      "rule_ids": [
+        "decision:traceguard:complete-target-declaration"
+      ],
+      "decision": "explicit-author-rule"
+    },
+    {
+      "surface_id": "fault:scripts/traceguard_closure_check.py:check",
+      "model_obligation_ids": [
+        "obligation:researchguard:traceguard:native-tests",
+        "obligation:researchguard:traceguard:task-model-closure"
+      ],
+      "rule_ids": [
+        "decision:traceguard:native-closure-boundary"
+      ],
+      "decision": "explicit-author-component-group-closure"
+    },
+    {
+      "surface_id": "fault:scripts/traceguard_library_closure_check.py:check",
+      "model_obligation_ids": [
+        "obligation:researchguard:traceguard:native-tests",
+        "obligation:researchguard:traceguard:task-model-closure"
+      ],
+      "rule_ids": [
+        "decision:traceguard:native-closure-boundary"
+      ],
+      "decision": "explicit-author-component-group-closure"
+    },
+    {
+      "surface_id": "script:scripts/traceguard_closure_check.py",
+      "model_obligation_ids": [
+        "obligation:researchguard:traceguard:native-tests",
+        "obligation:researchguard:traceguard:task-model-closure"
+      ],
+      "rule_ids": [
+        "decision:traceguard:native-closure-boundary"
+      ],
+      "decision": "explicit-author-rule"
+    },
+    {
+      "surface_id": "script:scripts/traceguard_library_closure_check.py",
+      "model_obligation_ids": [
+        "obligation:researchguard:traceguard:native-tests",
+        "obligation:researchguard:traceguard:task-model-closure"
+      ],
+      "rule_ids": [
+        "decision:traceguard:native-closure-boundary"
+      ],
+      "decision": "explicit-author-rule"
+    },
+    {
+      "surface_id": "template:SKILL.md",
+      "model_obligation_ids": [
+        "obligation:researchguard:traceguard:consumer-contract",
+        "obligation:researchguard:traceguard:prompt-load"
+      ],
+      "rule_ids": [
+        "decision:traceguard:consumer-prompt"
+      ],
+      "decision": "explicit-author-rule"
+    },
+    {
+      "surface_id": "template:references/commands-and-handoffs.md",
+      "model_obligation_ids": [
+        "obligation:researchguard:traceguard:consumer-contract",
+        "obligation:researchguard:traceguard:prompt-load"
+      ],
+      "rule_ids": [
+        "decision:traceguard:consumer-prompt"
+      ],
+      "decision": "explicit-author-rule"
+    },
+    {
+      "surface_id": "template:references/depth-and-closure.md",
+      "model_obligation_ids": [
+        "obligation:researchguard:traceguard:consumer-contract",
+        "obligation:researchguard:traceguard:native-tests",
+        "obligation:researchguard:traceguard:prompt-load",
+        "obligation:researchguard:traceguard:task-model-closure"
+      ],
+      "rule_ids": [
+        "decision:traceguard:consumer-prompt",
+        "decision:traceguard:native-closure-boundary"
+      ],
+      "decision": "explicit-author-rule"
+    },
+    {
+      "surface_id": "template:references/routes/case-library.md",
+      "model_obligation_ids": [
+        "obligation:researchguard:traceguard:consumer-contract",
+        "obligation:researchguard:traceguard:prompt-load"
+      ],
+      "rule_ids": [
+        "decision:traceguard:consumer-prompt"
+      ],
+      "decision": "explicit-author-rule"
+    },
+    {
+      "surface_id": "template:references/routes/general-trace.md",
+      "model_obligation_ids": [
+        "obligation:researchguard:traceguard:consumer-contract",
+        "obligation:researchguard:traceguard:prompt-load"
+      ],
+      "rule_ids": [
+        "decision:traceguard:consumer-prompt"
+      ],
+      "decision": "explicit-author-rule"
+    },
+    {
+      "surface_id": "template:references/safe-output.md",
+      "model_obligation_ids": [
+        "obligation:researchguard:traceguard:consumer-contract",
+        "obligation:researchguard:traceguard:prompt-load"
+      ],
+      "rule_ids": [
+        "decision:traceguard:consumer-prompt"
+      ],
+      "decision": "explicit-author-rule"
+    },
+    {
+      "surface_id": "template:references/task-iteration.md",
+      "model_obligation_ids": [
+        "obligation:researchguard:traceguard:consumer-contract",
+        "obligation:researchguard:traceguard:native-tests",
+        "obligation:researchguard:traceguard:prompt-load",
+        "obligation:researchguard:traceguard:task-model-closure"
+      ],
+      "rule_ids": [
+        "decision:traceguard:consumer-prompt",
+        "decision:traceguard:native-closure-boundary"
+      ],
+      "decision": "explicit-author-rule"
+    },
+    {
+      "surface_id": "template:references/trace-blueprint-contract.md",
+      "model_obligation_ids": [
+        "obligation:researchguard:traceguard:consumer-contract",
+        "obligation:researchguard:traceguard:native-tests",
+        "obligation:researchguard:traceguard:prompt-load",
+        "obligation:researchguard:traceguard:task-model-closure"
+      ],
+      "rule_ids": [
+        "decision:traceguard:consumer-prompt",
+        "decision:traceguard:native-closure-boundary"
+      ],
+      "decision": "explicit-author-rule"
+    },
+    {
+      "surface_id": "template:references/unified_inference_protocol.md",
+      "model_obligation_ids": [
+        "obligation:researchguard:traceguard:consumer-contract",
+        "obligation:researchguard:traceguard:native-tests",
+        "obligation:researchguard:traceguard:prompt-load",
+        "obligation:researchguard:traceguard:task-model-closure"
+      ],
+      "rule_ids": [
+        "decision:traceguard:consumer-prompt",
+        "decision:traceguard:native-closure-boundary"
+      ],
+      "decision": "explicit-author-rule"
+    },
+    {
+      "surface_id": "template:references/validated-template-pack.md",
+      "model_obligation_ids": [
+        "obligation:researchguard:traceguard:consumer-contract",
+        "obligation:researchguard:traceguard:native-tests",
+        "obligation:researchguard:traceguard:prompt-load",
+        "obligation:researchguard:traceguard:task-model-closure"
+      ],
+      "rule_ids": [
+        "decision:traceguard:consumer-prompt",
+        "decision:traceguard:native-closure-boundary"
+      ],
+      "decision": "explicit-author-rule"
+    },
+    {
+      "surface_id": "ui:scripts/traceguard_closure_check.py:check",
+      "model_obligation_ids": [
+        "obligation:researchguard:traceguard:native-tests",
+        "obligation:researchguard:traceguard:task-model-closure"
+      ],
+      "rule_ids": [
+        "decision:traceguard:native-closure-boundary"
+      ],
+      "decision": "explicit-author-rule"
+    },
+    {
+      "surface_id": "ui:scripts/traceguard_library_closure_check.py:check",
+      "model_obligation_ids": [
+        "obligation:researchguard:traceguard:native-tests",
+        "obligation:researchguard:traceguard:task-model-closure"
+      ],
+      "rule_ids": [
+        "decision:traceguard:native-closure-boundary"
+      ],
+      "decision": "explicit-author-rule"
+    }
+  ],
+  "obligation_bindings": [
+    {
+      "obligation_id": "obligation:researchguard:traceguard:consumer-contract",
+      "disposition": "governed",
+      "surface_ids": [
+        "artifact:agents/openai.yaml",
+        "config:.skillguard/contract-source.json",
+        "template:SKILL.md",
+        "template:references/commands-and-handoffs.md",
+        "template:references/depth-and-closure.md",
+        "template:references/routes/case-library.md",
+        "template:references/routes/general-trace.md",
+        "template:references/safe-output.md",
+        "template:references/task-iteration.md",
+        "template:references/trace-blueprint-contract.md",
+        "template:references/unified_inference_protocol.md",
+        "template:references/validated-template-pack.md"
+      ],
+      "reason": "Explicit member author rules bind these source surfaces to this compiled obligation.",
+      "proof_ref": ".skillguard/surface-semantic-map.json#decision_rules"
+    },
+    {
+      "obligation_id": "obligation:researchguard:traceguard:native-tests",
+      "disposition": "governed",
+      "surface_ids": [
+        "api:scripts/traceguard_closure_check.py:check",
+        "api:scripts/traceguard_closure_check.py:main",
+        "api:scripts/traceguard_library_closure_check.py:check",
+        "api:scripts/traceguard_library_closure_check.py:main",
+        "component:scripts/traceguard_closure_check.py",
+        "component:scripts/traceguard_library_closure_check.py",
+        "config:.skillguard/contract-source.json",
+        "fault:scripts/traceguard_closure_check.py:check",
+        "fault:scripts/traceguard_library_closure_check.py:check",
+        "script:scripts/traceguard_closure_check.py",
+        "script:scripts/traceguard_library_closure_check.py",
+        "template:references/depth-and-closure.md",
+        "template:references/task-iteration.md",
+        "template:references/trace-blueprint-contract.md",
+        "template:references/unified_inference_protocol.md",
+        "template:references/validated-template-pack.md",
+        "ui:scripts/traceguard_closure_check.py:check",
+        "ui:scripts/traceguard_library_closure_check.py:check"
+      ],
+      "reason": "Explicit member author rules bind these source surfaces to this compiled obligation.",
+      "proof_ref": ".skillguard/surface-semantic-map.json#decision_rules"
+    },
+    {
+      "obligation_id": "obligation:researchguard:traceguard:prompt-load",
+      "disposition": "governed",
+      "surface_ids": [
+        "artifact:agents/openai.yaml",
+        "config:.skillguard/contract-source.json",
+        "template:SKILL.md",
+        "template:references/commands-and-handoffs.md",
+        "template:references/depth-and-closure.md",
+        "template:references/routes/case-library.md",
+        "template:references/routes/general-trace.md",
+        "template:references/safe-output.md",
+        "template:references/task-iteration.md",
+        "template:references/trace-blueprint-contract.md",
+        "template:references/unified_inference_protocol.md",
+        "template:references/validated-template-pack.md"
+      ],
+      "reason": "Explicit member author rules bind these source surfaces to this compiled obligation.",
+      "proof_ref": ".skillguard/surface-semantic-map.json#decision_rules"
+    },
+    {
+      "obligation_id": "obligation:researchguard:traceguard:task-model-closure",
+      "disposition": "governed",
+      "surface_ids": [
+        "api:scripts/traceguard_closure_check.py:check",
+        "api:scripts/traceguard_closure_check.py:main",
+        "api:scripts/traceguard_library_closure_check.py:check",
+        "api:scripts/traceguard_library_closure_check.py:main",
+        "component:scripts/traceguard_closure_check.py",
+        "component:scripts/traceguard_library_closure_check.py",
+        "config:.skillguard/contract-source.json",
+        "fault:scripts/traceguard_closure_check.py:check",
+        "fault:scripts/traceguard_library_closure_check.py:check",
+        "script:scripts/traceguard_closure_check.py",
+        "script:scripts/traceguard_library_closure_check.py",
+        "template:references/depth-and-closure.md",
+        "template:references/task-iteration.md",
+        "template:references/trace-blueprint-contract.md",
+        "template:references/unified_inference_protocol.md",
+        "template:references/validated-template-pack.md",
+        "ui:scripts/traceguard_closure_check.py:check",
+        "ui:scripts/traceguard_library_closure_check.py:check"
+      ],
+      "reason": "Explicit member author rules bind these source surfaces to this compiled obligation.",
+      "proof_ref": ".skillguard/surface-semantic-map.json#decision_rules"
+    }
+  ],
+  "claim_boundary": "The declared member skill root is the source-discovery boundary. Its native package is separately bound by the contract's implementation paths and check inputs. This author map proves neither native check execution nor domain correctness, installation, release, or future AI behavior.",
+  "map_hash": "sha256:78d6225b28d1cf04a0fa9864656208c8a9d98b26975d3513034d2de422954028"
+}

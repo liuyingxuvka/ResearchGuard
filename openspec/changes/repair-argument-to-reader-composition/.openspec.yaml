@@ -1,0 +1,4 @@
+schema: spec-driven
+created: 2026-09-07
+goal: Keep ResearchGuard as native argument owner and LogicWriting as reader
+  composition and writing owner while producing reviewable candidate evidence.

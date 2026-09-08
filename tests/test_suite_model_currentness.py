@@ -10,8 +10,8 @@ from researchguard import __version__
 
 
 ROOT = Path(__file__).resolve().parents[1]
-MODEL_PATH = ROOT / ".flowguard" / "researchguard_suite_model.py"
-JSON_MODEL_PATH = ROOT / ".flowguard" / "researchguard_suite_model.json"
+MODEL_PATH = ROOT / ".flowguard" / "models" / "researchguard_suite_model.py"
+JSON_MODEL_PATH = ROOT / ".flowguard" / "models" / "researchguard_suite" / "model-definition.json"
 
 
 def _load_model():
@@ -31,10 +31,10 @@ def test_all_suite_version_authorities_are_current() -> None:
     topology = json.loads(JSON_MODEL_PATH.read_text(encoding="utf-8"))
     model = _load_model()
 
-    assert package["project"]["version"] == "0.4.11"
-    assert __version__ == "0.4.11"
-    assert model.CURRENT_RESEARCHGUARD_VERSION == "0.4.11"
-    assert topology["model_id"] == "researchguard.suite.v0.4.11"
+    assert package["project"]["version"] == "0.5.0"
+    assert __version__ == "0.5.0"
+    assert model.CURRENT_RESEARCHGUARD_VERSION == "0.5.0"
+    assert topology["model_id"] == "researchguard.suite.v0.5.0"
     assert topology["software_dna"]["model_path"] == "models/software_dna/researchguard.json"
     assert topology["software_dna"]["root_model_id"] == "researchguard-suite"
     assert topology["software_dna"]["member_model_ids"] == [
@@ -53,9 +53,9 @@ def test_suite_model_runner_and_currentness_test_are_freshness_inputs() -> None:
         ROOT / "scripts" / "build_skillguard_contracts.py"
     ).read_text(encoding="utf-8")
     for relative_path in (
-        ".flowguard/researchguard_suite_model.py",
-        ".flowguard/researchguard_suite_model.json",
-        ".flowguard/run_researchguard_suite_model.py",
+        ".flowguard/models/researchguard_suite_model.py",
+        ".flowguard/models/researchguard_suite/model-definition.json",
+        ".flowguard/verification/run_researchguard_suite_model.py",
         "tests/test_suite_model_currentness.py",
         "models/software_dna/researchguard.json",
         "src/researchguard/software_dna.py",

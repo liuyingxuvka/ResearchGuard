@@ -5,7 +5,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from researchguard.logic import __version__
+from researchguard.logic import __version__, load_model, model_fingerprint
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -316,10 +316,23 @@ hierarchy:
     assert audit.returncode == 0
     assert json.loads(audit.stdout)["findings"]
 
-    synthesis = _run("synthesize", str(model), "--goal", "Create a short deck", "--delivery", "--json")
-    assert synthesis.returncode == 0
+    loaded = load_model(model)
+    selection_request = tmp_path / "selection.json"
+    selection_request.write_text(json.dumps({
+        "schema": "researchguard.logic.synthesis-request.v1", "request_id": "req", "target_id": "artifact",
+        "target_goal": "Create a short deck", "artifact_kind": "presentation", "reader_id": "reader",
+        "model_id": loaded.id, "model_fingerprint": model_fingerprint(loaded), "body_unit_order": ["u1"],
+        "max_body_units": 1, "units": [{"unit_id": "u1", "parent_unit_id": None, "reader_question": "What?",
+        "unit_job": "State claim", "claim_ids": ["C1"], "predecessor_unit_ids": [], "progression_relation": "concludes",
+        "editorial_prominence": "lead", "placement": "body", "placement_reason": "required", "required": True}],
+        "source_branch_bindings": []
+    }), encoding="utf-8")
+    synthesis = _run("synthesize", str(model), "--selection-request", str(selection_request), "--delivery", "--json")
+    assert synthesis.returncode == 3
     payload = json.loads(synthesis.stdout)
-    assert payload["plan"]["selected_items"][0]["node_id"] == "C1"
+    assert payload["plan"]["units"][0]["claim_ids"] == ["C1"]
+    assert payload["delivery"]["status"] == "blocked_support_gap"
+    assert payload["delivery"]["suggestions"] == []
     suggestions = "\n".join(item["suggested_text"] for item in payload["delivery"]["suggestions"])
     assert "missing_handoff" not in suggestions
 

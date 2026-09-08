@@ -1,0 +1,260 @@
+{
+  "schema_version": "flowguard.semantic_self_mesh.v3",
+  "mesh_id": "researchguard-software-dna-v1",
+  "claim_scope": "whole_current_researchguard_model_universe",
+  "derivation_base_snapshot_path": ".flowguard/history/pre-round2-authority/snapshots/1ee1a583d258e38725c6d94056f0cbd6bd30246028ff8179149884ac94ac7302.json",
+  "derivation_base_snapshot_fingerprint": "sha256:1ee1a583d258e38725c6d94056f0cbd6bd30246028ff8179149884ac94ac7302",
+  "current_manifest_path": ".flowguard/models/regression-manifest.json",
+  "observed_base_added_model_ids": [
+    "authoritative_model_system",
+    "compositional_verification_kernel"
+  ],
+  "observed_base_removed_model_ids": [],
+  "declared_model_count": 10,
+  "semantic_universe_fingerprint": "sha256:1500e2f5c1d25b7bde01af84d9b314a75e6bb90b52fb71ce3c2beb5320baf98f",
+  "semantic_disposition_fingerprint": "sha256:bbfc8bacd2e61eb61112a327d7cb14da8e28670c7d1f10aecdf036d67b6e1138",
+  "semantic_relation_fingerprint": "sha256:cc7254b002b812aff4503744fd40d15605b9da20a4ab3e964261c1a0694e8ad9",
+  "semantic_model_status": "candidate_defined_not_verified",
+  "whole_system_completion_claim": "not_licensed_until_current_terminal_evidence",
+  "currentness_owner": "authoritative_model_system_revision",
+  "claim_boundary": "This candidate semantic self-mesh records the ten currently registered model partitions and their declared consumers. It does not license an observed authority snapshot, product-domain correctness, installation, or release readiness.",
+  "allowed_dispositions": [
+    "connected",
+    "intentional_leaf",
+    "delegated_or_supporting",
+    "scoped_out"
+  ],
+  "semantic_parents": [
+    {
+      "parent_id": "semantic-parent:software-root",
+      "purpose": "Root structural parent for ResearchGuard supporting model owners and the suite hierarchy."
+    },
+    {
+      "parent_id": "semantic-parent:researchguard_suite",
+      "purpose": "ResearchGuard suite parent for synthesis and trace-domain child model branches."
+    },
+    {
+      "parent_id": "semantic-parent:logic_synthesis",
+      "purpose": "LogicGuard synthesis parent for selection, argument-support, and discourse-structure closure."
+    }
+  ],
+  "models": [
+    {
+      "model_id": "authoritative_model_system",
+      "disposition": "connected",
+      "rationale": "Current researchguard model owner is attached to the software-DNA structural parent.",
+      "structural_parent_id": "semantic-parent:software-root",
+      "cross_boundary_parent_ids": [],
+      "consumer_ids": [
+        "claim:researchguard-software-dna-status"
+      ]
+    },
+    {
+      "model_id": "compositional_verification_kernel",
+      "disposition": "connected",
+      "rationale": "Current researchguard model owner is attached to the software-DNA structural parent.",
+      "structural_parent_id": "semantic-parent:software-root",
+      "cross_boundary_parent_ids": [],
+      "consumer_ids": [
+        "model:authoritative_model_system"
+      ]
+    },
+    {
+      "model_id": "researchguard_suite",
+      "disposition": "connected",
+      "rationale": "Current researchguard model owner is attached to the software-DNA structural parent.",
+      "structural_parent_id": "semantic-parent:software-root",
+      "cross_boundary_parent_ids": [],
+      "consumer_ids": [
+        "model:authoritative_model_system"
+      ]
+    },
+    {
+      "model_id": "logic_synthesis",
+      "disposition": "connected",
+      "rationale": "LogicGuard synthesis owner is consumed by the ResearchGuard suite parent.",
+      "structural_parent_id": "semantic-parent:researchguard_suite",
+      "cross_boundary_parent_ids": [],
+      "consumer_ids": [
+        "model:researchguard_suite"
+      ]
+    },
+    {
+      "model_id": "logic_selection_contract",
+      "disposition": "connected",
+      "rationale": "Explicit LogicGuard selection contract is consumed by the ResearchGuard suite parent.",
+      "structural_parent_id": "semantic-parent:logic_synthesis",
+      "cross_boundary_parent_ids": [],
+      "consumer_ids": [
+        "model:logic_synthesis",
+        "model:researchguard_suite"
+      ]
+    },
+    {
+      "model_id": "argument_support_closure",
+      "disposition": "connected",
+      "rationale": "Selected-claim support closure is consumed by the ResearchGuard suite parent.",
+      "structural_parent_id": "semantic-parent:logic_synthesis",
+      "cross_boundary_parent_ids": [],
+      "consumer_ids": [
+        "model:logic_synthesis",
+        "model:researchguard_suite"
+      ]
+    },
+    {
+      "model_id": "discourse_structure",
+      "disposition": "connected",
+      "rationale": "Cross-block discourse structure is consumed by the ResearchGuard suite parent.",
+      "structural_parent_id": "semantic-parent:logic_synthesis",
+      "cross_boundary_parent_ids": [],
+      "consumer_ids": [
+        "model:logic_synthesis",
+        "model:researchguard_suite"
+      ]
+    },
+    {
+      "model_id": "trace_domain_export",
+      "disposition": "connected",
+      "rationale": "Trace-to-Logic domain export is consumed by the ResearchGuard suite parent.",
+      "structural_parent_id": "semantic-parent:researchguard_suite",
+      "cross_boundary_parent_ids": [],
+      "consumer_ids": [
+        "model:researchguard_suite"
+      ]
+    },
+    {
+      "model_id": "hierarchical_model_mesh",
+      "disposition": "connected",
+      "rationale": "Current researchguard model owner is attached to the software-DNA structural parent.",
+      "structural_parent_id": "semantic-parent:software-root",
+      "cross_boundary_parent_ids": [],
+      "consumer_ids": [
+        "model:authoritative_model_system"
+      ]
+    },
+    {
+      "model_id": "model_test_code_alignment",
+      "disposition": "connected",
+      "rationale": "Current researchguard model owner is attached to the software-DNA structural parent.",
+      "structural_parent_id": "semantic-parent:software-root",
+      "cross_boundary_parent_ids": [],
+      "consumer_ids": [
+        "model:authoritative_model_system"
+      ]
+    }
+  ],
+  "required_terminal_evidence": [
+    "check:model-regression:authoritative_model_system",
+    "check:model-regression:compositional_verification_kernel",
+    "check:model-regression:researchguard_suite",
+    "check:model-regression:hierarchical_model_mesh",
+    "check:model-regression:model_test_code_alignment",
+    "check:model-regression:logic_synthesis",
+    "check:model-regression:logic_selection_contract",
+    "check:model-regression:argument_support_closure",
+    "check:model-regression:discourse_structure",
+    "check:model-regression:trace_domain_export"
+  ],
+  "feedback_progress_contracts": [
+    {
+      "relation_id": "topology:authoritative_model_system:semantic-parent:software-root",
+      "contract_id": "progress:authoritative_model_system:software-root",
+      "contract_kind": "progress_measure",
+      "evidence_source_kind": "current_child_model_receipts",
+      "evidence_model_ids": [
+        "authoritative_model_system"
+      ],
+      "rationale": "Progress is established by the exact current native model-owner receipt."
+    },
+    {
+      "relation_id": "topology:compositional_verification_kernel:semantic-parent:software-root",
+      "contract_id": "progress:compositional_verification_kernel:software-root",
+      "contract_kind": "progress_measure",
+      "evidence_source_kind": "current_child_model_receipts",
+      "evidence_model_ids": [
+        "compositional_verification_kernel"
+      ],
+      "rationale": "Progress is established by the exact current native model-owner receipt."
+    },
+    {
+      "relation_id": "topology:researchguard_suite:semantic-parent:software-root",
+      "contract_id": "progress:researchguard_suite:software-root",
+      "contract_kind": "progress_measure",
+      "evidence_source_kind": "current_child_model_receipts",
+      "evidence_model_ids": [
+        "researchguard_suite"
+      ],
+      "rationale": "Progress is established by the exact current native model-owner receipt."
+    },
+    {
+      "relation_id": "topology:hierarchical_model_mesh:semantic-parent:software-root",
+      "contract_id": "progress:hierarchical_model_mesh:software-root",
+      "contract_kind": "progress_measure",
+      "evidence_source_kind": "current_child_model_receipts",
+      "evidence_model_ids": [
+        "hierarchical_model_mesh"
+      ],
+      "rationale": "Progress is established by the exact current native model-owner receipt."
+    },
+    {
+      "relation_id": "topology:model_test_code_alignment:semantic-parent:software-root",
+      "contract_id": "progress:model_test_code_alignment:software-root",
+      "contract_kind": "progress_measure",
+      "evidence_source_kind": "current_child_model_receipts",
+      "evidence_model_ids": [
+        "model_test_code_alignment"
+      ],
+      "rationale": "Progress is established by the exact current native model-owner receipt."
+    },
+    {
+      "relation_id": "topology:logic_synthesis:semantic-parent:researchguard_suite",
+      "contract_id": "progress:logic_synthesis:researchguard_suite",
+      "contract_kind": "progress_measure",
+      "evidence_source_kind": "current_child_model_receipts",
+      "evidence_model_ids": [
+        "logic_synthesis"
+      ],
+      "rationale": "Child logic_synthesis is consumed through researchguard_suite; a non-pass, missing, or stale child receipt blocks the parent relation."
+    },
+    {
+      "relation_id": "topology:logic_selection_contract:semantic-parent:logic_synthesis",
+      "contract_id": "progress:logic_selection_contract:logic_synthesis",
+      "contract_kind": "progress_measure",
+      "evidence_source_kind": "current_child_model_receipts",
+      "evidence_model_ids": [
+        "logic_selection_contract"
+      ],
+      "rationale": "Child logic_selection_contract is consumed through logic_synthesis; a non-pass, missing, or stale child receipt blocks the parent relation."
+    },
+    {
+      "relation_id": "topology:argument_support_closure:semantic-parent:logic_synthesis",
+      "contract_id": "progress:argument_support_closure:logic_synthesis",
+      "contract_kind": "progress_measure",
+      "evidence_source_kind": "current_child_model_receipts",
+      "evidence_model_ids": [
+        "argument_support_closure"
+      ],
+      "rationale": "Child argument_support_closure is consumed through logic_synthesis; a non-pass, missing, or stale child receipt blocks the parent relation."
+    },
+    {
+      "relation_id": "topology:discourse_structure:semantic-parent:logic_synthesis",
+      "contract_id": "progress:discourse_structure:logic_synthesis",
+      "contract_kind": "progress_measure",
+      "evidence_source_kind": "current_child_model_receipts",
+      "evidence_model_ids": [
+        "discourse_structure"
+      ],
+      "rationale": "Child discourse_structure is consumed through logic_synthesis; a non-pass, missing, or stale child receipt blocks the parent relation."
+    },
+    {
+      "relation_id": "topology:trace_domain_export:semantic-parent:researchguard_suite",
+      "contract_id": "progress:trace_domain_export:researchguard_suite",
+      "contract_kind": "progress_measure",
+      "evidence_source_kind": "current_child_model_receipts",
+      "evidence_model_ids": [
+        "trace_domain_export"
+      ],
+      "rationale": "Child trace_domain_export is consumed through researchguard_suite; a non-pass, missing, or stale child receipt blocks the parent relation."
+    }
+  ]
+}

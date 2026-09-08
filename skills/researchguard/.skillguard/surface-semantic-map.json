@@ -1,0 +1,213 @@
+{
+  "schema_version": "skillguard.surface_semantic_map.v1",
+  "map_id": "map:researchguard:researchguard:surface-semantics",
+  "target_skill_id": "researchguard",
+  "source_discovery_fingerprint": "sha256:710a73905ab70fa002ab9352d0b078c5e84302bdd4208b91deea797f4bfc55f6",
+  "full_surface_ids": [
+    "artifact:agents/openai.yaml",
+    "config:.skillguard/contract-source.json",
+    "template:SKILL.md",
+    "template:references/external-domain-dna.md",
+    "template:references/member-admission-index.md",
+    "template:references/member-model-envelope.md"
+  ],
+  "current_obligation_ids": [
+    "obligation:researchguard:researchguard:consumer-contract",
+    "obligation:researchguard:researchguard:consumer-install-transaction",
+    "obligation:researchguard:researchguard:native-tests",
+    "obligation:researchguard:researchguard:prompt-load",
+    "obligation:researchguard:researchguard:task-model-closure"
+  ],
+  "decision_rules": [
+    {
+      "rule_id": "decision:researchguard:complete-target-declaration",
+      "model_obligation_ids": [
+        "obligation:researchguard:researchguard:consumer-contract",
+        "obligation:researchguard:researchguard:consumer-install-transaction",
+        "obligation:researchguard:researchguard:native-tests",
+        "obligation:researchguard:researchguard:prompt-load",
+        "obligation:researchguard:researchguard:task-model-closure"
+      ],
+      "source_paths": [
+        ".skillguard/contract-source.json"
+      ],
+      "reason": "The exact target contract declares every current member obligation, including the umbrella installation transaction where applicable.",
+      "proof_ref": ".skillguard/contract-source.json#closure_profiles"
+    },
+    {
+      "rule_id": "decision:researchguard:consumer-prompt",
+      "model_obligation_ids": [
+        "obligation:researchguard:researchguard:consumer-contract",
+        "obligation:researchguard:researchguard:prompt-load"
+      ],
+      "source_paths": [
+        "SKILL.md",
+        "agents/openai.yaml",
+        "references/external-domain-dna.md",
+        "references/member-admission-index.md",
+        "references/member-model-envelope.md"
+      ],
+      "reason": "These explicit consumer entry and reference files define the member boundary and its selected prompt loading.",
+      "proof_ref": ".skillguard/contract-source.json#closure_profiles"
+    },
+    {
+      "rule_id": "decision:researchguard:native-closure-boundary",
+      "model_obligation_ids": [
+        "obligation:researchguard:researchguard:native-tests",
+        "obligation:researchguard:researchguard:task-model-closure"
+      ],
+      "source_paths": [
+        "references/external-domain-dna.md",
+        "references/member-admission-index.md",
+        "references/member-model-envelope.md"
+      ],
+      "reason": "These explicit protocol references and closure adapters describe or execute native model closure; native target tests own its meaning.",
+      "proof_ref": ".skillguard/contract-source.json#closure_profiles"
+    }
+  ],
+  "surface_bindings": [
+    {
+      "surface_id": "artifact:agents/openai.yaml",
+      "model_obligation_ids": [
+        "obligation:researchguard:researchguard:consumer-contract",
+        "obligation:researchguard:researchguard:prompt-load"
+      ],
+      "rule_ids": [
+        "decision:researchguard:consumer-prompt"
+      ],
+      "decision": "explicit-author-rule"
+    },
+    {
+      "surface_id": "config:.skillguard/contract-source.json",
+      "model_obligation_ids": [
+        "obligation:researchguard:researchguard:consumer-contract",
+        "obligation:researchguard:researchguard:consumer-install-transaction",
+        "obligation:researchguard:researchguard:native-tests",
+        "obligation:researchguard:researchguard:prompt-load",
+        "obligation:researchguard:researchguard:task-model-closure"
+      ],
+      "rule_ids": [
+        "decision:researchguard:complete-target-declaration"
+      ],
+      "decision": "explicit-author-rule"
+    },
+    {
+      "surface_id": "template:SKILL.md",
+      "model_obligation_ids": [
+        "obligation:researchguard:researchguard:consumer-contract",
+        "obligation:researchguard:researchguard:prompt-load"
+      ],
+      "rule_ids": [
+        "decision:researchguard:consumer-prompt"
+      ],
+      "decision": "explicit-author-rule"
+    },
+    {
+      "surface_id": "template:references/external-domain-dna.md",
+      "model_obligation_ids": [
+        "obligation:researchguard:researchguard:consumer-contract",
+        "obligation:researchguard:researchguard:native-tests",
+        "obligation:researchguard:researchguard:prompt-load",
+        "obligation:researchguard:researchguard:task-model-closure"
+      ],
+      "rule_ids": [
+        "decision:researchguard:consumer-prompt",
+        "decision:researchguard:native-closure-boundary"
+      ],
+      "decision": "explicit-author-rule"
+    },
+    {
+      "surface_id": "template:references/member-admission-index.md",
+      "model_obligation_ids": [
+        "obligation:researchguard:researchguard:consumer-contract",
+        "obligation:researchguard:researchguard:native-tests",
+        "obligation:researchguard:researchguard:prompt-load",
+        "obligation:researchguard:researchguard:task-model-closure"
+      ],
+      "rule_ids": [
+        "decision:researchguard:consumer-prompt",
+        "decision:researchguard:native-closure-boundary"
+      ],
+      "decision": "explicit-author-rule"
+    },
+    {
+      "surface_id": "template:references/member-model-envelope.md",
+      "model_obligation_ids": [
+        "obligation:researchguard:researchguard:consumer-contract",
+        "obligation:researchguard:researchguard:native-tests",
+        "obligation:researchguard:researchguard:prompt-load",
+        "obligation:researchguard:researchguard:task-model-closure"
+      ],
+      "rule_ids": [
+        "decision:researchguard:consumer-prompt",
+        "decision:researchguard:native-closure-boundary"
+      ],
+      "decision": "explicit-author-rule"
+    }
+  ],
+  "obligation_bindings": [
+    {
+      "obligation_id": "obligation:researchguard:researchguard:consumer-contract",
+      "disposition": "governed",
+      "surface_ids": [
+        "artifact:agents/openai.yaml",
+        "config:.skillguard/contract-source.json",
+        "template:SKILL.md",
+        "template:references/external-domain-dna.md",
+        "template:references/member-admission-index.md",
+        "template:references/member-model-envelope.md"
+      ],
+      "reason": "Explicit member author rules bind these source surfaces to this compiled obligation.",
+      "proof_ref": ".skillguard/surface-semantic-map.json#decision_rules"
+    },
+    {
+      "obligation_id": "obligation:researchguard:researchguard:consumer-install-transaction",
+      "disposition": "governed",
+      "surface_ids": [
+        "config:.skillguard/contract-source.json"
+      ],
+      "reason": "Explicit member author rules bind these source surfaces to this compiled obligation.",
+      "proof_ref": ".skillguard/surface-semantic-map.json#decision_rules"
+    },
+    {
+      "obligation_id": "obligation:researchguard:researchguard:native-tests",
+      "disposition": "governed",
+      "surface_ids": [
+        "config:.skillguard/contract-source.json",
+        "template:references/external-domain-dna.md",
+        "template:references/member-admission-index.md",
+        "template:references/member-model-envelope.md"
+      ],
+      "reason": "Explicit member author rules bind these source surfaces to this compiled obligation.",
+      "proof_ref": ".skillguard/surface-semantic-map.json#decision_rules"
+    },
+    {
+      "obligation_id": "obligation:researchguard:researchguard:prompt-load",
+      "disposition": "governed",
+      "surface_ids": [
+        "artifact:agents/openai.yaml",
+        "config:.skillguard/contract-source.json",
+        "template:SKILL.md",
+        "template:references/external-domain-dna.md",
+        "template:references/member-admission-index.md",
+        "template:references/member-model-envelope.md"
+      ],
+      "reason": "Explicit member author rules bind these source surfaces to this compiled obligation.",
+      "proof_ref": ".skillguard/surface-semantic-map.json#decision_rules"
+    },
+    {
+      "obligation_id": "obligation:researchguard:researchguard:task-model-closure",
+      "disposition": "governed",
+      "surface_ids": [
+        "config:.skillguard/contract-source.json",
+        "template:references/external-domain-dna.md",
+        "template:references/member-admission-index.md",
+        "template:references/member-model-envelope.md"
+      ],
+      "reason": "Explicit member author rules bind these source surfaces to this compiled obligation.",
+      "proof_ref": ".skillguard/surface-semantic-map.json#decision_rules"
+    }
+  ],
+  "claim_boundary": "The declared member skill root is the source-discovery boundary. Its native package is separately bound by the contract's implementation paths and check inputs. This author map proves neither native check execution nor domain correctness, installation, release, or future AI behavior.",
+  "map_hash": "sha256:0318cc9524a1190398181cc6567e0ccd104cd75d34795e41a6dff30eba27d16f"
+}

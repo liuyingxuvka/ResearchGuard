@@ -31,6 +31,15 @@ class TraceHandoff:
     weakest_link: str = ""
     conclusion_transfer_status: str = ""
     downstream_consumer: str = ""
+    handoff_schema: str = "researchguard.trace.logic-handoff.v1"
+    domain_proposition: str = ""
+    domain_mechanism_refs: tuple[str, ...] = ()
+    domain_assumption_refs: tuple[str, ...] = ()
+    object_scope: tuple[str, ...] = ()
+    material_alternatives: tuple[str, ...] = ()
+    domain_boundaries: tuple[str, ...] = ()
+    native_causal_license: str = "not_licensed"
+    domain_gaps: tuple[str, ...] = ()
 
     def to_dict(self) -> dict[str, object]:
         return {
@@ -54,6 +63,15 @@ class TraceHandoff:
             "weakest_link": self.weakest_link,
             "conclusion_transfer_status": self.conclusion_transfer_status,
             "downstream_consumer": self.downstream_consumer,
+            "handoff_schema": self.handoff_schema,
+            "domain_proposition": self.domain_proposition,
+            "domain_mechanism_refs": list(self.domain_mechanism_refs),
+            "domain_assumption_refs": list(self.domain_assumption_refs),
+            "object_scope": list(self.object_scope),
+            "material_alternatives": list(self.material_alternatives),
+            "domain_boundaries": list(self.domain_boundaries),
+            "native_causal_license": self.native_causal_license,
+            "domain_gaps": list(self.domain_gaps),
         }
 
 
@@ -132,6 +150,15 @@ def derive_trace_handoffs(result: Any) -> tuple[TraceHandoff, ...]:
                 weakest_link=getattr(trace, "weakest_link", ""),
                 conclusion_transfer_status=getattr(trace, "conclusion_transfer_status", ""),
                 downstream_consumer=getattr(trace, "downstream_consumer", ""),
+                handoff_schema="researchguard.trace.logic-handoff.v1",
+                domain_proposition=getattr(trace, "domain_proposition", ""),
+                domain_mechanism_refs=tuple(getattr(trace, "domain_mechanism_refs", ())),
+                domain_assumption_refs=tuple(getattr(trace, "domain_assumption_refs", ())),
+                object_scope=tuple(getattr(trace, "object_scope", ())),
+                material_alternatives=tuple(getattr(trace, "material_alternatives", ())),
+                domain_boundaries=tuple(getattr(trace, "domain_boundaries", ())),
+                native_causal_license=getattr(trace, "native_causal_license", "not_licensed"),
+                domain_gaps=tuple(getattr(trace, "domain_gaps", ())),
             )
         )
     return tuple(handoffs)

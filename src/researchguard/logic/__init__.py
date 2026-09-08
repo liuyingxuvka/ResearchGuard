@@ -374,7 +374,8 @@ from .source_library import (
 )
 from .structure_audit import StructureAuditReport, StructureFinding, audit_structure
 from .structured_artifact import ArtifactBlock, ArtifactMap, build_artifact_map
-from .synthesis import SynthesisItem, SynthesisPlan, synthesize_artifact_plan
+from .synthesis import CandidateDisposition, SynthesisItem, SynthesisPlan, SynthesisUnit, synthesize_artifact_plan
+from .synthesis_contract import SelectionRequest, SYNTHESIS_REQUEST_SCHEMA, validate_selection_request
 from .validator import validate_model
 from .writer import (
     claim_strength_adjustment,
@@ -464,6 +465,11 @@ __all__ = [
     "ArtifactMap",
     "SynthesisItem",
     "SynthesisPlan",
+    "SynthesisUnit",
+    "CandidateDisposition",
+    "SelectionRequest",
+    "SYNTHESIS_REQUEST_SCHEMA",
+    "validate_selection_request",
     "adapt_delivery",
     "apply_default_perturbation",
     "audit_structure",

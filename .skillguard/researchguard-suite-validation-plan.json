@@ -15,8 +15,8 @@
   ],
   "toolchain": {
     "skillguard_version": "0.7.2",
-    "skillguard_source_revision": "sha256:a34718b6832e25679e0dddd48a1ae05183aa6686167f48d5a15b03e958607f2a",
-    "flowguard_version": "0.68.14",
+    "skillguard_source_revision": "sha256:b0acad16241cd418f5b9fdb5abffedb282cc41a0b1f0f2c175d28183c129213a",
+    "flowguard_version": "0.69.0",
     "flowguard_status": "current_not_run",
     "python_command": "python"
   },
@@ -27,8 +27,8 @@
   "members": [
     {
       "member_skill_id": "researchguard",
-      "contract_hash": "16122EF2A42307D22EB42B41E08899A764E69F6D1AC0F17AE80B1FA01DE4D27A",
-      "manifest_hash": "8A5DF11312F58AD7325EBA0CAEBD87D8065FA645AF03F94AA5BCF1A6C5AE213A",
+      "contract_hash": "D4E45F02D5FF9CB455A6EEC2A4D0C36834A071BEE5C8FA5FFDE031E818BF18B6",
+      "manifest_hash": "0DD08E03ACFF3C52A1E8A069CAB831C1F11D4EAF652F3FED9FE19B68CBDDFEAD",
       "checks": [
         {
           "check_id": "check:researchguard:consumer-contract",
@@ -68,8 +68,8 @@
     },
     {
       "member_skill_id": "logicguard",
-      "contract_hash": "2A52FC87FE7DE3A3203F18268B6647AC13633EC1BD42271768CA3E66A68FB7DB",
-      "manifest_hash": "20C80740170B927E30EA860413D2D2F3F2820B48FDDD19CEF6FC91F912581C67",
+      "contract_hash": "087F9CEF6A0B4F16FEF93901FAD7C96A016C7ED5E5F7ACF3A921DF0BEC63872D",
+      "manifest_hash": "61EADBB085103F588E6BAA30CAA61E6FF98858D208C81977A274DE20A099F02A",
       "checks": [
         {
           "check_id": "check:logicguard:consumer-contract",
@@ -109,8 +109,8 @@
     },
     {
       "member_skill_id": "sourceguard",
-      "contract_hash": "09EAD4092BA159F341FA8AE8D4DA7E81AF472E523DBB79DD1FA22A8D59EBE8C4",
-      "manifest_hash": "B395D53746895C9B6666E91CC9EFE32AF270E04C67A41E43D4AAF394B1FCF012",
+      "contract_hash": "511B9EDE6201D5F3174B349B67E8BB0407C568D226BC54B7CEEEB49F4303E1C0",
+      "manifest_hash": "0A61B7B2E3555CFB9374213671EBA47AFC954D481A307488410826ECD649C061",
       "checks": [
         {
           "check_id": "check:sourceguard:consumer-contract",
@@ -150,8 +150,8 @@
     },
     {
       "member_skill_id": "traceguard",
-      "contract_hash": "A24CA7C479C90FBACBF75F6ABB2333A7E0705F76BF547C4E7882B68D7754B4E2",
-      "manifest_hash": "E0A5B52B219DA335C23600443EDD8038ADFA7EBF1EA670B76AF1D601E065B1C4",
+      "contract_hash": "4DCEBDA88A94ECDE6BBD46C2946B6C175388C85EABB72922E11A65F97735409F",
+      "manifest_hash": "3F9A9819D7FA2CD187BB3AC54D3DB6404987111E14E864A019B20729E55A37C5",
       "checks": [
         {
           "check_id": "check:traceguard:consumer-contract",
@@ -191,8 +191,8 @@
     },
     {
       "member_skill_id": "experimentguard",
-      "contract_hash": "6D22E6D54F6D2CD125A09208F6E71075AE611363355B14CE1B5E624FEBCF8C8F",
-      "manifest_hash": "916B6CF315D58EF7524362A5FA4A1C439F422CD26765C3921A916922A884932C",
+      "contract_hash": "806853A4F2AD00B0AF5F515B3B3FC2411CC4C18B9BAB8B7DEB1B7D06DACF9090",
+      "manifest_hash": "46068E6F9F7C61694FFF9D3F27595C1CC264AA7082CB1E5EBDDF314FC981647D",
       "checks": [
         {
           "check_id": "check:experimentguard:consumer-contract",
@@ -235,5 +235,5 @@
   "check_count": 20,
   "cross_unit_receipt_reuse": false,
   "skillguard_adds_domain_route": false,
-  "claim_boundary": "This file records the current FlowGuard 0.68.14 toolchain and remains visibly non-executable until one explicitly owned maintenance-unit validation runs. Current native affected-only ownership comes from each compiled contract content-impact plan; no compatibility or fallback route is implied."
+  "claim_boundary": "This file records the current FlowGuard 0.69.0 toolchain and remains visibly non-executable until one explicitly owned maintenance-unit validation runs. Current native affected-only ownership comes from each compiled contract content-impact plan; no compatibility or fallback route is implied."
 }
