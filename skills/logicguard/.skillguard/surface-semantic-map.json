@@ -2,7 +2,7 @@
   "schema_version": "skillguard.surface_semantic_map.v1",
   "map_id": "map:researchguard:logicguard:surface-semantics",
   "target_skill_id": "logicguard",
-  "source_discovery_fingerprint": "sha256:8ede448ed5b9e1d91dd8c0de3898ba386134cd9fa96da0e31363c8573715cf60",
+  "source_discovery_fingerprint": "sha256:6a62b51d03591f776e8d6a56d350b73aca8419e9bc9256a5e0c0b3fbbb32c358",
   "full_surface_ids": [
     "api:scripts/logicguard_closure_check.py:check",
     "api:scripts/logicguard_closure_check.py:main",
@@ -477,5 +477,5 @@
     }
   ],
   "claim_boundary": "The declared member skill root is the source-discovery boundary. Its native package is separately bound by the contract's implementation paths and check inputs. This author map proves neither native check execution nor domain correctness, installation, release, or future AI behavior.",
-  "map_hash": "sha256:02e6dfe4b0cbddeeee374924561a6702f994596077c4914c1903d922b805e168"
+  "map_hash": "sha256:97dc67959ba293004acb7a4c78b343ffd4f0a2b618ef4f99aa0a7be395ec90a7"
 }

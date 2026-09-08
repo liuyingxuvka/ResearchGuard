@@ -2,7 +2,7 @@
   "schema_version": "skillguard.surface_semantic_map.v1",
   "map_id": "map:researchguard:researchguard:surface-semantics",
   "target_skill_id": "researchguard",
-  "source_discovery_fingerprint": "sha256:710a73905ab70fa002ab9352d0b078c5e84302bdd4208b91deea797f4bfc55f6",
+  "source_discovery_fingerprint": "sha256:2f6c8a3a6558b9a7506a46308fe1577fd1cf84b5aa2e037fd133afc562e00917",
   "full_surface_ids": [
     "artifact:agents/openai.yaml",
     "config:.skillguard/contract-source.json",
@@ -209,5 +209,5 @@
     }
   ],
   "claim_boundary": "The declared member skill root is the source-discovery boundary. Its native package is separately bound by the contract's implementation paths and check inputs. This author map proves neither native check execution nor domain correctness, installation, release, or future AI behavior.",
-  "map_hash": "sha256:0318cc9524a1190398181cc6567e0ccd104cd75d34795e41a6dff30eba27d16f"
+  "map_hash": "sha256:e7c160b459639565cc33d9bc3d8e93c5235a4e335d0a783639aac4aa0cb46389"
 }

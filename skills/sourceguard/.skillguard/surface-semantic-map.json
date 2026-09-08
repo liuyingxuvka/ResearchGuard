@@ -2,7 +2,7 @@
   "schema_version": "skillguard.surface_semantic_map.v1",
   "map_id": "map:researchguard:sourceguard:surface-semantics",
   "target_skill_id": "sourceguard",
-  "source_discovery_fingerprint": "sha256:3b25e4f8c94fac2490cef9f919eb6987f643905bb99605da63180bfcc10920c5",
+  "source_discovery_fingerprint": "sha256:d179cddbe03a42fe2064707a4134d2be89d4fdb81f62730d71768d227b29f63f",
   "full_surface_ids": [
     "api:scripts/sourceguard_closure_check.py:check",
     "api:scripts/sourceguard_closure_check.py:main",
@@ -375,5 +375,5 @@
     }
   ],
   "claim_boundary": "The declared member skill root is the source-discovery boundary. Its native package is separately bound by the contract's implementation paths and check inputs. This author map proves neither native check execution nor domain correctness, installation, release, or future AI behavior.",
-  "map_hash": "sha256:bacf13858ee0af9a86c0e9cf3e34139542b598227010d7805eec47cb80ea1980"
+  "map_hash": "sha256:86fad5ba1a58ce062a5629e764e379f2820ca045bdce5b280c13dc3c3350d06c"
 }

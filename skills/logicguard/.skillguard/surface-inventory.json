@@ -375,7 +375,7 @@
       "kind": "config",
       "name": ".skillguard/contract-source.json",
       "source_path": ".skillguard/contract-source.json",
-      "source_fingerprint": "sha256:21adcf878e2335251b96cf334dd1a82e8c98ab7d6d4dd29cf3e4ed0b4c140ba6",
+      "source_fingerprint": "sha256:0880ec1dc62df749be41ded110d3a6f1f985cde7f787a7f3a68b370eec21f56a",
       "function_id": "config:.skillguard/contract-source.json",
       "route_id": "config:.skillguard/contract-source.json",
       "review_group_id": "group:surface:10513a60240614296b758ebb",
@@ -1360,7 +1360,7 @@
       "proof_ref": ".skillguard/surface-inventory.json#full_discovery_fingerprint"
     }
   },
-  "full_discovery_fingerprint": "sha256:8ede448ed5b9e1d91dd8c0de3898ba386134cd9fa96da0e31363c8573715cf60",
+  "full_discovery_fingerprint": "sha256:6a62b51d03591f776e8d6a56d350b73aca8419e9bc9256a5e0c0b3fbbb32c358",
   "adequacy_check_ids": [
     "check:logicguard:consumer-contract",
     "check:logicguard:native-tests",
@@ -1369,5 +1369,5 @@
   ],
   "model_deepening_check_id": "check:logicguard:task-model-closure",
   "claim_boundary": "The declared member skill root is the source-discovery boundary. Its native package is separately bound by the contract's implementation paths and check inputs. This author map proves neither native check execution nor domain correctness, installation, release, or future AI behavior.",
-  "inventory_hash": "sha256:f8107022a1ca148a1ab9f0e1f1bbade7bbeaf0438d0cae7a1a6efaa25f402e1e"
+  "inventory_hash": "sha256:98c7da5ef8a5372d3886d3e87890eb8f4e47f689f04a81259eb4c5037b123626"
 }
