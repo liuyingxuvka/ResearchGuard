@@ -1,7 +1,7 @@
 # ResearchGuard
 
-**Current version:** `v0.5.0`
-**当前版本：** `v0.5.0`
+**Current version:** `v0.5.1`
+**当前版本：** `v0.5.1`
 
 ResearchGuard is one versioned research-quality guard suite with five direct
 Codex entrypoints:

@@ -31,10 +31,10 @@ def test_all_suite_version_authorities_are_current() -> None:
     topology = json.loads(JSON_MODEL_PATH.read_text(encoding="utf-8"))
     model = _load_model()
 
-    assert package["project"]["version"] == "0.5.0"
-    assert __version__ == "0.5.0"
-    assert model.CURRENT_RESEARCHGUARD_VERSION == "0.5.0"
-    assert topology["model_id"] == "researchguard.suite.v0.5.0"
+    assert package["project"]["version"] == "0.5.1"
+    assert __version__ == "0.5.1"
+    assert model.CURRENT_RESEARCHGUARD_VERSION == "0.5.1"
+    assert topology["model_id"] == "researchguard.suite.v0.5.1"
     assert topology["software_dna"]["model_path"] == "models/software_dna/researchguard.json"
     assert topology["software_dna"]["root_model_id"] == "researchguard-suite"
     assert topology["software_dna"]["member_model_ids"] == [

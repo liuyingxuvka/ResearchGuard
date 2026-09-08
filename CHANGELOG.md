@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.5.1 - 2026-09-08
+
+- Remove historical FlowGuard working evidence from the public release tree;
+  retain it only in the local audit evidence area.
+- Keep the current model authority, package, and five consumer projections on
+  one synchronized patch version.
+
 ## v0.5.0 - 2026-08-12
 
 - Add one repository-native software-DNA root with four recursively decomposed

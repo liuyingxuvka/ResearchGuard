@@ -44,7 +44,7 @@ MEMBERS = (
     "traceguard",
     "experimentguard",
 )
-CURRENT_VERSION = "0.5.0"
+CURRENT_VERSION = "0.5.1"
 RETIRED_SKILL_IDS = (
     "logicguard-source-library",
     "logicguard-structured-artifact",
