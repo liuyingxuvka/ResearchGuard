@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import inspect
+import ast
 from pathlib import Path
 import sys
 
@@ -49,10 +50,15 @@ class SynthesisState:
 
 
 def run_model() -> None:
-    sys.path.insert(0, str(Path(__file__).resolve().parents[4] / "src"))
-    from researchguard.logic.synthesis import synthesize_artifact_plan
-    parameter = inspect.signature(synthesize_artifact_plan).parameters["selection_request"]
-    assert parameter.default is inspect.Parameter.empty and parameter.kind is inspect.Parameter.KEYWORD_ONLY
+    source_path = Path(__file__).resolve().parents[4] / "src/researchguard/logic/synthesis.py"
+    tree = ast.parse(source_path.read_text(encoding="utf-8"), filename=str(source_path))
+    functions = [node for node in tree.body if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and node.name == "synthesize_artifact_plan"]
+    assert len(functions) == 1
+    parameter = next((item for item in functions[0].args.kwonlyargs if item.arg == "selection_request"), None)
+    assert parameter is not None
+    assert len(functions[0].args.kw_defaults) == len(functions[0].args.kwonlyargs)
+    index = [item.arg for item in functions[0].args.kwonlyargs].index("selection_request")
+    assert functions[0].args.kw_defaults[index] is None
     good = SynthesisState(True, True, True, True)
     assert good.accepted
     for index in range(4):

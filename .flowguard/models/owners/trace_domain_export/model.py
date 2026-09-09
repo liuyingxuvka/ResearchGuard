@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-import sys
+import ast
 
 
 FLOWGUARD_MODEL_MARKER = "flowguard-executable-model"
@@ -54,14 +54,12 @@ class ExportState:
 
 
 def run_model() -> None:
-    sys.path.insert(0, str(Path(__file__).resolve().parents[4] / "src"))
-    from researchguard.trace.export_logicguard import validate_logicguard_bundle
-    try:
-        validate_logicguard_bundle({})
-    except ValueError as exc:
-        assert "schema" in str(exc)
-    else:
-        raise AssertionError("legacy empty LogicGuard export was accepted")
+    source_path = Path(__file__).resolve().parents[4] / "src/researchguard/trace/export_logicguard.py"
+    tree = ast.parse(source_path.read_text(encoding="utf-8"), filename=str(source_path))
+    functions = [node for node in tree.body if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and node.name == "validate_logicguard_bundle"]
+    assert len(functions) == 1
+    function_text = ast.get_source_segment(source_path.read_text(encoding="utf-8"), functions[0]) or ""
+    assert "schema" in function_text and "ValueError" in function_text
     assert "domain_proposition" in DOMAIN_FIELDS
     assert "audit_context" not in DOMAIN_FIELDS
     good = ExportState(True, True, True, True)

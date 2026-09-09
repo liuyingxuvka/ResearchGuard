@@ -7,7 +7,7 @@ import os
 from pathlib import Path
 import sys
 
-from flowguard.source_identity import source_file_fingerprint
+import hashlib
 
 
 ROOT = Path(__file__).resolve().parents[4]
@@ -18,14 +18,14 @@ import model  # noqa: E402
 
 
 def _sha256(path: Path) -> str:
-    return source_file_fingerprint(path)
+    return "sha256:" + hashlib.sha256(path.read_bytes()).hexdigest()
 
 
 def _write_native_results() -> None:
     output = os.environ.get("FLOWGUARD_OUTPUT_DIR")
     if not output:
         return
-    directory = Path(output).resolve()
+    directory = Path(output)
     directory.mkdir(parents=True, exist_ok=True)
     cases = [model.KNOWN_GOOD_CASE_ID, f"boundary:{model.MODEL_ID}", *model.KNOWN_BAD_CASE_IDS]
     rows = []

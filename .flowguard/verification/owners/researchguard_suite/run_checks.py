@@ -15,7 +15,7 @@ import sys
 from typing import Any
 
 from flowguard.native_case_protocol import NativeModelCaseResult
-from flowguard.source_identity import source_file_fingerprint
+import hashlib
 
 
 ROOT = Path(__file__).resolve().parents[4]
@@ -26,8 +26,26 @@ sys.path.insert(0, str(MODEL_PATH.parent))
 import model  # noqa: E402
 
 
+def _run_bounded(command: list[str], *, env: dict[str, str], timeout: int) -> tuple[int, str]:
+    """Run one local child and close its whole Windows process tree on timeout."""
+    proc = subprocess.Popen(
+        command, cwd=ROOT, text=True, stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE, env=env, close_fds=True,
+    )
+    try:
+        stdout, stderr = proc.communicate(timeout=timeout)
+        return proc.returncode, stdout + stderr
+    except subprocess.TimeoutExpired:
+        subprocess.run(
+            ["taskkill", "/PID", str(proc.pid), "/T", "/F"],
+            capture_output=True, text=True, check=False,
+        )
+        stdout, stderr = proc.communicate(timeout=5)
+        return 124, (stdout or "") + (stderr or "") + f"\nPROCESS_TREE_TIMEOUT={timeout}\n"
+
+
 def _sha256(path: Path) -> str:
-    return source_file_fingerprint(path)
+    return "sha256:" + hashlib.sha256(path.read_bytes()).hexdigest()
 
 
 def _raw_sha256(path: Path) -> str:
@@ -47,11 +65,8 @@ def _run_child(model_id: str, *, parent_output: Path | None = None) -> tuple[dic
         child_output = parent_output / "children" / model_id
         child_output.mkdir(parents=True, exist_ok=True)
         environment["FLOWGUARD_OUTPUT_DIR"] = str(child_output)
-    completed = subprocess.run(
-        [sys.executable, str(runner)], cwd=ROOT, text=True,
-        capture_output=True, check=False, env=environment,
-    )
-    lines = [line for line in completed.stdout.splitlines() if line.strip()]
+    returncode, output = _run_bounded([sys.executable, str(runner)], env=environment, timeout=20)
+    lines = [line for line in output.splitlines() if line.strip()]
     receipt: dict[str, Any] | None = None
     if lines:
         try:
@@ -60,7 +75,7 @@ def _run_child(model_id: str, *, parent_output: Path | None = None) -> tuple[dic
             candidate = None
         if isinstance(candidate, dict) and candidate.get("artifact_kind") == "flowguard_model_child_receipt":
             receipt = candidate
-    return receipt, completed.stdout + completed.stderr
+    return receipt, output
 
 
 def _case_ids() -> tuple[str, ...]:
@@ -302,18 +317,16 @@ def main() -> int:
     if len({row.get("model_id") for row in child_receipts}) != len(model.CHILD_MODEL_IDS):
         findings.append("children:receipt_model_ids_not_exact")
 
-    native = subprocess.run(
+    native_returncode, native_output = _run_bounded(
         [sys.executable, ".flowguard/verification/run_researchguard_suite_model.py"],
-        cwd=ROOT, text=True, capture_output=True, check=False, env=os.environ.copy(),
+        env=os.environ.copy(), timeout=30,
     )
-    if native.returncode:
+    if native_returncode:
         findings.append("native:researchguard_suite_model_failed")
-
-    native_output = native.stdout + native.stderr
     _write_native_results(
         parent_output,
         native_output=native_output,
-        native_returncode=native.returncode,
+        native_returncode=native_returncode,
         child_receipts=child_receipts,
     )
 
