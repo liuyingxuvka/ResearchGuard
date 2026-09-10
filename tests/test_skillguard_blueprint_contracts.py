@@ -12,6 +12,7 @@ from scripts.build_skillguard_contracts import (
     BLUEPRINT_COMPONENTS,
     IMPLEMENTATION_PATHS,
     MEMBERS,
+    _skillguard_source_fingerprint,
     contract,
 )
 
@@ -233,3 +234,18 @@ def test_current_flowguard_validation_plan_is_visible_but_not_run() -> None:
     assert plan["toolchain"]["flowguard_version"] == "0.69.0"
     assert plan["toolchain"]["flowguard_status"] == "current_not_run"
     assert "maintenance-unit-validation-not-run" in plan["stale_reason_codes"]
+
+
+def test_skillguard_source_fingerprint_resolves_explicit_projection(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    projection = tmp_path / "skills" / "skillguard"
+    (projection / "scripts").mkdir(parents=True)
+    (projection / "SKILL.md").write_text("current", encoding="utf-8")
+    (projection / "scripts" / "skillguard_compile.py").write_text(
+        "current", encoding="utf-8"
+    )
+    monkeypatch.setenv("CODEX_HOME", str(tmp_path))
+    fingerprint = _skillguard_source_fingerprint()
+    assert fingerprint.startswith("sha256:")
+    assert len(fingerprint) == len("sha256:") + 64

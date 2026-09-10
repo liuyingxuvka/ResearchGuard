@@ -7,6 +7,7 @@ import hashlib
 import importlib.metadata
 import importlib.util
 import json
+import os
 from pathlib import Path
 
 
@@ -314,14 +315,44 @@ def _installed_version(distribution: str, expected: str) -> str:
 
 
 def _skillguard_source_fingerprint() -> str:
-    spec = importlib.util.find_spec("skillguard")
-    if spec is None or spec.origin is None:
+    """Resolve the one active SkillGuard source projection and fingerprint it.
+
+    The bundled consumer projection exposes ``skillguard.py`` and the
+    ``skillguard_v2`` package from ``<CODEX_HOME>/skills/skillguard/scripts``;
+    it is not installed as a conventional import package.  The old lookup
+    assumed the historical package layout and therefore failed before a
+    validation plan could be generated.  Prefer the explicit active
+    CODEX_HOME projection, then use the already-loaded module locations as a
+    path-equivalent fallback.  Every candidate must contain the current
+    author entrypoint and compiler, so an arbitrary Python package cannot be
+    mistaken for the SkillGuard source authority.
+    """
+
+    candidates: list[Path] = []
+    codex_home = Path(os.environ.get("CODEX_HOME", Path.home() / ".codex"))
+    candidates.append(codex_home.expanduser() / "skills" / "skillguard")
+
+    for module_name in ("skillguard_v2", "skillguard"):
+        spec = importlib.util.find_spec(module_name)
+        if spec is None or spec.origin is None:
+            continue
+        origin = Path(spec.origin).resolve()
+        if module_name == "skillguard_v2":
+            candidates.append(origin.parents[2])
+        else:
+            candidates.append(origin.parent.parent)
+
+    source_root = next(
+        (
+            candidate.resolve()
+            for candidate in candidates
+            if (candidate / "SKILL.md").is_file()
+            and (candidate / "scripts" / "skillguard_compile.py").is_file()
+        ),
+        None,
+    )
+    if source_root is None:
         raise ValueError("installed SkillGuard source root is unavailable")
-    source_root = Path(spec.origin).resolve().parent.parent
-    if not (source_root / "SKILL.md").is_file() or not (
-        source_root / "scripts" / "skillguard_compile.py"
-    ).is_file():
-        raise ValueError("installed SkillGuard source root is not an author toolchain")
     rows: dict[str, str] = {}
     for path in sorted(item for item in source_root.rglob("*") if item.is_file()):
         relative = path.relative_to(source_root)
