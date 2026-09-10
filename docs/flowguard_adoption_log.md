@@ -907,3 +907,42 @@ This entry proves the modeled finding-identity repair, affected checks, full sui
 - Add current external-admission owner obligation and immutable-receipt owner binding under the existing researchguard_suite authority
 - Supply an independent current path-quality denominator and rerun the task-local maturation review
 - Rerun affected parent replay after the bounded native timeout is resolved; keep the direct pass scoped to native suite scenarios
+
+
+## flowguard-project-upgrade - FlowGuard project upgrade record update
+
+- Project: ResearchGuard
+- Trigger reason: target project requires current semantic adoption and version records
+- Status: completed
+- Skill decision: used_flowguard
+- Started: 2026-09-10T09:20:10+00:00
+- Ended: 2026-09-10T09:20:10+00:00
+- Duration seconds: 0.000
+- Commands OK: True
+
+### Model Files
+- none recorded
+
+### Commands
+- OK (0.000s): `managed adoption rule-set preflight` - generated block contains every required stable rule
+- OK (0.000s): `package-authority/global-consumer validation` - pass
+- OK (0.000s): `post-write project adoption audit` - semantic and version parity after write
+
+### Findings
+- adoption_record_written: FlowGuard project AGENTS block and manifest were written or refreshed.
+
+### Counterexamples
+- none recorded
+
+### Friction Points
+- none recorded
+
+### Skipped Steps
+- Project adoption does not replace executable model checks, tests, replay, or closure evidence.
+
+### Risk Evidence Summary
+- none recorded
+
+### Next Actions
+- python -m flowguard project-audit --root . --json
+- Rerun affected FlowGuard model checks and focused tests before broad confidence.
