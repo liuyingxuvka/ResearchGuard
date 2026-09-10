@@ -7,7 +7,7 @@ import os
 from pathlib import Path
 import sys
 
-from flowguard.source_identity import source_file_fingerprint
+import hashlib
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4] / ".flowguard/models/owners/authoritative_model_system"))
 import model
@@ -18,7 +18,7 @@ RUNNER_PATH = Path(__file__).resolve()
 
 
 def _sha256(path: Path) -> str:
-    return source_file_fingerprint(path)
+    return "sha256:" + hashlib.sha256(path.read_bytes()).hexdigest()
 
 
 def _write_native_results() -> None:
@@ -60,4 +60,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
 

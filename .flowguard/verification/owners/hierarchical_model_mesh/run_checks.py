@@ -3,7 +3,7 @@ import json
 import os
 import sys
 
-from flowguard.source_identity import source_file_fingerprint
+import hashlib
 
 ROOT = Path(__file__).resolve().parents[4]
 MODEL_PATH = ROOT / ".flowguard/models/owners/hierarchical_model_mesh/model.py"
@@ -14,7 +14,7 @@ import model
 
 
 def _sha256(path: Path) -> str:
-    return source_file_fingerprint(path)
+    return "sha256:" + hashlib.sha256(path.read_bytes()).hexdigest()
 
 
 def _write_native_results() -> None:

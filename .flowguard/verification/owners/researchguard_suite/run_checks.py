@@ -22,6 +22,14 @@ ROOT = Path(__file__).resolve().parents[4]
 MODEL_PATH = ROOT / ".flowguard/models/owners/researchguard_suite/model.py"
 RUNNER_PATH = Path(__file__).resolve()
 SEMANTIC_MESH_PATH = ROOT / ".flowguard/models/owners/authoritative_model_system/semantic_model_mesh.json"
+# These checks execute in fresh Python processes.  On a cold Windows machine
+# importing the provider-neutral FlowGuard package and hashing the 586-item
+# ResearchGuard denominator can exceed the old 30-second native limit.  Keep
+# the timeout finite (so a hung child still fails closed), but large enough to
+# cover a legitimate cold run.  The parent simulator supplies its own global
+# budget; these are per-process bounds only.
+CHILD_TIMEOUT_SECONDS = 60
+NATIVE_TIMEOUT_SECONDS = 180
 sys.path.insert(0, str(MODEL_PATH.parent))
 import model  # noqa: E402
 
@@ -65,7 +73,11 @@ def _run_child(model_id: str, *, parent_output: Path | None = None) -> tuple[dic
         child_output = parent_output / "children" / model_id
         child_output.mkdir(parents=True, exist_ok=True)
         environment["FLOWGUARD_OUTPUT_DIR"] = str(child_output)
-    returncode, output = _run_bounded([sys.executable, str(runner)], env=environment, timeout=20)
+    returncode, output = _run_bounded(
+        [sys.executable, str(runner)],
+        env=environment,
+        timeout=CHILD_TIMEOUT_SECONDS,
+    )
     lines = [line for line in output.splitlines() if line.strip()]
     receipt: dict[str, Any] | None = None
     if lines:
@@ -319,7 +331,8 @@ def main() -> int:
 
     native_returncode, native_output = _run_bounded(
         [sys.executable, ".flowguard/verification/run_researchguard_suite_model.py"],
-        env=os.environ.copy(), timeout=30,
+        env=os.environ.copy(),
+        timeout=NATIVE_TIMEOUT_SECONDS,
     )
     if native_returncode:
         findings.append("native:researchguard_suite_model_failed")

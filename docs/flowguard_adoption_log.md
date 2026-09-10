@@ -857,3 +857,53 @@ This entry proves the modeled finding-identity repair, affected checks, full sui
 ### Next Actions
 - python -m flowguard project-audit --root . --json
 - Rerun affected FlowGuard model checks and focused tests before broad confidence.
+
+
+## researchguard-openspec-8.5-model-miss-20260910 - Record external-admission and immutable-receipt model miss with four-member closure evidence
+
+- Project: ResearchGuard
+- Trigger reason: Action List 0C.6.2 / R05 OpenSpec 8.5 post-green false-negative requires model-miss closure
+- Status: blocked
+- Skill decision: used_flowguard
+- Started: 2026-09-10T00:44:34+00:00
+- Ended: 2026-09-10T00:44:34+00:00
+- Duration seconds: 0.000
+- Commands OK: False
+
+### Model Files
+- .flowguard/models/owners/researchguard_suite/model.py
+- .flowguard/verification/owners/researchguard_suite/run_checks.py
+
+### Commands
+- OK (0.000s): `python -B -m pytest tests/test_expected_target_authority.py tests/test_member_model_envelope.py tests/test_portable_composition_bundle.py --junitxml=.flowguard/evidence/model-miss-8.5-20260910/pytest-junit.xml -q (35 passed)`
+- OK (0.000s): `python -B .flowguard/verification/run_researchguard_suite_model.py (15 scenarios passed; direct native replay)`
+- OK (0.000s): `python -m flowguard project-audit --root . (pass)`
+- FAIL (0.000s): `python -B -m flowguard model-maturation-review --plan=.flowguard/evidence/model-miss-8.5-20260910/model-maturation-plan-api.json --json (exit 1; upgrade required)`
+- FAIL (0.000s): `python -B .flowguard/verification/owners/researchguard_suite/run_checks.py (exit 1; bounded native return 124)`
+- FAIL (0.000s): `FlowGuard model-maturation receipt verification (blocked receipt; verification_current=false)`
+
+### Findings
+- model_miss_recorded: external-admission and immutable-receipt boundaries are explicit for logicguard, sourceguard, traceguard, and experimentguard
+- model_maturation_blocked: owner resolution is blocked and independent path-quality denominator is absent
+- parent_replay_blocked: existing 180-second native budget returned 124; direct replay later passed
+
+### Counterexamples
+- post-green false-negative: caller-forged or resigned member result/terminal with recomputed self-hashes could appear self-consistent without external admission or immutable producer receipt
+
+### Friction Points
+- Current API rejected stale draft contribution metadata; contribution was rebuilt through ModelMaturationCoverageContribution and receipt publication APIs
+- Parent runner native budget is shorter than this current 15-scenario direct replay on the present machine
+
+### Skipped Steps
+- External-domain qualification and whole-target semantic claims remain unlicensed
+- No model-authority pointer mutation, installation/release, Git operation, LogicWriting change, or shared FlowGuard source change
+
+### Risk Evidence Summary
+- proof:researchguard:8.5:four-member-admission-opaque-receipt covers 35 current rejection tests only; route_evidence_current=false
+- model-maturation-receipt:11833555c29d009158f32e4d is immutable blocked evidence; fingerprint sha256:6b9259fbf7cfb2276a596eb6b0ae49f783e66a32c1dacd3d452f0c4554fa527f
+- Historical blocked project-adoption audit remains linked at implementation-round2-evidence/rg-project-audit-final-20260908.json
+
+### Next Actions
+- Add current external-admission owner obligation and immutable-receipt owner binding under the existing researchguard_suite authority
+- Supply an independent current path-quality denominator and rerun the task-local maturation review
+- Rerun affected parent replay after the bounded native timeout is resolved; keep the direct pass scoped to native suite scenarios
