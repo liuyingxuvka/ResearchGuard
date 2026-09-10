@@ -93,6 +93,112 @@ def build_mapping(root: Path, result_path: Path | None = None) -> dict[str, Any]
     return mapping
 
 
+def verify_strict_execution(
+    payload: dict[str, Any],
+    declared_cases: list[tuple[str, str, str]],
+    *,
+    expected_source_revision: str | None = None,
+) -> dict[str, Any]:
+    """Verify an executed native envelope without changing coverage mapping.
+
+    ``build_mapping`` deliberately remains a case-coverage registry.  This
+    separate verifier consumes a native envelope and requires the identity
+    and terminal fields that make an execution result admissible.  It does
+    not manufacture or repair those fields.
+    """
+    gaps: list[str] = []
+    if payload.get("status") != "pass":
+        gaps.append("top_level_status_not_pass")
+    if payload.get("ok") is not True:
+        gaps.append("top_level_ok_not_true")
+    if payload.get("exit_code") != 0:
+        gaps.append("top_level_exit_code_not_zero")
+    if payload.get("terminal") is not True:
+        gaps.append("top_level_terminal_not_true")
+    if payload.get("cleanup_confirmed") is not True:
+        gaps.append("top_level_cleanup_not_confirmed")
+    rows = payload.get("results")
+    if not isinstance(rows, list):
+        return {"status": "blocked", "gaps": [*gaps, "results_not_list"]}
+    expected = {case_id: (owner, parent) for owner, parent, case_id in declared_cases}
+    grouped: dict[str, list[dict[str, Any]]] = {}
+    for row in rows:
+        if isinstance(row, dict):
+            grouped.setdefault(str(row.get("source_case_id", "")), []).append(row)
+        else:
+            gaps.append("result_row_not_object")
+    for case_id, (owner, _parent) in expected.items():
+        matches = grouped.get(case_id, [])
+        if len(matches) != 1:
+            gaps.append(f"case_cardinality:{case_id}")
+            continue
+        row = matches[0]
+        if row.get("owner_id") not in {owner, f"model:{owner}"}:
+            gaps.append(f"owner_mismatch:{case_id}")
+        for field in (
+            "model_instance_id", "model_instance_fingerprint",
+            "input_inventory_fingerprint", "result_fingerprint",
+            "receipt_id", "receipt_fingerprint", "runner_fingerprint",
+        ):
+            if not row.get(field):
+                gaps.append(f"missing_{field}:{case_id}")
+        if row.get("observed_status") not in {"pass", "blocked"}:
+            gaps.append(f"invalid_observed_status:{case_id}")
+        expected_status = row.get("expected_observed_status")
+        if expected_status is not None and row.get("observed_status") != expected_status:
+            gaps.append(f"oracle_mismatch:{case_id}")
+    foreign = sorted(set(grouped) - set(expected))
+    gaps.extend(f"foreign_case:{case_id}" for case_id in foreign)
+    if expected_source_revision is not None and payload.get("source_revision") != expected_source_revision:
+        gaps.append("source_revision_mismatch")
+    child_ids = payload.get("child_receipt_ids")
+    expected_children = sorted({owner for owner, _parent, _case in declared_cases if owner != "researchguard_suite"})
+    if not isinstance(child_ids, list) or sorted(set(child_ids)) != expected_children:
+        gaps.append("parent_child_closure_mismatch")
+    return {
+        "status": "pass" if not gaps else "blocked",
+        "strict_self_dna_status": "pass" if not gaps else "blocked",
+        "gaps": sorted(set(gaps)),
+        "claim_boundary": "Strict local execution envelope identity, oracle, and parent closure only; native model semantics remain owner-scoped.",
+    }
+
+
+def verify_strict_parent_execution(
+    parent: dict[str, Any],
+    children: list[dict[str, Any]],
+    expected_child_model_ids: list[str],
+) -> dict[str, Any]:
+    """Adapt the native FlowGuard parent/child receipt envelope.
+
+    Native receipts use ``result_status`` and ``consumed_child_receipts``;
+    they do not expose the compact per-case fields consumed by the coverage
+    mapping.  This adapter validates the native identity/terminal/closure
+    contract without pretending that it is a case mapping.
+    """
+    gaps: list[str] = []
+    if parent.get("result_status") != "pass": gaps.append("parent_result_status_not_pass")
+    if parent.get("exit_code") != 0: gaps.append("parent_exit_code_not_zero")
+    if not parent.get("receipt_id"): gaps.append("parent_receipt_id_missing")
+    if not parent.get("result_fingerprint"): gaps.append("parent_result_fingerprint_missing")
+    if not parent.get("proof_artifact_fingerprint"): gaps.append("parent_proof_fingerprint_missing")
+    expected = set(expected_child_model_ids)
+    seen: set[str] = set()
+    for child in children:
+        subject = str(child.get("subject_id", ""))
+        model_id = subject.removeprefix("validation-owner:model:")
+        if model_id not in expected: gaps.append(f"foreign_child:{model_id}")
+        seen.add(model_id)
+        if child.get("result_status") != "pass": gaps.append(f"child_result_status_not_pass:{model_id}")
+        if child.get("exit_code") != 0: gaps.append(f"child_exit_code_not_zero:{model_id}")
+        for field in ("receipt_id", "result_fingerprint", "proof_artifact_fingerprint", "producer_id", "producer_version"):
+            if not child.get(field): gaps.append(f"child_{field}_missing:{model_id}")
+    if seen != expected: gaps.append("child_model_closure_mismatch")
+    listed = {str(x.get("receipt_id", "")) for x in parent.get("required_child_receipts", []) if isinstance(x, dict)}
+    actual = {str(x.get("receipt_id", "")) for x in parent.get("consumed_child_receipts", []) if isinstance(x, dict)}
+    if listed != actual: gaps.append("parent_consumed_required_receipts_mismatch")
+    return {"status": "pass" if not gaps else "blocked", "strict_self_dna_status": "pass" if not gaps else "blocked", "gaps": sorted(set(gaps)), "claim_boundary": "Native FlowGuard parent/child receipt identity and closure only; case-level oracle semantics remain native-owner evidence."}
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", default=".")

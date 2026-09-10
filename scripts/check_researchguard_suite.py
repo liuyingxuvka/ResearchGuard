@@ -63,15 +63,27 @@ RETIRED_COMMANDS = (
 )
 
 
-def _python(*args: str) -> subprocess.CompletedProcess[str]:
+def _python(*args: str, timeout: int = 20) -> subprocess.CompletedProcess[str]:
     env = dict(__import__("os").environ)
     env["PYTHONPATH"] = str(SRC)
-    return subprocess.run(
-        [sys.executable, *args],
-        cwd=ROOT,
-        env=env,
-        text=True,
-        capture_output=True,
+    proc = subprocess.Popen(
+        [sys.executable, *args], cwd=ROOT, env=env, text=True,
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=True,
+    )
+    try:
+        stdout, stderr = proc.communicate(timeout=max(1, int(timeout)))
+    except subprocess.TimeoutExpired:
+        subprocess.run(
+            ["taskkill", "/PID", str(proc.pid), "/T", "/F"],
+            capture_output=True, text=True, check=False,
+        )
+        stdout, stderr = proc.communicate(timeout=5)
+        stderr = (stderr or "") + f"\nPROCESS_TREE_TIMEOUT={max(1, int(timeout))}\n"
+        return subprocess.CompletedProcess(
+            [sys.executable, *args], 124, stdout or "", stderr,
+        )
+    return subprocess.CompletedProcess(
+        [sys.executable, *args], proc.returncode, stdout or "", stderr or "",
     )
 
 

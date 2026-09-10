@@ -21,6 +21,18 @@ member skills to classify.
 Extract `primary_action` and context facts only. Contracts derive admission;
 the router selects the unique smallest set covering each responsibility.
 
+## Local Material Routing
+
+Read the route-declared local reference before classifying.
+
+## Entrypoint Acceptance Map
+
+Emit `composition_ready` only when current; otherwise `composition_blocked`.
+
+## Use When
+
+Use for ambiguous or cross-member work.
+
 ## Do Not Use When
 
 Use a direct member route when one native owner is clear; never use the umbrella
@@ -92,4 +104,5 @@ native gaps stay open or end visibly as stalled, limited, external, or excluded.
 ## Output Requirements
 
 Report the selected set/order, responsibilities, evidence, failures, blockers,
-skips, references, risk, typed handoffs, field owners, terminal reason, and claim boundary.
+`skipped_checks`, `residual_risk`, references, risk, typed handoffs, field owners,
+terminal reason, and `claim_boundary`.

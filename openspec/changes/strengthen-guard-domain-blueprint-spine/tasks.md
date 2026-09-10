@@ -128,7 +128,7 @@
 - [x] 8.2 Run the ResearchGuard envelope, routing, prompt, root CLI, suite identity, and cross-member integration tests and retain every failed, skipped, stale, or not-run owner visibly.
 - [x] 8.3 Freeze one current native model/schema/receipt fingerprint set per member and one ResearchGuard envelope/composition contract fingerprint after focused tests pass.
 - [x] 8.4 Re-run only obligations affected by any repair and preserve exact-current unaffected resolved receipts; do not use uncertain impact as permission for full execution.
-- [ ] 8.5 Record this post-green false-negative as a FlowGuard model miss with the external-admission boundary, immutable-receipt boundary, four same-class members, prior overclaim, and exact closure tests; keep the blocked project-adoption audit visible.
+- [x] 8.5 Record this post-green false-negative as a FlowGuard model miss with the external-admission boundary, immutable-receipt boundary, four same-class members, prior overclaim, and exact closure tests; keep the blocked project-adoption audit visible.
 - [x] 8.6 Run four real raw-bytes co-shrink adversarials plus affected ExperimentGuard, LogicGuard, SourceGuard, TraceGuard, umbrella, CLI, prompt, and strict OpenSpec suites; keep full SkillGuard/release validation outside this native repair phase.
 - [x] 8.7 Add and run four fresh-process co-shrink tests, four serialized anchor/receipt replay tests, four absent-or-unavailable external-anchor tests, and four alternate-target positives that succeed only with separately admitted anchors.
 - [x] 8.8 Add fresh-process arbitrary never-published native-receipt tests for all four members, real ExperimentGuard owner replay, and a real two-member composition proving valid-looking ids/self-hashes cannot replace immutable resolution and readiness remains `composition_blocked`.
@@ -215,3 +215,49 @@
 8. Recheck remote branch/tag ownership and CI prerequisites. Push only the exact verified candidate, create and push its patch tag, publish the GitHub Release, and upload package/source, clean-consumer, canonical logical DNA, commit-binding manifest, checksum, and release-note assets.
 9. Download and verify every asset, then compare source commit, tag, release, package, installed package, five installed skills, external DNA, model authority, checksums, and claim boundaries as distinct identities tied to the same patch.
 10. Record terminal lifecycle states and bounded residuals in the out-of-repository immutable release receipt and final report, never by editing archived tasks. Perform the predictive-KB postflight and record one structured observation only when the work exposed a reusable lesson, route gap, miss, or card weakness.
+
+## 13. Current recovery implementation ledger (R00–R10)
+
+This appended section is the current integration ledger for the 2026-09-09
+recovery round. Sections 1–12 preserve the earlier domain-blueprint intent and
+historical checklist. Their checked boxes are not a substitute for the
+current receipts listed here. The integration owner updates each state only
+from the named evidence and keeps these claims separate:
+`implemented`, `protocol_tested`, `current_model_closed`,
+`real_quality_proved`, and `installed_current`.
+
+| Package | Current scope and owner | Required implementation/evidence | Dependencies and stop condition | State at ledger authoring |
+|---|---|---|---|---|
+| R00 | Baseline, ownership, OpenSpec alignment; integration owner | New run root with source/peer/lock inventory, exact owner map, and current ledger; preserve every dirty peer path and record FlowGuard/toolchain identity | Stop on active writer, ambiguous ownership, or identity drift; re-freeze before any authority or release write | `landed for baseline; final model/source freeze still required` |
+| R01 | LogicWriting local process backend consumed by the RG handoff; Worker A | Single stdout/stderr reader, bounded input, hard deadline, explicit lifecycle, owned process-tree cleanup, and external-process tests | Missing drain, descendant cleanup, or atomic completion is `cleanup_unconfirmed` and cannot release capacity | `in progress under integration review` |
+| R02 | Quality job ledger and bounded scheduler; Worker A | One terminal row per planned job, dependency-derived judge failures, bounded concurrency two, no late overwrite, and full deadline accounting | Any unclean timeout stops the lane; unstarted rows retain `not_started_*` reason | `in progress under integration review` |
+| R03 | Source/implementation/policy identity for the producer; Worker A with integration owner | Immutable plan/capture/manifest; source and installed-provider fingerprints; aggregate-only readback; pair/context binding | Relevant source, input, policy, capture, or context drift is stale/incomplete; no self-copied benchmark plan may pass | `in progress under integration review` |
+| R04 | LogicWriting generic production chain at the ResearchGuard boundary; Worker C | WritingRequest→ResearchGuard installed native plan/receipt→handoff mapping→ReaderBrief consumption; planner is an independent role and writer receives only validated projection | Invalid native receipt, provider absence, or planner contract failure blocks; synthetic doubles remain `protocol_only` | `partial: focused protocol chain landed; real provider integration pending` |
+| R05 | Native self-DNA mapping and strict parent/child evidence; Worker B | Coverage-only 63-case mapping plus strict current parent envelope consuming the exact declared child model ids; stale/foreign/missing/duplicate receipts fail | Never upgrade mapping coverage to native closure; require fresh immutable child and parent receipts | `partial: adapter and focused tests landed; fresh native receipt pending` |
+| R06 | Bounded native suite checker and FlowGuard model owner execution; integration owner with Worker B | Member checker timeout/cleanup diagnostics; current RG10/LW22 model owner receipts; project/model audit; shared FlowGuard read-only | Stale authority, failed owner, unexplained timeout, or unverified child blocks model closure | `partial: checker bound tested; native/model rerun pending` |
+| R07 | Isolated ResearchGuard package/console and five SkillGuard projections; integration owner | Exact wheel in isolated venv, console/import path proof, clean projection prepare/verify, no author/private/evidence leakage | Any package, console, projection, or prepare failure prevents activation and quality runs | `open` |
+| R08 | Installed-console production smoke, held-out, and pair quality; integration owner | Smoke first; then 4 held-out writers + 8 independent judges, then 48 writers + 48 judges; planner count and immutable manifests separate | Do not launch full run before smoke; incomplete execution has no score and cannot qualify native model | `open` |
+| R09 | Current native regression, model-test alignment, and transactional daily install; integration owner | RG tests/member checker, FlowGuard/model audit, SkillGuard contract/projection checks, package/console parity, native installer receipt | Any affected source change invalidates dependent evidence; installation only after model and quality gates | `open` |
+| R10 | Public source commit, GitHub push, and remote readback; integration owner | Public allowlist, staged diff check, commit, push to actual default branch, and `git ls-remote` readback | Never publish private evidence or overclaim model/install/quality; tags/releases need separate closure | `open` |
+
+### Current closure rules
+
+1. Native model closure requires current member receipts, strict parent/child
+   consumption, the affected FlowGuard authority pointer, and a matching
+   source/toolchain identity. Old receipts, model directories, and denominator
+   counts remain historical evidence.
+2. Composition and reverse-trace operations are qualification-first. A
+   blocked or stale member suppresses ordinary partial output while retaining
+   the exact first gap and affected owner for repair.
+3. A protocol test proves only the declared boundary. It cannot turn a test
+   double, synthetic plan, caller-authored receipt, or local source import
+   into an installed-provider or native-execution claim.
+4. `real_quality_proved` is owned by the LogicWriting consumer after both pair
+   and held-out receipts pass. ResearchGuard evidence supports the handoff but
+   does not score prose or choose a preferred article.
+5. `installed_current` requires the exact package, console, five projections,
+   SkillGuard transaction, and read-only parity to agree. A successful source
+   commit or one matching skill hash never closes this row.
+6. R10 proves source publication only. Every failure leaves its terminal state,
+   owner, locator, and next bounded repair visible in the external run receipt;
+   no historical checkbox is silently rewritten to make the gate pass.

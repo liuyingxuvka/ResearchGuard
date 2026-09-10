@@ -45,3 +45,33 @@ The ResearchGuard suite has strong member-specific reasoning engines, but those 
 ## Impact
 
 This affects ResearchGuard admission/routing/composition and CLI code, the shared target-anchor and native-receipt contracts, all four member runtimes, five maintained skill prompts and author contracts, prompt manifests, focused and cross-member tests, the single FlowGuard repository self-DNA after toolchain stabilization, installed consumer projections, and the patch release. ResearchGuard remains the repository root owner for umbrella admission, routing, composition, envelopes, handoffs, and authority transport; it never becomes a shared member-domain solver or payload interpreter. Direct members consume externally owned anchors and cannot issue their own task target.
+
+## Current implementation-round amendment (R00–R10, 2026-09-09)
+
+The proposal above records the broader domain-blueprint intent and remains an
+immutable historical design statement until this change is archived. The
+current recovery round uses the same native member semantics but executes them
+through a bounded, local, evidence-first sequence. R05 closes the distinction
+between the 63-case self-DNA coverage map and strict native parent/child
+execution. R06 gives the suite checker a bounded terminal path and re-runs
+current member owners only after source and toolchain identities are frozen.
+R07 prepares clean consumer projections and an isolated ResearchGuard package
+and console. R08 exercises that installed console through LogicWriting's
+production reader chain. R09 closes model/test/installation parity, and R10
+publishes only the reviewed public source allowlist.
+
+The ResearchGuard boundary is explicit: the repository owns native domain
+semantics, opaque envelopes, target-anchor admission, immutable receipt
+resolution, and the five-skill installation transaction. LogicWriting owns
+reader ordering, materiality, composition, and prose evaluation. ResearchGuard
+does not author a target from a caller-shaped candidate, interpret a
+LogicWriting score, or provide a fallback solver. A directory count, an old
+receipt, a synthetic fixture, or a successful package build cannot close a
+native model or product claim.
+
+The appended R00–R10 ledger in `tasks.md` is the current implementation and
+acceptance source. It records implementation, protocol evidence, current
+model closure, real quality, and installed-currentness as separate states.
+The historical task checkboxes above remain useful for intent coverage, but a
+checked historical row is not evidence that the corresponding current-round
+receipt exists.

@@ -386,3 +386,41 @@ A structural blueprint result never replaces a native semantic receipt. A green 
 10. Run one frozen full suite, isolated installation checks, version synchronization, Git/tag/release gates, and then archive the completed OpenSpec change.
 
 Rollback before release removes only the scoped new current implementation and restores the exact prior source, model pointer, project records, and consumer projection when every affected side effect is restorable. After release, defects use a forward patch; historical receipts, peer evidence, and prior immutable model records are not rewritten.
+
+## Current implementation-round amendment (R00–R10, 2026-09-09)
+
+The design above contains the domain-blueprint and self-DNA decisions that
+preceded the current implementation pass. This amendment records how those
+decisions are exercised now without rewriting that history:
+
+* The native hierarchy is checked at two different boundaries. Each member's
+  domain model owns its own parent/child/descendant semantics and immutable
+  receipt. The FlowGuard software-DNA root separately owns repository code,
+  tests, prompts, resources, topology, and their parent/child/consumer
+  bindings. The 63 self-DNA case mapping is coverage metadata; it cannot be
+  substituted for current native child and parent execution receipts.
+* The only accepted provider path for production use is the installed
+  ResearchGuard console selected by the current package/console identity.
+  Test doubles may exercise the LogicWriting process boundary, but their
+  receipts are marked `protocol_only` and cannot qualify native model,
+  quality, installation, or release claims. All native receipts must be
+  reopened from immutable producer bytes and retain producer, request, input,
+  result, checker, status, locator, and cleanup identity.
+* R01–R03 are process and evidence contracts consumed by the ResearchGuard
+  side through R04's handoff. R05–R06 are ResearchGuard-native strict mapping,
+  parent/child receipt, and bounded-suite checks. R07–R10 are integration
+  gates, not new domain solvers: they freeze the package and projection,
+  validate the installed chain, run the current model/test gates, and publish
+  a scoped source commit only after those boundaries are visible.
+* A blocked member is an atomic composition blocker. The umbrella may report
+  the first gap and exact stale/foreign child, but it cannot expose an
+  affected set, reverse trace, or terminal `composition_ready` result from a
+  partial four-member set. The same fail-closed rule applies when the provider
+  is unavailable, a child receipt is stale, cleanup is unconfirmed, or a
+  consumer projection is not current.
+
+The current acceptance matrix is maintained in `tasks.md`. It deliberately
+keeps `implemented`, `protocol_tested`, `current_model_closed`,
+`real_quality_proved`, and `installed_current` independent. A later release
+receipt may consume these claims only after their exact source, toolchain,
+input, and owner identities match; it cannot infer one claim from another.
