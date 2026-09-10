@@ -260,6 +260,35 @@ def test_console_entrypoint_rejects_multiple_materialized_executables(
         install_researchguard._installed_console_entrypoint()
 
 
+def test_distribution_inventory_accepts_windows_console_script_within_interpreter(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    interpreter = tmp_path / "venv"
+    site_packages = interpreter / "Lib" / "site-packages"
+    package = site_packages / "researchguard/__init__.py"
+    console = interpreter / "Scripts/researchguard.exe"
+    package.parent.mkdir(parents=True)
+    console.parent.mkdir(parents=True)
+    package.write_bytes(b"package")
+    console.write_bytes(b"console")
+    distribution = _PackageDistribution(
+        site_packages,
+        "1.0.0",
+        (
+            "researchguard/__init__.py",
+            "../../Scripts/researchguard.exe",
+        ),
+    )
+    monkeypatch.setattr(install_researchguard.sys, "prefix", str(interpreter))
+
+    authority_root, inventory = install_researchguard._distribution_file_inventory(
+        distribution
+    )
+
+    assert authority_root == interpreter.resolve()
+    assert console.resolve() in inventory
+
+
 def _use_fake_consumer_authority(
     monkeypatch: pytest.MonkeyPatch,
     api: _ConsumerDistributionAPI,

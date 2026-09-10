@@ -1,0 +1,1664 @@
+{
+  "added_ids": [],
+  "affected_closure_fingerprint": "sha256:fb1b989b8ee1762269e90ac6c47069b92bef0af1a1a117bc842b4370d93f3ec3",
+  "affected_closure_ids": [
+    "coverage:universe",
+    "model_instance:model:argument_support_closure",
+    "model_instance:model:authoritative_model_system",
+    "model_instance:model:compositional_verification_kernel",
+    "model_instance:model:discourse_structure",
+    "model_instance:model:hierarchical_model_mesh",
+    "model_instance:model:logic_selection_contract",
+    "model_instance:model:logic_synthesis",
+    "model_instance:model:model_test_code_alignment",
+    "model_instance:model:researchguard_suite",
+    "model_instance:model:trace_domain_export",
+    "model_relation:relation:model-realizes-native-owner:argument_support_closure:argument_support_closure",
+    "model_relation:relation:model-realizes-native-owner:discourse_structure:discourse_structure",
+    "model_relation:relation:model-realizes-native-owner:hierarchical_model_mesh:model_mesh_maintenance",
+    "model_relation:relation:model-realizes-native-owner:logic_selection_contract:logic_selection_contract",
+    "model_relation:relation:model-realizes-native-owner:logic_synthesis:logic_synthesis",
+    "model_relation:relation:model-realizes-native-owner:model_test_code_alignment:model_test_alignment",
+    "model_relation:relation:model-realizes-native-owner:trace_domain_export:trace_domain_export",
+    "model_relation:relation:model-realizes-purpose:argument_support_closure",
+    "model_relation:relation:model-realizes-purpose:authoritative_model_system",
+    "model_relation:relation:model-realizes-purpose:compositional_verification_kernel",
+    "model_relation:relation:model-realizes-purpose:discourse_structure",
+    "model_relation:relation:model-realizes-purpose:hierarchical_model_mesh",
+    "model_relation:relation:model-realizes-purpose:logic_selection_contract",
+    "model_relation:relation:model-realizes-purpose:logic_synthesis",
+    "model_relation:relation:model-realizes-purpose:model_test_code_alignment",
+    "model_relation:relation:model-realizes-purpose:researchguard_suite",
+    "model_relation:relation:model-realizes-purpose:trace_domain_export",
+    "model_relation:relation:semantic-model-affects-consumer:argument_support_closure:logic_synthesis",
+    "model_relation:relation:semantic-model-affects-consumer:argument_support_closure:researchguard_suite",
+    "model_relation:relation:semantic-model-affects-consumer:compositional_verification_kernel:authoritative_model_system",
+    "model_relation:relation:semantic-model-affects-consumer:discourse_structure:logic_synthesis",
+    "model_relation:relation:semantic-model-affects-consumer:discourse_structure:researchguard_suite",
+    "model_relation:relation:semantic-model-affects-consumer:hierarchical_model_mesh:authoritative_model_system",
+    "model_relation:relation:semantic-model-affects-consumer:logic_selection_contract:logic_synthesis",
+    "model_relation:relation:semantic-model-affects-consumer:logic_selection_contract:researchguard_suite",
+    "model_relation:relation:semantic-model-affects-consumer:logic_synthesis:researchguard_suite",
+    "model_relation:relation:semantic-model-affects-consumer:model_test_code_alignment:authoritative_model_system",
+    "model_relation:relation:semantic-model-affects-consumer:researchguard_suite:authoritative_model_system",
+    "model_relation:relation:semantic-model-affects-consumer:trace_domain_export:researchguard_suite",
+    "model_relation:relation:semantic-parent-contains-model:semantic-parent:logic_synthesis:argument_support_closure",
+    "model_relation:relation:semantic-parent-contains-model:semantic-parent:logic_synthesis:discourse_structure",
+    "model_relation:relation:semantic-parent-contains-model:semantic-parent:logic_synthesis:logic_selection_contract",
+    "model_relation:relation:semantic-parent-contains-model:semantic-parent:researchguard_suite:logic_synthesis",
+    "model_relation:relation:semantic-parent-contains-model:semantic-parent:researchguard_suite:trace_domain_export",
+    "model_relation:relation:semantic-parent-contains-model:semantic-parent:software-root:authoritative_model_system",
+    "model_relation:relation:semantic-parent-contains-model:semantic-parent:software-root:compositional_verification_kernel",
+    "model_relation:relation:semantic-parent-contains-model:semantic-parent:software-root:hierarchical_model_mesh",
+    "model_relation:relation:semantic-parent-contains-model:semantic-parent:software-root:model_test_code_alignment",
+    "model_relation:relation:semantic-parent-contains-model:semantic-parent:software-root:researchguard_suite",
+    "model_relation:relation:semantic-system-contains:semantic-parent:logic_synthesis",
+    "model_relation:relation:semantic-system-contains:semantic-parent:researchguard_suite",
+    "model_relation:relation:semantic-system-contains:semantic-parent:software-root",
+    "parent_closure:native-owner-route:argument_support_closure",
+    "parent_closure:native-owner-route:discourse_structure",
+    "parent_closure:native-owner-route:logic_selection_contract",
+    "parent_closure:native-owner-route:logic_synthesis",
+    "parent_closure:native-owner-route:model_mesh_maintenance",
+    "parent_closure:native-owner-route:model_test_alignment",
+    "parent_closure:native-owner-route:trace_domain_export",
+    "parent_closure:purpose:argument_support_closure",
+    "parent_closure:purpose:authoritative_model_system",
+    "parent_closure:purpose:compositional_verification_kernel",
+    "parent_closure:purpose:discourse_structure",
+    "parent_closure:purpose:hierarchical_model_mesh",
+    "parent_closure:purpose:logic_selection_contract",
+    "parent_closure:purpose:logic_synthesis",
+    "parent_closure:purpose:model_test_code_alignment",
+    "parent_closure:purpose:researchguard_suite",
+    "parent_closure:purpose:trace_domain_export",
+    "parent_closure:semantic-parent:logic_synthesis",
+    "parent_closure:semantic-parent:researchguard_suite",
+    "parent_closure:semantic-parent:software-root",
+    "parent_closure:system:flowguard:model-regression-manifest",
+    "root:model:authoritative_model_system",
+    "system_property:subject_revision"
+  ],
+  "affected_edge_ids": [
+    "model_relation:relation:model-realizes-native-owner:argument_support_closure:argument_support_closure",
+    "model_relation:relation:model-realizes-native-owner:discourse_structure:discourse_structure",
+    "model_relation:relation:model-realizes-native-owner:hierarchical_model_mesh:model_mesh_maintenance",
+    "model_relation:relation:model-realizes-native-owner:logic_selection_contract:logic_selection_contract",
+    "model_relation:relation:model-realizes-native-owner:logic_synthesis:logic_synthesis",
+    "model_relation:relation:model-realizes-native-owner:model_test_code_alignment:model_test_alignment",
+    "model_relation:relation:model-realizes-native-owner:trace_domain_export:trace_domain_export",
+    "model_relation:relation:model-realizes-purpose:argument_support_closure",
+    "model_relation:relation:model-realizes-purpose:authoritative_model_system",
+    "model_relation:relation:model-realizes-purpose:compositional_verification_kernel",
+    "model_relation:relation:model-realizes-purpose:discourse_structure",
+    "model_relation:relation:model-realizes-purpose:hierarchical_model_mesh",
+    "model_relation:relation:model-realizes-purpose:logic_selection_contract",
+    "model_relation:relation:model-realizes-purpose:logic_synthesis",
+    "model_relation:relation:model-realizes-purpose:model_test_code_alignment",
+    "model_relation:relation:model-realizes-purpose:researchguard_suite",
+    "model_relation:relation:model-realizes-purpose:trace_domain_export",
+    "model_relation:relation:semantic-model-affects-consumer:argument_support_closure:logic_synthesis",
+    "model_relation:relation:semantic-model-affects-consumer:argument_support_closure:researchguard_suite",
+    "model_relation:relation:semantic-model-affects-consumer:compositional_verification_kernel:authoritative_model_system",
+    "model_relation:relation:semantic-model-affects-consumer:discourse_structure:logic_synthesis",
+    "model_relation:relation:semantic-model-affects-consumer:discourse_structure:researchguard_suite",
+    "model_relation:relation:semantic-model-affects-consumer:hierarchical_model_mesh:authoritative_model_system",
+    "model_relation:relation:semantic-model-affects-consumer:logic_selection_contract:logic_synthesis",
+    "model_relation:relation:semantic-model-affects-consumer:logic_selection_contract:researchguard_suite",
+    "model_relation:relation:semantic-model-affects-consumer:logic_synthesis:researchguard_suite",
+    "model_relation:relation:semantic-model-affects-consumer:model_test_code_alignment:authoritative_model_system",
+    "model_relation:relation:semantic-model-affects-consumer:researchguard_suite:authoritative_model_system",
+    "model_relation:relation:semantic-model-affects-consumer:trace_domain_export:researchguard_suite",
+    "model_relation:relation:semantic-parent-contains-model:semantic-parent:logic_synthesis:argument_support_closure",
+    "model_relation:relation:semantic-parent-contains-model:semantic-parent:logic_synthesis:discourse_structure",
+    "model_relation:relation:semantic-parent-contains-model:semantic-parent:logic_synthesis:logic_selection_contract",
+    "model_relation:relation:semantic-parent-contains-model:semantic-parent:researchguard_suite:logic_synthesis",
+    "model_relation:relation:semantic-parent-contains-model:semantic-parent:researchguard_suite:trace_domain_export",
+    "model_relation:relation:semantic-parent-contains-model:semantic-parent:software-root:authoritative_model_system",
+    "model_relation:relation:semantic-parent-contains-model:semantic-parent:software-root:compositional_verification_kernel",
+    "model_relation:relation:semantic-parent-contains-model:semantic-parent:software-root:hierarchical_model_mesh",
+    "model_relation:relation:semantic-parent-contains-model:semantic-parent:software-root:model_test_code_alignment",
+    "model_relation:relation:semantic-parent-contains-model:semantic-parent:software-root:researchguard_suite",
+    "model_relation:relation:semantic-system-contains:semantic-parent:logic_synthesis",
+    "model_relation:relation:semantic-system-contains:semantic-parent:researchguard_suite",
+    "model_relation:relation:semantic-system-contains:semantic-parent:software-root"
+  ],
+  "affected_owner_bindings": [
+    {
+      "affected_id": "coverage:universe",
+      "owner_route": "model_mesh_maintenance"
+    },
+    {
+      "affected_id": "model_instance:model:argument_support_closure",
+      "owner_route": "model_test_alignment"
+    },
+    {
+      "affected_id": "model_instance:model:authoritative_model_system",
+      "owner_route": "model_test_alignment"
+    },
+    {
+      "affected_id": "model_instance:model:compositional_verification_kernel",
+      "owner_route": "model_test_alignment"
+    },
+    {
+      "affected_id": "model_instance:model:discourse_structure",
+      "owner_route": "model_test_alignment"
+    },
+    {
+      "affected_id": "model_instance:model:hierarchical_model_mesh",
+      "owner_route": "model_test_alignment"
+    },
+    {
+      "affected_id": "model_instance:model:logic_selection_contract",
+      "owner_route": "model_test_alignment"
+    },
+    {
+      "affected_id": "model_instance:model:logic_synthesis",
+      "owner_route": "model_test_alignment"
+    },
+    {
+      "affected_id": "model_instance:model:model_test_code_alignment",
+      "owner_route": "model_test_alignment"
+    },
+    {
+      "affected_id": "model_instance:model:researchguard_suite",
+      "owner_route": "model_test_alignment"
+    },
+    {
+      "affected_id": "model_instance:model:trace_domain_export",
+      "owner_route": "model_test_alignment"
+    },
+    {
+      "affected_id": "model_relation:relation:model-realizes-native-owner:argument_support_closure:argument_support_closure",
+      "owner_route": "model_mesh_maintenance"
+    },
+    {
+      "affected_id": "model_relation:relation:model-realizes-native-owner:discourse_structure:discourse_structure",
+      "owner_route": "model_mesh_maintenance"
+    },
+    {
+      "affected_id": "model_relation:relation:model-realizes-native-owner:hierarchical_model_mesh:model_mesh_maintenance",
+      "owner_route": "model_mesh_maintenance"
+    },
+    {
+      "affected_id": "model_relation:relation:model-realizes-native-owner:logic_selection_contract:logic_selection_contract",
+      "owner_route": "model_mesh_maintenance"
+    },
+    {
+      "affected_id": "model_relation:relation:model-realizes-native-owner:logic_synthesis:logic_synthesis",
+      "owner_route": "model_mesh_maintenance"
+    },
+    {
+      "affected_id": "model_relation:relation:model-realizes-native-owner:model_test_code_alignment:model_test_alignment",
+      "owner_route": "model_mesh_maintenance"
+    },
+    {
+      "affected_id": "model_relation:relation:model-realizes-native-owner:trace_domain_export:trace_domain_export",
+      "owner_route": "model_mesh_maintenance"
+    },
+    {
+      "affected_id": "model_relation:relation:model-realizes-purpose:argument_support_closure",
+      "owner_route": "model_mesh_maintenance"
+    },
+    {
+      "affected_id": "model_relation:relation:model-realizes-purpose:authoritative_model_system",
+      "owner_route": "model_mesh_maintenance"
+    },
+    {
+      "affected_id": "model_relation:relation:model-realizes-purpose:compositional_verification_kernel",
+      "owner_route": "model_mesh_maintenance"
+    },
+    {
+      "affected_id": "model_relation:relation:model-realizes-purpose:discourse_structure",
+      "owner_route": "model_mesh_maintenance"
+    },
+    {
+      "affected_id": "model_relation:relation:model-realizes-purpose:hierarchical_model_mesh",
+      "owner_route": "model_mesh_maintenance"
+    },
+    {
+      "affected_id": "model_relation:relation:model-realizes-purpose:logic_selection_contract",
+      "owner_route": "model_mesh_maintenance"
+    },
+    {
+      "affected_id": "model_relation:relation:model-realizes-purpose:logic_synthesis",
+      "owner_route": "model_mesh_maintenance"
+    },
+    {
+      "affected_id": "model_relation:relation:model-realizes-purpose:model_test_code_alignment",
+      "owner_route": "model_mesh_maintenance"
+    },
+    {
+      "affected_id": "model_relation:relation:model-realizes-purpose:researchguard_suite",
+      "owner_route": "model_mesh_maintenance"
+    },
+    {
+      "affected_id": "model_relation:relation:model-realizes-purpose:trace_domain_export",
+      "owner_route": "model_mesh_maintenance"
+    },
+    {
+      "affected_id": "model_relation:relation:semantic-model-affects-consumer:argument_support_closure:logic_synthesis",
+      "owner_route": "model_mesh_maintenance"
+    },
+    {
+      "affected_id": "model_relation:relation:semantic-model-affects-consumer:argument_support_closure:researchguard_suite",
+      "owner_route": "model_mesh_maintenance"
+    },
+    {
+      "affected_id": "model_relation:relation:semantic-model-affects-consumer:compositional_verification_kernel:authoritative_model_system",
+      "owner_route": "model_mesh_maintenance"
+    },
+    {
+      "affected_id": "model_relation:relation:semantic-model-affects-consumer:discourse_structure:logic_synthesis",
+      "owner_route": "model_mesh_maintenance"
+    },
+    {
+      "affected_id": "model_relation:relation:semantic-model-affects-consumer:discourse_structure:researchguard_suite",
+      "owner_route": "model_mesh_maintenance"
+    },
+    {
+      "affected_id": "model_relation:relation:semantic-model-affects-consumer:hierarchical_model_mesh:authoritative_model_system",
+      "owner_route": "model_mesh_maintenance"
+    },
+    {
+      "affected_id": "model_relation:relation:semantic-model-affects-consumer:logic_selection_contract:logic_synthesis",
+      "owner_route": "model_mesh_maintenance"
+    },
+    {
+      "affected_id": "model_relation:relation:semantic-model-affects-consumer:logic_selection_contract:researchguard_suite",
+      "owner_route": "model_mesh_maintenance"
+    },
+    {
+      "affected_id": "model_relation:relation:semantic-model-affects-consumer:logic_synthesis:researchguard_suite",
+      "owner_route": "model_mesh_maintenance"
+    },
+    {
+      "affected_id": "model_relation:relation:semantic-model-affects-consumer:model_test_code_alignment:authoritative_model_system",
+      "owner_route": "model_mesh_maintenance"
+    },
+    {
+      "affected_id": "model_relation:relation:semantic-model-affects-consumer:researchguard_suite:authoritative_model_system",
+      "owner_route": "model_mesh_maintenance"
+    },
+    {
+      "affected_id": "model_relation:relation:semantic-model-affects-consumer:trace_domain_export:researchguard_suite",
+      "owner_route": "model_mesh_maintenance"
+    },
+    {
+      "affected_id": "model_relation:relation:semantic-parent-contains-model:semantic-parent:logic_synthesis:argument_support_closure",
+      "owner_route": "model_mesh_maintenance"
+    },
+    {
+      "affected_id": "model_relation:relation:semantic-parent-contains-model:semantic-parent:logic_synthesis:discourse_structure",
+      "owner_route": "model_mesh_maintenance"
+    },
+    {
+      "affected_id": "model_relation:relation:semantic-parent-contains-model:semantic-parent:logic_synthesis:logic_selection_contract",
+      "owner_route": "model_mesh_maintenance"
+    },
+    {
+      "affected_id": "model_relation:relation:semantic-parent-contains-model:semantic-parent:researchguard_suite:logic_synthesis",
+      "owner_route": "model_mesh_maintenance"
+    },
+    {
+      "affected_id": "model_relation:relation:semantic-parent-contains-model:semantic-parent:researchguard_suite:trace_domain_export",
+      "owner_route": "model_mesh_maintenance"
+    },
+    {
+      "affected_id": "model_relation:relation:semantic-parent-contains-model:semantic-parent:software-root:authoritative_model_system",
+      "owner_route": "model_mesh_maintenance"
+    },
+    {
+      "affected_id": "model_relation:relation:semantic-parent-contains-model:semantic-parent:software-root:compositional_verification_kernel",
+      "owner_route": "model_mesh_maintenance"
+    },
+    {
+      "affected_id": "model_relation:relation:semantic-parent-contains-model:semantic-parent:software-root:hierarchical_model_mesh",
+      "owner_route": "model_mesh_maintenance"
+    },
+    {
+      "affected_id": "model_relation:relation:semantic-parent-contains-model:semantic-parent:software-root:model_test_code_alignment",
+      "owner_route": "model_mesh_maintenance"
+    },
+    {
+      "affected_id": "model_relation:relation:semantic-parent-contains-model:semantic-parent:software-root:researchguard_suite",
+      "owner_route": "model_mesh_maintenance"
+    },
+    {
+      "affected_id": "model_relation:relation:semantic-system-contains:semantic-parent:logic_synthesis",
+      "owner_route": "model_mesh_maintenance"
+    },
+    {
+      "affected_id": "model_relation:relation:semantic-system-contains:semantic-parent:researchguard_suite",
+      "owner_route": "model_mesh_maintenance"
+    },
+    {
+      "affected_id": "model_relation:relation:semantic-system-contains:semantic-parent:software-root",
+      "owner_route": "model_mesh_maintenance"
+    },
+    {
+      "affected_id": "parent_closure:native-owner-route:argument_support_closure",
+      "owner_route": "argument_support_closure"
+    },
+    {
+      "affected_id": "parent_closure:native-owner-route:discourse_structure",
+      "owner_route": "discourse_structure"
+    },
+    {
+      "affected_id": "parent_closure:native-owner-route:logic_selection_contract",
+      "owner_route": "logic_selection_contract"
+    },
+    {
+      "affected_id": "parent_closure:native-owner-route:logic_synthesis",
+      "owner_route": "logic_synthesis"
+    },
+    {
+      "affected_id": "parent_closure:native-owner-route:model_mesh_maintenance",
+      "owner_route": "model_mesh_maintenance"
+    },
+    {
+      "affected_id": "parent_closure:native-owner-route:model_test_alignment",
+      "owner_route": "model_test_alignment"
+    },
+    {
+      "affected_id": "parent_closure:native-owner-route:trace_domain_export",
+      "owner_route": "trace_domain_export"
+    },
+    {
+      "affected_id": "parent_closure:purpose:argument_support_closure",
+      "owner_route": "model_test_alignment"
+    },
+    {
+      "affected_id": "parent_closure:purpose:authoritative_model_system",
+      "owner_route": "model_test_alignment"
+    },
+    {
+      "affected_id": "parent_closure:purpose:compositional_verification_kernel",
+      "owner_route": "model_test_alignment"
+    },
+    {
+      "affected_id": "parent_closure:purpose:discourse_structure",
+      "owner_route": "model_test_alignment"
+    },
+    {
+      "affected_id": "parent_closure:purpose:hierarchical_model_mesh",
+      "owner_route": "model_test_alignment"
+    },
+    {
+      "affected_id": "parent_closure:purpose:logic_selection_contract",
+      "owner_route": "model_test_alignment"
+    },
+    {
+      "affected_id": "parent_closure:purpose:logic_synthesis",
+      "owner_route": "model_test_alignment"
+    },
+    {
+      "affected_id": "parent_closure:purpose:model_test_code_alignment",
+      "owner_route": "model_test_alignment"
+    },
+    {
+      "affected_id": "parent_closure:purpose:researchguard_suite",
+      "owner_route": "model_test_alignment"
+    },
+    {
+      "affected_id": "parent_closure:purpose:trace_domain_export",
+      "owner_route": "model_test_alignment"
+    },
+    {
+      "affected_id": "parent_closure:semantic-parent:logic_synthesis",
+      "owner_route": "model_mesh_maintenance"
+    },
+    {
+      "affected_id": "parent_closure:semantic-parent:researchguard_suite",
+      "owner_route": "model_mesh_maintenance"
+    },
+    {
+      "affected_id": "parent_closure:semantic-parent:software-root",
+      "owner_route": "model_mesh_maintenance"
+    },
+    {
+      "affected_id": "parent_closure:system:flowguard:model-regression-manifest",
+      "owner_route": "model_mesh_maintenance"
+    },
+    {
+      "affected_id": "root:model:authoritative_model_system",
+      "owner_route": "model_mesh_maintenance"
+    },
+    {
+      "affected_id": "system_property:subject_revision",
+      "owner_route": "model_mesh_maintenance"
+    }
+  ],
+  "base_snapshot_fingerprint": "sha256:3d6847fa58f270ce3c120f48078f51d0b4d52728fa4f298049b66fe6f366a464",
+  "candidate_snapshot_fingerprint": "sha256:40b54080393580b7658ef37231c2546d03fe6de511ade1d83e5caddaa3213d38",
+  "changed_commitment_ids": [],
+  "changed_contract_ids": [],
+  "changed_coverage_ids": [
+    "coverage:universe"
+  ],
+  "changed_field_ids": [],
+  "changed_gap_ids": [],
+  "changed_owner_artifact_ids": [
+    "parent_closure:purpose:argument_support_closure",
+    "parent_closure:purpose:authoritative_model_system",
+    "parent_closure:purpose:compositional_verification_kernel",
+    "parent_closure:purpose:discourse_structure",
+    "parent_closure:purpose:hierarchical_model_mesh",
+    "parent_closure:purpose:logic_selection_contract",
+    "parent_closure:purpose:logic_synthesis",
+    "parent_closure:purpose:model_test_code_alignment",
+    "parent_closure:purpose:researchguard_suite",
+    "parent_closure:purpose:trace_domain_export",
+    "parent_closure:system:flowguard:model-regression-manifest"
+  ],
+  "changed_relation_ids": [
+    "relation:model-realizes-native-owner:argument_support_closure:argument_support_closure",
+    "relation:model-realizes-native-owner:discourse_structure:discourse_structure",
+    "relation:model-realizes-native-owner:hierarchical_model_mesh:model_mesh_maintenance",
+    "relation:model-realizes-native-owner:logic_selection_contract:logic_selection_contract",
+    "relation:model-realizes-native-owner:logic_synthesis:logic_synthesis",
+    "relation:model-realizes-native-owner:model_test_code_alignment:model_test_alignment",
+    "relation:model-realizes-native-owner:trace_domain_export:trace_domain_export",
+    "relation:model-realizes-purpose:argument_support_closure",
+    "relation:model-realizes-purpose:authoritative_model_system",
+    "relation:model-realizes-purpose:compositional_verification_kernel",
+    "relation:model-realizes-purpose:discourse_structure",
+    "relation:model-realizes-purpose:hierarchical_model_mesh",
+    "relation:model-realizes-purpose:logic_selection_contract",
+    "relation:model-realizes-purpose:logic_synthesis",
+    "relation:model-realizes-purpose:model_test_code_alignment",
+    "relation:model-realizes-purpose:researchguard_suite",
+    "relation:model-realizes-purpose:trace_domain_export",
+    "relation:semantic-model-affects-consumer:argument_support_closure:logic_synthesis",
+    "relation:semantic-model-affects-consumer:argument_support_closure:researchguard_suite",
+    "relation:semantic-model-affects-consumer:compositional_verification_kernel:authoritative_model_system",
+    "relation:semantic-model-affects-consumer:discourse_structure:logic_synthesis",
+    "relation:semantic-model-affects-consumer:discourse_structure:researchguard_suite",
+    "relation:semantic-model-affects-consumer:hierarchical_model_mesh:authoritative_model_system",
+    "relation:semantic-model-affects-consumer:logic_selection_contract:logic_synthesis",
+    "relation:semantic-model-affects-consumer:logic_selection_contract:researchguard_suite",
+    "relation:semantic-model-affects-consumer:logic_synthesis:researchguard_suite",
+    "relation:semantic-model-affects-consumer:model_test_code_alignment:authoritative_model_system",
+    "relation:semantic-model-affects-consumer:researchguard_suite:authoritative_model_system",
+    "relation:semantic-model-affects-consumer:trace_domain_export:researchguard_suite",
+    "relation:semantic-parent-contains-model:semantic-parent:logic_synthesis:argument_support_closure",
+    "relation:semantic-parent-contains-model:semantic-parent:logic_synthesis:discourse_structure",
+    "relation:semantic-parent-contains-model:semantic-parent:logic_synthesis:logic_selection_contract",
+    "relation:semantic-parent-contains-model:semantic-parent:researchguard_suite:logic_synthesis",
+    "relation:semantic-parent-contains-model:semantic-parent:researchguard_suite:trace_domain_export",
+    "relation:semantic-parent-contains-model:semantic-parent:software-root:authoritative_model_system",
+    "relation:semantic-parent-contains-model:semantic-parent:software-root:compositional_verification_kernel",
+    "relation:semantic-parent-contains-model:semantic-parent:software-root:hierarchical_model_mesh",
+    "relation:semantic-parent-contains-model:semantic-parent:software-root:model_test_code_alignment",
+    "relation:semantic-parent-contains-model:semantic-parent:software-root:researchguard_suite",
+    "relation:semantic-system-contains:semantic-parent:logic_synthesis",
+    "relation:semantic-system-contains:semantic-parent:researchguard_suite",
+    "relation:semantic-system-contains:semantic-parent:software-root"
+  ],
+  "changed_root_ids": [
+    "root:model:authoritative_model_system"
+  ],
+  "changed_side_effect_ids": [],
+  "changed_source_surface_ids": [],
+  "changed_system_property_ids": [
+    "system_property:subject_revision"
+  ],
+  "changed_test_ids": [],
+  "completed_evidence_refs": [],
+  "current_effective_intent_view": {
+    "active_contributions": [
+      {
+        "conflicts_with_contribution_ids": [],
+        "contribution_id": "current-design:round2:argument_support_closure:1",
+        "decision_state": "accepted",
+        "declared_consumer_ids": [],
+        "desired_terminal_state_ids": [],
+        "effective_revision": "round2",
+        "fingerprint": "sha256:206bdf1529c2909ef72975c0182be06e7b0d01d821eb055a71ae75fae3e83362",
+        "lifecycle_state": "candidate",
+        "logical_model_id": "model:argument_support_closure",
+        "native_owner_id": "",
+        "rationale": "Manual review of the historical specification accepted this intent as the current design source for a direct model rebuild. The implementation identity changed, so the old contribution is superseded explicitly; no compatibility or automatic inheritance path exists.",
+        "schema": "flowguard.model_intent_contribution.v1",
+        "source_fingerprint": "sha256:36a0f5ae3b82d0ff0c818dd17c8931e392fc6236568d060d2b6a017e66811d4e",
+        "source_kind": "design",
+        "source_ref": "openspec/changes/repair-argument-to-reader-composition/design.md",
+        "subject_lane": "normative_target",
+        "subject_role": "design",
+        "supersedes_contribution_ids": [
+          "intent:round2:researchguard:argument_support_closure"
+        ],
+        "target_invariant_ids": [],
+        "target_obligation_ids": [],
+        "target_output_ids": [],
+        "target_relation_ids": [],
+        "target_state_ids": [],
+        "target_transition_ids": [],
+        "unresolved_owner_id": "",
+        "work_context_fingerprint": "",
+        "work_context_id": ""
+      },
+      {
+        "conflicts_with_contribution_ids": [],
+        "contribution_id": "current-design:round2:authoritative_model_system:1",
+        "decision_state": "accepted",
+        "declared_consumer_ids": [],
+        "desired_terminal_state_ids": [],
+        "effective_revision": "round2",
+        "fingerprint": "sha256:e804f73402b82bf827b8da8e1213ed212dcd164786e3380c32c65f50aa81288c",
+        "lifecycle_state": "candidate",
+        "logical_model_id": "model:authoritative_model_system",
+        "native_owner_id": "",
+        "rationale": "Manual review of the historical specification accepted this intent as the current design source for a direct model rebuild. The implementation identity changed, so the old contribution is superseded explicitly; no compatibility or automatic inheritance path exists.",
+        "schema": "flowguard.model_intent_contribution.v1",
+        "source_fingerprint": "sha256:d47b69c76a5a12349b600aabb186786031d5156909f7477706022c8690cb352f",
+        "source_kind": "design",
+        "source_ref": "openspec/changes/strengthen-guard-domain-blueprint-spine/design.md",
+        "subject_lane": "normative_target",
+        "subject_role": "design",
+        "supersedes_contribution_ids": [
+          "intent:round2:researchguard:authoritative_model_system"
+        ],
+        "target_invariant_ids": [],
+        "target_obligation_ids": [],
+        "target_output_ids": [],
+        "target_relation_ids": [],
+        "target_state_ids": [],
+        "target_transition_ids": [],
+        "unresolved_owner_id": "",
+        "work_context_fingerprint": "",
+        "work_context_id": ""
+      },
+      {
+        "conflicts_with_contribution_ids": [],
+        "contribution_id": "current-design:round2:compositional_verification_kernel:1",
+        "decision_state": "accepted",
+        "declared_consumer_ids": [],
+        "desired_terminal_state_ids": [],
+        "effective_revision": "round2",
+        "fingerprint": "sha256:2ce18596b9143e12b7a7f9672b05e42cc950552bdfa6f8304ae5bd923b62547f",
+        "lifecycle_state": "candidate",
+        "logical_model_id": "model:compositional_verification_kernel",
+        "native_owner_id": "",
+        "rationale": "Manual review of the historical specification accepted this intent as the current design source for a direct model rebuild. The implementation identity changed, so the old contribution is superseded explicitly; no compatibility or automatic inheritance path exists.",
+        "schema": "flowguard.model_intent_contribution.v1",
+        "source_fingerprint": "sha256:d47b69c76a5a12349b600aabb186786031d5156909f7477706022c8690cb352f",
+        "source_kind": "design",
+        "source_ref": "openspec/changes/strengthen-guard-domain-blueprint-spine/design.md",
+        "subject_lane": "normative_target",
+        "subject_role": "design",
+        "supersedes_contribution_ids": [
+          "intent:round2:researchguard:compositional_verification_kernel"
+        ],
+        "target_invariant_ids": [],
+        "target_obligation_ids": [],
+        "target_output_ids": [],
+        "target_relation_ids": [],
+        "target_state_ids": [],
+        "target_transition_ids": [],
+        "unresolved_owner_id": "",
+        "work_context_fingerprint": "",
+        "work_context_id": ""
+      },
+      {
+        "conflicts_with_contribution_ids": [],
+        "contribution_id": "current-design:round2:discourse_structure:1",
+        "decision_state": "accepted",
+        "declared_consumer_ids": [],
+        "desired_terminal_state_ids": [],
+        "effective_revision": "round2",
+        "fingerprint": "sha256:6d3b6b9f0b7468ebc405a4c7a9f832a0e97e5ac2609af167f85fddb295f7861f",
+        "lifecycle_state": "candidate",
+        "logical_model_id": "model:discourse_structure",
+        "native_owner_id": "",
+        "rationale": "Manual review of the historical specification accepted this intent as the current design source for a direct model rebuild. The implementation identity changed, so the old contribution is superseded explicitly; no compatibility or automatic inheritance path exists.",
+        "schema": "flowguard.model_intent_contribution.v1",
+        "source_fingerprint": "sha256:36a0f5ae3b82d0ff0c818dd17c8931e392fc6236568d060d2b6a017e66811d4e",
+        "source_kind": "design",
+        "source_ref": "openspec/changes/repair-argument-to-reader-composition/design.md",
+        "subject_lane": "normative_target",
+        "subject_role": "design",
+        "supersedes_contribution_ids": [
+          "intent:round2:researchguard:discourse_structure"
+        ],
+        "target_invariant_ids": [],
+        "target_obligation_ids": [],
+        "target_output_ids": [],
+        "target_relation_ids": [],
+        "target_state_ids": [],
+        "target_transition_ids": [],
+        "unresolved_owner_id": "",
+        "work_context_fingerprint": "",
+        "work_context_id": ""
+      },
+      {
+        "conflicts_with_contribution_ids": [],
+        "contribution_id": "current-design:round2:hierarchical_model_mesh:1",
+        "decision_state": "accepted",
+        "declared_consumer_ids": [],
+        "desired_terminal_state_ids": [],
+        "effective_revision": "round2",
+        "fingerprint": "sha256:ff3f1c1573a7646a8e3dc4bf80675ec837e0c41de1b9582fb0a7115e3eb3fbd8",
+        "lifecycle_state": "candidate",
+        "logical_model_id": "model:hierarchical_model_mesh",
+        "native_owner_id": "",
+        "rationale": "Manual review of the historical specification accepted this intent as the current design source for a direct model rebuild. The implementation identity changed, so the old contribution is superseded explicitly; no compatibility or automatic inheritance path exists.",
+        "schema": "flowguard.model_intent_contribution.v1",
+        "source_fingerprint": "sha256:d47b69c76a5a12349b600aabb186786031d5156909f7477706022c8690cb352f",
+        "source_kind": "design",
+        "source_ref": "openspec/changes/strengthen-guard-domain-blueprint-spine/design.md",
+        "subject_lane": "normative_target",
+        "subject_role": "design",
+        "supersedes_contribution_ids": [
+          "intent:round2:researchguard:hierarchical_model_mesh"
+        ],
+        "target_invariant_ids": [],
+        "target_obligation_ids": [],
+        "target_output_ids": [],
+        "target_relation_ids": [],
+        "target_state_ids": [],
+        "target_transition_ids": [],
+        "unresolved_owner_id": "",
+        "work_context_fingerprint": "",
+        "work_context_id": ""
+      },
+      {
+        "conflicts_with_contribution_ids": [],
+        "contribution_id": "current-design:round2:logic_selection_contract:1",
+        "decision_state": "accepted",
+        "declared_consumer_ids": [],
+        "desired_terminal_state_ids": [],
+        "effective_revision": "round2",
+        "fingerprint": "sha256:3a0ff90e7720035f3787546ea23253db973027f5dc1b3c961b66b12ac165e7fd",
+        "lifecycle_state": "candidate",
+        "logical_model_id": "model:logic_selection_contract",
+        "native_owner_id": "",
+        "rationale": "Manual review of the historical specification accepted this intent as the current design source for a direct model rebuild. The implementation identity changed, so the old contribution is superseded explicitly; no compatibility or automatic inheritance path exists.",
+        "schema": "flowguard.model_intent_contribution.v1",
+        "source_fingerprint": "sha256:36a0f5ae3b82d0ff0c818dd17c8931e392fc6236568d060d2b6a017e66811d4e",
+        "source_kind": "design",
+        "source_ref": "openspec/changes/repair-argument-to-reader-composition/design.md",
+        "subject_lane": "normative_target",
+        "subject_role": "design",
+        "supersedes_contribution_ids": [
+          "intent:round2:researchguard:logic_selection_contract"
+        ],
+        "target_invariant_ids": [],
+        "target_obligation_ids": [],
+        "target_output_ids": [],
+        "target_relation_ids": [],
+        "target_state_ids": [],
+        "target_transition_ids": [],
+        "unresolved_owner_id": "",
+        "work_context_fingerprint": "",
+        "work_context_id": ""
+      },
+      {
+        "conflicts_with_contribution_ids": [],
+        "contribution_id": "current-design:round2:logic_synthesis:1",
+        "decision_state": "accepted",
+        "declared_consumer_ids": [],
+        "desired_terminal_state_ids": [],
+        "effective_revision": "round2",
+        "fingerprint": "sha256:b357b4ce000d8ffc65282eb69e49e94ee4ec90e6a6522663e8e7694df81712af",
+        "lifecycle_state": "candidate",
+        "logical_model_id": "model:logic_synthesis",
+        "native_owner_id": "",
+        "rationale": "Manual review of the historical specification accepted this intent as the current design source for a direct model rebuild. The implementation identity changed, so the old contribution is superseded explicitly; no compatibility or automatic inheritance path exists.",
+        "schema": "flowguard.model_intent_contribution.v1",
+        "source_fingerprint": "sha256:36a0f5ae3b82d0ff0c818dd17c8931e392fc6236568d060d2b6a017e66811d4e",
+        "source_kind": "design",
+        "source_ref": "openspec/changes/repair-argument-to-reader-composition/design.md",
+        "subject_lane": "normative_target",
+        "subject_role": "design",
+        "supersedes_contribution_ids": [
+          "intent:round2:researchguard:logic_synthesis"
+        ],
+        "target_invariant_ids": [],
+        "target_obligation_ids": [],
+        "target_output_ids": [],
+        "target_relation_ids": [],
+        "target_state_ids": [],
+        "target_transition_ids": [],
+        "unresolved_owner_id": "",
+        "work_context_fingerprint": "",
+        "work_context_id": ""
+      },
+      {
+        "conflicts_with_contribution_ids": [],
+        "contribution_id": "current-design:round2:model_test_code_alignment:1",
+        "decision_state": "accepted",
+        "declared_consumer_ids": [],
+        "desired_terminal_state_ids": [],
+        "effective_revision": "round2",
+        "fingerprint": "sha256:6150d7c0e0d57b549e189926ee68b257aa155d2a4f5a138664173e77f02fc472",
+        "lifecycle_state": "candidate",
+        "logical_model_id": "model:model_test_code_alignment",
+        "native_owner_id": "",
+        "rationale": "Manual review of the historical specification accepted this intent as the current design source for a direct model rebuild. The implementation identity changed, so the old contribution is superseded explicitly; no compatibility or automatic inheritance path exists.",
+        "schema": "flowguard.model_intent_contribution.v1",
+        "source_fingerprint": "sha256:d47b69c76a5a12349b600aabb186786031d5156909f7477706022c8690cb352f",
+        "source_kind": "design",
+        "source_ref": "openspec/changes/strengthen-guard-domain-blueprint-spine/design.md",
+        "subject_lane": "normative_target",
+        "subject_role": "design",
+        "supersedes_contribution_ids": [
+          "intent:round2:researchguard:model_test_code_alignment"
+        ],
+        "target_invariant_ids": [],
+        "target_obligation_ids": [],
+        "target_output_ids": [],
+        "target_relation_ids": [],
+        "target_state_ids": [],
+        "target_transition_ids": [],
+        "unresolved_owner_id": "",
+        "work_context_fingerprint": "",
+        "work_context_id": ""
+      },
+      {
+        "conflicts_with_contribution_ids": [],
+        "contribution_id": "current-design:round2:researchguard_suite:1",
+        "decision_state": "accepted",
+        "declared_consumer_ids": [],
+        "desired_terminal_state_ids": [],
+        "effective_revision": "round2",
+        "fingerprint": "sha256:89baad858ff917115c8799133dd012e0825fe62caa5baa97f9f731887f1aedce",
+        "lifecycle_state": "candidate",
+        "logical_model_id": "model:researchguard_suite",
+        "native_owner_id": "",
+        "rationale": "Manual review of the historical specification accepted this intent as the current design source for a direct model rebuild. The implementation identity changed, so the old contribution is superseded explicitly; no compatibility or automatic inheritance path exists.",
+        "schema": "flowguard.model_intent_contribution.v1",
+        "source_fingerprint": "sha256:d47b69c76a5a12349b600aabb186786031d5156909f7477706022c8690cb352f",
+        "source_kind": "design",
+        "source_ref": "openspec/changes/strengthen-guard-domain-blueprint-spine/design.md",
+        "subject_lane": "normative_target",
+        "subject_role": "design",
+        "supersedes_contribution_ids": [
+          "intent:round2:researchguard:researchguard_suite"
+        ],
+        "target_invariant_ids": [],
+        "target_obligation_ids": [],
+        "target_output_ids": [],
+        "target_relation_ids": [],
+        "target_state_ids": [],
+        "target_transition_ids": [],
+        "unresolved_owner_id": "",
+        "work_context_fingerprint": "",
+        "work_context_id": ""
+      },
+      {
+        "conflicts_with_contribution_ids": [],
+        "contribution_id": "current-design:round2:trace_domain_export:1",
+        "decision_state": "accepted",
+        "declared_consumer_ids": [],
+        "desired_terminal_state_ids": [],
+        "effective_revision": "round2",
+        "fingerprint": "sha256:1c059f54886febddc1d5054586e5300b19720e0577b2f2ddb0562bf69f03719b",
+        "lifecycle_state": "candidate",
+        "logical_model_id": "model:trace_domain_export",
+        "native_owner_id": "",
+        "rationale": "Manual review of the historical specification accepted this intent as the current design source for a direct model rebuild. The implementation identity changed, so the old contribution is superseded explicitly; no compatibility or automatic inheritance path exists.",
+        "schema": "flowguard.model_intent_contribution.v1",
+        "source_fingerprint": "sha256:36a0f5ae3b82d0ff0c818dd17c8931e392fc6236568d060d2b6a017e66811d4e",
+        "source_kind": "design",
+        "source_ref": "openspec/changes/repair-argument-to-reader-composition/design.md",
+        "subject_lane": "normative_target",
+        "subject_role": "design",
+        "supersedes_contribution_ids": [
+          "intent:round2:researchguard:trace_domain_export"
+        ],
+        "target_invariant_ids": [],
+        "target_obligation_ids": [],
+        "target_output_ids": [],
+        "target_relation_ids": [],
+        "target_state_ids": [],
+        "target_transition_ids": [],
+        "unresolved_owner_id": "",
+        "work_context_fingerprint": "",
+        "work_context_id": ""
+      }
+    ],
+    "base_effective_intent_view_fingerprint": "sha256:e5a31a4f34be9311bb2645bdffc460c3b85dfae93a7999bc93dd24750b0ae5fd",
+    "bootstrap_receipt": null,
+    "candidate_snapshot_fingerprint": "sha256:40b54080393580b7658ef37231c2546d03fe6de511ade1d83e5caddaa3213d38",
+    "fingerprint": "sha256:7ec2c3b934ace52eaad41faab15f0d1a0e790e390955f8897be851e47523495d",
+    "model_owner_ids": [
+      "model-obligation:argument_support_closure",
+      "model-obligation:authoritative_model_system",
+      "model-obligation:compositional_verification_kernel",
+      "model-obligation:discourse_structure",
+      "model-obligation:hierarchical_model_mesh",
+      "model-obligation:logic_selection_contract",
+      "model-obligation:logic_synthesis",
+      "model-obligation:model_test_code_alignment",
+      "model-obligation:researchguard_suite",
+      "model-obligation:trace_domain_export"
+    ],
+    "owner_bindings": [
+      {
+        "contribution_ids": [
+          "current-design:round2:argument_support_closure:1"
+        ],
+        "fingerprint": "sha256:76698a48a198a15306046a4383ec6d811f3a8d45020f14b7df35b9a1b07fd194",
+        "logical_model_id": "argument_support_closure",
+        "model_owner_id": "model-obligation:argument_support_closure",
+        "realization_relation_fingerprint": "sha256:786159f4b93911c720f7d6ce44e650a69fb0f03586e5f5911ad0dabc6b966aa1",
+        "realization_relation_id": "relation:model-realizes-purpose:argument_support_closure",
+        "schema": "flowguard.effective_intent_owner_binding.v1"
+      },
+      {
+        "contribution_ids": [
+          "current-design:round2:authoritative_model_system:1"
+        ],
+        "fingerprint": "sha256:dc378d25eb453ba74b037cfe7e898638e40dd155b0bdc9afc4088ad89d0a391f",
+        "logical_model_id": "authoritative_model_system",
+        "model_owner_id": "model-obligation:authoritative_model_system",
+        "realization_relation_fingerprint": "sha256:73ba3559f704ae2c2550a2d48191a1543b4688944ba058d8b228c281c19ea253",
+        "realization_relation_id": "relation:model-realizes-purpose:authoritative_model_system",
+        "schema": "flowguard.effective_intent_owner_binding.v1"
+      },
+      {
+        "contribution_ids": [
+          "current-design:round2:compositional_verification_kernel:1"
+        ],
+        "fingerprint": "sha256:6f7b9dea708cc27dc31885cd35161c92209c0c7730d0c6c870d7c0a148a57aef",
+        "logical_model_id": "compositional_verification_kernel",
+        "model_owner_id": "model-obligation:compositional_verification_kernel",
+        "realization_relation_fingerprint": "sha256:b0d036592ec1ebfdc802b1c972fc9d98fd81d25337230584f7b9c71ba770bccf",
+        "realization_relation_id": "relation:model-realizes-purpose:compositional_verification_kernel",
+        "schema": "flowguard.effective_intent_owner_binding.v1"
+      },
+      {
+        "contribution_ids": [
+          "current-design:round2:discourse_structure:1"
+        ],
+        "fingerprint": "sha256:3bdf757e4043ee2fb574b604e88f08c9e58ebb785e29c50137138ae41fe274e3",
+        "logical_model_id": "discourse_structure",
+        "model_owner_id": "model-obligation:discourse_structure",
+        "realization_relation_fingerprint": "sha256:b6bb49c700d6644a4adf2a0f19a99af015ba79099559f58bca3181705be91143",
+        "realization_relation_id": "relation:model-realizes-purpose:discourse_structure",
+        "schema": "flowguard.effective_intent_owner_binding.v1"
+      },
+      {
+        "contribution_ids": [
+          "current-design:round2:hierarchical_model_mesh:1"
+        ],
+        "fingerprint": "sha256:890486bfdf6fb0f51433b625d8c5accac9a828ee0b017411293bd0f5d24cd2ae",
+        "logical_model_id": "hierarchical_model_mesh",
+        "model_owner_id": "model-obligation:hierarchical_model_mesh",
+        "realization_relation_fingerprint": "sha256:18d06ac2061e5e39d0a09c174b70daf9a92fbf45ce30e44b7f933023bea3e7ae",
+        "realization_relation_id": "relation:model-realizes-purpose:hierarchical_model_mesh",
+        "schema": "flowguard.effective_intent_owner_binding.v1"
+      },
+      {
+        "contribution_ids": [
+          "current-design:round2:logic_selection_contract:1"
+        ],
+        "fingerprint": "sha256:8e074f7d60c00d0ea92ed539efa502b58a457f7c29e796f33cdb2763c5cc08bb",
+        "logical_model_id": "logic_selection_contract",
+        "model_owner_id": "model-obligation:logic_selection_contract",
+        "realization_relation_fingerprint": "sha256:055cab9efd6a51744b86a16b03ad03514c31d02cd9860f9c3784b16cebbe54c0",
+        "realization_relation_id": "relation:model-realizes-purpose:logic_selection_contract",
+        "schema": "flowguard.effective_intent_owner_binding.v1"
+      },
+      {
+        "contribution_ids": [
+          "current-design:round2:logic_synthesis:1"
+        ],
+        "fingerprint": "sha256:c2091556e5e52b2e03ff7d4efe6c5f109bb5cb79ef947a23be61c6d016cf7479",
+        "logical_model_id": "logic_synthesis",
+        "model_owner_id": "model-obligation:logic_synthesis",
+        "realization_relation_fingerprint": "sha256:5380379d5c34c7f85b4fb323b795872ba2070863166cc9c884b1e101ff4522b0",
+        "realization_relation_id": "relation:model-realizes-purpose:logic_synthesis",
+        "schema": "flowguard.effective_intent_owner_binding.v1"
+      },
+      {
+        "contribution_ids": [
+          "current-design:round2:model_test_code_alignment:1"
+        ],
+        "fingerprint": "sha256:d7db4cd10c47b6d423dd66004c5e3c11aa8d4f4687231e36cf982787b5eeb4d7",
+        "logical_model_id": "model_test_code_alignment",
+        "model_owner_id": "model-obligation:model_test_code_alignment",
+        "realization_relation_fingerprint": "sha256:eda5a12d09762371c11fdc13ec16379be8bcc9dbe65aee98f30df94d93f53cd0",
+        "realization_relation_id": "relation:model-realizes-purpose:model_test_code_alignment",
+        "schema": "flowguard.effective_intent_owner_binding.v1"
+      },
+      {
+        "contribution_ids": [
+          "current-design:round2:researchguard_suite:1"
+        ],
+        "fingerprint": "sha256:95e398a1668e58ce2d3e47e7ef0bc2aa71d10ee8c9021ab8eb4dd66d39cfad13",
+        "logical_model_id": "researchguard_suite",
+        "model_owner_id": "model-obligation:researchguard_suite",
+        "realization_relation_fingerprint": "sha256:0302269ea9723274f667bc09964c382591d8b35d27a3c734d20f35eccaeaf283",
+        "realization_relation_id": "relation:model-realizes-purpose:researchguard_suite",
+        "schema": "flowguard.effective_intent_owner_binding.v1"
+      },
+      {
+        "contribution_ids": [
+          "current-design:round2:trace_domain_export:1"
+        ],
+        "fingerprint": "sha256:d58f348fd9d0e4cab39621f3f44e348fe7c4b7a129c9ab9d7c029d58f0830887",
+        "logical_model_id": "trace_domain_export",
+        "model_owner_id": "model-obligation:trace_domain_export",
+        "realization_relation_fingerprint": "sha256:4cfbcd715f3efccacac21f391f1cf23b180a5a18bf7a41d28ef4d99fefbcfc3d",
+        "realization_relation_id": "relation:model-realizes-purpose:trace_domain_export",
+        "schema": "flowguard.effective_intent_owner_binding.v1"
+      }
+    ],
+    "schema": "flowguard.current_effective_intent_view.v1",
+    "subject_lane": "observed_implementation",
+    "system_id": "flowguard",
+    "transitions": [
+      {
+        "action": "retain",
+        "fingerprint": "sha256:a356a2d1e4f1b1026073847dd26aea34b4c15c160bcf95719ccdd4d741e838ed",
+        "prior_contribution_fingerprint": "sha256:206bdf1529c2909ef72975c0182be06e7b0d01d821eb055a71ae75fae3e83362",
+        "prior_contribution_id": "current-design:round2:argument_support_closure:1",
+        "reason": "The active design contribution is unchanged by the v0.5.1 release-tree sanitation and version synchronization; retain its prior authoritative intent exactly.",
+        "replacement_contribution_ids": [],
+        "schema": "flowguard.effective_intent_transition.v1"
+      },
+      {
+        "action": "retain",
+        "fingerprint": "sha256:fd8ace5fc11e7db629759f1ff6bc280991931ccb3d1ecaac0a19fc629bb0b01e",
+        "prior_contribution_fingerprint": "sha256:e804f73402b82bf827b8da8e1213ed212dcd164786e3380c32c65f50aa81288c",
+        "prior_contribution_id": "current-design:round2:authoritative_model_system:1",
+        "reason": "The active design contribution is unchanged by the v0.5.1 release-tree sanitation and version synchronization; retain its prior authoritative intent exactly.",
+        "replacement_contribution_ids": [],
+        "schema": "flowguard.effective_intent_transition.v1"
+      },
+      {
+        "action": "retain",
+        "fingerprint": "sha256:ca2bcfca79b37247407fb5dd7fef0e5749fa276b22f35fbd8ac0d1f42f5f9083",
+        "prior_contribution_fingerprint": "sha256:2ce18596b9143e12b7a7f9672b05e42cc950552bdfa6f8304ae5bd923b62547f",
+        "prior_contribution_id": "current-design:round2:compositional_verification_kernel:1",
+        "reason": "The active design contribution is unchanged by the v0.5.1 release-tree sanitation and version synchronization; retain its prior authoritative intent exactly.",
+        "replacement_contribution_ids": [],
+        "schema": "flowguard.effective_intent_transition.v1"
+      },
+      {
+        "action": "retain",
+        "fingerprint": "sha256:91ef6af0494f13662c0b6882c90fd692f488a039ad56c42615c6e723deaec83b",
+        "prior_contribution_fingerprint": "sha256:6d3b6b9f0b7468ebc405a4c7a9f832a0e97e5ac2609af167f85fddb295f7861f",
+        "prior_contribution_id": "current-design:round2:discourse_structure:1",
+        "reason": "The active design contribution is unchanged by the v0.5.1 release-tree sanitation and version synchronization; retain its prior authoritative intent exactly.",
+        "replacement_contribution_ids": [],
+        "schema": "flowguard.effective_intent_transition.v1"
+      },
+      {
+        "action": "retain",
+        "fingerprint": "sha256:2dc92b8321ecd4fc64e1490d334571f9fd4db124ff9711ebceadbd4873ba5acd",
+        "prior_contribution_fingerprint": "sha256:ff3f1c1573a7646a8e3dc4bf80675ec837e0c41de1b9582fb0a7115e3eb3fbd8",
+        "prior_contribution_id": "current-design:round2:hierarchical_model_mesh:1",
+        "reason": "The active design contribution is unchanged by the v0.5.1 release-tree sanitation and version synchronization; retain its prior authoritative intent exactly.",
+        "replacement_contribution_ids": [],
+        "schema": "flowguard.effective_intent_transition.v1"
+      },
+      {
+        "action": "retain",
+        "fingerprint": "sha256:63e7a4b417b9581f16fa9ac40b1e6428e090a5c9ac701da5c886c0c19c06124a",
+        "prior_contribution_fingerprint": "sha256:3a0ff90e7720035f3787546ea23253db973027f5dc1b3c961b66b12ac165e7fd",
+        "prior_contribution_id": "current-design:round2:logic_selection_contract:1",
+        "reason": "The active design contribution is unchanged by the v0.5.1 release-tree sanitation and version synchronization; retain its prior authoritative intent exactly.",
+        "replacement_contribution_ids": [],
+        "schema": "flowguard.effective_intent_transition.v1"
+      },
+      {
+        "action": "retain",
+        "fingerprint": "sha256:fbad7b3fafd0727adbcf3845a516004c9c9d443181c754ec7f0fae549aa05a37",
+        "prior_contribution_fingerprint": "sha256:b357b4ce000d8ffc65282eb69e49e94ee4ec90e6a6522663e8e7694df81712af",
+        "prior_contribution_id": "current-design:round2:logic_synthesis:1",
+        "reason": "The active design contribution is unchanged by the v0.5.1 release-tree sanitation and version synchronization; retain its prior authoritative intent exactly.",
+        "replacement_contribution_ids": [],
+        "schema": "flowguard.effective_intent_transition.v1"
+      },
+      {
+        "action": "retain",
+        "fingerprint": "sha256:a5db7e7352f3ba48c72966304a574d0a809d26da55ea0dea288d835362695703",
+        "prior_contribution_fingerprint": "sha256:6150d7c0e0d57b549e189926ee68b257aa155d2a4f5a138664173e77f02fc472",
+        "prior_contribution_id": "current-design:round2:model_test_code_alignment:1",
+        "reason": "The active design contribution is unchanged by the v0.5.1 release-tree sanitation and version synchronization; retain its prior authoritative intent exactly.",
+        "replacement_contribution_ids": [],
+        "schema": "flowguard.effective_intent_transition.v1"
+      },
+      {
+        "action": "retain",
+        "fingerprint": "sha256:e6bc4ab2d32d70f75b65b06565c1afe9858b5ef1d3d85a08718086e47db29517",
+        "prior_contribution_fingerprint": "sha256:89baad858ff917115c8799133dd012e0825fe62caa5baa97f9f731887f1aedce",
+        "prior_contribution_id": "current-design:round2:researchguard_suite:1",
+        "reason": "The active design contribution is unchanged by the v0.5.1 release-tree sanitation and version synchronization; retain its prior authoritative intent exactly.",
+        "replacement_contribution_ids": [],
+        "schema": "flowguard.effective_intent_transition.v1"
+      },
+      {
+        "action": "retain",
+        "fingerprint": "sha256:757ad3a503cac8f398d68aed358b7a68849931c0c8fe8e740ad142a7742aeb65",
+        "prior_contribution_fingerprint": "sha256:1c059f54886febddc1d5054586e5300b19720e0577b2f2ddb0562bf69f03719b",
+        "prior_contribution_id": "current-design:round2:trace_domain_export:1",
+        "reason": "The active design contribution is unchanged by the v0.5.1 release-tree sanitation and version synchronization; retain its prior authoritative intent exactly.",
+        "replacement_contribution_ids": [],
+        "schema": "flowguard.effective_intent_transition.v1"
+      }
+    ],
+    "verified_source_identities": [
+      {
+        "authority_kind": "project_file",
+        "contribution_id": "current-design:round2:argument_support_closure:1",
+        "fingerprint": "sha256:46e1fb8eb7f2dd18134add1965f2026d1b2f03a2388a472f539c771c0fa98232",
+        "native_owner_id": "",
+        "resolved_project_ref": "openspec/changes/repair-argument-to-reader-composition/design.md",
+        "schema": "flowguard.model_intent_source_identity.v1",
+        "source_fingerprint": "sha256:36a0f5ae3b82d0ff0c818dd17c8931e392fc6236568d060d2b6a017e66811d4e",
+        "source_ref": "openspec/changes/repair-argument-to-reader-composition/design.md",
+        "work_context_artifact_id": "",
+        "work_context_fingerprint": "",
+        "work_context_id": ""
+      },
+      {
+        "authority_kind": "project_file",
+        "contribution_id": "current-design:round2:authoritative_model_system:1",
+        "fingerprint": "sha256:496486f0182f4bc0b8b74079ced369aa38280ff9bd929292da3d0ab23826e5dc",
+        "native_owner_id": "",
+        "resolved_project_ref": "openspec/changes/strengthen-guard-domain-blueprint-spine/design.md",
+        "schema": "flowguard.model_intent_source_identity.v1",
+        "source_fingerprint": "sha256:d47b69c76a5a12349b600aabb186786031d5156909f7477706022c8690cb352f",
+        "source_ref": "openspec/changes/strengthen-guard-domain-blueprint-spine/design.md",
+        "work_context_artifact_id": "",
+        "work_context_fingerprint": "",
+        "work_context_id": ""
+      },
+      {
+        "authority_kind": "project_file",
+        "contribution_id": "current-design:round2:compositional_verification_kernel:1",
+        "fingerprint": "sha256:f1609abfca2e35fbbdc4e17b70fa5242fc8ae7779fe9b76eb03e04aa8dba58e2",
+        "native_owner_id": "",
+        "resolved_project_ref": "openspec/changes/strengthen-guard-domain-blueprint-spine/design.md",
+        "schema": "flowguard.model_intent_source_identity.v1",
+        "source_fingerprint": "sha256:d47b69c76a5a12349b600aabb186786031d5156909f7477706022c8690cb352f",
+        "source_ref": "openspec/changes/strengthen-guard-domain-blueprint-spine/design.md",
+        "work_context_artifact_id": "",
+        "work_context_fingerprint": "",
+        "work_context_id": ""
+      },
+      {
+        "authority_kind": "project_file",
+        "contribution_id": "current-design:round2:discourse_structure:1",
+        "fingerprint": "sha256:0755f5a41a7690505bdcd20066af82cef52a52e92b3b8c896e2fb01e948e75e1",
+        "native_owner_id": "",
+        "resolved_project_ref": "openspec/changes/repair-argument-to-reader-composition/design.md",
+        "schema": "flowguard.model_intent_source_identity.v1",
+        "source_fingerprint": "sha256:36a0f5ae3b82d0ff0c818dd17c8931e392fc6236568d060d2b6a017e66811d4e",
+        "source_ref": "openspec/changes/repair-argument-to-reader-composition/design.md",
+        "work_context_artifact_id": "",
+        "work_context_fingerprint": "",
+        "work_context_id": ""
+      },
+      {
+        "authority_kind": "project_file",
+        "contribution_id": "current-design:round2:hierarchical_model_mesh:1",
+        "fingerprint": "sha256:97514f5d743660f075a005f9936b95a4d2b8f8445bc1bdeaeee2ce8aa99a7fd6",
+        "native_owner_id": "",
+        "resolved_project_ref": "openspec/changes/strengthen-guard-domain-blueprint-spine/design.md",
+        "schema": "flowguard.model_intent_source_identity.v1",
+        "source_fingerprint": "sha256:d47b69c76a5a12349b600aabb186786031d5156909f7477706022c8690cb352f",
+        "source_ref": "openspec/changes/strengthen-guard-domain-blueprint-spine/design.md",
+        "work_context_artifact_id": "",
+        "work_context_fingerprint": "",
+        "work_context_id": ""
+      },
+      {
+        "authority_kind": "project_file",
+        "contribution_id": "current-design:round2:logic_selection_contract:1",
+        "fingerprint": "sha256:a9249d638c423f822c1beaad4e61641fccab6c3762ee32d26dd3fae938c7b385",
+        "native_owner_id": "",
+        "resolved_project_ref": "openspec/changes/repair-argument-to-reader-composition/design.md",
+        "schema": "flowguard.model_intent_source_identity.v1",
+        "source_fingerprint": "sha256:36a0f5ae3b82d0ff0c818dd17c8931e392fc6236568d060d2b6a017e66811d4e",
+        "source_ref": "openspec/changes/repair-argument-to-reader-composition/design.md",
+        "work_context_artifact_id": "",
+        "work_context_fingerprint": "",
+        "work_context_id": ""
+      },
+      {
+        "authority_kind": "project_file",
+        "contribution_id": "current-design:round2:logic_synthesis:1",
+        "fingerprint": "sha256:0463ffed64fbba6ce6893aa49d909e43832b8ab6842157c5e946e431c3eb57c4",
+        "native_owner_id": "",
+        "resolved_project_ref": "openspec/changes/repair-argument-to-reader-composition/design.md",
+        "schema": "flowguard.model_intent_source_identity.v1",
+        "source_fingerprint": "sha256:36a0f5ae3b82d0ff0c818dd17c8931e392fc6236568d060d2b6a017e66811d4e",
+        "source_ref": "openspec/changes/repair-argument-to-reader-composition/design.md",
+        "work_context_artifact_id": "",
+        "work_context_fingerprint": "",
+        "work_context_id": ""
+      },
+      {
+        "authority_kind": "project_file",
+        "contribution_id": "current-design:round2:model_test_code_alignment:1",
+        "fingerprint": "sha256:d4b18eafb07915a095e41391f3607d31ec0b878fe6a77cf4948cc16aeb2bfe69",
+        "native_owner_id": "",
+        "resolved_project_ref": "openspec/changes/strengthen-guard-domain-blueprint-spine/design.md",
+        "schema": "flowguard.model_intent_source_identity.v1",
+        "source_fingerprint": "sha256:d47b69c76a5a12349b600aabb186786031d5156909f7477706022c8690cb352f",
+        "source_ref": "openspec/changes/strengthen-guard-domain-blueprint-spine/design.md",
+        "work_context_artifact_id": "",
+        "work_context_fingerprint": "",
+        "work_context_id": ""
+      },
+      {
+        "authority_kind": "project_file",
+        "contribution_id": "current-design:round2:researchguard_suite:1",
+        "fingerprint": "sha256:5f3c4ead053aaa650f545ba0e21535c554d906b70da2acb2e1432b3d6d728a5e",
+        "native_owner_id": "",
+        "resolved_project_ref": "openspec/changes/strengthen-guard-domain-blueprint-spine/design.md",
+        "schema": "flowguard.model_intent_source_identity.v1",
+        "source_fingerprint": "sha256:d47b69c76a5a12349b600aabb186786031d5156909f7477706022c8690cb352f",
+        "source_ref": "openspec/changes/strengthen-guard-domain-blueprint-spine/design.md",
+        "work_context_artifact_id": "",
+        "work_context_fingerprint": "",
+        "work_context_id": ""
+      },
+      {
+        "authority_kind": "project_file",
+        "contribution_id": "current-design:round2:trace_domain_export:1",
+        "fingerprint": "sha256:1380702bd43a196fd69f6dd2b2a704059780926f76aea15fd743b750348ada65",
+        "native_owner_id": "",
+        "resolved_project_ref": "openspec/changes/repair-argument-to-reader-composition/design.md",
+        "schema": "flowguard.model_intent_source_identity.v1",
+        "source_fingerprint": "sha256:36a0f5ae3b82d0ff0c818dd17c8931e392fc6236568d060d2b6a017e66811d4e",
+        "source_ref": "openspec/changes/repair-argument-to-reader-composition/design.md",
+        "work_context_artifact_id": "",
+        "work_context_fingerprint": "",
+        "work_context_id": ""
+      }
+    ]
+  },
+  "decision_reason": "",
+  "expected_head_fingerprint": "sha256:0c3c54fc5a4a0921c81542015681bac6370b97911c864394f08030527f651585",
+  "fingerprint": "sha256:16fbb224403c285863dc972453aac64f5bce0cf5ec31e529bf812bf4a5f5707c",
+  "fingerprint_changed_ids": [
+    "coverage:universe",
+    "model_instance:model:argument_support_closure",
+    "model_instance:model:authoritative_model_system",
+    "model_instance:model:compositional_verification_kernel",
+    "model_instance:model:discourse_structure",
+    "model_instance:model:hierarchical_model_mesh",
+    "model_instance:model:logic_selection_contract",
+    "model_instance:model:logic_synthesis",
+    "model_instance:model:model_test_code_alignment",
+    "model_instance:model:researchguard_suite",
+    "model_instance:model:trace_domain_export",
+    "model_relation:relation:model-realizes-native-owner:argument_support_closure:argument_support_closure",
+    "model_relation:relation:model-realizes-native-owner:discourse_structure:discourse_structure",
+    "model_relation:relation:model-realizes-native-owner:hierarchical_model_mesh:model_mesh_maintenance",
+    "model_relation:relation:model-realizes-native-owner:logic_selection_contract:logic_selection_contract",
+    "model_relation:relation:model-realizes-native-owner:logic_synthesis:logic_synthesis",
+    "model_relation:relation:model-realizes-native-owner:model_test_code_alignment:model_test_alignment",
+    "model_relation:relation:model-realizes-native-owner:trace_domain_export:trace_domain_export",
+    "model_relation:relation:model-realizes-purpose:argument_support_closure",
+    "model_relation:relation:model-realizes-purpose:authoritative_model_system",
+    "model_relation:relation:model-realizes-purpose:compositional_verification_kernel",
+    "model_relation:relation:model-realizes-purpose:discourse_structure",
+    "model_relation:relation:model-realizes-purpose:hierarchical_model_mesh",
+    "model_relation:relation:model-realizes-purpose:logic_selection_contract",
+    "model_relation:relation:model-realizes-purpose:logic_synthesis",
+    "model_relation:relation:model-realizes-purpose:model_test_code_alignment",
+    "model_relation:relation:model-realizes-purpose:researchguard_suite",
+    "model_relation:relation:model-realizes-purpose:trace_domain_export",
+    "model_relation:relation:semantic-model-affects-consumer:argument_support_closure:logic_synthesis",
+    "model_relation:relation:semantic-model-affects-consumer:argument_support_closure:researchguard_suite",
+    "model_relation:relation:semantic-model-affects-consumer:compositional_verification_kernel:authoritative_model_system",
+    "model_relation:relation:semantic-model-affects-consumer:discourse_structure:logic_synthesis",
+    "model_relation:relation:semantic-model-affects-consumer:discourse_structure:researchguard_suite",
+    "model_relation:relation:semantic-model-affects-consumer:hierarchical_model_mesh:authoritative_model_system",
+    "model_relation:relation:semantic-model-affects-consumer:logic_selection_contract:logic_synthesis",
+    "model_relation:relation:semantic-model-affects-consumer:logic_selection_contract:researchguard_suite",
+    "model_relation:relation:semantic-model-affects-consumer:logic_synthesis:researchguard_suite",
+    "model_relation:relation:semantic-model-affects-consumer:model_test_code_alignment:authoritative_model_system",
+    "model_relation:relation:semantic-model-affects-consumer:researchguard_suite:authoritative_model_system",
+    "model_relation:relation:semantic-model-affects-consumer:trace_domain_export:researchguard_suite",
+    "model_relation:relation:semantic-parent-contains-model:semantic-parent:logic_synthesis:argument_support_closure",
+    "model_relation:relation:semantic-parent-contains-model:semantic-parent:logic_synthesis:discourse_structure",
+    "model_relation:relation:semantic-parent-contains-model:semantic-parent:logic_synthesis:logic_selection_contract",
+    "model_relation:relation:semantic-parent-contains-model:semantic-parent:researchguard_suite:logic_synthesis",
+    "model_relation:relation:semantic-parent-contains-model:semantic-parent:researchguard_suite:trace_domain_export",
+    "model_relation:relation:semantic-parent-contains-model:semantic-parent:software-root:authoritative_model_system",
+    "model_relation:relation:semantic-parent-contains-model:semantic-parent:software-root:compositional_verification_kernel",
+    "model_relation:relation:semantic-parent-contains-model:semantic-parent:software-root:hierarchical_model_mesh",
+    "model_relation:relation:semantic-parent-contains-model:semantic-parent:software-root:model_test_code_alignment",
+    "model_relation:relation:semantic-parent-contains-model:semantic-parent:software-root:researchguard_suite",
+    "model_relation:relation:semantic-system-contains:semantic-parent:logic_synthesis",
+    "model_relation:relation:semantic-system-contains:semantic-parent:researchguard_suite",
+    "model_relation:relation:semantic-system-contains:semantic-parent:software-root",
+    "parent_closure:purpose:argument_support_closure",
+    "parent_closure:purpose:authoritative_model_system",
+    "parent_closure:purpose:compositional_verification_kernel",
+    "parent_closure:purpose:discourse_structure",
+    "parent_closure:purpose:hierarchical_model_mesh",
+    "parent_closure:purpose:logic_selection_contract",
+    "parent_closure:purpose:logic_synthesis",
+    "parent_closure:purpose:model_test_code_alignment",
+    "parent_closure:purpose:researchguard_suite",
+    "parent_closure:purpose:trace_domain_export",
+    "parent_closure:system:flowguard:model-regression-manifest",
+    "root:model:authoritative_model_system"
+  ],
+  "implementation_bundle_fingerprint": "",
+  "intent_conflict_ids": [],
+  "intent_contribution_inventory_fingerprint": "sha256:0019c742273f74601efc61b5a643123b74c5d8a7a263b92f064a33d07d537c20",
+  "intent_contributions": [],
+  "intent_dispositions": [],
+  "intent_unresolved_ids": [],
+  "members": [
+    {
+      "base_instance_fingerprint": "sha256:38f9854880e34cacc511780f87e86976ad39e98f6ed91835a99f5dbdba734cf2",
+      "candidate_instance_fingerprint": "sha256:41caa9533a2eb6aaf3f1130d6f1038c0c05fabb2d7790f7fd5ed3c12938123f1",
+      "changed_element_ids": [
+        "model_instance:model:argument_support_closure"
+      ],
+      "member_id": "argument_support_closure",
+      "operation": "replace",
+      "schema": "flowguard.model_revision_member.v1"
+    },
+    {
+      "base_instance_fingerprint": "sha256:a7f104eada3df910499eca7fc4793e582a4f9a05ef09bab35bbe71c33a66679d",
+      "candidate_instance_fingerprint": "sha256:baa0e32561a079e424c4d31e01177961f6defa323f7a5e1568d5e663b8bab3a3",
+      "changed_element_ids": [
+        "model_instance:model:authoritative_model_system"
+      ],
+      "member_id": "authoritative_model_system",
+      "operation": "replace",
+      "schema": "flowguard.model_revision_member.v1"
+    },
+    {
+      "base_instance_fingerprint": "sha256:444b11f0c7dea02be80e1e6cf6673d3defd8536b43fdf3f2b846198729013c34",
+      "candidate_instance_fingerprint": "sha256:3c313340e9d32f72bcb26212d2e51df5e6c989aa4dcbadeedc160a294d64c5dc",
+      "changed_element_ids": [
+        "model_instance:model:compositional_verification_kernel"
+      ],
+      "member_id": "compositional_verification_kernel",
+      "operation": "replace",
+      "schema": "flowguard.model_revision_member.v1"
+    },
+    {
+      "base_instance_fingerprint": "sha256:366d6ff5f4fd6a32ad459b9787b075cb65be2d0d33c174e0858689f813fc848d",
+      "candidate_instance_fingerprint": "sha256:149d4f2bcf17db7996126641d662fdad2e3f93736c5cbb367c124e6bb86efadd",
+      "changed_element_ids": [
+        "model_instance:model:discourse_structure"
+      ],
+      "member_id": "discourse_structure",
+      "operation": "replace",
+      "schema": "flowguard.model_revision_member.v1"
+    },
+    {
+      "base_instance_fingerprint": "sha256:ba9377db1719f409f9ac64b466f5fc8228a190b2791203793e5f7ec54b81f5f4",
+      "candidate_instance_fingerprint": "sha256:318c6247b069b25fcb998971b7beb7b52c0af7189e390259a4fb7de8a52f37e3",
+      "changed_element_ids": [
+        "model_instance:model:hierarchical_model_mesh"
+      ],
+      "member_id": "hierarchical_model_mesh",
+      "operation": "replace",
+      "schema": "flowguard.model_revision_member.v1"
+    },
+    {
+      "base_instance_fingerprint": "sha256:04cb9e5ec4732355fd2018a6e2968b40b43875ab95eaa895df22f56c09211d23",
+      "candidate_instance_fingerprint": "sha256:f58d63d78a9f7cb6d064e32aba07b5adb8df36d1c90a23b5343cd998f407baaa",
+      "changed_element_ids": [
+        "model_instance:model:logic_selection_contract"
+      ],
+      "member_id": "logic_selection_contract",
+      "operation": "replace",
+      "schema": "flowguard.model_revision_member.v1"
+    },
+    {
+      "base_instance_fingerprint": "sha256:594168055db4f996ad9d57fc06e0217e2daad4f275f8e9a44d9232d6eba5505a",
+      "candidate_instance_fingerprint": "sha256:9da55fa33e0b4ccb5c406643efb449e192d0d1e00d7b5d37e78643f110ff92b9",
+      "changed_element_ids": [
+        "model_instance:model:logic_synthesis"
+      ],
+      "member_id": "logic_synthesis",
+      "operation": "replace",
+      "schema": "flowguard.model_revision_member.v1"
+    },
+    {
+      "base_instance_fingerprint": "sha256:24eac64fefb3827845c42baf63ef1a8eb22add9d1f9f3583fdb3da3d3e517460",
+      "candidate_instance_fingerprint": "sha256:1883e263902cffc10f7ebe53974aacd9dea3c7b2eed31ca7a4b9218be86b9356",
+      "changed_element_ids": [
+        "model_instance:model:model_test_code_alignment"
+      ],
+      "member_id": "model_test_code_alignment",
+      "operation": "replace",
+      "schema": "flowguard.model_revision_member.v1"
+    },
+    {
+      "base_instance_fingerprint": "sha256:af5595535a2fc53afa3331ab4d4c30169bd585eb52d94ac58d8d03abe5de3599",
+      "candidate_instance_fingerprint": "sha256:a0a90d2d4754119fd1d732487ebe94787916c161b40cc7d120876d8026fabdc7",
+      "changed_element_ids": [
+        "model_instance:model:researchguard_suite"
+      ],
+      "member_id": "researchguard_suite",
+      "operation": "replace",
+      "schema": "flowguard.model_revision_member.v1"
+    },
+    {
+      "base_instance_fingerprint": "sha256:1037e202ab6dc2b38ec52123c93072ea8f18c1957b109874e839349b3485ccaf",
+      "candidate_instance_fingerprint": "sha256:d0ad334aa9cb76283c8a9b001579a88162b917b63521d1c15b0082705c4d90c3",
+      "changed_element_ids": [
+        "model_instance:model:trace_domain_export"
+      ],
+      "member_id": "trace_domain_export",
+      "operation": "replace",
+      "schema": "flowguard.model_revision_member.v1"
+    }
+  ],
+  "no_declared_intent_evidence_fingerprints": [],
+  "no_declared_intent_rationale": "",
+  "no_declared_intent_rationale_id": "",
+  "originating_activation_receipt_fingerprint": "",
+  "originating_revision_set_fingerprint": "",
+  "path_quality_result_set_fingerprint": "sha256:ecaa3d25545e393bc1426dce221fdf2001d3e90eb72ef198049a94fea4840df5",
+  "path_quality_results": [],
+  "path_quality_subjects": [],
+  "prediction_replay_refs": [],
+  "removal_dispositions": [],
+  "removed_ids": [],
+  "required_evidence_refs": [
+    {
+      "affected_closure_fingerprint": "sha256:fb1b989b8ee1762269e90ac6c47069b92bef0af1a1a117bc842b4370d93f3ec3",
+      "candidate_snapshot_fingerprint": "sha256:40b54080393580b7658ef37231c2546d03fe6de511ade1d83e5caddaa3213d38",
+      "covered_affected_ids": [
+        "parent_closure:native-owner-route:argument_support_closure"
+      ],
+      "current": true,
+      "eligible": true,
+      "environment_fingerprint": "sha256:f1e99836c936e6588912017d24aa7b17e2d2a35407b6e778da3b441af1a97f55",
+      "obligation_ids": [
+        "parent_closure:native-owner-route:argument_support_closure"
+      ],
+      "owner_route": "argument_support_closure",
+      "receipt_fingerprint": "sha256:805695fb36512e31a4dfd237e59d205564687dc4a1ebab6d55050da93a583a00",
+      "receipt_id": "receipt:validation-owner:argument_support_closure:dfbbaf552734ac040f4689373ab5ce6a",
+      "schema": "flowguard.model_revision_evidence.v2",
+      "status": "required",
+      "subject_fingerprint": "sha256:40b54080393580b7658ef37231c2546d03fe6de511ade1d83e5caddaa3213d38",
+      "toolchain_fingerprint": "sha256:86f54030f960a89be8f9fa1472b4ccfa6e6baa049204927bd7bc8a2c98add0be"
+    },
+    {
+      "affected_closure_fingerprint": "sha256:fb1b989b8ee1762269e90ac6c47069b92bef0af1a1a117bc842b4370d93f3ec3",
+      "candidate_snapshot_fingerprint": "sha256:40b54080393580b7658ef37231c2546d03fe6de511ade1d83e5caddaa3213d38",
+      "covered_affected_ids": [
+        "parent_closure:native-owner-route:discourse_structure"
+      ],
+      "current": true,
+      "eligible": true,
+      "environment_fingerprint": "sha256:f1e99836c936e6588912017d24aa7b17e2d2a35407b6e778da3b441af1a97f55",
+      "obligation_ids": [
+        "parent_closure:native-owner-route:discourse_structure"
+      ],
+      "owner_route": "discourse_structure",
+      "receipt_fingerprint": "sha256:4335e7e928decdbc0d402c6aeeef2b46669d3d8243aaa1ef66751db6f36be8cb",
+      "receipt_id": "receipt:validation-owner:discourse_structure:bb2a5da0bb7623a7ecf8666a58ac390b",
+      "schema": "flowguard.model_revision_evidence.v2",
+      "status": "required",
+      "subject_fingerprint": "sha256:40b54080393580b7658ef37231c2546d03fe6de511ade1d83e5caddaa3213d38",
+      "toolchain_fingerprint": "sha256:ffe769534da9b90f7b12418e518ba1e31891a430ee8d1a8040962a91a9340e34"
+    },
+    {
+      "affected_closure_fingerprint": "sha256:fb1b989b8ee1762269e90ac6c47069b92bef0af1a1a117bc842b4370d93f3ec3",
+      "candidate_snapshot_fingerprint": "sha256:40b54080393580b7658ef37231c2546d03fe6de511ade1d83e5caddaa3213d38",
+      "covered_affected_ids": [
+        "parent_closure:native-owner-route:logic_selection_contract"
+      ],
+      "current": true,
+      "eligible": true,
+      "environment_fingerprint": "sha256:f1e99836c936e6588912017d24aa7b17e2d2a35407b6e778da3b441af1a97f55",
+      "obligation_ids": [
+        "parent_closure:native-owner-route:logic_selection_contract"
+      ],
+      "owner_route": "logic_selection_contract",
+      "receipt_fingerprint": "sha256:66e7cbafb4ea7b4618285ddf5936ef2ae5b04055149a5992cd68c37152de73ca",
+      "receipt_id": "receipt:validation-owner:logic_selection_contract:dc9550ed542fbadd8c3fdc8d7d3ef27b",
+      "schema": "flowguard.model_revision_evidence.v2",
+      "status": "required",
+      "subject_fingerprint": "sha256:40b54080393580b7658ef37231c2546d03fe6de511ade1d83e5caddaa3213d38",
+      "toolchain_fingerprint": "sha256:2faf2d5526e21c4a4a261d5e6bcf407a53d1e5f9eeffec5330248c3eff8dd7d2"
+    },
+    {
+      "affected_closure_fingerprint": "sha256:fb1b989b8ee1762269e90ac6c47069b92bef0af1a1a117bc842b4370d93f3ec3",
+      "candidate_snapshot_fingerprint": "sha256:40b54080393580b7658ef37231c2546d03fe6de511ade1d83e5caddaa3213d38",
+      "covered_affected_ids": [
+        "parent_closure:native-owner-route:logic_synthesis"
+      ],
+      "current": true,
+      "eligible": true,
+      "environment_fingerprint": "sha256:f1e99836c936e6588912017d24aa7b17e2d2a35407b6e778da3b441af1a97f55",
+      "obligation_ids": [
+        "parent_closure:native-owner-route:logic_synthesis"
+      ],
+      "owner_route": "logic_synthesis",
+      "receipt_fingerprint": "sha256:6a74dab698af5d39153188d245997cce13ccb8f155608112ba8fccaf90d08c53",
+      "receipt_id": "receipt:validation-owner:logic_synthesis:d67be1344bec73cc7f0b3aa70c8a5b63",
+      "schema": "flowguard.model_revision_evidence.v2",
+      "status": "required",
+      "subject_fingerprint": "sha256:40b54080393580b7658ef37231c2546d03fe6de511ade1d83e5caddaa3213d38",
+      "toolchain_fingerprint": "sha256:e1bd7a7ce36e6b65bae64c630b2cc92e7332b7b88b88dc05a8590bd7b5d97c5e"
+    },
+    {
+      "affected_closure_fingerprint": "sha256:fb1b989b8ee1762269e90ac6c47069b92bef0af1a1a117bc842b4370d93f3ec3",
+      "candidate_snapshot_fingerprint": "sha256:40b54080393580b7658ef37231c2546d03fe6de511ade1d83e5caddaa3213d38",
+      "covered_affected_ids": [
+        "coverage:universe",
+        "model_relation:relation:model-realizes-native-owner:argument_support_closure:argument_support_closure",
+        "model_relation:relation:model-realizes-native-owner:discourse_structure:discourse_structure",
+        "model_relation:relation:model-realizes-native-owner:hierarchical_model_mesh:model_mesh_maintenance",
+        "model_relation:relation:model-realizes-native-owner:logic_selection_contract:logic_selection_contract",
+        "model_relation:relation:model-realizes-native-owner:logic_synthesis:logic_synthesis",
+        "model_relation:relation:model-realizes-native-owner:model_test_code_alignment:model_test_alignment",
+        "model_relation:relation:model-realizes-native-owner:trace_domain_export:trace_domain_export",
+        "model_relation:relation:model-realizes-purpose:argument_support_closure",
+        "model_relation:relation:model-realizes-purpose:authoritative_model_system",
+        "model_relation:relation:model-realizes-purpose:compositional_verification_kernel",
+        "model_relation:relation:model-realizes-purpose:discourse_structure",
+        "model_relation:relation:model-realizes-purpose:hierarchical_model_mesh",
+        "model_relation:relation:model-realizes-purpose:logic_selection_contract",
+        "model_relation:relation:model-realizes-purpose:logic_synthesis",
+        "model_relation:relation:model-realizes-purpose:model_test_code_alignment",
+        "model_relation:relation:model-realizes-purpose:researchguard_suite",
+        "model_relation:relation:model-realizes-purpose:trace_domain_export",
+        "model_relation:relation:semantic-model-affects-consumer:argument_support_closure:logic_synthesis",
+        "model_relation:relation:semantic-model-affects-consumer:argument_support_closure:researchguard_suite",
+        "model_relation:relation:semantic-model-affects-consumer:compositional_verification_kernel:authoritative_model_system",
+        "model_relation:relation:semantic-model-affects-consumer:discourse_structure:logic_synthesis",
+        "model_relation:relation:semantic-model-affects-consumer:discourse_structure:researchguard_suite",
+        "model_relation:relation:semantic-model-affects-consumer:hierarchical_model_mesh:authoritative_model_system",
+        "model_relation:relation:semantic-model-affects-consumer:logic_selection_contract:logic_synthesis",
+        "model_relation:relation:semantic-model-affects-consumer:logic_selection_contract:researchguard_suite",
+        "model_relation:relation:semantic-model-affects-consumer:logic_synthesis:researchguard_suite",
+        "model_relation:relation:semantic-model-affects-consumer:model_test_code_alignment:authoritative_model_system",
+        "model_relation:relation:semantic-model-affects-consumer:researchguard_suite:authoritative_model_system",
+        "model_relation:relation:semantic-model-affects-consumer:trace_domain_export:researchguard_suite",
+        "model_relation:relation:semantic-parent-contains-model:semantic-parent:logic_synthesis:argument_support_closure",
+        "model_relation:relation:semantic-parent-contains-model:semantic-parent:logic_synthesis:discourse_structure",
+        "model_relation:relation:semantic-parent-contains-model:semantic-parent:logic_synthesis:logic_selection_contract",
+        "model_relation:relation:semantic-parent-contains-model:semantic-parent:researchguard_suite:logic_synthesis",
+        "model_relation:relation:semantic-parent-contains-model:semantic-parent:researchguard_suite:trace_domain_export",
+        "model_relation:relation:semantic-parent-contains-model:semantic-parent:software-root:authoritative_model_system",
+        "model_relation:relation:semantic-parent-contains-model:semantic-parent:software-root:compositional_verification_kernel",
+        "model_relation:relation:semantic-parent-contains-model:semantic-parent:software-root:hierarchical_model_mesh",
+        "model_relation:relation:semantic-parent-contains-model:semantic-parent:software-root:model_test_code_alignment",
+        "model_relation:relation:semantic-parent-contains-model:semantic-parent:software-root:researchguard_suite",
+        "model_relation:relation:semantic-system-contains:semantic-parent:logic_synthesis",
+        "model_relation:relation:semantic-system-contains:semantic-parent:researchguard_suite",
+        "model_relation:relation:semantic-system-contains:semantic-parent:software-root",
+        "parent_closure:native-owner-route:model_mesh_maintenance",
+        "parent_closure:semantic-parent:logic_synthesis",
+        "parent_closure:semantic-parent:researchguard_suite",
+        "parent_closure:semantic-parent:software-root",
+        "parent_closure:system:flowguard:model-regression-manifest",
+        "root:model:authoritative_model_system",
+        "system_property:subject_revision"
+      ],
+      "current": true,
+      "eligible": true,
+      "environment_fingerprint": "sha256:f1e99836c936e6588912017d24aa7b17e2d2a35407b6e778da3b441af1a97f55",
+      "obligation_ids": [
+        "coverage:universe",
+        "model_relation:relation:model-realizes-native-owner:argument_support_closure:argument_support_closure",
+        "model_relation:relation:model-realizes-native-owner:discourse_structure:discourse_structure",
+        "model_relation:relation:model-realizes-native-owner:hierarchical_model_mesh:model_mesh_maintenance",
+        "model_relation:relation:model-realizes-native-owner:logic_selection_contract:logic_selection_contract",
+        "model_relation:relation:model-realizes-native-owner:logic_synthesis:logic_synthesis",
+        "model_relation:relation:model-realizes-native-owner:model_test_code_alignment:model_test_alignment",
+        "model_relation:relation:model-realizes-native-owner:trace_domain_export:trace_domain_export",
+        "model_relation:relation:model-realizes-purpose:argument_support_closure",
+        "model_relation:relation:model-realizes-purpose:authoritative_model_system",
+        "model_relation:relation:model-realizes-purpose:compositional_verification_kernel",
+        "model_relation:relation:model-realizes-purpose:discourse_structure",
+        "model_relation:relation:model-realizes-purpose:hierarchical_model_mesh",
+        "model_relation:relation:model-realizes-purpose:logic_selection_contract",
+        "model_relation:relation:model-realizes-purpose:logic_synthesis",
+        "model_relation:relation:model-realizes-purpose:model_test_code_alignment",
+        "model_relation:relation:model-realizes-purpose:researchguard_suite",
+        "model_relation:relation:model-realizes-purpose:trace_domain_export",
+        "model_relation:relation:semantic-model-affects-consumer:argument_support_closure:logic_synthesis",
+        "model_relation:relation:semantic-model-affects-consumer:argument_support_closure:researchguard_suite",
+        "model_relation:relation:semantic-model-affects-consumer:compositional_verification_kernel:authoritative_model_system",
+        "model_relation:relation:semantic-model-affects-consumer:discourse_structure:logic_synthesis",
+        "model_relation:relation:semantic-model-affects-consumer:discourse_structure:researchguard_suite",
+        "model_relation:relation:semantic-model-affects-consumer:hierarchical_model_mesh:authoritative_model_system",
+        "model_relation:relation:semantic-model-affects-consumer:logic_selection_contract:logic_synthesis",
+        "model_relation:relation:semantic-model-affects-consumer:logic_selection_contract:researchguard_suite",
+        "model_relation:relation:semantic-model-affects-consumer:logic_synthesis:researchguard_suite",
+        "model_relation:relation:semantic-model-affects-consumer:model_test_code_alignment:authoritative_model_system",
+        "model_relation:relation:semantic-model-affects-consumer:researchguard_suite:authoritative_model_system",
+        "model_relation:relation:semantic-model-affects-consumer:trace_domain_export:researchguard_suite",
+        "model_relation:relation:semantic-parent-contains-model:semantic-parent:logic_synthesis:argument_support_closure",
+        "model_relation:relation:semantic-parent-contains-model:semantic-parent:logic_synthesis:discourse_structure",
+        "model_relation:relation:semantic-parent-contains-model:semantic-parent:logic_synthesis:logic_selection_contract",
+        "model_relation:relation:semantic-parent-contains-model:semantic-parent:researchguard_suite:logic_synthesis",
+        "model_relation:relation:semantic-parent-contains-model:semantic-parent:researchguard_suite:trace_domain_export",
+        "model_relation:relation:semantic-parent-contains-model:semantic-parent:software-root:authoritative_model_system",
+        "model_relation:relation:semantic-parent-contains-model:semantic-parent:software-root:compositional_verification_kernel",
+        "model_relation:relation:semantic-parent-contains-model:semantic-parent:software-root:hierarchical_model_mesh",
+        "model_relation:relation:semantic-parent-contains-model:semantic-parent:software-root:model_test_code_alignment",
+        "model_relation:relation:semantic-parent-contains-model:semantic-parent:software-root:researchguard_suite",
+        "model_relation:relation:semantic-system-contains:semantic-parent:logic_synthesis",
+        "model_relation:relation:semantic-system-contains:semantic-parent:researchguard_suite",
+        "model_relation:relation:semantic-system-contains:semantic-parent:software-root",
+        "parent_closure:native-owner-route:model_mesh_maintenance",
+        "parent_closure:semantic-parent:logic_synthesis",
+        "parent_closure:semantic-parent:researchguard_suite",
+        "parent_closure:semantic-parent:software-root",
+        "parent_closure:system:flowguard:model-regression-manifest",
+        "root:model:authoritative_model_system",
+        "system_property:subject_revision"
+      ],
+      "owner_route": "model_mesh_maintenance",
+      "receipt_fingerprint": "sha256:ec2bdbbdcf5cdb5918f7d7ce82271bd4ce724054c8fae275ae6e452b26c9d3c0",
+      "receipt_id": "receipt:validation-owner:model_mesh_maintenance:871c6fa18e7f7cf66e7a90f593f1bbea",
+      "schema": "flowguard.model_revision_evidence.v2",
+      "status": "required",
+      "subject_fingerprint": "sha256:40b54080393580b7658ef37231c2546d03fe6de511ade1d83e5caddaa3213d38",
+      "toolchain_fingerprint": "sha256:54af417ab8caefe2f7b49a633fe311aee63a430f780b9ef395b75662bdbeb2b6"
+    },
+    {
+      "affected_closure_fingerprint": "sha256:fb1b989b8ee1762269e90ac6c47069b92bef0af1a1a117bc842b4370d93f3ec3",
+      "candidate_snapshot_fingerprint": "sha256:40b54080393580b7658ef37231c2546d03fe6de511ade1d83e5caddaa3213d38",
+      "covered_affected_ids": [
+        "model_instance:model:argument_support_closure",
+        "model_instance:model:authoritative_model_system",
+        "model_instance:model:compositional_verification_kernel",
+        "model_instance:model:discourse_structure",
+        "model_instance:model:hierarchical_model_mesh",
+        "model_instance:model:logic_selection_contract",
+        "model_instance:model:logic_synthesis",
+        "model_instance:model:model_test_code_alignment",
+        "model_instance:model:researchguard_suite",
+        "model_instance:model:trace_domain_export",
+        "parent_closure:native-owner-route:model_test_alignment",
+        "parent_closure:purpose:argument_support_closure",
+        "parent_closure:purpose:authoritative_model_system",
+        "parent_closure:purpose:compositional_verification_kernel",
+        "parent_closure:purpose:discourse_structure",
+        "parent_closure:purpose:hierarchical_model_mesh",
+        "parent_closure:purpose:logic_selection_contract",
+        "parent_closure:purpose:logic_synthesis",
+        "parent_closure:purpose:model_test_code_alignment",
+        "parent_closure:purpose:researchguard_suite",
+        "parent_closure:purpose:trace_domain_export"
+      ],
+      "current": true,
+      "eligible": true,
+      "environment_fingerprint": "sha256:f1e99836c936e6588912017d24aa7b17e2d2a35407b6e778da3b441af1a97f55",
+      "obligation_ids": [
+        "model_instance:model:argument_support_closure",
+        "model_instance:model:authoritative_model_system",
+        "model_instance:model:compositional_verification_kernel",
+        "model_instance:model:discourse_structure",
+        "model_instance:model:hierarchical_model_mesh",
+        "model_instance:model:logic_selection_contract",
+        "model_instance:model:logic_synthesis",
+        "model_instance:model:model_test_code_alignment",
+        "model_instance:model:researchguard_suite",
+        "model_instance:model:trace_domain_export",
+        "parent_closure:native-owner-route:model_test_alignment",
+        "parent_closure:purpose:argument_support_closure",
+        "parent_closure:purpose:authoritative_model_system",
+        "parent_closure:purpose:compositional_verification_kernel",
+        "parent_closure:purpose:discourse_structure",
+        "parent_closure:purpose:hierarchical_model_mesh",
+        "parent_closure:purpose:logic_selection_contract",
+        "parent_closure:purpose:logic_synthesis",
+        "parent_closure:purpose:model_test_code_alignment",
+        "parent_closure:purpose:researchguard_suite",
+        "parent_closure:purpose:trace_domain_export"
+      ],
+      "owner_route": "model_test_alignment",
+      "receipt_fingerprint": "sha256:859d48884394758068df660d5218f58e5c05c4149d86f4be233e87e96657aa70",
+      "receipt_id": "receipt:validation-owner:model_test_alignment:803932fb46955b870aa335cd09540e39",
+      "schema": "flowguard.model_revision_evidence.v2",
+      "status": "required",
+      "subject_fingerprint": "sha256:40b54080393580b7658ef37231c2546d03fe6de511ade1d83e5caddaa3213d38",
+      "toolchain_fingerprint": "sha256:33dfda3b072220c99a779b19f0a3e37900d10d90f6b8c8e549ccd721fe08acbc"
+    },
+    {
+      "affected_closure_fingerprint": "sha256:fb1b989b8ee1762269e90ac6c47069b92bef0af1a1a117bc842b4370d93f3ec3",
+      "candidate_snapshot_fingerprint": "sha256:40b54080393580b7658ef37231c2546d03fe6de511ade1d83e5caddaa3213d38",
+      "covered_affected_ids": [
+        "parent_closure:native-owner-route:trace_domain_export"
+      ],
+      "current": true,
+      "eligible": true,
+      "environment_fingerprint": "sha256:f1e99836c936e6588912017d24aa7b17e2d2a35407b6e778da3b441af1a97f55",
+      "obligation_ids": [
+        "parent_closure:native-owner-route:trace_domain_export"
+      ],
+      "owner_route": "trace_domain_export",
+      "receipt_fingerprint": "sha256:02f36e9530bf9151ab3de28b83493c9ff95a694a4201aca5e36567d439575722",
+      "receipt_id": "receipt:validation-owner:trace_domain_export:453336bca29a5367d6e89795b20eb728",
+      "schema": "flowguard.model_revision_evidence.v2",
+      "status": "required",
+      "subject_fingerprint": "sha256:40b54080393580b7658ef37231c2546d03fe6de511ade1d83e5caddaa3213d38",
+      "toolchain_fingerprint": "sha256:fabb396d3fe71ae3bcbaeb899c530a642e1ca343396533e15fa68a9ee4ad81d2"
+    }
+  ],
+  "required_path_quality_model_ids": [
+    "argument_support_closure",
+    "authoritative_model_system",
+    "compositional_verification_kernel",
+    "discourse_structure",
+    "hierarchical_model_mesh",
+    "logic_selection_contract",
+    "logic_synthesis",
+    "model_test_code_alignment",
+    "researchguard_suite",
+    "trace_domain_export"
+  ],
+  "revision_set_id": "researchguard-round2-authority-refresh-20260908",
+  "rollback_contract_fingerprint": "",
+  "schema": "flowguard.model_revision_set.v5",
+  "snapshot_diff_fingerprint": "sha256:3be49fad978d897db9aa5cd30cf3934169ddc635a7eccc4d62195852fe41818d",
+  "status": "proposed",
+  "task_id": "restore-researchguard-model-authority-currentness"
+}

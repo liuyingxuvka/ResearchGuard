@@ -14,7 +14,7 @@ import subprocess
 import sys
 from typing import Any
 
-from flowguard.native_case_protocol import NativeModelCaseResult
+from flowguard.native_case_protocol import CASE_DIMENSIONS, NativeModelCaseResult
 import hashlib
 
 
@@ -62,6 +62,33 @@ def _raw_sha256(path: Path) -> str:
     return "sha256:" + hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def _case_dimensions(case_id: str) -> tuple[str, ...]:
+    """Return the contract dimensions for one declared case identity."""
+
+    if case_id == model.KNOWN_GOOD_CASE_ID:
+        return CASE_DIMENSIONS["good"]
+    if case_id == f"boundary:{model.MODEL_ID}":
+        return CASE_DIMENSIONS["boundary"]
+    if case_id in model.KNOWN_BAD_CASE_IDS:
+        return CASE_DIMENSIONS["bad"]
+    raise ValueError(f"unknown native case id: {case_id}")
+
+
+def _child_output_dir(parent_output: Path, model_id: str) -> Path:
+    """Return a deterministic compact output directory for one child.
+
+    Parent simulator directories can already be content-addressed and close
+    to Windows' path-length limit.  Keep the model identity in the receipt
+    rather than repeating the full id in the filesystem path.
+    """
+
+    try:
+        child_index = model.CHILD_MODEL_IDS.index(model_id)
+    except ValueError as exc:
+        raise ValueError(f"unknown child model id: {model_id}") from exc
+    return parent_output / "c" / f"m{child_index:02d}"
+
+
 def _run_child(model_id: str, *, parent_output: Path | None = None) -> tuple[dict[str, Any] | None, str]:
     runner = ROOT / f".flowguard/verification/owners/{model_id}/run_checks.py"
     environment = os.environ.copy()
@@ -70,7 +97,13 @@ def _run_child(model_id: str, *, parent_output: Path | None = None) -> tuple[dic
         # Reusing the parent's FLOWGUARD_OUTPUT_DIR lets the last child
         # overwrite the aggregate envelope, which makes a green child look
         # like a foreign parent result during strict reconciliation.
-        child_output = parent_output / "children" / model_id
+        # Keep the directory component compact.  The simulator may already
+        # place the parent under a long, content-addressed directory; using
+        # the full model id here can exceed Windows MAX_PATH before the child
+        # even starts.  The receipt itself carries the model id, and the
+        # deterministic index keeps this path one-to-one with the declared
+        # child order.
+        child_output = _child_output_dir(parent_output, model_id)
         child_output.mkdir(parents=True, exist_ok=True)
         environment["FLOWGUARD_OUTPUT_DIR"] = str(child_output)
     returncode, output = _run_bounded(
@@ -186,6 +219,7 @@ def _write_native_results(
         raw_hash = _raw_sha256(raw)
         outcome = "pass" if accepted else "rejected"
         observed = "pass" if accepted else "blocked"
+        dimensions = _case_dimensions(case_id)
         rows.append(
             NativeModelCaseResult(
                 owner_id=f"model:{model.MODEL_ID}",
@@ -193,7 +227,7 @@ def _write_native_results(
                 outcome=outcome,
                 observed_status=observed,
                 observed_finding_codes=() if not finding_id else (finding_id,),
-                executed_dimensions=(("input", "error", "decision", "retry", "timeout", "completion") if index == 1 else ("input", "state", "output", "effect", "order", "completion")),
+                executed_dimensions=dimensions,
                 oracle_results=tuple(
                     {
                         "dimension": dimension,
@@ -201,7 +235,7 @@ def _write_native_results(
                         "status": observed,
                         "ok": accepted,
                     }
-                    for dimension in (("input", "error", "decision", "retry", "timeout", "completion") if index == 1 else ("input", "state", "output", "effect", "order", "completion"))
+                    for dimension in dimensions
                 ),
                 result_artifact_fingerprint=raw_hash,
                 input_fingerprint=input_fp or raw_hash,

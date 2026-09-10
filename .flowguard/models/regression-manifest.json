@@ -128,9 +128,9 @@
           "check:model-regression:authoritative_model_system"
         ],
         "model_sha256": "sha256:a08802cfd3e4373a81914281931147c47c5b669ba75708a4cef801c255cc39d3",
-        "runner_sha256": "sha256:4b0aaeac9e6cfd0da28b116f0c7d6e1cf1d4d388f4057187cc2e689023848a94",
+        "runner_sha256": "sha256:5731dc168785a08148bad7b53db94a658ab708e29f8ad51a5ebfd09fadfa3e6a",
         "declaration_fingerprint": "sha256:734cefa96ddddfa9e614673516569f28bf2d584a5d8a53b6cca816ee001d8966",
-        "closure_fingerprint": "sha256:cde03154314d45cd9af55fa8780a935872fc59eac89f0fb07b07c8c0b219221f"
+        "closure_fingerprint": "sha256:0211358e597f87ccea16adebad1aef1a2e8e582ba67758a5473fbe182ad50124"
       }
     },
     {
@@ -193,9 +193,9 @@
           "check:model-regression:compositional_verification_kernel"
         ],
         "model_sha256": "sha256:4d008f62db5c74b5e8f01cd3bcd1633f52f34f6813cdd7855065a69127ddaa83",
-        "runner_sha256": "sha256:6df2d813bb1303dc3179ee12711af3487da299e0c3db989e0166aef7038ca0f6",
+        "runner_sha256": "sha256:0c093a2faeb6bb93b79463c860c45b01edb4d02f4dcda4c6ebecac2fbb560876",
         "declaration_fingerprint": "sha256:74303de2caf0ddb5897249a954e44933ab40ed8e05f55c034c73c4efa7d669c4",
-        "closure_fingerprint": "sha256:9350a5ad83adb363a23c9e71da28497a648f21d3f219882dc7bfe012f8611824"
+        "closure_fingerprint": "sha256:322dc8224e050b414d40a0b531aa9b1c33d068bb10fb2dfb520872d9b3e5f322"
       }
     },
     {
@@ -315,9 +315,9 @@
           "check:researchguard:native-suite"
         ],
         "model_sha256": "sha256:22976dc1c1afff087047811457eccc78665705366e7919b0d0bad48db31a5516",
-        "runner_sha256": "sha256:2c51796b3ac33d6a2c6958e83204f65991f5161097150ab89b0cf6363cc4150a",
+        "runner_sha256": "sha256:3c4c7616f901b30730d6da38852385e1e5c7bb26e2550f891749dfcaf4725edf",
         "declaration_fingerprint": "sha256:127254026c95ce948a725619f36387fb3592aeaeecbacd21249f1b157b59d482",
-        "closure_fingerprint": "sha256:71651cd914312d2e45151a572c416058f01f7415c8c413396d12927c4761764b"
+        "closure_fingerprint": "sha256:b2df901932e917c310e6ab1b05f9cfb81ec4cd8e08d1ee53f48f032f4c3662b8"
       }
     },
     {
@@ -393,9 +393,9 @@
           "check:model-regression:hierarchical_model_mesh"
         ],
         "model_sha256": "sha256:fea4a7f5816212d906c3882bd98aa935272cbd7d1cb2197df4b1d963d6cfecf0",
-        "runner_sha256": "sha256:4fc5cb1fa1577ec0bd52684c78bdcbd9647c299a6b1556bdc0e1a2d2f9a77459",
+        "runner_sha256": "sha256:5458eb7269867b917e4561e7d147f0cd883ea7ac87ca7a4d3c3ed838bad7aed1",
         "declaration_fingerprint": "sha256:d06b226fe0d7cbe55ad73ad6d6f2703d00d559b39eadce4e5218b30ad9a18bc4",
-        "closure_fingerprint": "sha256:5a674e15e1aef8d6e485c14d813356f23de51d3986af434eab3ac2fe6e1fdb9b"
+        "closure_fingerprint": "sha256:5e8d65b7d293cfe5759004b828bbc6c6f9637bdf0a89eaf5f422e9344bd5e930"
       }
     },
     {
@@ -471,9 +471,9 @@
           "check:model-regression:model_test_code_alignment"
         ],
         "model_sha256": "sha256:56a73efb4dbd9e2ba8cce8099c3b8d028127806b81048b990d058675a3dfcecd",
-        "runner_sha256": "sha256:5506e3ef524f155b9ab75f621c83158fb125e76fca74e49c54f74ed99884b34a",
+        "runner_sha256": "sha256:b431b160df580d312a771c87779653e640a4aaf736a43e0d23bac647a846e77f",
         "declaration_fingerprint": "sha256:3c2e518dc49af5b7a16ecfca37491c42748f193fa04c11d48dff86cf7d36c8b4",
-        "closure_fingerprint": "sha256:e825cbeece68d1091da553333f932f88ad39e4241e300a35ac443d4024289b74"
+        "closure_fingerprint": "sha256:d9f98b38387c0fa97b386bd0e9e04948a02a1f782fd1f54bf9c3ee29d489fe39"
       }
     },
     {
@@ -543,9 +543,9 @@
           "check:model-regression:logic_synthesis"
         ],
         "model_sha256": "sha256:608d149b74e16f58643b76b848cfa8236e5e4622b6875c4c924828c0c0961f80",
-        "runner_sha256": "sha256:4aeac3a8193bb4f9c0118299e8931a4002641b8e8a7a2a30386d05abd90d4906",
+        "runner_sha256": "sha256:f739da226ef3e68bae71e3cbd7c87ab657ac5abba8b408345ac67801f5cd5c24",
         "declaration_fingerprint": "sha256:ca486a3e359cb321dc39fa090116f38fdfac2baa111c740e250388966eb4ed5f",
-        "closure_fingerprint": "sha256:1ff45744594d484378f61783c87e782507799eb38f50b97ddfa1baa6fac2af46"
+        "closure_fingerprint": "sha256:0028589554f58fbd235be3f891d71d0bb3549fbfa5c38cd749c5d71d62473633"
       }
     },
     {
@@ -615,9 +615,9 @@
           "check:model-regression:logic_selection_contract"
         ],
         "model_sha256": "sha256:dfac767d01cbbc9917fdb799d1b63796eff34329dfdf9ea81f7992d70d4a5fa8",
-        "runner_sha256": "sha256:94925f8f024b903d76be4ada38b93ea001f1944ecc2cc4cf0eb5953f63de414e",
+        "runner_sha256": "sha256:07aace2601c7e4170a0e170f65040e893b2f145399835396693ae75c4638e0d8",
         "declaration_fingerprint": "sha256:60695de9d10ddcda4768b4dbd5bd009b4928c2099f7fad2a34773232479876a9",
-        "closure_fingerprint": "sha256:a9884be4055d5901b944b918785e60d89a0ec15b25b482510054c7962c475533"
+        "closure_fingerprint": "sha256:3bb9ad9e9bd3f5a84df3abfe656ba2ae192a276e952446ac55fef2955a904b09"
       }
     },
     {
@@ -687,9 +687,9 @@
           "check:model-regression:argument_support_closure"
         ],
         "model_sha256": "sha256:10fed2e6b8078b0d23fe65fe1543f76e024421d41d2d1fb8aaa9d9543a3d518a",
-        "runner_sha256": "sha256:b12db7af04ef187aacb8dee4802ee628abc74a114d3325730cd8fca5fd4534a4",
+        "runner_sha256": "sha256:ce7330503f629ca7a2acddc3996b8d6792bd6e481999a93c01d2b1166c7c4cc7",
         "declaration_fingerprint": "sha256:84cf5129e4a9ef383398f55484794257a1bd7136622c1c190c2fb2b6d0aab972",
-        "closure_fingerprint": "sha256:5f6ed088dbf30380cbaa7bf279576227fe4531af5e726289d92f383fead4d5e3"
+        "closure_fingerprint": "sha256:dcb92dc56abb2c8bcba2af56269eeb7d55b5ee972ffd5df1ff6f1cc9a782072d"
       }
     },
     {
@@ -765,9 +765,9 @@
           "check:model-regression:discourse_structure"
         ],
         "model_sha256": "sha256:7b1fc003ac45990fd546dacf789a3874d1eda778eddde00415b78724ebd30f20",
-        "runner_sha256": "sha256:0516bed8866bb246fd09598a6dc7400fbf1d9030af964a5151656c28a423831c",
+        "runner_sha256": "sha256:fd7b2c1447705cc6af150f9ee94a2f8b7892d5e1db429c6e92db7a1629c46b70",
         "declaration_fingerprint": "sha256:6808b065969869de22781fc8bbb026a0a60fbf23b9eb0184752e6453d8e61814",
-        "closure_fingerprint": "sha256:3e7780866cd663c951cb965378e53aeea9d7458bff1954bcc95a8619c8d8c587"
+        "closure_fingerprint": "sha256:63c6d3b877218544d3a190a1ddb767eab966649d7a25d21bf18b76087fa6b4d7"
       }
     },
     {
@@ -838,9 +838,9 @@
           "check:model-regression:trace_domain_export"
         ],
         "model_sha256": "sha256:9c86289be032b0e256f83c69bf95ce90e858d4c8a39900e1fc6d1109e45d90aa",
-        "runner_sha256": "sha256:f3b510091e6edcc343cceda28e44e6fe87a17323a0fe27d6f1e2e4daee46c883",
+        "runner_sha256": "sha256:7d7b73a228f1289e74a74aa86f4561efd64fef71e7e46dd3cf3958fbd2cdc115",
         "declaration_fingerprint": "sha256:e872e2b4a45a0434e8bcf39b1f042e73971fc7219d295de9da36b7863c659f94",
-        "closure_fingerprint": "sha256:7cea8d3a5a78cc3e675f66e4ebfae2b2b254c65e4b13111858b45ffba0bf2ced"
+        "closure_fingerprint": "sha256:0dcfb984e8b5d879e341a03c4de54ca62118cdf8444e291fce54a0a4cfa71f19"
       }
     }
   ]

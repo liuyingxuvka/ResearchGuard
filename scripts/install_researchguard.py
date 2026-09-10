@@ -539,7 +539,20 @@ def _distribution_file_inventory(
     """Return the exact regular-file inventory owned by one installed distribution."""
 
     base = Path(distribution.locate_file(".")).resolve(strict=True)
-    authority_root = base.parent.resolve(strict=True)
+    # On Windows, pip places console scripts in ``<venv>\\Scripts`` while
+    # package files live in ``<venv>\\Lib\\site-packages``.  Treating the
+    # site-packages parent (``<venv>\\Lib``) as the interpreter root rejects
+    # every normal wheel installation before the installer can verify it.
+    # Keep the containment check rooted at the active interpreter when the
+    # distribution is inside that interpreter; retain the local distribution
+    # parent for the small synthetic distributions used by unit tests and for
+    # externally managed user-site distributions.
+    interpreter_root = Path(sys.prefix).resolve(strict=True)
+    authority_root = (
+        interpreter_root
+        if base.is_relative_to(interpreter_root)
+        else base.parent.resolve(strict=True)
+    )
     files = list(distribution.files or ())
     if not files:
         raise InstallError("ResearchGuard distribution file inventory is empty")

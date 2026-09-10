@@ -52,7 +52,8 @@
     "generated_patterns": [
       ".flowguard/evidence/**/*",
       ".flowguard/history/**/*",
-      "implementation-round2-evidence/**/*"
+      "implementation-round2-evidence/**/*",
+      "tmp-native-probe/**/*"
     ],
     "external_patterns": []
   },
@@ -70,7 +71,8 @@
     ".codex/**/*",
     ".flowguard/evidence/**/*",
     ".flowguard/history/**/*",
-    "implementation-round2-evidence/**/*"
+    "implementation-round2-evidence/**/*",
+    "tmp-native-probe/**/*"
   ],
   "bounded_dynamic_prefixes": [
     "getattr",
@@ -78,6 +80,7 @@
     "delattr",
     "__import__",
     "importlib.import_module",
+    "globals",
     "locals"
   ],
   "dynamic_allowances": [],
@@ -100,9 +103,9 @@
         "model_path": ".flowguard/models/owners/authoritative_model_system/model.py",
         "model_source_fingerprint": "sha256:a08802cfd3e4373a81914281931147c47c5b669ba75708a4cef801c255cc39d3",
         "runner_path": ".flowguard/verification/owners/authoritative_model_system/run_checks.py",
-        "runner_source_fingerprint": "sha256:4b1b5f83bf49646752b4bd2123911c94d2da561b3047becb136caaeaf7e4a2d8",
+        "runner_source_fingerprint": "sha256:5731dc168785a08148bad7b53db94a658ab708e29f8ad51a5ebfd09fadfa3e6a",
         "purpose_declaration_fingerprint": "sha256:734cefa96ddddfa9e614673516569f28bf2d584a5d8a53b6cca816ee001d8966",
-        "purpose_closure_fingerprint": "sha256:fbab71c339d9118f6992a663e6387faeffe8a51937686e4c7b5f867f71b30e27"
+        "purpose_closure_fingerprint": "sha256:0211358e597f87ccea16adebad1aef1a2e8e582ba67758a5473fbe182ad50124"
       }
     },
     {
@@ -122,9 +125,9 @@
         "model_path": ".flowguard/models/owners/compositional_verification_kernel/model.py",
         "model_source_fingerprint": "sha256:4d008f62db5c74b5e8f01cd3bcd1633f52f34f6813cdd7855065a69127ddaa83",
         "runner_path": ".flowguard/verification/owners/compositional_verification_kernel/run_checks.py",
-        "runner_source_fingerprint": "sha256:3971155df203cc4e2204bc697ce2539e125f8dca92ad7051557f218f30b8e341",
+        "runner_source_fingerprint": "sha256:0c093a2faeb6bb93b79463c860c45b01edb4d02f4dcda4c6ebecac2fbb560876",
         "purpose_declaration_fingerprint": "sha256:74303de2caf0ddb5897249a954e44933ab40ed8e05f55c034c73c4efa7d669c4",
-        "purpose_closure_fingerprint": "sha256:b110ca179d15a82dbb929e76bcf5d69eab9073a1a9e452f8a9772cb7b746ab42"
+        "purpose_closure_fingerprint": "sha256:322dc8224e050b414d40a0b531aa9b1c33d068bb10fb2dfb520872d9b3e5f322"
       }
     },
     {
@@ -144,9 +147,9 @@
         "model_path": ".flowguard/models/owners/researchguard_suite/model.py",
         "model_source_fingerprint": "sha256:22976dc1c1afff087047811457eccc78665705366e7919b0d0bad48db31a5516",
         "runner_path": ".flowguard/verification/owners/researchguard_suite/run_checks.py",
-        "runner_source_fingerprint": "sha256:c9e9b0de65472cd83bfc1e6a2508ab4f6be16f5a53f3cf7836ad5cbf9d2cf4a2",
+        "runner_source_fingerprint": "sha256:3c4c7616f901b30730d6da38852385e1e5c7bb26e2550f891749dfcaf4725edf",
         "purpose_declaration_fingerprint": "sha256:127254026c95ce948a725619f36387fb3592aeaeecbacd21249f1b157b59d482",
-        "purpose_closure_fingerprint": "sha256:7d34fa7a9ed7e677f5689f1c92cece5d8b421bf4ee37ce681fd4e883affacbc6"
+        "purpose_closure_fingerprint": "sha256:b2df901932e917c310e6ab1b05f9cfb81ec4cd8e08d1ee53f48f032f4c3662b8"
       }
     },
     {
@@ -166,9 +169,9 @@
         "model_path": ".flowguard/models/owners/hierarchical_model_mesh/model.py",
         "model_source_fingerprint": "sha256:fea4a7f5816212d906c3882bd98aa935272cbd7d1cb2197df4b1d963d6cfecf0",
         "runner_path": ".flowguard/verification/owners/hierarchical_model_mesh/run_checks.py",
-        "runner_source_fingerprint": "sha256:85830694dbcfd0b0851d989ab8f34afb320b22f4260d0d1112ab662e058a917b",
+        "runner_source_fingerprint": "sha256:5458eb7269867b917e4561e7d147f0cd883ea7ac87ca7a4d3c3ed838bad7aed1",
         "purpose_declaration_fingerprint": "sha256:d06b226fe0d7cbe55ad73ad6d6f2703d00d559b39eadce4e5218b30ad9a18bc4",
-        "purpose_closure_fingerprint": "sha256:f5bdc75f40e61fd52b9cab91ddc5b5b6faa1f014b4717cb25816b1985be479a6"
+        "purpose_closure_fingerprint": "sha256:5e8d65b7d293cfe5759004b828bbc6c6f9637bdf0a89eaf5f422e9344bd5e930"
       }
     },
     {
@@ -188,9 +191,9 @@
         "model_path": ".flowguard/models/owners/model_test_code_alignment/model.py",
         "model_source_fingerprint": "sha256:56a73efb4dbd9e2ba8cce8099c3b8d028127806b81048b990d058675a3dfcecd",
         "runner_path": ".flowguard/verification/owners/model_test_code_alignment/run_checks.py",
-        "runner_source_fingerprint": "sha256:7397f75cc176c18818e3d5f536526eff2160ade851b0e82b4dd481a049f204de",
+        "runner_source_fingerprint": "sha256:b431b160df580d312a771c87779653e640a4aaf736a43e0d23bac647a846e77f",
         "purpose_declaration_fingerprint": "sha256:3c2e518dc49af5b7a16ecfca37491c42748f193fa04c11d48dff86cf7d36c8b4",
-        "purpose_closure_fingerprint": "sha256:2eda20c32b446f33f8e9074c9c3ce8edaf632c8a19294c8c9656e4d5bdefb9d6"
+        "purpose_closure_fingerprint": "sha256:d9f98b38387c0fa97b386bd0e9e04948a02a1f782fd1f54bf9c3ee29d489fe39"
       }
     },
     {
@@ -208,11 +211,11 @@
         "purpose_source_id": ".flowguard/models/regression-manifest.json#model:logic_synthesis:purpose-declaration",
         "purpose_source_owner_id": "model-purpose-declaration:logic_synthesis",
         "model_path": ".flowguard/models/owners/logic_synthesis/model.py",
-        "model_source_fingerprint": "sha256:8e23f04b89fad9e3c698f4fefc7958a2ee11bef01d6bd4a3d8b3bd54a98524ea",
+        "model_source_fingerprint": "sha256:608d149b74e16f58643b76b848cfa8236e5e4622b6875c4c924828c0c0961f80",
         "runner_path": ".flowguard/verification/owners/logic_synthesis/run_checks.py",
-        "runner_source_fingerprint": "sha256:54f80fc1eb1df9d50419743963c39df25162beab3305b18393ce94f0080193ad",
+        "runner_source_fingerprint": "sha256:f739da226ef3e68bae71e3cbd7c87ab657ac5abba8b408345ac67801f5cd5c24",
         "purpose_declaration_fingerprint": "sha256:ca486a3e359cb321dc39fa090116f38fdfac2baa111c740e250388966eb4ed5f",
-        "purpose_closure_fingerprint": "sha256:2c41a5244146b2452951c459097c363977a799324ff32357473cece675761e40"
+        "purpose_closure_fingerprint": "sha256:0028589554f58fbd235be3f891d71d0bb3549fbfa5c38cd749c5d71d62473633"
       }
     },
     {
@@ -232,9 +235,9 @@
         "model_path": ".flowguard/models/owners/logic_selection_contract/model.py",
         "model_source_fingerprint": "sha256:dfac767d01cbbc9917fdb799d1b63796eff34329dfdf9ea81f7992d70d4a5fa8",
         "runner_path": ".flowguard/verification/owners/logic_selection_contract/run_checks.py",
-        "runner_source_fingerprint": "sha256:91f4e26e18b10952129adbf7cf9077d2add23f135f83273501b752842070408a",
+        "runner_source_fingerprint": "sha256:07aace2601c7e4170a0e170f65040e893b2f145399835396693ae75c4638e0d8",
         "purpose_declaration_fingerprint": "sha256:60695de9d10ddcda4768b4dbd5bd009b4928c2099f7fad2a34773232479876a9",
-        "purpose_closure_fingerprint": "sha256:43bf4fb1a6a0cf6405abdc80e1af104269f30e4cb8f90509838542b2daace398"
+        "purpose_closure_fingerprint": "sha256:3bb9ad9e9bd3f5a84df3abfe656ba2ae192a276e952446ac55fef2955a904b09"
       }
     },
     {
@@ -254,9 +257,9 @@
         "model_path": ".flowguard/models/owners/argument_support_closure/model.py",
         "model_source_fingerprint": "sha256:10fed2e6b8078b0d23fe65fe1543f76e024421d41d2d1fb8aaa9d9543a3d518a",
         "runner_path": ".flowguard/verification/owners/argument_support_closure/run_checks.py",
-        "runner_source_fingerprint": "sha256:efe102c08e33d32b6394f9b1170d1a40af48431e6c962cbf648c0f793522b689",
+        "runner_source_fingerprint": "sha256:ce7330503f629ca7a2acddc3996b8d6792bd6e481999a93c01d2b1166c7c4cc7",
         "purpose_declaration_fingerprint": "sha256:84cf5129e4a9ef383398f55484794257a1bd7136622c1c190c2fb2b6d0aab972",
-        "purpose_closure_fingerprint": "sha256:3f8c5c4b598a2e1e15c3eedfa562cf0361455550c93c819134a955be3c5e966c"
+        "purpose_closure_fingerprint": "sha256:dcb92dc56abb2c8bcba2af56269eeb7d55b5ee972ffd5df1ff6f1cc9a782072d"
       }
     },
     {
@@ -276,9 +279,9 @@
         "model_path": ".flowguard/models/owners/discourse_structure/model.py",
         "model_source_fingerprint": "sha256:7b1fc003ac45990fd546dacf789a3874d1eda778eddde00415b78724ebd30f20",
         "runner_path": ".flowguard/verification/owners/discourse_structure/run_checks.py",
-        "runner_source_fingerprint": "sha256:99b72b813a5d2061b195a9798d88705c80c397ca74a0777437c397f189dfa866",
+        "runner_source_fingerprint": "sha256:fd7b2c1447705cc6af150f9ee94a2f8b7892d5e1db429c6e92db7a1629c46b70",
         "purpose_declaration_fingerprint": "sha256:6808b065969869de22781fc8bbb026a0a60fbf23b9eb0184752e6453d8e61814",
-        "purpose_closure_fingerprint": "sha256:4011486c9f23e990d31aa576246ebcced12bc0afd69f9bed1c6318e5ca33beee"
+        "purpose_closure_fingerprint": "sha256:63c6d3b877218544d3a190a1ddb767eab966649d7a25d21bf18b76087fa6b4d7"
       }
     },
     {
@@ -296,11 +299,11 @@
         "purpose_source_id": ".flowguard/models/regression-manifest.json#model:trace_domain_export:purpose-declaration",
         "purpose_source_owner_id": "model-purpose-declaration:trace_domain_export",
         "model_path": ".flowguard/models/owners/trace_domain_export/model.py",
-        "model_source_fingerprint": "sha256:f6c83309380d2f66ec0f34298b1c469fb3016b72163173e12e83e2703b891328",
+        "model_source_fingerprint": "sha256:9c86289be032b0e256f83c69bf95ce90e858d4c8a39900e1fc6d1109e45d90aa",
         "runner_path": ".flowguard/verification/owners/trace_domain_export/run_checks.py",
-        "runner_source_fingerprint": "sha256:f10e6a81fba64c514362348fb71ee33a61b1b08c76d35ccdaafbb12d473a113c",
+        "runner_source_fingerprint": "sha256:7d7b73a228f1289e74a74aa86f4561efd64fef71e7e46dd3cf3958fbd2cdc115",
         "purpose_declaration_fingerprint": "sha256:e872e2b4a45a0434e8bcf39b1f042e73971fc7219d295de9da36b7863c659f94",
-        "purpose_closure_fingerprint": "sha256:fddf19f4eb3bf1c3eecd6036d3f3238f4599d442573ae29bcb5d4635c61d8006"
+        "purpose_closure_fingerprint": "sha256:0dcfb984e8b5d879e341a03c4de54ca62118cdf8444e291fce54a0a4cfa71f19"
       }
     }
   ],
@@ -337,6 +340,8 @@
     ".flowguard/verification/run_researchguard_skillguard_maintenance_model.py": "authoritative_model_system",
     ".flowguard/verification/run_researchguard_suite_model.py": "researchguard_suite",
     "scripts/author/build_skillguard_surface_inventory.py": "authoritative_model_system",
+    "scripts/author/refresh_regression_manifest_fingerprints.py": "authoritative_model_system",
+    "scripts/build_self_dna_case_mapping.py": "authoritative_model_system",
     "scripts/build_skillguard_contracts.py": "authoritative_model_system",
     "scripts/check_prompt_bundles.py": "authoritative_model_system",
     "scripts/check_researchguard_suite.py": "authoritative_model_system",
