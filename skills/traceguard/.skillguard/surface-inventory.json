@@ -505,7 +505,7 @@
       "kind": "config",
       "name": ".skillguard/contract-source.json",
       "source_path": ".skillguard/contract-source.json",
-      "source_fingerprint": "sha256:b424a7951b97918c297444a720b3b479ed054cbbb63d5ba1f39169d52f3c2ffb",
+      "source_fingerprint": "sha256:cb26890cbc0aeac878661b25d1dc479c05f87884f72aeddee557cdad1fb3c1ac",
       "function_id": "config:.skillguard/contract-source.json",
       "route_id": "config:.skillguard/contract-source.json",
       "review_group_id": "group:surface:10513a60240614296b758ebb",
@@ -734,7 +734,7 @@
       "kind": "template",
       "name": "SKILL.md",
       "source_path": "SKILL.md",
-      "source_fingerprint": "sha256:4df13d4aec14636606c4df8f39cd3d2e6a73a371e5a8de55c5c73be1ec2e29e8",
+      "source_fingerprint": "sha256:bb4ef81667a2b78c55499c9827d15807086d4c99a948d60b770adb7070aaaf6f",
       "function_id": "template:SKILL.md",
       "route_id": "template:SKILL.md",
       "review_group_id": "group:surface:45d8dca86b7e8a7dd698b75b",
@@ -1375,7 +1375,7 @@
       "proof_ref": ".skillguard/surface-inventory.json#full_discovery_fingerprint"
     }
   },
-  "full_discovery_fingerprint": "sha256:dffa4665a6af78f551deca9a9983bbd60c8b3458d0a09f054d0c0f0cb751f312",
+  "full_discovery_fingerprint": "sha256:b73ee5c4451d396636d7cdbdb290dfd3f5695f6669c3c59d0b306b0a0f1ce2be",
   "adequacy_check_ids": [
     "check:traceguard:consumer-contract",
     "check:traceguard:native-tests",
@@ -1384,5 +1384,5 @@
   ],
   "model_deepening_check_id": "check:traceguard:task-model-closure",
   "claim_boundary": "The declared member skill root is the source-discovery boundary. Its native package is separately bound by the contract's implementation paths and check inputs. This author map proves neither native check execution nor domain correctness, installation, release, or future AI behavior.",
-  "inventory_hash": "sha256:fc30b80159048b3e4073cd1a79dbc4363a46c7a8f590dff6bc9fb9691db92da5"
+  "inventory_hash": "sha256:8e4aecfaf0c9d90c34490048ded8cefec2c7acc3947d1c7420bb60ba68f91467"
 }

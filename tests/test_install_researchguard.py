@@ -10,6 +10,71 @@ import pytest
 from scripts import install_researchguard
 
 
+def test_source_validation_uses_complete_suite_budget(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    calls: list[tuple[list[str], int]] = []
+    monkeypatch.setattr(
+        install_researchguard,
+        "_validate_source_version_identity",
+        lambda: None,
+    )
+
+    def fake_native_command(args: list[str], *, timeout: int = 300) -> None:
+        calls.append((args, timeout))
+
+    monkeypatch.setattr(install_researchguard, "_native_command", fake_native_command)
+    install_researchguard._validate_source()
+
+    assert len(calls) == 1
+    command, timeout = calls[0]
+    assert command[-4:] == ["scripts/check_researchguard_suite.py", "--member", "all", "--json"]
+    assert timeout == 1200
+
+
+def test_package_wheel_build_uses_disposable_local_context(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    source_root = tmp_path / "source"
+    package_root = source_root / "src" / "researchguard"
+    package_root.mkdir(parents=True)
+    (source_root / "pyproject.toml").write_text("[project]\nname='researchguard'\n", encoding="utf-8")
+    (source_root / "README.md").write_text("readme\n", encoding="utf-8")
+    (package_root / "cli.py").write_text("main = None\n", encoding="utf-8")
+    monkeypatch.setattr(install_researchguard, "ROOT", source_root)
+    monkeypatch.setattr(install_researchguard, "SOURCE_PACKAGE", package_root)
+
+    calls: list[tuple[list[str], int]] = []
+
+    def fake_native_command(args: list[str], *, timeout: int = 300) -> None:
+        calls.append((args, timeout))
+        wheel_dir = Path(args[args.index("--wheel-dir") + 1])
+        wheel_dir.mkdir(parents=True, exist_ok=True)
+        (wheel_dir / f"researchguard-{install_researchguard.VERSION}-py3-none-any.whl").write_bytes(
+            b"wheel"
+        )
+
+    monkeypatch.setattr(install_researchguard, "_native_command", fake_native_command)
+    wheel_dir = tmp_path / "wheel"
+    temporary_root = tmp_path / "temporary"
+    temporary_root.mkdir()
+    wheel = install_researchguard._build_package_wheel(temporary_root, wheel_dir)
+
+    assert wheel == wheel_dir / f"researchguard-{install_researchguard.VERSION}-py3-none-any.whl"
+    assert len(calls) == 1
+    command, timeout = calls[0]
+    assert timeout == 600
+    build_context = Path(command[-1])
+    assert build_context.name == "package-context"
+    assert build_context.is_relative_to(tmp_path)
+    assert build_context != source_root
+    assert (build_context / "pyproject.toml").read_text(encoding="utf-8") == (
+        "[project]\nname='researchguard'\n"
+    )
+    assert (build_context / "src" / "researchguard" / "cli.py").is_file()
+
+
 class _ConsumerDistributionAPI:
     def __init__(self) -> None:
         self.plan_calls: list[str] = []

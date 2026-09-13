@@ -153,7 +153,7 @@
       "kind": "config",
       "name": ".skillguard/contract-source.json",
       "source_path": ".skillguard/contract-source.json",
-      "source_fingerprint": "sha256:0d0329f6142ce6665331643cd2bddf61ca1efd4fd357e3459b4cc78937bc261a",
+      "source_fingerprint": "sha256:1f0f1d93030d35aa1f3fa7ec8289c72a5f1d06f2a24dc939d1d64902faebc264",
       "function_id": "config:.skillguard/contract-source.json",
       "route_id": "config:.skillguard/contract-source.json",
       "review_group_id": "group:surface:10513a60240614296b758ebb",
@@ -206,7 +206,7 @@
       "kind": "template",
       "name": "SKILL.md",
       "source_path": "SKILL.md",
-      "source_fingerprint": "sha256:e669c705c7f70957afeab5808c5a0db2e63d7941799a6b3d1fff75f3ceb46b8d",
+      "source_fingerprint": "sha256:89494e121b24cc0a92f271f0cd8f990ac80f92be46a50b2518cb2dd3e31ea044",
       "function_id": "template:SKILL.md",
       "route_id": "template:SKILL.md",
       "review_group_id": "group:surface:45d8dca86b7e8a7dd698b75b",
@@ -371,7 +371,7 @@
       "proof_ref": ".skillguard/surface-inventory.json#full_discovery_fingerprint"
     }
   },
-  "full_discovery_fingerprint": "sha256:c84c94cf1a1495bef05525132b9d4bb513e773e580e1e8cc2d28f7fb023f7ad6",
+  "full_discovery_fingerprint": "sha256:67be89863a9a80d0cd798a29c624398d0bd086a6e1d498d919b0a25e5c0d30e7",
   "adequacy_check_ids": [
     "check:experimentguard:consumer-contract",
     "check:experimentguard:native-tests",
@@ -380,5 +380,5 @@
   ],
   "model_deepening_check_id": "check:experimentguard:task-model-closure",
   "claim_boundary": "The declared member skill root is the source-discovery boundary. Its native package is separately bound by the contract's implementation paths and check inputs. This author map proves neither native check execution nor domain correctness, installation, release, or future AI behavior.",
-  "inventory_hash": "sha256:d8a737992b982f805605603cfcbeb9653d4b2407f188ba68629f5da90716587f"
+  "inventory_hash": "sha256:a9a8562412643395a3ab15fbe247827aeb032cb369f7ac07a62f1536516e6e35"
 }

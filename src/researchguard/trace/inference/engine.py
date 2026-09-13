@@ -7,7 +7,6 @@ from typing import Any, Mapping
 
 from .compiler import compile_model
 from .explain import explain_solution
-from .osqp_backend import solve_problem
 from .policy import DEFAULT_POLICY, InferencePolicy
 from .projection import project_hypotheses, project_traces
 from .types import InferenceReceipt, fingerprint
@@ -526,6 +525,13 @@ def infer_model(
             ),
         )
     problem = compile_model(inference_model, policy)
+    # Loading NumPy/SciPy/OSQP is expensive on the supported Windows runtime.
+    # Keep the solver dependency on the actual inference path so importing the
+    # public console for routing, schema checks, or ``--help`` remains bounded.
+    # The mathematical execution path is unchanged: solve only after the
+    # canonical problem has been compiled.
+    from .osqp_backend import solve_problem
+
     solution = solve_problem(problem, policy)
     contributions = explain_solution(problem, solution, policy)
     trace_projections = project_traces(

@@ -1,0 +1,1904 @@
+{
+  "bindings": [
+    {
+      "binding_fingerprint": "sha256:21194bc3b7ff7aa837ba433d631777cca8551c01dbeb941336e69d255bc75eaf",
+      "blueprint_case_id": "behavior-case:implementation-surface:49a6a8a0c5e11cd22889237622665d4547e7061436ff32165021b2d8f48a5a35:bad:case:hierarchical_model_mesh:child-evidence-exact:bad",
+      "blueprint_source_case_id": "case:hierarchical_model_mesh:child-evidence-exact:bad",
+      "case_kind": "bad",
+      "covered_dimensions": [
+        "completion",
+        "decision",
+        "effect",
+        "error",
+        "input",
+        "state"
+      ],
+      "evidence_scope": "model_policy",
+      "expected_finding_codes": [
+        "researchguard:hierarchical_model_mesh:child-evidence-exact"
+      ],
+      "expected_observed_status": "blocked",
+      "expected_status": "rejected",
+      "mapping_fingerprint": "sha256:6ad0fb6dc987c96bdaf4e54cadfc6d759b775ca139ff4382c179c422c385e283",
+      "native_case_ids": [
+        "case:hierarchical_model_mesh:child-evidence-exact:bad"
+      ],
+      "owner_id": "model:hierarchical_model_mesh",
+      "protected_failure_ids": [
+        "researchguard:hierarchical_model_mesh:child-evidence-exact"
+      ],
+      "required_child_case_ids": [],
+      "required_trace_labels": [],
+      "schema_version": "flowguard.native_model_case_binding.v1"
+    },
+    {
+      "binding_fingerprint": "sha256:e8526e6b1956796f9fbfdb74ac09f6bfa0c5c7da03fe92eabe77cfa2ac39e07e",
+      "blueprint_case_id": "behavior-case:implementation-surface:49a6a8a0c5e11cd22889237622665d4547e7061436ff32165021b2d8f48a5a35:bad:case:hierarchical_model_mesh:loop-progress-current:bad",
+      "blueprint_source_case_id": "case:hierarchical_model_mesh:loop-progress-current:bad",
+      "case_kind": "bad",
+      "covered_dimensions": [
+        "completion",
+        "decision",
+        "effect",
+        "error",
+        "input",
+        "state"
+      ],
+      "evidence_scope": "model_policy",
+      "expected_finding_codes": [
+        "researchguard:hierarchical_model_mesh:loop-progress-current"
+      ],
+      "expected_observed_status": "blocked",
+      "expected_status": "rejected",
+      "mapping_fingerprint": "sha256:6ad0fb6dc987c96bdaf4e54cadfc6d759b775ca139ff4382c179c422c385e283",
+      "native_case_ids": [
+        "case:hierarchical_model_mesh:loop-progress-current:bad"
+      ],
+      "owner_id": "model:hierarchical_model_mesh",
+      "protected_failure_ids": [
+        "researchguard:hierarchical_model_mesh:loop-progress-current"
+      ],
+      "required_child_case_ids": [],
+      "required_trace_labels": [],
+      "schema_version": "flowguard.native_model_case_binding.v1"
+    },
+    {
+      "binding_fingerprint": "sha256:dbee4ba94ba1daaebd81e52548be596d9d33a90d046caeb78770da9885b513e2",
+      "blueprint_case_id": "behavior-case:implementation-surface:49a6a8a0c5e11cd22889237622665d4547e7061436ff32165021b2d8f48a5a35:bad:case:hierarchical_model_mesh:parent-unique:bad",
+      "blueprint_source_case_id": "case:hierarchical_model_mesh:parent-unique:bad",
+      "case_kind": "bad",
+      "covered_dimensions": [
+        "completion",
+        "decision",
+        "effect",
+        "error",
+        "input",
+        "state"
+      ],
+      "evidence_scope": "model_policy",
+      "expected_finding_codes": [
+        "researchguard:hierarchical_model_mesh:parent-unique"
+      ],
+      "expected_observed_status": "blocked",
+      "expected_status": "rejected",
+      "mapping_fingerprint": "sha256:6ad0fb6dc987c96bdaf4e54cadfc6d759b775ca139ff4382c179c422c385e283",
+      "native_case_ids": [
+        "case:hierarchical_model_mesh:parent-unique:bad"
+      ],
+      "owner_id": "model:hierarchical_model_mesh",
+      "protected_failure_ids": [
+        "researchguard:hierarchical_model_mesh:parent-unique"
+      ],
+      "required_child_case_ids": [],
+      "required_trace_labels": [],
+      "schema_version": "flowguard.native_model_case_binding.v1"
+    },
+    {
+      "binding_fingerprint": "sha256:bf05ce5a33d593b1e7068ecdf71a5e9216cd1d2df525e612f5ef1e817a3d9ffa",
+      "blueprint_case_id": "behavior-case:implementation-surface:49a6a8a0c5e11cd22889237622665d4547e7061436ff32165021b2d8f48a5a35:bad:case:hierarchical_model_mesh:root-unique:bad",
+      "blueprint_source_case_id": "case:hierarchical_model_mesh:root-unique:bad",
+      "case_kind": "bad",
+      "covered_dimensions": [
+        "completion",
+        "decision",
+        "effect",
+        "error",
+        "input",
+        "state"
+      ],
+      "evidence_scope": "model_policy",
+      "expected_finding_codes": [
+        "researchguard:hierarchical_model_mesh:root-unique"
+      ],
+      "expected_observed_status": "blocked",
+      "expected_status": "rejected",
+      "mapping_fingerprint": "sha256:6ad0fb6dc987c96bdaf4e54cadfc6d759b775ca139ff4382c179c422c385e283",
+      "native_case_ids": [
+        "case:hierarchical_model_mesh:root-unique:bad"
+      ],
+      "owner_id": "model:hierarchical_model_mesh",
+      "protected_failure_ids": [
+        "researchguard:hierarchical_model_mesh:root-unique"
+      ],
+      "required_child_case_ids": [],
+      "required_trace_labels": [],
+      "schema_version": "flowguard.native_model_case_binding.v1"
+    },
+    {
+      "binding_fingerprint": "sha256:5fe1f2397f50650a2754e3c789eaa9f0f03cd25df480c21ce8754f8e50925e63",
+      "blueprint_case_id": "behavior-case:implementation-surface:49a6a8a0c5e11cd22889237622665d4547e7061436ff32165021b2d8f48a5a35:bad:case:hierarchical_model_mesh:support-nonstructural:bad",
+      "blueprint_source_case_id": "case:hierarchical_model_mesh:support-nonstructural:bad",
+      "case_kind": "bad",
+      "covered_dimensions": [
+        "completion",
+        "decision",
+        "effect",
+        "error",
+        "input",
+        "state"
+      ],
+      "evidence_scope": "model_policy",
+      "expected_finding_codes": [
+        "researchguard:hierarchical_model_mesh:support-nonstructural"
+      ],
+      "expected_observed_status": "blocked",
+      "expected_status": "rejected",
+      "mapping_fingerprint": "sha256:6ad0fb6dc987c96bdaf4e54cadfc6d759b775ca139ff4382c179c422c385e283",
+      "native_case_ids": [
+        "case:hierarchical_model_mesh:support-nonstructural:bad"
+      ],
+      "owner_id": "model:hierarchical_model_mesh",
+      "protected_failure_ids": [
+        "researchguard:hierarchical_model_mesh:support-nonstructural"
+      ],
+      "required_child_case_ids": [],
+      "required_trace_labels": [],
+      "schema_version": "flowguard.native_model_case_binding.v1"
+    },
+    {
+      "binding_fingerprint": "sha256:93c0095aedeba965c6c7b1ab50f58cb3a59a8f01a2f0659ea744bf7323e2a374",
+      "blueprint_case_id": "behavior-case:implementation-surface:49a6a8a0c5e11cd22889237622665d4547e7061436ff32165021b2d8f48a5a35:boundary:boundary:hierarchical_model_mesh",
+      "blueprint_source_case_id": "boundary:hierarchical_model_mesh",
+      "case_kind": "boundary",
+      "covered_dimensions": [
+        "completion",
+        "decision",
+        "error",
+        "input",
+        "retry",
+        "timeout"
+      ],
+      "evidence_scope": "model_policy",
+      "expected_finding_codes": [],
+      "expected_observed_status": "pass",
+      "expected_status": "pass",
+      "mapping_fingerprint": "sha256:6ad0fb6dc987c96bdaf4e54cadfc6d759b775ca139ff4382c179c422c385e283",
+      "native_case_ids": [
+        "boundary:hierarchical_model_mesh"
+      ],
+      "owner_id": "model:hierarchical_model_mesh",
+      "protected_failure_ids": [],
+      "required_child_case_ids": [],
+      "required_trace_labels": [],
+      "schema_version": "flowguard.native_model_case_binding.v1"
+    },
+    {
+      "binding_fingerprint": "sha256:8c44792af3f1c2d9cda9b9877899de17a1e432b2290092435338164b066f5cdb",
+      "blueprint_case_id": "behavior-case:implementation-surface:49a6a8a0c5e11cd22889237622665d4547e7061436ff32165021b2d8f48a5a35:good:native:hierarchical_model_mesh:good-current",
+      "blueprint_source_case_id": "native:hierarchical_model_mesh:good-current",
+      "case_kind": "good",
+      "covered_dimensions": [
+        "completion",
+        "effect",
+        "input",
+        "order",
+        "output",
+        "state"
+      ],
+      "evidence_scope": "model_policy",
+      "expected_finding_codes": [],
+      "expected_observed_status": "pass",
+      "expected_status": "pass",
+      "mapping_fingerprint": "sha256:6ad0fb6dc987c96bdaf4e54cadfc6d759b775ca139ff4382c179c422c385e283",
+      "native_case_ids": [
+        "native:hierarchical_model_mesh:good-current"
+      ],
+      "owner_id": "model:hierarchical_model_mesh",
+      "protected_failure_ids": [],
+      "required_child_case_ids": [],
+      "required_trace_labels": [],
+      "schema_version": "flowguard.native_model_case_binding.v1"
+    },
+    {
+      "binding_fingerprint": "sha256:68339b39cd73e5d837744b56620330842b0e6208ecb60e04e2bb19e4fb8ba096",
+      "blueprint_case_id": "behavior-case:implementation-surface:4d5f891bebfcfecdb97deedc0c63cf64038d763dc9c19ce36b671db1c09229f1:bad:case:discourse_structure:missing-downstream-consumer",
+      "blueprint_source_case_id": "case:discourse_structure:missing-downstream-consumer",
+      "case_kind": "bad",
+      "covered_dimensions": [
+        "completion",
+        "decision",
+        "effect",
+        "error",
+        "input",
+        "state"
+      ],
+      "evidence_scope": "model_policy",
+      "expected_finding_codes": [
+        "researchguard:discourse_structure:missing-downstream-consumer"
+      ],
+      "expected_observed_status": "blocked",
+      "expected_status": "rejected",
+      "mapping_fingerprint": "sha256:6ad0fb6dc987c96bdaf4e54cadfc6d759b775ca139ff4382c179c422c385e283",
+      "native_case_ids": [
+        "case:discourse_structure:missing-downstream-consumer"
+      ],
+      "owner_id": "model:discourse_structure",
+      "protected_failure_ids": [
+        "researchguard:discourse_structure:missing-downstream-consumer"
+      ],
+      "required_child_case_ids": [],
+      "required_trace_labels": [],
+      "schema_version": "flowguard.native_model_case_binding.v1"
+    },
+    {
+      "binding_fingerprint": "sha256:b1a0b0fa278eb7afefc9391bba7e9bf52a2cedebf4a2b3b89d965a26344db71c",
+      "blueprint_case_id": "behavior-case:implementation-surface:4d5f891bebfcfecdb97deedc0c63cf64038d763dc9c19ce36b671db1c09229f1:bad:case:discourse_structure:missing-parent-contribution",
+      "blueprint_source_case_id": "case:discourse_structure:missing-parent-contribution",
+      "case_kind": "bad",
+      "covered_dimensions": [
+        "completion",
+        "decision",
+        "effect",
+        "error",
+        "input",
+        "state"
+      ],
+      "evidence_scope": "model_policy",
+      "expected_finding_codes": [
+        "researchguard:discourse_structure:missing-parent-contribution"
+      ],
+      "expected_observed_status": "blocked",
+      "expected_status": "rejected",
+      "mapping_fingerprint": "sha256:6ad0fb6dc987c96bdaf4e54cadfc6d759b775ca139ff4382c179c422c385e283",
+      "native_case_ids": [
+        "case:discourse_structure:missing-parent-contribution"
+      ],
+      "owner_id": "model:discourse_structure",
+      "protected_failure_ids": [
+        "researchguard:discourse_structure:missing-parent-contribution"
+      ],
+      "required_child_case_ids": [],
+      "required_trace_labels": [],
+      "schema_version": "flowguard.native_model_case_binding.v1"
+    },
+    {
+      "binding_fingerprint": "sha256:940bf9d0ee0d1c96085a1e5f270feca123ef82c87d751b690f6a724538cc3274",
+      "blueprint_case_id": "behavior-case:implementation-surface:4d5f891bebfcfecdb97deedc0c63cf64038d763dc9c19ce36b671db1c09229f1:bad:case:discourse_structure:missing-sibling-progression",
+      "blueprint_source_case_id": "case:discourse_structure:missing-sibling-progression",
+      "case_kind": "bad",
+      "covered_dimensions": [
+        "completion",
+        "decision",
+        "effect",
+        "error",
+        "input",
+        "state"
+      ],
+      "evidence_scope": "model_policy",
+      "expected_finding_codes": [
+        "researchguard:discourse_structure:missing-sibling-progression"
+      ],
+      "expected_observed_status": "blocked",
+      "expected_status": "rejected",
+      "mapping_fingerprint": "sha256:6ad0fb6dc987c96bdaf4e54cadfc6d759b775ca139ff4382c179c422c385e283",
+      "native_case_ids": [
+        "case:discourse_structure:missing-sibling-progression"
+      ],
+      "owner_id": "model:discourse_structure",
+      "protected_failure_ids": [
+        "researchguard:discourse_structure:missing-sibling-progression"
+      ],
+      "required_child_case_ids": [],
+      "required_trace_labels": [],
+      "schema_version": "flowguard.native_model_case_binding.v1"
+    },
+    {
+      "binding_fingerprint": "sha256:c01a38513781a43d9a71502d21a595ea3edfe4b005a50ebfa6d662799b43337e",
+      "blueprint_case_id": "behavior-case:implementation-surface:4d5f891bebfcfecdb97deedc0c63cf64038d763dc9c19ce36b671db1c09229f1:bad:case:discourse_structure:missing-structure-input",
+      "blueprint_source_case_id": "case:discourse_structure:missing-structure-input",
+      "case_kind": "bad",
+      "covered_dimensions": [
+        "completion",
+        "decision",
+        "effect",
+        "error",
+        "input",
+        "state"
+      ],
+      "evidence_scope": "model_policy",
+      "expected_finding_codes": [
+        "researchguard:discourse_structure:missing-structure-input"
+      ],
+      "expected_observed_status": "blocked",
+      "expected_status": "rejected",
+      "mapping_fingerprint": "sha256:6ad0fb6dc987c96bdaf4e54cadfc6d759b775ca139ff4382c179c422c385e283",
+      "native_case_ids": [
+        "case:discourse_structure:missing-structure-input"
+      ],
+      "owner_id": "model:discourse_structure",
+      "protected_failure_ids": [
+        "researchguard:discourse_structure:missing-structure-input"
+      ],
+      "required_child_case_ids": [],
+      "required_trace_labels": [],
+      "schema_version": "flowguard.native_model_case_binding.v1"
+    },
+    {
+      "binding_fingerprint": "sha256:31c287e876bfb29a8eb47bd4324e8aea9f2ecd83023802a92dfe0428ee18b9d5",
+      "blueprint_case_id": "behavior-case:implementation-surface:4d5f891bebfcfecdb97deedc0c63cf64038d763dc9c19ce36b671db1c09229f1:bad:case:discourse_structure:unrecovered-conclusion-obligation",
+      "blueprint_source_case_id": "case:discourse_structure:unrecovered-conclusion-obligation",
+      "case_kind": "bad",
+      "covered_dimensions": [
+        "completion",
+        "decision",
+        "effect",
+        "error",
+        "input",
+        "state"
+      ],
+      "evidence_scope": "model_policy",
+      "expected_finding_codes": [
+        "researchguard:discourse_structure:unrecovered-conclusion-obligation"
+      ],
+      "expected_observed_status": "blocked",
+      "expected_status": "rejected",
+      "mapping_fingerprint": "sha256:6ad0fb6dc987c96bdaf4e54cadfc6d759b775ca139ff4382c179c422c385e283",
+      "native_case_ids": [
+        "case:discourse_structure:unrecovered-conclusion-obligation"
+      ],
+      "owner_id": "model:discourse_structure",
+      "protected_failure_ids": [
+        "researchguard:discourse_structure:unrecovered-conclusion-obligation"
+      ],
+      "required_child_case_ids": [],
+      "required_trace_labels": [],
+      "schema_version": "flowguard.native_model_case_binding.v1"
+    },
+    {
+      "binding_fingerprint": "sha256:ed84595e14b66befb5470d91f51ec4d525cf506d020cb91632130f58584106b7",
+      "blueprint_case_id": "behavior-case:implementation-surface:4d5f891bebfcfecdb97deedc0c63cf64038d763dc9c19ce36b671db1c09229f1:boundary:boundary:discourse_structure",
+      "blueprint_source_case_id": "boundary:discourse_structure",
+      "case_kind": "boundary",
+      "covered_dimensions": [
+        "completion",
+        "decision",
+        "error",
+        "input",
+        "retry",
+        "timeout"
+      ],
+      "evidence_scope": "model_policy",
+      "expected_finding_codes": [],
+      "expected_observed_status": "pass",
+      "expected_status": "pass",
+      "mapping_fingerprint": "sha256:6ad0fb6dc987c96bdaf4e54cadfc6d759b775ca139ff4382c179c422c385e283",
+      "native_case_ids": [
+        "boundary:discourse_structure"
+      ],
+      "owner_id": "model:discourse_structure",
+      "protected_failure_ids": [],
+      "required_child_case_ids": [],
+      "required_trace_labels": [],
+      "schema_version": "flowguard.native_model_case_binding.v1"
+    },
+    {
+      "binding_fingerprint": "sha256:b1bf827879322b2a52707e41c99d661558f1a1445d9ddd91a0c05b8ddd5cd7a2",
+      "blueprint_case_id": "behavior-case:implementation-surface:4d5f891bebfcfecdb97deedc0c63cf64038d763dc9c19ce36b671db1c09229f1:good:native:discourse_structure:current-good",
+      "blueprint_source_case_id": "native:discourse_structure:current-good",
+      "case_kind": "good",
+      "covered_dimensions": [
+        "completion",
+        "effect",
+        "input",
+        "order",
+        "output",
+        "state"
+      ],
+      "evidence_scope": "model_policy",
+      "expected_finding_codes": [],
+      "expected_observed_status": "pass",
+      "expected_status": "pass",
+      "mapping_fingerprint": "sha256:6ad0fb6dc987c96bdaf4e54cadfc6d759b775ca139ff4382c179c422c385e283",
+      "native_case_ids": [
+        "native:discourse_structure:current-good"
+      ],
+      "owner_id": "model:discourse_structure",
+      "protected_failure_ids": [],
+      "required_child_case_ids": [],
+      "required_trace_labels": [],
+      "schema_version": "flowguard.native_model_case_binding.v1"
+    },
+    {
+      "binding_fingerprint": "sha256:87cbd5c58a492d960ec1cfffc474bf7167d5154dbbd69b10819d248278de329a",
+      "blueprint_case_id": "behavior-case:implementation-surface:4db5545aa6ab304731328532bca1b73ce99ff9cf714f6bac58420227dfdde9c8:bad:case:logic_synthesis:candidate-ledger-truncated",
+      "blueprint_source_case_id": "case:logic_synthesis:candidate-ledger-truncated",
+      "case_kind": "bad",
+      "covered_dimensions": [
+        "completion",
+        "decision",
+        "effect",
+        "error",
+        "input",
+        "state"
+      ],
+      "evidence_scope": "model_policy",
+      "expected_finding_codes": [
+        "researchguard:logic_synthesis:candidate-ledger-truncated"
+      ],
+      "expected_observed_status": "blocked",
+      "expected_status": "rejected",
+      "mapping_fingerprint": "sha256:6ad0fb6dc987c96bdaf4e54cadfc6d759b775ca139ff4382c179c422c385e283",
+      "native_case_ids": [
+        "case:logic_synthesis:candidate-ledger-truncated"
+      ],
+      "owner_id": "model:logic_synthesis",
+      "protected_failure_ids": [
+        "researchguard:logic_synthesis:candidate-ledger-truncated"
+      ],
+      "required_child_case_ids": [],
+      "required_trace_labels": [],
+      "schema_version": "flowguard.native_model_case_binding.v1"
+    },
+    {
+      "binding_fingerprint": "sha256:6035b7a7f49b332a32409fea358f6af39f831ea2f932fbf3e5dbf15f4deb0d3c",
+      "blueprint_case_id": "behavior-case:implementation-surface:4db5545aa6ab304731328532bca1b73ce99ff9cf714f6bac58420227dfdde9c8:bad:case:logic_synthesis:foreign-support-closes-claim",
+      "blueprint_source_case_id": "case:logic_synthesis:foreign-support-closes-claim",
+      "case_kind": "bad",
+      "covered_dimensions": [
+        "completion",
+        "decision",
+        "effect",
+        "error",
+        "input",
+        "state"
+      ],
+      "evidence_scope": "model_policy",
+      "expected_finding_codes": [
+        "researchguard:logic_synthesis:foreign-support-closes-claim"
+      ],
+      "expected_observed_status": "blocked",
+      "expected_status": "rejected",
+      "mapping_fingerprint": "sha256:6ad0fb6dc987c96bdaf4e54cadfc6d759b775ca139ff4382c179c422c385e283",
+      "native_case_ids": [
+        "case:logic_synthesis:foreign-support-closes-claim"
+      ],
+      "owner_id": "model:logic_synthesis",
+      "protected_failure_ids": [
+        "researchguard:logic_synthesis:foreign-support-closes-claim"
+      ],
+      "required_child_case_ids": [],
+      "required_trace_labels": [],
+      "schema_version": "flowguard.native_model_case_binding.v1"
+    },
+    {
+      "binding_fingerprint": "sha256:9373c820e6ccc0175fa14d3aac7e599d4229fa3ebe9078bfeac6003bd304f451",
+      "blueprint_case_id": "behavior-case:implementation-surface:4db5545aa6ab304731328532bca1b73ce99ff9cf714f6bac58420227dfdde9c8:bad:case:logic_synthesis:omit-delivered-to-body",
+      "blueprint_source_case_id": "case:logic_synthesis:omit-delivered-to-body",
+      "case_kind": "bad",
+      "covered_dimensions": [
+        "completion",
+        "decision",
+        "effect",
+        "error",
+        "input",
+        "state"
+      ],
+      "evidence_scope": "model_policy",
+      "expected_finding_codes": [
+        "researchguard:logic_synthesis:omit-delivered-to-body"
+      ],
+      "expected_observed_status": "blocked",
+      "expected_status": "rejected",
+      "mapping_fingerprint": "sha256:6ad0fb6dc987c96bdaf4e54cadfc6d759b775ca139ff4382c179c422c385e283",
+      "native_case_ids": [
+        "case:logic_synthesis:omit-delivered-to-body"
+      ],
+      "owner_id": "model:logic_synthesis",
+      "protected_failure_ids": [
+        "researchguard:logic_synthesis:omit-delivered-to-body"
+      ],
+      "required_child_case_ids": [],
+      "required_trace_labels": [],
+      "schema_version": "flowguard.native_model_case_binding.v1"
+    },
+    {
+      "binding_fingerprint": "sha256:bc85eef99a51d06008f5764d9d9c4d8b7f8ba29961a1b8f7e3371840adfa8fdf",
+      "blueprint_case_id": "behavior-case:implementation-surface:4db5545aa6ab304731328532bca1b73ce99ff9cf714f6bac58420227dfdde9c8:bad:case:logic_synthesis:selection-request-required",
+      "blueprint_source_case_id": "case:logic_synthesis:selection-request-required",
+      "case_kind": "bad",
+      "covered_dimensions": [
+        "completion",
+        "decision",
+        "effect",
+        "error",
+        "input",
+        "state"
+      ],
+      "evidence_scope": "model_policy",
+      "expected_finding_codes": [
+        "researchguard:logic_synthesis:selection-request-required"
+      ],
+      "expected_observed_status": "blocked",
+      "expected_status": "rejected",
+      "mapping_fingerprint": "sha256:6ad0fb6dc987c96bdaf4e54cadfc6d759b775ca139ff4382c179c422c385e283",
+      "native_case_ids": [
+        "case:logic_synthesis:selection-request-required"
+      ],
+      "owner_id": "model:logic_synthesis",
+      "protected_failure_ids": [
+        "researchguard:logic_synthesis:selection-request-required"
+      ],
+      "required_child_case_ids": [],
+      "required_trace_labels": [],
+      "schema_version": "flowguard.native_model_case_binding.v1"
+    },
+    {
+      "binding_fingerprint": "sha256:c63efaf5a6cf5dad4092ba8d11bec0fb4f35afb8a9659056ad7850c5e7e2a07c",
+      "blueprint_case_id": "behavior-case:implementation-surface:4db5545aa6ab304731328532bca1b73ce99ff9cf714f6bac58420227dfdde9c8:boundary:boundary:logic_synthesis",
+      "blueprint_source_case_id": "boundary:logic_synthesis",
+      "case_kind": "boundary",
+      "covered_dimensions": [
+        "completion",
+        "decision",
+        "error",
+        "input",
+        "retry",
+        "timeout"
+      ],
+      "evidence_scope": "model_policy",
+      "expected_finding_codes": [],
+      "expected_observed_status": "pass",
+      "expected_status": "pass",
+      "mapping_fingerprint": "sha256:6ad0fb6dc987c96bdaf4e54cadfc6d759b775ca139ff4382c179c422c385e283",
+      "native_case_ids": [
+        "boundary:logic_synthesis"
+      ],
+      "owner_id": "model:logic_synthesis",
+      "protected_failure_ids": [],
+      "required_child_case_ids": [],
+      "required_trace_labels": [],
+      "schema_version": "flowguard.native_model_case_binding.v1"
+    },
+    {
+      "binding_fingerprint": "sha256:e09fd0d3b22979cf1ddfa3eaa241f9795a6422e0bcc900799092eb17505fdce4",
+      "blueprint_case_id": "behavior-case:implementation-surface:4db5545aa6ab304731328532bca1b73ce99ff9cf714f6bac58420227dfdde9c8:good:native:logic_synthesis:current-good",
+      "blueprint_source_case_id": "native:logic_synthesis:current-good",
+      "case_kind": "good",
+      "covered_dimensions": [
+        "completion",
+        "effect",
+        "input",
+        "order",
+        "output",
+        "state"
+      ],
+      "evidence_scope": "model_policy",
+      "expected_finding_codes": [],
+      "expected_observed_status": "pass",
+      "expected_status": "pass",
+      "mapping_fingerprint": "sha256:6ad0fb6dc987c96bdaf4e54cadfc6d759b775ca139ff4382c179c422c385e283",
+      "native_case_ids": [
+        "native:logic_synthesis:current-good"
+      ],
+      "owner_id": "model:logic_synthesis",
+      "protected_failure_ids": [],
+      "required_child_case_ids": [],
+      "required_trace_labels": [],
+      "schema_version": "flowguard.native_model_case_binding.v1"
+    },
+    {
+      "binding_fingerprint": "sha256:18d17fcdef9e30145be10ae537d75ed887d01c591f38f480c61365fab46774f3",
+      "blueprint_case_id": "behavior-case:implementation-surface:8f780e31adb9126b982d61ae805b02c433832c6fdee11a2113e510a358e56d3f:bad:case:model_test_code_alignment:code-boundary:bad",
+      "blueprint_source_case_id": "case:model_test_code_alignment:code-boundary:bad",
+      "case_kind": "bad",
+      "covered_dimensions": [
+        "completion",
+        "decision",
+        "effect",
+        "error",
+        "input",
+        "state"
+      ],
+      "evidence_scope": "model_policy",
+      "expected_finding_codes": [
+        "researchguard:model_test_code_alignment:code-boundary"
+      ],
+      "expected_observed_status": "blocked",
+      "expected_status": "rejected",
+      "mapping_fingerprint": "sha256:6ad0fb6dc987c96bdaf4e54cadfc6d759b775ca139ff4382c179c422c385e283",
+      "native_case_ids": [
+        "case:model_test_code_alignment:code-boundary:bad"
+      ],
+      "owner_id": "model:model_test_code_alignment",
+      "protected_failure_ids": [
+        "researchguard:model_test_code_alignment:code-boundary"
+      ],
+      "required_child_case_ids": [],
+      "required_trace_labels": [],
+      "schema_version": "flowguard.native_model_case_binding.v1"
+    },
+    {
+      "binding_fingerprint": "sha256:a675953047ba3594a2976ae4d468bdaec7a09f129d80e9d7c188fc679cbf12e3",
+      "blueprint_case_id": "behavior-case:implementation-surface:8f780e31adb9126b982d61ae805b02c433832c6fdee11a2113e510a358e56d3f:bad:case:model_test_code_alignment:io-oracle:bad",
+      "blueprint_source_case_id": "case:model_test_code_alignment:io-oracle:bad",
+      "case_kind": "bad",
+      "covered_dimensions": [
+        "completion",
+        "decision",
+        "effect",
+        "error",
+        "input",
+        "state"
+      ],
+      "evidence_scope": "model_policy",
+      "expected_finding_codes": [
+        "researchguard:model_test_code_alignment:io-oracle"
+      ],
+      "expected_observed_status": "blocked",
+      "expected_status": "rejected",
+      "mapping_fingerprint": "sha256:6ad0fb6dc987c96bdaf4e54cadfc6d759b775ca139ff4382c179c422c385e283",
+      "native_case_ids": [
+        "case:model_test_code_alignment:io-oracle:bad"
+      ],
+      "owner_id": "model:model_test_code_alignment",
+      "protected_failure_ids": [
+        "researchguard:model_test_code_alignment:io-oracle"
+      ],
+      "required_child_case_ids": [],
+      "required_trace_labels": [],
+      "schema_version": "flowguard.native_model_case_binding.v1"
+    },
+    {
+      "binding_fingerprint": "sha256:a731dd170cf78f11939ef54ed1af10180ee8a84e6bd485e951008ec6b9cc9f57",
+      "blueprint_case_id": "behavior-case:implementation-surface:8f780e31adb9126b982d61ae805b02c433832c6fdee11a2113e510a358e56d3f:bad:case:model_test_code_alignment:model-code-owner:bad",
+      "blueprint_source_case_id": "case:model_test_code_alignment:model-code-owner:bad",
+      "case_kind": "bad",
+      "covered_dimensions": [
+        "completion",
+        "decision",
+        "effect",
+        "error",
+        "input",
+        "state"
+      ],
+      "evidence_scope": "model_policy",
+      "expected_finding_codes": [
+        "researchguard:model_test_code_alignment:model-code-owner"
+      ],
+      "expected_observed_status": "blocked",
+      "expected_status": "rejected",
+      "mapping_fingerprint": "sha256:6ad0fb6dc987c96bdaf4e54cadfc6d759b775ca139ff4382c179c422c385e283",
+      "native_case_ids": [
+        "case:model_test_code_alignment:model-code-owner:bad"
+      ],
+      "owner_id": "model:model_test_code_alignment",
+      "protected_failure_ids": [
+        "researchguard:model_test_code_alignment:model-code-owner"
+      ],
+      "required_child_case_ids": [],
+      "required_trace_labels": [],
+      "schema_version": "flowguard.native_model_case_binding.v1"
+    },
+    {
+      "binding_fingerprint": "sha256:98861ff914e22dee21d5a901233fb2061a5466a0d295aa9d31210c14f039ef82",
+      "blueprint_case_id": "behavior-case:implementation-surface:8f780e31adb9126b982d61ae805b02c433832c6fdee11a2113e510a358e56d3f:bad:case:model_test_code_alignment:parent-not-leaf:bad",
+      "blueprint_source_case_id": "case:model_test_code_alignment:parent-not-leaf:bad",
+      "case_kind": "bad",
+      "covered_dimensions": [
+        "completion",
+        "decision",
+        "effect",
+        "error",
+        "input",
+        "state"
+      ],
+      "evidence_scope": "model_policy",
+      "expected_finding_codes": [
+        "researchguard:model_test_code_alignment:parent-not-leaf"
+      ],
+      "expected_observed_status": "blocked",
+      "expected_status": "rejected",
+      "mapping_fingerprint": "sha256:6ad0fb6dc987c96bdaf4e54cadfc6d759b775ca139ff4382c179c422c385e283",
+      "native_case_ids": [
+        "case:model_test_code_alignment:parent-not-leaf:bad"
+      ],
+      "owner_id": "model:model_test_code_alignment",
+      "protected_failure_ids": [
+        "researchguard:model_test_code_alignment:parent-not-leaf"
+      ],
+      "required_child_case_ids": [],
+      "required_trace_labels": [],
+      "schema_version": "flowguard.native_model_case_binding.v1"
+    },
+    {
+      "binding_fingerprint": "sha256:bc4d0d7471e1d018ea73db4a1bd5919dbf178cdd2d2dcb3ca5365386114ef578",
+      "blueprint_case_id": "behavior-case:implementation-surface:8f780e31adb9126b982d61ae805b02c433832c6fdee11a2113e510a358e56d3f:bad:case:model_test_code_alignment:test-owner:bad",
+      "blueprint_source_case_id": "case:model_test_code_alignment:test-owner:bad",
+      "case_kind": "bad",
+      "covered_dimensions": [
+        "completion",
+        "decision",
+        "effect",
+        "error",
+        "input",
+        "state"
+      ],
+      "evidence_scope": "model_policy",
+      "expected_finding_codes": [
+        "researchguard:model_test_code_alignment:test-owner"
+      ],
+      "expected_observed_status": "blocked",
+      "expected_status": "rejected",
+      "mapping_fingerprint": "sha256:6ad0fb6dc987c96bdaf4e54cadfc6d759b775ca139ff4382c179c422c385e283",
+      "native_case_ids": [
+        "case:model_test_code_alignment:test-owner:bad"
+      ],
+      "owner_id": "model:model_test_code_alignment",
+      "protected_failure_ids": [
+        "researchguard:model_test_code_alignment:test-owner"
+      ],
+      "required_child_case_ids": [],
+      "required_trace_labels": [],
+      "schema_version": "flowguard.native_model_case_binding.v1"
+    },
+    {
+      "binding_fingerprint": "sha256:223d62ad2bde84a9af6fa0b83efd7f98f352ea9639776ff9bd5412dee93bc20b",
+      "blueprint_case_id": "behavior-case:implementation-surface:8f780e31adb9126b982d61ae805b02c433832c6fdee11a2113e510a358e56d3f:boundary:boundary:model_test_code_alignment",
+      "blueprint_source_case_id": "boundary:model_test_code_alignment",
+      "case_kind": "boundary",
+      "covered_dimensions": [
+        "completion",
+        "decision",
+        "error",
+        "input",
+        "retry",
+        "timeout"
+      ],
+      "evidence_scope": "model_policy",
+      "expected_finding_codes": [],
+      "expected_observed_status": "pass",
+      "expected_status": "pass",
+      "mapping_fingerprint": "sha256:6ad0fb6dc987c96bdaf4e54cadfc6d759b775ca139ff4382c179c422c385e283",
+      "native_case_ids": [
+        "boundary:model_test_code_alignment"
+      ],
+      "owner_id": "model:model_test_code_alignment",
+      "protected_failure_ids": [],
+      "required_child_case_ids": [],
+      "required_trace_labels": [],
+      "schema_version": "flowguard.native_model_case_binding.v1"
+    },
+    {
+      "binding_fingerprint": "sha256:cfc1f3ac1aedf851119925a7760314f9976c1662716559ee55a6f5b4530705f7",
+      "blueprint_case_id": "behavior-case:implementation-surface:8f780e31adb9126b982d61ae805b02c433832c6fdee11a2113e510a358e56d3f:good:native:model_test_code_alignment:good-current",
+      "blueprint_source_case_id": "native:model_test_code_alignment:good-current",
+      "case_kind": "good",
+      "covered_dimensions": [
+        "completion",
+        "effect",
+        "input",
+        "order",
+        "output",
+        "state"
+      ],
+      "evidence_scope": "model_policy",
+      "expected_finding_codes": [],
+      "expected_observed_status": "pass",
+      "expected_status": "pass",
+      "mapping_fingerprint": "sha256:6ad0fb6dc987c96bdaf4e54cadfc6d759b775ca139ff4382c179c422c385e283",
+      "native_case_ids": [
+        "native:model_test_code_alignment:good-current"
+      ],
+      "owner_id": "model:model_test_code_alignment",
+      "protected_failure_ids": [],
+      "required_child_case_ids": [],
+      "required_trace_labels": [],
+      "schema_version": "flowguard.native_model_case_binding.v1"
+    },
+    {
+      "binding_fingerprint": "sha256:9661266368bffa4012b78df7b91ccded12b5f416931aaaee0748d0416a3eb09c",
+      "blueprint_case_id": "behavior-case:implementation-surface:956ee479760b303af79be3d504b6f1573d5232b70ecceda6180484167390c0cc:bad:case:argument_support_closure:cycle-not-terminated",
+      "blueprint_source_case_id": "case:argument_support_closure:cycle-not-terminated",
+      "case_kind": "bad",
+      "covered_dimensions": [
+        "completion",
+        "decision",
+        "effect",
+        "error",
+        "input",
+        "state"
+      ],
+      "evidence_scope": "model_policy",
+      "expected_finding_codes": [
+        "researchguard:argument_support_closure:cycle-not-terminated"
+      ],
+      "expected_observed_status": "blocked",
+      "expected_status": "rejected",
+      "mapping_fingerprint": "sha256:6ad0fb6dc987c96bdaf4e54cadfc6d759b775ca139ff4382c179c422c385e283",
+      "native_case_ids": [
+        "case:argument_support_closure:cycle-not-terminated"
+      ],
+      "owner_id": "model:argument_support_closure",
+      "protected_failure_ids": [
+        "researchguard:argument_support_closure:cycle-not-terminated"
+      ],
+      "required_child_case_ids": [],
+      "required_trace_labels": [],
+      "schema_version": "flowguard.native_model_case_binding.v1"
+    },
+    {
+      "binding_fingerprint": "sha256:6d4355dab5a60b3db44b99e5fa7ab5484a3dcb0273e7ba56a35fada7e4aa03a5",
+      "blueprint_case_id": "behavior-case:implementation-surface:956ee479760b303af79be3d504b6f1573d5232b70ecceda6180484167390c0cc:bad:case:argument_support_closure:foreign-claim-support",
+      "blueprint_source_case_id": "case:argument_support_closure:foreign-claim-support",
+      "case_kind": "bad",
+      "covered_dimensions": [
+        "completion",
+        "decision",
+        "effect",
+        "error",
+        "input",
+        "state"
+      ],
+      "evidence_scope": "model_policy",
+      "expected_finding_codes": [
+        "researchguard:argument_support_closure:foreign-claim-support"
+      ],
+      "expected_observed_status": "blocked",
+      "expected_status": "rejected",
+      "mapping_fingerprint": "sha256:6ad0fb6dc987c96bdaf4e54cadfc6d759b775ca139ff4382c179c422c385e283",
+      "native_case_ids": [
+        "case:argument_support_closure:foreign-claim-support"
+      ],
+      "owner_id": "model:argument_support_closure",
+      "protected_failure_ids": [
+        "researchguard:argument_support_closure:foreign-claim-support"
+      ],
+      "required_child_case_ids": [],
+      "required_trace_labels": [],
+      "schema_version": "flowguard.native_model_case_binding.v1"
+    },
+    {
+      "binding_fingerprint": "sha256:a9e2d95f173f1f356fb8d2b6bf9850191fc00b40915aff093dc6a5b41238688e",
+      "blueprint_case_id": "behavior-case:implementation-surface:956ee479760b303af79be3d504b6f1573d5232b70ecceda6180484167390c0cc:bad:case:argument_support_closure:missing-argument-role",
+      "blueprint_source_case_id": "case:argument_support_closure:missing-argument-role",
+      "case_kind": "bad",
+      "covered_dimensions": [
+        "completion",
+        "decision",
+        "effect",
+        "error",
+        "input",
+        "state"
+      ],
+      "evidence_scope": "model_policy",
+      "expected_finding_codes": [
+        "researchguard:argument_support_closure:missing-argument-role"
+      ],
+      "expected_observed_status": "blocked",
+      "expected_status": "rejected",
+      "mapping_fingerprint": "sha256:6ad0fb6dc987c96bdaf4e54cadfc6d759b775ca139ff4382c179c422c385e283",
+      "native_case_ids": [
+        "case:argument_support_closure:missing-argument-role"
+      ],
+      "owner_id": "model:argument_support_closure",
+      "protected_failure_ids": [
+        "researchguard:argument_support_closure:missing-argument-role"
+      ],
+      "required_child_case_ids": [],
+      "required_trace_labels": [],
+      "schema_version": "flowguard.native_model_case_binding.v1"
+    },
+    {
+      "binding_fingerprint": "sha256:a890a75715fd0f170995fb621267979c108ab99e7aae1366cee91d32cf6cd872",
+      "blueprint_case_id": "behavior-case:implementation-surface:956ee479760b303af79be3d504b6f1573d5232b70ecceda6180484167390c0cc:bad:case:argument_support_closure:missing-selected-claim-support",
+      "blueprint_source_case_id": "case:argument_support_closure:missing-selected-claim-support",
+      "case_kind": "bad",
+      "covered_dimensions": [
+        "completion",
+        "decision",
+        "effect",
+        "error",
+        "input",
+        "state"
+      ],
+      "evidence_scope": "model_policy",
+      "expected_finding_codes": [
+        "researchguard:argument_support_closure:missing-selected-claim-support"
+      ],
+      "expected_observed_status": "blocked",
+      "expected_status": "rejected",
+      "mapping_fingerprint": "sha256:6ad0fb6dc987c96bdaf4e54cadfc6d759b775ca139ff4382c179c422c385e283",
+      "native_case_ids": [
+        "case:argument_support_closure:missing-selected-claim-support"
+      ],
+      "owner_id": "model:argument_support_closure",
+      "protected_failure_ids": [
+        "researchguard:argument_support_closure:missing-selected-claim-support"
+      ],
+      "required_child_case_ids": [],
+      "required_trace_labels": [],
+      "schema_version": "flowguard.native_model_case_binding.v1"
+    },
+    {
+      "binding_fingerprint": "sha256:588638705ff42bb5a8f5246a3043f5bc8dff87f764ad65c544938c69b8be215a",
+      "blueprint_case_id": "behavior-case:implementation-surface:956ee479760b303af79be3d504b6f1573d5232b70ecceda6180484167390c0cc:boundary:boundary:argument_support_closure",
+      "blueprint_source_case_id": "boundary:argument_support_closure",
+      "case_kind": "boundary",
+      "covered_dimensions": [
+        "completion",
+        "decision",
+        "error",
+        "input",
+        "retry",
+        "timeout"
+      ],
+      "evidence_scope": "model_policy",
+      "expected_finding_codes": [],
+      "expected_observed_status": "pass",
+      "expected_status": "pass",
+      "mapping_fingerprint": "sha256:6ad0fb6dc987c96bdaf4e54cadfc6d759b775ca139ff4382c179c422c385e283",
+      "native_case_ids": [
+        "boundary:argument_support_closure"
+      ],
+      "owner_id": "model:argument_support_closure",
+      "protected_failure_ids": [],
+      "required_child_case_ids": [],
+      "required_trace_labels": [],
+      "schema_version": "flowguard.native_model_case_binding.v1"
+    },
+    {
+      "binding_fingerprint": "sha256:21c449ba40f3585ba2b441e5c52e1cc478df2d726b2204826a9b779c2b77aab0",
+      "blueprint_case_id": "behavior-case:implementation-surface:956ee479760b303af79be3d504b6f1573d5232b70ecceda6180484167390c0cc:good:native:argument_support_closure:current-good",
+      "blueprint_source_case_id": "native:argument_support_closure:current-good",
+      "case_kind": "good",
+      "covered_dimensions": [
+        "completion",
+        "effect",
+        "input",
+        "order",
+        "output",
+        "state"
+      ],
+      "evidence_scope": "model_policy",
+      "expected_finding_codes": [],
+      "expected_observed_status": "pass",
+      "expected_status": "pass",
+      "mapping_fingerprint": "sha256:6ad0fb6dc987c96bdaf4e54cadfc6d759b775ca139ff4382c179c422c385e283",
+      "native_case_ids": [
+        "native:argument_support_closure:current-good"
+      ],
+      "owner_id": "model:argument_support_closure",
+      "protected_failure_ids": [],
+      "required_child_case_ids": [],
+      "required_trace_labels": [],
+      "schema_version": "flowguard.native_model_case_binding.v1"
+    },
+    {
+      "binding_fingerprint": "sha256:dd2bd3314be9ea9030f4661cba18618280ac2c2b94fd99663ba671a8e9419b65",
+      "blueprint_case_id": "behavior-case:implementation-surface:96851650ef5401be95d6a576d98a25d3c0d74ab9c7c047710654d43cddfb4bfb:bad:native:authoritative_model_system:binding-missing",
+      "blueprint_source_case_id": "native:authoritative_model_system:binding-missing",
+      "case_kind": "bad",
+      "covered_dimensions": [
+        "completion",
+        "decision",
+        "effect",
+        "error",
+        "input",
+        "state"
+      ],
+      "evidence_scope": "model_policy",
+      "expected_finding_codes": [
+        "researchguard:authoritative_model_system:binding-missing"
+      ],
+      "expected_observed_status": "blocked",
+      "expected_status": "rejected",
+      "mapping_fingerprint": "sha256:6ad0fb6dc987c96bdaf4e54cadfc6d759b775ca139ff4382c179c422c385e283",
+      "native_case_ids": [
+        "native:authoritative_model_system:binding-missing"
+      ],
+      "owner_id": "model:authoritative_model_system",
+      "protected_failure_ids": [
+        "researchguard:authoritative_model_system:binding-missing"
+      ],
+      "required_child_case_ids": [],
+      "required_trace_labels": [],
+      "schema_version": "flowguard.native_model_case_binding.v1"
+    },
+    {
+      "binding_fingerprint": "sha256:e5f0caf6c4cf92f76ce8108b7bdb27ee8ce32fd94fb331d8363b548ab8cc32fb",
+      "blueprint_case_id": "behavior-case:implementation-surface:96851650ef5401be95d6a576d98a25d3c0d74ab9c7c047710654d43cddfb4bfb:bad:native:authoritative_model_system:definition-missing",
+      "blueprint_source_case_id": "native:authoritative_model_system:definition-missing",
+      "case_kind": "bad",
+      "covered_dimensions": [
+        "completion",
+        "decision",
+        "effect",
+        "error",
+        "input",
+        "state"
+      ],
+      "evidence_scope": "model_policy",
+      "expected_finding_codes": [
+        "researchguard:authoritative_model_system:definition-missing"
+      ],
+      "expected_observed_status": "blocked",
+      "expected_status": "rejected",
+      "mapping_fingerprint": "sha256:6ad0fb6dc987c96bdaf4e54cadfc6d759b775ca139ff4382c179c422c385e283",
+      "native_case_ids": [
+        "native:authoritative_model_system:definition-missing"
+      ],
+      "owner_id": "model:authoritative_model_system",
+      "protected_failure_ids": [
+        "researchguard:authoritative_model_system:definition-missing"
+      ],
+      "required_child_case_ids": [],
+      "required_trace_labels": [],
+      "schema_version": "flowguard.native_model_case_binding.v1"
+    },
+    {
+      "binding_fingerprint": "sha256:1f26b8f65d138e027fc6e6d0440c31bfb39664c8b98a66cc60fd01d55c20a633",
+      "blueprint_case_id": "behavior-case:implementation-surface:96851650ef5401be95d6a576d98a25d3c0d74ab9c7c047710654d43cddfb4bfb:bad:native:authoritative_model_system:evidence-stale",
+      "blueprint_source_case_id": "native:authoritative_model_system:evidence-stale",
+      "case_kind": "bad",
+      "covered_dimensions": [
+        "completion",
+        "decision",
+        "effect",
+        "error",
+        "input",
+        "state"
+      ],
+      "evidence_scope": "model_policy",
+      "expected_finding_codes": [
+        "researchguard:authoritative_model_system:evidence-stale"
+      ],
+      "expected_observed_status": "blocked",
+      "expected_status": "rejected",
+      "mapping_fingerprint": "sha256:6ad0fb6dc987c96bdaf4e54cadfc6d759b775ca139ff4382c179c422c385e283",
+      "native_case_ids": [
+        "native:authoritative_model_system:evidence-stale"
+      ],
+      "owner_id": "model:authoritative_model_system",
+      "protected_failure_ids": [
+        "researchguard:authoritative_model_system:evidence-stale"
+      ],
+      "required_child_case_ids": [],
+      "required_trace_labels": [],
+      "schema_version": "flowguard.native_model_case_binding.v1"
+    },
+    {
+      "binding_fingerprint": "sha256:7588eccc520d70e6e592bfa3843a00d52f471601514f268eb2d463c86627a7e8",
+      "blueprint_case_id": "behavior-case:implementation-surface:96851650ef5401be95d6a576d98a25d3c0d74ab9c7c047710654d43cddfb4bfb:boundary:boundary:authoritative_model_system",
+      "blueprint_source_case_id": "boundary:authoritative_model_system",
+      "case_kind": "boundary",
+      "covered_dimensions": [
+        "completion",
+        "decision",
+        "error",
+        "input",
+        "retry",
+        "timeout"
+      ],
+      "evidence_scope": "model_policy",
+      "expected_finding_codes": [],
+      "expected_observed_status": "pass",
+      "expected_status": "pass",
+      "mapping_fingerprint": "sha256:6ad0fb6dc987c96bdaf4e54cadfc6d759b775ca139ff4382c179c422c385e283",
+      "native_case_ids": [
+        "boundary:authoritative_model_system"
+      ],
+      "owner_id": "model:authoritative_model_system",
+      "protected_failure_ids": [],
+      "required_child_case_ids": [],
+      "required_trace_labels": [],
+      "schema_version": "flowguard.native_model_case_binding.v1"
+    },
+    {
+      "binding_fingerprint": "sha256:df56abb9f7b525793081dabc091d6c8bcbf7a3b0b582ccf8d9aa998407fa6b6d",
+      "blueprint_case_id": "behavior-case:implementation-surface:96851650ef5401be95d6a576d98a25d3c0d74ab9c7c047710654d43cddfb4bfb:good:native:authoritative_model_system:current-good",
+      "blueprint_source_case_id": "native:authoritative_model_system:current-good",
+      "case_kind": "good",
+      "covered_dimensions": [
+        "completion",
+        "effect",
+        "input",
+        "order",
+        "output",
+        "state"
+      ],
+      "evidence_scope": "model_policy",
+      "expected_finding_codes": [],
+      "expected_observed_status": "pass",
+      "expected_status": "pass",
+      "mapping_fingerprint": "sha256:6ad0fb6dc987c96bdaf4e54cadfc6d759b775ca139ff4382c179c422c385e283",
+      "native_case_ids": [
+        "native:authoritative_model_system:current-good"
+      ],
+      "owner_id": "model:authoritative_model_system",
+      "protected_failure_ids": [],
+      "required_child_case_ids": [],
+      "required_trace_labels": [],
+      "schema_version": "flowguard.native_model_case_binding.v1"
+    },
+    {
+      "binding_fingerprint": "sha256:377138de1e770fc67e6fd81f9528381dd98dc55c4f1d0f4c6a82efc657a00d36",
+      "blueprint_case_id": "behavior-case:implementation-surface:ae2f8a4926d6a8b00fb7eb1a15349581115375e19f89ca7a13841e5ef44c2e6b:bad:case:logic_selection_contract:binding-identity-invalid",
+      "blueprint_source_case_id": "case:logic_selection_contract:binding-identity-invalid",
+      "case_kind": "bad",
+      "covered_dimensions": [
+        "completion",
+        "decision",
+        "effect",
+        "error",
+        "input",
+        "state"
+      ],
+      "evidence_scope": "model_policy",
+      "expected_finding_codes": [
+        "researchguard:logic_selection_contract:binding-identity-invalid"
+      ],
+      "expected_observed_status": "blocked",
+      "expected_status": "rejected",
+      "mapping_fingerprint": "sha256:6ad0fb6dc987c96bdaf4e54cadfc6d759b775ca139ff4382c179c422c385e283",
+      "native_case_ids": [
+        "case:logic_selection_contract:binding-identity-invalid"
+      ],
+      "owner_id": "model:logic_selection_contract",
+      "protected_failure_ids": [
+        "researchguard:logic_selection_contract:binding-identity-invalid"
+      ],
+      "required_child_case_ids": [],
+      "required_trace_labels": [],
+      "schema_version": "flowguard.native_model_case_binding.v1"
+    },
+    {
+      "binding_fingerprint": "sha256:d8f1f896cfe79ab4f5312f5e691e8fc39876edf194961b701b5e6aef72835171",
+      "blueprint_case_id": "behavior-case:implementation-surface:ae2f8a4926d6a8b00fb7eb1a15349581115375e19f89ca7a13841e5ef44c2e6b:bad:case:logic_selection_contract:body-order-incomplete",
+      "blueprint_source_case_id": "case:logic_selection_contract:body-order-incomplete",
+      "case_kind": "bad",
+      "covered_dimensions": [
+        "completion",
+        "decision",
+        "effect",
+        "error",
+        "input",
+        "state"
+      ],
+      "evidence_scope": "model_policy",
+      "expected_finding_codes": [
+        "researchguard:logic_selection_contract:body-order-incomplete"
+      ],
+      "expected_observed_status": "blocked",
+      "expected_status": "rejected",
+      "mapping_fingerprint": "sha256:6ad0fb6dc987c96bdaf4e54cadfc6d759b775ca139ff4382c179c422c385e283",
+      "native_case_ids": [
+        "case:logic_selection_contract:body-order-incomplete"
+      ],
+      "owner_id": "model:logic_selection_contract",
+      "protected_failure_ids": [
+        "researchguard:logic_selection_contract:body-order-incomplete"
+      ],
+      "required_child_case_ids": [],
+      "required_trace_labels": [],
+      "schema_version": "flowguard.native_model_case_binding.v1"
+    },
+    {
+      "binding_fingerprint": "sha256:da2c2a74d31925926d9aea8132dd8219ffd183fbfba2124007715cf738301d17",
+      "blueprint_case_id": "behavior-case:implementation-surface:ae2f8a4926d6a8b00fb7eb1a15349581115375e19f89ca7a13841e5ef44c2e6b:bad:case:logic_selection_contract:legacy-top-n-fallback",
+      "blueprint_source_case_id": "case:logic_selection_contract:legacy-top-n-fallback",
+      "case_kind": "bad",
+      "covered_dimensions": [
+        "completion",
+        "decision",
+        "effect",
+        "error",
+        "input",
+        "state"
+      ],
+      "evidence_scope": "model_policy",
+      "expected_finding_codes": [
+        "researchguard:logic_selection_contract:legacy-top-n-fallback"
+      ],
+      "expected_observed_status": "blocked",
+      "expected_status": "rejected",
+      "mapping_fingerprint": "sha256:6ad0fb6dc987c96bdaf4e54cadfc6d759b775ca139ff4382c179c422c385e283",
+      "native_case_ids": [
+        "case:logic_selection_contract:legacy-top-n-fallback"
+      ],
+      "owner_id": "model:logic_selection_contract",
+      "protected_failure_ids": [
+        "researchguard:logic_selection_contract:legacy-top-n-fallback"
+      ],
+      "required_child_case_ids": [],
+      "required_trace_labels": [],
+      "schema_version": "flowguard.native_model_case_binding.v1"
+    },
+    {
+      "binding_fingerprint": "sha256:7930be69253c84b950c9f98e01f174be0b2f96b18f9dde4c924114a997349d74",
+      "blueprint_case_id": "behavior-case:implementation-surface:ae2f8a4926d6a8b00fb7eb1a15349581115375e19f89ca7a13841e5ef44c2e6b:bad:case:logic_selection_contract:model-fingerprint-mismatch",
+      "blueprint_source_case_id": "case:logic_selection_contract:model-fingerprint-mismatch",
+      "case_kind": "bad",
+      "covered_dimensions": [
+        "completion",
+        "decision",
+        "effect",
+        "error",
+        "input",
+        "state"
+      ],
+      "evidence_scope": "model_policy",
+      "expected_finding_codes": [
+        "researchguard:logic_selection_contract:model-fingerprint-mismatch"
+      ],
+      "expected_observed_status": "blocked",
+      "expected_status": "rejected",
+      "mapping_fingerprint": "sha256:6ad0fb6dc987c96bdaf4e54cadfc6d759b775ca139ff4382c179c422c385e283",
+      "native_case_ids": [
+        "case:logic_selection_contract:model-fingerprint-mismatch"
+      ],
+      "owner_id": "model:logic_selection_contract",
+      "protected_failure_ids": [
+        "researchguard:logic_selection_contract:model-fingerprint-mismatch"
+      ],
+      "required_child_case_ids": [],
+      "required_trace_labels": [],
+      "schema_version": "flowguard.native_model_case_binding.v1"
+    },
+    {
+      "binding_fingerprint": "sha256:bd53f6653609aa872ff10cb5539360784997b84f5191d713b2cf64a22481688c",
+      "blueprint_case_id": "behavior-case:implementation-surface:ae2f8a4926d6a8b00fb7eb1a15349581115375e19f89ca7a13841e5ef44c2e6b:boundary:boundary:logic_selection_contract",
+      "blueprint_source_case_id": "boundary:logic_selection_contract",
+      "case_kind": "boundary",
+      "covered_dimensions": [
+        "completion",
+        "decision",
+        "error",
+        "input",
+        "retry",
+        "timeout"
+      ],
+      "evidence_scope": "model_policy",
+      "expected_finding_codes": [],
+      "expected_observed_status": "pass",
+      "expected_status": "pass",
+      "mapping_fingerprint": "sha256:6ad0fb6dc987c96bdaf4e54cadfc6d759b775ca139ff4382c179c422c385e283",
+      "native_case_ids": [
+        "boundary:logic_selection_contract"
+      ],
+      "owner_id": "model:logic_selection_contract",
+      "protected_failure_ids": [],
+      "required_child_case_ids": [],
+      "required_trace_labels": [],
+      "schema_version": "flowguard.native_model_case_binding.v1"
+    },
+    {
+      "binding_fingerprint": "sha256:3bc3c2a4c2413f761bf21ed2d1346c30437d8a86aa4981800bcdb5cbd386e91c",
+      "blueprint_case_id": "behavior-case:implementation-surface:ae2f8a4926d6a8b00fb7eb1a15349581115375e19f89ca7a13841e5ef44c2e6b:good:native:logic_selection_contract:current-good",
+      "blueprint_source_case_id": "native:logic_selection_contract:current-good",
+      "case_kind": "good",
+      "covered_dimensions": [
+        "completion",
+        "effect",
+        "input",
+        "order",
+        "output",
+        "state"
+      ],
+      "evidence_scope": "model_policy",
+      "expected_finding_codes": [],
+      "expected_observed_status": "pass",
+      "expected_status": "pass",
+      "mapping_fingerprint": "sha256:6ad0fb6dc987c96bdaf4e54cadfc6d759b775ca139ff4382c179c422c385e283",
+      "native_case_ids": [
+        "native:logic_selection_contract:current-good"
+      ],
+      "owner_id": "model:logic_selection_contract",
+      "protected_failure_ids": [],
+      "required_child_case_ids": [],
+      "required_trace_labels": [],
+      "schema_version": "flowguard.native_model_case_binding.v1"
+    },
+    {
+      "binding_fingerprint": "sha256:8e8c6f04860c65f2df897999c2277c98a381b7501e5e56f28ec80657b02e8794",
+      "blueprint_case_id": "behavior-case:implementation-surface:b007f656a3160d2efe414b4a0e3d175c85a63bed8162fd6f3fbfbc3fa5e383d3:bad:case:trace_domain_export:audit-context-promoted-to-domain",
+      "blueprint_source_case_id": "case:trace_domain_export:audit-context-promoted-to-domain",
+      "case_kind": "bad",
+      "covered_dimensions": [
+        "completion",
+        "decision",
+        "effect",
+        "error",
+        "input",
+        "state"
+      ],
+      "evidence_scope": "model_policy",
+      "expected_finding_codes": [
+        "researchguard:trace_domain_export:audit-context-promoted-to-domain"
+      ],
+      "expected_observed_status": "blocked",
+      "expected_status": "rejected",
+      "mapping_fingerprint": "sha256:6ad0fb6dc987c96bdaf4e54cadfc6d759b775ca139ff4382c179c422c385e283",
+      "native_case_ids": [
+        "case:trace_domain_export:audit-context-promoted-to-domain"
+      ],
+      "owner_id": "model:trace_domain_export",
+      "protected_failure_ids": [
+        "researchguard:trace_domain_export:audit-context-promoted-to-domain"
+      ],
+      "required_child_case_ids": [],
+      "required_trace_labels": [],
+      "schema_version": "flowguard.native_model_case_binding.v1"
+    },
+    {
+      "binding_fingerprint": "sha256:cb639a75f909960071dfd8503d2de098779bfc52a4a005c5a4c5996a8b12fbf6",
+      "blueprint_case_id": "behavior-case:implementation-surface:b007f656a3160d2efe414b4a0e3d175c85a63bed8162fd6f3fbfbc3fa5e383d3:bad:case:trace_domain_export:domain-proposition-missing",
+      "blueprint_source_case_id": "case:trace_domain_export:domain-proposition-missing",
+      "case_kind": "bad",
+      "covered_dimensions": [
+        "completion",
+        "decision",
+        "effect",
+        "error",
+        "input",
+        "state"
+      ],
+      "evidence_scope": "model_policy",
+      "expected_finding_codes": [
+        "researchguard:trace_domain_export:domain-proposition-missing"
+      ],
+      "expected_observed_status": "blocked",
+      "expected_status": "rejected",
+      "mapping_fingerprint": "sha256:6ad0fb6dc987c96bdaf4e54cadfc6d759b775ca139ff4382c179c422c385e283",
+      "native_case_ids": [
+        "case:trace_domain_export:domain-proposition-missing"
+      ],
+      "owner_id": "model:trace_domain_export",
+      "protected_failure_ids": [
+        "researchguard:trace_domain_export:domain-proposition-missing"
+      ],
+      "required_child_case_ids": [],
+      "required_trace_labels": [],
+      "schema_version": "flowguard.native_model_case_binding.v1"
+    },
+    {
+      "binding_fingerprint": "sha256:92837c5ceb598e4f24e3993b9f4552ebedbfed5c6a703be92868906e7553101d",
+      "blueprint_case_id": "behavior-case:implementation-surface:b007f656a3160d2efe414b4a0e3d175c85a63bed8162fd6f3fbfbc3fa5e383d3:bad:case:trace_domain_export:mechanism-reference-missing",
+      "blueprint_source_case_id": "case:trace_domain_export:mechanism-reference-missing",
+      "case_kind": "bad",
+      "covered_dimensions": [
+        "completion",
+        "decision",
+        "effect",
+        "error",
+        "input",
+        "state"
+      ],
+      "evidence_scope": "model_policy",
+      "expected_finding_codes": [
+        "researchguard:trace_domain_export:mechanism-reference-missing"
+      ],
+      "expected_observed_status": "blocked",
+      "expected_status": "rejected",
+      "mapping_fingerprint": "sha256:6ad0fb6dc987c96bdaf4e54cadfc6d759b775ca139ff4382c179c422c385e283",
+      "native_case_ids": [
+        "case:trace_domain_export:mechanism-reference-missing"
+      ],
+      "owner_id": "model:trace_domain_export",
+      "protected_failure_ids": [
+        "researchguard:trace_domain_export:mechanism-reference-missing"
+      ],
+      "required_child_case_ids": [],
+      "required_trace_labels": [],
+      "schema_version": "flowguard.native_model_case_binding.v1"
+    },
+    {
+      "binding_fingerprint": "sha256:9fe0857ca74697ecab47cb3a781e6a72cd2fad09d2fc3de67ea007c298e5308b",
+      "blueprint_case_id": "behavior-case:implementation-surface:b007f656a3160d2efe414b4a0e3d175c85a63bed8162fd6f3fbfbc3fa5e383d3:bad:case:trace_domain_export:temporal-order-promoted-to-causality",
+      "blueprint_source_case_id": "case:trace_domain_export:temporal-order-promoted-to-causality",
+      "case_kind": "bad",
+      "covered_dimensions": [
+        "completion",
+        "decision",
+        "effect",
+        "error",
+        "input",
+        "state"
+      ],
+      "evidence_scope": "model_policy",
+      "expected_finding_codes": [
+        "researchguard:trace_domain_export:temporal-order-promoted-to-causality"
+      ],
+      "expected_observed_status": "blocked",
+      "expected_status": "rejected",
+      "mapping_fingerprint": "sha256:6ad0fb6dc987c96bdaf4e54cadfc6d759b775ca139ff4382c179c422c385e283",
+      "native_case_ids": [
+        "case:trace_domain_export:temporal-order-promoted-to-causality"
+      ],
+      "owner_id": "model:trace_domain_export",
+      "protected_failure_ids": [
+        "researchguard:trace_domain_export:temporal-order-promoted-to-causality"
+      ],
+      "required_child_case_ids": [],
+      "required_trace_labels": [],
+      "schema_version": "flowguard.native_model_case_binding.v1"
+    },
+    {
+      "binding_fingerprint": "sha256:92e00459c09eb22cdbd5dd3cc109078998d8857e8eb800555f35a4d70403b2d1",
+      "blueprint_case_id": "behavior-case:implementation-surface:b007f656a3160d2efe414b4a0e3d175c85a63bed8162fd6f3fbfbc3fa5e383d3:boundary:boundary:trace_domain_export",
+      "blueprint_source_case_id": "boundary:trace_domain_export",
+      "case_kind": "boundary",
+      "covered_dimensions": [
+        "completion",
+        "decision",
+        "error",
+        "input",
+        "retry",
+        "timeout"
+      ],
+      "evidence_scope": "model_policy",
+      "expected_finding_codes": [],
+      "expected_observed_status": "pass",
+      "expected_status": "pass",
+      "mapping_fingerprint": "sha256:6ad0fb6dc987c96bdaf4e54cadfc6d759b775ca139ff4382c179c422c385e283",
+      "native_case_ids": [
+        "boundary:trace_domain_export"
+      ],
+      "owner_id": "model:trace_domain_export",
+      "protected_failure_ids": [],
+      "required_child_case_ids": [],
+      "required_trace_labels": [],
+      "schema_version": "flowguard.native_model_case_binding.v1"
+    },
+    {
+      "binding_fingerprint": "sha256:c2534714517f35b50c5146b904cc3b20a110d5a9b424df661acaab9e19c00bef",
+      "blueprint_case_id": "behavior-case:implementation-surface:b007f656a3160d2efe414b4a0e3d175c85a63bed8162fd6f3fbfbc3fa5e383d3:good:native:trace_domain_export:current-good",
+      "blueprint_source_case_id": "native:trace_domain_export:current-good",
+      "case_kind": "good",
+      "covered_dimensions": [
+        "completion",
+        "effect",
+        "input",
+        "order",
+        "output",
+        "state"
+      ],
+      "evidence_scope": "model_policy",
+      "expected_finding_codes": [],
+      "expected_observed_status": "pass",
+      "expected_status": "pass",
+      "mapping_fingerprint": "sha256:6ad0fb6dc987c96bdaf4e54cadfc6d759b775ca139ff4382c179c422c385e283",
+      "native_case_ids": [
+        "native:trace_domain_export:current-good"
+      ],
+      "owner_id": "model:trace_domain_export",
+      "protected_failure_ids": [],
+      "required_child_case_ids": [],
+      "required_trace_labels": [],
+      "schema_version": "flowguard.native_model_case_binding.v1"
+    },
+    {
+      "binding_fingerprint": "sha256:2039776bb8c82bba3115d6e3a46bd02af96f2c2d32da506d44c32ed270a78315",
+      "blueprint_case_id": "behavior-case:implementation-surface:c3cd8b0d1a85ce6841b1b27ab38662fcec452b1f326e91047f88072bc090fc72:bad:native:experimentguard:recommendation-boundary",
+      "blueprint_source_case_id": "native:experimentguard:recommendation-boundary",
+      "case_kind": "bad",
+      "covered_dimensions": [
+        "completion",
+        "decision",
+        "effect",
+        "error",
+        "input",
+        "state"
+      ],
+      "evidence_scope": "model_policy",
+      "expected_finding_codes": [
+        "researchguard:experiment-execution-overclaim"
+      ],
+      "expected_observed_status": "pass",
+      "expected_status": "pass",
+      "mapping_fingerprint": "sha256:6ad0fb6dc987c96bdaf4e54cadfc6d759b775ca139ff4382c179c422c385e283",
+      "native_case_ids": [
+        "native:experimentguard:recommendation-boundary"
+      ],
+      "owner_id": "model:researchguard_suite",
+      "protected_failure_ids": [
+        "researchguard:experiment-execution-overclaim"
+      ],
+      "required_child_case_ids": [],
+      "required_trace_labels": [],
+      "schema_version": "flowguard.native_model_case_binding.v1"
+    },
+    {
+      "binding_fingerprint": "sha256:0c8f628e2dde4171f752c2b934d809aa1e6a5b79038f4459f3822783e147daf3",
+      "blueprint_case_id": "behavior-case:implementation-surface:c3cd8b0d1a85ce6841b1b27ab38662fcec452b1f326e91047f88072bc090fc72:bad:native:member-task-iteration:strict-closure",
+      "blueprint_source_case_id": "native:member-task-iteration:strict-closure",
+      "case_kind": "bad",
+      "covered_dimensions": [
+        "completion",
+        "decision",
+        "effect",
+        "error",
+        "input",
+        "state"
+      ],
+      "evidence_scope": "model_policy",
+      "expected_finding_codes": [
+        "researchguard:premature-member-model-closure"
+      ],
+      "expected_observed_status": "pass",
+      "expected_status": "pass",
+      "mapping_fingerprint": "sha256:6ad0fb6dc987c96bdaf4e54cadfc6d759b775ca139ff4382c179c422c385e283",
+      "native_case_ids": [
+        "native:member-task-iteration:strict-closure"
+      ],
+      "owner_id": "model:researchguard_suite",
+      "protected_failure_ids": [
+        "researchguard:premature-member-model-closure"
+      ],
+      "required_child_case_ids": [],
+      "required_trace_labels": [],
+      "schema_version": "flowguard.native_model_case_binding.v1"
+    },
+    {
+      "binding_fingerprint": "sha256:0c53b4f6cde905d4312c769eef2dff34f0d1e119b00ebda46351eaedb18ef025",
+      "blueprint_case_id": "behavior-case:implementation-surface:c3cd8b0d1a85ce6841b1b27ab38662fcec452b1f326e91047f88072bc090fc72:bad:native:researchguard-suite:currentness-mismatch",
+      "blueprint_source_case_id": "native:researchguard-suite:currentness-mismatch",
+      "case_kind": "bad",
+      "covered_dimensions": [
+        "completion",
+        "decision",
+        "effect",
+        "error",
+        "input",
+        "state"
+      ],
+      "evidence_scope": "model_policy",
+      "expected_finding_codes": [
+        "researchguard:stale-suite-identity"
+      ],
+      "expected_observed_status": "pass",
+      "expected_status": "pass",
+      "mapping_fingerprint": "sha256:6ad0fb6dc987c96bdaf4e54cadfc6d759b775ca139ff4382c179c422c385e283",
+      "native_case_ids": [
+        "native:researchguard-suite:currentness-mismatch"
+      ],
+      "owner_id": "model:researchguard_suite",
+      "protected_failure_ids": [
+        "researchguard:stale-suite-identity"
+      ],
+      "required_child_case_ids": [],
+      "required_trace_labels": [],
+      "schema_version": "flowguard.native_model_case_binding.v1"
+    },
+    {
+      "binding_fingerprint": "sha256:f862ff4042f05c82091429f32b74c8319a77d43f380572cf8e57e779a5b479bf",
+      "blueprint_case_id": "behavior-case:implementation-surface:c3cd8b0d1a85ce6841b1b27ab38662fcec452b1f326e91047f88072bc090fc72:bad:scenario:rg03-or-rg06",
+      "blueprint_source_case_id": "scenario:rg03-or-rg06",
+      "case_kind": "bad",
+      "covered_dimensions": [
+        "completion",
+        "decision",
+        "effect",
+        "error",
+        "input",
+        "state"
+      ],
+      "evidence_scope": "model_policy",
+      "expected_finding_codes": [
+        "researchguard:ambiguous-or-recursive-route"
+      ],
+      "expected_observed_status": "pass",
+      "expected_status": "pass",
+      "mapping_fingerprint": "sha256:6ad0fb6dc987c96bdaf4e54cadfc6d759b775ca139ff4382c179c422c385e283",
+      "native_case_ids": [
+        "scenario:rg03-or-rg06"
+      ],
+      "owner_id": "model:researchguard_suite",
+      "protected_failure_ids": [
+        "researchguard:ambiguous-or-recursive-route"
+      ],
+      "required_child_case_ids": [],
+      "required_trace_labels": [],
+      "schema_version": "flowguard.native_model_case_binding.v1"
+    },
+    {
+      "binding_fingerprint": "sha256:b04da2a39c9e1f2b654e711e30c0620b86fafe4a291b9bf4feccf9a436793d2a",
+      "blueprint_case_id": "behavior-case:implementation-surface:c3cd8b0d1a85ce6841b1b27ab38662fcec452b1f326e91047f88072bc090fc72:bad:scenario:rg03-rg10-rg11",
+      "blueprint_source_case_id": "scenario:rg03-rg10-rg11",
+      "case_kind": "bad",
+      "covered_dimensions": [
+        "completion",
+        "decision",
+        "effect",
+        "error",
+        "input",
+        "state"
+      ],
+      "evidence_scope": "model_policy",
+      "expected_finding_codes": [
+        "researchguard:unproven-member-admission"
+      ],
+      "expected_observed_status": "pass",
+      "expected_status": "pass",
+      "mapping_fingerprint": "sha256:6ad0fb6dc987c96bdaf4e54cadfc6d759b775ca139ff4382c179c422c385e283",
+      "native_case_ids": [
+        "scenario:rg03-rg10-rg11"
+      ],
+      "owner_id": "model:researchguard_suite",
+      "protected_failure_ids": [
+        "researchguard:unproven-member-admission"
+      ],
+      "required_child_case_ids": [],
+      "required_trace_labels": [],
+      "schema_version": "flowguard.native_model_case_binding.v1"
+    },
+    {
+      "binding_fingerprint": "sha256:cffc3c8fc4f93d1a0a170c996670136b94b7c910f763f75ed6e332dae606cf4c",
+      "blueprint_case_id": "behavior-case:implementation-surface:c3cd8b0d1a85ce6841b1b27ab38662fcec452b1f326e91047f88072bc090fc72:bad:scenario:rg04",
+      "blueprint_source_case_id": "scenario:rg04",
+      "case_kind": "bad",
+      "covered_dimensions": [
+        "completion",
+        "decision",
+        "effect",
+        "error",
+        "input",
+        "state"
+      ],
+      "evidence_scope": "model_policy",
+      "expected_finding_codes": [
+        "researchguard:alternate-success-after-member-failure"
+      ],
+      "expected_observed_status": "pass",
+      "expected_status": "pass",
+      "mapping_fingerprint": "sha256:6ad0fb6dc987c96bdaf4e54cadfc6d759b775ca139ff4382c179c422c385e283",
+      "native_case_ids": [
+        "scenario:rg04"
+      ],
+      "owner_id": "model:researchguard_suite",
+      "protected_failure_ids": [
+        "researchguard:alternate-success-after-member-failure"
+      ],
+      "required_child_case_ids": [],
+      "required_trace_labels": [],
+      "schema_version": "flowguard.native_model_case_binding.v1"
+    },
+    {
+      "binding_fingerprint": "sha256:6885034991cdd00aa5044c0dbeca5eea10b6124daa744b40826a87d387321c93",
+      "blueprint_case_id": "behavior-case:implementation-surface:c3cd8b0d1a85ce6841b1b27ab38662fcec452b1f326e91047f88072bc090fc72:boundary:boundary:researchguard_suite",
+      "blueprint_source_case_id": "boundary:researchguard_suite",
+      "case_kind": "boundary",
+      "covered_dimensions": [
+        "completion",
+        "decision",
+        "error",
+        "input",
+        "retry",
+        "timeout"
+      ],
+      "evidence_scope": "model_policy",
+      "expected_finding_codes": [],
+      "expected_observed_status": "pass",
+      "expected_status": "pass",
+      "mapping_fingerprint": "sha256:6ad0fb6dc987c96bdaf4e54cadfc6d759b775ca139ff4382c179c422c385e283",
+      "native_case_ids": [
+        "boundary:researchguard_suite"
+      ],
+      "owner_id": "model:researchguard_suite",
+      "protected_failure_ids": [],
+      "required_child_case_ids": [],
+      "required_trace_labels": [],
+      "schema_version": "flowguard.native_model_case_binding.v1"
+    },
+    {
+      "binding_fingerprint": "sha256:842c68a2c4cbf2c2e5817946e1d6bfab3f401a1e1f93176d545d0212a6377811",
+      "blueprint_case_id": "behavior-case:implementation-surface:c3cd8b0d1a85ce6841b1b27ab38662fcec452b1f326e91047f88072bc090fc72:good:native-runner:researchguard-suite:declared-route-scenarios",
+      "blueprint_source_case_id": "native-runner:researchguard-suite:declared-route-scenarios",
+      "case_kind": "good",
+      "covered_dimensions": [
+        "completion",
+        "effect",
+        "input",
+        "order",
+        "output",
+        "state"
+      ],
+      "evidence_scope": "model_policy",
+      "expected_finding_codes": [],
+      "expected_observed_status": "pass",
+      "expected_status": "pass",
+      "mapping_fingerprint": "sha256:6ad0fb6dc987c96bdaf4e54cadfc6d759b775ca139ff4382c179c422c385e283",
+      "native_case_ids": [
+        "native-runner:researchguard-suite:declared-route-scenarios"
+      ],
+      "owner_id": "model:researchguard_suite",
+      "protected_failure_ids": [],
+      "required_child_case_ids": [],
+      "required_trace_labels": [],
+      "schema_version": "flowguard.native_model_case_binding.v1"
+    },
+    {
+      "binding_fingerprint": "sha256:9e054e2a59ad4c037370ede34fcbdce8f2fc0deaf7c561fedd832e8ac4585eb3",
+      "blueprint_case_id": "behavior-case:implementation-surface:eb33d6f25f37176a86634eeee127ad706a725182d511ffe6a0758834f964e893:bad:native:compositional_verification_kernel:binding-missing",
+      "blueprint_source_case_id": "native:compositional_verification_kernel:binding-missing",
+      "case_kind": "bad",
+      "covered_dimensions": [
+        "completion",
+        "decision",
+        "effect",
+        "error",
+        "input",
+        "state"
+      ],
+      "evidence_scope": "model_policy",
+      "expected_finding_codes": [
+        "researchguard:compositional_verification_kernel:binding-missing"
+      ],
+      "expected_observed_status": "blocked",
+      "expected_status": "rejected",
+      "mapping_fingerprint": "sha256:6ad0fb6dc987c96bdaf4e54cadfc6d759b775ca139ff4382c179c422c385e283",
+      "native_case_ids": [
+        "native:compositional_verification_kernel:binding-missing"
+      ],
+      "owner_id": "model:compositional_verification_kernel",
+      "protected_failure_ids": [
+        "researchguard:compositional_verification_kernel:binding-missing"
+      ],
+      "required_child_case_ids": [],
+      "required_trace_labels": [],
+      "schema_version": "flowguard.native_model_case_binding.v1"
+    },
+    {
+      "binding_fingerprint": "sha256:56ad2f0546e826f042b8252bccf5bf5c00ef2eb3d2e86d32bc556cf70deeec3f",
+      "blueprint_case_id": "behavior-case:implementation-surface:eb33d6f25f37176a86634eeee127ad706a725182d511ffe6a0758834f964e893:bad:native:compositional_verification_kernel:definition-missing",
+      "blueprint_source_case_id": "native:compositional_verification_kernel:definition-missing",
+      "case_kind": "bad",
+      "covered_dimensions": [
+        "completion",
+        "decision",
+        "effect",
+        "error",
+        "input",
+        "state"
+      ],
+      "evidence_scope": "model_policy",
+      "expected_finding_codes": [
+        "researchguard:compositional_verification_kernel:definition-missing"
+      ],
+      "expected_observed_status": "blocked",
+      "expected_status": "rejected",
+      "mapping_fingerprint": "sha256:6ad0fb6dc987c96bdaf4e54cadfc6d759b775ca139ff4382c179c422c385e283",
+      "native_case_ids": [
+        "native:compositional_verification_kernel:definition-missing"
+      ],
+      "owner_id": "model:compositional_verification_kernel",
+      "protected_failure_ids": [
+        "researchguard:compositional_verification_kernel:definition-missing"
+      ],
+      "required_child_case_ids": [],
+      "required_trace_labels": [],
+      "schema_version": "flowguard.native_model_case_binding.v1"
+    },
+    {
+      "binding_fingerprint": "sha256:5ea58b310595454c73f7759ca44cec3e823820af3963e9ee77add675b335db8e",
+      "blueprint_case_id": "behavior-case:implementation-surface:eb33d6f25f37176a86634eeee127ad706a725182d511ffe6a0758834f964e893:bad:native:compositional_verification_kernel:evidence-stale",
+      "blueprint_source_case_id": "native:compositional_verification_kernel:evidence-stale",
+      "case_kind": "bad",
+      "covered_dimensions": [
+        "completion",
+        "decision",
+        "effect",
+        "error",
+        "input",
+        "state"
+      ],
+      "evidence_scope": "model_policy",
+      "expected_finding_codes": [
+        "researchguard:compositional_verification_kernel:evidence-stale"
+      ],
+      "expected_observed_status": "blocked",
+      "expected_status": "rejected",
+      "mapping_fingerprint": "sha256:6ad0fb6dc987c96bdaf4e54cadfc6d759b775ca139ff4382c179c422c385e283",
+      "native_case_ids": [
+        "native:compositional_verification_kernel:evidence-stale"
+      ],
+      "owner_id": "model:compositional_verification_kernel",
+      "protected_failure_ids": [
+        "researchguard:compositional_verification_kernel:evidence-stale"
+      ],
+      "required_child_case_ids": [],
+      "required_trace_labels": [],
+      "schema_version": "flowguard.native_model_case_binding.v1"
+    },
+    {
+      "binding_fingerprint": "sha256:5a58d3e6518c8bb98c565ec8513ed70fb8bd72bd5f6d0af08f35cb469e304a1c",
+      "blueprint_case_id": "behavior-case:implementation-surface:eb33d6f25f37176a86634eeee127ad706a725182d511ffe6a0758834f964e893:boundary:boundary:compositional_verification_kernel",
+      "blueprint_source_case_id": "boundary:compositional_verification_kernel",
+      "case_kind": "boundary",
+      "covered_dimensions": [
+        "completion",
+        "decision",
+        "error",
+        "input",
+        "retry",
+        "timeout"
+      ],
+      "evidence_scope": "model_policy",
+      "expected_finding_codes": [],
+      "expected_observed_status": "pass",
+      "expected_status": "pass",
+      "mapping_fingerprint": "sha256:6ad0fb6dc987c96bdaf4e54cadfc6d759b775ca139ff4382c179c422c385e283",
+      "native_case_ids": [
+        "boundary:compositional_verification_kernel"
+      ],
+      "owner_id": "model:compositional_verification_kernel",
+      "protected_failure_ids": [],
+      "required_child_case_ids": [],
+      "required_trace_labels": [],
+      "schema_version": "flowguard.native_model_case_binding.v1"
+    },
+    {
+      "binding_fingerprint": "sha256:04923f3fb2011b29e411bbcd56de5ff3583decafc492075ffb1f605d7d509fdc",
+      "blueprint_case_id": "behavior-case:implementation-surface:eb33d6f25f37176a86634eeee127ad706a725182d511ffe6a0758834f964e893:good:native:compositional_verification_kernel:current-good",
+      "blueprint_source_case_id": "native:compositional_verification_kernel:current-good",
+      "case_kind": "good",
+      "covered_dimensions": [
+        "completion",
+        "effect",
+        "input",
+        "order",
+        "output",
+        "state"
+      ],
+      "evidence_scope": "model_policy",
+      "expected_finding_codes": [],
+      "expected_observed_status": "pass",
+      "expected_status": "pass",
+      "mapping_fingerprint": "sha256:6ad0fb6dc987c96bdaf4e54cadfc6d759b775ca139ff4382c179c422c385e283",
+      "native_case_ids": [
+        "native:compositional_verification_kernel:current-good"
+      ],
+      "owner_id": "model:compositional_verification_kernel",
+      "protected_failure_ids": [],
+      "required_child_case_ids": [],
+      "required_trace_labels": [],
+      "schema_version": "flowguard.native_model_case_binding.v1"
+    }
+  ],
+  "diagnostic_native_case_ids": [],
+  "mapping_fingerprint": "sha256:6ad0fb6dc987c96bdaf4e54cadfc6d759b775ca139ff4382c179c422c385e283",
+  "schema_version": "flowguard.native_case_mapping.v1",
+  "source_manifest_fingerprint": "sha256:d8fb2e62a1b9438c6647e7284b5501141a81ca92f33fe8badcf0ef89ef880d7f",
+  "source_paths": [
+    ".flowguard/models/owners/argument_support_closure/model.py",
+    ".flowguard/models/owners/authoritative_model_system/model.py",
+    ".flowguard/models/owners/compositional_verification_kernel/model.py",
+    ".flowguard/models/owners/discourse_structure/model.py",
+    ".flowguard/models/owners/hierarchical_model_mesh/model.py",
+    ".flowguard/models/owners/logic_selection_contract/model.py",
+    ".flowguard/models/owners/logic_synthesis/model.py",
+    ".flowguard/models/owners/model_test_code_alignment/model.py",
+    ".flowguard/models/owners/researchguard_suite/model.py",
+    ".flowguard/models/owners/trace_domain_export/model.py",
+    ".flowguard/models/regression-manifest.json",
+    ".flowguard/verification/owners/argument_support_closure/run_checks.py",
+    ".flowguard/verification/owners/authoritative_model_system/run_checks.py",
+    ".flowguard/verification/owners/compositional_verification_kernel/run_checks.py",
+    ".flowguard/verification/owners/discourse_structure/run_checks.py",
+    ".flowguard/verification/owners/hierarchical_model_mesh/run_checks.py",
+    ".flowguard/verification/owners/logic_selection_contract/run_checks.py",
+    ".flowguard/verification/owners/logic_synthesis/run_checks.py",
+    ".flowguard/verification/owners/model_test_code_alignment/run_checks.py",
+    ".flowguard/verification/owners/researchguard_suite/run_checks.py",
+    ".flowguard/verification/owners/trace_domain_export/run_checks.py"
+  ]
+}

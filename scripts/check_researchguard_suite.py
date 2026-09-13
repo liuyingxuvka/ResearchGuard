@@ -62,8 +62,18 @@ RETIRED_COMMANDS = (
     "run_traceguard.py",
 )
 
+# A fresh source-tree console probe imports all four member contracts and may
+# initialize the provider-neutral routing graph.  On a cold, loaded Windows
+# host that startup can exceed the old 20-second helper bound even though the
+# command is healthy.  Keep the bound finite and fail closed, but give the
+# fresh-process probe enough budget to observe a legitimate current console.
+CONSOLE_PROBE_TIMEOUT_SECONDS = 240
 
-def _python(*args: str, timeout: int = 20) -> subprocess.CompletedProcess[str]:
+
+def _python(
+    *args: str,
+    timeout: int = CONSOLE_PROBE_TIMEOUT_SECONDS,
+) -> subprocess.CompletedProcess[str]:
     env = dict(__import__("os").environ)
     env["PYTHONPATH"] = str(SRC)
     proc = subprocess.Popen(

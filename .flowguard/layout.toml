@@ -28,9 +28,9 @@ history = "non_authority"
 [inventory]
 schema = "flowguard.project_layout_shape.v1"
 mode = "exact"
-fingerprint = "sha256:7a05b0d0bcdfb90c52f0835ca6333d6d41df345a430f9814cae7555185df8b7c"
-member_count = 64
-role_fingerprints = {behavior = "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945", evidence = "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945", history = "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945", models = "sha256:1f8e0ef1f4990016b81dc8f92060e6685109eedeb47a1f0f4830627f027bba0b", structure = "sha256:483f5cfc186669693b1c27bf1941c11fc1f9fb44d0e3820fa9b855bd88fde7de", verification = "sha256:c8be200dbd17b4ca9539a731ea32b29025f434718091c0a0bd73b38b390d4dfc"}
+fingerprint = "sha256:b005a0e8af826cf244b6d6870e7f60cd06683eff9ae7df0f327b051ad0675f5f"
+member_count = 65
+role_fingerprints = {behavior = "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945", evidence = "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945", history = "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945", models = "sha256:742a34c22cd2f317bd965a86fb5f5319ff4c1397bd4a80599ceb04d768587016", structure = "sha256:483f5cfc186669693b1c27bf1941c11fc1f9fb44d0e3820fa9b855bd88fde7de", verification = "sha256:c8be200dbd17b4ca9539a731ea32b29025f434718091c0a0bd73b38b390d4dfc"}
 
 [[inventory.members]]
 path = "models"
@@ -49,6 +49,11 @@ kind = "file"
 
 [[inventory.members]]
 path = "models/logicguard_skill_contract_model.py"
+role = "models"
+kind = "file"
+
+[[inventory.members]]
+path = "models/native-case-mapping.json"
 role = "models"
 kind = "file"
 

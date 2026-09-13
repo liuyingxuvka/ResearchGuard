@@ -89,6 +89,8 @@ def test_contract_keeps_one_native_owner_with_exact_blueprint_components(member:
         f"check:{member}:task-model-closure",
     }
     assert set(checks) == expected_ids
+    assert checks[f"check:{member}:consumer-contract"]["timeout_seconds"] == 300
+    assert checks[f"check:{member}:prompt-load"]["timeout_seconds"] == 60
     assert checks[f"check:{member}:prompt-load"]["depends_on_check_ids"] == [
         f"check:{member}:consumer-contract"
     ]

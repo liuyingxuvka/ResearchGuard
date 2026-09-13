@@ -5,11 +5,15 @@ description: Use LogicGuard for argument structure, claim licensing, source-libr
 
 # LogicGuard
 
-## Purpose and first action
+## Purpose
 
 LogicGuard is the direct ResearchGuard member for hierarchical executable argument modeling. Select exactly one current internal route, read only its owning reference, then build or inspect the model before writing a conclusion.
 
 Use the native console surface `researchguard logic ...` when command execution is required.
+
+## Entrypoint Scope
+
+LogicGuard owns structural reasoning: argument hierarchy, claim licensing, source-library structure, structured artifacts, model deepening, and evidence-bounded synthesis. It owns the structural support decision for the selected task; factual truth, source discovery, and temporal causality remain typed handoffs to the responsible member.
 
 ## Route map
 
@@ -21,6 +25,17 @@ Use the native console surface `researchguard logic ...` when command execution 
 - `route:project-library-viewer` → inspect the read-only project source-library UI. Read `references/routes/project-library-viewer.md`.
 
 Multiple unclear internal routes remain in `route:general-argument` until one first action is selected. Do not silently try another route.
+
+## Local Material Routing
+
+Read only the reference declared by the selected route. Load conditional references when their trigger fires, and keep member-domain material under the LogicGuard skill tree; the ResearchGuard repository software-DNA root remains FlowGuard-owned.
+
+## Entrypoint Acceptance Map
+
+- Accept `route:general-argument` after the structural task and first action are declared.
+- Accept a named route only after its owning reference is loaded and the target model or artifact is identified.
+- Accept blueprint, deepening, synthesis, citation, or template work only after its conditional reference and native evidence boundary are loaded.
+- If the route, target, support, warrant, or current native receipt is missing, return a visible non-closure terminal instead of selecting another route or claiming closure.
 
 ## Conditional depth map
 
@@ -35,9 +50,29 @@ Multiple unclear internal routes remain in `route:general-argument` until one fi
 
 These triggers control loading, not quality levels. Once a deep trigger fires, continue the current native predict-validate-revise loop until closure or a visible non-closure terminal.
 
-## Use and non-use boundary
+## Use When
 
-Use LogicGuard for structural reasoning, important writing audits, conclusion tournaments, artifact hierarchy, source-library reasoning, model deepening, and evidence-bounded synthesis. Do not use it to decide factual truth, discover missing external evidence silently, reconstruct a temporal storyline, or turn chronology into causality. Emit an explicit SourceGuard or TraceGuard handoff instead.
+Use LogicGuard for structural reasoning, important writing audits, conclusion tournaments, artifact hierarchy, source-library reasoning, model deepening, and evidence-bounded synthesis.
+
+## Do Not Use When
+
+Do not use LogicGuard to decide factual truth, discover missing external evidence silently, reconstruct a temporal storyline, or turn chronology into causality. Emit an explicit SourceGuard or TraceGuard handoff instead.
+
+## Required Workflow
+
+1. Declare one current route, the task target, and the intended structural decision.
+2. Read only the route-owned reference, then load conditional references for every active trigger.
+3. Build or inspect the executable model before drafting a conclusion; record support, warrant, assumption, boundary, opposition, and downstream contribution.
+4. Run the native predict-validate-revise loop and the exact native checks required by the route.
+5. Close only with current target-native evidence, or return the visible non-closure terminal and the smallest typed handoff.
+6. Return the required evidence and claim boundary with safe wording (`assert`, `qualify`, or `withhold`).
+
+## Hard Gates
+
+- Exactly one current internal route owns the task; ambiguity stays in `route:general-argument` until the first action is selected.
+- Missing structural support, warrant, assumption, boundary, opposition, perturbation, target-unit/card coverage, or current native receipts blocks closure.
+- A caller-invented receipt, co-shrunk inventory, self-report, or member-authored replacement cannot qualify as external authority.
+- A different target needs its own external admission and anchor; a member result cannot silently upgrade another member's claim.
 
 ## Native closure
 
@@ -47,6 +82,6 @@ For a domain blueprint, LogicGuard's artifact parser must replay one externally 
 
 Anchor and receipt locators and hashes are persistent evidence, not cache entries. Direct blueprint use without external admission remains unverified. LogicGuard exposes no public or generic target, attestation, or receipt issuer and no inline candidate-authoring shortcut.
 
-## Output
+## Output Requirements
 
-Return route and model identity, loaded references and triggers, evidence, failures, blockers, skipped checks, open gaps, minimal support/attack sets where applicable, safe wording (`assert`, `qualify`, or `withhold`), typed handoffs, terminal reason, residual risk, and claim boundary.
+Return route and model identity, loaded references and triggers, `evidence`, `failures`, `blockers`, `skipped_checks`, open gaps, minimal support/attack sets where applicable, safe wording (`assert`, `qualify`, or `withhold`), typed handoffs, terminal reason, `residual_risk`, and `claim_boundary`.

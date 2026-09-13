@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import inspect
 import sys
 import time
 from pathlib import Path
@@ -29,3 +30,10 @@ def test_console_probe_timeout_is_terminal_and_bounded():
     assert elapsed < 8
     assert result.returncode == 124
     assert "PROCESS_TREE_TIMEOUT=1" in result.stderr
+
+
+def test_source_console_probe_has_a_bounded_cold_start_budget():
+    checker = _load_checker()
+    parameter = inspect.signature(checker._python).parameters["timeout"]
+    assert checker.CONSOLE_PROBE_TIMEOUT_SECONDS == 240
+    assert parameter.default == checker.CONSOLE_PROBE_TIMEOUT_SECONDS

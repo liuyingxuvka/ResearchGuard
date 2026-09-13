@@ -128,9 +128,9 @@
           "check:model-regression:authoritative_model_system"
         ],
         "model_sha256": "sha256:a08802cfd3e4373a81914281931147c47c5b669ba75708a4cef801c255cc39d3",
-        "runner_sha256": "sha256:5731dc168785a08148bad7b53db94a658ab708e29f8ad51a5ebfd09fadfa3e6a",
+        "runner_sha256": "sha256:04f76125c565eabda826c5049480cd9eee52ebb976e7790e7b7f68904615ee4a",
         "declaration_fingerprint": "sha256:734cefa96ddddfa9e614673516569f28bf2d584a5d8a53b6cca816ee001d8966",
-        "closure_fingerprint": "sha256:0211358e597f87ccea16adebad1aef1a2e8e582ba67758a5473fbe182ad50124"
+        "closure_fingerprint": "sha256:d4d3cf3888d576a77d5dbac880598c1cc6fd4bc90b56df2ff0296aaae4afd8c1"
       }
     },
     {
@@ -193,9 +193,9 @@
           "check:model-regression:compositional_verification_kernel"
         ],
         "model_sha256": "sha256:4d008f62db5c74b5e8f01cd3bcd1633f52f34f6813cdd7855065a69127ddaa83",
-        "runner_sha256": "sha256:0c093a2faeb6bb93b79463c860c45b01edb4d02f4dcda4c6ebecac2fbb560876",
+        "runner_sha256": "sha256:e1993662977c68836588556f6bc8b84840b9496a2518277e411717a9b32f644d",
         "declaration_fingerprint": "sha256:74303de2caf0ddb5897249a954e44933ab40ed8e05f55c034c73c4efa7d669c4",
-        "closure_fingerprint": "sha256:322dc8224e050b414d40a0b531aa9b1c33d068bb10fb2dfb520872d9b3e5f322"
+        "closure_fingerprint": "sha256:55ac3822a3f78b96aa2638956858c2c21bacb1d82a81c1501e6c9e0b471d94d2"
       }
     },
     {
@@ -206,12 +206,30 @@
         ".flowguard/verification/owners/researchguard_suite/run_checks.py"
       ],
       "tier": "full",
-      "timeout_seconds": 240,
+      "timeout_seconds": 1200,
       "shard_safe": true,
       "mutation_policy": "none",
       "input_globs": [
         ".flowguard/models/owners/researchguard_suite/model.py",
         ".flowguard/verification/owners/researchguard_suite/run_checks.py",
+        ".flowguard/models/owners/authoritative_model_system/model.py",
+        ".flowguard/verification/owners/authoritative_model_system/run_checks.py",
+        ".flowguard/models/owners/compositional_verification_kernel/model.py",
+        ".flowguard/verification/owners/compositional_verification_kernel/run_checks.py",
+        ".flowguard/models/owners/hierarchical_model_mesh/model.py",
+        ".flowguard/verification/owners/hierarchical_model_mesh/run_checks.py",
+        ".flowguard/models/owners/model_test_code_alignment/model.py",
+        ".flowguard/verification/owners/model_test_code_alignment/run_checks.py",
+        ".flowguard/models/owners/logic_synthesis/model.py",
+        ".flowguard/verification/owners/logic_synthesis/run_checks.py",
+        ".flowguard/models/owners/logic_selection_contract/model.py",
+        ".flowguard/verification/owners/logic_selection_contract/run_checks.py",
+        ".flowguard/models/owners/argument_support_closure/model.py",
+        ".flowguard/verification/owners/argument_support_closure/run_checks.py",
+        ".flowguard/models/owners/discourse_structure/model.py",
+        ".flowguard/verification/owners/discourse_structure/run_checks.py",
+        ".flowguard/models/owners/trace_domain_export/model.py",
+        ".flowguard/verification/owners/trace_domain_export/run_checks.py",
         ".flowguard/models/owners/authoritative_model_system/semantic_model_mesh.json",
         ".flowguard/models/researchguard_suite_model.py",
         ".flowguard/models/researchguard_suite/model-definition.json",
@@ -315,9 +333,9 @@
           "check:researchguard:native-suite"
         ],
         "model_sha256": "sha256:22976dc1c1afff087047811457eccc78665705366e7919b0d0bad48db31a5516",
-        "runner_sha256": "sha256:3c4c7616f901b30730d6da38852385e1e5c7bb26e2550f891749dfcaf4725edf",
+        "runner_sha256": "sha256:2e028d7fde8237f6207b3615c78c209a37e186253c319317e83ebadd22a3f09a",
         "declaration_fingerprint": "sha256:127254026c95ce948a725619f36387fb3592aeaeecbacd21249f1b157b59d482",
-        "closure_fingerprint": "sha256:b2df901932e917c310e6ab1b05f9cfb81ec4cd8e08d1ee53f48f032f4c3662b8"
+        "closure_fingerprint": "sha256:9ec37f5640f3055bc3bfce04fddd87fd9d3b88b7beea0a4d8d8651c76eac5736"
       }
     },
     {
@@ -393,9 +411,9 @@
           "check:model-regression:hierarchical_model_mesh"
         ],
         "model_sha256": "sha256:fea4a7f5816212d906c3882bd98aa935272cbd7d1cb2197df4b1d963d6cfecf0",
-        "runner_sha256": "sha256:5458eb7269867b917e4561e7d147f0cd883ea7ac87ca7a4d3c3ed838bad7aed1",
+        "runner_sha256": "sha256:1c67fe71af9285bd82d6dd4d095b60380455f3e95d2363f7dee360eb85a7a811",
         "declaration_fingerprint": "sha256:d06b226fe0d7cbe55ad73ad6d6f2703d00d559b39eadce4e5218b30ad9a18bc4",
-        "closure_fingerprint": "sha256:5e8d65b7d293cfe5759004b828bbc6c6f9637bdf0a89eaf5f422e9344bd5e930"
+        "closure_fingerprint": "sha256:9ce61a6ef2f72610f870353ed5ef15acaf25aa42200d70d2b6c5ff7206e2f965"
       }
     },
     {
@@ -471,9 +489,9 @@
           "check:model-regression:model_test_code_alignment"
         ],
         "model_sha256": "sha256:56a73efb4dbd9e2ba8cce8099c3b8d028127806b81048b990d058675a3dfcecd",
-        "runner_sha256": "sha256:b431b160df580d312a771c87779653e640a4aaf736a43e0d23bac647a846e77f",
+        "runner_sha256": "sha256:5af40b5fbac3771f9089c6d480b137bc79d2fd6fac297892b50d73712b20f4d3",
         "declaration_fingerprint": "sha256:3c2e518dc49af5b7a16ecfca37491c42748f193fa04c11d48dff86cf7d36c8b4",
-        "closure_fingerprint": "sha256:d9f98b38387c0fa97b386bd0e9e04948a02a1f782fd1f54bf9c3ee29d489fe39"
+        "closure_fingerprint": "sha256:ec10401340b27bcefb1a4a6e4a6e1411d38449af4a55c08eae682150069dbccd"
       }
     },
     {
@@ -543,9 +561,9 @@
           "check:model-regression:logic_synthesis"
         ],
         "model_sha256": "sha256:608d149b74e16f58643b76b848cfa8236e5e4622b6875c4c924828c0c0961f80",
-        "runner_sha256": "sha256:f739da226ef3e68bae71e3cbd7c87ab657ac5abba8b408345ac67801f5cd5c24",
+        "runner_sha256": "sha256:a29cc85eb5406f422e672a9018a2963de7136a515f95489f2c48fb3d56530c5e",
         "declaration_fingerprint": "sha256:ca486a3e359cb321dc39fa090116f38fdfac2baa111c740e250388966eb4ed5f",
-        "closure_fingerprint": "sha256:0028589554f58fbd235be3f891d71d0bb3549fbfa5c38cd749c5d71d62473633"
+        "closure_fingerprint": "sha256:4190ce96dc2aa0327b51acd676411018cdb87e43527d7e84c35b43573b2a7333"
       }
     },
     {
@@ -615,9 +633,9 @@
           "check:model-regression:logic_selection_contract"
         ],
         "model_sha256": "sha256:dfac767d01cbbc9917fdb799d1b63796eff34329dfdf9ea81f7992d70d4a5fa8",
-        "runner_sha256": "sha256:07aace2601c7e4170a0e170f65040e893b2f145399835396693ae75c4638e0d8",
+        "runner_sha256": "sha256:3fe39353c457c3f23ba744b3664b9f34e4219a81eee658f14ec09995df227a8b",
         "declaration_fingerprint": "sha256:60695de9d10ddcda4768b4dbd5bd009b4928c2099f7fad2a34773232479876a9",
-        "closure_fingerprint": "sha256:3bb9ad9e9bd3f5a84df3abfe656ba2ae192a276e952446ac55fef2955a904b09"
+        "closure_fingerprint": "sha256:8561104fc91d189b270adc4a6c23cf3e44ff9154cf5fb2fab219ce9b1d942bd6"
       }
     },
     {
@@ -687,9 +705,9 @@
           "check:model-regression:argument_support_closure"
         ],
         "model_sha256": "sha256:10fed2e6b8078b0d23fe65fe1543f76e024421d41d2d1fb8aaa9d9543a3d518a",
-        "runner_sha256": "sha256:ce7330503f629ca7a2acddc3996b8d6792bd6e481999a93c01d2b1166c7c4cc7",
+        "runner_sha256": "sha256:2a141c8edf63c745fd8eb56c76c32f2eff141154e035de2b954a521e5f51acee",
         "declaration_fingerprint": "sha256:84cf5129e4a9ef383398f55484794257a1bd7136622c1c190c2fb2b6d0aab972",
-        "closure_fingerprint": "sha256:dcb92dc56abb2c8bcba2af56269eeb7d55b5ee972ffd5df1ff6f1cc9a782072d"
+        "closure_fingerprint": "sha256:83cae9e77e3aa2b642dd385ac794e3014b89be894e52eabbc4c984f8f5bbbd1a"
       }
     },
     {
@@ -765,9 +783,9 @@
           "check:model-regression:discourse_structure"
         ],
         "model_sha256": "sha256:7b1fc003ac45990fd546dacf789a3874d1eda778eddde00415b78724ebd30f20",
-        "runner_sha256": "sha256:fd7b2c1447705cc6af150f9ee94a2f8b7892d5e1db429c6e92db7a1629c46b70",
+        "runner_sha256": "sha256:eef4b3fe9cde163ede0e60a322458b21356ba154d8a47675bfa87d53b73aa6e5",
         "declaration_fingerprint": "sha256:6808b065969869de22781fc8bbb026a0a60fbf23b9eb0184752e6453d8e61814",
-        "closure_fingerprint": "sha256:63c6d3b877218544d3a190a1ddb767eab966649d7a25d21bf18b76087fa6b4d7"
+        "closure_fingerprint": "sha256:424065b3720deed8e4ecb3f91a46583a6ab85b74c7b32c9d91b8f8ed91d55f97"
       }
     },
     {
@@ -838,9 +856,9 @@
           "check:model-regression:trace_domain_export"
         ],
         "model_sha256": "sha256:9c86289be032b0e256f83c69bf95ce90e858d4c8a39900e1fc6d1109e45d90aa",
-        "runner_sha256": "sha256:7d7b73a228f1289e74a74aa86f4561efd64fef71e7e46dd3cf3958fbd2cdc115",
+        "runner_sha256": "sha256:5046cca8208297a361cf1cbb4e73605929924196fde51cbaa223073fce241209",
         "declaration_fingerprint": "sha256:e872e2b4a45a0434e8bcf39b1f042e73971fc7219d295de9da36b7863c659f94",
-        "closure_fingerprint": "sha256:0dcfb984e8b5d879e341a03c4de54ca62118cdf8444e291fce54a0a4cfa71f19"
+        "closure_fingerprint": "sha256:6fc4c3281bda6ab7281e127c8c6684a7b54d37ebe98aac1ef1f56b83db1d323b"
       }
     }
   ]

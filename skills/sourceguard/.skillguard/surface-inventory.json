@@ -348,7 +348,7 @@
       "kind": "config",
       "name": ".skillguard/contract-source.json",
       "source_path": ".skillguard/contract-source.json",
-      "source_fingerprint": "sha256:f21b6c5cbb3cb4d75abceaefb3100f30f2bd4a05732e4cbee4af5d550014df9b",
+      "source_fingerprint": "sha256:59327873758b997670d3569f60298259ff55662881f4d5a489775022b11ac0d4",
       "function_id": "config:.skillguard/contract-source.json",
       "route_id": "config:.skillguard/contract-source.json",
       "review_group_id": "group:surface:10513a60240614296b758ebb",
@@ -489,7 +489,7 @@
       "kind": "template",
       "name": "SKILL.md",
       "source_path": "SKILL.md",
-      "source_fingerprint": "sha256:d2f6401932766ccfe64d175b19ff9033d15d30d1304ef0c62bd78936de9829c4",
+      "source_fingerprint": "sha256:fdee5d54746f847eff77c8708b890af9e80049ba1d1f365a1a841b933dfb51a8",
       "function_id": "template:SKILL.md",
       "route_id": "template:SKILL.md",
       "review_group_id": "group:surface:45d8dca86b7e8a7dd698b75b",
@@ -1051,7 +1051,7 @@
       "proof_ref": ".skillguard/surface-inventory.json#full_discovery_fingerprint"
     }
   },
-  "full_discovery_fingerprint": "sha256:d179cddbe03a42fe2064707a4134d2be89d4fdb81f62730d71768d227b29f63f",
+  "full_discovery_fingerprint": "sha256:fa285a57cfc8cf463d54204c8f9d541410177cbf496580983e46df190b975921",
   "adequacy_check_ids": [
     "check:sourceguard:consumer-contract",
     "check:sourceguard:native-tests",
@@ -1060,5 +1060,5 @@
   ],
   "model_deepening_check_id": "check:sourceguard:task-model-closure",
   "claim_boundary": "The declared member skill root is the source-discovery boundary. Its native package is separately bound by the contract's implementation paths and check inputs. This author map proves neither native check execution nor domain correctness, installation, release, or future AI behavior.",
-  "inventory_hash": "sha256:26d4749d38bf34727f09b77159694481cbb082355c6b41409fa105d2fa29e283"
+  "inventory_hash": "sha256:a56949633305691e7f6e585e78c40be6097e8a5b2116c76caf1110700250febc"
 }

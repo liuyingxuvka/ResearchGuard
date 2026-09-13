@@ -253,7 +253,7 @@
       "expected": {
         "exit_code": 0
       },
-      "timeout_seconds": 60,
+      "timeout_seconds": 300,
       "evidence_class": "hard",
       "evidence_domain_id": "evidence-domain:researchguard:experimentguard:consumer-contract",
       "execution_owner_id": "owner:researchguard:experimentguard:consumer-contract",

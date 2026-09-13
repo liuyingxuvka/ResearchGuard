@@ -85,6 +85,14 @@ def test_child_native_emitter_uses_declared_case_kind_dimensions(
         assert {
             oracle["dimension"] for oracle in row["oracle_results"]
         } == expected
+        # ``ok`` is the oracle's verdict about whether the declared scenario
+        # was observed as expected.  A child bad case is deliberately emitted
+        # as rejected/blocked, but that expected rejection is still a passing
+        # oracle check and must project through the native-case registry.
+        assert all(oracle.get("ok") is True for oracle in row["oracle_results"])
+        if _expected_kind(index) == "bad":
+            assert row["outcome"] == "rejected"
+            assert row["observed_status"] == "blocked"
 
 
 def test_parent_native_emitter_uses_declared_case_kind_dimensions() -> None:

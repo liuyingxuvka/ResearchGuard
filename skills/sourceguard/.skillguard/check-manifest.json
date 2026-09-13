@@ -1,5 +1,5 @@
 {
-  "check_declarations_hash": "387CB7447145A6548CECC4EE098367BFA5C7014A3A0065D9DEBBE4A39630B011",
+  "check_declarations_hash": "F2D9A89ECB485A1576FA91BA64943150E4976E7B0174B16F5D90CAD3F8E8B313",
   "checks": [
     {
       "args": [
@@ -73,12 +73,12 @@
       "maintenance_unit_id": "unit:researchguard-suite",
       "member_skill_id": "sourceguard",
       "native_route_id": "route:researchguard:sourceguard",
-      "owner_declaration_hash": "sha256:6c33baeb42b6f4714ef22f2eb23978b5060cc1f67faa231b80550a30d7e9ca90",
-      "owner_input_projection_hash": "sha256:be982360db3c6798036e5c5ab6f8986be2a77850d254e835677e63a023d3bb47",
+      "owner_declaration_hash": "sha256:00289f85299575f9a5159632c5583d9d83ffc3831baf2ebfbd2298c4f292614a",
+      "owner_input_projection_hash": "sha256:ef9e44429f38d529a645b57130d9be84728fcc1bf063004c3eab1da2da6d8480",
       "projection_declaration_hash": "sha256:8e8d8a875d81e332fa75ca05e90f7a7660af356b07b8c048a1a271fb8b96df12",
       "semantic_check_id": "semantic:researchguard:sourceguard:consumer-contract:current",
       "target_input_role_ids": [],
-      "timeout_seconds": 60
+      "timeout_seconds": 300
     },
     {
       "args": [
@@ -136,8 +136,8 @@
       "maintenance_unit_id": "unit:researchguard-suite",
       "member_skill_id": "sourceguard",
       "native_route_id": "route:researchguard:sourceguard",
-      "owner_declaration_hash": "sha256:8f1e648e93f948741dd83a5ae63b65e1f8c7131830ca85f7994565c7caa303f8",
-      "owner_input_projection_hash": "sha256:4cdfe22ecc740490db209780ca604995239dee04e99711f2e5851d1954be8299",
+      "owner_declaration_hash": "sha256:9755aaedb1c3f069780dc0f67f524a9500e207edfb2dd992373937ff90580657",
+      "owner_input_projection_hash": "sha256:12011e2c0c43ef7d2445b00d3ab3c36d9f5e6d9bd4788b11a389a48e6832905a",
       "projection_declaration_hash": "sha256:1b064d954557adb0b7d99bd8cddb2126d61b984f37eff2af7ddb09c36af0860a",
       "semantic_check_id": "semantic:researchguard:sourceguard:prompt-load:current",
       "target_input_role_ids": [],
@@ -250,8 +250,8 @@
       "maintenance_unit_id": "unit:researchguard-suite",
       "member_skill_id": "sourceguard",
       "native_route_id": "route:researchguard:sourceguard",
-      "owner_declaration_hash": "sha256:39e397b143cef2d95f0131102bb720c3a05627f23d3d709fd6be43bfbb6c4d2f",
-      "owner_input_projection_hash": "sha256:a8a34efea3d419d34ec1512b016bc3765e2829dfd2647379520d5a631fb21827",
+      "owner_declaration_hash": "sha256:36653a4000f2e883b096468c1b0c44ef60608ee9fad5ec784bd13224dba23937",
+      "owner_input_projection_hash": "sha256:cfa7331fa629c34e184031afa5774694dbbc1d3ac725839656e92b8dd0b86d9f",
       "projection_declaration_hash": "sha256:4480ff6c9d702fb3a3375056083247591b9fac792e06995216e8a11d1773a528",
       "semantic_check_id": "semantic:researchguard:sourceguard:native-tests:current",
       "target_input_role_ids": [],
@@ -295,7 +295,7 @@
       "maintenance_unit_id": "unit:researchguard-suite",
       "member_skill_id": "sourceguard",
       "native_route_id": "route:researchguard:sourceguard",
-      "owner_declaration_hash": "sha256:d069c9ecf36bc3dcac2762ce99664f6c373436246dd3040a7df5358441066bec",
+      "owner_declaration_hash": "sha256:99edc1066e3dde372fda63b80640009bbc631ad306942c18427ac60e75901707",
       "owner_input_projection_hash": "sha256:1d4c5348c7ef78b75786287335948cc61975369241596473ff90ea5e57478070",
       "projection_declaration_hash": "sha256:b2e401c4b0a2c5e0d55d71d9e5e1c47719fe516240315dfa07e651df6d72daee",
       "semantic_check_id": "semantic:researchguard:sourceguard:task-model-closure:current",
@@ -370,7 +370,7 @@
         "classification_rule_ids": [
           "skillguard.content_role_classifier.current:contract_schema"
         ],
-        "component_hash": "sha256:8701a2eec3f8c4a3117e4bbf64676494aba932453582b5272e9b3ba12ca582c8",
+        "component_hash": "sha256:9f5983b60b28e436e999d164524fd2c7b1075cc47c0b2971295e4ba8084f54a5",
         "component_id": "component:contract_schema:3a7bd6065bd4bdd5",
         "consumer_ids": [
           "owner:researchguard:sourceguard:native-tests",
@@ -403,7 +403,7 @@
         "classification_rule_ids": [
           "skillguard.content_role_classifier.current:documentation_model"
         ],
-        "component_hash": "sha256:f72d3ebc46189b7cf57dd2a5f7f3d9ddb51d5256bc7672875880cef0d22f2bbb",
+        "component_hash": "sha256:19a0eabfd3d19308bddb96d89101707a11ced330fad69b002566ebea8ac2833d",
         "component_id": "component:documentation_model:904b23e37203cb97",
         "consumer_ids": [
           "owner:researchguard:sourceguard:consumer-contract",
@@ -513,7 +513,7 @@
         "classification_rule_ids": [
           "skillguard.content_role_classifier.current:runtime_source"
         ],
-        "component_hash": "sha256:683f0d4b894c8e0282d0a0d99c69b58666c93e79335358cc5d0098b084d40202",
+        "component_hash": "sha256:18c8212133527cc19c0b1fa35d1bb632ce0bcf9ca5e04a2af2afc872d9caa6ae",
         "component_id": "component:runtime_source:28ac7e03dd7af118",
         "consumer_ids": [
           "owner:researchguard:sourceguard:native-tests",
@@ -531,7 +531,7 @@
         "classification_rule_ids": [
           "skillguard.content_role_classifier.current:runtime_source"
         ],
-        "component_hash": "sha256:c2a287f7ad278b6ec9500c14f35701cc85baf68c32d46dbf1fa6bfaf76637157",
+        "component_hash": "sha256:7bcaa4d146d1745606acfd4bc6e5e015a9ff43f62d01fcbbecbd433a26daa916",
         "component_id": "component:runtime_source:3ce32c2d5f065afc",
         "consumer_ids": [
           "owner:researchguard:sourceguard:consumer-contract"
@@ -595,7 +595,7 @@
         "classification_rule_ids": [
           "skillguard.content_role_classifier.current:runtime_source"
         ],
-        "component_hash": "sha256:50ec8b3dcdcede3072066e0c5bcc6b364bde350e23b816859f159ffb42b0047a",
+        "component_hash": "sha256:e41893cecc3b0295f050e6d7fbf1884e54a265f64c510f88948cacfe49ef7bba",
         "component_id": "component:runtime_source:8fec9ed998cc736f",
         "consumer_ids": [
           "owner:researchguard:sourceguard:native-tests",
@@ -698,7 +698,7 @@
       "owner_cycles": [],
       "unmapped_paths": []
     },
-    "impact_graph_hash": "sha256:a3d163d85cb85d22f8c24a658f55fd256dbe41d640f9feb493ea5c48fd8446c2",
+    "impact_graph_hash": "sha256:9ecbfffe7b1018406c41bcc20823b5bfc75c304ad526030e8c3054280bccf157",
     "inventory": [
       {
         "classification_rule_id": "skillguard.content_role_classifier.current:documentation_model",
@@ -849,7 +849,7 @@
       },
       {
         "classification_rule_id": "skillguard.content_role_classifier.current:runtime_source",
-        "content_hash": "sha256:e48f2ef36c5ae36c4b7b501c1bd75845deff61e57b864892d9212a716a261586",
+        "content_hash": "sha256:5aed00334902dc9446169f5d309313061bdb3ac9daa2ee103e8622ae278b8944",
         "install_disposition": "source_only",
         "path": "scripts/check_researchguard_suite.py",
         "role": "runtime_source"
@@ -863,28 +863,28 @@
       },
       {
         "classification_rule_id": "skillguard.content_role_classifier.current:contract_schema",
-        "content_hash": "sha256:04943f49691744cc65a89501706cf2d47359a66aab24ed2b670b11b1b433275c",
+        "content_hash": "sha256:c40bacc40b2968039d685a3f367ecdb5dbec083562bfec04b3b2b60b8b1982cc",
         "install_disposition": "source_only",
         "path": "skills/sourceguard/.skillguard/contract-source.json",
         "role": "contract_schema"
       },
       {
         "classification_rule_id": "skillguard.content_role_classifier.current:runtime_source",
-        "content_hash": "sha256:a1b792f73287babee93bffa3e5b02a1f5680876c44cfb06221d6fcca8b57f516",
+        "content_hash": "sha256:785a5cd0f6056c56676addebdfa24e2381f5f5ac82833b9ff014282a3993343f",
         "install_disposition": "source_only",
         "path": "skills/sourceguard/.skillguard/surface-inventory.json",
         "role": "runtime_source"
       },
       {
         "classification_rule_id": "skillguard.content_role_classifier.current:runtime_source",
-        "content_hash": "sha256:e026e7f792fe0773d1763089704cd4133ecf44785bd5a6dd0299024e7510efcf",
+        "content_hash": "sha256:98031356b625bda7bc3755fcb4112ebfa55a0a040eb3d4f47118502e2fa8025e",
         "install_disposition": "copy",
         "path": "skills/sourceguard/.skillguard/surface-semantic-map.json",
         "role": "runtime_source"
       },
       {
         "classification_rule_id": "skillguard.content_role_classifier.current:documentation_model",
-        "content_hash": "sha256:a3a94ff96853437e99bc472c06b7ebb14a59eb1cd44e9066d7bee07a9cd2840c",
+        "content_hash": "sha256:cbfaee2eddcaac13ea6f752c24231a537f76ac3614db3c658398661eed5f9d95",
         "install_disposition": "copy",
         "path": "skills/sourceguard/SKILL.md",
         "role": "documentation_model"
@@ -1226,7 +1226,7 @@
         "role": "test_dev"
       }
     ],
-    "inventory_hash": "sha256:f6993be8714628ebcf1f7b17366ab05dd9535b2f69b722928a063e6f40b28ab7",
+    "inventory_hash": "sha256:622ab7ea6d943a2d9b119b6c558a345e3dbe16413b4d8a8f8fa84c3cd702f2a5",
     "member_root_path": "skills/sourceguard",
     "owner_receipt_root_ref": {
       "path_token": "owner_evidence_root",
@@ -1284,8 +1284,8 @@
             "path": "skills/sourceguard/agents/openai.yaml"
           }
         ],
-        "owner_declaration_hash": "sha256:6c33baeb42b6f4714ef22f2eb23978b5060cc1f67faa231b80550a30d7e9ca90",
-        "owner_input_projection_hash": "sha256:be982360db3c6798036e5c5ab6f8986be2a77850d254e835677e63a023d3bb47",
+        "owner_declaration_hash": "sha256:00289f85299575f9a5159632c5583d9d83ffc3831baf2ebfbd2298c4f292614a",
+        "owner_input_projection_hash": "sha256:ef9e44429f38d529a645b57130d9be84728fcc1bf063004c3eab1da2da6d8480",
         "target_input_role_ids": []
       },
       {
@@ -1374,8 +1374,8 @@
             "path": "tests/source"
           }
         ],
-        "owner_declaration_hash": "sha256:39e397b143cef2d95f0131102bb720c3a05627f23d3d709fd6be43bfbb6c4d2f",
-        "owner_input_projection_hash": "sha256:a8a34efea3d419d34ec1512b016bc3765e2829dfd2647379520d5a631fb21827",
+        "owner_declaration_hash": "sha256:36653a4000f2e883b096468c1b0c44ef60608ee9fad5ec784bd13224dba23937",
+        "owner_input_projection_hash": "sha256:cfa7331fa629c34e184031afa5774694dbbc1d3ac725839656e92b8dd0b86d9f",
         "target_input_role_ids": []
       },
       {
@@ -1413,8 +1413,8 @@
             "path": "skills/sourceguard"
           }
         ],
-        "owner_declaration_hash": "sha256:8f1e648e93f948741dd83a5ae63b65e1f8c7131830ca85f7994565c7caa303f8",
-        "owner_input_projection_hash": "sha256:4cdfe22ecc740490db209780ca604995239dee04e99711f2e5851d1954be8299",
+        "owner_declaration_hash": "sha256:9755aaedb1c3f069780dc0f67f524a9500e207edfb2dd992373937ff90580657",
+        "owner_input_projection_hash": "sha256:12011e2c0c43ef7d2445b00d3ab3c36d9f5e6d9bd4788b11a389a48e6832905a",
         "target_input_role_ids": []
       },
       {
@@ -1434,7 +1434,7 @@
             "path": "tests/source/test_task_iteration.py"
           }
         ],
-        "owner_declaration_hash": "sha256:d069c9ecf36bc3dcac2762ce99664f6c373436246dd3040a7df5358441066bec",
+        "owner_declaration_hash": "sha256:99edc1066e3dde372fda63b80640009bbc631ad306942c18427ac60e75901707",
         "owner_input_projection_hash": "sha256:1d4c5348c7ef78b75786287335948cc61975369241596473ff90ea5e57478070",
         "target_input_role_ids": []
       }
@@ -1444,14 +1444,14 @@
     "projection_consumers": [
       {
         "consumer_id": "projection:contract-compile",
-        "consumer_projection_hash": "sha256:db020b82599da383a4511a6b0766d4de393c319dcbf57a0d4a7d03f65a7e38da",
+        "consumer_projection_hash": "sha256:464b92bfc129b2b6d3195cb2432ae5d483c1202e7374e2cb3fb22c11594730ae",
         "impact_plan_schema_version": "skillguard.content_impact_plan.current",
         "impact_policy_id": "skillguard.content_impact_policy.current",
         "input_component_ids": [
           "component:contract_schema:3a7bd6065bd4bdd5",
           "component:documentation_model:449616afee6e3859"
         ],
-        "input_projection_hash": "sha256:3e4a07add9a1e72236a657473038e23e2048efd16bf5829d1dc0decd4b6c6d84",
+        "input_projection_hash": "sha256:e18835f77220ca31d95237d68ee07ea37bdd8f32f5a6356f1eb047b190a725a2",
         "kind": "contract_compile",
         "projection_declaration_hash": "sha256:fb90c8c3f299e6ecbf103535dde5509e56ec74f0f9a0676393f3f04e3e0671d9"
       },
@@ -1467,7 +1467,7 @@
       },
       {
         "consumer_id": "projection:installation",
-        "consumer_projection_hash": "sha256:b3baf2311083ac134ee59702d60da4321864dc194b9de9b37165df2e1decbb43",
+        "consumer_projection_hash": "sha256:46e5864c82fc3c9a03be12bc0f569e1e942d5b10da03d6d9042d9885ee669073",
         "impact_plan_schema_version": "skillguard.content_impact_plan.current",
         "impact_policy_id": "skillguard.content_impact_policy.current",
         "input_component_ids": [
@@ -1476,7 +1476,7 @@
           "component:runtime_source:28ac7e03dd7af118",
           "component:runtime_source:f346f090c6bfdfd7"
         ],
-        "input_projection_hash": "sha256:46131fd53ce4782d7cd98cc143fd4866aa84eedd46d9a0410c0f3765f898b2c7",
+        "input_projection_hash": "sha256:5f00847b0251819c24164d36c6f912904214dfe51d69349e8a99fe03d4079d2b",
         "kind": "installation",
         "projection_declaration_hash": "sha256:c003f6ada070def332a7068df77555e7640870a5c8f4424777087a4493fe8c45"
       },
@@ -1505,14 +1505,14 @@
       },
       {
         "consumer_id": "projection:source-maintenance",
-        "consumer_projection_hash": "sha256:4c6cce8180d0b1ee598979a9a144bb615b44eadf3cfeefd722810c19f67b86a2",
+        "consumer_projection_hash": "sha256:5ee026faf901e90fdacd48f3f3b2b4b9b5b5f9a238bb52eb7baa7ced3f2f6d52",
         "impact_plan_schema_version": "skillguard.content_impact_plan.current",
         "impact_policy_id": "skillguard.content_impact_policy.current",
         "input_component_ids": [
           "component:contract_schema:3a7bd6065bd4bdd5",
           "component:runtime_source:8fec9ed998cc736f"
         ],
-        "input_projection_hash": "sha256:0acfcd7453a396db024d302f50056baf4673a7e70b44cfc7979b0f6193ee3db4",
+        "input_projection_hash": "sha256:267a66615064385153eaf2969390334cdfeb8da850a5491c9c1ebfe66ed2cdf2",
         "kind": "source_maintenance",
         "projection_declaration_hash": "sha256:26748763d66e04e262d5e72415f7837bbd2851e0739f73af17949ee0893552b5"
       }
@@ -1520,9 +1520,9 @@
     "schema_version": "skillguard.content_impact_plan.current",
     "unknown_mapping_disposition": "block"
   },
-  "contract_hash": "EB756827DB3DA532F929330ACCE649E127DFA64D92A9007DA71DBC21E6EC520E",
+  "contract_hash": "91BE15C4ED374BB1263C9B6B384E3936CAB2A211035CB34AF98E0936246BB127",
   "maintenance_unit_id": "unit:researchguard-suite",
-  "manifest_hash": "FD5CFFA4D7CE4DC02579F8FB356A3AB098E0DFB5E1E3B10760F792D8A87763FB",
+  "manifest_hash": "11348D933F1A7562F8A3246F96634D90EEF63AB8EDFF6BCFF3B765CB122B4F47",
   "member_skill_ids": [
     "researchguard",
     "logicguard",
@@ -1534,8 +1534,8 @@
   "schema_version": "skillguard.check_manifest.v2",
   "skill_id": "sourceguard",
   "source_fingerprints": {
-    "binding": "04943F49691744CC65A89501706CF2D47359A66AAB24ED2B670B11B1B433275C",
-    "entrypoint": "A3A94FF96853437E99BC472C06B7EBB14A59EB1CD44E9066D7BEE07A9CD2840C",
+    "binding": "C40BACC40B2968039D685A3F367ECDB5DBEC083562BFEC04B3B2B60B8B1982CC",
+    "entrypoint": "CBFAEE2EDDCAAC13EA6F752C24231A537F76AC3614DB3C658398661EED5F9D95",
     "implementation:.flowguard/models/researchguard_skill_contract_model_common.py": "6A27B0F7929BD20A34EBA1282DC5FCEE48A0A92350486B028A2A8290FBB1148E",
     "implementation:.flowguard/models/researchguard_suite/model-definition.json": "AE9E524EC63D7D53DA19254BF41681DD8ACB26B4D39394F1D95FF479318695B7",
     "implementation:.flowguard/models/researchguard_suite_model.py": "69A6E1518558FEA65C31D393C15C081BB0DEC2958CD936E3811EF775634C7BA6",
@@ -1547,7 +1547,7 @@
     "implementation:researchguard/prompt_bundle_manifest.json": "A99F41793A3D1BD08D99D65916AB7CFF79B515EAE59F361D7E5B8F26A6FA5FB3",
     "implementation:scripts/check_prompt_bundles.py": "BACAB53C360600B008488118256602D8D16D6DACBFDE8DD10030EB4C91EA6D04",
     "implementation:scripts/check_researchguard_test_mesh.py": "4C031BB33887868353DCD5DB77F1F132CDEEEB53B070D11C5A6E23DFF6A5BE8C",
-    "implementation:skills/sourceguard": "C9F860451100A31E87E9D1D5D6E79724617C741FCE3B221B934747DD0678EC4E",
+    "implementation:skills/sourceguard": "33A203A7847BDBADFEFD0B66091D0F37BE11533F0857551E1626EC6E761F9971",
     "implementation:skills/sourceguard/references/information-blueprint.md": "12E4B7A5140E9E40057A58DA2DE7F1EF0E2BC025B54AE1A41E1EDEC2BDC712D9",
     "implementation:src/researchguard/model_envelope.py": "D72E673E7F38D93169693767D88D96DF9AA662334BFCF21021BBBA71C5510CBE",
     "implementation:src/researchguard/source": "44BF09C10F1AF73D48FAFC86C16EA3B8DA2EFF24BEB8BF906DD6FF737402E383",

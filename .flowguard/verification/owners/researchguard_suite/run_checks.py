@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 import hashlib
+import math
 import os
 from pathlib import Path
 import subprocess
@@ -26,15 +27,35 @@ SEMANTIC_MESH_PATH = ROOT / ".flowguard/models/owners/authoritative_model_system
 # importing the provider-neutral FlowGuard package and hashing the 586-item
 # ResearchGuard denominator can exceed the old 30-second native limit.  Keep
 # the timeout finite (so a hung child still fails closed), but large enough to
-# cover a legitimate cold run.  The parent simulator supplies its own global
-# budget; these are per-process bounds only.
+# cover a legitimate cold run.  The official simulator supplies a separate
+# per-top-level-owner budget; these are inner per-process bounds only.
 CHILD_TIMEOUT_SECONDS = 60
-NATIVE_TIMEOUT_SECONDS = 180
+
+
+def _positive_timeout_from_env(name: str, default: float) -> float:
+    """Read one finite positive timeout override without weakening the bound."""
+
+    raw = os.environ.get(name, "").strip()
+    if not raw:
+        return float(default)
+    try:
+        value = float(raw)
+    except ValueError as exc:
+        raise ValueError(f"{name} must be a finite positive number") from exc
+    if not math.isfinite(value) or value <= 0:
+        raise ValueError(f"{name} must be a finite positive number")
+    return value
+
+
+NATIVE_TIMEOUT_SECONDS = _positive_timeout_from_env(
+    "FLOWGUARD_RESEARCHGUARD_NATIVE_TIMEOUT_SECONDS",
+    420.0,
+)
 sys.path.insert(0, str(MODEL_PATH.parent))
 import model  # noqa: E402
 
 
-def _run_bounded(command: list[str], *, env: dict[str, str], timeout: int) -> tuple[int, str]:
+def _run_bounded(command: list[str], *, env: dict[str, str], timeout: float) -> tuple[int, str]:
     """Run one local child and close its whole Windows process tree on timeout."""
     proc = subprocess.Popen(
         command, cwd=ROOT, text=True, stdout=subprocess.PIPE,

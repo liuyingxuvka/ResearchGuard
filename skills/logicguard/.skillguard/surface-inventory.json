@@ -375,7 +375,7 @@
       "kind": "config",
       "name": ".skillguard/contract-source.json",
       "source_path": ".skillguard/contract-source.json",
-      "source_fingerprint": "sha256:0880ec1dc62df749be41ded110d3a6f1f985cde7f787a7f3a68b370eec21f56a",
+      "source_fingerprint": "sha256:c6c44246c6478e669c7e18da540c59df4b157dae41d3ff1a34408ea423b1aed8",
       "function_id": "config:.skillguard/contract-source.json",
       "route_id": "config:.skillguard/contract-source.json",
       "review_group_id": "group:surface:10513a60240614296b758ebb",
@@ -516,7 +516,7 @@
       "kind": "template",
       "name": "SKILL.md",
       "source_path": "SKILL.md",
-      "source_fingerprint": "sha256:a30b3ba35aee7ac8ba55dbcb5749e509ac59487c8223642e7d37384f3cc70531",
+      "source_fingerprint": "sha256:3468267bb36064f424de3bd6dfff845d2ae35a2e53834575bb1901a9fa3814f9",
       "function_id": "template:SKILL.md",
       "route_id": "template:SKILL.md",
       "review_group_id": "group:surface:45d8dca86b7e8a7dd698b75b",
@@ -1360,7 +1360,7 @@
       "proof_ref": ".skillguard/surface-inventory.json#full_discovery_fingerprint"
     }
   },
-  "full_discovery_fingerprint": "sha256:6a62b51d03591f776e8d6a56d350b73aca8419e9bc9256a5e0c0b3fbbb32c358",
+  "full_discovery_fingerprint": "sha256:00489f41eafeab10030eeb6ac83e325e81bfc0824e073688ed46581290650be5",
   "adequacy_check_ids": [
     "check:logicguard:consumer-contract",
     "check:logicguard:native-tests",
@@ -1369,5 +1369,5 @@
   ],
   "model_deepening_check_id": "check:logicguard:task-model-closure",
   "claim_boundary": "The declared member skill root is the source-discovery boundary. Its native package is separately bound by the contract's implementation paths and check inputs. This author map proves neither native check execution nor domain correctness, installation, release, or future AI behavior.",
-  "inventory_hash": "sha256:98c7da5ef8a5372d3886d3e87890eb8f4e47f689f04a81259eb4c5037b123626"
+  "inventory_hash": "sha256:741d433d9e7e50e7b6b30d42f88a03a0cedb36c2a9b0d9f0d0b576a174ad895c"
 }

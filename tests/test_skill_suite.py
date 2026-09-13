@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -35,6 +36,27 @@ BLUEPRINT_REFERENCES = {
     "experimentguard": "references/experiment-model-protocol.md",
 }
 
+SKILLGUARD_REQUIRED_SECTIONS = (
+    "Purpose",
+    "Entrypoint Scope",
+    "Local Material Routing",
+    "Entrypoint Acceptance Map",
+    "Use When",
+    "Do Not Use When",
+    "Required Workflow",
+    "Hard Gates",
+    "Output Requirements",
+)
+
+SKILLGUARD_OUTPUT_TERMS = (
+    "evidence",
+    "failures",
+    "blockers",
+    "skipped_checks",
+    "residual_risk",
+    "claim_boundary",
+)
+
 
 def test_consumer_skill_inventory_and_metadata_are_exact() -> None:
     assert sorted(path.name for path in (ROOT / "skills").iterdir() if path.is_dir()) == sorted(
@@ -53,6 +75,15 @@ def test_consumer_skill_inventory_and_metadata_are_exact() -> None:
         assert interface["interface"]["display_name"]
         assert interface["interface"]["short_description"]
         assert f"${member}" in interface["interface"]["default_prompt"]
+
+
+def test_managed_skill_entrypoints_have_current_operational_sections() -> None:
+    for member in MEMBERS:
+        text = (ROOT / "skills" / member / "SKILL.md").read_text(encoding="utf-8")
+        headings = set(re.findall(r"^##\s+(.+?)\s*$", text, flags=re.MULTILINE))
+        assert set(SKILLGUARD_REQUIRED_SECTIONS) <= headings, member
+        lowered = text.casefold()
+        assert all(term.casefold() in lowered for term in SKILLGUARD_OUTPUT_TERMS), member
 
 
 def test_internal_route_inventory_is_exact() -> None:

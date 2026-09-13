@@ -533,6 +533,71 @@ def _native_command(args: list[str], *, timeout: int = 300) -> None:
         )
 
 
+def _prepare_package_build_context(temporary_root: Path) -> Path:
+    """Copy the package inputs into the local temporary build workspace.
+
+    Setuptools creates its intermediate ``build`` and ``*.egg-info`` trees
+    relative to the project argument.  Building directly from ``ROOT`` makes a
+    slow archive-backed checkout part of the timed wheel step and leaves build
+    artifacts in the source tree when the command is interrupted.  Keeping the
+    project metadata and package files together under the installer temporary
+    directory makes the build location explicit and disposable.
+    """
+
+    context = temporary_root / "package-context"
+    source_metadata = {
+        "pyproject.toml": ROOT / "pyproject.toml",
+        "README.md": ROOT / "README.md",
+    }
+    try:
+        context.mkdir(parents=False, exist_ok=False)
+        for name, source in source_metadata.items():
+            if _is_link_or_reparse(source) or not source.is_file():
+                raise InstallError(f"package build input is missing or unsafe: {name}")
+            shutil.copy2(source, context / name)
+        package_destination = context / "src" / "researchguard"
+        package_destination.parent.mkdir(parents=True, exist_ok=False)
+        if _is_link_or_reparse(SOURCE_PACKAGE) or not SOURCE_PACKAGE.is_dir():
+            raise InstallError("ResearchGuard package build source is missing or unsafe")
+        shutil.copytree(
+            SOURCE_PACKAGE,
+            package_destination,
+            ignore=shutil.ignore_patterns("__pycache__", "*.pyc", "*.pyo"),
+        )
+    except InstallError:
+        raise
+    except OSError as exc:
+        raise InstallError(
+            f"package build context preparation failed: {type(exc).__name__}: {exc}"
+        ) from exc
+    return context
+
+
+def _build_package_wheel(temporary_root: Path, wheel_dir: Path) -> Path:
+    """Build one wheel from the disposable local package context."""
+
+    build_context = _prepare_package_build_context(temporary_root)
+    _native_command(
+        [
+            sys.executable,
+            "-m",
+            "pip",
+            "wheel",
+            "--no-deps",
+            "--wheel-dir",
+            str(wheel_dir),
+            str(build_context),
+        ],
+        timeout=600,
+    )
+    wheels = sorted(wheel_dir.glob(f"researchguard-{VERSION}-*.whl"))
+    if len(wheels) != 1:
+        raise InstallError(
+            f"wheel build did not produce exactly one v{VERSION} artifact"
+        )
+    return wheels[0]
+
+
 def _distribution_file_inventory(
     distribution: object,
 ) -> tuple[Path, dict[Path, str]]:
@@ -793,6 +858,10 @@ def _restore_manifest_state(snapshot: Mapping[str, object]) -> dict[str, object]
 
 def _validate_source() -> None:
     _validate_source_version_identity()
+    # The source checker runs the provider-neutral denominator and four
+    # current member probes serially.  On the archive-backed source checkout
+    # that legitimate cold check can take several minutes; keep it bounded
+    # while giving the complete pre-install check enough time to finish.
     _native_command(
         [
             sys.executable,
@@ -800,7 +869,8 @@ def _validate_source() -> None:
             "--member",
             "all",
             "--json",
-        ]
+        ],
+        timeout=1200,
     )
 
 
@@ -1294,24 +1364,7 @@ def _install_locked(lock_identity: Mapping[str, object]) -> dict[str, object]:
         prepared = _prepare_skill_stages(temporary_root / "skills")
         wheel_dir = temporary_root / "wheel"
         wheel_dir.mkdir()
-        _native_command(
-            [
-                sys.executable,
-                "-m",
-                "pip",
-                "wheel",
-                "--no-deps",
-                "--wheel-dir",
-                str(wheel_dir),
-                ".",
-            ],
-            timeout=600,
-        )
-        wheels = sorted(wheel_dir.glob(f"researchguard-{VERSION}-*.whl"))
-        if len(wheels) != 1:
-            raise InstallError(
-                f"wheel build did not produce exactly one v{VERSION} artifact"
-            )
+        wheel = _build_package_wheel(temporary_root, wheel_dir)
         package_snapshot = _capture_package_state(
             temporary_root / "package-rollback"
         )
@@ -1326,7 +1379,7 @@ def _install_locked(lock_identity: Mapping[str, object]) -> dict[str, object]:
                     "install",
                     "--no-deps",
                     "--force-reinstall",
-                    str(wheels[0]),
+                    str(wheel),
                 ],
                 timeout=600,
             )

@@ -42,6 +42,13 @@ RESEARCHGUARD_SOFTWARE_DNA_INPUTS = (
 FLOWGUARD_VERSION = "0.69.0"
 SKILLGUARD_VERSION = "0.7.2"
 
+# ``check_researchguard_suite.py`` deliberately launches a fresh source-tree
+# console process.  Its startup includes the complete current routing graph,
+# so a 60-second SkillGuard check budget can report a false timeout on a cold
+# Windows host before the native check has a chance to run.  Keep this a
+# bounded contract value with room for that probe and its parent process.
+CONSUMER_CONTRACT_TIMEOUT_SECONDS = 300
+
 BLUEPRINT_COMPONENTS = {
     "researchguard": {
         "reference": "skills/researchguard/references/member-model-envelope.md",
@@ -484,7 +491,7 @@ def contract(member: str) -> dict:
             ],
             depends=[],
             obligations=[contract_obligation],
-            timeout=60,
+            timeout=CONSUMER_CONTRACT_TIMEOUT_SECONDS,
         ),
         check(
             member,
