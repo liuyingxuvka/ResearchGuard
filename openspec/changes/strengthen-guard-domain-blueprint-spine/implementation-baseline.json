@@ -1,8 +1,20 @@
 {
-  "schema_version": "researchguard.guard-domain-blueprint-implementation-baseline.v1",
-  "source_commit": "964a2e81e6660a77e0013205e4e076fda8418e24",
-  "python_identity": "Python 3.12.10",
-  "package_identity": "researchguard 0.4.1",
+  "accepted_flowguard_revision": "ef6643e6261a942c09a58e3cf539641fd292665e1cb5ac9cc620a764e3877bfd",
+  "accepted_flowguard_revision_fingerprint": "sha256:7ed208ff535ff9f24a2d01df9b8742e00400b1b7c0ca908c1d3f529da14f4188",
+  "authority_notes": [
+    "This baseline freezes the current source, toolchain, native member, prompt, and FlowGuard identities before project-upgrade writes.",
+    "Current implementation authority is the repository source at source_commit; separately installed consumer projections are not source authority.",
+    "The current OpenSpec bases are openspec/specs/researchguard-member-model-loops/spec.md and openspec/specs/researchguard-narrow-entry-loading/spec.md; historical exact-one and v0.1.x changes are non-authoritative.",
+    "Untracked evidence, peer receipts, and runtime history are excluded from source authority and are retained unchanged.",
+    "Normal runtime accepts only current schemas; no compatibility reader, converter, alias, dual output, retry, or fallback is authorized."
+  ],
+  "captured_at": "2026-09-13T17:34:56.672594+00:00",
+  "flowguard_identity": {
+    "project_version": "0.69.0",
+    "schema_version": "1.0",
+    "source_path": "D:\\FlowGuard_20260427\\flowguard\\__init__.py",
+    "source_sha256": "sha256:5c412df8242e9850ca2ea358dc240eab018bae775b3dbeee3de0cc6af7a55789"
+  },
   "maintained_skill_ids": [
     "researchguard",
     "logicguard",
@@ -17,17 +29,39 @@
     "experimentguard"
   ],
   "native_schema_ids": {
+    "experimentguard": "researchguard.experiment.task-spec.v2",
     "logicguard": "researchguard.logic.model-store.v1",
     "sourceguard": "researchguard.source.model_guard_contract.v2",
-    "traceguard": "researchguard.trace.model.v2",
-    "experimentguard": "researchguard.experiment.task-spec.v2"
+    "traceguard": "researchguard.trace.model.v2"
   },
-  "prompt_bundle_manifest_sha256": "d64298fd184ba051f9e4159fca4a39b27e2b1fbc7512dfef3c6ac487f138aa5d",
-  "observed_flowguard_snapshot": "31947568d2df99910a14a026413366b50865737c3b287d80ca2ad2ee42ced1a3",
-  "authority_notes": [
-    "Current implementation authority is the repository source at source_commit, not the separately installed package projection.",
-    "The current OpenSpec bases are openspec/specs/researchguard-member-model-loops/spec.md and openspec/specs/researchguard-narrow-entry-loading/spec.md; historical exact-one and v0.1.x changes are non-authoritative.",
-    "Peer-owned .flowguard evidence, project records, model-system revisions, activations, and snapshots are excluded from phases 1-8 and remain read-only.",
-    "Normal runtime accepts only the current schemas introduced by this change; no compatibility reader, converter, alias, dual output, retry, or fallback is authorized."
-  ]
+  "observed_flowguard_snapshot": "827a243133d2b8355d47ebb40f799d58dae0baa6dcf10d6a0dbad3142de3054b",
+  "observed_flowguard_snapshot_fingerprint": "sha256:8bec1e3b11250f0ee4f556acae1d0f74c787a5c6ee39028df36d227f765301f1",
+  "package_identity": "researchguard 0.5.1",
+  "prompt_bundle_manifest_sha256": "sha256:a99f41793a3d1bd08d99d65916ab7cff79b515eae59f361d7e5b8f26a6fa5fb3",
+  "python_identity": "3.12.10 (C:\\Users\\liu_y\\AppData\\Local\\Microsoft\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\python.exe)",
+  "remote_main_commit": "0933506e117d7a6cb325d62ad01cd458aa9c25c8",
+  "schema_version": "researchguard.guard-domain-blueprint-implementation-baseline.v2",
+  "skillguard_identity": {
+    "checker_engine_sha256": "sha256:9ef6f0f0f1a973069ad471385c60b2169c8e90fc968e3c42892a1aafe0288132",
+    "checker_version": "skillguard.local_cli_dispatch.v1",
+    "installation_head": {
+      "head_hash": "200AE44770C7FCB801BD3BB57CC3C88B7E383EC3E1543C02738FCF8DAD0B7DFF",
+      "receipt_hash": "5442AEF9ACA390F7CCDBFEC3B8EDF6573243636FCEE4F6410C05866CC6E0778F",
+      "receipt_id": "installation-f9613222e02c5c2e41543e9c",
+      "receipt_ref": {
+        "path_token": "receipt_root",
+        "relative_path": "receipts/5442aef9aca390f7ccdbfec3.json"
+      },
+      "schema_version": "skillguard.installation_verification_head.v1"
+    },
+    "source_path": "C:\\Users\\liu_y\\.codex\\skills\\skillguard"
+  },
+  "source_commit": "0933506e117d7a6cb325d62ad01cd458aa9c25c8",
+  "working_tree": {
+    "staged_diff": [],
+    "status_entry_count": 1626,
+    "status_inventory_sha256": "sha256:ac493b11fcd14b4eb2e50a75c92f6f513dac1304f51674d9ff39e0028cd1e43b",
+    "tracked_diff": [],
+    "untracked_evidence_excluded": true
+  }
 }
