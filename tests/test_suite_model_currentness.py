@@ -45,7 +45,7 @@ def test_all_suite_version_authorities_are_current() -> None:
     ]
     assert topology["software_dna"]["readiness_layer_count"] == 7
     test_dependencies = package["project"]["optional-dependencies"]["test"]
-    assert "flowguard @ git+https://github.com/liuyingxuvka/FlowGuard.git@3725d324fa792e0b03bf1a5472f080e55cbf3ec9" in test_dependencies
+    assert "flowguard @ git+https://github.com/liuyingxuvka/FlowGuard.git@18443e17db93725cf9484daca22fee25e9d7c1d7" in test_dependencies
 
 
 def test_suite_model_runner_and_currentness_test_are_freshness_inputs() -> None:

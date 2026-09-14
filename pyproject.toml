@@ -41,7 +41,7 @@ dependencies = [
 [project.optional-dependencies]
 test = [
   "pytest>=8.0",
-  "flowguard @ git+https://github.com/liuyingxuvka/FlowGuard.git@3725d324fa792e0b03bf1a5472f080e55cbf3ec9",
+  "flowguard @ git+https://github.com/liuyingxuvka/FlowGuard.git@18443e17db93725cf9484daca22fee25e9d7c1d7",
 ]
 
 [project.scripts]
