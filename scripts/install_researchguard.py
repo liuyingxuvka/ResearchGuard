@@ -391,9 +391,10 @@ def _audit_installed_skill(
     active = ACTIVE_SKILL_ROOT / member
     if not active.is_dir():
         raise InstallError(f"installed skill is missing: {member}")
+    member_root = SKILL_SOURCE / member
     raw_result = _target_installation_api().verify_target_stage(
-        ROOT,
-        SKILL_SOURCE / member,
+        member_root,
+        member_root,
         active,
     )
     if not isinstance(raw_result, Mapping):
@@ -880,7 +881,13 @@ def _prepare_skill_stages(stage_root: Path) -> dict[str, dict[str, object]]:
     prepared: dict[str, dict[str, object]] = {}
     for member in MEMBERS:
         stage = stage_root / member
-        raw_report = api.prepare_target_stage(ROOT, SKILL_SOURCE / member, stage)
+        # Each compiled member contract declares ``member_root_path: .``.
+        # SkillGuard's target installer therefore receives the member's own
+        # canonical root as its repository root. Passing the ResearchGuard
+        # suite root makes the target installer resolve ``.`` to the suite
+        # directory and correctly fail closed with a member-root mismatch.
+        member_root = SKILL_SOURCE / member
+        raw_report = api.prepare_target_stage(member_root, member_root, stage)
         if not isinstance(raw_report, Mapping):
             raise InstallError(f"consumer stage preparation result is malformed: {member}")
         report = dict(raw_report)
@@ -897,7 +904,7 @@ def _prepare_skill_stages(stage_root: Path) -> dict[str, dict[str, object]]:
         verification = _verified_stage_result(
             member,
             api.verify_target_stage(
-                ROOT,
+                SKILL_SOURCE / member,
                 SKILL_SOURCE / member,
                 Path(row["stage"]),
             ),
@@ -1081,9 +1088,10 @@ def _activate_prepared_skills(
     for member in MEMBERS:
         row = prepared[member]
         try:
+            member_root = SKILL_SOURCE / member
             raw_result = api.activate_target_stage(
-                ROOT,
-                SKILL_SOURCE / member,
+                member_root,
+                member_root,
                 Path(row["stage"]),
                 ACTIVE_SKILL_ROOT.parent,
                 stage_verification=row["verification"],

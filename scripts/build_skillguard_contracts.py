@@ -31,7 +31,7 @@ TEST_MESH_MAINTENANCE_INPUTS = (
     ".skillguard/test-mesh.json",
     "scripts/check_researchguard_test_mesh.py",
 )
-RESEARCHGUARD_VERSION = "0.5.3"
+RESEARCHGUARD_VERSION = "0.5.4"
 
 # Freshness inputs for the integration owner; the builder does not copy or
 # regenerate the native software-DNA model.

@@ -117,6 +117,7 @@ class _TargetInstallationAPI:
         self.fail_activate = fail_activate
         self.fail_rollback = fail_rollback
         self.calls: list[tuple[str, str]] = []
+        self.repository_roots: list[Path] = []
 
     @staticmethod
     def _manifest(root: Path, member: str, release_id: str | None = None) -> None:
@@ -134,12 +135,13 @@ class _TargetInstallationAPI:
 
     def verify_target_stage(
         self,
-        _repository_root: Path,
+        repository_root: Path,
         canonical_skill_root: Path,
         stage_skill_root: Path,
     ) -> dict[str, object]:
         member = canonical_skill_root.name
         self.calls.append(("verify", member))
+        self.repository_roots.append(repository_root)
         if member == self.fail_verify:
             return {
                 "status": "blocked",
@@ -174,6 +176,7 @@ class _TargetInstallationAPI:
     ) -> dict[str, object]:
         member = canonical_skill_root.name
         self.calls.append(("prepare", member))
+        self.repository_roots.append(repository_root)
         if member == self.fail_prepare:
             return {
                 "status": "blocked",
@@ -187,6 +190,7 @@ class _TargetInstallationAPI:
             stage_skill_root,
         )
         self.calls.pop()
+        self.repository_roots.pop()
         return {
             "status": "passed",
             "skill_id": member,
@@ -196,7 +200,7 @@ class _TargetInstallationAPI:
 
     def activate_target_stage(
         self,
-        _repository_root: Path,
+        repository_root: Path,
         canonical_skill_root: Path,
         _stage_skill_root: Path,
         _codex_home: Path,
@@ -205,6 +209,7 @@ class _TargetInstallationAPI:
     ) -> dict[str, object]:
         member = canonical_skill_root.name
         self.calls.append(("activate", member))
+        self.repository_roots.append(repository_root)
         assert stage_verification["status"] == "passed"
         if member == self.fail_activate:
             return {
@@ -463,7 +468,11 @@ def test_all_members_are_prepared_and_verified_before_any_activation(
 ) -> None:
     active_root = tmp_path / "skills"
     active_root.mkdir()
+    source_skill_root = tmp_path / "source" / "skills"
+    for member in ("alpha", "beta"):
+        (source_skill_root / member).mkdir(parents=True)
     monkeypatch.setattr(install_researchguard, "ACTIVE_SKILL_ROOT", active_root)
+    monkeypatch.setattr(install_researchguard, "SKILL_SOURCE", source_skill_root)
     monkeypatch.setattr(install_researchguard, "MEMBERS", ("alpha", "beta"))
     monkeypatch.setattr(install_researchguard, "RETIRED_SKILLS", ())
     api = _TargetInstallationAPI()
@@ -480,6 +489,18 @@ def test_all_members_are_prepared_and_verified_before_any_activation(
         ("verify", "beta"),
         ("activate", "alpha"),
         ("activate", "beta"),
+    ]
+    expected_roots = [
+        (install_researchguard.SKILL_SOURCE / member).resolve(strict=True)
+        for member in ("alpha", "beta")
+    ]
+    assert api.repository_roots == [
+        expected_roots[0],
+        expected_roots[1],
+        expected_roots[0],
+        expected_roots[1],
+        expected_roots[0],
+        expected_roots[1],
     ]
 
 

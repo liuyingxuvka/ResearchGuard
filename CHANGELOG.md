@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.5.4 - 2026-09-21
+
+- Fix the SkillGuard transaction installer to pass each member's declared
+  contract root to prepare, verify, activate, and installed-skill audit.
+- Add rollback and root-binding coverage so a suite-root/member-root mismatch
+  fails closed without leaving a partial installation.
+
 ## v0.5.3 - 2026-09-21
 
 - Add a canonical FlowGuard behavior-commitment envelope boundary and strict
