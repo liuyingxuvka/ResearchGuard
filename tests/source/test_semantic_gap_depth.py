@@ -674,7 +674,7 @@ def test_coverage_universe_fingerprint_changes_when_authoritative_gap_changes() 
     assert "gaps:g-bridge" in second.critical_uncovered_ids
 
 
-def test_v3_skillguard_binds_native_receipt_without_parallel_planner() -> None:
+def test_v2_skillguard_binds_native_receipt_without_parallel_planner() -> None:
     control = (
         Path(__file__).resolve().parents[2]
         / "skills"
@@ -693,10 +693,10 @@ def test_v3_skillguard_binds_native_receipt_without_parallel_planner() -> None:
         "check:sourceguard:task-model-closure",
     }
     assert source["maintenance_unit_id"] == "unit:researchguard-suite"
-    assert source["schema_version"] == "skillguard.skill_contract.v3"
-    assert source["routes"][0]["route_id"] == "route:sourceguard:current-validation"
-    assert len(source["steps"]) == 4
-    assert len(source["obligations"]) == 4
-    assert "depth_profile" not in source
+    assert source["schema_version"] == "skillguard.contract_source.v2"
+    assert source["native_route_bindings"][0]["native_route_id"] == "route:researchguard:sourceguard"
+    assert len(source["step_bindings"]) == 4
+    assert len(source["checks"]) == 4
+    assert source["depth_profile"]["profile_id"].endswith(":strict-model-closure")
     assert not (control / "work-contract.json").exists()
     assert not (control / "check_manifest.json").exists()

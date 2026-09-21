@@ -59,117 +59,12 @@
       ]
     }
   ],
-  "current_obligation_ids": [
-    "obligation:researchguard:logicguard:consumer-contract",
-    "obligation:researchguard:logicguard:native-tests",
-    "obligation:researchguard:logicguard:prompt-load",
-    "obligation:researchguard:logicguard:task-model-closure"
-  ],
-  "model_obligations": [
-    {
-      "obligation_id": "obligation:researchguard:logicguard:consumer-contract",
-      "disposition": "governed",
-      "surface_ids": [
-        "artifact:agents/openai.yaml",
-        "config:.skillguard/contract-source.json",
-        "template:SKILL.md",
-        "template:references/broad-depth-and-closure.md",
-        "template:references/citation-grounding.md",
-        "template:references/commands.md",
-        "template:references/domain-blueprint-contract.md",
-        "template:references/general-argument.md",
-        "template:references/h-wadf-quick-reference.md",
-        "template:references/routes/artifact-synthesis.md",
-        "template:references/routes/model-deepening.md",
-        "template:references/routes/project-library-viewer.md",
-        "template:references/routes/source-library.md",
-        "template:references/routes/structured-artifact.md",
-        "template:references/structural-contribution.md",
-        "template:references/task-model-maturation.md",
-        "template:references/validated-template-pack.md"
-      ],
-      "reason": "Explicit member author rules bind these source surfaces to this compiled obligation.",
-      "proof_ref": ".skillguard/surface-semantic-map.json#decision_rules"
-    },
-    {
-      "obligation_id": "obligation:researchguard:logicguard:native-tests",
-      "disposition": "governed",
-      "surface_ids": [
-        "api:scripts/logicguard_closure_check.py:check",
-        "api:scripts/logicguard_closure_check.py:main",
-        "component:scripts/logicguard_closure_check.py",
-        "config:.skillguard/contract-source.json",
-        "fault:scripts/logicguard_closure_check.py:check",
-        "script:scripts/logicguard_closure_check.py",
-        "template:references/broad-depth-and-closure.md",
-        "template:references/domain-blueprint-contract.md",
-        "template:references/routes/model-deepening.md",
-        "template:references/routes/source-library.md",
-        "template:references/routes/structured-artifact.md",
-        "template:references/structural-contribution.md",
-        "template:references/task-model-maturation.md",
-        "template:references/validated-template-pack.md",
-        "ui:scripts/logicguard_closure_check.py:check"
-      ],
-      "reason": "Explicit member author rules bind these source surfaces to this compiled obligation.",
-      "proof_ref": ".skillguard/surface-semantic-map.json#decision_rules"
-    },
-    {
-      "obligation_id": "obligation:researchguard:logicguard:prompt-load",
-      "disposition": "governed",
-      "surface_ids": [
-        "artifact:agents/openai.yaml",
-        "config:.skillguard/contract-source.json",
-        "template:SKILL.md",
-        "template:references/broad-depth-and-closure.md",
-        "template:references/citation-grounding.md",
-        "template:references/commands.md",
-        "template:references/domain-blueprint-contract.md",
-        "template:references/general-argument.md",
-        "template:references/h-wadf-quick-reference.md",
-        "template:references/routes/artifact-synthesis.md",
-        "template:references/routes/model-deepening.md",
-        "template:references/routes/project-library-viewer.md",
-        "template:references/routes/source-library.md",
-        "template:references/routes/structured-artifact.md",
-        "template:references/structural-contribution.md",
-        "template:references/task-model-maturation.md",
-        "template:references/validated-template-pack.md"
-      ],
-      "reason": "Explicit member author rules bind these source surfaces to this compiled obligation.",
-      "proof_ref": ".skillguard/surface-semantic-map.json#decision_rules"
-    },
-    {
-      "obligation_id": "obligation:researchguard:logicguard:task-model-closure",
-      "disposition": "governed",
-      "surface_ids": [
-        "api:scripts/logicguard_closure_check.py:check",
-        "api:scripts/logicguard_closure_check.py:main",
-        "component:scripts/logicguard_closure_check.py",
-        "config:.skillguard/contract-source.json",
-        "fault:scripts/logicguard_closure_check.py:check",
-        "script:scripts/logicguard_closure_check.py",
-        "template:references/broad-depth-and-closure.md",
-        "template:references/domain-blueprint-contract.md",
-        "template:references/routes/model-deepening.md",
-        "template:references/routes/source-library.md",
-        "template:references/routes/structured-artifact.md",
-        "template:references/structural-contribution.md",
-        "template:references/task-model-maturation.md",
-        "template:references/validated-template-pack.md",
-        "ui:scripts/logicguard_closure_check.py:check"
-      ],
-      "reason": "Explicit member author rules bind these source surfaces to this compiled obligation.",
-      "proof_ref": ".skillguard/surface-semantic-map.json#decision_rules"
-    }
-  ],
   "full_surface_ids": [
     "api:scripts/logicguard_closure_check.py:check",
     "api:scripts/logicguard_closure_check.py:main",
     "artifact:agents/openai.yaml",
-    "component:scripts/logicguard_closure_check.py",
     "config:.skillguard/contract-source.json",
-    "fault:scripts/logicguard_closure_check.py:check",
+    "fault:scripts/logicguard_closure_check.py:37:check",
     "script:scripts/logicguard_closure_check.py",
     "template:SKILL.md",
     "template:references/broad-depth-and-closure.md",
@@ -186,7 +81,7 @@
     "template:references/structural-contribution.md",
     "template:references/task-model-maturation.md",
     "template:references/validated-template-pack.md",
-    "ui:scripts/logicguard_closure_check.py:check"
+    "ui:scripts/logicguard_closure_check.py:37:check"
   ],
   "full_surfaces": [
     {
@@ -199,10 +94,6 @@
       "route_id": "api:scripts.logicguard_closure_check.check",
       "review_group_id": "group:surface:90be7bee79fe10de69819b91",
       "review_granularity": "surface",
-      "model_obligation_ids": [
-        "obligation:researchguard:logicguard:native-tests",
-        "obligation:researchguard:logicguard:task-model-closure"
-      ],
       "disposition": "governed",
       "owner_id": "owner:researchguard:logicguard",
       "intent_id": "intent:logicguard:b8b40332a368b0c22e546a97",
@@ -243,10 +134,6 @@
       "route_id": "api:scripts.logicguard_closure_check.main",
       "review_group_id": "group:surface:6cb61787456ca0eb0fff661e",
       "review_granularity": "surface",
-      "model_obligation_ids": [
-        "obligation:researchguard:logicguard:native-tests",
-        "obligation:researchguard:logicguard:task-model-closure"
-      ],
       "disposition": "governed",
       "owner_id": "owner:researchguard:logicguard",
       "intent_id": "intent:logicguard:b8b40332a368b0c22e546a97",
@@ -287,10 +174,6 @@
       "route_id": "artifact:agents/openai.yaml",
       "review_group_id": "group:surface:d9efd0b752469e1fc3464d11",
       "review_granularity": "surface",
-      "model_obligation_ids": [
-        "obligation:researchguard:logicguard:consumer-contract",
-        "obligation:researchguard:logicguard:prompt-load"
-      ],
       "disposition": "governed",
       "owner_id": "owner:researchguard:logicguard",
       "intent_id": "intent:logicguard:b4b5d7396edc7efe153c0a50",
@@ -322,70 +205,15 @@
       "write_authority": "target-owned-native-route"
     },
     {
-      "surface_id": "component:scripts/logicguard_closure_check.py",
-      "kind": "component",
-      "name": "scripts.logicguard_closure_check.__private_components__",
-      "source_path": "scripts/logicguard_closure_check.py",
-      "source_fingerprint": "sha256:3d99fce913d97d390815b023ebe68fb77cb669ef7f6b379cb9cae156276e97fb",
-      "function_id": "component:scripts.logicguard_closure_check",
-      "route_id": "component:scripts.logicguard_closure_check",
-      "review_group_id": "group:component:b27c51582d0754fc574a136d",
-      "review_granularity": "component",
-      "component_members": [
-        "_finding",
-        "_load_json",
-        "_run"
-      ],
-      "model_obligation_ids": [
-        "obligation:researchguard:logicguard:native-tests",
-        "obligation:researchguard:logicguard:task-model-closure"
-      ],
-      "disposition": "governed",
-      "owner_id": "owner:researchguard:logicguard",
-      "intent_id": "intent:logicguard:b8b40332a368b0c22e546a97",
-      "obligation_ids": [
-        "obligation:researchguard:logicguard:native-tests",
-        "obligation:researchguard:logicguard:task-model-closure"
-      ],
-      "required_check_ids": [
-        "check:logicguard:native-tests",
-        "check:logicguard:task-model-closure"
-      ],
-      "adequacy_check_ids": [
-        "check:logicguard:consumer-contract",
-        "check:logicguard:native-tests",
-        "check:logicguard:task-model-closure"
-      ],
-      "execution_owner_ids": [
-        "owner:researchguard:logicguard:consumer-contract",
-        "owner:researchguard:logicguard:native-tests",
-        "owner:researchguard:logicguard:task-model-closure"
-      ],
-      "evidence_subject_ids": [
-        "subject:researchguard:logicguard:consumer-contract",
-        "subject:researchguard:logicguard:native-tests",
-        "subject:researchguard:logicguard:task-model-closure"
-      ],
-      "lifecycle_phase": "native-consumer-runtime",
-      "consumer_exposure": "declared-member-skill",
-      "write_authority": "target-owned-native-route"
-    },
-    {
       "surface_id": "config:.skillguard/contract-source.json",
       "kind": "config",
       "name": ".skillguard/contract-source.json",
       "source_path": ".skillguard/contract-source.json",
-      "source_fingerprint": "sha256:c6c44246c6478e669c7e18da540c59df4b157dae41d3ff1a34408ea423b1aed8",
+      "source_fingerprint": "sha256:df0ff1ea8aeccd90767fe80f0a5eba834262b68d968661bf747d63f0d6ffbe83",
       "function_id": "config:.skillguard/contract-source.json",
       "route_id": "config:.skillguard/contract-source.json",
       "review_group_id": "group:surface:10513a60240614296b758ebb",
       "review_granularity": "surface",
-      "model_obligation_ids": [
-        "obligation:researchguard:logicguard:consumer-contract",
-        "obligation:researchguard:logicguard:native-tests",
-        "obligation:researchguard:logicguard:prompt-load",
-        "obligation:researchguard:logicguard:task-model-closure"
-      ],
       "disposition": "governed",
       "owner_id": "owner:researchguard:logicguard",
       "intent_id": "intent:logicguard:6557a58d2e67847ad49ad72c",
@@ -424,19 +252,15 @@
       "write_authority": "author-contract-only"
     },
     {
-      "surface_id": "fault:scripts/logicguard_closure_check.py:check",
+      "surface_id": "fault:scripts/logicguard_closure_check.py:37:check",
       "kind": "fault",
       "name": "scripts.logicguard_closure_check.check",
       "source_path": "scripts/logicguard_closure_check.py",
       "source_fingerprint": "sha256:3d99fce913d97d390815b023ebe68fb77cb669ef7f6b379cb9cae156276e97fb",
       "function_id": "scripts.logicguard_closure_check.check",
       "route_id": "fault:scripts.logicguard_closure_check.check",
-      "review_group_id": "group:component:b27c51582d0754fc574a136d",
+      "review_group_id": "group:component:120155cc38cb53144ada42ea",
       "review_granularity": "component",
-      "model_obligation_ids": [
-        "obligation:researchguard:logicguard:native-tests",
-        "obligation:researchguard:logicguard:task-model-closure"
-      ],
       "disposition": "governed",
       "owner_id": "owner:researchguard:logicguard",
       "intent_id": "intent:logicguard:b8b40332a368b0c22e546a97",
@@ -477,10 +301,6 @@
       "route_id": "entry:scripts/logicguard_closure_check.py",
       "review_group_id": "group:surface:1452d9e7c73575573279ab68",
       "review_granularity": "surface",
-      "model_obligation_ids": [
-        "obligation:researchguard:logicguard:native-tests",
-        "obligation:researchguard:logicguard:task-model-closure"
-      ],
       "disposition": "governed",
       "owner_id": "owner:researchguard:logicguard",
       "intent_id": "intent:logicguard:b8b40332a368b0c22e546a97",
@@ -521,10 +341,6 @@
       "route_id": "template:SKILL.md",
       "review_group_id": "group:surface:45d8dca86b7e8a7dd698b75b",
       "review_granularity": "surface",
-      "model_obligation_ids": [
-        "obligation:researchguard:logicguard:consumer-contract",
-        "obligation:researchguard:logicguard:prompt-load"
-      ],
       "disposition": "governed",
       "owner_id": "owner:researchguard:logicguard",
       "intent_id": "intent:logicguard:b4b5d7396edc7efe153c0a50",
@@ -560,17 +376,11 @@
       "kind": "template",
       "name": "references/broad-depth-and-closure.md",
       "source_path": "references/broad-depth-and-closure.md",
-      "source_fingerprint": "sha256:12b13076078a09e8a965c7bc565a6ba3efdb2520a433e9368c9bc0790e12d215",
+      "source_fingerprint": "sha256:c577f30e39303c8dd389fda7d4eb571e6f57ecb4bbc50701412c03ee8c74691f",
       "function_id": "template:references/broad-depth-and-closure.md",
       "route_id": "template:references/broad-depth-and-closure.md",
       "review_group_id": "group:surface:2a1f78cfb888b903e123957c",
       "review_granularity": "surface",
-      "model_obligation_ids": [
-        "obligation:researchguard:logicguard:consumer-contract",
-        "obligation:researchguard:logicguard:native-tests",
-        "obligation:researchguard:logicguard:prompt-load",
-        "obligation:researchguard:logicguard:task-model-closure"
-      ],
       "disposition": "governed",
       "owner_id": "owner:researchguard:logicguard",
       "intent_id": "intent:logicguard:06e820a0cca1b90005e81651",
@@ -618,10 +428,6 @@
       "route_id": "template:references/citation-grounding.md",
       "review_group_id": "group:surface:9f0060248ff59c93f28d1c07",
       "review_granularity": "surface",
-      "model_obligation_ids": [
-        "obligation:researchguard:logicguard:consumer-contract",
-        "obligation:researchguard:logicguard:prompt-load"
-      ],
       "disposition": "governed",
       "owner_id": "owner:researchguard:logicguard",
       "intent_id": "intent:logicguard:b4b5d7396edc7efe153c0a50",
@@ -662,10 +468,6 @@
       "route_id": "template:references/commands.md",
       "review_group_id": "group:surface:caeb036aedbd15c588458812",
       "review_granularity": "surface",
-      "model_obligation_ids": [
-        "obligation:researchguard:logicguard:consumer-contract",
-        "obligation:researchguard:logicguard:prompt-load"
-      ],
       "disposition": "governed",
       "owner_id": "owner:researchguard:logicguard",
       "intent_id": "intent:logicguard:b4b5d7396edc7efe153c0a50",
@@ -706,12 +508,6 @@
       "route_id": "template:references/domain-blueprint-contract.md",
       "review_group_id": "group:surface:9dbec2b3b2d94a88d52e59c5",
       "review_granularity": "surface",
-      "model_obligation_ids": [
-        "obligation:researchguard:logicguard:consumer-contract",
-        "obligation:researchguard:logicguard:native-tests",
-        "obligation:researchguard:logicguard:prompt-load",
-        "obligation:researchguard:logicguard:task-model-closure"
-      ],
       "disposition": "governed",
       "owner_id": "owner:researchguard:logicguard",
       "intent_id": "intent:logicguard:06e820a0cca1b90005e81651",
@@ -759,10 +555,6 @@
       "route_id": "template:references/general-argument.md",
       "review_group_id": "group:surface:9b9a50f4e04c5e848a206683",
       "review_granularity": "surface",
-      "model_obligation_ids": [
-        "obligation:researchguard:logicguard:consumer-contract",
-        "obligation:researchguard:logicguard:prompt-load"
-      ],
       "disposition": "governed",
       "owner_id": "owner:researchguard:logicguard",
       "intent_id": "intent:logicguard:b4b5d7396edc7efe153c0a50",
@@ -803,10 +595,6 @@
       "route_id": "template:references/h-wadf-quick-reference.md",
       "review_group_id": "group:surface:ff4fb079836403139ce3c330",
       "review_granularity": "surface",
-      "model_obligation_ids": [
-        "obligation:researchguard:logicguard:consumer-contract",
-        "obligation:researchguard:logicguard:prompt-load"
-      ],
       "disposition": "governed",
       "owner_id": "owner:researchguard:logicguard",
       "intent_id": "intent:logicguard:b4b5d7396edc7efe153c0a50",
@@ -847,10 +635,6 @@
       "route_id": "template:references/routes/artifact-synthesis.md",
       "review_group_id": "group:surface:ff5cd11222105fa3bdc866dc",
       "review_granularity": "surface",
-      "model_obligation_ids": [
-        "obligation:researchguard:logicguard:consumer-contract",
-        "obligation:researchguard:logicguard:prompt-load"
-      ],
       "disposition": "governed",
       "owner_id": "owner:researchguard:logicguard",
       "intent_id": "intent:logicguard:b4b5d7396edc7efe153c0a50",
@@ -891,12 +675,6 @@
       "route_id": "template:references/routes/model-deepening.md",
       "review_group_id": "group:surface:45b77939ed793e5271b9b8ff",
       "review_granularity": "surface",
-      "model_obligation_ids": [
-        "obligation:researchguard:logicguard:consumer-contract",
-        "obligation:researchguard:logicguard:native-tests",
-        "obligation:researchguard:logicguard:prompt-load",
-        "obligation:researchguard:logicguard:task-model-closure"
-      ],
       "disposition": "governed",
       "owner_id": "owner:researchguard:logicguard",
       "intent_id": "intent:logicguard:06e820a0cca1b90005e81651",
@@ -944,10 +722,6 @@
       "route_id": "template:references/routes/project-library-viewer.md",
       "review_group_id": "group:surface:4eb6c6123952a4ad340f0e55",
       "review_granularity": "surface",
-      "model_obligation_ids": [
-        "obligation:researchguard:logicguard:consumer-contract",
-        "obligation:researchguard:logicguard:prompt-load"
-      ],
       "disposition": "governed",
       "owner_id": "owner:researchguard:logicguard",
       "intent_id": "intent:logicguard:b4b5d7396edc7efe153c0a50",
@@ -988,12 +762,6 @@
       "route_id": "template:references/routes/source-library.md",
       "review_group_id": "group:surface:016aa1760dcfaa38d33a4bd6",
       "review_granularity": "surface",
-      "model_obligation_ids": [
-        "obligation:researchguard:logicguard:consumer-contract",
-        "obligation:researchguard:logicguard:native-tests",
-        "obligation:researchguard:logicguard:prompt-load",
-        "obligation:researchguard:logicguard:task-model-closure"
-      ],
       "disposition": "governed",
       "owner_id": "owner:researchguard:logicguard",
       "intent_id": "intent:logicguard:06e820a0cca1b90005e81651",
@@ -1041,12 +809,6 @@
       "route_id": "template:references/routes/structured-artifact.md",
       "review_group_id": "group:surface:50adc64f1d69991fcac11022",
       "review_granularity": "surface",
-      "model_obligation_ids": [
-        "obligation:researchguard:logicguard:consumer-contract",
-        "obligation:researchguard:logicguard:native-tests",
-        "obligation:researchguard:logicguard:prompt-load",
-        "obligation:researchguard:logicguard:task-model-closure"
-      ],
       "disposition": "governed",
       "owner_id": "owner:researchguard:logicguard",
       "intent_id": "intent:logicguard:06e820a0cca1b90005e81651",
@@ -1094,12 +856,6 @@
       "route_id": "template:references/structural-contribution.md",
       "review_group_id": "group:surface:83f88eb8bea142eea114c2ef",
       "review_granularity": "surface",
-      "model_obligation_ids": [
-        "obligation:researchguard:logicguard:consumer-contract",
-        "obligation:researchguard:logicguard:native-tests",
-        "obligation:researchguard:logicguard:prompt-load",
-        "obligation:researchguard:logicguard:task-model-closure"
-      ],
       "disposition": "governed",
       "owner_id": "owner:researchguard:logicguard",
       "intent_id": "intent:logicguard:06e820a0cca1b90005e81651",
@@ -1142,17 +898,11 @@
       "kind": "template",
       "name": "references/task-model-maturation.md",
       "source_path": "references/task-model-maturation.md",
-      "source_fingerprint": "sha256:57db408a3a1ded03c8fd16ab558857022fe60af5ad8883991f618f5a29df2675",
+      "source_fingerprint": "sha256:b6366d80e7375b709079e397544ddb765c0155e7307dd2669e3d9c32b7267d84",
       "function_id": "template:references/task-model-maturation.md",
       "route_id": "template:references/task-model-maturation.md",
       "review_group_id": "group:surface:1e517d45fe2b4af9d7962c3a",
       "review_granularity": "surface",
-      "model_obligation_ids": [
-        "obligation:researchguard:logicguard:consumer-contract",
-        "obligation:researchguard:logicguard:native-tests",
-        "obligation:researchguard:logicguard:prompt-load",
-        "obligation:researchguard:logicguard:task-model-closure"
-      ],
       "disposition": "governed",
       "owner_id": "owner:researchguard:logicguard",
       "intent_id": "intent:logicguard:06e820a0cca1b90005e81651",
@@ -1200,12 +950,6 @@
       "route_id": "template:references/validated-template-pack.md",
       "review_group_id": "group:surface:89e914963ae4efc7acd320e1",
       "review_granularity": "surface",
-      "model_obligation_ids": [
-        "obligation:researchguard:logicguard:consumer-contract",
-        "obligation:researchguard:logicguard:native-tests",
-        "obligation:researchguard:logicguard:prompt-load",
-        "obligation:researchguard:logicguard:task-model-closure"
-      ],
       "disposition": "governed",
       "owner_id": "owner:researchguard:logicguard",
       "intent_id": "intent:logicguard:06e820a0cca1b90005e81651",
@@ -1244,19 +988,15 @@
       "write_authority": "target-owned-native-route"
     },
     {
-      "surface_id": "ui:scripts/logicguard_closure_check.py:check",
+      "surface_id": "ui:scripts/logicguard_closure_check.py:37:check",
       "kind": "ui",
       "name": "scripts.logicguard_closure_check.check",
       "source_path": "scripts/logicguard_closure_check.py",
       "source_fingerprint": "sha256:3d99fce913d97d390815b023ebe68fb77cb669ef7f6b379cb9cae156276e97fb",
       "function_id": "scripts.logicguard_closure_check.check",
       "route_id": "ui:scripts.logicguard_closure_check.check",
-      "review_group_id": "group:surface:8104a045ae3599b5728f0eab",
+      "review_group_id": "group:surface:b7ba933ca37985b42cb42dc7",
       "review_granularity": "surface",
-      "model_obligation_ids": [
-        "obligation:researchguard:logicguard:native-tests",
-        "obligation:researchguard:logicguard:task-model-closure"
-      ],
       "disposition": "governed",
       "owner_id": "owner:researchguard:logicguard",
       "intent_id": "intent:logicguard:b8b40332a368b0c22e546a97",
@@ -1353,14 +1093,9 @@
       "disposition": "not_applicable_proven",
       "reason": "Current skill-root scan contains no provider surfaces; this says nothing about native package surfaces outside that root.",
       "proof_ref": ".skillguard/surface-inventory.json#full_discovery_fingerprint"
-    },
-    "component": {
-      "disposition": "governed",
-      "reason": "Current skill-root scan contains explicitly mapped component surfaces; this says nothing about native package surfaces outside that root.",
-      "proof_ref": ".skillguard/surface-inventory.json#full_discovery_fingerprint"
     }
   },
-  "full_discovery_fingerprint": "sha256:00489f41eafeab10030eeb6ac83e325e81bfc0824e073688ed46581290650be5",
+  "full_discovery_fingerprint": "sha256:c8621b70d09f1c706d7ba81233ba415e1675103cfe155473364f64e58a144ea5",
   "adequacy_check_ids": [
     "check:logicguard:consumer-contract",
     "check:logicguard:native-tests",
@@ -1369,5 +1104,5 @@
   ],
   "model_deepening_check_id": "check:logicguard:task-model-closure",
   "claim_boundary": "The declared member skill root is the source-discovery boundary. Its native package is separately bound by the contract's implementation paths and check inputs. This author map proves neither native check execution nor domain correctness, installation, release, or future AI behavior.",
-  "inventory_hash": "sha256:741d433d9e7e50e7b6b30d42f88a03a0cedb36c2a9b0d9f0d0b576a174ad895c"
+  "inventory_hash": "sha256:ae036465fcf1858ae02283e28b2a2917bec1d794d5c8cce938018e07d2db612a"
 }

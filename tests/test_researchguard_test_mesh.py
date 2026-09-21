@@ -94,9 +94,9 @@ def test_static_test_mesh_audit_covers_five_members_and_twenty_exact_owners() ->
     assert result["generator_impact"]["direct_semantic_owner_ids"] == []
     assert result["consumer_install_transaction"] == {
         "obligation_id": (
-            "obligation:researchguard:consumer-install-transaction"
+            "obligation:researchguard:researchguard:consumer-install-transaction"
         ),
-        "execution_owner_id": "member-native-check:researchguard",
+        "execution_owner_id": "owner:researchguard:researchguard:native-tests",
         "source_only_paths": [
             "scripts/install_researchguard.py",
             "tests/test_install_researchguard.py",
@@ -132,11 +132,10 @@ def test_member_check_input_references_are_unique(member: str) -> None:
             ROOT / "skills" / member / ".skillguard" / "contract-source.json"
         ).read_text(encoding="utf-8")
     )
-    input_ids = {row["id"] for row in source["inputs"]}
     for check in source["checks"]:
-        identities = list(check["input_ids"])
-        assert len(identities) == len(set(identities)), check["check_id"]
-        assert set(identities) <= input_ids
+        paths = [row["path"] for row in check["input_selectors"] if row.get("path")]
+        assert len(paths) == len(set(paths)), check["check_id"]
+        assert all("\\" not in path and not Path(path).is_absolute() for path in paths)
 
 
 def test_consumer_install_transaction_reuses_the_researchguard_native_owner() -> None:
@@ -144,13 +143,24 @@ def test_consumer_install_transaction_reuses_the_researchguard_native_owner() ->
         (ROOT / "skills" / "researchguard" / ".skillguard" / "contract-source.json")
         .read_text(encoding="utf-8")
     )
-    obligation_id = "obligation:researchguard:consumer-install-transaction"
-    obligation = next(
-        row for row in source["obligations"] if row["obligation_id"] == obligation_id
+    obligation_id = "obligation:researchguard:researchguard:consumer-install-transaction"
+    compiled = json.loads(
+        (ROOT / "skills" / "researchguard" / ".skillguard" / "compiled-contract.json")
+        .read_text(encoding="utf-8")
     )
-    assert obligation["check_ids"] == ["check:researchguard:native-tests"]
+    obligation = next(
+        row for row in compiled["obligations"] if row["obligation_id"] == obligation_id
+    )
+    assert obligation["owner_step_ids"] == ["step:researchguard:researchguard:tests"]
+    native_check = next(
+        row for row in source["checks"] if row["check_id"] == "check:researchguard:native-tests"
+    )
+    assert native_check["covers_obligation_ids"] == [
+        "obligation:researchguard:researchguard:native-tests",
+        obligation_id,
+    ]
     native_step = next(
-        row for row in source["steps"] if row["step_id"] == "step:researchguard:native-tests"
+        row for row in source["step_bindings"] if row["step_id"] == "step:researchguard:researchguard:tests"
     )
     assert native_step["check_ids"] == ["check:researchguard:native-tests"]
-    assert source["routes"][0]["obligation_ids"][-1] == obligation_id
+    assert obligation["obligation_id"] == obligation_id

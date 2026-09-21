@@ -1,6 +1,6 @@
-"""Audit the current five-member SkillGuard v3 contract mesh.
+"""Audit the current five-member SkillGuard contract mesh.
 
-This is a read-only structural audit.  It checks the generated v3 contracts,
+This is a read-only structural audit.  It checks the generated current contracts,
 their four-step validation routes, portable consumer projections, and the
 single unit-level test-mesh definition.  It does not run a member check or
 claim a receipt.
@@ -23,7 +23,7 @@ EXPECTED_MEMBERS = (
     "experimentguard",
 )
 CHECK_KINDS = ("consumer-contract", "prompt-load", "native-tests", "task-model-closure")
-INSTALL_OBLIGATION_ID = "obligation:researchguard:consumer-install-transaction"
+INSTALL_OBLIGATION_ID = "obligation:researchguard:researchguard:consumer-install-transaction"
 TEST_MESH_MAINTENANCE_INPUTS = (".skillguard/test-mesh.json", "scripts/check_researchguard_test_mesh.py")
 UNIT_TEST_MESH_PROJECTION_ID = "projection:researchguard-suite-maintenance-definition"
 
@@ -45,15 +45,15 @@ def _check_member(root: Path, member: str, findings: list[dict[str, str]]) -> di
     source = _load_json(control / "contract-source.json")
     compiled = _load_json(control / "compiled-contract.json")
     manifest = _load_json(control / "check-manifest.json")
-    _record(findings, source.get("schema_version") == "skillguard.skill_contract.v3", "source_schema_invalid", member)
-    _record(findings, compiled.get("schema_version") == "skillguard.compiled_contract.v3", "compiled_schema_invalid", member)
-    _record(findings, manifest.get("schema_version") == "skillguard.check_manifest.v3", "manifest_schema_invalid", member)
+    _record(findings, source.get("schema_version") == "skillguard.contract_source.v2", "source_schema_invalid", member)
+    _record(findings, compiled.get("schema_version") == "skillguard.compiled_contract.v2", "compiled_schema_invalid", member)
+    _record(findings, manifest.get("schema_version") == "skillguard.check_manifest.v2", "manifest_schema_invalid", member)
     for label, payload in (("source", source), ("compiled", compiled), ("manifest", manifest)):
         _record(findings, payload.get("skill_id") == member, "member_skill_identity_mismatch", f"{member}:{label}")
         if "maintenance_unit_id" in payload:
             _record(findings, payload.get("maintenance_unit_id") == EXPECTED_UNIT_ID, "maintenance_unit_identity_mismatch", f"{member}:{label}")
         if "member_skill_ids" in payload:
-            _record(findings, payload.get("member_skill_ids") == [member], "member_inventory_invalid", f"{member}:{label}")
+            _record(findings, payload.get("member_skill_ids") == list(EXPECTED_MEMBERS), "member_inventory_invalid", f"{member}:{label}")
 
     expected_checks = {f"check:{member}:{kind}" for kind in CHECK_KINDS}
     source_checks = {str(row.get("check_id")) for row in source.get("checks", []) if isinstance(row, dict)}
@@ -61,33 +61,42 @@ def _check_member(root: Path, member: str, findings: list[dict[str, str]]) -> di
     manifest_checks = {str(row.get("check_id")) for row in manifest.get("checks", []) if isinstance(row, dict)}
     _record(findings, source_checks == compiled_checks == manifest_checks == expected_checks, "check_inventory_projection_mismatch", member)
 
-    input_ids = {str(row.get("id")) for row in source.get("inputs", []) if isinstance(row, dict)}
-    input_paths = {str(row.get("path")) for row in source.get("inputs", []) if isinstance(row, dict)}
-    _record(findings, len(input_ids) == len(source.get("inputs", [])), "duplicate_input_ids", member)
-    _record(findings, all(set(row.get("input_ids", [])) <= input_ids for row in source.get("checks", []) if isinstance(row, dict)), "check_input_reference_invalid", member)
-    _record(findings, all("\\" not in path and not Path(path).is_absolute() for path in input_paths), "nonportable_input_path", member)
-    _record(findings, all((root / "skills" / member / path).is_file() for path in input_paths), "missing_contract_input", member)
+    # v2 uses selector-based inputs and keeps executable route/obligation
+    # exports in compiled-contract.json. The former v3 inputs/routes shape is
+    # intentionally not accepted as a second authority.
+    implementation_paths = {str(path) for path in source.get("implementation_paths", [])}
+    for check in source.get("checks", []):
+        selectors = check.get("input_selectors", []) if isinstance(check, dict) else []
+        selector_paths = [str(row.get("path")) for row in selectors if isinstance(row, dict) and row.get("path")]
+        check_id = str(check.get("check_id", "")) if isinstance(check, dict) else ""
+        _record(findings, len(selector_paths) == len(set(selector_paths)), "duplicate_input_selectors", f"{member}:{check_id}")
+        _record(findings, all("\\" not in path and not Path(path).is_absolute() for path in selector_paths), "nonportable_input_path", member)
+        for path in selector_paths:
+            _record(findings, (root / path).is_file() or (root / path).is_dir(), "missing_contract_input", f"{member}:{path}")
 
-    steps = source.get("steps", [])
-    route = source.get("routes", [{}])[0] if source.get("routes") else {}
+    compiled_routes = compiled.get("routes", [])
+    route = compiled_routes[0] if compiled_routes else {}
     ordered_steps = list(route.get("step_ids", [])) if isinstance(route, dict) else []
-    step_by_id = {str(row.get("step_id")): row for row in steps if isinstance(row, dict)}
-    _record(findings, len(source.get("routes", [])) == 1 and ordered_steps == [f"step:{member}:{kind}" for kind in CHECK_KINDS], "route_shape_invalid", member)
+    expected_steps = [f"step:researchguard:{member}:{kind}" for kind in ("contract", "prompt-load", "tests", "task-model-closure")] + [
+        f"step:researchguard:{member}:success",
+        f"step:researchguard:{member}:blocked",
+    ]
+    _record(findings, len(compiled_routes) == 1 and ordered_steps == expected_steps, "route_shape_invalid", member)
+    step_by_id = {str(row.get("step_id")): row for row in compiled.get("steps", []) if isinstance(row, dict)}
     expected_requires = [[], [ordered_steps[0]] if ordered_steps else [], [ordered_steps[1]] if len(ordered_steps) > 1 else [], [ordered_steps[2]] if len(ordered_steps) > 2 else []]
-    _record(findings, [step_by_id.get(step_id, {}).get("requires", []) for step_id in ordered_steps] == expected_requires, "step_dependency_chain_invalid", member)
-    obligations = {str(row.get("obligation_id")) for row in source.get("obligations", []) if isinstance(row, dict)}
-    expected_obligations = {f"obligation:{member}:{kind}" for kind in CHECK_KINDS}
+    _record(findings, [step_by_id.get(step_id, {}).get("prerequisite_step_ids", []) for step_id in ordered_steps[:4]] == expected_requires, "step_dependency_chain_invalid", member)
+    obligations = {str(row.get("obligation_id")) for row in compiled.get("obligations", []) if isinstance(row, dict)}
+    expected_obligations = {f"obligation:researchguard:{member}:{kind}" for kind in CHECK_KINDS}
     if member == "researchguard":
         expected_obligations.add(INSTALL_OBLIGATION_ID)
     _record(findings, obligations == expected_obligations, "obligation_inventory_invalid", member)
     _record(findings, manifest.get("contract_hash") == compiled.get("contract_hash"), "manifest_contract_hash_mismatch", member)
     plan = compiled.get("content_impact_plan", {})
-    _record(findings, plan.get("schema_version") == "skillguard.content_impact_plan.v3", "content_impact_plan_schema_invalid", member)
+    _record(findings, plan.get("schema_version") == "skillguard.content_impact_plan.current", "content_impact_plan_schema_invalid", member)
     inventory_paths = {str(row.get("path")) for row in plan.get("inventory", []) if isinstance(row, dict)}
-    _record(findings, inventory_paths <= input_paths, "content_inventory_outside_inputs", member)
-    _record(findings, all(row.get("install_disposition") == "copy" for row in plan.get("inventory", []) if isinstance(row, dict)), "content_inventory_install_disposition_invalid", member)
-    projection_paths = set(source.get("consumer_projection", {}).get("file_paths", []))
-    _record(findings, projection_paths == inventory_paths, "consumer_projection_inventory_mismatch", member)
+    _record(findings, all("\\" not in path and not Path(path).is_absolute() and (root / path).exists() for path in inventory_paths), "content_inventory_outside_inputs", member)
+    allowed_dispositions = {"copy", "source_only", "generate", "exclude"}
+    _record(findings, all(row.get("install_disposition") in allowed_dispositions for row in plan.get("inventory", []) if isinstance(row, dict)), "content_inventory_install_disposition_invalid", member)
 
     return {
         "member_skill_id": member,
@@ -136,11 +145,11 @@ def audit(root: Path = ROOT) -> dict[str, Any]:
         },
         "generator_impact": {
             "direct_semantic_owner_ids": [],
-            "disposition": "v3 member contracts are generated artifacts; this read-only audit does not create a second execution owner",
+            "disposition": "v2 member contracts are generated artifacts; this read-only audit does not create a second execution owner",
         },
         "consumer_install_transaction": {
             "obligation_id": INSTALL_OBLIGATION_ID,
-            "execution_owner_id": "member-native-check:researchguard",
+            "execution_owner_id": "owner:researchguard:researchguard:native-tests",
             "source_only_paths": ["scripts/install_researchguard.py", "tests/test_install_researchguard.py"],
         },
         "installation_boundaries": [

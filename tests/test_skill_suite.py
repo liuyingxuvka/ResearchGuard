@@ -132,10 +132,21 @@ def test_author_contracts_form_one_five_surface_unit() -> None:
             ).read_text(encoding="utf-8")
         )
         assert payload["maintenance_unit_id"] == "unit:researchguard-suite"
-        assert payload["member_skill_ids"] == [member]
+        assert payload["member_skill_ids"] == list(MEMBERS)
         assert payload["skill_id"] == member
-        assert payload["schema_version"] == "skillguard.skill_contract.v3"
-        assert payload["routes"][0]["route_id"] == f"route:{member}:current-validation"
+        assert payload["schema_version"] == "skillguard.contract_source.v2"
+        assert payload["repository_role"] == "skill_maintainer_source"
+        assert payload["native_route_owner"] == f"owner:researchguard:{member}"
+        assert payload["may_define_parallel_execution_route"] is False
+        assert payload["may_define_skillguard_runtime_route"] is False
+        assert payload["native_route_bindings"] == [
+            {
+                "binding_id": f"native:researchguard:{member}",
+                "native_route_id": f"route:researchguard:{member}",
+                "required_before_closure": True,
+                "source": f"skills/{member}/SKILL.md",
+            }
+        ]
 
 
 def test_member_domain_dna_and_repository_software_dna_stay_separate() -> None:

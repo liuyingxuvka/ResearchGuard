@@ -2,14 +2,13 @@
   "schema_version": "skillguard.surface_semantic_map.v1",
   "map_id": "map:researchguard:logicguard:surface-semantics",
   "target_skill_id": "logicguard",
-  "source_discovery_fingerprint": "sha256:00489f41eafeab10030eeb6ac83e325e81bfc0824e073688ed46581290650be5",
+  "source_discovery_fingerprint": "sha256:c8621b70d09f1c706d7ba81233ba415e1675103cfe155473364f64e58a144ea5",
   "full_surface_ids": [
     "api:scripts/logicguard_closure_check.py:check",
     "api:scripts/logicguard_closure_check.py:main",
     "artifact:agents/openai.yaml",
-    "component:scripts/logicguard_closure_check.py",
     "config:.skillguard/contract-source.json",
-    "fault:scripts/logicguard_closure_check.py:check",
+    "fault:scripts/logicguard_closure_check.py:37:check",
     "script:scripts/logicguard_closure_check.py",
     "template:SKILL.md",
     "template:references/broad-depth-and-closure.md",
@@ -26,7 +25,7 @@
     "template:references/structural-contribution.md",
     "template:references/task-model-maturation.md",
     "template:references/validated-template-pack.md",
-    "ui:scripts/logicguard_closure_check.py:check"
+    "ui:scripts/logicguard_closure_check.py:37:check"
   ],
   "current_obligation_ids": [
     "obligation:researchguard:logicguard:consumer-contract",
@@ -132,17 +131,6 @@
       "decision": "explicit-author-rule"
     },
     {
-      "surface_id": "component:scripts/logicguard_closure_check.py",
-      "model_obligation_ids": [
-        "obligation:researchguard:logicguard:native-tests",
-        "obligation:researchguard:logicguard:task-model-closure"
-      ],
-      "rule_ids": [
-        "decision:logicguard:native-closure-boundary"
-      ],
-      "decision": "explicit-author-component-group-closure"
-    },
-    {
       "surface_id": "config:.skillguard/contract-source.json",
       "model_obligation_ids": [
         "obligation:researchguard:logicguard:consumer-contract",
@@ -156,7 +144,7 @@
       "decision": "explicit-author-rule"
     },
     {
-      "surface_id": "fault:scripts/logicguard_closure_check.py:check",
+      "surface_id": "fault:scripts/logicguard_closure_check.py:37:check",
       "model_obligation_ids": [
         "obligation:researchguard:logicguard:native-tests",
         "obligation:researchguard:logicguard:task-model-closure"
@@ -367,7 +355,7 @@
       "decision": "explicit-author-rule"
     },
     {
-      "surface_id": "ui:scripts/logicguard_closure_check.py:check",
+      "surface_id": "ui:scripts/logicguard_closure_check.py:37:check",
       "model_obligation_ids": [
         "obligation:researchguard:logicguard:native-tests",
         "obligation:researchguard:logicguard:task-model-closure"
@@ -410,9 +398,8 @@
       "surface_ids": [
         "api:scripts/logicguard_closure_check.py:check",
         "api:scripts/logicguard_closure_check.py:main",
-        "component:scripts/logicguard_closure_check.py",
         "config:.skillguard/contract-source.json",
-        "fault:scripts/logicguard_closure_check.py:check",
+        "fault:scripts/logicguard_closure_check.py:37:check",
         "script:scripts/logicguard_closure_check.py",
         "template:references/broad-depth-and-closure.md",
         "template:references/domain-blueprint-contract.md",
@@ -422,7 +409,7 @@
         "template:references/structural-contribution.md",
         "template:references/task-model-maturation.md",
         "template:references/validated-template-pack.md",
-        "ui:scripts/logicguard_closure_check.py:check"
+        "ui:scripts/logicguard_closure_check.py:37:check"
       ],
       "reason": "Explicit member author rules bind these source surfaces to this compiled obligation.",
       "proof_ref": ".skillguard/surface-semantic-map.json#decision_rules"
@@ -458,9 +445,8 @@
       "surface_ids": [
         "api:scripts/logicguard_closure_check.py:check",
         "api:scripts/logicguard_closure_check.py:main",
-        "component:scripts/logicguard_closure_check.py",
         "config:.skillguard/contract-source.json",
-        "fault:scripts/logicguard_closure_check.py:check",
+        "fault:scripts/logicguard_closure_check.py:37:check",
         "script:scripts/logicguard_closure_check.py",
         "template:references/broad-depth-and-closure.md",
         "template:references/domain-blueprint-contract.md",
@@ -470,12 +456,12 @@
         "template:references/structural-contribution.md",
         "template:references/task-model-maturation.md",
         "template:references/validated-template-pack.md",
-        "ui:scripts/logicguard_closure_check.py:check"
+        "ui:scripts/logicguard_closure_check.py:37:check"
       ],
       "reason": "Explicit member author rules bind these source surfaces to this compiled obligation.",
       "proof_ref": ".skillguard/surface-semantic-map.json#decision_rules"
     }
   ],
   "claim_boundary": "The declared member skill root is the source-discovery boundary. Its native package is separately bound by the contract's implementation paths and check inputs. This author map proves neither native check execution nor domain correctness, installation, release, or future AI behavior.",
-  "map_hash": "sha256:73b072ef60673ecb33993fdcd5029128246e8965389d065f872c91fcc8274c08"
+  "map_hash": "sha256:7d4da968bf54c916718a74c077cc375d287b10e9aadf087978d21bfd101b3861"
 }

@@ -47,76 +47,6 @@
       ]
     }
   ],
-  "current_obligation_ids": [
-    "obligation:researchguard:researchguard:consumer-contract",
-    "obligation:researchguard:researchguard:consumer-install-transaction",
-    "obligation:researchguard:researchguard:native-tests",
-    "obligation:researchguard:researchguard:prompt-load",
-    "obligation:researchguard:researchguard:task-model-closure"
-  ],
-  "model_obligations": [
-    {
-      "obligation_id": "obligation:researchguard:researchguard:consumer-contract",
-      "disposition": "governed",
-      "surface_ids": [
-        "artifact:agents/openai.yaml",
-        "config:.skillguard/contract-source.json",
-        "template:SKILL.md",
-        "template:references/external-domain-dna.md",
-        "template:references/member-admission-index.md",
-        "template:references/member-model-envelope.md"
-      ],
-      "reason": "Explicit member author rules bind these source surfaces to this compiled obligation.",
-      "proof_ref": ".skillguard/surface-semantic-map.json#decision_rules"
-    },
-    {
-      "obligation_id": "obligation:researchguard:researchguard:consumer-install-transaction",
-      "disposition": "governed",
-      "surface_ids": [
-        "config:.skillguard/contract-source.json"
-      ],
-      "reason": "Explicit member author rules bind these source surfaces to this compiled obligation.",
-      "proof_ref": ".skillguard/surface-semantic-map.json#decision_rules"
-    },
-    {
-      "obligation_id": "obligation:researchguard:researchguard:native-tests",
-      "disposition": "governed",
-      "surface_ids": [
-        "config:.skillguard/contract-source.json",
-        "template:references/external-domain-dna.md",
-        "template:references/member-admission-index.md",
-        "template:references/member-model-envelope.md"
-      ],
-      "reason": "Explicit member author rules bind these source surfaces to this compiled obligation.",
-      "proof_ref": ".skillguard/surface-semantic-map.json#decision_rules"
-    },
-    {
-      "obligation_id": "obligation:researchguard:researchguard:prompt-load",
-      "disposition": "governed",
-      "surface_ids": [
-        "artifact:agents/openai.yaml",
-        "config:.skillguard/contract-source.json",
-        "template:SKILL.md",
-        "template:references/external-domain-dna.md",
-        "template:references/member-admission-index.md",
-        "template:references/member-model-envelope.md"
-      ],
-      "reason": "Explicit member author rules bind these source surfaces to this compiled obligation.",
-      "proof_ref": ".skillguard/surface-semantic-map.json#decision_rules"
-    },
-    {
-      "obligation_id": "obligation:researchguard:researchguard:task-model-closure",
-      "disposition": "governed",
-      "surface_ids": [
-        "config:.skillguard/contract-source.json",
-        "template:references/external-domain-dna.md",
-        "template:references/member-admission-index.md",
-        "template:references/member-model-envelope.md"
-      ],
-      "reason": "Explicit member author rules bind these source surfaces to this compiled obligation.",
-      "proof_ref": ".skillguard/surface-semantic-map.json#decision_rules"
-    }
-  ],
   "full_surface_ids": [
     "artifact:agents/openai.yaml",
     "config:.skillguard/contract-source.json",
@@ -136,10 +66,6 @@
       "route_id": "artifact:agents/openai.yaml",
       "review_group_id": "group:surface:d9efd0b752469e1fc3464d11",
       "review_granularity": "surface",
-      "model_obligation_ids": [
-        "obligation:researchguard:researchguard:consumer-contract",
-        "obligation:researchguard:researchguard:prompt-load"
-      ],
       "disposition": "governed",
       "owner_id": "owner:researchguard:researchguard",
       "intent_id": "intent:researchguard:82e473857f9416d1f331e7bd",
@@ -175,18 +101,11 @@
       "kind": "config",
       "name": ".skillguard/contract-source.json",
       "source_path": ".skillguard/contract-source.json",
-      "source_fingerprint": "sha256:3e1537a1b1deb6811acf4c2944d318641792fc2c5eeec57eb315d9a51870b565",
+      "source_fingerprint": "sha256:7b1b30ace1644de651fc80698288f2d8344ae899d704720edb5b532a40227a08",
       "function_id": "config:.skillguard/contract-source.json",
       "route_id": "config:.skillguard/contract-source.json",
       "review_group_id": "group:surface:10513a60240614296b758ebb",
       "review_granularity": "surface",
-      "model_obligation_ids": [
-        "obligation:researchguard:researchguard:consumer-contract",
-        "obligation:researchguard:researchguard:consumer-install-transaction",
-        "obligation:researchguard:researchguard:native-tests",
-        "obligation:researchguard:researchguard:prompt-load",
-        "obligation:researchguard:researchguard:task-model-closure"
-      ],
       "disposition": "governed",
       "owner_id": "owner:researchguard:researchguard",
       "intent_id": "intent:researchguard:a582674cd839c00616151da1",
@@ -235,10 +154,6 @@
       "route_id": "template:SKILL.md",
       "review_group_id": "group:surface:45d8dca86b7e8a7dd698b75b",
       "review_granularity": "surface",
-      "model_obligation_ids": [
-        "obligation:researchguard:researchguard:consumer-contract",
-        "obligation:researchguard:researchguard:prompt-load"
-      ],
       "disposition": "governed",
       "owner_id": "owner:researchguard:researchguard",
       "intent_id": "intent:researchguard:82e473857f9416d1f331e7bd",
@@ -279,12 +194,6 @@
       "route_id": "template:references/external-domain-dna.md",
       "review_group_id": "group:surface:5fe0f923b5076835578e29ce",
       "review_granularity": "surface",
-      "model_obligation_ids": [
-        "obligation:researchguard:researchguard:consumer-contract",
-        "obligation:researchguard:researchguard:native-tests",
-        "obligation:researchguard:researchguard:prompt-load",
-        "obligation:researchguard:researchguard:task-model-closure"
-      ],
       "disposition": "governed",
       "owner_id": "owner:researchguard:researchguard",
       "intent_id": "intent:researchguard:08bf68317ae809ff4c94c627",
@@ -332,12 +241,6 @@
       "route_id": "template:references/member-admission-index.md",
       "review_group_id": "group:surface:b9d0811aa15910aedd430c8d",
       "review_granularity": "surface",
-      "model_obligation_ids": [
-        "obligation:researchguard:researchguard:consumer-contract",
-        "obligation:researchguard:researchguard:native-tests",
-        "obligation:researchguard:researchguard:prompt-load",
-        "obligation:researchguard:researchguard:task-model-closure"
-      ],
       "disposition": "governed",
       "owner_id": "owner:researchguard:researchguard",
       "intent_id": "intent:researchguard:08bf68317ae809ff4c94c627",
@@ -385,12 +288,6 @@
       "route_id": "template:references/member-model-envelope.md",
       "review_group_id": "group:surface:5b795b0c1f8f276be008c9c9",
       "review_granularity": "surface",
-      "model_obligation_ids": [
-        "obligation:researchguard:researchguard:consumer-contract",
-        "obligation:researchguard:researchguard:native-tests",
-        "obligation:researchguard:researchguard:prompt-load",
-        "obligation:researchguard:researchguard:task-model-closure"
-      ],
       "disposition": "governed",
       "owner_id": "owner:researchguard:researchguard",
       "intent_id": "intent:researchguard:08bf68317ae809ff4c94c627",
@@ -494,14 +391,9 @@
       "disposition": "not_applicable_proven",
       "reason": "Current skill-root scan contains no provider surfaces; this says nothing about native package surfaces outside that root.",
       "proof_ref": ".skillguard/surface-inventory.json#full_discovery_fingerprint"
-    },
-    "component": {
-      "disposition": "not_applicable_proven",
-      "reason": "Current skill-root scan contains no component surfaces; this says nothing about native package surfaces outside that root.",
-      "proof_ref": ".skillguard/surface-inventory.json#full_discovery_fingerprint"
     }
   },
-  "full_discovery_fingerprint": "sha256:c01b7ec93fed3e34c9130f0b188d520917d713cfe1010b9528c2dd55363d9fa9",
+  "full_discovery_fingerprint": "sha256:b4cacd7ec5c8459fced89bf71e7f13e4f943c1e10289ed94d5bee92c21ad617a",
   "adequacy_check_ids": [
     "check:researchguard:consumer-contract",
     "check:researchguard:native-tests",
@@ -510,5 +402,5 @@
   ],
   "model_deepening_check_id": "check:researchguard:task-model-closure",
   "claim_boundary": "The declared member skill root is the source-discovery boundary. Its native package is separately bound by the contract's implementation paths and check inputs. This author map proves neither native check execution nor domain correctness, installation, release, or future AI behavior.",
-  "inventory_hash": "sha256:21abc0e6089a34c1a8ae05b5f557a27316f6a31c8d17caebb0e8e1140083e390"
+  "inventory_hash": "sha256:e8d243f2feb93d86e82dbd6275adf84a96638535fecf3ff9fbb72014afe569f8"
 }

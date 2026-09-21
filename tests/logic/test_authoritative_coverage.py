@@ -289,16 +289,18 @@ def test_skill_contract_binds_authoritative_native_receipt_without_parallel_rout
     manifest_ids = {item["check_id"] for item in manifest["checks"]}
 
     assert contract["maintenance_unit_id"] == "unit:researchguard-suite"
-    assert contract["member_skill_ids"] == ["logicguard"]
-    assert contract["schema_version"] == "skillguard.skill_contract.v3"
+    assert contract["member_skill_ids"] == [
+        "researchguard", "logicguard", "sourceguard", "traceguard", "experimentguard"
+    ]
+    assert contract["schema_version"] == "skillguard.contract_source.v2"
     assert set(checks) == manifest_ids == {
         "check:logicguard:consumer-contract",
         "check:logicguard:prompt-load",
         "check:logicguard:native-tests",
         "check:logicguard:task-model-closure",
     }
-    assert contract["routes"][0]["route_id"] == "route:logicguard:current-validation"
-    assert len(contract["steps"]) == 4
+    assert contract["native_route_bindings"][0]["native_route_id"] == "route:researchguard:logicguard"
+    assert len(contract["step_bindings"]) == 4
 
 
 def test_low_declared_importance_cannot_remove_an_explicit_shallow_card() -> None:

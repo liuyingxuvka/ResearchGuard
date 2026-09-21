@@ -31,7 +31,7 @@ TEST_MESH_MAINTENANCE_INPUTS = (
     ".skillguard/test-mesh.json",
     "scripts/check_researchguard_test_mesh.py",
 )
-RESEARCHGUARD_VERSION = "0.5.4"
+RESEARCHGUARD_VERSION = "0.5.5"
 
 # Freshness inputs for the integration owner; the builder does not copy or
 # regenerate the native software-DNA model.
@@ -438,7 +438,7 @@ def contract(member: str) -> dict:
     prompt_obligation = f"obligation:researchguard:{member}:prompt-load"
     native_obligation = f"obligation:researchguard:{member}:native-tests"
     install_obligation = (
-        "obligation:researchguard:consumer-install-transaction"
+        "obligation:researchguard:researchguard:consumer-install-transaction"
     )
     deepening_check_id = f"check:{member}:task-model-closure"
     deepening_obligation = f"obligation:researchguard:{member}:task-model-closure"

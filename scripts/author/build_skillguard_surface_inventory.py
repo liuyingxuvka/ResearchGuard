@@ -170,6 +170,10 @@ def build_member(repository_root: Path, member: str, scanner: Any) -> tuple[dict
             for row in rows], "obligation_bindings": obligation_bindings, "claim_boundary": CLAIM_BOUNDARY,
     }
     mapping["map_hash"] = _hash(mapping)
+    inventory_rows = [
+        {key: value for key, value in row.items() if key != "model_obligation_ids"}
+        for row in rows
+    ]
     categories = {"option": "command", "export": "api", "prompt": "template"}
     observed_categories = {categories.get(row["kind"], row["kind"]) for row in rows}
     inventory = {
@@ -180,8 +184,7 @@ def build_member(repository_root: Path, member: str, scanner: Any) -> tuple[dict
                   "intent_id": f"intent:researchguard:{member}", "owner_id": owner_id, "route_id": route_id,
                   "function_id": f"function:researchguard:{member}", "required_check_ids": sorted(checks),
                   "adequacy_check_ids": sorted(checks), "evidence_subject_ids": sorted({row["evidence_subject_id"] for row in checks.values()})}],
-        "current_obligation_ids": sorted(obligations), "model_obligations": obligation_bindings,
-        "full_surface_ids": mapping["full_surface_ids"], "full_surfaces": rows,
+        "full_surface_ids": [row["surface_id"] for row in inventory_rows], "full_surfaces": inventory_rows,
         "surface_category_dispositions": {
             category: {"disposition": "governed" if category in observed_categories else "not_applicable_proven",
                        "reason": f"Current skill-root scan {'contains explicitly mapped' if category in observed_categories else 'contains no'} {category} surfaces; this says nothing about native package surfaces outside that root.",
@@ -231,8 +234,9 @@ def main(argv: list[str] | None = None) -> int:
                 _write(path, payload)
             elif not path.is_file() or _read(path) != payload:
                 raise ValueError(f"{member}: stale or missing {filename}; regenerate from current reviewed rules")
+        compiled = _read(directory / "compiled-contract.json")
         results.append({"member": member, "surface_count": len(inventory["full_surfaces"]),
-                        "obligation_count": len(inventory["current_obligation_ids"]), "inventory_hash": inventory["inventory_hash"]})
+                        "obligation_count": len(compiled.get("obligations", ())), "inventory_hash": inventory["inventory_hash"]})
     print(json.dumps({"status": "written" if args.write else "current", "members": results}))
     return 0
 

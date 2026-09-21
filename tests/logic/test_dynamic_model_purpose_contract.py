@@ -17,6 +17,16 @@ from researchguard.logic import (
 )
 
 
+REFERENCE_BOUNDARY_DOCS = (
+    "skills/logicguard/references/broad-depth-and-closure.md",
+    "skills/logicguard/references/task-model-maturation.md",
+    "skills/sourceguard/references/source-model-protocol.md",
+    "skills/sourceguard/references/task-iteration.md",
+    "skills/traceguard/references/task-iteration.md",
+    "skills/experimentguard/references/experiment-model-protocol.md",
+)
+
+
 def _write(path: Path, value: object) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
@@ -201,6 +211,37 @@ def test_dynamic_contract_exhausts_one_or_many_current_failures(
     assert receipt.receipt_version == "researchguard.logic.depth.v3"
     assert receipt.target_contract_fingerprint == proof["contract_fingerprint"]
     assert receipt.target_proof_receipt["proofed_failure_count"] == proof["proofed_failure_count"]
+
+
+def test_short_structure_boundary_is_documented_without_claiming_prose_quality() -> None:
+    root = Path(__file__).resolve().parents[2]
+    documents = [
+        (root / relative).read_text(encoding="utf-8")
+        for relative in REFERENCE_BOUNDARY_DOCS
+    ]
+    combined = "\n".join(documents)
+    assert "short structure" in combined
+    assert "frozen input" in combined
+    assert "not automatic quality improvement" in combined
+    assert "factual truth" in combined
+    assert "prose quality" in combined
+    assert "fabricat" in combined
+
+
+def test_known_bad_short_graphs_remove_declared_support_roles_only(tmp_path: Path) -> None:
+    contract, candidate = _prepare(tmp_path, multiple=True)
+    value = json.loads(contract.read_text(encoding="utf-8"))
+    failures = value["prevented_failure_classes"]
+    assert len(failures) == 2
+    assert all(row["oracle"]["kind"] == "primary_depth_gap_prefix" for row in failures)
+    assert all(row["known_good_relative_path"].endswith("good.json") for row in failures)
+    assert {row["known_bad_relative_path"] for row in failures} == {
+        ".logicguard/cases/bad-support.json",
+        ".logicguard/cases/bad-warrant.json",
+    }
+    # The candidate is a small bound structure; the test only exercises the
+    # native purpose contract and never turns it into a prose/style oracle.
+    assert len(candidate.read_text(encoding="utf-8")) < 5000
 
 
 def test_bad_case_that_does_not_block_keeps_target_closed(tmp_path: Path) -> None:

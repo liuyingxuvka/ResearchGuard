@@ -2,18 +2,16 @@
   "schema_version": "skillguard.surface_semantic_map.v1",
   "map_id": "map:researchguard:traceguard:surface-semantics",
   "target_skill_id": "traceguard",
-  "source_discovery_fingerprint": "sha256:b73ee5c4451d396636d7cdbdb290dfd3f5695f6669c3c59d0b306b0a0f1ce2be",
+  "source_discovery_fingerprint": "sha256:72214c591b5e10d2994138845d38b20a02fb6172eb179ad8abf43a31d89439f0",
   "full_surface_ids": [
     "api:scripts/traceguard_closure_check.py:check",
     "api:scripts/traceguard_closure_check.py:main",
     "api:scripts/traceguard_library_closure_check.py:check",
     "api:scripts/traceguard_library_closure_check.py:main",
     "artifact:agents/openai.yaml",
-    "component:scripts/traceguard_closure_check.py",
-    "component:scripts/traceguard_library_closure_check.py",
     "config:.skillguard/contract-source.json",
-    "fault:scripts/traceguard_closure_check.py:check",
-    "fault:scripts/traceguard_library_closure_check.py:check",
+    "fault:scripts/traceguard_closure_check.py:55:check",
+    "fault:scripts/traceguard_library_closure_check.py:25:check",
     "script:scripts/traceguard_closure_check.py",
     "script:scripts/traceguard_library_closure_check.py",
     "template:SKILL.md",
@@ -26,8 +24,8 @@
     "template:references/trace-blueprint-contract.md",
     "template:references/unified_inference_protocol.md",
     "template:references/validated-template-pack.md",
-    "ui:scripts/traceguard_closure_check.py:check",
-    "ui:scripts/traceguard_library_closure_check.py:check"
+    "ui:scripts/traceguard_closure_check.py:55:check",
+    "ui:scripts/traceguard_library_closure_check.py:25:check"
   ],
   "current_obligation_ids": [
     "obligation:researchguard:traceguard:consumer-contract",
@@ -148,28 +146,6 @@
       "decision": "explicit-author-rule"
     },
     {
-      "surface_id": "component:scripts/traceguard_closure_check.py",
-      "model_obligation_ids": [
-        "obligation:researchguard:traceguard:native-tests",
-        "obligation:researchguard:traceguard:task-model-closure"
-      ],
-      "rule_ids": [
-        "decision:traceguard:native-closure-boundary"
-      ],
-      "decision": "explicit-author-component-group-closure"
-    },
-    {
-      "surface_id": "component:scripts/traceguard_library_closure_check.py",
-      "model_obligation_ids": [
-        "obligation:researchguard:traceguard:native-tests",
-        "obligation:researchguard:traceguard:task-model-closure"
-      ],
-      "rule_ids": [
-        "decision:traceguard:native-closure-boundary"
-      ],
-      "decision": "explicit-author-component-group-closure"
-    },
-    {
       "surface_id": "config:.skillguard/contract-source.json",
       "model_obligation_ids": [
         "obligation:researchguard:traceguard:consumer-contract",
@@ -183,7 +159,7 @@
       "decision": "explicit-author-rule"
     },
     {
-      "surface_id": "fault:scripts/traceguard_closure_check.py:check",
+      "surface_id": "fault:scripts/traceguard_closure_check.py:55:check",
       "model_obligation_ids": [
         "obligation:researchguard:traceguard:native-tests",
         "obligation:researchguard:traceguard:task-model-closure"
@@ -194,7 +170,7 @@
       "decision": "explicit-author-component-group-closure"
     },
     {
-      "surface_id": "fault:scripts/traceguard_library_closure_check.py:check",
+      "surface_id": "fault:scripts/traceguard_library_closure_check.py:25:check",
       "model_obligation_ids": [
         "obligation:researchguard:traceguard:native-tests",
         "obligation:researchguard:traceguard:task-model-closure"
@@ -352,7 +328,7 @@
       "decision": "explicit-author-rule"
     },
     {
-      "surface_id": "ui:scripts/traceguard_closure_check.py:check",
+      "surface_id": "ui:scripts/traceguard_closure_check.py:55:check",
       "model_obligation_ids": [
         "obligation:researchguard:traceguard:native-tests",
         "obligation:researchguard:traceguard:task-model-closure"
@@ -363,7 +339,7 @@
       "decision": "explicit-author-rule"
     },
     {
-      "surface_id": "ui:scripts/traceguard_library_closure_check.py:check",
+      "surface_id": "ui:scripts/traceguard_library_closure_check.py:25:check",
       "model_obligation_ids": [
         "obligation:researchguard:traceguard:native-tests",
         "obligation:researchguard:traceguard:task-model-closure"
@@ -403,11 +379,9 @@
         "api:scripts/traceguard_closure_check.py:main",
         "api:scripts/traceguard_library_closure_check.py:check",
         "api:scripts/traceguard_library_closure_check.py:main",
-        "component:scripts/traceguard_closure_check.py",
-        "component:scripts/traceguard_library_closure_check.py",
         "config:.skillguard/contract-source.json",
-        "fault:scripts/traceguard_closure_check.py:check",
-        "fault:scripts/traceguard_library_closure_check.py:check",
+        "fault:scripts/traceguard_closure_check.py:55:check",
+        "fault:scripts/traceguard_library_closure_check.py:25:check",
         "script:scripts/traceguard_closure_check.py",
         "script:scripts/traceguard_library_closure_check.py",
         "template:references/depth-and-closure.md",
@@ -415,8 +389,8 @@
         "template:references/trace-blueprint-contract.md",
         "template:references/unified_inference_protocol.md",
         "template:references/validated-template-pack.md",
-        "ui:scripts/traceguard_closure_check.py:check",
-        "ui:scripts/traceguard_library_closure_check.py:check"
+        "ui:scripts/traceguard_closure_check.py:55:check",
+        "ui:scripts/traceguard_library_closure_check.py:25:check"
       ],
       "reason": "Explicit member author rules bind these source surfaces to this compiled obligation.",
       "proof_ref": ".skillguard/surface-semantic-map.json#decision_rules"
@@ -449,11 +423,9 @@
         "api:scripts/traceguard_closure_check.py:main",
         "api:scripts/traceguard_library_closure_check.py:check",
         "api:scripts/traceguard_library_closure_check.py:main",
-        "component:scripts/traceguard_closure_check.py",
-        "component:scripts/traceguard_library_closure_check.py",
         "config:.skillguard/contract-source.json",
-        "fault:scripts/traceguard_closure_check.py:check",
-        "fault:scripts/traceguard_library_closure_check.py:check",
+        "fault:scripts/traceguard_closure_check.py:55:check",
+        "fault:scripts/traceguard_library_closure_check.py:25:check",
         "script:scripts/traceguard_closure_check.py",
         "script:scripts/traceguard_library_closure_check.py",
         "template:references/depth-and-closure.md",
@@ -461,13 +433,13 @@
         "template:references/trace-blueprint-contract.md",
         "template:references/unified_inference_protocol.md",
         "template:references/validated-template-pack.md",
-        "ui:scripts/traceguard_closure_check.py:check",
-        "ui:scripts/traceguard_library_closure_check.py:check"
+        "ui:scripts/traceguard_closure_check.py:55:check",
+        "ui:scripts/traceguard_library_closure_check.py:25:check"
       ],
       "reason": "Explicit member author rules bind these source surfaces to this compiled obligation.",
       "proof_ref": ".skillguard/surface-semantic-map.json#decision_rules"
     }
   ],
   "claim_boundary": "The declared member skill root is the source-discovery boundary. Its native package is separately bound by the contract's implementation paths and check inputs. This author map proves neither native check execution nor domain correctness, installation, release, or future AI behavior.",
-  "map_hash": "sha256:5dc19147e8a3dbadc2fa9f30f6ada906b35192831592ddfd4f540cbfc0e350d1"
+  "map_hash": "sha256:1d1932287a8c2563c2e8b2ab95194216fed29e6b14a1e848d324b595dd4c9465"
 }

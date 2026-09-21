@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.5.5 - 2026-09-21
+
+- Refresh the five current SkillGuard v2 consumer contracts after the A09 documentation and dynamic-model contract repairs.
+- Keep the suite package, examples, executable suite model, regression manifest, tests, and all five consumer projections on one current patch identity.
+- Preserve direct-current replacement and fail-closed routing with no compatibility reader, alias, or fallback path.
+
 ## v0.5.4 - 2026-09-21
 
 - Fix the SkillGuard transaction installer to pass each member's declared

@@ -1,236 +1,668 @@
 {
-  "schema_version": "skillguard.skill_contract.v3",
+  "schema_version": "skillguard.contract_source.v2",
   "skill_id": "researchguard",
+  "repository_role": "skill_maintainer_source",
   "maintenance_unit_id": "unit:researchguard-suite",
   "member_skill_ids": [
-    "researchguard"
+    "researchguard",
+    "logicguard",
+    "sourceguard",
+    "traceguard",
+    "experimentguard"
   ],
-  "inputs": [
+  "consumer_projection": {
+    "projection_id": "projection:consumer-distribution",
+    "prohibited_path_prefixes": [
+      ".skillguard/"
+    ],
+    "prohibited_prompt_tokens": [
+      "SkillGuard",
+      ".skillguard",
+      "skillguard.py"
+    ],
+    "release_manifest_path": "consumer-release.json"
+  },
+  "projection_consumers": [
     {
-      "id": "input:001",
-      "path": "SKILL.md",
-      "required": true,
-      "role": "instructions"
-    },
-    {
-      "id": "input:002",
-      "path": "agents/openai.yaml",
-      "required": true,
-      "role": "runtime_source"
-    },
-    {
-      "id": "input:003",
-      "path": "references/external-domain-dna.md",
-      "required": true,
-      "role": "runtime_source"
-    },
-    {
-      "id": "input:004",
-      "path": "references/member-admission-index.md",
-      "required": true,
-      "role": "runtime_source"
-    },
-    {
-      "id": "input:005",
-      "path": "references/member-model-envelope.md",
-      "required": true,
-      "role": "runtime_source"
-    },
-    {
-      "id": "input:wrapper",
-      "path": ".skillguard/checks/run_researchguard_check.py",
-      "required": true,
-      "role": "author_check"
-    }
-  ],
-  "routes": [
-    {
-      "route_id": "route:researchguard:current-validation",
-      "choice_group": "operation",
-      "when": [
+      "consumer_id": "projection:researchguard-suite-maintenance-definition",
+      "kind": "source_maintenance",
+      "input_selectors": [
         {
-          "fact": "operation",
-          "equals": "validate"
+          "kind": "path",
+          "path": ".skillguard/test-mesh.json"
+        },
+        {
+          "kind": "path",
+          "path": "scripts/check_researchguard_test_mesh.py"
         }
-      ],
-      "step_ids": [
-        "step:researchguard:consumer-contract",
-        "step:researchguard:prompt-load",
-        "step:researchguard:native-tests",
-        "step:researchguard:task-model-closure"
-      ],
-      "obligation_ids": [
-        "obligation:researchguard:consumer-contract",
-        "obligation:researchguard:prompt-load",
-        "obligation:researchguard:native-tests",
-        "obligation:researchguard:task-model-closure",
-        "obligation:researchguard:consumer-install-transaction"
       ]
     }
   ],
-  "steps": [
+  "model_id": "researchguard.researchguard.contract.current",
+  "model_path": ".flowguard/models/researchguard_skill_contract_model.py",
+  "confirmed": true,
+  "integration_mode": "native-integrated",
+  "native_route_owner": "owner:researchguard:researchguard",
+  "may_define_parallel_execution_route": false,
+  "may_define_skillguard_runtime_route": false,
+  "native_route_bindings": [
     {
-      "step_id": "step:researchguard:consumer-contract",
-      "check_ids": [
-        "check:researchguard:consumer-contract"
-      ],
-      "requires": []
-    },
-    {
-      "step_id": "step:researchguard:prompt-load",
-      "check_ids": [
-        "check:researchguard:prompt-load"
-      ],
-      "requires": [
-        "step:researchguard:consumer-contract"
-      ]
-    },
-    {
-      "step_id": "step:researchguard:native-tests",
-      "check_ids": [
-        "check:researchguard:native-tests"
-      ],
-      "requires": [
-        "step:researchguard:prompt-load"
-      ]
-    },
-    {
-      "step_id": "step:researchguard:task-model-closure",
-      "check_ids": [
-        "check:researchguard:task-model-closure"
-      ],
-      "requires": [
-        "step:researchguard:native-tests"
-      ]
+      "binding_id": "native:researchguard:researchguard",
+      "native_route_id": "route:researchguard:researchguard",
+      "required_before_closure": true,
+      "source": "skills/researchguard/SKILL.md"
     }
   ],
-  "obligations": [
+  "native_check_bindings": [
     {
-      "obligation_id": "obligation:researchguard:consumer-contract",
-      "check_ids": [
-        "check:researchguard:consumer-contract"
-      ]
+      "binding_id": "native-check:researchguard:researchguard:consumer-contract",
+      "native_check_id": "check:researchguard:consumer-contract",
+      "required": true,
+      "evidence_source": "scripts/check_researchguard_suite.py"
     },
     {
-      "obligation_id": "obligation:researchguard:prompt-load",
-      "check_ids": [
-        "check:researchguard:prompt-load"
-      ]
+      "binding_id": "native-check:researchguard:researchguard:prompt-load",
+      "native_check_id": "check:researchguard:prompt-load",
+      "required": true,
+      "evidence_source": "scripts/check_prompt_bundles.py"
     },
     {
-      "obligation_id": "obligation:researchguard:native-tests",
-      "check_ids": [
-        "check:researchguard:native-tests"
-      ]
+      "binding_id": "native-check:researchguard:researchguard:native-tests",
+      "native_check_id": "check:researchguard:native-tests",
+      "required": true,
+      "evidence_source": "tests"
     },
     {
-      "obligation_id": "obligation:researchguard:task-model-closure",
-      "check_ids": [
+      "binding_id": "native-check:researchguard:researchguard:task-model-closure",
+      "native_check_id": "check:researchguard:task-model-closure",
+      "required": true,
+      "evidence_source": "tests/task-local-iteration"
+    }
+  ],
+  "depth_profile": {
+    "schema_version": "skillguard.depth_profile.v2",
+    "profile_id": "profile:researchguard:researchguard:strict-model-closure",
+    "target_skill_id": "researchguard",
+    "integration_mode": "native-integrated",
+    "native_owner_id": "owner:researchguard:researchguard",
+    "native_route_ids": [
+      "route:researchguard:researchguard"
+    ],
+    "native_check_ids": [
+      "check:researchguard:consumer-contract",
+      "check:researchguard:prompt-load",
+      "check:researchguard:native-tests",
+      "check:researchguard:task-model-closure"
+    ],
+    "model_deepening_check_id": "check:researchguard:task-model-closure",
+    "surface_inventory": {
+      "path": ".skillguard/surface-inventory.json",
+      "adequacy_check_ids": [
+        "check:researchguard:consumer-contract",
+        "check:researchguard:prompt-load",
+        "check:researchguard:native-tests",
+        "check:researchguard:task-model-closure"
+      ],
+      "model_deepening_check_id": "check:researchguard:task-model-closure"
+    },
+    "skillguard_adds_domain_route": false,
+    "enforcement_level": "enforced",
+    "required_closure_profiles": [
+      "enforced"
+    ],
+    "provider_runtime": {
+      "provider_id": "skillguard-local-provider",
+      "required_runtime_contract_id": "skillguard-declared-check-supervision-current",
+      "required_capability_ids": [
+        "declared-check-inventory.v1",
+        "declared-check-receipt-reconciliation.v1",
+        "installation-receipt-binding.v1",
+        "installation-currentness-replay.v1",
+        "provider-runtime-enrollment.v1",
+        "single-flight-check-execution.v1"
+      ],
+      "required_enrollment_status": "enrolled",
+      "readiness_check_ids": [
+        "check:researchguard:consumer-contract",
+        "check:researchguard:prompt-load",
+        "check:researchguard:native-tests",
         "check:researchguard:task-model-closure"
       ]
     },
+    "claim_boundary": "SkillGuard supervises only the exact current ResearchGuard target-owned strict model-closure checks; it does not replace their domain judgment."
+  },
+  "implementation_paths": [
+    "skills/researchguard",
+    "src/researchguard/__init__.py",
+    "src/researchguard/__main__.py",
+    "src/researchguard/admission.py",
+    "src/researchguard/cli.py",
+    "src/researchguard/domain_dna.py",
+    "src/researchguard/external_scope_authority.py",
+    "src/researchguard/routing.py",
+    "src/researchguard/suite.py",
+    "src/researchguard/logic/admission.py",
+    "src/researchguard/source/admission.py",
+    "src/researchguard/trace/admission.py",
+    "src/researchguard/experiment/admission.py",
+    ".flowguard/models/researchguard_suite_model.py",
+    ".flowguard/models/researchguard_suite/model-definition.json",
+    ".flowguard/verification/run_researchguard_suite_model.py",
+    ".flowguard/models/researchguard_skill_contract_model.py",
+    ".flowguard/models/researchguard_skill_contract_model_common.py",
+    "scripts/build_skillguard_contracts.py",
+    "scripts/author/build_skillguard_surface_inventory.py",
+    "tests/contract/test_skillguard_surface_inventory.py",
+    "scripts/compile_external_domain_dna_examples.py",
+    "scripts/check_researchguard_suite.py",
+    "scripts/check_zero_residuals.py",
+    "scripts/install_researchguard.py",
+    "tests/test_suite_routing.py",
+    "tests/admission_fixtures.py",
+    "tests/test_root_cli.py",
+    "tests/test_skill_suite.py",
+    "tests/test_install_researchguard.py",
+    "tests/test_external_domain_dna_real_paper.py",
+    "tests/test_external_scope_authority.py",
+    "tests/external_scope_authority_fixtures.py",
+    "tests/test_prompt_bundles.py",
+    "tests/test_suite_model_currentness.py",
+    "tests/test_zero_residuals.py",
+    "tests/logic/test_task_iteration.py",
+    "tests/source/test_task_iteration.py",
+    "tests/trace/test_task_iteration.py",
+    "tests/experiment/test_recommendation.py",
+    "models/external_domain_dna",
+    "pyproject.toml",
+    "researchguard/prompt_bundle_manifest.json",
+    "scripts/check_prompt_bundles.py",
+    "src/researchguard/model_envelope.py",
+    "src/researchguard/target_authority.py",
+    "src/researchguard/experiment/owner_attestation.py",
+    "src/researchguard/logic/owner_attestation.py",
+    "src/researchguard/source/owner_attestation.py",
+    "src/researchguard/trace/owner_attestation.py",
+    "tests/test_member_model_envelope.py",
+    "tests/test_guard_blueprint_integration.py",
+    "skills/researchguard/references/member-model-envelope.md",
+    ".skillguard/test-mesh.json",
+    "scripts/check_researchguard_test_mesh.py"
+  ],
+  "step_bindings": [
     {
-      "obligation_id": "obligation:researchguard:consumer-install-transaction",
+      "step_id": "step:researchguard:researchguard:contract",
+      "action": {
+        "kind": "native",
+        "summary": "Validate the exact current consumer skill and route boundary."
+      },
+      "check_ids": [
+        "check:researchguard:consumer-contract"
+      ],
+      "output_artifact_ids": []
+    },
+    {
+      "step_id": "step:researchguard:researchguard:prompt-load",
+      "action": {
+        "kind": "native",
+        "summary": "Validate the selected-only entry budget and conditional reference graph."
+      },
+      "check_ids": [
+        "check:researchguard:prompt-load"
+      ],
+      "output_artifact_ids": []
+    },
+    {
+      "step_id": "step:researchguard:researchguard:tests",
+      "action": {
+        "kind": "native",
+        "summary": "Execute the member-owned current native regression suite."
+      },
       "check_ids": [
         "check:researchguard:native-tests"
-      ]
+      ],
+      "output_artifact_ids": []
+    },
+    {
+      "step_id": "step:researchguard:researchguard:task-model-closure",
+      "action": {
+        "kind": "native",
+        "summary": "Execute the target-owned task-local model closure and gap-continuation checks."
+      },
+      "check_ids": [
+        "check:researchguard:task-model-closure"
+      ],
+      "output_artifact_ids": []
     }
   ],
   "checks": [
     {
       "check_id": "check:researchguard:consumer-contract",
-      "command": "{{python}}",
+      "maintenance_unit_id": "unit:researchguard-suite",
+      "member_skill_id": "researchguard",
+      "evidence_subject_id": "subject:researchguard:researchguard:consumer-contract",
+      "semantic_check_id": "semantic:researchguard:researchguard:consumer-contract:current",
+      "kind": "command",
+      "command": "python",
       "args": [
-        ".skillguard/checks/run_researchguard_check.py",
-        "consumer-contract"
+        "scripts/check_researchguard_suite.py",
+        "--member",
+        "researchguard",
+        "--json"
+      ],
+      "cwd_token": "repository_root",
+      "input_selectors": [
+        {
+          "kind": "path",
+          "path": "skills/researchguard/SKILL.md"
+        },
+        {
+          "kind": "path",
+          "path": "skills/researchguard/agents/openai.yaml"
+        },
+        {
+          "kind": "path",
+          "path": "scripts/check_researchguard_suite.py"
+        },
+        {
+          "kind": "path",
+          "path": ".flowguard/models/researchguard_suite_model.py"
+        },
+        {
+          "kind": "path",
+          "path": ".flowguard/models/researchguard_suite/model-definition.json"
+        },
+        {
+          "kind": "path",
+          "path": ".flowguard/verification/run_researchguard_suite_model.py"
+        },
+        {
+          "kind": "path",
+          "path": ".flowguard/models/researchguard_skill_contract_model.py"
+        },
+        {
+          "kind": "path",
+          "path": ".flowguard/models/researchguard_skill_contract_model_common.py"
+        }
       ],
       "expected": {
         "exit_code": 0
       },
-      "input_ids": [
-        "input:wrapper",
-        "input:001",
-        "input:002",
-        "input:003",
-        "input:004",
-        "input:005"
-      ],
       "timeout_seconds": 300,
-      "kind": "command"
+      "evidence_class": "hard",
+      "evidence_domain_id": "evidence-domain:researchguard:researchguard:consumer-contract",
+      "execution_owner_id": "owner:researchguard:researchguard:consumer-contract",
+      "native_route_id": "route:researchguard:researchguard",
+      "depends_on_check_ids": [],
+      "covers_obligation_ids": [
+        "obligation:researchguard:researchguard:consumer-contract"
+      ],
+      "coverage_scope": "declared_obligations",
+      "coverage_rationale": "This check is the sole execution owner for its exact member obligation."
     },
     {
       "check_id": "check:researchguard:prompt-load",
-      "command": "{{python}}",
+      "maintenance_unit_id": "unit:researchguard-suite",
+      "member_skill_id": "researchguard",
+      "evidence_subject_id": "subject:researchguard:researchguard:prompt-load",
+      "semantic_check_id": "semantic:researchguard:researchguard:prompt-load:current",
+      "kind": "command",
+      "command": "python",
       "args": [
-        ".skillguard/checks/run_researchguard_check.py",
-        "prompt-load"
+        "scripts/check_prompt_bundles.py",
+        "--member",
+        "researchguard",
+        "--json"
+      ],
+      "cwd_token": "repository_root",
+      "input_selectors": [
+        {
+          "kind": "subtree",
+          "path": "skills/researchguard"
+        },
+        {
+          "kind": "path",
+          "path": "skills/researchguard/references/member-model-envelope.md"
+        },
+        {
+          "kind": "path",
+          "path": "researchguard/prompt_bundle_manifest.json"
+        },
+        {
+          "kind": "path",
+          "path": "scripts/check_prompt_bundles.py"
+        },
+        {
+          "kind": "path",
+          "path": "src/researchguard/admission.py"
+        },
+        {
+          "kind": "path",
+          "path": "src/researchguard/routing.py"
+        },
+        {
+          "kind": "path",
+          "path": "src/researchguard/logic/admission.py"
+        },
+        {
+          "kind": "path",
+          "path": "src/researchguard/source/admission.py"
+        },
+        {
+          "kind": "path",
+          "path": "src/researchguard/trace/admission.py"
+        },
+        {
+          "kind": "path",
+          "path": "src/researchguard/experiment/admission.py"
+        }
       ],
       "expected": {
         "exit_code": 0
       },
-      "input_ids": [
-        "input:wrapper",
-        "input:001",
-        "input:002",
-        "input:003",
-        "input:004",
-        "input:005"
-      ],
       "timeout_seconds": 60,
-      "kind": "command"
+      "evidence_class": "hard",
+      "evidence_domain_id": "evidence-domain:researchguard:researchguard:prompt-load",
+      "execution_owner_id": "owner:researchguard:researchguard:prompt-load",
+      "native_route_id": "route:researchguard:researchguard",
+      "depends_on_check_ids": [
+        "check:researchguard:consumer-contract"
+      ],
+      "covers_obligation_ids": [
+        "obligation:researchguard:researchguard:prompt-load"
+      ],
+      "coverage_scope": "declared_obligations",
+      "coverage_rationale": "This check is the sole execution owner for its exact member obligation."
     },
     {
       "check_id": "check:researchguard:native-tests",
-      "command": "{{python}}",
+      "maintenance_unit_id": "unit:researchguard-suite",
+      "member_skill_id": "researchguard",
+      "evidence_subject_id": "subject:researchguard:researchguard:native-tests",
+      "semantic_check_id": "semantic:researchguard:researchguard:native-tests:current",
+      "kind": "command",
+      "command": "python",
       "args": [
-        ".skillguard/checks/run_researchguard_check.py",
-        "native-tests"
+        "-m",
+        "pytest",
+        "tests/test_suite_routing.py",
+        "tests/test_root_cli.py",
+        "tests/test_skill_suite.py",
+        "tests/test_install_researchguard.py",
+        "tests/test_prompt_bundles.py",
+        "tests/test_zero_residuals.py",
+        "tests/test_external_domain_dna_real_paper.py",
+        "tests/test_external_scope_authority.py",
+        "tests/contract/test_skillguard_surface_inventory.py",
+        "-q"
+      ],
+      "cwd_token": "repository_root",
+      "input_selectors": [
+        {
+          "kind": "subtree",
+          "path": "skills/researchguard"
+        },
+        {
+          "kind": "path",
+          "path": "src/researchguard/__init__.py"
+        },
+        {
+          "kind": "path",
+          "path": "src/researchguard/__main__.py"
+        },
+        {
+          "kind": "path",
+          "path": "src/researchguard/admission.py"
+        },
+        {
+          "kind": "path",
+          "path": "src/researchguard/cli.py"
+        },
+        {
+          "kind": "path",
+          "path": "src/researchguard/domain_dna.py"
+        },
+        {
+          "kind": "path",
+          "path": "src/researchguard/external_scope_authority.py"
+        },
+        {
+          "kind": "path",
+          "path": "src/researchguard/routing.py"
+        },
+        {
+          "kind": "path",
+          "path": "src/researchguard/suite.py"
+        },
+        {
+          "kind": "path",
+          "path": "src/researchguard/logic/admission.py"
+        },
+        {
+          "kind": "path",
+          "path": "src/researchguard/source/admission.py"
+        },
+        {
+          "kind": "path",
+          "path": "src/researchguard/trace/admission.py"
+        },
+        {
+          "kind": "path",
+          "path": "src/researchguard/experiment/admission.py"
+        },
+        {
+          "kind": "path",
+          "path": "scripts/build_skillguard_contracts.py"
+        },
+        {
+          "kind": "path",
+          "path": "scripts/author/build_skillguard_surface_inventory.py"
+        },
+        {
+          "kind": "path",
+          "path": "tests/contract/test_skillguard_surface_inventory.py"
+        },
+        {
+          "kind": "path",
+          "path": "scripts/compile_external_domain_dna_examples.py"
+        },
+        {
+          "kind": "path",
+          "path": "scripts/check_researchguard_suite.py"
+        },
+        {
+          "kind": "path",
+          "path": "scripts/check_zero_residuals.py"
+        },
+        {
+          "kind": "path",
+          "path": "scripts/install_researchguard.py"
+        },
+        {
+          "kind": "path",
+          "path": "tests/test_suite_routing.py"
+        },
+        {
+          "kind": "path",
+          "path": "tests/admission_fixtures.py"
+        },
+        {
+          "kind": "path",
+          "path": "tests/test_root_cli.py"
+        },
+        {
+          "kind": "path",
+          "path": "tests/test_skill_suite.py"
+        },
+        {
+          "kind": "path",
+          "path": "tests/test_install_researchguard.py"
+        },
+        {
+          "kind": "path",
+          "path": "tests/test_external_domain_dna_real_paper.py"
+        },
+        {
+          "kind": "path",
+          "path": "tests/test_external_scope_authority.py"
+        },
+        {
+          "kind": "path",
+          "path": "tests/external_scope_authority_fixtures.py"
+        },
+        {
+          "kind": "path",
+          "path": "tests/test_prompt_bundles.py"
+        },
+        {
+          "kind": "path",
+          "path": "tests/test_suite_model_currentness.py"
+        },
+        {
+          "kind": "path",
+          "path": "tests/test_zero_residuals.py"
+        },
+        {
+          "kind": "path",
+          "path": "tests/logic/test_task_iteration.py"
+        },
+        {
+          "kind": "path",
+          "path": "tests/source/test_task_iteration.py"
+        },
+        {
+          "kind": "path",
+          "path": "tests/trace/test_task_iteration.py"
+        },
+        {
+          "kind": "path",
+          "path": "tests/experiment/test_recommendation.py"
+        },
+        {
+          "kind": "subtree",
+          "path": "models/external_domain_dna"
+        },
+        {
+          "kind": "path",
+          "path": "pyproject.toml"
+        },
+        {
+          "kind": "path",
+          "path": "src/researchguard/model_envelope.py"
+        },
+        {
+          "kind": "path",
+          "path": "src/researchguard/target_authority.py"
+        },
+        {
+          "kind": "path",
+          "path": "src/researchguard/experiment/owner_attestation.py"
+        },
+        {
+          "kind": "path",
+          "path": "src/researchguard/logic/owner_attestation.py"
+        },
+        {
+          "kind": "path",
+          "path": "src/researchguard/source/owner_attestation.py"
+        },
+        {
+          "kind": "path",
+          "path": "src/researchguard/trace/owner_attestation.py"
+        },
+        {
+          "kind": "path",
+          "path": "tests/test_member_model_envelope.py"
+        },
+        {
+          "kind": "path",
+          "path": "tests/test_guard_blueprint_integration.py"
+        }
       ],
       "expected": {
         "exit_code": 0
       },
-      "input_ids": [
-        "input:wrapper",
-        "input:001",
-        "input:002",
-        "input:003",
-        "input:004",
-        "input:005"
-      ],
       "timeout_seconds": 900,
-      "kind": "command"
+      "evidence_class": "hard",
+      "evidence_domain_id": "evidence-domain:researchguard:researchguard:native-tests",
+      "execution_owner_id": "owner:researchguard:researchguard:native-tests",
+      "native_route_id": "route:researchguard:researchguard",
+      "depends_on_check_ids": [
+        "check:researchguard:prompt-load"
+      ],
+      "covers_obligation_ids": [
+        "obligation:researchguard:researchguard:native-tests",
+        "obligation:researchguard:researchguard:consumer-install-transaction"
+      ],
+      "coverage_scope": "declared_obligations",
+      "coverage_rationale": "This existing member-native owner runs the complete declared member test suite once. Its exact blueprint code/test selectors cover native qualification, qualification-first impact and reverse trace, persisted fresh-process target-authority replay, and caller-forged/co-shrunk self-attestation rejection without adding duplicate execution owners. For the ResearchGuard umbrella, this same owner also proves the suite install transaction's total lock, package/consumer/manifest rollback, and cleanup-unconfirmed boundary."
     },
     {
       "check_id": "check:researchguard:task-model-closure",
-      "command": "{{python}}",
+      "maintenance_unit_id": "unit:researchguard-suite",
+      "member_skill_id": "researchguard",
+      "evidence_subject_id": "subject:researchguard:researchguard:task-model-closure",
+      "semantic_check_id": "semantic:researchguard:researchguard:task-model-closure:current",
+      "kind": "command",
+      "command": "python",
       "args": [
-        ".skillguard/checks/run_researchguard_check.py",
-        "task-model-closure"
+        "-m",
+        "pytest",
+        "tests/experiment",
+        "tests/logic",
+        "tests/source",
+        "tests/trace",
+        "-q"
+      ],
+      "cwd_token": "repository_root",
+      "input_selectors": [
+        {
+          "kind": "path",
+          "path": "tests/experiment/test_recommendation.py"
+        },
+        {
+          "kind": "path",
+          "path": "tests/logic/test_task_iteration.py"
+        },
+        {
+          "kind": "path",
+          "path": "tests/source/test_task_iteration.py"
+        },
+        {
+          "kind": "path",
+          "path": "tests/trace/test_task_iteration.py"
+        }
       ],
       "expected": {
         "exit_code": 0
       },
-      "input_ids": [
-        "input:wrapper",
-        "input:001",
-        "input:002",
-        "input:003",
-        "input:004",
-        "input:005"
-      ],
       "timeout_seconds": 900,
-      "kind": "command"
+      "evidence_class": "hard",
+      "evidence_domain_id": "evidence-domain:researchguard:researchguard:task-model-closure",
+      "execution_owner_id": "owner:researchguard:researchguard:task-model-closure",
+      "native_route_id": "route:researchguard:researchguard",
+      "depends_on_check_ids": [
+        "check:researchguard:native-tests"
+      ],
+      "covers_obligation_ids": [
+        "obligation:researchguard:researchguard:task-model-closure"
+      ],
+      "coverage_scope": "declared_obligations",
+      "coverage_rationale": "This check is the sole execution owner for its exact member obligation."
     }
   ],
-  "consumer_projection": {
-    "projection_id": "projection:consumer-distribution",
-    "file_paths": [
-      "SKILL.md",
-      "agents/openai.yaml",
-      "references/external-domain-dna.md",
-      "references/member-admission-index.md",
-      "references/member-model-envelope.md"
-    ],
-    "release_manifest_path": "consumer-release.json"
-  }
+  "artifacts": [],
+  "closure_profiles": [
+    {
+      "profile_id": "enforced",
+      "required_obligation_ids": [
+        "obligation:researchguard:researchguard:consumer-contract",
+        "obligation:researchguard:researchguard:prompt-load",
+        "obligation:researchguard:researchguard:native-tests",
+        "obligation:researchguard:researchguard:consumer-install-transaction",
+        "obligation:researchguard:researchguard:task-model-closure"
+      ]
+    }
+  ],
+  "judgment_rubrics": [],
+  "claim_boundary": "This contract covers the current researchguard consumer projection, native route, and member-owned tests inside ResearchGuard v0.5.5. The four exact native-blueprint evidence categories are selectors of the one existing target-owned native-tests owner, so final validation does not repeat the same member suite. Distinct model obligation ids remain a later binding with the frozen FlowGuard self-DNA toolchain. The ResearchGuard native-tests owner covers installation transaction behavior without claiming an installation executed or is current. It does not prove source truth, unrun external work, installed currentness, publication, or future AI behavior."
 }

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-__version__ = "0.5.4"
+__version__ = "0.5.5"
 
 SUITE_ID = "researchguard-suite"
 MEMBER_IDS = ("logicguard", "sourceguard", "traceguard", "experimentguard")

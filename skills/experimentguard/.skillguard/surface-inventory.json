@@ -45,58 +45,6 @@
       ]
     }
   ],
-  "current_obligation_ids": [
-    "obligation:researchguard:experimentguard:consumer-contract",
-    "obligation:researchguard:experimentguard:native-tests",
-    "obligation:researchguard:experimentguard:prompt-load",
-    "obligation:researchguard:experimentguard:task-model-closure"
-  ],
-  "model_obligations": [
-    {
-      "obligation_id": "obligation:researchguard:experimentguard:consumer-contract",
-      "disposition": "governed",
-      "surface_ids": [
-        "artifact:agents/openai.yaml",
-        "config:.skillguard/contract-source.json",
-        "template:SKILL.md",
-        "template:references/experiment-model-protocol.md"
-      ],
-      "reason": "Explicit member author rules bind these source surfaces to this compiled obligation.",
-      "proof_ref": ".skillguard/surface-semantic-map.json#decision_rules"
-    },
-    {
-      "obligation_id": "obligation:researchguard:experimentguard:native-tests",
-      "disposition": "governed",
-      "surface_ids": [
-        "config:.skillguard/contract-source.json",
-        "template:references/experiment-model-protocol.md"
-      ],
-      "reason": "Explicit member author rules bind these source surfaces to this compiled obligation.",
-      "proof_ref": ".skillguard/surface-semantic-map.json#decision_rules"
-    },
-    {
-      "obligation_id": "obligation:researchguard:experimentguard:prompt-load",
-      "disposition": "governed",
-      "surface_ids": [
-        "artifact:agents/openai.yaml",
-        "config:.skillguard/contract-source.json",
-        "template:SKILL.md",
-        "template:references/experiment-model-protocol.md"
-      ],
-      "reason": "Explicit member author rules bind these source surfaces to this compiled obligation.",
-      "proof_ref": ".skillguard/surface-semantic-map.json#decision_rules"
-    },
-    {
-      "obligation_id": "obligation:researchguard:experimentguard:task-model-closure",
-      "disposition": "governed",
-      "surface_ids": [
-        "config:.skillguard/contract-source.json",
-        "template:references/experiment-model-protocol.md"
-      ],
-      "reason": "Explicit member author rules bind these source surfaces to this compiled obligation.",
-      "proof_ref": ".skillguard/surface-semantic-map.json#decision_rules"
-    }
-  ],
   "full_surface_ids": [
     "artifact:agents/openai.yaml",
     "config:.skillguard/contract-source.json",
@@ -114,10 +62,6 @@
       "route_id": "artifact:agents/openai.yaml",
       "review_group_id": "group:surface:d9efd0b752469e1fc3464d11",
       "review_granularity": "surface",
-      "model_obligation_ids": [
-        "obligation:researchguard:experimentguard:consumer-contract",
-        "obligation:researchguard:experimentguard:prompt-load"
-      ],
       "disposition": "governed",
       "owner_id": "owner:researchguard:experimentguard",
       "intent_id": "intent:experimentguard:02aa2aef48a9ed841ca6b123",
@@ -153,17 +97,11 @@
       "kind": "config",
       "name": ".skillguard/contract-source.json",
       "source_path": ".skillguard/contract-source.json",
-      "source_fingerprint": "sha256:1f0f1d93030d35aa1f3fa7ec8289c72a5f1d06f2a24dc939d1d64902faebc264",
+      "source_fingerprint": "sha256:311ff71c3221997003214dd9215744563244a2ac224328dc07b281c3e8987fe4",
       "function_id": "config:.skillguard/contract-source.json",
       "route_id": "config:.skillguard/contract-source.json",
       "review_group_id": "group:surface:10513a60240614296b758ebb",
       "review_granularity": "surface",
-      "model_obligation_ids": [
-        "obligation:researchguard:experimentguard:consumer-contract",
-        "obligation:researchguard:experimentguard:native-tests",
-        "obligation:researchguard:experimentguard:prompt-load",
-        "obligation:researchguard:experimentguard:task-model-closure"
-      ],
       "disposition": "governed",
       "owner_id": "owner:researchguard:experimentguard",
       "intent_id": "intent:experimentguard:1ba2b7b283a1d06cfd3a7c70",
@@ -211,10 +149,6 @@
       "route_id": "template:SKILL.md",
       "review_group_id": "group:surface:45d8dca86b7e8a7dd698b75b",
       "review_granularity": "surface",
-      "model_obligation_ids": [
-        "obligation:researchguard:experimentguard:consumer-contract",
-        "obligation:researchguard:experimentguard:prompt-load"
-      ],
       "disposition": "governed",
       "owner_id": "owner:researchguard:experimentguard",
       "intent_id": "intent:experimentguard:02aa2aef48a9ed841ca6b123",
@@ -250,17 +184,11 @@
       "kind": "template",
       "name": "references/experiment-model-protocol.md",
       "source_path": "references/experiment-model-protocol.md",
-      "source_fingerprint": "sha256:41c3ee3c735b3aedd31c0b621f6316a099750577d9ebafaf1137776d8aaeca7a",
+      "source_fingerprint": "sha256:1a238a628d501eba7995394d6e0388b42720f8035b8bce3d857371523d8bacb2",
       "function_id": "template:references/experiment-model-protocol.md",
       "route_id": "template:references/experiment-model-protocol.md",
       "review_group_id": "group:surface:d75b4d439e45a68020911274",
       "review_granularity": "surface",
-      "model_obligation_ids": [
-        "obligation:researchguard:experimentguard:consumer-contract",
-        "obligation:researchguard:experimentguard:native-tests",
-        "obligation:researchguard:experimentguard:prompt-load",
-        "obligation:researchguard:experimentguard:task-model-closure"
-      ],
       "disposition": "governed",
       "owner_id": "owner:researchguard:experimentguard",
       "intent_id": "intent:experimentguard:7e74b85719624626622dcea1",
@@ -364,14 +292,9 @@
       "disposition": "not_applicable_proven",
       "reason": "Current skill-root scan contains no provider surfaces; this says nothing about native package surfaces outside that root.",
       "proof_ref": ".skillguard/surface-inventory.json#full_discovery_fingerprint"
-    },
-    "component": {
-      "disposition": "not_applicable_proven",
-      "reason": "Current skill-root scan contains no component surfaces; this says nothing about native package surfaces outside that root.",
-      "proof_ref": ".skillguard/surface-inventory.json#full_discovery_fingerprint"
     }
   },
-  "full_discovery_fingerprint": "sha256:67be89863a9a80d0cd798a29c624398d0bd086a6e1d498d919b0a25e5c0d30e7",
+  "full_discovery_fingerprint": "sha256:c654c3cc4335fbe3b2ff8a6a816afa8fc92e4ef3a3f4602000c130ad11cbbd1b",
   "adequacy_check_ids": [
     "check:experimentguard:consumer-contract",
     "check:experimentguard:native-tests",
@@ -380,5 +303,5 @@
   ],
   "model_deepening_check_id": "check:experimentguard:task-model-closure",
   "claim_boundary": "The declared member skill root is the source-discovery boundary. Its native package is separately bound by the contract's implementation paths and check inputs. This author map proves neither native check execution nor domain correctness, installation, release, or future AI behavior.",
-  "inventory_hash": "sha256:a9a8562412643395a3ab15fbe247827aeb032cb369f7ac07a62f1536516e6e35"
+  "inventory_hash": "sha256:545b0d8499dfe0bc6616d4b218eeff0da15c6a75c46870ac4525aa85a866af5a"
 }

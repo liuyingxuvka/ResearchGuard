@@ -65,52 +65,44 @@ def _payloads(member: str) -> tuple[dict, dict, dict]:
 
 
 @pytest.mark.parametrize("member", MEMBERS)
-def test_compact_v3_contract_keeps_one_sequential_route(member: str) -> None:
+def test_compact_v2_contract_keeps_one_sequential_route(member: str) -> None:
     source, compiled, manifest = _payloads(member)
     check_ids = {f"check:{member}:{kind}" for kind in (
         "consumer-contract", "prompt-load", "native-tests", "task-model-closure"
     )}
-    assert source["schema_version"] == "skillguard.skill_contract.v3"
-    assert compiled["schema_version"] == "skillguard.compiled_contract.v3"
-    assert manifest["schema_version"] == "skillguard.check_manifest.v3"
-    assert source["member_skill_ids"] == [member]
-    assert compiled["member_skill_ids"] == [member]
+    assert source["schema_version"] == "skillguard.contract_source.v2"
+    assert compiled["schema_version"] == "skillguard.compiled_contract.v2"
+    assert manifest["schema_version"] == "skillguard.check_manifest.v2"
+    assert source["member_skill_ids"] == list(MEMBERS)
+    assert compiled["member_skill_ids"] == list(MEMBERS)
     assert {row["check_id"] for row in source["checks"]} == check_ids
     assert {row["check_id"] for row in compiled["checks"]} == check_ids
     assert {row["check_id"] for row in manifest["checks"]} == check_ids
     assert source["checks"][0]["timeout_seconds"] == 300
     assert source["checks"][1]["timeout_seconds"] == 60
-    assert source["routes"][0]["step_ids"] == [
-        f"step:{member}:consumer-contract",
-        f"step:{member}:prompt-load",
-        f"step:{member}:native-tests",
-        f"step:{member}:task-model-closure",
+    assert source["native_route_bindings"][0]["native_route_id"] == f"route:researchguard:{member}"
+    assert [row["step_id"] for row in source["step_bindings"]] == [
+        f"step:researchguard:{member}:contract",
+        f"step:researchguard:{member}:prompt-load",
+        f"step:researchguard:{member}:tests",
+        f"step:researchguard:{member}:task-model-closure",
     ]
-    assert [row["requires"] for row in source["steps"]] == [
-        [],
-        [f"step:{member}:consumer-contract"],
-        [f"step:{member}:prompt-load"],
-        [f"step:{member}:native-tests"],
-    ]
-    input_ids = {row["id"] for row in source["inputs"]}
-    assert all(set(row["input_ids"]) <= input_ids for row in source["checks"])
-    assert all("input_selectors" not in row for row in source["checks"])
+    assert all("input_selectors" in row for row in source["checks"])
     assert manifest["contract_hash"] == compiled["contract_hash"]
-    assert manifest["manifest_hash"].startswith("sha256:")
+    assert len(manifest["manifest_hash"]) == 64
+    assert all(char in "0123456789ABCDEF" for char in manifest["manifest_hash"])
 
 
 @pytest.mark.parametrize("member", MEMBERS)
-def test_compact_v3_content_impact_plan_is_portable_and_copy_scoped(member: str) -> None:
+def test_compact_v2_content_impact_plan_is_portable_and_copy_scoped(member: str) -> None:
     source, compiled, _manifest = _payloads(member)
     plan = compiled["content_impact_plan"]
-    assert plan["schema_version"] == "skillguard.content_impact_plan.v3"
-    paths = {row["path"] for row in plan["inventory"]}
-    input_paths = {row["path"] for row in source["inputs"]}
-    assert paths <= input_paths
-    assert all((ROOT / "skills" / member / path).is_file() for path in paths)
-    assert all(row["install_disposition"] == "copy" for row in plan["inventory"])
-    assert set(source["consumer_projection"]["file_paths"]) <= input_paths
-    assert set(source["consumer_projection"]["file_paths"]) == paths
+    assert plan["schema_version"] == "skillguard.content_impact_plan.current"
+    assert plan["unknown_mapping_disposition"] == "block"
+    assert plan["policy_id"] == "skillguard.content_impact_policy.current"
+    assert all(row["member_paths"] for row in plan["components"])
+    assert all(row["install_disposition"] in {"copy", "source_only"} for row in plan["components"])
+    assert source["consumer_projection"]["prohibited_path_prefixes"] == [".skillguard/"]
 
 
 @pytest.mark.parametrize("member", MEMBERS)

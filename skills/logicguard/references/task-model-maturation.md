@@ -4,6 +4,8 @@ This is the existing LogicGuard task loop, not a separate route or understanding
 
 Freeze task id, purpose, explicit coverage and fingerprint, assumptions, unknowns, iteration bound, and predecessor receipt on later iterations. For every important covered node, record a concrete prediction and falsifier before the observation or perturbation. Native depth analysis, simulation, and current source/trace receipts—not caller prose—produce input, resolved, persisted, and introduced gaps.
 
+Separate native task proof and development regression from any separately authorized real-prose or style evaluation. For the first two, a bounded short graph is sufficient when the contract needs a case: keep one valid target graph and remove the declared support or warrant for a known-bad variant, without changing task identity, native oracle, frozen order, or candidate binding. Passing this structural example says nothing about factual truth or the quality of a long article.
+
 Revise while an addressable gap or predictive weakness remains. Every iteration returns one addressable next action. Candidate acceptance must preserve protected claims and pass a separately declared holdout claim that is neither the root nor a protected claim. Keep accepted revisions immutable; rollback appends a compensating revision instead of rewriting history.
 
 Use the native `argument-iteration freeze`, `run`, and `rollback` commands from `commands.md`. The loop may change only the current task model. It must not tune LogicGuard evaluators, thresholds, templates, defaults, or another Guard.
