@@ -13,11 +13,13 @@ affected/reverse indexes for the explicit self-DNA operation.
 from __future__ import annotations
 
 import ast
+import copy
 import hashlib
 import json
 import os
 from collections import Counter, deque
 from pathlib import Path
+import re
 import tomllib
 from typing import Any, Iterable, Mapping, Sequence
 
@@ -25,6 +27,12 @@ from typing import Any, Iterable, Mapping, Sequence
 SOFTWARE_DNA_SCHEMA = "researchguard.software-dna-contract.v2"
 SOFTWARE_DNA_PATH = Path("models/software_dna/researchguard.json")
 ROOT_MODEL_ID = "researchguard-suite"
+BCL_CONNECTION_SCHEMA = "researchguard.software-dna-bcl-connection.v1"
+BCL_LEDGER_ARTIFACT_TYPE = "flowguard_behavior_commitment_ledger"
+BCL_LEDGER_SCHEMA_VERSION = "1.0"
+BCL_LEDGER_FORMAT_VERSION = "1"
+NATIVE_OWNER_MANIFEST_PATH = Path(".flowguard/models/regression-manifest.json")
+NATIVE_OWNER_COUNT = 10
 MEMBER_MODEL_IDS = (
     "logicguard",
     "sourceguard",
@@ -526,8 +534,689 @@ def _build_indexes(models: Sequence[Mapping[str, Any]], blocks: Sequence[Mapping
     }
 
 
-def software_dna_affected_closure(indexes: Mapping[str, Any], changed_ids: Iterable[str]) -> dict[str, Any]:
+def _flowguard_behavior_commitment_api() -> Any:
+    """Load FlowGuard's public BCL APIs only when a BCL operation is requested.
+
+    The software-DNA static contract deliberately remains usable with the
+    source-only package.  Importing the optional BCL implementation here keeps
+    that static check independent from whatever FlowGuard installation happens
+    to be present, while every BCL operation still goes through FlowGuard's
+    canonical dataclasses and parser.
+    """
+
+    try:
+        from flowguard import behavior_commitment
+    except ImportError as exc:  # pragma: no cover - depends on the environment
+        raise SoftwareDnaError(f"flowguard behavior commitment API unavailable: {exc}") from exc
+    return behavior_commitment
+
+
+def _canonical_json_fingerprint(value: object) -> str:
+    rendered = json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    return f"sha256:{hashlib.sha256(rendered.encode('utf-8')).hexdigest()}"
+
+
+def _bcl_fingerprint(api: Any, ledger: Any) -> str:
+    # FlowGuard intentionally returns the bare hexadecimal digest.  ResearchGuard
+    # identities use the same sha256: prefix as its inventory and source rows.
+    return f"sha256:{api.behavior_commitment_ledger_fingerprint(ledger)}"
+
+
+def _canonical_bcl_envelope(value: str | Path | Mapping[str, Any]) -> tuple[Any, dict[str, Any], str]:
+    """Load one exact current FlowGuard BCL envelope.
+
+    FlowGuard's public ``from_mapping`` also accepts its historical direct
+    payload shape.  ResearchGuard intentionally performs the envelope check
+    before delegating to that parser, so a bare legacy object cannot become a
+    current connection by accident.
+    """
+
+    api = _flowguard_behavior_commitment_api()
+    path: Path | None = None
+    if isinstance(value, (str, Path)):
+        path = Path(value)
+        try:
+            raw = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+            raise SoftwareDnaError(f"behavior commitment ledger is unreadable: {exc}") from exc
+    elif isinstance(value, Mapping):
+        raw = copy.deepcopy(dict(value))
+    else:
+        raise SoftwareDnaError("behavior commitment ledger must be a canonical envelope path or mapping")
+
+    if not isinstance(raw, Mapping):
+        raise SoftwareDnaError("behavior commitment ledger envelope must be an object")
+    expected_fields = {"artifact_type", "schema_version", "format_version", "ledger"}
+    actual_fields = set(raw)
+    if "ledger" not in raw:
+        raise SoftwareDnaError("behavior_ledger_bare_legacy_format: canonical envelope is required")
+    if actual_fields != expected_fields:
+        raise SoftwareDnaError("behavior_ledger_malformed: canonical envelope fields are not exact-current")
+    if raw.get("artifact_type") != BCL_LEDGER_ARTIFACT_TYPE:
+        raise SoftwareDnaError("behavior_ledger_artifact_type_invalid")
+    if str(raw.get("schema_version")) != BCL_LEDGER_SCHEMA_VERSION:
+        raise SoftwareDnaError("behavior_ledger_schema_invalid")
+    if str(raw.get("format_version")) != BCL_LEDGER_FORMAT_VERSION:
+        raise SoftwareDnaError("behavior_ledger_format_invalid")
+    if not isinstance(raw.get("ledger"), Mapping):
+        raise SoftwareDnaError("behavior_ledger_missing_nested_payload")
+
+    try:
+        # Use the official path reader for file input.  This keeps the source
+        # path operation on exactly the same API as FlowGuard reverse joins.
+        ledger = api.load_behavior_commitment_ledger(path) if path is not None else api.behavior_commitment_ledger_from_mapping(raw)
+    except (OSError, ValueError, TypeError, KeyError) as exc:
+        raise SoftwareDnaError(f"behavior_ledger_malformed: {exc}") from exc
+    canonical = api.behavior_commitment_ledger_to_mapping(ledger)
+    if canonical != dict(raw):
+        raise SoftwareDnaError("behavior_ledger_noncanonical: envelope does not round-trip byte semantics")
+    return ledger, canonical, _bcl_fingerprint(api, ledger)
+
+
+def load_canonical_behavior_commitment_ledger(value: str | Path | Mapping[str, Any]) -> Any:
+    """Return a FlowGuard ledger only when the exact current envelope parses."""
+
+    ledger, _canonical, _fingerprint = _canonical_bcl_envelope(value)
+    return ledger
+
+
+def _software_dna_blocks(root_path: Path, contract: Mapping[str, Any]) -> tuple[Mapping[str, Any], ...]:
+    models = _all_models(contract)
+    seen_code: list[tuple[str, str]] = []
+    seen_tests: list[tuple[str, str]] = []
+    blocks: list[Mapping[str, Any]] = []
+    for model in models:
+        for block in _rows(model.get("function_blocks"), f"{model.get('model_id')} function blocks"):
+            blocks.append(
+                _validate_block(
+                    root_path,
+                    model,
+                    block,
+                    seen_code=seen_code,
+                    seen_tests=seen_tests,
+                )
+            )
+    return tuple(blocks)
+
+
+def _native_owner_snapshot(root_path: Path) -> tuple[tuple[str, ...], str]:
+    path = root_path / NATIVE_OWNER_MANIFEST_PATH
+    try:
+        raw = json.loads(path.read_text(encoding="utf-8"))
+        rows = _rows(raw.get("models"), "native owner manifest models")
+    except (OSError, UnicodeError, json.JSONDecodeError, SoftwareDnaError) as exc:
+        raise SoftwareDnaError(f"native_owner_manifest_invalid: {exc}") from exc
+    owner_ids = tuple(str(row.get("model_id", "")) for row in rows)
+    if len(owner_ids) != NATIVE_OWNER_COUNT or any(not item for item in owner_ids) or len(set(owner_ids)) != len(owner_ids):
+        raise SoftwareDnaError(
+            f"native_owner_count_invalid: expected {NATIVE_OWNER_COUNT} unique current owners, got {len(owner_ids)}"
+        )
+    return owner_ids, _sha256(path)
+
+
+def _canonical_model_owner_id(raw_owner: object, model_ids: set[str]) -> str:
+    text = str(raw_owner or "").strip().replace("\\", "/")
+    if text.startswith("model:"):
+        model_id = text.removeprefix("model:")
+    elif text.startswith("models/software_dna/researchguard.json#"):
+        model_id = text.split("#", 1)[1]
+    elif text.startswith(".flowguard/models/owners/") and text.endswith("/model.py"):
+        model_id = text.split("/", 4)[3]
+    else:
+        raise SoftwareDnaError("behavior_commitment_owner_noncanonical")
+    if model_id not in model_ids:
+        raise SoftwareDnaError(f"behavior_commitment_unknown_model_owner: {model_id}")
+    return f"model:{model_id}"
+
+
+def _source_ref_path_tokens(root_path: Path, source_ref: str) -> tuple[tuple[str, Path], ...]:
+    tokens: list[tuple[str, Path]] = []
+    for token in (part.strip() for part in str(source_ref).split(";") if part.strip()):
+        path_text = token.split("#", 1)[0].strip().replace("\\", "/")
+        if not path_text or Path(path_text).is_absolute() or path_text.startswith("../") or "/../" in f"/{path_text}/":
+            raise SoftwareDnaError("behavior_commitment_source_foreign")
+        path = (root_path / path_text).resolve()
+        try:
+            path.relative_to(root_path)
+        except ValueError as exc:
+            raise SoftwareDnaError("behavior_commitment_source_foreign") from exc
+        if not path.is_file():
+            raise SoftwareDnaError(f"behavior_commitment_source_missing: {path_text}")
+        tokens.append((path_text, path))
+    if not tokens:
+        raise SoftwareDnaError("behavior_commitment_source_missing")
+    return tuple(tokens)
+
+
+def _source_content_fingerprint(paths: Sequence[tuple[str, Path]]) -> str:
+    if len(paths) == 1:
+        return _sha256(paths[0][1])
+    return _canonical_json_fingerprint(
+        [{"path": relative, "fingerprint": _sha256(path)} for relative, path in paths]
+    )
+
+
+def _candidate_lifecycle_envelope(api: Any) -> dict[str, dict[str, str]]:
+    lanes = tuple(getattr(api, "BCL_LIFECYCLE_LANES", ()))
+    required = str(getattr(api, "BCL_LIFECYCLE_REQUIRED", "required_and_covered"))
+    not_applicable = str(getattr(api, "BCL_LIFECYCLE_NOT_APPLICABLE", "verified_not_applicable"))
+    return {lane: {"status": not_applicable if lane == "ui" else required} for lane in lanes}
+
+
+def _build_independent_behavior_inventory(
+    api: Any,
+    root_path: Path,
+    blocks: Sequence[Mapping[str, Any]],
+    inventory: Mapping[str, Any],
+) -> Any:
+    items: list[Any] = []
+    item_cls = api.BehaviorInventoryItem
+    for block in blocks:
+        block_id = str(block["block_id"])
+        code_path = str(block["code"]["path"])
+        code_symbol = str(block["code"]["symbol"])
+        code_file = root_path / code_path
+        owner = f"model:{block['model_id']}"
+        commitment_id = f"commitment:{block_id}"
+        obligation_id = block_id
+        intent_id = f"intent:{block_id}"
+        items.append(
+            item_cls(
+                behavior_id=f"behavior:{block_id}",
+                source_kind="implementation",
+                source_ref=code_path,
+                source_fingerprint=_sha256(code_file),
+                public_surface=block_id,
+                intent=f"Current implementation contract for {block_id}",
+                success="the bound function returns its declared current contract result",
+                errors=("native owner evidence is missing or fails closed",),
+                recovery=("re-run the owning native check after source and evidence are current",),
+                owner=owner,
+                disposition=getattr(api, "BCL_BEHAVIOR_DISPOSITION_MODELED", "modeled"),
+                intent_source_refs=(code_path,),
+                function_id=f"function:{code_path}#{code_symbol}",
+                route_id=f"route:{block_id}",
+                obligation_ids=(obligation_id,),
+                required_check_ids=(f"check:{block_id}",),
+                test_refs=(f"test:{block['test']['path']}::{block['test']['node_id']}",),
+                evidence_subject_ids=(f"evidence:{block['evidence_path']}",),
+                oracle_ids=(f"oracle:{block_id}",),
+                failure_case_ids=(f"failure:{block_id}",),
+                recovery_case_ids=(f"recovery:{block_id}",),
+                current_intent_fingerprint=_canonical_json_fingerprint({"intent": intent_id, "block": block_id}),
+                lifecycle_envelope=_candidate_lifecycle_envelope(api),
+                commitment_id=commitment_id,
+                model_owner_id=owner,
+                validation_boundary="ResearchGuard software-DNA source/model/code/test binding only",
+                rationale="Independently enumerated from the provider-neutral inventory and the native 17-model contract.",
+            )
+        )
+    return api.BehaviorInventory(
+        inventory_id="researchguard-software-dna-behavior-inventory",
+        project_boundary=root_path.as_posix(),
+        current_revision=str(inventory.get("inventory_fingerprint", "")),
+        discovery_owner="researchguard:provider-neutral-inventory",
+        discovery_fingerprint=str(inventory.get("inventory_fingerprint", "")),
+        discovery_evidence_ids=(f"software-dna-inventory:{inventory.get('inventory_fingerprint', '')}",),
+        expected_behavior_ids=tuple(item.behavior_id for item in items),
+        items=tuple(items),
+        claim_boundary="Independent implementation behavior denominator only; it does not prove domain truth or current native execution.",
+        metadata={"source": "provider-neutral-inventory", "model_boundary": "17"},
+    )
+
+
+def build_researchguard_behavior_commitment_candidate(root: str | Path) -> dict[str, Any]:
+    """Build a private BCL candidate from the current 17-model DNA.
+
+    The candidate is intentionally conservative: current native evidence is
+    not fabricated.  It is suitable for a private qualification run and is
+    expected to remain blocked until every obligation has a real current
+    owner receipt.
+    """
+
+    root_path = Path(root).resolve()
+    static = check_software_dna_contract(root_path)
+    if not static.get("ready"):
+        return {"status": "blocked", "ready": False, "gaps": [static.get("gap", {"code": "software_dna_contract_invalid"})]}
+    try:
+        api = _flowguard_behavior_commitment_api()
+        contract = _load_contract(root_path)
+        models = _all_models(contract)
+        model_ids = {str(model["model_id"]) for model in models}
+        blocks = _software_dna_blocks(root_path, contract)
+        native_owner_ids, native_manifest_fingerprint = _native_owner_snapshot(root_path)
+        inventory = static["inventory"]
+        source_rows: list[Any] = []
+        commitments: list[Any] = []
+        evidence_cls = api.BehaviorEvidenceBinding
+        source_cls = api.BehaviorSourceSurface
+        commitment_cls = api.BehaviorCommitment
+        for block in blocks:
+            block_id = str(block["block_id"])
+            commitment_id = f"commitment:{block_id}"
+            intent_id = f"intent:{block_id}"
+            owner = f"model:{block['model_id']}"
+            code_path = str(block["code"]["path"])
+            test_path = str(block["test"]["path"])
+            evidence_path = str(block["evidence_path"])
+            paths = (("code", code_path, "code"), ("test", test_path, "test"), ("evidence", evidence_path, "doc"))
+            surface_ids: list[str] = []
+            for kind, source_ref, surface_kind in paths:
+                sid = f"surface:{kind}:{block_id}"
+                surface_ids.append(sid)
+                file_path = root_path / source_ref
+                classification = (
+                    getattr(api, "BCL_SOURCE_CLASSIFICATION_IMPLEMENTATION", "implementation")
+                    if kind == "code"
+                    else getattr(api, "BCL_SOURCE_CLASSIFICATION_TEST", "test")
+                    if kind == "test"
+                    else getattr(api, "BCL_SOURCE_CLASSIFICATION_GENERATED_EVIDENCE", "generated_evidence")
+                )
+                source_rows.append(
+                    source_cls(
+                        surface_id=sid,
+                        surface_kind=surface_kind,
+                        label=f"{kind} surface for {block_id}",
+                        source_ref=source_ref,
+                        source_system_id="researchguard-repository",
+                        native_artifact_id=f"artifact:{kind}:{block_id}",
+                        content_fingerprint=_sha256(file_path),
+                        source_authority_role=getattr(api, "BCL_SOURCE_AUTHORITY_SUPPORTING", "supporting"),
+                        source_classification=classification,
+                        declared_semantics_fingerprint=_canonical_json_fingerprint({"block": block_id, "kind": kind}),
+                        coverage_disposition=getattr(api, "BCL_DISPOSITION_MODELED", "modeled"),
+                        commitment_ids=(commitment_id,),
+                        business_intent_ids=(intent_id,),
+                        freshness_state=getattr(api, "BCL_SOURCE_FRESHNESS_CURRENT", "current"),
+                        validation_boundary="ResearchGuard software-DNA source binding only",
+                        rationale="Bound to one native software-DNA function block.",
+                        metadata={"live_source_identity": {"member_paths": [source_ref]}},
+                    )
+                )
+            evidence = evidence_cls(
+                model_obligation_ids=(block_id,),
+                code_contract_ids=(f"code:{code_path}#{block['code']['symbol']}",),
+                test_evidence_ids=(f"test:{test_path}::{block['test']['node_id']}",),
+                evidence_state=getattr(api, "BCL_EVIDENCE_MISSING", "missing"),
+                current=False,
+                metadata={"native_evidence": []},
+            )
+            commitments.append(
+                commitment_cls(
+                    commitment_id=commitment_id,
+                    business_intent_id=intent_id,
+                    label=f"ResearchGuard software-DNA block {block_id}",
+                    commitment_kind=getattr(api, "BCL_COMMITMENT_WORKFLOW", "workflow"),
+                    behavior_plane="development_process",
+                    actor_kind=getattr(api, "BCL_ACTOR_DEVELOPER", "developer"),
+                    actor="ResearchGuard maintainer",
+                    trigger=f"the native software-DNA contract evaluates {block_id}",
+                    expected_result="the exact bound model/code/test/evidence chain is qualified",
+                    failure_boundary="unknown, orphan, foreign, stale, malformed, or unproven evidence remains blocked",
+                    preconditions=("current provider-neutral inventory", "current native model contract"),
+                    expected_terminal="software-DNA qualification is ready or reports an explicit gap",
+                    source_surface_ids=tuple(surface_ids),
+                    source_refs=(code_path, test_path, evidence_path),
+                    primary_owner_model_id=owner,
+                    evidence=evidence,
+                    validation_boundary="ResearchGuard software-DNA source/model/code/test binding only",
+                    rationale="One real native function block maps to one real model owner and one explicit evidence obligation.",
+                    metadata={"block_id": block_id, "native_owner_boundary": list(native_owner_ids)},
+                )
+            )
+        behavior_inventory = _build_independent_behavior_inventory(api, root_path, blocks, inventory)
+        base_ledger = api.BehaviorCommitmentLedger(
+            ledger_id="researchguard-software-dna-bcl-candidate",
+            project_boundary=root_path.as_posix(),
+            current_revision=static["inventory"]["inventory_fingerprint"],
+            commitments=tuple(commitments),
+            source_surfaces=tuple(source_rows),
+            subject_lane=getattr(api, "SUBJECT_NORMATIVE_TARGET", "normative_target"),
+            expected_source_surface_ids=tuple(row.surface_id for row in source_rows),
+            require_complete_source_inventory=True,
+            independent_behavior_inventory=behavior_inventory,
+            require_complete_behavior_inventory=True,
+            expected_commitment_ids=tuple(item.commitment_id for item in commitments),
+            expected_business_intent_ids=tuple(item.business_intent_id for item in commitments),
+            claim_scope=getattr(api, "BCL_SCOPE_ROUTINE", "routine"),
+            change_mode=getattr(api, "BCL_CHANGE_BOOTSTRAP_LEDGER", "bootstrap_ledger"),
+            require_current_evidence=True,
+            require_risk_gates_for_broad_claim=False,
+            owner="model:researchguard-suite",
+            validation_boundary="Current ResearchGuard provider-neutral software-DNA inventory and native 17-model contract",
+            rationale="Private candidate only; no current native evidence is invented by this builder.",
+            metadata={
+                "connection_schema": BCL_CONNECTION_SCHEMA,
+                "software_dna_contract_fingerprint": _sha256(root_path / SOFTWARE_DNA_PATH),
+                "provider_neutral_inventory_fingerprint": str(inventory["inventory_fingerprint"]),
+                "native_owner_manifest_fingerprint": native_manifest_fingerprint,
+                "native_owner_ids": list(native_owner_ids),
+                "software_dna_model_ids": sorted(model_ids),
+                "software_dna_function_block_ids": sorted(str(item["block_id"]) for item in blocks),
+                "native_evidence_status": "missing_until_real_owner_receipts_are_bound",
+            },
+        )
+        live_audit = api.audit_behavior_commitment_source_inventory(base_ledger, root_path)
+        source_by_id = {row.surface_id: row.to_dict() for row in base_ledger.source_surfaces}
+        for identity in live_audit.surface_identities:
+            row = source_by_id.get(identity.surface_id)
+            if row is None:
+                continue
+            row["inventory_revision"] = live_audit.live_inventory_revision
+            row["discovery_evidence_ids"] = [live_audit.live_discovery_evidence_id]
+            row["metadata"] = {"live_source_identity": {"member_paths": [member.path for member in identity.members]}}
+        final_surfaces = tuple(source_cls(**source_by_id[row.surface_id]) for row in base_ledger.source_surfaces)
+        final_ledger = api.BehaviorCommitmentLedger(
+            **{
+                **base_ledger.to_dict(),
+                "commitments": [item.to_dict() for item in base_ledger.commitments],
+                "source_surfaces": [item.to_dict() for item in final_surfaces],
+                "source_inventory_revision": live_audit.live_inventory_revision,
+                "source_inventory_fingerprint": live_audit.live_inventory_fingerprint,
+                "source_inventory_evidence_ids": [live_audit.live_discovery_evidence_id],
+            }
+        )
+        envelope = api.behavior_commitment_ledger_to_mapping(final_ledger)
+        return {
+            "status": "candidate",
+            "ready": False,
+            "schema_version": BCL_CONNECTION_SCHEMA,
+            "ledger": envelope,
+            "ledger_fingerprint": _bcl_fingerprint(api, final_ledger),
+            "counts": {
+                "models": len(models),
+                "function_blocks": len(blocks),
+                "native_owner_count": len(native_owner_ids),
+                "commitments": len(commitments),
+                "source_surfaces": len(final_surfaces),
+            },
+            "gaps": [{"code": "current_native_evidence_missing", "message": "Candidate deliberately contains no fabricated native owner receipts."}],
+            "claim_boundary": "Private BCL candidate only; current native evidence and reverse closure remain unproven.",
+        }
+    except (OSError, ValueError, TypeError, KeyError, SoftwareDnaError) as exc:
+        return {
+            "status": "blocked",
+            "ready": False,
+            "schema_version": BCL_CONNECTION_SCHEMA,
+            "gaps": [{"code": "behavior_commitment_candidate_invalid", "message": str(exc)}],
+        }
+
+
+def _gap(code: str, message: str, **fields: Any) -> dict[str, Any]:
+    return {"code": code, "message": message, **fields}
+
+
+def _native_evidence_records(evidence: Any) -> tuple[Mapping[str, Any], ...]:
+    metadata = evidence.metadata if evidence is not None else {}
+    raw = metadata.get("native_evidence", ()) if isinstance(metadata, Mapping) else ()
+    if isinstance(raw, Mapping):
+        rows: list[Mapping[str, Any]] = []
+        for obligation_id, row in raw.items():
+            if isinstance(row, Mapping):
+                rows.append({"obligation_id": obligation_id, **dict(row)})
+        return tuple(rows)
+    if isinstance(raw, Sequence) and not isinstance(raw, (str, bytes)):
+        return tuple(row for row in raw if isinstance(row, Mapping))
+    return ()
+
+
+def _qualify_native_evidence(root_path: Path, commitment: Any, block_id: str, native_owner_ids: set[str]) -> list[dict[str, Any]]:
+    gaps: list[dict[str, Any]] = []
+    evidence = commitment.evidence
+    records = _native_evidence_records(evidence)
+    matches = [row for row in records if str(row.get("obligation_id", "")) == block_id]
+    if len(matches) != 1:
+        gaps.append(_gap("behavior_commitment_evidence_missing", "each model obligation needs exactly one native evidence record", commitment_id=commitment.commitment_id, obligation_id=block_id))
+        return gaps
+    row = matches[0]
+    native_owner = str(row.get("native_owner_id", ""))
+    normalized_owner = native_owner.removeprefix("owner:").removeprefix("model:")
+    if normalized_owner not in native_owner_ids:
+        gaps.append(_gap("behavior_commitment_evidence_foreign_owner", "native evidence names an owner outside the current 10-owner manifest", commitment_id=commitment.commitment_id, obligation_id=block_id, native_owner_id=native_owner))
+    if str(row.get("model_owner_id", row.get("model_id", ""))) not in {commitment.primary_owner_model_id, commitment.primary_owner_model_id.removeprefix("model:")}:
+        gaps.append(_gap("behavior_commitment_evidence_model_mismatch", "native evidence model identity does not match the commitment's primary owner", commitment_id=commitment.commitment_id, obligation_id=block_id))
+    if row.get("current") is not True or str(row.get("status", row.get("evidence_state", ""))) not in {"pass", "passed", "current_pass", "green"}:
+        gaps.append(_gap("behavior_commitment_evidence_not_current", "native evidence must be explicitly current and passing", commitment_id=commitment.commitment_id, obligation_id=block_id))
+    path_text = str(row.get("path", row.get("evidence_path", row.get("result_path", "")))).replace("\\", "/")
+    if not path_text or Path(path_text).is_absolute() or path_text.startswith("../") or "/../" in f"/{path_text}/":
+        gaps.append(_gap("behavior_commitment_evidence_foreign", "native evidence path is outside the ResearchGuard root", commitment_id=commitment.commitment_id, obligation_id=block_id))
+        return gaps
+    path = (root_path / path_text).resolve()
+    try:
+        path.relative_to(root_path)
+    except ValueError:
+        gaps.append(_gap("behavior_commitment_evidence_foreign", "native evidence path resolves outside the ResearchGuard root", commitment_id=commitment.commitment_id, obligation_id=block_id))
+        return gaps
+    if not path.is_file():
+        gaps.append(_gap("behavior_commitment_evidence_missing", "native evidence file is missing", commitment_id=commitment.commitment_id, obligation_id=block_id, path=path_text))
+        return gaps
+    expected = str(row.get("fingerprint", row.get("content_fingerprint", "")))
+    actual = _sha256(path)
+    if expected != actual:
+        gaps.append(_gap("behavior_commitment_evidence_tampered", "native evidence bytes do not match the recorded fingerprint", commitment_id=commitment.commitment_id, obligation_id=block_id, path=path_text))
+    return gaps
+
+
+def qualify_researchguard_behavior_commitment_ledger(
+    root: str | Path,
+    source: str | Path | Mapping[str, Any],
+    *,
+    indexes: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Qualify one canonical BCL against the current 17-model DNA.
+
+    This is a qualification report, not an alternate FlowGuard model.  The
+    ten native FlowGuard owners are only evidence producers; the 17 Research-
+    Guard model IDs remain the software-DNA ownership denominator.
+    """
+
+    root_path = Path(root).resolve()
+    gaps: list[dict[str, Any]] = []
+    static = check_software_dna_contract(root_path)
+    if not static.get("ready"):
+        gaps.append(_gap("software_dna_contract_invalid", "current 17-model software-DNA contract is not ready"))
+        return {"schema_version": BCL_CONNECTION_SCHEMA, "status": "blocked", "ready": False, "gaps": gaps, "indexes": {}}
+    try:
+        api = _flowguard_behavior_commitment_api()
+        ledger, canonical, ledger_fingerprint = _canonical_bcl_envelope(source)
+        contract = _load_contract(root_path)
+        models = _all_models(contract)
+        model_ids = {str(model["model_id"]) for model in models}
+        blocks = _software_dna_blocks(root_path, contract)
+        block_by_id = {str(block["block_id"]): block for block in blocks}
+        native_owner_ids, native_manifest_fingerprint = _native_owner_snapshot(root_path)
+        metadata = ledger.metadata if isinstance(ledger.metadata, Mapping) else {}
+        if str(metadata.get("connection_schema", "")) != BCL_CONNECTION_SCHEMA:
+            gaps.append(_gap("behavior_ledger_connection_schema_missing", "ledger does not identify the ResearchGuard BCL connection schema"))
+        if str(metadata.get("software_dna_contract_fingerprint", "")) != _sha256(root_path / SOFTWARE_DNA_PATH):
+            gaps.append(_gap("software_dna_source_identity_stale", "ledger was built from a different software-DNA contract"))
+        if str(metadata.get("provider_neutral_inventory_fingerprint", "")) != str(static["inventory"].get("inventory_fingerprint", "")):
+            gaps.append(_gap("software_dna_inventory_identity_stale", "ledger was built from a different provider-neutral inventory"))
+        if str(metadata.get("native_owner_manifest_fingerprint", "")) != native_manifest_fingerprint:
+            gaps.append(_gap("native_owner_identity_stale", "ledger was built from a different 10-owner manifest"))
+        recorded_models = tuple(str(item) for item in metadata.get("software_dna_model_ids", ()))
+        if set(recorded_models) != model_ids or len(recorded_models) != len(model_ids):
+            gaps.append(_gap("software_dna_model_identity_mismatch", "ledger model identity set is not the current 17-model set"))
+        if len(models) != 17 or len(blocks) != 20:
+            gaps.append(_gap("software_dna_denominator_count_mismatch", "ResearchGuard software-DNA denominator must remain 17 models and 20 function blocks"))
+        commitments = tuple(ledger.commitments)
+        commitment_ids = [str(item.commitment_id) for item in commitments]
+        if len(commitments) != 20 or len(set(commitment_ids)) != len(commitment_ids):
+            gaps.append(_gap("behavior_commitment_count_or_identity_mismatch", "BCL must contain one unique commitment for each of the 20 native function blocks"))
+        obligation_to_commitment: dict[str, str] = {}
+        seen_intents: set[str] = set()
+        for commitment in commitments:
+            cid = str(commitment.commitment_id)
+            if not commitment.business_intent_id:
+                gaps.append(_gap("behavior_commitment_intent_missing", "every commitment needs one business intent", commitment_id=cid))
+            elif commitment.business_intent_id in seen_intents:
+                gaps.append(_gap("behavior_commitment_duplicate_intent", "one business intent cannot close two commitments", commitment_id=cid, business_intent_id=commitment.business_intent_id))
+            seen_intents.add(commitment.business_intent_id)
+            try:
+                owner = _canonical_model_owner_id(commitment.primary_owner_model_id, model_ids)
+            except SoftwareDnaError as exc:
+                gaps.append(_gap(str(exc).split(":", 1)[0], str(exc), commitment_id=cid, owner=commitment.primary_owner_model_id))
+                owner = ""
+            if owner and commitment.primary_owner_model_id != owner:
+                gaps.append(_gap("behavior_commitment_owner_noncanonical", "primary owner must be stored in canonical model:<id> form", commitment_id=cid))
+            if owner and (owner in commitment.supporting_model_ids or owner in commitment.child_model_ids):
+                gaps.append(_gap("behavior_commitment_multiple_primary_owners", "primary owner cannot also be supporting or child owner", commitment_id=cid))
+            evidence = commitment.evidence
+            obligations = tuple(str(item) for item in evidence.model_obligation_ids)
+            if not obligations:
+                gaps.append(_gap("behavior_commitment_empty_obligation", "every commitment needs a real model obligation", commitment_id=cid))
+            if len(obligations) != len(set(obligations)):
+                gaps.append(_gap("behavior_commitment_duplicate_obligation", "one commitment repeats a model obligation", commitment_id=cid))
+            for obligation in obligations:
+                if obligation in obligation_to_commitment:
+                    gaps.append(_gap("behavior_commitment_duplicate_obligation", "one model obligation cannot close multiple commitments", obligation_id=obligation, commitment_id=cid))
+                obligation_to_commitment[obligation] = cid
+                if obligation not in block_by_id:
+                    gaps.append(_gap("behavior_commitment_unknown_obligation", "model obligation is not one of the current 20 native function blocks", commitment_id=cid, obligation_id=obligation))
+            if len(commitment.source_surface_ids) == 0:
+                gaps.append(_gap("behavior_commitment_source_missing", "commitment has no source surfaces", commitment_id=cid))
+            expected_blocks = [block_by_id[item] for item in obligations if item in block_by_id]
+            if len(expected_blocks) == 1:
+                block = expected_blocks[0]
+                expected_code = f"code:{block['code']['path']}#{block['code']['symbol']}"
+                expected_test = f"test:{block['test']['path']}::{block['test']['node_id']}"
+                if tuple(evidence.code_contract_ids) != (expected_code,):
+                    gaps.append(_gap("behavior_commitment_code_binding_mismatch", "code contract does not bind the named model block", commitment_id=cid))
+                if tuple(evidence.test_evidence_ids) != (expected_test,):
+                    gaps.append(_gap("behavior_commitment_test_binding_mismatch", "test evidence does not bind the named model block", commitment_id=cid))
+                gaps.extend(_qualify_native_evidence(root_path, commitment, obligations[0], set(native_owner_ids)))
+        expected_obligations = set(block_by_id)
+        if set(obligation_to_commitment) != expected_obligations:
+            gaps.append(_gap("behavior_commitment_obligation_denominator_mismatch", "BCL obligations do not exactly cover the current 20 function blocks"))
+        surface_by_id = {str(surface.surface_id): surface for surface in ledger.source_surfaces}
+        for surface_id, surface in surface_by_id.items():
+            if len(surface.commitment_ids) != 1:
+                gaps.append(_gap("behavior_commitment_surface_mapping_invalid", "each source surface must map to one real commitment", surface_id=surface_id))
+            try:
+                live_paths = _source_ref_path_tokens(root_path, surface.source_ref)
+                live_fingerprint = _source_content_fingerprint(live_paths)
+                if surface.content_fingerprint != live_fingerprint:
+                    gaps.append(_gap("behavior_commitment_source_tampered", "source surface fingerprint does not match current bytes", surface_id=surface_id))
+            except SoftwareDnaError as exc:
+                code = str(exc).split(":", 1)[0]
+                gaps.append(_gap(code if code.startswith("behavior_commitment_source_") else "behavior_commitment_source_invalid", str(exc), surface_id=surface_id))
+            if surface.freshness_state != getattr(api, "BCL_SOURCE_FRESHNESS_CURRENT", "current"):
+                gaps.append(_gap("behavior_commitment_source_stale", "source surface is not marked current", surface_id=surface_id))
+            for commitment_id in surface.commitment_ids:
+                if commitment_id not in commitment_ids:
+                    gaps.append(_gap("behavior_commitment_source_foreign", "source surface points to an unknown commitment", surface_id=surface_id, commitment_id=commitment_id))
+                elif surface_id not in next(item for item in commitments if item.commitment_id == commitment_id).source_surface_ids:
+                    gaps.append(_gap("behavior_commitment_source_reverse_missing", "source-to-commitment mapping is not bidirectional", surface_id=surface_id, commitment_id=commitment_id))
+        for commitment in commitments:
+            for surface_id in commitment.source_surface_ids:
+                if surface_id not in surface_by_id:
+                    gaps.append(_gap("behavior_commitment_source_foreign", "commitment points to an unknown source surface", commitment_id=commitment.commitment_id, surface_id=surface_id))
+
+        try:
+            official = api.review_behavior_commitment_ledger(ledger, project_root=root_path)
+            official_dict = official.to_dict()
+            for finding in official.findings:
+                # Keep official FlowGuard findings visible, even when a local
+                # exact identity check already reported the same underlying gap.
+                gaps.append(_gap(finding.code, finding.message, commitment_id=finding.commitment_id, surface_id=finding.surface_id, authority="flowguard"))
+        except (ValueError, TypeError, OSError, KeyError) as exc:
+            official_dict = {"ok": False, "findings": [], "error": str(exc)}
+            gaps.append(_gap("behavior_ledger_flowguard_review_failed", str(exc)))
+
+        report = {
+            "schema_version": BCL_CONNECTION_SCHEMA,
+            "status": "ready" if not gaps else "blocked",
+            "ready": not gaps,
+            "ledger": {
+                "ledger_id": ledger.ledger_id,
+                "current_revision": ledger.current_revision,
+                "fingerprint": ledger_fingerprint,
+            },
+            "counts": {
+                "models": len(models),
+                "function_blocks": len(blocks),
+                "native_owner_count": len(native_owner_ids),
+                "commitments": len(commitments),
+                "source_surfaces": len(surface_by_id),
+                "obligations": len(obligation_to_commitment),
+            },
+            "gaps": gaps,
+            "flowguard_review": official_dict,
+            "claim_boundary": "ResearchGuard software-DNA BCL connection only; it does not prove LogicGuard, SourceGuard, TraceGuard, or ExperimentGuard domain truth.",
+            "canonical_envelope": canonical,
+        }
+        if not gaps:
+            report["indexes"] = connect_behavior_commitment_indexes(indexes or static["indexes"], report)
+        else:
+            report["indexes"] = {}
+        return report
+    except (OSError, ValueError, TypeError, KeyError, SoftwareDnaError) as exc:
+        message = str(exc)
+        token = message.split(":", 1)[0]
+        error_code = token if re.fullmatch(r"[a-z][a-z0-9_]+", token) and token.startswith(("behavior_", "software_dna_", "native_owner_")) else "behavior_ledger_invalid"
+        return {
+            "schema_version": BCL_CONNECTION_SCHEMA,
+            "status": "blocked",
+            "ready": False,
+            "gaps": [_gap(error_code, message)],
+            "indexes": {},
+        }
+
+
+def connect_behavior_commitment_indexes(indexes: Mapping[str, Any], qualification: Mapping[str, Any]) -> dict[str, Any]:
+    """Add BCL edges only after a complete current qualification."""
+
+    if qualification.get("ready") is not True:
+        return {}
+    result = copy.deepcopy(dict(indexes))
+    forward = {str(key): list(value) for key, value in _object(result.get("forward"), "software DNA forward index").items()}
+    reverse = {str(key): list(value) for key, value in _object(result.get("reverse"), "software DNA reverse index").items()}
+    edges = {str(key): set(value) for key, value in _object(result.get("edges"), "software DNA index edges").items()}
+    canonical = _object(qualification.get("canonical_envelope"), "qualified canonical BCL envelope")
+    ledger = _object(canonical.get("ledger"), "qualified BCL payload")
+    ledger_fp = str(_object(qualification.get("ledger"), "qualified BCL identity").get("fingerprint", ""))
+    for commitment in _rows(ledger.get("commitments"), "qualified BCL commitments"):
+        cid = str(commitment.get("commitment_id", ""))
+        bcl_id = f"bcl:{cid}"
+        targets = [str(commitment.get("primary_owner_model_id", "")), *[str(item) for item in commitment.get("source_surface_ids", ())]]
+        evidence = _object(commitment.get("evidence"), f"{cid} evidence")
+        targets.extend(str(item) for item in evidence.get("model_obligation_ids", ()))
+        targets.extend(str(item) for item in evidence.get("code_contract_ids", ()))
+        targets.extend(str(item) for item in evidence.get("test_evidence_ids", ()))
+        forward[bcl_id] = sorted(set(targets))
+        edges.setdefault(bcl_id, set())
+        for target in forward[bcl_id]:
+            edges.setdefault(target, set())
+            edges[bcl_id].add(target)
+            edges[target].add(bcl_id)
+            reverse.setdefault(target, []).append(bcl_id)
+    result["forward"] = {key: sorted(set(value)) for key, value in sorted(forward.items())}
+    result["reverse"] = {key: sorted(set(value)) for key, value in sorted(reverse.items())}
+    result["edges"] = {key: sorted(value) for key, value in sorted(edges.items())}
+    result["known_ids"] = sorted(result["edges"])
+    result["behavior_commitment_ledger"] = {"status": "ready", "fingerprint": ledger_fp}
+    return result
+
+
+def software_dna_affected_closure(
+    indexes: Mapping[str, Any],
+    changed_ids: Iterable[str],
+    *,
+    expected_bcl_fingerprint: str | None = None,
+) -> dict[str, Any]:
     """Close only declared affected edges; unknown identities block."""
+
+    if expected_bcl_fingerprint is not None:
+        observed_bcl = _object(indexes.get("behavior_commitment_ledger"), "software DNA behavior commitment ledger identity")
+        observed_fingerprint = str(observed_bcl.get("fingerprint", ""))
+        if observed_fingerprint != expected_bcl_fingerprint:
+            return {
+                "status": "blocked",
+                "mode": "affected_only",
+                "full_denominator_materialized": False,
+                "gap": {"code": "behavior_ledger_replaced", "expected": expected_bcl_fingerprint, "observed": observed_fingerprint},
+                "affected_ids": [],
+            }
 
     graph = _object(indexes.get("edges"), "software DNA index edges")
     seeds = tuple(str(item) for item in changed_ids)
@@ -563,7 +1252,21 @@ def software_dna_affected_closure(indexes: Mapping[str, Any], changed_ids: Itera
     }
 
 
-def software_dna_reverse_trace(indexes: Mapping[str, Any], target_id: str) -> dict[str, Any]:
+def software_dna_reverse_trace(
+    indexes: Mapping[str, Any],
+    target_id: str,
+    *,
+    expected_bcl_fingerprint: str | None = None,
+) -> dict[str, Any]:
+    if expected_bcl_fingerprint is not None:
+        observed_bcl = _object(indexes.get("behavior_commitment_ledger"), "software DNA behavior commitment ledger identity")
+        observed_fingerprint = str(observed_bcl.get("fingerprint", ""))
+        if observed_fingerprint != expected_bcl_fingerprint:
+            return {
+                "status": "blocked",
+                "gap": {"code": "behavior_ledger_replaced", "expected": expected_bcl_fingerprint, "observed": observed_fingerprint},
+                "owners": [],
+            }
     reverse = _object(indexes.get("reverse"), "software DNA reverse index")
     if target_id not in reverse:
         return {"status": "blocked", "gap": {"code": "unknown_reverse_identity", "id": target_id}, "owners": []}
@@ -815,8 +1518,11 @@ def check_software_dna_contract(root: str | Path) -> dict[str, Any]:
 
 
 __all__ = [
+    "BCL_CONNECTION_SCHEMA",
     "INDEX_KINDS",
     "MEMBER_MODEL_IDS",
+    "NATIVE_OWNER_COUNT",
+    "NATIVE_OWNER_MANIFEST_PATH",
     "READINESS_LAYERS",
     "REPOSITORY_BOUNDARY_FILES",
     "REPOSITORY_BOUNDARY_ROOTS",
@@ -824,8 +1530,12 @@ __all__ = [
     "SOFTWARE_DNA_PATH",
     "SOFTWARE_DNA_SCHEMA",
     "SoftwareDnaError",
+    "build_researchguard_behavior_commitment_candidate",
     "build_provider_neutral_inventory",
     "check_software_dna_contract",
+    "connect_behavior_commitment_indexes",
+    "load_canonical_behavior_commitment_ledger",
+    "qualify_researchguard_behavior_commitment_ledger",
     "software_dna_affected_closure",
     "software_dna_reverse_trace",
 ]

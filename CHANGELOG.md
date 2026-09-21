@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.5.3 - 2026-09-21
+
+- Add a canonical FlowGuard behavior-commitment envelope boundary and strict
+  round-trip loading for the ResearchGuard software-DNA bridge.
+- Keep the 17-model, 20-function-block, and 10-native-owner denominators
+  separate, with incomplete native evidence remaining explicitly blocked.
+- Add counterexample coverage for malformed, foreign, stale, duplicated, and
+  tampered behavior commitments.
+
 ## v0.5.2 - 2026-09-21
 
 - Adopt the compact SkillGuard v3 author contracts and one explicit sequential
