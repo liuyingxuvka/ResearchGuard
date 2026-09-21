@@ -10,10 +10,8 @@ import pytest
 
 from scripts.build_skillguard_contracts import (
     BLUEPRINT_COMPONENTS,
-    IMPLEMENTATION_PATHS,
     MEMBERS,
     _skillguard_source_fingerprint,
-    contract,
 )
 
 
@@ -58,147 +56,64 @@ EXPECTED_BLUEPRINT_TESTS = {
 }
 
 
-def _check_index(payload: dict[str, object]) -> dict[str, dict[str, object]]:
-    return {
-        str(item["check_id"]): item
-        for item in payload["checks"]  # type: ignore[index]
-    }
+def _payloads(member: str) -> tuple[dict, dict, dict]:
+    base = ROOT / "skills" / member / ".skillguard"
+    return tuple(
+        json.loads((base / name).read_text(encoding="utf-8"))
+        for name in ("contract-source.json", "compiled-contract.json", "check-manifest.json")
+    )  # type: ignore[return-value]
 
 
-def _component_for_path(plan: dict[str, object], path: str) -> dict[str, object]:
-    matches = [
-        item
-        for item in plan["components"]  # type: ignore[index]
-        if path in item["member_paths"]
+@pytest.mark.parametrize("member", MEMBERS)
+def test_compact_v3_contract_keeps_one_sequential_route(member: str) -> None:
+    source, compiled, manifest = _payloads(member)
+    check_ids = {f"check:{member}:{kind}" for kind in (
+        "consumer-contract", "prompt-load", "native-tests", "task-model-closure"
+    )}
+    assert source["schema_version"] == "skillguard.skill_contract.v3"
+    assert compiled["schema_version"] == "skillguard.compiled_contract.v3"
+    assert manifest["schema_version"] == "skillguard.check_manifest.v3"
+    assert source["member_skill_ids"] == [member]
+    assert compiled["member_skill_ids"] == [member]
+    assert {row["check_id"] for row in source["checks"]} == check_ids
+    assert {row["check_id"] for row in compiled["checks"]} == check_ids
+    assert {row["check_id"] for row in manifest["checks"]} == check_ids
+    assert source["checks"][0]["timeout_seconds"] == 300
+    assert source["checks"][1]["timeout_seconds"] == 60
+    assert source["routes"][0]["step_ids"] == [
+        f"step:{member}:consumer-contract",
+        f"step:{member}:prompt-load",
+        f"step:{member}:native-tests",
+        f"step:{member}:task-model-closure",
     ]
-    assert len(matches) == 1, (path, matches)
-    return matches[0]
-
-
-@pytest.mark.parametrize(
-    "member",
-    ("researchguard", "logicguard", "sourceguard", "traceguard", "experimentguard"),
-)
-def test_contract_keeps_one_native_owner_with_exact_blueprint_components(member: str) -> None:
-    payload = contract(member)
-    checks = _check_index(payload)
-    expected_ids = {
-        f"check:{member}:consumer-contract",
-        f"check:{member}:prompt-load",
-        f"check:{member}:native-tests",
-        f"check:{member}:task-model-closure",
-    }
-    assert set(checks) == expected_ids
-    assert checks[f"check:{member}:consumer-contract"]["timeout_seconds"] == 300
-    assert checks[f"check:{member}:prompt-load"]["timeout_seconds"] == 60
-    assert checks[f"check:{member}:prompt-load"]["depends_on_check_ids"] == [
-        f"check:{member}:consumer-contract"
+    assert [row["requires"] for row in source["steps"]] == [
+        [],
+        [f"step:{member}:consumer-contract"],
+        [f"step:{member}:prompt-load"],
+        [f"step:{member}:native-tests"],
     ]
-    assert {
-        row["execution_owner_id"] for row in checks.values()
-    } == {
-        f"owner:researchguard:{member}:consumer-contract",
-        f"owner:researchguard:{member}:prompt-load",
-        f"owner:researchguard:{member}:native-tests",
-        f"owner:researchguard:{member}:task-model-closure",
-    }
-
-    native = checks[f"check:{member}:native-tests"]
-    assert native["execution_owner_id"] == f"owner:researchguard:{member}:native-tests"
-    install_obligation = (
-        "obligation:researchguard:researchguard:consumer-install-transaction"
-    )
-    expected_native_obligations = [
-        f"obligation:researchguard:{member}:native-tests",
-        *([install_obligation] if member == "researchguard" else []),
-    ]
-    assert native["covers_obligation_ids"] == expected_native_obligations
-    assert {
-        row["execution_owner_id"]
-        for row in checks.values()
-        if install_obligation in row["covers_obligation_ids"]
-    } == (
-        {"owner:researchguard:researchguard:native-tests"}
-        if member == "researchguard"
-        else set()
-    )
-    rationale = str(native["coverage_rationale"])
-    for phrase in (
-        "native qualification",
-        "impact and reverse trace",
-        "fresh-process target-authority replay",
-        "self-attestation rejection",
-        "without adding duplicate execution owners",
-    ):
-        assert phrase in rationale
-
-    selectors = {
-        (str(item["kind"]), str(item["path"]))
-        for item in native["input_selectors"]
-    }
-    blueprint = BLUEPRINT_COMPONENTS[member]
-    for path in [*blueprint["runtime"], *blueprint["tests"]]:
-        assert ("path", path) in selectors
-    assert not any(path.startswith(".flowguard/") for _kind, path in selectors)
-
-    implementation_paths = set(payload["implementation_paths"])
-    assert blueprint["reference"] in implementation_paths
-    assert set(blueprint["runtime"]).issubset(implementation_paths)
-    assert set(blueprint["tests"]).issubset(implementation_paths)
-    assert any(path.startswith(".flowguard/") for path in IMPLEMENTATION_PATHS[member])
-
-    depth_ids = set(payload["depth_profile"]["native_check_ids"])
-    readiness_ids = set(
-        payload["depth_profile"]["provider_runtime"]["readiness_check_ids"]
-    )
-    assert depth_ids == expected_ids
-    assert readiness_ids == expected_ids
+    input_ids = {row["id"] for row in source["inputs"]}
+    assert all(set(row["input_ids"]) <= input_ids for row in source["checks"])
+    assert all("input_selectors" not in row for row in source["checks"])
+    assert manifest["contract_hash"] == compiled["contract_hash"]
+    assert manifest["manifest_hash"].startswith("sha256:")
 
 
-@pytest.mark.parametrize(
-    "member",
-    ("researchguard", "logicguard", "sourceguard", "traceguard", "experimentguard"),
-)
-def test_compiled_component_map_is_member_exact_and_never_run_all(member: str) -> None:
-    compiled = json.loads(
-        (ROOT / "skills" / member / ".skillguard" / "compiled-contract.json").read_text(
-            encoding="utf-8"
-        )
-    )
+@pytest.mark.parametrize("member", MEMBERS)
+def test_compact_v3_content_impact_plan_is_portable_and_copy_scoped(member: str) -> None:
+    source, compiled, _manifest = _payloads(member)
     plan = compiled["content_impact_plan"]
-    assert plan["unknown_mapping_disposition"] == "block"
-    assert plan["all_owner_component_ids"] == []
-    assert all(not values for values in plan["health"].values())
-    assert len(compiled["checks"]) == 4
-
-    native_owner = f"owner:researchguard:{member}:native-tests"
-    foreign_owner_prefixes = {
-        f"owner:researchguard:{other}:" for other in MEMBERS if other != member
-    }
-    blueprint = BLUEPRINT_COMPONENTS[member]
-    for path in [*blueprint["runtime"], *blueprint["tests"]]:
-        component = _component_for_path(plan, path)
-        consumers = set(component["consumer_ids"])
-        assert native_owner in consumers
-        assert not any(
-            any(consumer.startswith(prefix) for prefix in foreign_owner_prefixes)
-            for consumer in consumers
-        )
-
-    for component in plan["components"]:
-        if any(path.startswith(".flowguard/") for path in component["member_paths"]):
-            assert native_owner not in component["consumer_ids"]
-
-    reference_component = _component_for_path(plan, blueprint["reference"])
-    assert f"owner:researchguard:{member}:prompt-load" in reference_component[
-        "consumer_ids"
-    ]
+    assert plan["schema_version"] == "skillguard.content_impact_plan.v3"
+    paths = {row["path"] for row in plan["inventory"]}
+    input_paths = {row["path"] for row in source["inputs"]}
+    assert paths <= input_paths
+    assert all((ROOT / "skills" / member / path).is_file() for path in paths)
+    assert all(row["install_disposition"] == "copy" for row in plan["inventory"])
+    assert set(source["consumer_projection"]["file_paths"]) <= input_paths
+    assert set(source["consumer_projection"]["file_paths"]) == paths
 
 
-@pytest.mark.parametrize(
-    "member",
-    ("researchguard", "logicguard", "sourceguard", "traceguard", "experimentguard"),
-)
+@pytest.mark.parametrize("member", MEMBERS)
 def test_blueprint_evidence_categories_are_real_pytest_nodes(member: str) -> None:
     env = dict(os.environ)
     env["PYTHONDONTWRITEBYTECODE"] = "1"
@@ -206,14 +121,7 @@ def test_blueprint_evidence_categories_are_real_pytest_nodes(member: str) -> Non
         [str(ROOT / "src"), str(ROOT / "tests"), env.get("PYTHONPATH", "")]
     )
     result = subprocess.run(
-        [
-            sys.executable,
-            "-m",
-            "pytest",
-            *BLUEPRINT_COMPONENTS[member]["tests"],
-            "--collect-only",
-            "-vv",
-        ],
+        [sys.executable, "-m", "pytest", *BLUEPRINT_COMPONENTS[member]["tests"], "--collect-only", "-vv"],
         cwd=ROOT,
         env=env,
         text=True,

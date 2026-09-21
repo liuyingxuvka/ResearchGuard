@@ -79,6 +79,7 @@ def test_static_test_mesh_audit_covers_five_members_and_twenty_exact_owners() ->
             "evidence_subject_count": 4,
             "evidence_domain_count": 4,
             "closure_profile_id": "enforced",
+            "obligation_count": 5 if member == "researchguard" else 4,
             "plan_only_static_eligibility": (
                 "eligible_after_legitimate_claimed_run"
             ),
@@ -90,14 +91,12 @@ def test_static_test_mesh_audit_covers_five_members_and_twenty_exact_owners() ->
     assert projection["consumer_id"] == UNIT_TEST_MESH_PROJECTION_ID
     assert projection["paths"] == sorted(TEST_MESH_MAINTENANCE_INPUTS)
     assert projection["semantic_owner_selection"] == []
-    assert result["generator_impact"]["direct_semantic_owner_ids"] == [
-        "owner:researchguard:researchguard:native-tests"
-    ]
+    assert result["generator_impact"]["direct_semantic_owner_ids"] == []
     assert result["consumer_install_transaction"] == {
         "obligation_id": (
-            "obligation:researchguard:researchguard:consumer-install-transaction"
+            "obligation:researchguard:consumer-install-transaction"
         ),
-        "execution_owner_id": "owner:researchguard:researchguard:native-tests",
+        "execution_owner_id": "member-native-check:researchguard",
         "source_only_paths": [
             "scripts/install_researchguard.py",
             "tests/test_install_researchguard.py",
@@ -106,7 +105,7 @@ def test_static_test_mesh_audit_covers_five_members_and_twenty_exact_owners() ->
     assert len(result["installation_boundaries"]) == 5
     assert all(
         row["release_manifest_path"] == "consumer-release.json"
-        and row["installation_projection_id"] == "projection:installation"
+        and row["installation_projection_id"] == "projection:consumer-distribution"
         for row in result["installation_boundaries"]
     )
 
@@ -127,47 +126,31 @@ def test_validation_plan_is_current_but_not_run_without_a_maintenance_owner() ->
     "member",
     ("researchguard", "logicguard", "sourceguard", "traceguard", "experimentguard"),
 )
-def test_member_check_input_selectors_are_exactly_unique(member: str) -> None:
+def test_member_check_input_references_are_unique(member: str) -> None:
     source = json.loads(
         (
             ROOT / "skills" / member / ".skillguard" / "contract-source.json"
         ).read_text(encoding="utf-8")
     )
+    input_ids = {row["id"] for row in source["inputs"]}
     for check in source["checks"]:
-        identities = [
-            json.dumps(selector, ensure_ascii=False, sort_keys=True)
-            for selector in check["input_selectors"]
-        ]
+        identities = list(check["input_ids"])
         assert len(identities) == len(set(identities)), check["check_id"]
+        assert set(identities) <= input_ids
 
 
 def test_consumer_install_transaction_reuses_the_researchguard_native_owner() -> None:
-    payload = contract("researchguard")
-    checks = {row["check_id"]: row for row in payload["checks"]}
-    native = checks["check:researchguard:native-tests"]
-    obligation_id = (
-        "obligation:researchguard:researchguard:consumer-install-transaction"
+    source = json.loads(
+        (ROOT / "skills" / "researchguard" / ".skillguard" / "contract-source.json")
+        .read_text(encoding="utf-8")
     )
-    assert native["execution_owner_id"] == (
-        "owner:researchguard:researchguard:native-tests"
-    )
-    assert native["covers_obligation_ids"] == [
-        "obligation:researchguard:researchguard:native-tests",
-        obligation_id,
-    ]
-    assert obligation_id in payload["closure_profiles"][0]["required_obligation_ids"]
-
-    model_path = ROOT / ".flowguard/models/researchguard_skill_contract_model_common.py"
-    spec = importlib.util.spec_from_file_location(
-        "researchguard_contract_model_common_under_test", model_path
-    )
-    assert spec is not None and spec.loader is not None
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    model = module.build_contract_model("researchguard")
+    obligation_id = "obligation:researchguard:consumer-install-transaction"
     obligation = next(
-        row for row in model["obligations"] if row["obligation_id"] == obligation_id
+        row for row in source["obligations"] if row["obligation_id"] == obligation_id
     )
-    assert obligation["owner_step_ids"] == [
-        "step:researchguard:researchguard:tests"
-    ]
+    assert obligation["check_ids"] == ["check:researchguard:native-tests"]
+    native_step = next(
+        row for row in source["steps"] if row["step_id"] == "step:researchguard:native-tests"
+    )
+    assert native_step["check_ids"] == ["check:researchguard:native-tests"]
+    assert source["routes"][0]["obligation_ids"][-1] == obligation_id

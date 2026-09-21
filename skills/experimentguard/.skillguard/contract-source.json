@@ -1,449 +1,207 @@
 {
-  "schema_version": "skillguard.contract_source.v2",
+  "schema_version": "skillguard.skill_contract.v3",
   "skill_id": "experimentguard",
-  "repository_role": "skill_maintainer_source",
   "maintenance_unit_id": "unit:researchguard-suite",
   "member_skill_ids": [
-    "researchguard",
-    "logicguard",
-    "sourceguard",
-    "traceguard",
     "experimentguard"
   ],
-  "consumer_projection": {
-    "projection_id": "projection:consumer-distribution",
-    "prohibited_path_prefixes": [
-      ".skillguard/"
-    ],
-    "prohibited_prompt_tokens": [
-      "SkillGuard",
-      ".skillguard",
-      "skillguard.py"
-    ],
-    "release_manifest_path": "consumer-release.json"
-  },
-  "projection_consumers": [
+  "inputs": [
     {
-      "consumer_id": "projection:researchguard-suite-maintenance-definition",
-      "kind": "source_maintenance",
-      "input_selectors": [
+      "id": "input:001",
+      "path": "SKILL.md",
+      "required": true,
+      "role": "instructions"
+    },
+    {
+      "id": "input:002",
+      "path": "agents/openai.yaml",
+      "required": true,
+      "role": "runtime_source"
+    },
+    {
+      "id": "input:003",
+      "path": "references/experiment-model-protocol.md",
+      "required": true,
+      "role": "runtime_source"
+    },
+    {
+      "id": "input:wrapper",
+      "path": ".skillguard/checks/run_researchguard_check.py",
+      "required": true,
+      "role": "author_check"
+    }
+  ],
+  "routes": [
+    {
+      "route_id": "route:experimentguard:current-validation",
+      "choice_group": "operation",
+      "when": [
         {
-          "kind": "path",
-          "path": ".skillguard/test-mesh.json"
-        },
-        {
-          "kind": "path",
-          "path": "scripts/check_researchguard_test_mesh.py"
+          "fact": "operation",
+          "equals": "validate"
         }
+      ],
+      "step_ids": [
+        "step:experimentguard:consumer-contract",
+        "step:experimentguard:prompt-load",
+        "step:experimentguard:native-tests",
+        "step:experimentguard:task-model-closure"
+      ],
+      "obligation_ids": [
+        "obligation:experimentguard:consumer-contract",
+        "obligation:experimentguard:prompt-load",
+        "obligation:experimentguard:native-tests",
+        "obligation:experimentguard:task-model-closure"
       ]
     }
   ],
-  "model_id": "researchguard.experimentguard.contract.current",
-  "model_path": ".flowguard/models/experimentguard_skill_contract_model.py",
-  "confirmed": true,
-  "integration_mode": "native-integrated",
-  "native_route_owner": "owner:researchguard:experimentguard",
-  "may_define_parallel_execution_route": false,
-  "may_define_skillguard_runtime_route": false,
-  "native_route_bindings": [
+  "steps": [
     {
-      "binding_id": "native:researchguard:experimentguard",
-      "native_route_id": "route:researchguard:experimentguard",
-      "required_before_closure": true,
-      "source": "skills/experimentguard/SKILL.md"
-    }
-  ],
-  "native_check_bindings": [
-    {
-      "binding_id": "native-check:researchguard:experimentguard:consumer-contract",
-      "native_check_id": "check:experimentguard:consumer-contract",
-      "required": true,
-      "evidence_source": "scripts/check_researchguard_suite.py"
-    },
-    {
-      "binding_id": "native-check:researchguard:experimentguard:prompt-load",
-      "native_check_id": "check:experimentguard:prompt-load",
-      "required": true,
-      "evidence_source": "scripts/check_prompt_bundles.py"
-    },
-    {
-      "binding_id": "native-check:researchguard:experimentguard:native-tests",
-      "native_check_id": "check:experimentguard:native-tests",
-      "required": true,
-      "evidence_source": "tests"
-    },
-    {
-      "binding_id": "native-check:researchguard:experimentguard:task-model-closure",
-      "native_check_id": "check:experimentguard:task-model-closure",
-      "required": true,
-      "evidence_source": "tests/task-local-iteration"
-    }
-  ],
-  "depth_profile": {
-    "schema_version": "skillguard.depth_profile.v2",
-    "profile_id": "profile:researchguard:experimentguard:strict-model-closure",
-    "target_skill_id": "experimentguard",
-    "integration_mode": "native-integrated",
-    "native_owner_id": "owner:researchguard:experimentguard",
-    "native_route_ids": [
-      "route:researchguard:experimentguard"
-    ],
-    "native_check_ids": [
-      "check:experimentguard:consumer-contract",
-      "check:experimentguard:prompt-load",
-      "check:experimentguard:native-tests",
-      "check:experimentguard:task-model-closure"
-    ],
-    "model_deepening_check_id": "check:experimentguard:task-model-closure",
-    "surface_inventory": {
-      "path": ".skillguard/surface-inventory.json",
-      "adequacy_check_ids": [
-        "check:experimentguard:consumer-contract",
-        "check:experimentguard:prompt-load",
-        "check:experimentguard:native-tests",
-        "check:experimentguard:task-model-closure"
-      ],
-      "model_deepening_check_id": "check:experimentguard:task-model-closure"
-    },
-    "skillguard_adds_domain_route": false,
-    "enforcement_level": "enforced",
-    "required_closure_profiles": [
-      "enforced"
-    ],
-    "provider_runtime": {
-      "provider_id": "skillguard-local-provider",
-      "required_runtime_contract_id": "skillguard-declared-check-supervision-current",
-      "required_capability_ids": [
-        "declared-check-inventory.v1",
-        "declared-check-receipt-reconciliation.v1",
-        "installation-receipt-binding.v1",
-        "installation-currentness-replay.v1",
-        "provider-runtime-enrollment.v1",
-        "single-flight-check-execution.v1"
-      ],
-      "required_enrollment_status": "enrolled",
-      "readiness_check_ids": [
-        "check:experimentguard:consumer-contract",
-        "check:experimentguard:prompt-load",
-        "check:experimentguard:native-tests",
-        "check:experimentguard:task-model-closure"
-      ]
-    },
-    "claim_boundary": "SkillGuard supervises only the exact current ResearchGuard target-owned strict model-closure checks; it does not replace their domain judgment."
-  },
-  "implementation_paths": [
-    "skills/experimentguard",
-    "src/researchguard/experiment",
-    ".flowguard/models/researchguard_suite_model.py",
-    ".flowguard/models/researchguard_suite/model-definition.json",
-    ".flowguard/verification/run_researchguard_suite_model.py",
-    ".flowguard/models/experimentguard_skill_contract_model.py",
-    ".flowguard/models/researchguard_skill_contract_model_common.py",
-    "tests/experiment",
-    "researchguard/prompt_bundle_manifest.json",
-    "scripts/check_prompt_bundles.py",
-    "src/researchguard/target_authority.py",
-    "src/researchguard/model_envelope.py",
-    "src/researchguard/experiment/owner_attestation.py",
-    "src/researchguard/experiment/blueprint.py",
-    "src/researchguard/experiment/schema.py",
-    "src/researchguard/experiment/engine.py",
-    "src/researchguard/experiment/cli.py",
-    "tests/experiment/test_blueprint_design.py",
-    "skills/experimentguard/references/experiment-model-protocol.md",
-    ".skillguard/test-mesh.json",
-    "scripts/check_researchguard_test_mesh.py"
-  ],
-  "step_bindings": [
-    {
-      "step_id": "step:researchguard:experimentguard:contract",
-      "action": {
-        "kind": "native",
-        "summary": "Validate the exact current consumer skill and route boundary."
-      },
+      "step_id": "step:experimentguard:consumer-contract",
       "check_ids": [
         "check:experimentguard:consumer-contract"
       ],
-      "output_artifact_ids": []
+      "requires": []
     },
     {
-      "step_id": "step:researchguard:experimentguard:prompt-load",
-      "action": {
-        "kind": "native",
-        "summary": "Validate the selected-only entry budget and conditional reference graph."
-      },
+      "step_id": "step:experimentguard:prompt-load",
       "check_ids": [
         "check:experimentguard:prompt-load"
       ],
-      "output_artifact_ids": []
+      "requires": [
+        "step:experimentguard:consumer-contract"
+      ]
     },
     {
-      "step_id": "step:researchguard:experimentguard:tests",
-      "action": {
-        "kind": "native",
-        "summary": "Execute the member-owned current native regression suite."
-      },
+      "step_id": "step:experimentguard:native-tests",
       "check_ids": [
         "check:experimentguard:native-tests"
       ],
-      "output_artifact_ids": []
+      "requires": [
+        "step:experimentguard:prompt-load"
+      ]
     },
     {
-      "step_id": "step:researchguard:experimentguard:task-model-closure",
-      "action": {
-        "kind": "native",
-        "summary": "Execute the target-owned task-local model closure and gap-continuation checks."
-      },
+      "step_id": "step:experimentguard:task-model-closure",
       "check_ids": [
         "check:experimentguard:task-model-closure"
       ],
-      "output_artifact_ids": []
+      "requires": [
+        "step:experimentguard:native-tests"
+      ]
+    }
+  ],
+  "obligations": [
+    {
+      "obligation_id": "obligation:experimentguard:consumer-contract",
+      "check_ids": [
+        "check:experimentguard:consumer-contract"
+      ]
+    },
+    {
+      "obligation_id": "obligation:experimentguard:prompt-load",
+      "check_ids": [
+        "check:experimentguard:prompt-load"
+      ]
+    },
+    {
+      "obligation_id": "obligation:experimentguard:native-tests",
+      "check_ids": [
+        "check:experimentguard:native-tests"
+      ]
+    },
+    {
+      "obligation_id": "obligation:experimentguard:task-model-closure",
+      "check_ids": [
+        "check:experimentguard:task-model-closure"
+      ]
     }
   ],
   "checks": [
     {
       "check_id": "check:experimentguard:consumer-contract",
-      "maintenance_unit_id": "unit:researchguard-suite",
-      "member_skill_id": "experimentguard",
-      "evidence_subject_id": "subject:researchguard:experimentguard:consumer-contract",
-      "semantic_check_id": "semantic:researchguard:experimentguard:consumer-contract:current",
-      "kind": "command",
-      "command": "python",
+      "command": "{{python}}",
       "args": [
-        "scripts/check_researchguard_suite.py",
-        "--member",
-        "experimentguard",
-        "--json"
-      ],
-      "cwd_token": "repository_root",
-      "input_selectors": [
-        {
-          "kind": "path",
-          "path": "skills/experimentguard/SKILL.md"
-        },
-        {
-          "kind": "path",
-          "path": "skills/experimentguard/agents/openai.yaml"
-        },
-        {
-          "kind": "path",
-          "path": "scripts/check_researchguard_suite.py"
-        },
-        {
-          "kind": "path",
-          "path": ".flowguard/models/researchguard_suite_model.py"
-        },
-        {
-          "kind": "path",
-          "path": ".flowguard/models/researchguard_suite/model-definition.json"
-        },
-        {
-          "kind": "path",
-          "path": ".flowguard/verification/run_researchguard_suite_model.py"
-        },
-        {
-          "kind": "path",
-          "path": ".flowguard/models/experimentguard_skill_contract_model.py"
-        },
-        {
-          "kind": "path",
-          "path": ".flowguard/models/researchguard_skill_contract_model_common.py"
-        }
+        ".skillguard/checks/run_researchguard_check.py",
+        "consumer-contract"
       ],
       "expected": {
         "exit_code": 0
       },
-      "timeout_seconds": 300,
-      "evidence_class": "hard",
-      "evidence_domain_id": "evidence-domain:researchguard:experimentguard:consumer-contract",
-      "execution_owner_id": "owner:researchguard:experimentguard:consumer-contract",
-      "native_route_id": "route:researchguard:experimentguard",
-      "depends_on_check_ids": [],
-      "covers_obligation_ids": [
-        "obligation:researchguard:experimentguard:consumer-contract"
+      "input_ids": [
+        "input:wrapper",
+        "input:001",
+        "input:002",
+        "input:003"
       ],
-      "coverage_scope": "declared_obligations",
-      "coverage_rationale": "This check is the sole execution owner for its exact member obligation."
+      "timeout_seconds": 300,
+      "kind": "command"
     },
     {
       "check_id": "check:experimentguard:prompt-load",
-      "maintenance_unit_id": "unit:researchguard-suite",
-      "member_skill_id": "experimentguard",
-      "evidence_subject_id": "subject:researchguard:experimentguard:prompt-load",
-      "semantic_check_id": "semantic:researchguard:experimentguard:prompt-load:current",
-      "kind": "command",
-      "command": "python",
+      "command": "{{python}}",
       "args": [
-        "scripts/check_prompt_bundles.py",
-        "--member",
-        "experimentguard",
-        "--json"
-      ],
-      "cwd_token": "repository_root",
-      "input_selectors": [
-        {
-          "kind": "subtree",
-          "path": "skills/experimentguard"
-        },
-        {
-          "kind": "path",
-          "path": "skills/experimentguard/references/experiment-model-protocol.md"
-        },
-        {
-          "kind": "path",
-          "path": "researchguard/prompt_bundle_manifest.json"
-        },
-        {
-          "kind": "path",
-          "path": "scripts/check_prompt_bundles.py"
-        }
+        ".skillguard/checks/run_researchguard_check.py",
+        "prompt-load"
       ],
       "expected": {
         "exit_code": 0
       },
+      "input_ids": [
+        "input:wrapper",
+        "input:001",
+        "input:002",
+        "input:003"
+      ],
       "timeout_seconds": 60,
-      "evidence_class": "hard",
-      "evidence_domain_id": "evidence-domain:researchguard:experimentguard:prompt-load",
-      "execution_owner_id": "owner:researchguard:experimentguard:prompt-load",
-      "native_route_id": "route:researchguard:experimentguard",
-      "depends_on_check_ids": [
-        "check:experimentguard:consumer-contract"
-      ],
-      "covers_obligation_ids": [
-        "obligation:researchguard:experimentguard:prompt-load"
-      ],
-      "coverage_scope": "declared_obligations",
-      "coverage_rationale": "This check is the sole execution owner for its exact member obligation."
+      "kind": "command"
     },
     {
       "check_id": "check:experimentguard:native-tests",
-      "maintenance_unit_id": "unit:researchguard-suite",
-      "member_skill_id": "experimentguard",
-      "evidence_subject_id": "subject:researchguard:experimentguard:native-tests",
-      "semantic_check_id": "semantic:researchguard:experimentguard:native-tests:current",
-      "kind": "command",
-      "command": "python",
+      "command": "{{python}}",
       "args": [
-        "-m",
-        "pytest",
-        "tests/experiment",
-        "-q"
-      ],
-      "cwd_token": "repository_root",
-      "input_selectors": [
-        {
-          "kind": "subtree",
-          "path": "skills/experimentguard"
-        },
-        {
-          "kind": "subtree",
-          "path": "src/researchguard/experiment"
-        },
-        {
-          "kind": "subtree",
-          "path": "tests/experiment"
-        },
-        {
-          "kind": "path",
-          "path": "src/researchguard/target_authority.py"
-        },
-        {
-          "kind": "path",
-          "path": "src/researchguard/model_envelope.py"
-        },
-        {
-          "kind": "path",
-          "path": "src/researchguard/experiment/owner_attestation.py"
-        },
-        {
-          "kind": "path",
-          "path": "src/researchguard/experiment/blueprint.py"
-        },
-        {
-          "kind": "path",
-          "path": "src/researchguard/experiment/schema.py"
-        },
-        {
-          "kind": "path",
-          "path": "src/researchguard/experiment/engine.py"
-        },
-        {
-          "kind": "path",
-          "path": "src/researchguard/experiment/cli.py"
-        },
-        {
-          "kind": "path",
-          "path": "tests/experiment/test_blueprint_design.py"
-        }
+        ".skillguard/checks/run_researchguard_check.py",
+        "native-tests"
       ],
       "expected": {
         "exit_code": 0
       },
+      "input_ids": [
+        "input:wrapper",
+        "input:001",
+        "input:002",
+        "input:003"
+      ],
       "timeout_seconds": 900,
-      "evidence_class": "hard",
-      "evidence_domain_id": "evidence-domain:researchguard:experimentguard:native-tests",
-      "execution_owner_id": "owner:researchguard:experimentguard:native-tests",
-      "native_route_id": "route:researchguard:experimentguard",
-      "depends_on_check_ids": [
-        "check:experimentguard:prompt-load"
-      ],
-      "covers_obligation_ids": [
-        "obligation:researchguard:experimentguard:native-tests"
-      ],
-      "coverage_scope": "declared_obligations",
-      "coverage_rationale": "This existing member-native owner runs the complete declared member test suite once. Its exact blueprint code/test selectors cover native qualification, qualification-first impact and reverse trace, persisted fresh-process target-authority replay, and caller-forged/co-shrunk self-attestation rejection without adding duplicate execution owners. "
+      "kind": "command"
     },
     {
       "check_id": "check:experimentguard:task-model-closure",
-      "maintenance_unit_id": "unit:researchguard-suite",
-      "member_skill_id": "experimentguard",
-      "evidence_subject_id": "subject:researchguard:experimentguard:task-model-closure",
-      "semantic_check_id": "semantic:researchguard:experimentguard:task-model-closure:current",
-      "kind": "command",
-      "command": "python",
+      "command": "{{python}}",
       "args": [
-        "-m",
-        "pytest",
-        "tests/experiment/test_recommendation.py",
-        "-q"
-      ],
-      "cwd_token": "repository_root",
-      "input_selectors": [
-        {
-          "kind": "path",
-          "path": "tests/experiment/test_recommendation.py"
-        }
+        ".skillguard/checks/run_researchguard_check.py",
+        "task-model-closure"
       ],
       "expected": {
         "exit_code": 0
       },
+      "input_ids": [
+        "input:wrapper",
+        "input:001",
+        "input:002",
+        "input:003"
+      ],
       "timeout_seconds": 900,
-      "evidence_class": "hard",
-      "evidence_domain_id": "evidence-domain:researchguard:experimentguard:task-model-closure",
-      "execution_owner_id": "owner:researchguard:experimentguard:task-model-closure",
-      "native_route_id": "route:researchguard:experimentguard",
-      "depends_on_check_ids": [
-        "check:experimentguard:native-tests"
-      ],
-      "covers_obligation_ids": [
-        "obligation:researchguard:experimentguard:task-model-closure"
-      ],
-      "coverage_scope": "declared_obligations",
-      "coverage_rationale": "This check is the sole execution owner for its exact member obligation."
+      "kind": "command"
     }
   ],
-  "artifacts": [],
-  "closure_profiles": [
-    {
-      "profile_id": "enforced",
-      "required_obligation_ids": [
-        "obligation:researchguard:experimentguard:consumer-contract",
-        "obligation:researchguard:experimentguard:prompt-load",
-        "obligation:researchguard:experimentguard:native-tests",
-        "obligation:researchguard:experimentguard:task-model-closure"
-      ]
-    }
-  ],
-  "judgment_rubrics": [],
-  "claim_boundary": "This contract covers the current experimentguard consumer projection, native route, and member-owned tests inside ResearchGuard v0.5.1. The four exact native-blueprint evidence categories are selectors of the one existing target-owned native-tests owner, so final validation does not repeat the same member suite. Distinct model obligation ids remain a later binding with the frozen FlowGuard self-DNA toolchain. It does not prove source truth, unrun external work, installed currentness, publication, or future AI behavior."
+  "consumer_projection": {
+    "projection_id": "projection:consumer-distribution",
+    "file_paths": [
+      "SKILL.md",
+      "agents/openai.yaml",
+      "references/experiment-model-protocol.md"
+    ],
+    "release_manifest_path": "consumer-release.json"
+  }
 }

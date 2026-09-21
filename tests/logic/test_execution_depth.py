@@ -215,8 +215,8 @@ def test_affected_skillguard_contracts_bind_native_depth_without_parallel_route(
         "check:logicguard:native-tests",
         "check:logicguard:task-model-closure",
     }
-    assert contract["native_route_owner"] == "owner:researchguard:logicguard"
-    assert contract["may_define_parallel_execution_route"] is False
-    assert contract["may_define_skillguard_runtime_route"] is False
+    assert contract["schema_version"] == "skillguard.skill_contract.v3"
+    assert contract["routes"][0]["route_id"] == "route:logicguard:current-validation"
+    assert len(contract["obligations"]) == 4
     assert not (control / "work-contract.json").exists()
     assert not (control / "check_manifest.json").exists()

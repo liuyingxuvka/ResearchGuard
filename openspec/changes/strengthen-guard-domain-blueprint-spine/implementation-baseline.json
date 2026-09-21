@@ -36,7 +36,7 @@
   },
   "observed_flowguard_snapshot": "827a243133d2b8355d47ebb40f799d58dae0baa6dcf10d6a0dbad3142de3054b",
   "observed_flowguard_snapshot_fingerprint": "sha256:8bec1e3b11250f0ee4f556acae1d0f74c787a5c6ee39028df36d227f765301f1",
-  "package_identity": "researchguard 0.5.1",
+  "package_identity": "researchguard 0.5.2",
   "prompt_bundle_manifest_sha256": "sha256:a99f41793a3d1bd08d99d65916ab7cff79b515eae59f361d7e5b8f26a6fa5fb3",
   "python_identity": "3.12.10 (C:\\Users\\liu_y\\AppData\\Local\\Microsoft\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\python.exe)",
   "remote_main_commit": "0933506e117d7a6cb325d62ad01cd458aa9c25c8",

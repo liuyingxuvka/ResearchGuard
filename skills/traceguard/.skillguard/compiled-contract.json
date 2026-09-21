@@ -1,1904 +1,398 @@
 {
-  "artifacts": [],
-  "check_declarations_hash": "008FC6E393990D70AEA63120AB1120CE4D81500AC20FDD30BF5524491127679A",
+  "check_declarations_hash": "sha256:56d7f5d3b3daaed9fdaecd4ac1bba35f22ec7b4f72d859fce0b950d0d34a01a6",
   "checks": [
     {
       "args": [
-        "scripts/check_researchguard_suite.py",
-        "--member",
-        "traceguard",
-        "--json"
+        ".skillguard/checks/run_researchguard_check.py",
+        "consumer-contract"
       ],
       "check_id": "check:traceguard:consumer-contract",
-      "command": "python",
-      "coverage_rationale": "This check is the sole execution owner for its exact member obligation.",
-      "coverage_scope": "declared_obligations",
-      "covers_obligation_ids": [
-        "obligation:researchguard:traceguard:consumer-contract"
-      ],
-      "cwd_token": "repository_root",
-      "depends_on_check_ids": [],
-      "evidence_class": "hard",
-      "evidence_domain_id": "evidence-domain:researchguard:traceguard:consumer-contract",
-      "evidence_subject_id": "subject:researchguard:traceguard:consumer-contract",
-      "execution_owner_id": "owner:researchguard:traceguard:consumer-contract",
+      "command": "{{python}}",
       "expected": {
         "exit_code": 0
       },
-      "input_component_ids": [
-        "component:documentation_model:9e4e07f6e9d27546",
-        "component:documentation_model:b80fe105d3564a69",
-        "component:documentation_model:db6267acd3238c1e",
-        "component:runtime_source:e8ab83c1e82b02b3",
-        "component:runtime_source:f05349e005bcf12e"
-      ],
-      "input_selectors": [
-        {
-          "kind": "path",
-          "path": ".flowguard/models/researchguard_skill_contract_model_common.py"
-        },
-        {
-          "kind": "path",
-          "path": ".flowguard/models/researchguard_suite/model-definition.json"
-        },
-        {
-          "kind": "path",
-          "path": ".flowguard/models/researchguard_suite_model.py"
-        },
-        {
-          "kind": "path",
-          "path": ".flowguard/models/traceguard_skill_contract_model.py"
-        },
-        {
-          "kind": "path",
-          "path": ".flowguard/verification/run_researchguard_suite_model.py"
-        },
-        {
-          "kind": "path",
-          "path": "scripts/check_researchguard_suite.py"
-        },
-        {
-          "kind": "path",
-          "path": "skills/traceguard/SKILL.md"
-        },
-        {
-          "kind": "path",
-          "path": "skills/traceguard/agents/openai.yaml"
-        }
+      "input_ids": [
+        "input:wrapper",
+        "input:001",
+        "input:002",
+        "input:003",
+        "input:004",
+        "input:005",
+        "input:006",
+        "input:007",
+        "input:008",
+        "input:009",
+        "input:010",
+        "input:011",
+        "input:012",
+        "input:013"
       ],
       "kind": "command",
-      "maintenance_unit_id": "unit:researchguard-suite",
-      "member_skill_id": "traceguard",
-      "native_route_id": "route:researchguard:traceguard",
-      "owner_declaration_hash": "sha256:cff37594568c145956f6a80afbfce269b40e23db282a0e5ee31fedba1d3cb59b",
-      "owner_input_projection_hash": "sha256:ea71de01fe6dbd1f90605b828639475ada03e95c7debf72ff89b496882f8446a",
-      "projection_declaration_hash": "sha256:27f565c031223383445f683e711f13342f6101f207ce11160679e290f5936fcb",
-      "semantic_check_id": "semantic:researchguard:traceguard:consumer-contract:current",
-      "target_input_role_ids": [],
       "timeout_seconds": 300
     },
     {
       "args": [
-        "scripts/check_prompt_bundles.py",
-        "--member",
-        "traceguard",
-        "--json"
+        ".skillguard/checks/run_researchguard_check.py",
+        "prompt-load"
       ],
       "check_id": "check:traceguard:prompt-load",
-      "command": "python",
-      "coverage_rationale": "This check is the sole execution owner for its exact member obligation.",
-      "coverage_scope": "declared_obligations",
-      "covers_obligation_ids": [
-        "obligation:researchguard:traceguard:prompt-load"
-      ],
-      "cwd_token": "repository_root",
-      "depends_on_check_ids": [
-        "check:traceguard:consumer-contract"
-      ],
-      "evidence_class": "hard",
-      "evidence_domain_id": "evidence-domain:researchguard:traceguard:prompt-load",
-      "evidence_subject_id": "subject:researchguard:traceguard:prompt-load",
-      "execution_owner_id": "owner:researchguard:traceguard:prompt-load",
+      "command": "{{python}}",
       "expected": {
         "exit_code": 0
       },
-      "input_component_ids": [
-        "component:contract_schema:4c9b54c096ac54d5",
-        "component:documentation_model:b80fe105d3564a69",
-        "component:documentation_model:c230e4643fc77213",
-        "component:runtime_source:3dfc59fa2f8b5462",
-        "component:runtime_source:61502c070ff4adf1",
-        "component:runtime_source:f05349e005bcf12e",
-        "component:runtime_source:f2ff2dd189954dbc"
-      ],
-      "input_selectors": [
-        {
-          "kind": "path",
-          "path": "researchguard/prompt_bundle_manifest.json"
-        },
-        {
-          "kind": "path",
-          "path": "scripts/check_prompt_bundles.py"
-        },
-        {
-          "kind": "path",
-          "path": "skills/traceguard/references/trace-blueprint-contract.md"
-        },
-        {
-          "kind": "subtree",
-          "path": "skills/traceguard"
-        }
+      "input_ids": [
+        "input:wrapper",
+        "input:001",
+        "input:002",
+        "input:003",
+        "input:004",
+        "input:005",
+        "input:006",
+        "input:007",
+        "input:008",
+        "input:009",
+        "input:010",
+        "input:011",
+        "input:012",
+        "input:013"
       ],
       "kind": "command",
-      "maintenance_unit_id": "unit:researchguard-suite",
-      "member_skill_id": "traceguard",
-      "native_route_id": "route:researchguard:traceguard",
-      "owner_declaration_hash": "sha256:a7f4d8b52957bb3944d881e6e7465977de468b9bb82250cf792cf6e8064c8828",
-      "owner_input_projection_hash": "sha256:aa28372ed626cc32713a1fb40ab3bc0ee8f76f1c505b2f755824843f4681af7a",
-      "projection_declaration_hash": "sha256:1ce31eb15a9a6db85d11e1de8cccdaccc6b5ae531f5e18416c2e4379b4d3b7f6",
-      "semantic_check_id": "semantic:researchguard:traceguard:prompt-load:current",
-      "target_input_role_ids": [],
       "timeout_seconds": 60
     },
     {
       "args": [
-        "-m",
-        "pytest",
-        "tests/trace",
-        "-q"
+        ".skillguard/checks/run_researchguard_check.py",
+        "native-tests"
       ],
       "check_id": "check:traceguard:native-tests",
-      "command": "python",
-      "coverage_rationale": "This existing member-native owner runs the complete declared member test suite once. Its exact blueprint code/test selectors cover native qualification, qualification-first impact and reverse trace, persisted fresh-process target-authority replay, and caller-forged/co-shrunk self-attestation rejection without adding duplicate execution owners. ",
-      "coverage_scope": "declared_obligations",
-      "covers_obligation_ids": [
-        "obligation:researchguard:traceguard:native-tests"
-      ],
-      "cwd_token": "repository_root",
-      "depends_on_check_ids": [
-        "check:traceguard:prompt-load"
-      ],
-      "evidence_class": "hard",
-      "evidence_domain_id": "evidence-domain:researchguard:traceguard:native-tests",
-      "evidence_subject_id": "subject:researchguard:traceguard:native-tests",
-      "execution_owner_id": "owner:researchguard:traceguard:native-tests",
+      "command": "{{python}}",
       "expected": {
         "exit_code": 0
       },
-      "input_component_ids": [
-        "component:contract_schema:4c9b54c096ac54d5",
-        "component:documentation_model:b80fe105d3564a69",
-        "component:documentation_model:c230e4643fc77213",
-        "component:fixture_reference:3526fa4f879142f2",
-        "component:runtime_source:3dfc59fa2f8b5462",
-        "component:runtime_source:61502c070ff4adf1",
-        "component:runtime_source:64bc99be03479306",
-        "component:runtime_source:f05349e005bcf12e",
-        "component:test_dev:5df80363f72170b9",
-        "component:test_dev:cb13d375fe03b253"
-      ],
-      "input_selectors": [
-        {
-          "kind": "path",
-          "path": "src/researchguard/model_envelope.py"
-        },
-        {
-          "kind": "path",
-          "path": "src/researchguard/target_authority.py"
-        },
-        {
-          "kind": "path",
-          "path": "src/researchguard/trace/blueprint.py"
-        },
-        {
-          "kind": "path",
-          "path": "src/researchguard/trace/cli.py"
-        },
-        {
-          "kind": "path",
-          "path": "src/researchguard/trace/inference/compiler.py"
-        },
-        {
-          "kind": "path",
-          "path": "src/researchguard/trace/inference/projection.py"
-        },
-        {
-          "kind": "path",
-          "path": "src/researchguard/trace/owner_attestation.py"
-        },
-        {
-          "kind": "path",
-          "path": "src/researchguard/trace/schema.py"
-        },
-        {
-          "kind": "path",
-          "path": "src/researchguard/trace/storyline_depth.py"
-        },
-        {
-          "kind": "path",
-          "path": "src/researchguard/trace/task_iteration.py"
-        },
-        {
-          "kind": "path",
-          "path": "tests/trace/test_blueprint_hierarchy.py"
-        },
-        {
-          "kind": "subtree",
-          "path": "skills/traceguard"
-        },
-        {
-          "kind": "subtree",
-          "path": "src/researchguard/trace"
-        },
-        {
-          "kind": "subtree",
-          "path": "tests/trace"
-        }
+      "input_ids": [
+        "input:wrapper",
+        "input:001",
+        "input:002",
+        "input:003",
+        "input:004",
+        "input:005",
+        "input:006",
+        "input:007",
+        "input:008",
+        "input:009",
+        "input:010",
+        "input:011",
+        "input:012",
+        "input:013"
       ],
       "kind": "command",
-      "maintenance_unit_id": "unit:researchguard-suite",
-      "member_skill_id": "traceguard",
-      "native_route_id": "route:researchguard:traceguard",
-      "owner_declaration_hash": "sha256:e5fe23df18a0d4341cea1f155866053eedee82b7bc17e3a6e5da2a2ec63ba8a0",
-      "owner_input_projection_hash": "sha256:05eb98a33018de45335aa703b5b9daa8daed69f5ba768f1ce11f49ca543c14fe",
-      "projection_declaration_hash": "sha256:5fb1a2eed9bdad9e24a6ab90ddb4c99627e3404fd1c8767be59f018b405ef681",
-      "semantic_check_id": "semantic:researchguard:traceguard:native-tests:current",
-      "target_input_role_ids": [],
       "timeout_seconds": 900
     },
     {
       "args": [
-        "-m",
-        "pytest",
-        "tests/trace/test_task_iteration.py",
-        "-q"
+        ".skillguard/checks/run_researchguard_check.py",
+        "task-model-closure"
       ],
       "check_id": "check:traceguard:task-model-closure",
-      "command": "python",
-      "coverage_rationale": "This check is the sole execution owner for its exact member obligation.",
-      "coverage_scope": "declared_obligations",
-      "covers_obligation_ids": [
-        "obligation:researchguard:traceguard:task-model-closure"
-      ],
-      "cwd_token": "repository_root",
-      "depends_on_check_ids": [
-        "check:traceguard:native-tests"
-      ],
-      "evidence_class": "hard",
-      "evidence_domain_id": "evidence-domain:researchguard:traceguard:task-model-closure",
-      "evidence_subject_id": "subject:researchguard:traceguard:task-model-closure",
-      "execution_owner_id": "owner:researchguard:traceguard:task-model-closure",
+      "command": "{{python}}",
       "expected": {
         "exit_code": 0
       },
-      "input_component_ids": [
-        "component:test_dev:5df80363f72170b9"
-      ],
-      "input_selectors": [
-        {
-          "kind": "path",
-          "path": "tests/trace/test_task_iteration.py"
-        }
+      "input_ids": [
+        "input:wrapper",
+        "input:001",
+        "input:002",
+        "input:003",
+        "input:004",
+        "input:005",
+        "input:006",
+        "input:007",
+        "input:008",
+        "input:009",
+        "input:010",
+        "input:011",
+        "input:012",
+        "input:013"
       ],
       "kind": "command",
-      "maintenance_unit_id": "unit:researchguard-suite",
-      "member_skill_id": "traceguard",
-      "native_route_id": "route:researchguard:traceguard",
-      "owner_declaration_hash": "sha256:bd47d227ed6916e51a6a7c03d88cf4680c87939d350c78441da8c9f437d6ee2e",
-      "owner_input_projection_hash": "sha256:b27b195a0e491463a7601b0a6a93a6249125762027ba04e185e3eb71e6dea7f3",
-      "projection_declaration_hash": "sha256:e820f4fda4631b8214a31fd72571bd377a97ef68d0a07e244d479e2dff539d0e",
-      "semantic_check_id": "semantic:researchguard:traceguard:task-model-closure:current",
-      "target_input_role_ids": [],
       "timeout_seconds": 900
     }
   ],
-  "claim_boundary": "This contract covers the current traceguard consumer projection, native route, and member-owned tests inside ResearchGuard v0.5.1. The four exact native-blueprint evidence categories are selectors of the one existing target-owned native-tests owner, so final validation does not repeat the same member suite. Distinct model obligation ids remain a later binding with the frozen FlowGuard self-DNA toolchain. It does not prove source truth, unrun external work, installed currentness, publication, or future AI behavior.",
-  "closure_profiles": [
-    {
-      "profile_id": "enforced",
-      "required_obligation_ids": [
-        "obligation:researchguard:traceguard:consumer-contract",
-        "obligation:researchguard:traceguard:prompt-load",
-        "obligation:researchguard:traceguard:native-tests",
-        "obligation:researchguard:traceguard:task-model-closure"
-      ]
-    }
-  ],
-  "compiler_version": "skillguard.contract_compiler.v2",
+  "claim_boundary": "Compilation derives one contract from the explicit source; it does not execute checks or prove installation or publication.",
   "consumer_projection": {
-    "prohibited_path_prefixes": [
-      ".skillguard/"
-    ],
-    "prohibited_prompt_tokens": [
-      "SkillGuard",
-      ".skillguard",
-      "skillguard.py"
+    "file_paths": [
+      "SKILL.md",
+      "agents/openai.yaml",
+      "references/commands-and-handoffs.md",
+      "references/depth-and-closure.md",
+      "references/routes/case-library.md",
+      "references/routes/general-trace.md",
+      "references/safe-output.md",
+      "references/task-iteration.md",
+      "references/trace-blueprint-contract.md",
+      "references/unified_inference_protocol.md",
+      "references/validated-template-pack.md",
+      "scripts/traceguard_closure_check.py",
+      "scripts/traceguard_library_closure_check.py"
     ],
     "projection_id": "projection:consumer-distribution",
     "release_manifest_path": "consumer-release.json"
   },
   "content_impact_plan": {
-    "all_owner_component_ids": [],
-    "check_projections": [
-      {
-        "check_id": "check:traceguard:consumer-contract",
-        "covers_obligation_ids": [
-          "obligation:researchguard:traceguard:consumer-contract"
-        ],
-        "evidence_class": "hard",
-        "evidence_domain_id": "evidence-domain:researchguard:traceguard:consumer-contract",
-        "execution_owner_id": "owner:researchguard:traceguard:consumer-contract",
-        "projection_declaration_hash": "sha256:27f565c031223383445f683e711f13342f6101f207ce11160679e290f5936fcb",
-        "semantic_check_id": "semantic:researchguard:traceguard:consumer-contract:current"
-      },
-      {
-        "check_id": "check:traceguard:prompt-load",
-        "covers_obligation_ids": [
-          "obligation:researchguard:traceguard:prompt-load"
-        ],
-        "evidence_class": "hard",
-        "evidence_domain_id": "evidence-domain:researchguard:traceguard:prompt-load",
-        "execution_owner_id": "owner:researchguard:traceguard:prompt-load",
-        "projection_declaration_hash": "sha256:1ce31eb15a9a6db85d11e1de8cccdaccc6b5ae531f5e18416c2e4379b4d3b7f6",
-        "semantic_check_id": "semantic:researchguard:traceguard:prompt-load:current"
-      },
-      {
-        "check_id": "check:traceguard:native-tests",
-        "covers_obligation_ids": [
-          "obligation:researchguard:traceguard:native-tests"
-        ],
-        "evidence_class": "hard",
-        "evidence_domain_id": "evidence-domain:researchguard:traceguard:native-tests",
-        "execution_owner_id": "owner:researchguard:traceguard:native-tests",
-        "projection_declaration_hash": "sha256:5fb1a2eed9bdad9e24a6ab90ddb4c99627e3404fd1c8767be59f018b405ef681",
-        "semantic_check_id": "semantic:researchguard:traceguard:native-tests:current"
-      },
-      {
-        "check_id": "check:traceguard:task-model-closure",
-        "covers_obligation_ids": [
-          "obligation:researchguard:traceguard:task-model-closure"
-        ],
-        "evidence_class": "hard",
-        "evidence_domain_id": "evidence-domain:researchguard:traceguard:task-model-closure",
-        "execution_owner_id": "owner:researchguard:traceguard:task-model-closure",
-        "projection_declaration_hash": "sha256:e820f4fda4631b8214a31fd72571bd377a97ef68d0a07e244d479e2dff539d0e",
-        "semantic_check_id": "semantic:researchguard:traceguard:task-model-closure:current"
-      }
-    ],
-    "components": [
-      {
-        "classification_rule_ids": [
-          "skillguard.content_role_classifier.current:contract_schema"
-        ],
-        "component_hash": "sha256:c6ff6b5984f40cacddd90b892331b325b486a60adefd3ea50c827693d65c42dd",
-        "component_id": "component:contract_schema:4c9b54c096ac54d5",
-        "consumer_ids": [
-          "owner:researchguard:traceguard:native-tests",
-          "owner:researchguard:traceguard:prompt-load",
-          "projection:contract-compile",
-          "projection:source-maintenance"
-        ],
-        "install_disposition": "source_only",
-        "member_paths": [
-          "skills/traceguard/.skillguard/contract-source.json"
-        ],
-        "role": "contract_schema"
-      },
-      {
-        "classification_rule_ids": [
-          "skillguard.content_role_classifier.current:contract_schema"
-        ],
-        "component_hash": "sha256:6b98997e57f1603801f9af5851d7853a792c56a019b9b8359f192523b72b6e6c",
-        "component_id": "component:contract_schema:f653a6ca9bc8de29",
-        "consumer_ids": [
-          "projection:researchguard-suite-maintenance-definition"
-        ],
-        "install_disposition": "source_only",
-        "member_paths": [
-          ".skillguard/test-mesh.json"
-        ],
-        "role": "contract_schema"
-      },
-      {
-        "classification_rule_ids": [
-          "skillguard.content_role_classifier.current:documentation_model"
-        ],
-        "component_hash": "sha256:be2781879427405ddb244c276f29df51d1e422805b7d7562b1caa02f3d028b41",
-        "component_id": "component:documentation_model:b80fe105d3564a69",
-        "consumer_ids": [
-          "owner:researchguard:traceguard:consumer-contract",
-          "owner:researchguard:traceguard:native-tests",
-          "owner:researchguard:traceguard:prompt-load",
-          "projection:installation"
-        ],
-        "install_disposition": "copy",
-        "member_paths": [
-          "skills/traceguard/SKILL.md"
-        ],
-        "role": "documentation_model"
-      },
-      {
-        "classification_rule_ids": [
-          "skillguard.content_role_classifier.current:documentation_model"
-        ],
-        "component_hash": "sha256:319f7110fdeb182ae7c57e6062b7386c73947cd935aed2ea50551e97f1527ad5",
-        "component_id": "component:documentation_model:c230e4643fc77213",
-        "consumer_ids": [
-          "owner:researchguard:traceguard:native-tests",
-          "owner:researchguard:traceguard:prompt-load",
-          "projection:installation"
-        ],
-        "install_disposition": "copy",
-        "member_paths": [
-          "skills/traceguard/references/commands-and-handoffs.md",
-          "skills/traceguard/references/depth-and-closure.md",
-          "skills/traceguard/references/routes/case-library.md",
-          "skills/traceguard/references/routes/general-trace.md",
-          "skills/traceguard/references/safe-output.md",
-          "skills/traceguard/references/task-iteration.md",
-          "skills/traceguard/references/trace-blueprint-contract.md",
-          "skills/traceguard/references/unified_inference_protocol.md",
-          "skills/traceguard/references/validated-template-pack.md"
-        ],
-        "role": "documentation_model"
-      },
-      {
-        "classification_rule_ids": [
-          "skillguard.content_role_classifier.current:documentation_model"
-        ],
-        "component_hash": "sha256:52f00efc8b714be022c28a9219c4e1ac13f97db23baea6a70b6beca11015a66d",
-        "component_id": "component:documentation_model:9e4e07f6e9d27546",
-        "consumer_ids": [
-          "owner:researchguard:traceguard:consumer-contract"
-        ],
-        "install_disposition": "source_only",
-        "member_paths": [
-          ".flowguard/models/researchguard_suite/model-definition.json",
-          ".flowguard/models/researchguard_suite_model.py",
-          ".flowguard/verification/run_researchguard_suite_model.py"
-        ],
-        "role": "documentation_model"
-      },
-      {
-        "classification_rule_ids": [
-          "skillguard.content_role_classifier.current:documentation_model"
-        ],
-        "component_hash": "sha256:6ce7df9d44fd2c9dd6d62ac668deeb3f3c86e7f77fa8e779887ec39f92b8405e",
-        "component_id": "component:documentation_model:db6267acd3238c1e",
-        "consumer_ids": [
-          "owner:researchguard:traceguard:consumer-contract",
-          "projection:contract-compile"
-        ],
-        "install_disposition": "source_only",
-        "member_paths": [
-          ".flowguard/models/researchguard_skill_contract_model_common.py",
-          ".flowguard/models/traceguard_skill_contract_model.py"
-        ],
-        "role": "documentation_model"
-      },
-      {
-        "classification_rule_ids": [
-          "skillguard.content_role_classifier.current:fixture_reference"
-        ],
-        "component_hash": "sha256:6b54e3cf43af34c2a532a0aa271d9735841fb23540bbacb60b6aaaf9b01e20d5",
-        "component_id": "component:fixture_reference:3526fa4f879142f2",
-        "consumer_ids": [
-          "owner:researchguard:traceguard:native-tests"
-        ],
-        "install_disposition": "source_only",
-        "member_paths": [
-          "tests/trace/fixtures/template_packs/trace_requests.json",
-          "tests/trace/fixtures/traceguard_library_execution_cases.json",
-          "tests/trace/fixtures/unified_inference_approved_deltas.json"
-        ],
-        "role": "fixture_reference"
-      },
-      {
-        "classification_rule_ids": [
-          "skillguard.content_role_classifier.current:runtime_source"
-        ],
-        "component_hash": "sha256:959f10170fd640e9881c37e800acaaa5c4386e2d9d46c0720ed9b9b080c74baa",
-        "component_id": "component:runtime_source:f05349e005bcf12e",
-        "consumer_ids": [
-          "owner:researchguard:traceguard:consumer-contract",
-          "owner:researchguard:traceguard:native-tests",
-          "owner:researchguard:traceguard:prompt-load",
-          "projection:installation"
-        ],
-        "install_disposition": "copy",
-        "member_paths": [
-          "skills/traceguard/agents/openai.yaml"
-        ],
-        "role": "runtime_source"
-      },
-      {
-        "classification_rule_ids": [
-          "skillguard.content_role_classifier.current:runtime_source"
-        ],
-        "component_hash": "sha256:11dbab7a49ea483bd3a249e2b49f745d2488fbfd52ab404b6f882b4dc72efffb",
-        "component_id": "component:runtime_source:61502c070ff4adf1",
-        "consumer_ids": [
-          "owner:researchguard:traceguard:native-tests",
-          "owner:researchguard:traceguard:prompt-load",
-          "projection:installation"
-        ],
-        "install_disposition": "copy",
-        "member_paths": [
-          "skills/traceguard/.skillguard/surface-semantic-map.json",
-          "skills/traceguard/scripts/traceguard_closure_check.py",
-          "skills/traceguard/scripts/traceguard_library_closure_check.py"
-        ],
-        "role": "runtime_source"
-      },
-      {
-        "classification_rule_ids": [
-          "skillguard.content_role_classifier.current:runtime_source"
-        ],
-        "component_hash": "sha256:7bcaa4d146d1745606acfd4bc6e5e015a9ff43f62d01fcbbecbd433a26daa916",
-        "component_id": "component:runtime_source:e8ab83c1e82b02b3",
-        "consumer_ids": [
-          "owner:researchguard:traceguard:consumer-contract"
-        ],
-        "install_disposition": "source_only",
-        "member_paths": [
-          "scripts/check_researchguard_suite.py"
-        ],
-        "role": "runtime_source"
-      },
-      {
-        "classification_rule_ids": [
-          "skillguard.content_role_classifier.current:runtime_source"
-        ],
-        "component_hash": "sha256:454fa0bdbfedb4340aa06f6609b379d358bf5c32100db5dccc2c502214dfbd3a",
-        "component_id": "component:runtime_source:64bc99be03479306",
-        "consumer_ids": [
-          "owner:researchguard:traceguard:native-tests"
-        ],
-        "install_disposition": "source_only",
-        "member_paths": [
-          "src/researchguard/model_envelope.py",
-          "src/researchguard/target_authority.py",
-          "src/researchguard/trace/__init__.py",
-          "src/researchguard/trace/admission.py",
-          "src/researchguard/trace/blueprint.py",
-          "src/researchguard/trace/cli.py",
-          "src/researchguard/trace/diagnostics.py",
-          "src/researchguard/trace/entity_resolution.py",
-          "src/researchguard/trace/evaluator.py",
-          "src/researchguard/trace/export_logicguard.py",
-          "src/researchguard/trace/guard_model/contract.json",
-          "src/researchguard/trace/guard_model/known-bad.json",
-          "src/researchguard/trace/guard_model/known-good.json",
-          "src/researchguard/trace/guard_model/oracles.json",
-          "src/researchguard/trace/guard_model/verify.py",
-          "src/researchguard/trace/handoff.py",
-          "src/researchguard/trace/headers.py",
-          "src/researchguard/trace/inference/__init__.py",
-          "src/researchguard/trace/inference/compiler.py",
-          "src/researchguard/trace/inference/contradiction_core.py",
-          "src/researchguard/trace/inference/engine.py",
-          "src/researchguard/trace/inference/explain.py",
-          "src/researchguard/trace/inference/factors/__init__.py",
-          "src/researchguard/trace/inference/factors/entity.py",
-          "src/researchguard/trace/inference/factors/evidence_trace.py",
-          "src/researchguard/trace/inference/factors/storyline_causal.py",
-          "src/researchguard/trace/inference/factors/temporal_stage.py",
-          "src/researchguard/trace/inference/osqp_backend.py",
-          "src/researchguard/trace/inference/policy.py",
-          "src/researchguard/trace/inference/projection.py",
-          "src/researchguard/trace/inference/types.py",
-          "src/researchguard/trace/library.py",
-          "src/researchguard/trace/library_depth.py",
-          "src/researchguard/trace/loader.py",
-          "src/researchguard/trace/owner_attestation.py",
-          "src/researchguard/trace/purpose_contract.py",
-          "src/researchguard/trace/report.py",
-          "src/researchguard/trace/results.py",
-          "src/researchguard/trace/schema.py",
-          "src/researchguard/trace/soft_logic.py",
-          "src/researchguard/trace/stage_model.py",
-          "src/researchguard/trace/storyline_depth.py",
-          "src/researchguard/trace/task_iteration.py",
-          "src/researchguard/trace/template_pack_catalog.json",
-          "src/researchguard/trace/template_packs.py",
-          "src/researchguard/trace/temporal.py",
-          "src/researchguard/trace/validation.py"
-        ],
-        "role": "runtime_source"
-      },
-      {
-        "classification_rule_ids": [
-          "skillguard.content_role_classifier.current:runtime_source"
-        ],
-        "component_hash": "sha256:5f8153a97f7b08ecd51853da630df69da11902e988bfe27652aecf719c1402e6",
-        "component_id": "component:runtime_source:3dfc59fa2f8b5462",
-        "consumer_ids": [
-          "owner:researchguard:traceguard:native-tests",
-          "owner:researchguard:traceguard:prompt-load",
-          "projection:source-maintenance"
-        ],
-        "install_disposition": "source_only",
-        "member_paths": [
-          "skills/traceguard/.skillguard/surface-inventory.json"
-        ],
-        "role": "runtime_source"
-      },
-      {
-        "classification_rule_ids": [
-          "skillguard.content_role_classifier.current:runtime_source"
-        ],
-        "component_hash": "sha256:23c174efe44071a9c8eaa818bafba96e12bb57cf8ac22a97da1acdca2dfbef61",
-        "component_id": "component:runtime_source:f2ff2dd189954dbc",
-        "consumer_ids": [
-          "owner:researchguard:traceguard:prompt-load"
-        ],
-        "install_disposition": "source_only",
-        "member_paths": [
-          "researchguard/prompt_bundle_manifest.json",
-          "scripts/check_prompt_bundles.py"
-        ],
-        "role": "runtime_source"
-      },
-      {
-        "classification_rule_ids": [
-          "skillguard.content_role_classifier.current:runtime_source"
-        ],
-        "component_hash": "sha256:155e117da93fdaf2cb3521602b368d3002b9db54e84318a54e4527aae5a4f838",
-        "component_id": "component:runtime_source:1cd73edc492ba30e",
-        "consumer_ids": [
-          "projection:researchguard-suite-maintenance-definition"
-        ],
-        "install_disposition": "source_only",
-        "member_paths": [
-          "scripts/check_researchguard_test_mesh.py"
-        ],
-        "role": "runtime_source"
-      },
-      {
-        "classification_rule_ids": [
-          "skillguard.content_role_classifier.current:test_dev"
-        ],
-        "component_hash": "sha256:1f2930181b5c728a79da96c8bda3701c53cdd625378bb6a5611dc009d4ab4234",
-        "component_id": "component:test_dev:cb13d375fe03b253",
-        "consumer_ids": [
-          "owner:researchguard:traceguard:native-tests"
-        ],
-        "install_disposition": "source_only",
-        "member_paths": [
-          "tests/trace/__init__.py",
-          "tests/trace/test_blueprint_hierarchy.py",
-          "tests/trace/test_contradiction_core.py",
-          "tests/trace/test_guard_model_purpose_contract.py",
-          "tests/trace/test_inference_kernel.py",
-          "tests/trace/test_inference_performance.py",
-          "tests/trace/test_library_execution_depth.py",
-          "tests/trace/test_logicguard_export_contract.py",
-          "tests/trace/test_storyline_depth.py",
-          "tests/trace/test_template_packs.py",
-          "tests/trace/test_traceguard.py"
-        ],
-        "role": "test_dev"
-      },
-      {
-        "classification_rule_ids": [
-          "skillguard.content_role_classifier.current:test_dev"
-        ],
-        "component_hash": "sha256:8170e790bed162ec144590e2b8dbad22785eb73aee195c692f39a558e602f18a",
-        "component_id": "component:test_dev:5df80363f72170b9",
-        "consumer_ids": [
-          "owner:researchguard:traceguard:native-tests",
-          "owner:researchguard:traceguard:task-model-closure"
-        ],
-        "install_disposition": "source_only",
-        "member_paths": [
-          "tests/trace/test_task_iteration.py"
-        ],
-        "role": "test_dev"
-      }
-    ],
-    "full_admission_reason_codes": [
-      "explicit_final_gate",
-      "explicit_release_gate",
-      "impact_policy_or_compiler_changed",
-      "shared_validation_runtime_changed",
-      "all_owner_component_changed"
-    ],
-    "health": {
-      "ambiguous_role_paths": [],
-      "dependency_parse_errors": [],
-      "duplicate_owner_ids": [],
-      "invalid_dependency_edges": [],
-      "owner_cycles": [],
-      "unmapped_paths": []
-    },
-    "impact_graph_hash": "sha256:706d5dec721785251d0b106013b7a85264427b88d41b3380e0584c66d6583be7",
     "inventory": [
       {
-        "classification_rule_id": "skillguard.content_role_classifier.current:documentation_model",
-        "content_hash": "sha256:6a27b0f7929bd20a34eba1282dc5fcee48a0a92350486b028a2a8290fbb1148e",
-        "install_disposition": "source_only",
-        "path": ".flowguard/models/researchguard_skill_contract_model_common.py",
-        "role": "documentation_model"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:documentation_model",
-        "content_hash": "sha256:ae9e524ec63d7d53da19254bf41681dd8acb26b4d39394f1d95ff479318695b7",
-        "install_disposition": "source_only",
-        "path": ".flowguard/models/researchguard_suite/model-definition.json",
-        "role": "documentation_model"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:documentation_model",
-        "content_hash": "sha256:69a6e1518558fea65c31d393c15c081bb0dec2958cd936e3811ef775634c7ba6",
-        "install_disposition": "source_only",
-        "path": ".flowguard/models/researchguard_suite_model.py",
-        "role": "documentation_model"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:documentation_model",
-        "content_hash": "sha256:e59ce18a4ee612ce381ba8dd5b8abd872a728e5fcac8a3f4e702fd0abf7fd702",
-        "install_disposition": "source_only",
-        "path": ".flowguard/models/traceguard_skill_contract_model.py",
-        "role": "documentation_model"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:documentation_model",
-        "content_hash": "sha256:70162dadde9444a4c710fd69017a757128a421af1ca243c93440b81c7a2f4300",
-        "install_disposition": "source_only",
-        "path": ".flowguard/verification/run_researchguard_suite_model.py",
-        "role": "documentation_model"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:contract_schema",
-        "content_hash": "sha256:24792ae72db97be19da8cfdfdffabc3d1532f3c77370039d1a2f97c835a36e66",
-        "install_disposition": "source_only",
-        "path": ".skillguard/test-mesh.json",
-        "role": "contract_schema"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:runtime_source",
-        "content_hash": "sha256:a99f41793a3d1bd08d99d65916ab7cff79b515eae59f361d7e5b8f26a6fa5fb3",
-        "install_disposition": "source_only",
-        "path": "researchguard/prompt_bundle_manifest.json",
-        "role": "runtime_source"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:runtime_source",
-        "content_hash": "sha256:bacab53c360600b008488118256602d8d16d6dacbfde8dd10030eb4c91ea6d04",
-        "install_disposition": "source_only",
-        "path": "scripts/check_prompt_bundles.py",
-        "role": "runtime_source"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:runtime_source",
-        "content_hash": "sha256:5aed00334902dc9446169f5d309313061bdb3ac9daa2ee103e8622ae278b8944",
-        "install_disposition": "source_only",
-        "path": "scripts/check_researchguard_suite.py",
-        "role": "runtime_source"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:runtime_source",
-        "content_hash": "sha256:4c031bb33887868353dcd5db77f1f132cdeeeb53b070d11c5a6e23dff6a5be8c",
-        "install_disposition": "source_only",
-        "path": "scripts/check_researchguard_test_mesh.py",
-        "role": "runtime_source"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:contract_schema",
-        "content_hash": "sha256:24ac756e9a955d99d1618c9702af3dcaadb1c3adccb7223adda1f2f53e8cfd34",
-        "install_disposition": "source_only",
-        "path": "skills/traceguard/.skillguard/contract-source.json",
-        "role": "contract_schema"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:runtime_source",
-        "content_hash": "sha256:e4e719bea76c4a892f6dc1a877eba604cf08d71d549d6c4808c3b2cc69b4a6cd",
-        "install_disposition": "source_only",
-        "path": "skills/traceguard/.skillguard/surface-inventory.json",
-        "role": "runtime_source"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:runtime_source",
-        "content_hash": "sha256:5deeefe0c0bb067a3dc1f15f4f5b023f6c02874237a6185cf6d95dfe8ca813db",
         "install_disposition": "copy",
-        "path": "skills/traceguard/.skillguard/surface-semantic-map.json",
-        "role": "runtime_source"
+        "path": "SKILL.md"
       },
       {
-        "classification_rule_id": "skillguard.content_role_classifier.current:documentation_model",
-        "content_hash": "sha256:0824833ac7e3357a76f70e54c8b5776deb66ac29571f724aa4214fcabd7ae79d",
         "install_disposition": "copy",
-        "path": "skills/traceguard/SKILL.md",
-        "role": "documentation_model"
+        "path": "agents/openai.yaml"
       },
       {
-        "classification_rule_id": "skillguard.content_role_classifier.current:runtime_source",
-        "content_hash": "sha256:7bbd007e3e93873fd1654fd8c612339ebf02b0daccdf63336588ae6cc4818a4d",
         "install_disposition": "copy",
-        "path": "skills/traceguard/agents/openai.yaml",
-        "role": "runtime_source"
+        "path": "references/commands-and-handoffs.md"
       },
       {
-        "classification_rule_id": "skillguard.content_role_classifier.current:documentation_model",
-        "content_hash": "sha256:fb6d4446ad9e967677c5ec62b01799b9a6f3e32fb9581e7d3c83f7aa2fe49057",
         "install_disposition": "copy",
-        "path": "skills/traceguard/references/commands-and-handoffs.md",
-        "role": "documentation_model"
+        "path": "references/depth-and-closure.md"
       },
       {
-        "classification_rule_id": "skillguard.content_role_classifier.current:documentation_model",
-        "content_hash": "sha256:a37f9841fccda8a21e00ee0674ae7a23f79f1f3f8988411e0811af99a7792ea7",
         "install_disposition": "copy",
-        "path": "skills/traceguard/references/depth-and-closure.md",
-        "role": "documentation_model"
+        "path": "references/routes/case-library.md"
       },
       {
-        "classification_rule_id": "skillguard.content_role_classifier.current:documentation_model",
-        "content_hash": "sha256:f8e4d7b5a2eb72e95525c08179c59b3944d06514ac432fb6951caef77940252f",
         "install_disposition": "copy",
-        "path": "skills/traceguard/references/routes/case-library.md",
-        "role": "documentation_model"
+        "path": "references/routes/general-trace.md"
       },
       {
-        "classification_rule_id": "skillguard.content_role_classifier.current:documentation_model",
-        "content_hash": "sha256:0c2bee320b1d19a9dad141feceea3154e758468357ea867c1bbd39054110e05e",
         "install_disposition": "copy",
-        "path": "skills/traceguard/references/routes/general-trace.md",
-        "role": "documentation_model"
+        "path": "references/safe-output.md"
       },
       {
-        "classification_rule_id": "skillguard.content_role_classifier.current:documentation_model",
-        "content_hash": "sha256:af3626a20ab5ffd2be97cdca872fb2b7ba269658a0c2d0a40968ec97d0bfe345",
         "install_disposition": "copy",
-        "path": "skills/traceguard/references/safe-output.md",
-        "role": "documentation_model"
+        "path": "references/task-iteration.md"
       },
       {
-        "classification_rule_id": "skillguard.content_role_classifier.current:documentation_model",
-        "content_hash": "sha256:21360df69a1bd4d89c41004c4c586daf2f797cf1a12ec8652237e06bcd4d94b4",
         "install_disposition": "copy",
-        "path": "skills/traceguard/references/task-iteration.md",
-        "role": "documentation_model"
+        "path": "references/trace-blueprint-contract.md"
       },
       {
-        "classification_rule_id": "skillguard.content_role_classifier.current:documentation_model",
-        "content_hash": "sha256:7d44e7d49f7012c9a6be9dd34c052d24777a01b305b44635395b2bfa54f9d808",
         "install_disposition": "copy",
-        "path": "skills/traceguard/references/trace-blueprint-contract.md",
-        "role": "documentation_model"
+        "path": "references/unified_inference_protocol.md"
       },
       {
-        "classification_rule_id": "skillguard.content_role_classifier.current:documentation_model",
-        "content_hash": "sha256:21381c6cf574393638c85f776e2ca263a2c9dddeaa545b4e65a44f0abbffabce",
         "install_disposition": "copy",
-        "path": "skills/traceguard/references/unified_inference_protocol.md",
-        "role": "documentation_model"
+        "path": "references/validated-template-pack.md"
       },
       {
-        "classification_rule_id": "skillguard.content_role_classifier.current:documentation_model",
-        "content_hash": "sha256:8b64969ae32db9addef6c38f39cef025d173ad06ac69f1f637f93e611619c1cd",
         "install_disposition": "copy",
-        "path": "skills/traceguard/references/validated-template-pack.md",
-        "role": "documentation_model"
+        "path": "scripts/traceguard_closure_check.py"
       },
       {
-        "classification_rule_id": "skillguard.content_role_classifier.current:runtime_source",
-        "content_hash": "sha256:b41a2d44027c9fe6b4a08785683c8d8f79727d5cad1329a23f6e8e804e03b608",
         "install_disposition": "copy",
-        "path": "skills/traceguard/scripts/traceguard_closure_check.py",
-        "role": "runtime_source"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:runtime_source",
-        "content_hash": "sha256:aa28d805dbda8a0c9e8872ed9c9ee0609569ad65ead434e9bf699ccf62356b8a",
-        "install_disposition": "copy",
-        "path": "skills/traceguard/scripts/traceguard_library_closure_check.py",
-        "role": "runtime_source"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:runtime_source",
-        "content_hash": "sha256:d72e673e7f38d93169693767d88d96df9aa662334bfcf21021bbba71c5510cbe",
-        "install_disposition": "source_only",
-        "path": "src/researchguard/model_envelope.py",
-        "role": "runtime_source"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:runtime_source",
-        "content_hash": "sha256:39d7267acff55b802c6441b4aaf29c4755e6a8c9b11c1f089fb756c93d696897",
-        "install_disposition": "source_only",
-        "path": "src/researchguard/target_authority.py",
-        "role": "runtime_source"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:runtime_source",
-        "content_hash": "sha256:2fe8c9ba2fa2f73d179449008ce1637feda6a624e66ba5256a82f7ee1075439a",
-        "install_disposition": "source_only",
-        "path": "src/researchguard/trace/__init__.py",
-        "role": "runtime_source"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:runtime_source",
-        "content_hash": "sha256:4e432058b844f30cb860cd9da08e8fb74306a3d848b62af3744d22c9ed6cf8ea",
-        "install_disposition": "source_only",
-        "path": "src/researchguard/trace/admission.py",
-        "role": "runtime_source"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:runtime_source",
-        "content_hash": "sha256:e28e941906cc46685befde8de93ab64fd3cf0ccb2e6ad02f66f1ecb53389024e",
-        "install_disposition": "source_only",
-        "path": "src/researchguard/trace/blueprint.py",
-        "role": "runtime_source"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:runtime_source",
-        "content_hash": "sha256:70d486a70670eea8b1d9f8731ed0ad2d28145d26eeea0df2067ab6f4557c47b8",
-        "install_disposition": "source_only",
-        "path": "src/researchguard/trace/cli.py",
-        "role": "runtime_source"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:runtime_source",
-        "content_hash": "sha256:e3d4687230f03467033339bab57c70bf87fd80d575fd0782587e7673bdd8766f",
-        "install_disposition": "source_only",
-        "path": "src/researchguard/trace/diagnostics.py",
-        "role": "runtime_source"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:runtime_source",
-        "content_hash": "sha256:ba915223da28ca5a5a1b1e1788515978f3a15f58553014a4e0af952d74433879",
-        "install_disposition": "source_only",
-        "path": "src/researchguard/trace/entity_resolution.py",
-        "role": "runtime_source"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:runtime_source",
-        "content_hash": "sha256:20d2aba4cafbf50a76f76fccbdb61f46e643c89bc79df7a0850ca0b50f0d005b",
-        "install_disposition": "source_only",
-        "path": "src/researchguard/trace/evaluator.py",
-        "role": "runtime_source"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:runtime_source",
-        "content_hash": "sha256:53666aa418da322ee81ba18e2ecfc21f869d6249a9c22b7c5dafb3bffa262d9e",
-        "install_disposition": "source_only",
-        "path": "src/researchguard/trace/export_logicguard.py",
-        "role": "runtime_source"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:runtime_source",
-        "content_hash": "sha256:cb5472af53d27537ca8d23b482c2da2400f5749e1f81972c9b558cb834b77c35",
-        "install_disposition": "source_only",
-        "path": "src/researchguard/trace/guard_model/contract.json",
-        "role": "runtime_source"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:runtime_source",
-        "content_hash": "sha256:894b9d054ff25cefeb3e0e7ad4598d80f98c4bfef608788ede24c6d683c48d8a",
-        "install_disposition": "source_only",
-        "path": "src/researchguard/trace/guard_model/known-bad.json",
-        "role": "runtime_source"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:runtime_source",
-        "content_hash": "sha256:1fdcf3326597751f52e34f82773c147beed501840a917490bb580afa10f207ee",
-        "install_disposition": "source_only",
-        "path": "src/researchguard/trace/guard_model/known-good.json",
-        "role": "runtime_source"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:runtime_source",
-        "content_hash": "sha256:39e83f5bd5407fa3741857cf2431144b4bc20fa92d284be4452960e7a2713f62",
-        "install_disposition": "source_only",
-        "path": "src/researchguard/trace/guard_model/oracles.json",
-        "role": "runtime_source"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:runtime_source",
-        "content_hash": "sha256:974d371e9bb6d58e09b7917c32e5c05f7a24dec34f95b5a3fbdf67f342c43cca",
-        "install_disposition": "source_only",
-        "path": "src/researchguard/trace/guard_model/verify.py",
-        "role": "runtime_source"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:runtime_source",
-        "content_hash": "sha256:d366dce158ecc63dd68d25c8c085a6acdad3538d4ef659d1323930bc64eb6a41",
-        "install_disposition": "source_only",
-        "path": "src/researchguard/trace/handoff.py",
-        "role": "runtime_source"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:runtime_source",
-        "content_hash": "sha256:6203c7a037b3be365c1aa6521a69716b8788a74e9b638f75b1b41830fd59176c",
-        "install_disposition": "source_only",
-        "path": "src/researchguard/trace/headers.py",
-        "role": "runtime_source"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:runtime_source",
-        "content_hash": "sha256:ca5b0698849609c96bfb394fa3ac68664299acac64d2f24f0b59c3efedf486ef",
-        "install_disposition": "source_only",
-        "path": "src/researchguard/trace/inference/__init__.py",
-        "role": "runtime_source"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:runtime_source",
-        "content_hash": "sha256:01da0898494d74928d6e4ffda99dfd247eee38bbcaf264274d1bee9fef8a10bf",
-        "install_disposition": "source_only",
-        "path": "src/researchguard/trace/inference/compiler.py",
-        "role": "runtime_source"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:runtime_source",
-        "content_hash": "sha256:7c1d49a44a7d27b8449838ccaf97f8cf3666af765d0a1676b51e55087c249f04",
-        "install_disposition": "source_only",
-        "path": "src/researchguard/trace/inference/contradiction_core.py",
-        "role": "runtime_source"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:runtime_source",
-        "content_hash": "sha256:1e380bfc54351ed61ec357ab8bd7520daccc135e51cfe064080c58957d6935a8",
-        "install_disposition": "source_only",
-        "path": "src/researchguard/trace/inference/engine.py",
-        "role": "runtime_source"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:runtime_source",
-        "content_hash": "sha256:87c746f6f6d27d2c98a5db0f802432121d02258e4f0d745ad544fbc80a572a20",
-        "install_disposition": "source_only",
-        "path": "src/researchguard/trace/inference/explain.py",
-        "role": "runtime_source"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:runtime_source",
-        "content_hash": "sha256:ad0e0588c83ea8a4b9c86e82c75c3ca6d6cb48dd180a137f66d7cfbd8ac8f6d3",
-        "install_disposition": "source_only",
-        "path": "src/researchguard/trace/inference/factors/__init__.py",
-        "role": "runtime_source"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:runtime_source",
-        "content_hash": "sha256:11895005f634907c54816ab15b7c962172a8e1393e1b285bd77862f68ae6d868",
-        "install_disposition": "source_only",
-        "path": "src/researchguard/trace/inference/factors/entity.py",
-        "role": "runtime_source"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:runtime_source",
-        "content_hash": "sha256:8b3308ad21211ea40eaadc703c13013909e07fd412b7a2cd57f06a56f4b881f2",
-        "install_disposition": "source_only",
-        "path": "src/researchguard/trace/inference/factors/evidence_trace.py",
-        "role": "runtime_source"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:runtime_source",
-        "content_hash": "sha256:182b28912b9f9da405808aea88b2f9b014d056f5c03a5ea1592690530b3050e0",
-        "install_disposition": "source_only",
-        "path": "src/researchguard/trace/inference/factors/storyline_causal.py",
-        "role": "runtime_source"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:runtime_source",
-        "content_hash": "sha256:a45bec79846763496b5a87f18fe6bea77dbb308ad3a4e595fe6b2cadbbc87143",
-        "install_disposition": "source_only",
-        "path": "src/researchguard/trace/inference/factors/temporal_stage.py",
-        "role": "runtime_source"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:runtime_source",
-        "content_hash": "sha256:e63e752efac047dd29745576e18d0ff6c34b0e63830aa85cf8ee0d9463c16e76",
-        "install_disposition": "source_only",
-        "path": "src/researchguard/trace/inference/osqp_backend.py",
-        "role": "runtime_source"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:runtime_source",
-        "content_hash": "sha256:3d72b936f0587a33d41600783a2cb8cd35d41555337c18a444db92f3dbbc89fa",
-        "install_disposition": "source_only",
-        "path": "src/researchguard/trace/inference/policy.py",
-        "role": "runtime_source"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:runtime_source",
-        "content_hash": "sha256:0b60fd7fcd39c678e0ffca19ba298e1584318920e390174fb746a0bd2f0e14e9",
-        "install_disposition": "source_only",
-        "path": "src/researchguard/trace/inference/projection.py",
-        "role": "runtime_source"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:runtime_source",
-        "content_hash": "sha256:c4048631378e9058808a14c7bc3e3264b625a5d91b6e2fc3253ec820237fe7c9",
-        "install_disposition": "source_only",
-        "path": "src/researchguard/trace/inference/types.py",
-        "role": "runtime_source"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:runtime_source",
-        "content_hash": "sha256:82300c48132b2fe4112f9fbc77db4fe19e6eee166147f5452d6cdb890af05cd2",
-        "install_disposition": "source_only",
-        "path": "src/researchguard/trace/library.py",
-        "role": "runtime_source"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:runtime_source",
-        "content_hash": "sha256:a0824fa1eaffb4e80e06628359a96842aca17e1e2e8ae62b4ef8a47df9ff8ff3",
-        "install_disposition": "source_only",
-        "path": "src/researchguard/trace/library_depth.py",
-        "role": "runtime_source"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:runtime_source",
-        "content_hash": "sha256:d3b15de1749e8ad29f2e3a37608315aab516256e801aa1f6d2fa8a8821d26335",
-        "install_disposition": "source_only",
-        "path": "src/researchguard/trace/loader.py",
-        "role": "runtime_source"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:runtime_source",
-        "content_hash": "sha256:f0b835b9a4f54fb6685edd7c89e54884712f95b9e575d3fe037c9696d3792413",
-        "install_disposition": "source_only",
-        "path": "src/researchguard/trace/owner_attestation.py",
-        "role": "runtime_source"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:runtime_source",
-        "content_hash": "sha256:239864d8fb952d53320d76f88f6fa2e7ba8bffc8f4a05326f4407f07231256ba",
-        "install_disposition": "source_only",
-        "path": "src/researchguard/trace/purpose_contract.py",
-        "role": "runtime_source"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:runtime_source",
-        "content_hash": "sha256:7ed95524b6ed68d9c4037eff6c6013cafd7fd7e7de7524157a4d5aa145b50191",
-        "install_disposition": "source_only",
-        "path": "src/researchguard/trace/report.py",
-        "role": "runtime_source"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:runtime_source",
-        "content_hash": "sha256:539571fab3f5f95617ee83df9782d8d3ae3e4e7769c10a571dbc299def831ff0",
-        "install_disposition": "source_only",
-        "path": "src/researchguard/trace/results.py",
-        "role": "runtime_source"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:runtime_source",
-        "content_hash": "sha256:2b577d8222c2e38e173239fcb7bbdcfcb31834c83a25cd436599365454ad85b2",
-        "install_disposition": "source_only",
-        "path": "src/researchguard/trace/schema.py",
-        "role": "runtime_source"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:runtime_source",
-        "content_hash": "sha256:54b8be4a88a4e9eec48ff14589c0945bad06df604ba4abc7143f05241769d544",
-        "install_disposition": "source_only",
-        "path": "src/researchguard/trace/soft_logic.py",
-        "role": "runtime_source"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:runtime_source",
-        "content_hash": "sha256:13dc9e587afe6c5e7d6712bf60dd0ec620de5cf6a65dfa9cfc46c49d129f9dca",
-        "install_disposition": "source_only",
-        "path": "src/researchguard/trace/stage_model.py",
-        "role": "runtime_source"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:runtime_source",
-        "content_hash": "sha256:7459774393ea6f91545fdd4721d0bacd360398d4ae132b61d2e2a23287d68c2d",
-        "install_disposition": "source_only",
-        "path": "src/researchguard/trace/storyline_depth.py",
-        "role": "runtime_source"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:runtime_source",
-        "content_hash": "sha256:5582647082b28cb954e16f6259d289b68dca93a3031a6786eb199fd91db8b5ee",
-        "install_disposition": "source_only",
-        "path": "src/researchguard/trace/task_iteration.py",
-        "role": "runtime_source"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:runtime_source",
-        "content_hash": "sha256:761fc97aef8396ba604ab5d98d063308a213e0ece06cacc4a4aca8cfafd3947d",
-        "install_disposition": "source_only",
-        "path": "src/researchguard/trace/template_pack_catalog.json",
-        "role": "runtime_source"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:runtime_source",
-        "content_hash": "sha256:ba0c098e2034c6945cff4ca0c4b13a8eae3aaa133ce575cd32f4d0ab27087798",
-        "install_disposition": "source_only",
-        "path": "src/researchguard/trace/template_packs.py",
-        "role": "runtime_source"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:runtime_source",
-        "content_hash": "sha256:d0e130f175943f6c5a36c0ee6f3f1e477c9f2a4fa750caa613ed5e5a6e9897f4",
-        "install_disposition": "source_only",
-        "path": "src/researchguard/trace/temporal.py",
-        "role": "runtime_source"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:runtime_source",
-        "content_hash": "sha256:7c9e6d493f2c7b85b6278863a2cbc5c99cc74f6314493ddbe62ebec730a45912",
-        "install_disposition": "source_only",
-        "path": "src/researchguard/trace/validation.py",
-        "role": "runtime_source"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:test_dev",
-        "content_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "install_disposition": "source_only",
-        "path": "tests/trace/__init__.py",
-        "role": "test_dev"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:fixture_reference",
-        "content_hash": "sha256:4856b9ae0a4166106a7318828cdc783bca05549cfb0ed9b69845873b7a99f9a7",
-        "install_disposition": "source_only",
-        "path": "tests/trace/fixtures/template_packs/trace_requests.json",
-        "role": "fixture_reference"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:fixture_reference",
-        "content_hash": "sha256:93241664f68225a41a2ab4a7721f8c1118774037086af86f298777abd00b2b58",
-        "install_disposition": "source_only",
-        "path": "tests/trace/fixtures/traceguard_library_execution_cases.json",
-        "role": "fixture_reference"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:fixture_reference",
-        "content_hash": "sha256:9a08f40db277e5be6ddb907ecd9378ef29e5d8a22cac30a681c44d3669cf7852",
-        "install_disposition": "source_only",
-        "path": "tests/trace/fixtures/unified_inference_approved_deltas.json",
-        "role": "fixture_reference"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:test_dev",
-        "content_hash": "sha256:417eb312775e35402e86e860d123e51941c39b444a138959f4c2db2e86635fc4",
-        "install_disposition": "source_only",
-        "path": "tests/trace/test_blueprint_hierarchy.py",
-        "role": "test_dev"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:test_dev",
-        "content_hash": "sha256:bb0cdc48f9b429bd21e61c2f4e6dda96c2485b3bb7b71474a40e89b3dea26648",
-        "install_disposition": "source_only",
-        "path": "tests/trace/test_contradiction_core.py",
-        "role": "test_dev"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:test_dev",
-        "content_hash": "sha256:ec2452ae0ff9a7240694cfb1ec0d8372aa38d9df02e75c062d14e87bb6ec512c",
-        "install_disposition": "source_only",
-        "path": "tests/trace/test_guard_model_purpose_contract.py",
-        "role": "test_dev"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:test_dev",
-        "content_hash": "sha256:5147a786353f260e5395fa535f02004856fae11a5bcbd5fc35180018d784d716",
-        "install_disposition": "source_only",
-        "path": "tests/trace/test_inference_kernel.py",
-        "role": "test_dev"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:test_dev",
-        "content_hash": "sha256:020e6947a2700ce52af6be0b0fa6f4a606de50062033823ba791691e74473e8e",
-        "install_disposition": "source_only",
-        "path": "tests/trace/test_inference_performance.py",
-        "role": "test_dev"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:test_dev",
-        "content_hash": "sha256:83ba3ccd192c764f4fa1ccc87f423a02bc4357a9cbd6f0e66ec275d402d2f383",
-        "install_disposition": "source_only",
-        "path": "tests/trace/test_library_execution_depth.py",
-        "role": "test_dev"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:test_dev",
-        "content_hash": "sha256:3e66106e5fa12750a63673696121fe4efda879875be6459173c6713f1579a371",
-        "install_disposition": "source_only",
-        "path": "tests/trace/test_logicguard_export_contract.py",
-        "role": "test_dev"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:test_dev",
-        "content_hash": "sha256:e7722d5de7325ba7a215b6586f1d10fb3346bf06de36ed9ebe88e7da14067ed0",
-        "install_disposition": "source_only",
-        "path": "tests/trace/test_storyline_depth.py",
-        "role": "test_dev"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:test_dev",
-        "content_hash": "sha256:0b9b8c81395d3f3f0a27260f5791a6db5061205d5e32e264e9f86060aa900988",
-        "install_disposition": "source_only",
-        "path": "tests/trace/test_task_iteration.py",
-        "role": "test_dev"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:test_dev",
-        "content_hash": "sha256:f1c2ffa965e55573e91354c5f57309a54aada833d7086dce93beab6c0713d430",
-        "install_disposition": "source_only",
-        "path": "tests/trace/test_template_packs.py",
-        "role": "test_dev"
-      },
-      {
-        "classification_rule_id": "skillguard.content_role_classifier.current:test_dev",
-        "content_hash": "sha256:8fd6f72069fb4ebeb93611b520e1505cf48edf9ee29acb1c7e9bac0404bd1d89",
-        "install_disposition": "source_only",
-        "path": "tests/trace/test_traceguard.py",
-        "role": "test_dev"
+        "path": "scripts/traceguard_library_closure_check.py"
       }
     ],
-    "inventory_hash": "sha256:12fa6d19b74af1482d360efee2ae956226c35fe99d8b5d17863d78af399bade4",
-    "member_root_path": "skills/traceguard",
-    "owner_receipt_root_ref": {
-      "path_token": "owner_evidence_root",
-      "relative_path": "check-executions"
-    },
-    "owners": [
-      {
-        "check_ids": [
-          "check:traceguard:consumer-contract"
-        ],
-        "depends_on_owner_ids": [],
-        "execution_owner_id": "owner:researchguard:traceguard:consumer-contract",
-        "input_component_ids": [
-          "component:documentation_model:9e4e07f6e9d27546",
-          "component:documentation_model:b80fe105d3564a69",
-          "component:documentation_model:db6267acd3238c1e",
-          "component:runtime_source:e8ab83c1e82b02b3",
-          "component:runtime_source:f05349e005bcf12e"
-        ],
-        "input_selectors": [
-          {
-            "kind": "path",
-            "path": ".flowguard/models/researchguard_skill_contract_model_common.py"
-          },
-          {
-            "kind": "path",
-            "path": ".flowguard/models/researchguard_suite/model-definition.json"
-          },
-          {
-            "kind": "path",
-            "path": ".flowguard/models/researchguard_suite_model.py"
-          },
-          {
-            "kind": "path",
-            "path": ".flowguard/models/traceguard_skill_contract_model.py"
-          },
-          {
-            "kind": "path",
-            "path": ".flowguard/verification/run_researchguard_suite_model.py"
-          },
-          {
-            "kind": "path",
-            "path": "scripts/check_researchguard_suite.py"
-          },
-          {
-            "kind": "path",
-            "path": "skills/traceguard/SKILL.md"
-          },
-          {
-            "kind": "path",
-            "path": "skills/traceguard/agents/openai.yaml"
-          }
-        ],
-        "owner_declaration_hash": "sha256:cff37594568c145956f6a80afbfce269b40e23db282a0e5ee31fedba1d3cb59b",
-        "owner_input_projection_hash": "sha256:ea71de01fe6dbd1f90605b828639475ada03e95c7debf72ff89b496882f8446a",
-        "target_input_role_ids": []
-      },
-      {
-        "check_ids": [
-          "check:traceguard:native-tests"
-        ],
-        "depends_on_owner_ids": [
-          "owner:researchguard:traceguard:prompt-load"
-        ],
-        "execution_owner_id": "owner:researchguard:traceguard:native-tests",
-        "input_component_ids": [
-          "component:contract_schema:4c9b54c096ac54d5",
-          "component:documentation_model:b80fe105d3564a69",
-          "component:documentation_model:c230e4643fc77213",
-          "component:fixture_reference:3526fa4f879142f2",
-          "component:runtime_source:3dfc59fa2f8b5462",
-          "component:runtime_source:61502c070ff4adf1",
-          "component:runtime_source:64bc99be03479306",
-          "component:runtime_source:f05349e005bcf12e",
-          "component:test_dev:5df80363f72170b9",
-          "component:test_dev:cb13d375fe03b253"
-        ],
-        "input_selectors": [
-          {
-            "kind": "path",
-            "path": "src/researchguard/model_envelope.py"
-          },
-          {
-            "kind": "path",
-            "path": "src/researchguard/target_authority.py"
-          },
-          {
-            "kind": "path",
-            "path": "src/researchguard/trace/blueprint.py"
-          },
-          {
-            "kind": "path",
-            "path": "src/researchguard/trace/cli.py"
-          },
-          {
-            "kind": "path",
-            "path": "src/researchguard/trace/inference/compiler.py"
-          },
-          {
-            "kind": "path",
-            "path": "src/researchguard/trace/inference/projection.py"
-          },
-          {
-            "kind": "path",
-            "path": "src/researchguard/trace/owner_attestation.py"
-          },
-          {
-            "kind": "path",
-            "path": "src/researchguard/trace/schema.py"
-          },
-          {
-            "kind": "path",
-            "path": "src/researchguard/trace/storyline_depth.py"
-          },
-          {
-            "kind": "path",
-            "path": "src/researchguard/trace/task_iteration.py"
-          },
-          {
-            "kind": "path",
-            "path": "tests/trace/test_blueprint_hierarchy.py"
-          },
-          {
-            "kind": "subtree",
-            "path": "skills/traceguard"
-          },
-          {
-            "kind": "subtree",
-            "path": "src/researchguard/trace"
-          },
-          {
-            "kind": "subtree",
-            "path": "tests/trace"
-          }
-        ],
-        "owner_declaration_hash": "sha256:e5fe23df18a0d4341cea1f155866053eedee82b7bc17e3a6e5da2a2ec63ba8a0",
-        "owner_input_projection_hash": "sha256:05eb98a33018de45335aa703b5b9daa8daed69f5ba768f1ce11f49ca543c14fe",
-        "target_input_role_ids": []
-      },
-      {
-        "check_ids": [
-          "check:traceguard:prompt-load"
-        ],
-        "depends_on_owner_ids": [
-          "owner:researchguard:traceguard:consumer-contract"
-        ],
-        "execution_owner_id": "owner:researchguard:traceguard:prompt-load",
-        "input_component_ids": [
-          "component:contract_schema:4c9b54c096ac54d5",
-          "component:documentation_model:b80fe105d3564a69",
-          "component:documentation_model:c230e4643fc77213",
-          "component:runtime_source:3dfc59fa2f8b5462",
-          "component:runtime_source:61502c070ff4adf1",
-          "component:runtime_source:f05349e005bcf12e",
-          "component:runtime_source:f2ff2dd189954dbc"
-        ],
-        "input_selectors": [
-          {
-            "kind": "path",
-            "path": "researchguard/prompt_bundle_manifest.json"
-          },
-          {
-            "kind": "path",
-            "path": "scripts/check_prompt_bundles.py"
-          },
-          {
-            "kind": "path",
-            "path": "skills/traceguard/references/trace-blueprint-contract.md"
-          },
-          {
-            "kind": "subtree",
-            "path": "skills/traceguard"
-          }
-        ],
-        "owner_declaration_hash": "sha256:a7f4d8b52957bb3944d881e6e7465977de468b9bb82250cf792cf6e8064c8828",
-        "owner_input_projection_hash": "sha256:aa28372ed626cc32713a1fb40ab3bc0ee8f76f1c505b2f755824843f4681af7a",
-        "target_input_role_ids": []
-      },
-      {
-        "check_ids": [
-          "check:traceguard:task-model-closure"
-        ],
-        "depends_on_owner_ids": [
-          "owner:researchguard:traceguard:native-tests"
-        ],
-        "execution_owner_id": "owner:researchguard:traceguard:task-model-closure",
-        "input_component_ids": [
-          "component:test_dev:5df80363f72170b9"
-        ],
-        "input_selectors": [
-          {
-            "kind": "path",
-            "path": "tests/trace/test_task_iteration.py"
-          }
-        ],
-        "owner_declaration_hash": "sha256:bd47d227ed6916e51a6a7c03d88cf4680c87939d350c78441da8c9f437d6ee2e",
-        "owner_input_projection_hash": "sha256:b27b195a0e491463a7601b0a6a93a6249125762027ba04e185e3eb71e6dea7f3",
-        "target_input_role_ids": []
-      }
-    ],
-    "policy_id": "skillguard.content_impact_policy.current",
-    "portfolio_target_edges": [],
-    "projection_consumers": [
-      {
-        "consumer_id": "projection:contract-compile",
-        "consumer_projection_hash": "sha256:89ab1dd581184c48a4a699e581faca63d79760414c8a3455bf42dd83ff2cce22",
-        "impact_plan_schema_version": "skillguard.content_impact_plan.current",
-        "impact_policy_id": "skillguard.content_impact_policy.current",
-        "input_component_ids": [
-          "component:contract_schema:4c9b54c096ac54d5",
-          "component:documentation_model:db6267acd3238c1e"
-        ],
-        "input_projection_hash": "sha256:e49529d8bd833f3844477763684795efb758026d8be7d269332c746fec8afdae",
-        "kind": "contract_compile",
-        "projection_declaration_hash": "sha256:47d041098c1c7072247877b2ac819a886510b9489fa6ce165999001701cb9fad"
-      },
-      {
-        "consumer_id": "projection:global-router",
-        "consumer_projection_hash": "sha256:c05984df180fa719bed1a62a48db6052b1a7e03b87e7a9e6eda3430a1905cf86",
-        "impact_plan_schema_version": "skillguard.content_impact_plan.current",
-        "impact_policy_id": "skillguard.content_impact_policy.current",
-        "input_component_ids": [],
-        "input_projection_hash": "sha256:37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
-        "kind": "global_router",
-        "projection_declaration_hash": "sha256:667973c38b6c505040402a17baf7ebb4fb1ebe562415b046f317c029a3861f2a"
-      },
-      {
-        "consumer_id": "projection:installation",
-        "consumer_projection_hash": "sha256:c99dfcef0c4f90c3b45638b9d67f5edce9213a06030ec639ef965f321734d718",
-        "impact_plan_schema_version": "skillguard.content_impact_plan.current",
-        "impact_policy_id": "skillguard.content_impact_policy.current",
-        "input_component_ids": [
-          "component:documentation_model:b80fe105d3564a69",
-          "component:documentation_model:c230e4643fc77213",
-          "component:runtime_source:61502c070ff4adf1",
-          "component:runtime_source:f05349e005bcf12e"
-        ],
-        "input_projection_hash": "sha256:1fb8ddcc70d86022627f4a1aae2af204552f9d856978264d243dbd97e494e6db",
-        "kind": "installation",
-        "projection_declaration_hash": "sha256:f07ac65f7f4c5f637c8c67565a0b0b6934a2641d492deb1b81abf1d3cd60d48e"
-      },
-      {
-        "consumer_id": "projection:portfolio",
-        "consumer_projection_hash": "sha256:9829573143198c085bf05b11cfa1f5d2f0b51f7dcf833f143c0b53b00bf4bbae",
-        "impact_plan_schema_version": "skillguard.content_impact_plan.current",
-        "impact_policy_id": "skillguard.content_impact_policy.current",
-        "input_component_ids": [],
-        "input_projection_hash": "sha256:37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
-        "kind": "portfolio",
-        "projection_declaration_hash": "sha256:9194e37d395a5756ddd87565ee97fe8dcdae46c150b4b03754291a80060b8b26"
-      },
-      {
-        "consumer_id": "projection:researchguard-suite-maintenance-definition",
-        "consumer_projection_hash": "sha256:a58b19761c9c0e6ed0e11c5e3ed5bd857a8b8801c642f4f27071429fd42565a4",
-        "impact_plan_schema_version": "skillguard.content_impact_plan.current",
-        "impact_policy_id": "skillguard.content_impact_policy.current",
-        "input_component_ids": [
-          "component:contract_schema:f653a6ca9bc8de29",
-          "component:runtime_source:1cd73edc492ba30e"
-        ],
-        "input_projection_hash": "sha256:5f22b05e55ca5db1f9ecdf5df6c5bdd6506d4bfeb8003d8000502dfa758c43b3",
-        "kind": "source_maintenance",
-        "projection_declaration_hash": "sha256:0d6ccce69a023f82bafe073f64b6a4f2639142cef9a298a8f8fb1c6aaae2daaa"
-      },
-      {
-        "consumer_id": "projection:source-maintenance",
-        "consumer_projection_hash": "sha256:3a8ea79f5829af5e208ef44889117a2770ba99abb7ef8ff84bd0e68e716378d4",
-        "impact_plan_schema_version": "skillguard.content_impact_plan.current",
-        "impact_policy_id": "skillguard.content_impact_policy.current",
-        "input_component_ids": [
-          "component:contract_schema:4c9b54c096ac54d5",
-          "component:runtime_source:3dfc59fa2f8b5462"
-        ],
-        "input_projection_hash": "sha256:21ad1f2f2a78a074318626630a4f0d70735726498d53172d625193b65083bb55",
-        "kind": "source_maintenance",
-        "projection_declaration_hash": "sha256:8902140453a0a8f9663721fc859d4e177ab76e1468666677c4c745977ef0b776"
-      }
-    ],
-    "schema_version": "skillguard.content_impact_plan.current",
-    "unknown_mapping_disposition": "block"
+    "member_root_path": ".",
+    "schema_version": "skillguard.content_impact_plan.v3"
   },
-  "contract_hash": "4158245301686A2AFF4FFA91B26C12672C1BC03130C904B96316E8FB428B96AB",
-  "depth_profile": {
-    "claim_boundary": "SkillGuard supervises only the exact current ResearchGuard target-owned strict model-closure checks; it does not replace their domain judgment.",
-    "enforcement_level": "enforced",
-    "integration_mode": "native-integrated",
-    "model_deepening_check_id": "check:traceguard:task-model-closure",
-    "native_check_ids": [
-      "check:traceguard:consumer-contract",
-      "check:traceguard:prompt-load",
-      "check:traceguard:native-tests",
-      "check:traceguard:task-model-closure"
-    ],
-    "native_owner_id": "owner:researchguard:traceguard",
-    "native_route_ids": [
-      "route:researchguard:traceguard"
-    ],
-    "profile_id": "profile:researchguard:traceguard:strict-model-closure",
-    "provider_runtime": {
-      "provider_id": "skillguard-local-provider",
-      "readiness_check_ids": [
-        "check:traceguard:consumer-contract",
-        "check:traceguard:prompt-load",
-        "check:traceguard:native-tests",
-        "check:traceguard:task-model-closure"
-      ],
-      "required_capability_ids": [
-        "declared-check-inventory.v1",
-        "declared-check-receipt-reconciliation.v1",
-        "installation-receipt-binding.v1",
-        "installation-currentness-replay.v1",
-        "provider-runtime-enrollment.v1",
-        "single-flight-check-execution.v1"
-      ],
-      "required_enrollment_status": "enrolled",
-      "required_runtime_contract_id": "skillguard-declared-check-supervision-current"
-    },
-    "required_closure_profiles": [
-      "enforced"
-    ],
-    "schema_version": "skillguard.depth_profile.v2",
-    "skillguard_adds_domain_route": false,
-    "surface_inventory": {
-      "adequacy_check_ids": [
-        "check:traceguard:consumer-contract",
-        "check:traceguard:prompt-load",
-        "check:traceguard:native-tests",
-        "check:traceguard:task-model-closure"
-      ],
-      "model_deepening_check_id": "check:traceguard:task-model-closure",
-      "path": ".skillguard/surface-inventory.json"
-    },
-    "target_skill_id": "traceguard"
-  },
-  "flowguard_schema_version": "1.0",
-  "functions": [
+  "contract_hash": "sha256:1561047fe822c5cd2e744ae5ce15a837a0a73d66bbc6d1386eea69c1477cab68",
+  "inputs": [
     {
-      "business_intent": "Maintain the current traceguard consumer boundary without aliases, compatibility readers, or alternate launch paths.",
-      "function_id": "function:researchguard:traceguard",
-      "owner_id": "traceguard",
-      "route_ids": [
-        "route:researchguard:traceguard"
-      ],
-      "signature": "Input x State -> Set(Output x State)"
+      "id": "input:001",
+      "path": "SKILL.md",
+      "required": true,
+      "role": "instructions"
+    },
+    {
+      "id": "input:002",
+      "path": "agents/openai.yaml",
+      "required": true,
+      "role": "runtime_source"
+    },
+    {
+      "id": "input:003",
+      "path": "references/commands-and-handoffs.md",
+      "required": true,
+      "role": "runtime_source"
+    },
+    {
+      "id": "input:004",
+      "path": "references/depth-and-closure.md",
+      "required": true,
+      "role": "runtime_source"
+    },
+    {
+      "id": "input:005",
+      "path": "references/routes/case-library.md",
+      "required": true,
+      "role": "runtime_source"
+    },
+    {
+      "id": "input:006",
+      "path": "references/routes/general-trace.md",
+      "required": true,
+      "role": "runtime_source"
+    },
+    {
+      "id": "input:007",
+      "path": "references/safe-output.md",
+      "required": true,
+      "role": "runtime_source"
+    },
+    {
+      "id": "input:008",
+      "path": "references/task-iteration.md",
+      "required": true,
+      "role": "runtime_source"
+    },
+    {
+      "id": "input:009",
+      "path": "references/trace-blueprint-contract.md",
+      "required": true,
+      "role": "runtime_source"
+    },
+    {
+      "id": "input:010",
+      "path": "references/unified_inference_protocol.md",
+      "required": true,
+      "role": "runtime_source"
+    },
+    {
+      "id": "input:011",
+      "path": "references/validated-template-pack.md",
+      "required": true,
+      "role": "runtime_source"
+    },
+    {
+      "id": "input:012",
+      "path": "scripts/traceguard_closure_check.py",
+      "required": true,
+      "role": "runtime_source"
+    },
+    {
+      "id": "input:013",
+      "path": "scripts/traceguard_library_closure_check.py",
+      "required": true,
+      "role": "runtime_source"
+    },
+    {
+      "id": "input:wrapper",
+      "path": ".skillguard/checks/run_researchguard_check.py",
+      "required": true,
+      "role": "author_check"
     }
   ],
-  "judgment_rubrics": [],
   "maintenance_unit_id": "unit:researchguard-suite",
   "member_skill_ids": [
-    "researchguard",
-    "logicguard",
-    "sourceguard",
-    "traceguard",
-    "experimentguard"
+    "traceguard"
   ],
-  "model_id": "researchguard.traceguard.contract.current",
-  "model_path": ".flowguard/models/traceguard_skill_contract_model.py",
   "obligations": [
     {
-      "description": "The public consumer entry and internal route inventory are exact.",
-      "evidence_classes": [
-        "hard"
-      ],
-      "invariant_id": "invariant:researchguard:traceguard:consumer-contract",
-      "obligation_id": "obligation:researchguard:traceguard:consumer-contract",
-      "owner_step_ids": [
-        "step:researchguard:traceguard:contract"
-      ],
-      "required": true,
-      "required_check_ids": [
+      "check_ids": [
         "check:traceguard:consumer-contract"
-      ]
+      ],
+      "obligation_id": "obligation:traceguard:consumer-contract"
     },
     {
-      "description": "The selected entry and conditional reference load graph are current and contain no eager sibling path.",
-      "evidence_classes": [
-        "hard"
-      ],
-      "invariant_id": "invariant:researchguard:traceguard:prompt-load",
-      "obligation_id": "obligation:researchguard:traceguard:prompt-load",
-      "owner_step_ids": [
-        "step:researchguard:traceguard:prompt-load"
-      ],
-      "required": true,
-      "required_check_ids": [
+      "check_ids": [
         "check:traceguard:prompt-load"
-      ]
+      ],
+      "obligation_id": "obligation:traceguard:prompt-load"
     },
     {
-      "description": "The target-owned task-local model closure check passes with no addressable gap.",
-      "evidence_classes": [
-        "hard"
-      ],
-      "invariant_id": "invariant:researchguard:traceguard:task-model-closure",
-      "obligation_id": "obligation:researchguard:traceguard:task-model-closure",
-      "owner_step_ids": [
-        "step:researchguard:traceguard:task-model-closure"
-      ],
-      "required": true,
-      "required_check_ids": [
-        "check:traceguard:task-model-closure"
-      ]
-    },
-    {
-      "description": "The member-owned current native regression suite passes.",
-      "evidence_classes": [
-        "hard"
-      ],
-      "invariant_id": "invariant:researchguard:traceguard:native-tests",
-      "obligation_id": "obligation:researchguard:traceguard:native-tests",
-      "owner_step_ids": [
-        "step:researchguard:traceguard:tests"
-      ],
-      "required": true,
-      "required_check_ids": [
+      "check_ids": [
         "check:traceguard:native-tests"
-      ]
+      ],
+      "obligation_id": "obligation:traceguard:native-tests"
+    },
+    {
+      "check_ids": [
+        "check:traceguard:task-model-closure"
+      ],
+      "obligation_id": "obligation:traceguard:task-model-closure"
     }
   ],
-  "parent_model_id": "researchguard.suite.route-authority.current",
-  "portfolio_capability_contracts": [],
-  "repository_role": "skill_maintainer_source",
   "routes": [
     {
-      "blocked_terminal_step_id": "step:researchguard:traceguard:blocked",
-      "function_id": "function:researchguard:traceguard",
-      "handoffs": [],
-      "owner_id": "traceguard",
-      "route_id": "route:researchguard:traceguard",
-      "step_ids": [
-        "step:researchguard:traceguard:contract",
-        "step:researchguard:traceguard:prompt-load",
-        "step:researchguard:traceguard:tests",
-        "step:researchguard:traceguard:task-model-closure",
-        "step:researchguard:traceguard:success",
-        "step:researchguard:traceguard:blocked"
+      "choice_group": "operation",
+      "obligation_ids": [
+        "obligation:traceguard:consumer-contract",
+        "obligation:traceguard:prompt-load",
+        "obligation:traceguard:native-tests",
+        "obligation:traceguard:task-model-closure"
       ],
-      "success_terminal_step_id": "step:researchguard:traceguard:success"
+      "route_id": "route:traceguard:current-validation",
+      "step_ids": [
+        "step:traceguard:consumer-contract",
+        "step:traceguard:prompt-load",
+        "step:traceguard:native-tests",
+        "step:traceguard:task-model-closure"
+      ],
+      "when": [
+        {
+          "equals": "validate",
+          "fact": "operation"
+        }
+      ]
     }
   ],
-  "schema_version": "skillguard.compiled_contract.v2",
+  "schema_version": "skillguard.compiled_contract.v3",
   "skill_id": "traceguard",
-  "source_fingerprints": {
-    "binding": "24AC756E9A955D99D1618C9702AF3DCAADB1C3ADCCB7223ADDA1F2F53E8CFD34",
-    "entrypoint": "0824833AC7E3357A76F70E54C8B5776DEB66AC29571F724AA4214FCABD7AE79D",
-    "implementation:.flowguard/models/researchguard_skill_contract_model_common.py": "6A27B0F7929BD20A34EBA1282DC5FCEE48A0A92350486B028A2A8290FBB1148E",
-    "implementation:.flowguard/models/researchguard_suite/model-definition.json": "AE9E524EC63D7D53DA19254BF41681DD8ACB26B4D39394F1D95FF479318695B7",
-    "implementation:.flowguard/models/researchguard_suite_model.py": "69A6E1518558FEA65C31D393C15C081BB0DEC2958CD936E3811EF775634C7BA6",
-    "implementation:.flowguard/models/traceguard_skill_contract_model.py": "E59CE18A4EE612CE381BA8DD5B8ABD872A728E5FCAC8A3F4E702FD0ABF7FD702",
-    "implementation:.flowguard/verification/run_researchguard_suite_model.py": "70162DADDE9444A4C710FD69017A757128A421AF1CA243C93440B81C7A2F4300",
-    "implementation:.skillguard/test-mesh.json": "24792AE72DB97BE19DA8CFDFDFFABC3D1532F3C77370039D1A2F97C835A36E66",
-    "implementation:researchguard/prompt_bundle_manifest.json": "A99F41793A3D1BD08D99D65916AB7CFF79B515EAE59F361D7E5B8F26A6FA5FB3",
-    "implementation:scripts/check_prompt_bundles.py": "BACAB53C360600B008488118256602D8D16D6DACBFDE8DD10030EB4C91EA6D04",
-    "implementation:scripts/check_researchguard_test_mesh.py": "4C031BB33887868353DCD5DB77F1F132CDEEEB53B070D11C5A6E23DFF6A5BE8C",
-    "implementation:skills/traceguard": "8BDE6F4CF6FCE1A3E29F73DBB5854D260E18EB7CCB0D59F0DDA0F1EF96299E75",
-    "implementation:skills/traceguard/references/trace-blueprint-contract.md": "7D44E7D49F7012C9A6BE9DD34C052D24777A01B305B44635395B2BFA54F9D808",
-    "implementation:src/researchguard/model_envelope.py": "D72E673E7F38D93169693767D88D96DF9AA662334BFCF21021BBBA71C5510CBE",
-    "implementation:src/researchguard/target_authority.py": "39D7267ACFF55B802C6441B4AAF29C4755E6A8C9B11C1F089FB756C93D696897",
-    "implementation:src/researchguard/trace": "1D6F0A7DC17860A88BB76E184FA69C347D7E4A0B2C206E19B56F280E5EAD4638",
-    "implementation:src/researchguard/trace/blueprint.py": "E28E941906CC46685BEFDE8DE93AB64FD3CF0CCB2E6AD02F66F1ECB53389024E",
-    "implementation:src/researchguard/trace/cli.py": "70D486A70670EEA8B1D9F8731ED0AD2D28145D26EEEA0DF2067AB6F4557C47B8",
-    "implementation:src/researchguard/trace/inference/compiler.py": "01DA0898494D74928D6E4FFDA99DFD247EEE38BBCAF264274D1BEE9FEF8A10BF",
-    "implementation:src/researchguard/trace/inference/projection.py": "0B60FD7FCD39C678E0FFCA19BA298E1584318920E390174FB746A0BD2F0E14E9",
-    "implementation:src/researchguard/trace/owner_attestation.py": "F0B835B9A4F54FB6685EDD7C89E54884712F95B9E575D3FE037C9696D3792413",
-    "implementation:src/researchguard/trace/schema.py": "2B577D8222C2E38E173239FCB7BBDCFCB31834C83A25CD436599365454AD85B2",
-    "implementation:src/researchguard/trace/storyline_depth.py": "7459774393EA6F91545FDD4721D0BACD360398D4AE132B61D2E2A23287D68C2D",
-    "implementation:src/researchguard/trace/task_iteration.py": "5582647082B28CB954E16F6259D289B68DCA93A3031A6786EB199FD91DB8B5EE",
-    "implementation:tests/trace": "F7350F15E367C9C5E465B022A45C2974C741C434A7EE0D10ED3C54EF335D2B2C",
-    "implementation:tests/trace/test_blueprint_hierarchy.py": "417EB312775E35402E86E860D123E51941C39B444A138959F4C2DB2E86635FC4",
-    "model": "E59CE18A4EE612CE381BA8DD5B8ABD872A728E5FCAC8A3F4E702FD0ABF7FD702",
-    "model_export": "75D610C653D4C5888C1C6728D8CEC31D5E14D60E240C2FAF661DB0F8A47D8AF9"
+  "source_identity": {
+    "content_hash": "sha256:a88cbda2da14ffc8983b02b8dfa129a2fc43e45de51bccb76c2320691b02d289",
+    "input_fingerprints": {
+      "input:001": "sha256:bb4ef81667a2b78c55499c9827d15807086d4c99a948d60b770adb7070aaaf6f",
+      "input:002": "sha256:4cb172f6cd1ad2ab958f73d496afb723b6d9c63d3fe3c2957ee069cdea7762a3",
+      "input:003": "sha256:ea1d7d74e831c6e2039d0287d366eb76aff6366e7e20decfe4ca4f0faba88fe6",
+      "input:004": "sha256:6046609d203d16892277521da27dac919d3e5542901de6cf2a5be7f6249711d3",
+      "input:005": "sha256:7bfb3b9764b665fe8d91ffdcb2416fab582c3859818b44a6ddfc14221d723a53",
+      "input:006": "sha256:b5b381a13104d67fe913cd8741fb0eb06f72d70f8119b4ac44a3e43aebf0dbfa",
+      "input:007": "sha256:3fc4a5358c554397114c4c69ce0f105073d05bb09e37aecc2ca1b7434aaab7f5",
+      "input:008": "sha256:0cb01976f9d1f7ce5889a19f9f7b0ace98fcc2bf0d1c78d661440ea1f5cf7fcd",
+      "input:009": "sha256:dc87de58248fc9162e1406e2ac7088758c5dd8479345dea8de8845ee0ec105ab",
+      "input:010": "sha256:2b6329e59a245e6d34e9e01c571cd4be1170437aff72dcb8b279b3a2d416dd46",
+      "input:011": "sha256:fcb42c531dffcb0784cd46be2b6d1726366282f32245238491aa54a19959527e",
+      "input:012": "sha256:81b369dd14395c8cd9cabacbdacdebea1e998864f32b6eb82de8507f15555fd9",
+      "input:013": "sha256:15f59a600a79601e1d835ae426c0956ef2a7c76071c2ecbf6237798e0d6f05a3",
+      "input:wrapper": "sha256:c68d74ce0474e9cdeda50131bcfda90aece3abe0cd30d8b6afebbe7c3759f2dc"
+    },
+    "path": ".skillguard/contract-source.json"
   },
   "steps": [
     {
-      "action_kind": "validator",
-      "binding": {
-        "action": {
-          "kind": "native",
-          "summary": "Validate the exact current consumer skill and route boundary."
-        },
-        "check_ids": [
-          "check:traceguard:consumer-contract"
-        ],
-        "output_artifact_ids": []
-      },
-      "owner_id": "traceguard",
-      "prerequisite_step_ids": [],
-      "route_id": "route:researchguard:traceguard",
-      "step_id": "step:researchguard:traceguard:contract",
-      "terminal_kind": ""
-    },
-    {
-      "action_kind": "validator",
-      "binding": {
-        "action": {
-          "kind": "native",
-          "summary": "Validate the selected-only entry budget and conditional reference graph."
-        },
-        "check_ids": [
-          "check:traceguard:prompt-load"
-        ],
-        "output_artifact_ids": []
-      },
-      "owner_id": "traceguard",
-      "prerequisite_step_ids": [
-        "step:researchguard:traceguard:contract"
+      "check_ids": [
+        "check:traceguard:consumer-contract"
       ],
-      "route_id": "route:researchguard:traceguard",
-      "step_id": "step:researchguard:traceguard:prompt-load",
-      "terminal_kind": ""
+      "requires": [],
+      "step_id": "step:traceguard:consumer-contract"
     },
     {
-      "action_kind": "validator",
-      "binding": {
-        "action": {
-          "kind": "native",
-          "summary": "Execute the member-owned current native regression suite."
-        },
-        "check_ids": [
-          "check:traceguard:native-tests"
-        ],
-        "output_artifact_ids": []
-      },
-      "owner_id": "traceguard",
-      "prerequisite_step_ids": [
-        "step:researchguard:traceguard:prompt-load"
+      "check_ids": [
+        "check:traceguard:prompt-load"
       ],
-      "route_id": "route:researchguard:traceguard",
-      "step_id": "step:researchguard:traceguard:tests",
-      "terminal_kind": ""
-    },
-    {
-      "action_kind": "native",
-      "binding": {
-        "action": {
-          "kind": "native",
-          "summary": "Execute the target-owned task-local model closure and gap-continuation checks."
-        },
-        "check_ids": [
-          "check:traceguard:task-model-closure"
-        ],
-        "output_artifact_ids": []
-      },
-      "owner_id": "traceguard",
-      "prerequisite_step_ids": [
-        "step:researchguard:traceguard:tests"
+      "requires": [
+        "step:traceguard:consumer-contract"
       ],
-      "route_id": "route:researchguard:traceguard",
-      "step_id": "step:researchguard:traceguard:task-model-closure",
-      "terminal_kind": ""
+      "step_id": "step:traceguard:prompt-load"
     },
     {
-      "action_kind": "terminal",
-      "owner_id": "traceguard",
-      "prerequisite_step_ids": [
-        "step:researchguard:traceguard:task-model-closure"
+      "check_ids": [
+        "check:traceguard:native-tests"
       ],
-      "route_id": "route:researchguard:traceguard",
-      "step_id": "step:researchguard:traceguard:success",
-      "terminal_kind": "success"
+      "requires": [
+        "step:traceguard:prompt-load"
+      ],
+      "step_id": "step:traceguard:native-tests"
     },
     {
-      "action_kind": "terminal",
-      "owner_id": "traceguard",
-      "prerequisite_step_ids": [],
-      "route_id": "route:researchguard:traceguard",
-      "step_id": "step:researchguard:traceguard:blocked",
-      "terminal_kind": "blocked"
+      "check_ids": [
+        "check:traceguard:task-model-closure"
+      ],
+      "requires": [
+        "step:traceguard:native-tests"
+      ],
+      "step_id": "step:traceguard:task-model-closure"
     }
   ]
 }

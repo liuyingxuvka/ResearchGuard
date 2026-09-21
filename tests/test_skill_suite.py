@@ -132,10 +132,10 @@ def test_author_contracts_form_one_five_surface_unit() -> None:
             ).read_text(encoding="utf-8")
         )
         assert payload["maintenance_unit_id"] == "unit:researchguard-suite"
-        assert payload["member_skill_ids"] == list(MEMBERS)
+        assert payload["member_skill_ids"] == [member]
         assert payload["skill_id"] == member
-        assert payload["integration_mode"] == "native-integrated"
-        assert payload["may_define_skillguard_runtime_route"] is False
+        assert payload["schema_version"] == "skillguard.skill_contract.v3"
+        assert payload["routes"][0]["route_id"] == f"route:{member}:current-validation"
 
 
 def test_member_domain_dna_and_repository_software_dna_stay_separate() -> None:

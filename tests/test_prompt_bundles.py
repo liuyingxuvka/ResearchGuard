@@ -5,9 +5,6 @@ import json
 from copy import deepcopy
 from pathlib import Path
 
-from scripts.build_skillguard_contracts import contract
-
-
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "scripts" / "check_prompt_bundles.py"
 SPEC = importlib.util.spec_from_file_location("researchguard_prompt_bundles", SCRIPT)
@@ -172,92 +169,27 @@ def test_reported_prompt_byte_totals_equal_exact_entry_files() -> None:
 
 
 def test_prompt_governance_has_one_declared_execution_path() -> None:
-    manifest_checker_paths = {
-        "researchguard/prompt_bundle_manifest.json",
-        "scripts/check_prompt_bundles.py",
-    }
-    prompt_test_path = "tests/test_prompt_bundles.py"
     for member in (
-        "researchguard",
-        "logicguard",
-        "sourceguard",
-        "traceguard",
-        "experimentguard",
+        "researchguard", "logicguard", "sourceguard", "traceguard", "experimentguard"
     ):
-        payload = contract(member)
-        stored_payload = json.loads(
-            (
-                ROOT
-                / "skills"
-                / member
-                / ".skillguard"
-                / "contract-source.json"
-            ).read_text(encoding="utf-8")
+        source = json.loads(
+            (ROOT / "skills" / member / ".skillguard" / "contract-source.json").read_text(
+                encoding="utf-8"
+            )
         )
-        checks = {row["check_id"]: row for row in payload["checks"]}
-        stored_checks = {
-            row["check_id"]: row for row in stored_payload["checks"]
-        }
+        assert source["schema_version"] == "skillguard.skill_contract.v3"
+        checks = {row["check_id"]: row for row in source["checks"]}
         prompt = checks[f"check:{member}:prompt-load"]
         native = checks[f"check:{member}:native-tests"]
-        stored_prompt = stored_checks[f"check:{member}:prompt-load"]
-        stored_native = stored_checks[f"check:{member}:native-tests"]
-        implementation_paths = payload["implementation_paths"]
-        stored_implementation_paths = stored_payload["implementation_paths"]
-        assert stored_prompt["input_selectors"] == prompt["input_selectors"]
-        assert stored_native["args"] == native["args"]
-        governed_source_paths = manifest_checker_paths | {
-            prompt_test_path,
-            "tests/test_skill_suite.py",
-            BLUEPRINT_BOUNDARIES[member][1],
-        }
-        assert {
-            path
-            for path in stored_implementation_paths
-            if path in governed_source_paths
-        } == {
-            path for path in implementation_paths if path in governed_source_paths
-        }
-        assert all(
-            implementation_paths.count(path) == 1
-            for path in manifest_checker_paths
-        )
-        prompt_paths = {
-            row["path"]
-            for row in prompt["input_selectors"]
-            if row["kind"] == "path"
-        }
-        assert manifest_checker_paths <= prompt_paths
-        assert prompt_test_path not in prompt_paths
-        assert {
-            check_id
-            for check_id, check in checks.items()
-            if manifest_checker_paths.intersection(
-                row["path"]
-                for row in check["input_selectors"]
-                if row["kind"] == "path"
-            )
-        } == {f"check:{member}:prompt-load"}
-        assert (prompt_test_path in native["args"]) is (member == "researchguard")
-        assert {
-            check_id
-            for check_id, check in checks.items()
-            if prompt_test_path
-            in {
-                row["path"]
-                for row in check["input_selectors"]
-                if row["kind"] == "path"
-            }
-        } == (
-            {f"check:{member}:native-tests"}
-            if member == "researchguard"
-            else set()
-        )
-        assert (prompt_test_path in implementation_paths) is (
-            member == "researchguard"
-        )
+        assert prompt["args"] == [
+            ".skillguard/checks/run_researchguard_check.py", "prompt-load"
+        ]
+        assert native["args"] == [
+            ".skillguard/checks/run_researchguard_check.py", "native-tests"
+        ]
+        assert prompt["command"] == native["command"] == "{{python}}"
+        assert prompt["expected"] == native["expected"] == {"exit_code": 0}
+        assert (ROOT / "skills" / member / ".skillguard" / "checks" / "run_researchguard_check.py").is_file()
 
-    suite_checker = (ROOT / "scripts/check_researchguard_suite.py").read_text(
-        encoding="utf-8"
-    )
+    suite_checker = (ROOT / "scripts/check_researchguard_suite.py").read_text(encoding="utf-8")
     assert "check_prompt_bundles.py" not in suite_checker

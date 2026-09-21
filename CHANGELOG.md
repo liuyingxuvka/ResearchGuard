@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.5.2 - 2026-09-21
+
+- Adopt the compact SkillGuard v3 author contracts and one explicit sequential
+  validation route for each of the five current consumer surfaces.
+- Refresh the ResearchGuard suite identity, current model pins, examples, and
+  tests to the 0.5.2 patch release without adding compatibility or fallback
+  paths.
+
 ## v0.5.1 - 2026-09-08
 
 - Remove historical FlowGuard working evidence from the public release tree;
