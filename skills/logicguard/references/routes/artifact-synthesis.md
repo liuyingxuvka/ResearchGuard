@@ -41,12 +41,11 @@ researchguard logic <args>
     target locator mapping, final treatment, source registry, tournament
     result, revision provenance, or structure materially changes.
 23. After selecting a non-trivial synthesis route, usually show a compact AI-selected Mermaid diagram or table. A synthesis route is often best, but AI may choose an argument-support map, source-path view, structural-contribution graph, gap table, tournament table, structure map, or comparison matrix if that better explains the target story. Use explicit edge semantics: selected material contributes to target blocks, downstream consumers use prior units, missing bridges block or qualify target blocks, and appendix/brief/omit treatment changes placement rather than truth. Keep the diagram in the explanation, not in final artifact-native copy.
-24. Before final artifact-native prose is treated as ready, update the main
-    LogicGuard closure ledger with synthesis readiness: target story plan
-    status, unsupported sections, citation/source-fit status, conclusion
-    tournament status, structural-contribution recovery, postwrite audit
-    freshness, safe wording, and unsafe wording. If final text changes after
-    the audit, mark `postwrite_status` stale and rerun the main closure helper.
+24. Return current native synthesis readiness, unsupported sections, source fit,
+    conclusion boundaries and remaining structural gaps. Final prose integration
+    and postwrite review belong to the active writing/document owner. If final
+    text changes, that owner rechecks affected claims and citations; no separate
+    hand-written closure-ledger checker is required.
 
 ## Boundaries
 

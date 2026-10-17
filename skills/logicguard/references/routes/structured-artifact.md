@@ -45,11 +45,10 @@ researchguard logic <args>
     each structural repair: added, rewritten original, moved, deleted or
     omitted, source note, or human-review gap. Do not let later style polishing
     overwrite earlier provenance semantics.
-23. For non-trivial artifacts, write the structure result into the main
-    LogicGuard closure ledger: model-card coverage, structural rows unresolved,
-    high-importance leaves, source/citation readiness, postwrite status, and
-    skipped checks. The main logicguard_closure_check.py helper must be able
-    to see these rows before a full structure or reasoning claim is made.
+23. Return the native structure result, unresolved structural rows, important
+    leaves, source/citation gaps and skipped work. The active writing/document
+    owner performs final prose and postwrite integration. The retired manual
+    closure-ledger helper is not a completion gate.
 
 ## Boundaries
 

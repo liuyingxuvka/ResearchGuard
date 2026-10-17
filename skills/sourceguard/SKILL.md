@@ -74,4 +74,5 @@ Anchor and receipt locators and hashes are persistent evidence, not cache entrie
 
 ## Output Requirements
 
-Return source roles, selected action, loaded references and triggers, `evidence`, `failures`, `blockers`, `skipped_checks`, unresolved gaps, search-stop decision, `residual_risk`, safe claim use, typed handoffs, terminal reason, and `claim_boundary`.
+Return the native result, evidence and claim boundary, blockers and next action.
+Include machine receipts or diagnostics only when needed or requested.

@@ -44,17 +44,11 @@ Do not use it as a replacement for LogicGuard source library. LogicGuard source 
     ledgers and do not reproduce the evaluator inside the library route.
 11. For non-trivial investigations, preserve trace-card coverage: leads detected, trace cards created, layer coverage, missing roles, access gaps, live alternatives, and downstream handoff ids.
 12. Use LogicGuard later for final claim support checks when writing a research-backed final artifact such as a report, paper, memo, brief, article, deck storyline, or public conclusion.
-13. For non-trivial case-library work, update a case-library closure ledger and
-    run the helper when available:
-
-    ```powershell
-    python %USERPROFILE%\\.codex\\skills\traceguard\scripts\traceguard_library_closure_check.py --ledger <trace-case-library-ledger.json> --json
-    ```
-
-    If the helper returns `partial`, `blocked`, or `downgraded`, continue with
-    the named next action: build a TraceGuard model from saved case material,
-    evaluate the model, write gaps back, rerun after case material changes, or
-    explicitly scope the case library as saved-but-not-evaluated.
+13. Preserve native case-library validation, saved model identities, evaluation
+    results and actual gap writeback. If a case has only been saved, state
+    saved-but-not-evaluated. The manual case-library ledger-field helper is
+    retired; it adds no native inference or writeback evidence. Final prose
+    integration belongs to the active writing/document owner.
 
 ## Boundary
 

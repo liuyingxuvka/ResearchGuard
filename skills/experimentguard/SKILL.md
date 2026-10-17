@@ -102,7 +102,5 @@ routing reach `researchguard.experiment`; never invoke a sibling after failure.
 
 ## Output Requirements
 
-Return `status`, `selected_experiment_ids`, `alternative_minimal_sets`,
-`unresolved_hypothesis_pairs`, `reason_code`, and `claim_boundary`. Also report
-`evidence`, `failures`, `blockers`, `skipped_checks`, and `residual_risk` to keep
-supported, incomplete, and blocked results distinct.
+Return the native result, evidence and claim boundary, blockers and next action.
+Include machine receipts or diagnostics only when needed or requested.

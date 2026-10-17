@@ -63,13 +63,11 @@ When showing the verified graph, make the selected graph mode clear. A source ca
 
 If only the first item is true, say the source is preserved, not fully modeled.
 
-For non-trivial source-library work that feeds an artifact, update the
-LogicGuard closure ledger used by the main `logicguard` skill. Record whether
-the source has content logic nodes beyond Document/navigation, whether
-anchored deepening is still needed, which model-card or gap ids depend on it,
-and which source roles are safe or unsafe. If any of these are missing, the
-main closure helper must return `partial` or `blocked` rather than allowing a
-full reasoning claim.
+For source-library work feeding an artifact, return saved native source/content
+nodes, the cards or gaps that depend on them, remaining deepening needs and safe
+source roles. Saved material does not prove completed argument modeling. Keep
+missing content or unresolved support visible; final prose integration belongs
+to the active writing/document owner. No separate closure ledger is required.
 
 ## Boundaries
 

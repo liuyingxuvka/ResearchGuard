@@ -11,6 +11,10 @@ ResearchGuard routes ambiguity across four native members—`logicguard`,
 `sourceguard`, `traceguard`, and `experimentguard`—without duplicate work or
 retries.
 
+Use a clear single owner directly. An umbrella composition records the minimum
+members, order and handoffs; ready does not mean executed. Qualified portable
+transport replays native models through the existing protocol.
+
 ## Entrypoint Scope
 
 Use a member directly when its action is clear. Use the umbrella only for
@@ -103,6 +107,5 @@ native gaps stay open or end visibly as stalled, limited, external, or excluded.
 
 ## Output Requirements
 
-Report the selected set/order, responsibilities, evidence, failures, blockers,
-`skipped_checks`, `residual_risk`, references, risk, typed handoffs, field owners,
-terminal reason, and `claim_boundary`.
+Return the native result, evidence and claim boundary, blockers and next action.
+Include machine receipts or diagnostics only when needed or requested.

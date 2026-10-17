@@ -77,9 +77,8 @@ researchguard logic <args>
    - `route:artifact-synthesis` when the expanded model is ready for a target story plan, outline, section plan, paragraph blueprint, or delivery guidance;
    - `logicguard` for mixed or ambiguous follow-up modeling.
 14. For non-trivial deepening, show a compact AI-selected Mermaid diagram or table of the selected node, proposed children, structural contribution rows, gaps, and next route. A why/proof tree is often clearest for child support, a contribution graph is often clearest for downstream use, and a gap table is often clearest for missing evidence, warrant, boundary, or rebuttal work. Keep it as explanation; it is not validation evidence.
-15. After each deepening round, update the main LogicGuard closure ledger with
-    remaining high-importance leaf nodes, open gaps, skipped cards, terminal
-    classifications, and next-route recommendations. A deepening round is not
+15. After each deepening round, return the native remaining important leaves,
+    open gaps, skipped cards, terminal classifications and next-route needs. A deepening round is not
     complete while high-importance cards remain unexpanded without a terminal
     treatment such as source gap, trace gap, appendix, omit, downgrade, or
     human review.

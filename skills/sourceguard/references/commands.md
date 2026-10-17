@@ -18,3 +18,18 @@ researchguard source report <model.yaml> --model-contract <contract.json> --form
 researchguard source export-traceguard <model.yaml> --model-contract <contract.json> --output <seed.yaml>
 researchguard source export-logicguard <model.yaml> --model-contract <contract.json> --output <candidates.yaml>
 ```
+
+
+## Read one result cheaply
+
+For routine planning, call `plan_next_actions(model, limit=3)` once and use
+`render_text(plan)` on that same PlanResult. The text retains selected actions,
+open gaps and the mathematical boundary. Keep the full scored candidate JSON as
+an on-demand artifact; do not paste it into every turn or recompute a plan just
+to change its display. The existing CLI text view is:
+
+```text
+researchguard source report <model.yaml> --model-contract <contract.json> --format txt
+```
+
+A short view does not remove a critical gap or license stronger claim use.

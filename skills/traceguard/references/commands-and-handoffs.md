@@ -21,3 +21,17 @@ researchguard trace library build-model <case-library> <case-id> --output <model
 ```
 
 TraceGuard → LogicGuard includes trace/model-card/structure ids, validated and missing steps, alternatives, causal weakest link, conclusion-transfer status, downstream consumer, and safe/unsafe wording. TraceGuard → SourceGuard includes exact trace gap, evidence role/class, locator, counter/limiting need, and bridge need. Handoffs remain `awaiting_owner`; they never execute the sibling.
+
+
+## One evaluation, several views
+
+The public `evaluate_model` default keeps `include_storyline_depth=True`.
+Run the required solve and critical perturbations once for the current model;
+reuse that current result for summary, weaknesses and gap reporting. The command
+list above is a menu, not a sequence to rerun every solve for one unchanged model.
+
+Only an explicitly bounded evidence-chain task may use the existing
+`evaluate_model(model, include_storyline_depth=False)` API. That result cannot
+claim broad, causal, robust, predictive or closed storyline coverage. Native why,
+causal, what-if and robustness requests keep their required depth and all critical
+perturbations. Full JSON remains available on demand.
