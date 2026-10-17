@@ -711,8 +711,8 @@ def _verify_portable_target_contract_material(
         raise GuardPurposeContractError(
             "traceguard_portable_target_material_invalid", "schema"
         )
-    candidate = Path(candidate_path).resolve()
-    locator = Path(str(raw["candidate_locator"]))
+    candidate = Path(str(candidate_path).replace("\\", "/")).resolve()
+    locator = Path(str(raw["candidate_locator"]).replace("\\", "/"))
     if (
         locator.is_absolute()
         or ".." in locator.parts
@@ -736,7 +736,7 @@ def _verify_portable_target_contract_material(
             raise GuardPurposeContractError(
                 "traceguard_portable_target_material_invalid", "file-row"
             )
-        relative = Path(str(row["relative_path"])).as_posix()
+        relative = Path(str(row["relative_path"]).replace("\\", "/")).as_posix()
         if Path(relative).is_absolute() or ".." in Path(relative).parts or relative in documents:
             raise GuardPurposeContractError(
                 "traceguard_portable_target_material_invalid", "file-path"
@@ -763,7 +763,7 @@ def _verify_portable_target_contract_material(
         raise GuardPurposeContractError(
             "traceguard_task_purpose_contract_ref_invalid", str(contract_ref)
         )
-    normalized_contract_ref = Path(contract_ref).as_posix()
+    normalized_contract_ref = Path(contract_ref.replace("\\", "/")).as_posix()
     contract_body = documents.get(normalized_contract_ref)
     if contract_body is None:
         raise GuardPurposeContractError(
@@ -785,7 +785,7 @@ def _verify_portable_target_contract_material(
     required = {normalized_contract_ref}
 
     def load_case(row: Mapping[str, Any]) -> dict[str, Any]:
-        relative = (contract_parent / str(row["model_path"])).as_posix()
+        relative = (contract_parent / str(row["model_path"]).replace("\\", "/")).as_posix()
         if ".." in Path(relative).parts:
             raise GuardPurposeContractError(
                 "traceguard_portable_target_material_invalid", "case-path"

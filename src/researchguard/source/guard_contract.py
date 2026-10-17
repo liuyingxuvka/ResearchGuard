@@ -161,7 +161,7 @@ def _evaluate_case(
         observation_path = _resolve_target_input(contract_path, case.observation_path)
         observation = _load_observation(observation_path)
     else:
-        relative = Path(case.observation_path).as_posix()
+        relative = Path(case.observation_path.replace("\\", "/")).as_posix()
         if Path(relative).is_absolute() or ".." in Path(relative).parts:
             raise SchemaError("portable purpose proof input escapes the contract root")
         body = portable_documents.get(relative)
@@ -231,8 +231,8 @@ def _portable_target_documents(
         raise SchemaError("portable SourceGuard target proof denominator is invalid")
     if raw["schema_version"] != PORTABLE_TARGET_PROOF_MATERIAL_SCHEMA:
         raise SchemaError("portable SourceGuard target proof schema is not current")
-    resolved = Path(contract_path).resolve()
-    locator = Path(str(raw["contract_locator"]))
+    resolved = Path(str(contract_path).replace("\\", "/")).resolve()
+    locator = Path(str(raw["contract_locator"]).replace("\\", "/"))
     if (
         locator.is_absolute()
         or ".." in locator.parts
@@ -250,7 +250,7 @@ def _portable_target_documents(
             "body_b64",
         }:
             raise SchemaError("portable SourceGuard target proof file is invalid")
-        relative = Path(str(row["relative_path"])).as_posix()
+        relative = Path(str(row["relative_path"]).replace("\\", "/")).as_posix()
         if Path(relative).is_absolute() or ".." in Path(relative).parts or relative in documents:
             raise SchemaError("portable SourceGuard target proof path is invalid")
         try:
@@ -265,8 +265,8 @@ def _portable_target_documents(
         raise SchemaError("target model purpose proof requires a current contract")
     required = {resolved.name}
     for failure in contract.prevented_failures:
-        required.add(Path(failure.known_good.observation_path).as_posix())
-        required.add(Path(failure.known_bad.observation_path).as_posix())
+        required.add(Path(failure.known_good.observation_path.replace("\\", "/")).as_posix())
+        required.add(Path(failure.known_bad.observation_path.replace("\\", "/")).as_posix())
     if set(documents) != required:
         raise SchemaError("portable SourceGuard target proof file denominator is not closed")
     return documents

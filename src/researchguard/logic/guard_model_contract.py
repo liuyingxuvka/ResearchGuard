@@ -905,9 +905,13 @@ def verify_portable_target_contract_material(
         raise GuardModelContractError("portable target proof locator binding differs")
     try:
         contract_relative = _portable_relative_path(raw["guard_contract_locator"])
-        expected_root = Path(target_root).resolve()
+        # These are portable locators, not paths on the exporting machine.
+        # A bundle authored on Windows must name the same relative contract
+        # when replayed on POSIX.  Keep the original bytes/hash untouched and
+        # apply the existing containment check to the normalized locators.
+        expected_root = Path(str(target_root).replace("\\", "/")).resolve()
         requested_contract = _inside(
-            expected_root, contract_path, must_exist=False
+            expected_root, str(contract_path).replace("\\", "/"), must_exist=False
         )
         requested_relative = requested_contract.relative_to(expected_root).as_posix()
     except ValueError as exc:
