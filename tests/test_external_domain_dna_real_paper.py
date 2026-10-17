@@ -901,7 +901,9 @@ def test_native_replay_cache_has_exact_identity_and_never_caches_material_replay
     assert material_calls == 3
 
 
-def test_generic_nonpaper_consistent_workflow_uses_the_same_native_path(tmp_path: Path) -> None:
+def test_generic_nonpaper_consistent_workflow_uses_the_same_native_path(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     spec = _spec()
     target = spec["target"]
     workflow = {"transitions": {"ready_to_done": "done"}}
@@ -1209,6 +1211,15 @@ def test_generic_nonpaper_consistent_workflow_uses_the_same_native_path(tmp_path
         scope_authority_record=scope_authority,
         material_root=tmp_path,
     )
+    native_calls: list[tuple[str, ...]] = []
+    native_context = domain_dna_module._portable_native_context
+
+    def counted_native(bundle: bytes, **kwargs):
+        native_calls.append(tuple(kwargs.get("trusted_producer_descriptor_fingerprints", ())))
+        return native_context(bundle, **kwargs)
+
+    monkeypatch.setattr(domain_dna_module, "_portable_native_context", counted_native)
+    _compute_portable_native_context.cache_clear()
     qualified = qualify_external_domain_dna(
         bundle,
         trusted_artifact_sha256=_artifact_hashes(spec),
@@ -1223,6 +1234,37 @@ def test_generic_nonpaper_consistent_workflow_uses_the_same_native_path(tmp_path
     assert qualified["target_id"] == "workflow:synthetic-state-check"
     assert source_input["extraction_requests"][0]["selector"]["selector_kind"] == "json_pointer"
     assert "line_number" not in source_input["extraction_requests"][0]
+
+    assert native_calls == [_trust_roots()]
+    native_calls.clear()
+    projected = project_external_domain_dna(
+        bundle, trusted_artifact_sha256=_artifact_hashes(spec),
+        trusted_producer_descriptor_fingerprints=_trust_roots(),
+        trusted_scope_authority_producer_descriptor_fingerprints=[scope_authority["producer_descriptor_fingerprint"]],
+        material_root=tmp_path, query_kind="impact", object_id=str(target["target_id"]),
+    )
+    assert projected["status"] == "dna_qualified"
+    assert projected["detail"]["status"] == "impact_complete"
+    assert native_calls == [_trust_roots()]
+    native_calls.clear()
+    assert external_domain_dna_impact(bundle, [str(target["target_id"])])["status"] == "impact_complete"
+    assert native_calls == [()]
+    native_calls.clear()
+    assert external_domain_dna_reverse(bundle, str(target["target_id"]))["status"] == "reverse_complete"
+    assert native_calls == [()]
+
+    # Standalone graph queries retain the existing native gate even after a
+    # trusted projection has populated the bounded replay cache.
+    def native_failure(*args, **kwargs):
+        raise ExternalDomainDnaError("native replay rejected current material")
+
+    monkeypatch.setattr(domain_dna_module, "_portable_native_context", native_failure)
+    for query in (
+        lambda: external_domain_dna_impact(bundle, [str(target["target_id"])]),
+        lambda: external_domain_dna_reverse(bundle, str(target["target_id"])),
+    ):
+        with pytest.raises(ExternalDomainDnaError, match="native replay rejected"):
+            query()
 
 
 def test_wheel_packaging_and_zero_bespoke_domain_evaluator_residuals(

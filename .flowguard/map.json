@@ -43,7 +43,7 @@
         ".flowguard/models/researchguard_suite_model.py"
       ],
       "status": "confirmed",
-      "fingerprint": "sha256:9e62a03366e994c85c2ce681b755ea6825be420cfd106da17f1f7df5439ce0b0"
+      "fingerprint": "sha256:dd1d50b18be6302a3d9fe147e1a8eb696499d05c3b9921ba095f1759e39e476a"
     },
     {
       "id": "logicguard",
@@ -205,29 +205,6 @@
       "models": [],
       "status": "confirmed",
       "fingerprint": "sha256:bab5b58a40f132016ec1dfab25edede2bcd82fff34e2552e94fd5f9250e89e27"
-    },
-    {
-      "id": "consumer-skills",
-      "summary": "Own five consumer entrypoints and selected reference/script material.",
-      "responsibilities": [
-        "Own five consumer entrypoints and selected reference/script material."
-      ],
-      "files": [
-        "skills/**/*.py"
-      ],
-      "entrypoints": [],
-      "state": [
-        "static consumer skill files"
-      ],
-      "side_effects": [],
-      "depends_on": [],
-      "tests": [
-        "tests/test_skill_suite.py",
-        "tests/test_prompt_bundles.py"
-      ],
-      "models": [],
-      "status": "confirmed",
-      "fingerprint": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     {
       "id": "migration",

@@ -2336,7 +2336,7 @@ def export_external_domain_dna(
     ).encode("utf-8")
 
 
-def _parse_bundle(bundle: bytes) -> tuple[Mapping[str, object], Mapping[str, object]]:
+def _parse_bundle_structure(bundle: bytes) -> tuple[Mapping[str, object], Mapping[str, object]]:
     try:
         raw = json.loads(bundle.decode("utf-8"))
     except (UnicodeError, json.JSONDecodeError) as exc:
@@ -2416,24 +2416,6 @@ def _parse_bundle(bundle: bytes) -> tuple[Mapping[str, object], Mapping[str, obj
         )
     except (UnicodeError, ValueError) as exc:
         raise ExternalDomainDnaError("native composition bundle is not canonical base64") from exc
-    native_contexts, native_qualification = _portable_native_context(native_bundle)
-    if native_qualification.get("bundle_fingerprint") != native_composition["bundle_fingerprint"]:
-        raise ExternalDomainDnaError("native composition bundle fingerprint is rebound")
-    expected_bindings = {
-        member_id: native_contexts[member_id]["binding"] for member_id in MEMBER_IDS
-    }
-    if _digest(expected_bindings) != native_composition["member_binding_fingerprint"]:
-        raise ExternalDomainDnaError("native composition member bindings are rebound")
-    member_models = validated["member_models"]
-    assert isinstance(member_models, Mapping)
-    for member_id in MEMBER_IDS:
-        model = member_models[member_id]
-        if not isinstance(model, Mapping) or _canonical(model["native_binding"]) != _canonical(
-            expected_bindings[member_id]
-        ):
-            raise ExternalDomainDnaError(
-                f"{member_id} external model is not bound to the embedded native envelope"
-            )
     verification = _rows(artifact["material_verification"], "material verification")
     evidence = _mapping(
         artifact["native_member_evidence"],
@@ -2544,7 +2526,43 @@ def _parse_bundle(bundle: bytes) -> tuple[Mapping[str, object], Mapping[str, obj
     return artifact, validated
 
 
-def qualify_external_domain_dna(
+def _check_native_bundle_bindings(
+    artifact: Mapping[str, object], spec: Mapping[str, object],
+    native_contexts: Mapping[str, Mapping[str, object]], native_qualification: Mapping[str, object],
+) -> None:
+    native_composition = artifact["native_composition"]
+    assert isinstance(native_composition, Mapping)
+    if native_qualification.get("bundle_fingerprint") != native_composition["bundle_fingerprint"]:
+        raise ExternalDomainDnaError("native composition bundle fingerprint is rebound")
+    expected_bindings = {
+        member_id: native_contexts[member_id]["binding"] for member_id in MEMBER_IDS
+    }
+    if _digest(expected_bindings) != native_composition["member_binding_fingerprint"]:
+        raise ExternalDomainDnaError("native composition member bindings are rebound")
+    member_models = spec["member_models"]
+    assert isinstance(member_models, Mapping)
+    for member_id in MEMBER_IDS:
+        model = member_models[member_id]
+        if not isinstance(model, Mapping) or _canonical(model["native_binding"]) != _canonical(
+            expected_bindings[member_id]
+        ):
+            raise ExternalDomainDnaError(
+                f"{member_id} external model is not bound to the embedded native envelope"
+            )
+
+
+def _parse_bundle(bundle: bytes) -> tuple[Mapping[str, object], Mapping[str, object]]:
+    """Check standalone graph queries against current native self-consistency once."""
+    artifact, spec = _parse_bundle_structure(bundle)
+    composition = artifact["native_composition"]
+    assert isinstance(composition, Mapping)
+    native_bundle = base64.b64decode(str(composition["bundle_b64"]).encode("ascii"), validate=True)
+    contexts, qualification = _portable_native_context(native_bundle)
+    _check_native_bundle_bindings(artifact, spec, contexts, qualification)
+    return artifact, spec
+
+
+def _qualify_external_domain_dna(
     bundle: bytes,
     *,
     trusted_artifact_sha256: Iterable[str] = (),
@@ -2552,13 +2570,21 @@ def qualify_external_domain_dna(
     trusted_scope_authority_fingerprints: Iterable[str] = (),
     trusted_scope_authority_producer_descriptor_fingerprints: Iterable[str] = (),
     material_root: Path | None = None,
-) -> dict[str, object]:
+) -> tuple[dict[str, object], Mapping[str, object] | None, Mapping[str, object] | None]:
     """Qualify candidate DNA against native replay and independent scope authority."""
 
     try:
-        artifact, spec = _parse_bundle(bundle)
+        artifact, spec = _parse_bundle_structure(bundle)
+        native_composition = artifact["native_composition"]
+        assert isinstance(native_composition, Mapping)
+        native_bundle = base64.b64decode(str(native_composition["bundle_b64"]).encode("ascii"), validate=True)
+        native_contexts, native_qualification = _portable_native_context(
+            native_bundle,
+            trusted_producer_descriptor_fingerprints=trusted_producer_descriptor_fingerprints,
+        )
+        _check_native_bundle_bindings(artifact, spec, native_contexts, native_qualification)
     except ExternalDomainDnaError as exc:
-        return {
+        return ({
             "status": "dna_blocked",
             "dna_fingerprint": "",
             "target_id": "",
@@ -2575,7 +2601,7 @@ def qualify_external_domain_dna(
             },
             "first_gap": {"code": "external-domain-dna-invalid", "detail": str(exc)},
             "claim_boundary": "No external-object claim is licensed.",
-        }
+        }, None, None)
     target = spec["target"]
     member_models = spec["member_models"]
     assert isinstance(target, Mapping) and isinstance(member_models, Mapping)
@@ -2595,17 +2621,6 @@ def qualify_external_domain_dna(
     if isinstance(authority, Mapping) and isinstance(authority.get("target"), Mapping):
         authority_target = authority["target"]  # type: ignore[assignment]
     try:
-        native_composition = artifact["native_composition"]
-        assert isinstance(native_composition, Mapping)
-        native_bundle = base64.b64decode(
-            str(native_composition["bundle_b64"]).encode("ascii"), validate=True
-        )
-        native_contexts, native_qualification = _portable_native_context(
-            native_bundle,
-            trusted_producer_descriptor_fingerprints=(
-                trusted_producer_descriptor_fingerprints
-            ),
-        )
         if resolved_root is not None:
             _verify_target_materials(authority_target, resolved_root)
         replayed_member_set = _replay_member_set(
@@ -2616,7 +2631,7 @@ def qualify_external_domain_dna(
             native_contexts=native_contexts,
         )
     except (ExternalDomainDnaError, ImportError, OSError, TypeError, ValueError) as exc:
-        return {
+        return ({
             "status": "dna_blocked",
             "dna_fingerprint": artifact["dna_fingerprint"],
             "target_id": target["target_id"],
@@ -2641,10 +2656,10 @@ def qualify_external_domain_dna(
                 "detail": str(exc),
             },
             "claim_boundary": "No external-object claim is licensed.",
-        }
+        }, artifact, spec)
     for member_id in MEMBER_IDS:
         if replayed_member_set[member_id] != native_evidence.get(member_id):
-            return {
+            return ({
                 "status": "dna_blocked",
                 "dna_fingerprint": artifact["dna_fingerprint"],
                 "target_id": target["target_id"],
@@ -2669,7 +2684,7 @@ def qualify_external_domain_dna(
                     "detail": member_id,
                 },
                 "claim_boundary": "No external-object claim is licensed.",
-            }
+            }, artifact, spec)
     artifact_rows = _rows(authority_target["artifacts"], "target artifacts")
     declared_hashes = {str(row["sha256"]) for row in artifact_rows}
     trusted = {str(item).removeprefix("sha256:") for item in trusted_artifact_sha256}
@@ -2755,7 +2770,7 @@ def qualify_external_domain_dna(
     assert isinstance(verification, list)
     model_scope = target["model_scope"]
     assert isinstance(model_scope, Mapping)
-    return {
+    return ({
         "status": status,
         "dna_id": artifact["dna_id"],
         "dna_fingerprint": artifact["dna_fingerprint"],
@@ -2852,7 +2867,28 @@ def qualify_external_domain_dna(
             "reverse": "output_object_id",
             "scope": "scope_id",
         },
-    }
+    }, artifact, spec)
+
+
+
+def qualify_external_domain_dna(
+    bundle: bytes,
+    *,
+    trusted_artifact_sha256: Iterable[str] = (),
+    trusted_producer_descriptor_fingerprints: Sequence[str] = (),
+    trusted_scope_authority_fingerprints: Iterable[str] = (),
+    trusted_scope_authority_producer_descriptor_fingerprints: Iterable[str] = (),
+    material_root: Path | None = None,
+) -> dict[str, object]:
+    """Qualify native replay and independent scope authority once."""
+    summary, _artifact, _spec = _qualify_external_domain_dna(
+        bundle, trusted_artifact_sha256=trusted_artifact_sha256,
+        trusted_producer_descriptor_fingerprints=trusted_producer_descriptor_fingerprints,
+        trusted_scope_authority_fingerprints=trusted_scope_authority_fingerprints,
+        trusted_scope_authority_producer_descriptor_fingerprints=trusted_scope_authority_producer_descriptor_fingerprints,
+        material_root=material_root,
+    )
+    return summary
 
 
 def _graph(
@@ -3114,6 +3150,10 @@ def external_domain_dna_impact(bundle: bytes, changed_ids: Iterable[str]) -> dic
     """Return the exact downstream closure for known changed object ids."""
 
     artifact, spec = _parse_bundle(bundle)
+    return _external_domain_dna_impact_from_artifact(artifact, spec, changed_ids)
+
+
+def _external_domain_dna_impact_from_artifact(artifact: Mapping[str, object], spec: Mapping[str, object], changed_ids: Iterable[str]) -> dict[str, object]:
     objects, edges = _graph(spec, artifact)
     changed = tuple(sorted(set(str(item) for item in changed_ids)))
     unknown = tuple(item for item in changed if item not in objects)
@@ -3167,6 +3207,10 @@ def external_domain_dna_reverse(bundle: bytes, output_id: str) -> dict[str, obje
     """Trace one known output backwards to all declared prerequisites."""
 
     artifact, spec = _parse_bundle(bundle)
+    return _external_domain_dna_reverse_from_artifact(artifact, spec, output_id)
+
+
+def _external_domain_dna_reverse_from_artifact(artifact: Mapping[str, object], spec: Mapping[str, object], output_id: str) -> dict[str, object]:
     objects, edges = _graph(spec, artifact)
     authority_missing = {
         str(item)
@@ -3254,7 +3298,7 @@ def project_external_domain_dna(
 ) -> dict[str, object]:
     """Keep default output compact and expose at most one explicit drill-down."""
 
-    summary = qualify_external_domain_dna(
+    summary, artifact, spec = _qualify_external_domain_dna(
         bundle,
         trusted_artifact_sha256=trusted_artifact_sha256,
         trusted_producer_descriptor_fingerprints=(
@@ -3268,7 +3312,7 @@ def project_external_domain_dna(
     )
     if summary["status"] == "dna_blocked" or query_kind is None:
         return summary
-    artifact, spec = _parse_bundle(bundle)
+    assert artifact is not None and spec is not None
     detail: object | None = None
     if query_kind == "member":
         member_models = spec["member_models"]
@@ -3301,9 +3345,9 @@ def project_external_domain_dna(
         if isinstance(model_scope, Mapping) and model_scope.get("scope_id") == object_id:
             detail = model_scope
     elif query_kind == "impact":
-        detail = external_domain_dna_impact(bundle, [object_id])
+        detail = _external_domain_dna_impact_from_artifact(artifact, spec, [object_id])
     elif query_kind == "reverse":
-        detail = external_domain_dna_reverse(bundle, object_id)
+        detail = _external_domain_dna_reverse_from_artifact(artifact, spec, object_id)
     result = dict(summary)
     result.update(
         {
