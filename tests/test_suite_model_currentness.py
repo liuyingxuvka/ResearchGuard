@@ -46,18 +46,3 @@ def test_all_suite_version_authorities_are_current() -> None:
     assert topology["software_dna"]["readiness_layer_count"] == 7
     test_dependencies = package["project"]["optional-dependencies"]["test"]
     assert "flowguard @ git+https://github.com/liuyingxuvka/FlowGuard.git@18443e17db93725cf9484daca22fee25e9d7c1d7" in test_dependencies
-
-
-def test_suite_model_runner_and_currentness_test_are_freshness_inputs() -> None:
-    builder = (
-        ROOT / "scripts" / "build_skillguard_contracts.py"
-    ).read_text(encoding="utf-8")
-    for relative_path in (
-        ".flowguard/models/researchguard_suite_model.py",
-        ".flowguard/models/researchguard_suite/model-definition.json",
-        ".flowguard/verification/run_researchguard_suite_model.py",
-        "tests/test_suite_model_currentness.py",
-        "models/software_dna/researchguard.json",
-        "src/researchguard/software_dna.py",
-    ):
-        assert relative_path in builder

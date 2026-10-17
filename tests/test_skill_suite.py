@@ -36,26 +36,7 @@ BLUEPRINT_REFERENCES = {
     "experimentguard": "references/experiment-model-protocol.md",
 }
 
-SKILLGUARD_REQUIRED_SECTIONS = (
-    "Purpose",
-    "Entrypoint Scope",
-    "Local Material Routing",
-    "Entrypoint Acceptance Map",
-    "Use When",
-    "Do Not Use When",
-    "Required Workflow",
-    "Hard Gates",
-    "Output Requirements",
-)
 
-SKILLGUARD_OUTPUT_TERMS = (
-    "evidence",
-    "failures",
-    "blockers",
-    "skipped_checks",
-    "residual_risk",
-    "claim_boundary",
-)
 
 
 def test_consumer_skill_inventory_and_metadata_are_exact() -> None:
@@ -77,13 +58,6 @@ def test_consumer_skill_inventory_and_metadata_are_exact() -> None:
         assert f"${member}" in interface["interface"]["default_prompt"]
 
 
-def test_managed_skill_entrypoints_have_current_operational_sections() -> None:
-    for member in MEMBERS:
-        text = (ROOT / "skills" / member / "SKILL.md").read_text(encoding="utf-8")
-        headings = set(re.findall(r"^##\s+(.+?)\s*$", text, flags=re.MULTILINE))
-        assert set(SKILLGUARD_REQUIRED_SECTIONS) <= headings, member
-        lowered = text.casefold()
-        assert all(term.casefold() in lowered for term in SKILLGUARD_OUTPUT_TERMS), member
 
 
 def test_internal_route_inventory_is_exact() -> None:
@@ -120,33 +94,6 @@ def test_consumer_projection_has_no_retired_skill_or_launcher() -> None:
     assert "run_traceguard.py" not in text
 
 
-def test_author_contracts_form_one_five_surface_unit() -> None:
-    for member in MEMBERS:
-        payload = json.loads(
-            (
-                ROOT
-                / "skills"
-                / member
-                / ".skillguard"
-                / "contract-source.json"
-            ).read_text(encoding="utf-8")
-        )
-        assert payload["maintenance_unit_id"] == "unit:researchguard-suite"
-        assert payload["member_skill_ids"] == list(MEMBERS)
-        assert payload["skill_id"] == member
-        assert payload["schema_version"] == "skillguard.contract_source.v2"
-        assert payload["repository_role"] == "skill_maintainer_source"
-        assert payload["native_route_owner"] == f"owner:researchguard:{member}"
-        assert payload["may_define_parallel_execution_route"] is False
-        assert payload["may_define_skillguard_runtime_route"] is False
-        assert payload["native_route_bindings"] == [
-            {
-                "binding_id": f"native:researchguard:{member}",
-                "native_route_id": f"route:researchguard:{member}",
-                "required_before_closure": True,
-                "source": f"skills/{member}/SKILL.md",
-            }
-        ]
 
 
 def test_member_domain_dna_and_repository_software_dna_stay_separate() -> None:

@@ -18,8 +18,6 @@
       ".github/**/*",
       ".github/*",
       ".gitignore",
-      ".skillguard/**/*",
-      ".skillguard/*",
       ".flowguard/project.toml",
       "pyproject.toml",
       "AGENTS.md"
@@ -223,10 +221,8 @@
     }
   ],
   "owner_overrides": {
-    "scripts/build_skillguard_contracts.py": "authoritative_model_system",
     "scripts/check_prompt_bundles.py": "authoritative_model_system",
     "scripts/check_researchguard_suite.py": "authoritative_model_system",
-    "scripts/check_researchguard_test_mesh.py": "authoritative_model_system",
     "scripts/check_zero_residuals.py": "authoritative_model_system",
     "scripts/compile_external_domain_dna_examples.py": "authoritative_model_system",
     "scripts/install_researchguard.py": "authoritative_model_system",
@@ -405,7 +401,6 @@
     ],
     "configuration": [
       ".flowguard/project.toml",
-      ".skillguard/**/*",
       ".github/**/*",
       ".gitignore"
     ],
@@ -426,7 +421,6 @@
     ],
     "schema": [
       ".flowguard/*.json",
-      ".skillguard/*.json",
       "models/**/*",
       "examples/**/*.json"
     ],

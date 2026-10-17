@@ -195,30 +195,3 @@ def test_inert_mutation_is_recorded_but_not_counted_as_depth() -> None:
     assert effects[0].effective is False
     assert effects[0].state_changed is False
     assert effects[0].support_path_changed is False
-
-
-def test_affected_skillguard_contracts_bind_native_depth_without_parallel_route() -> None:
-    root = Path(__file__).resolve().parents[2]
-    control = root / "skills" / "logicguard" / ".skillguard"
-    contract = json.loads(
-        (control / "contract-source.json").read_text(encoding="utf-8")
-    )
-    manifest = json.loads(
-        (control / "check-manifest.json").read_text(encoding="utf-8")
-    )
-    checks = {row["check_id"]: row for row in contract["checks"]}
-    manifest_ids = {item["check_id"] for item in manifest["checks"]}
-
-    assert set(checks) == manifest_ids == {
-        "check:logicguard:consumer-contract",
-        "check:logicguard:prompt-load",
-        "check:logicguard:native-tests",
-        "check:logicguard:task-model-closure",
-    }
-    assert contract["schema_version"] == "skillguard.contract_source.v2"
-    assert contract["native_route_bindings"][0]["native_route_id"] == "route:researchguard:logicguard"
-    assert len(contract["step_bindings"]) == 4
-    assert len(contract["checks"]) == 4
-    assert contract["depth_profile"]["profile_id"].endswith(":strict-model-closure")
-    assert not (control / "work-contract.json").exists()
-    assert not (control / "check_manifest.json").exists()

@@ -3,7 +3,7 @@
 The scanner is deliberately scoped to a candidate tree (consumer projection,
 unpacked distribution, or another release staging directory) and to the
 contents of the current staged Git diff.  It is not a replacement for
-SkillGuard's projection audit or the installer currentness check.
+the installer currentness check.
 """
 
 from __future__ import annotations

@@ -43,16 +43,6 @@ role = "models"
 kind = "directory"
 
 [[inventory.members]]
-path = "models/experimentguard_skill_contract_model.py"
-role = "models"
-kind = "file"
-
-[[inventory.members]]
-path = "models/logicguard_skill_contract_model.py"
-role = "models"
-kind = "file"
-
-[[inventory.members]]
 path = "models/native-case-mapping.json"
 role = "models"
 kind = "file"
@@ -178,21 +168,6 @@ role = "models"
 kind = "file"
 
 [[inventory.members]]
-path = "models/researchguard_skill_contract_model.py"
-role = "models"
-kind = "file"
-
-[[inventory.members]]
-path = "models/researchguard_skill_contract_model_common.py"
-role = "models"
-kind = "file"
-
-[[inventory.members]]
-path = "models/researchguard_skillguard_maintenance_model.py"
-role = "models"
-kind = "file"
-
-[[inventory.members]]
 path = "models/researchguard_suite"
 role = "models"
 kind = "directory"
@@ -209,16 +184,6 @@ kind = "file"
 
 [[inventory.members]]
 path = "models/sourceguard_content_anchor_oracle_model.py"
-role = "models"
-kind = "file"
-
-[[inventory.members]]
-path = "models/sourceguard_skill_contract_model.py"
-role = "models"
-kind = "file"
-
-[[inventory.members]]
-path = "models/traceguard_skill_contract_model.py"
 role = "models"
 kind = "file"
 
@@ -344,11 +309,6 @@ kind = "directory"
 
 [[inventory.members]]
 path = "verification/owners/trace_domain_export/run_checks.py"
-role = "verification"
-kind = "file"
-
-[[inventory.members]]
-path = "verification/run_researchguard_skillguard_maintenance_model.py"
 role = "verification"
 kind = "file"
 

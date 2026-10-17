@@ -169,28 +169,5 @@ def test_reported_prompt_byte_totals_equal_exact_entry_files() -> None:
 
 
 def test_prompt_governance_has_one_declared_execution_path() -> None:
-    for member in (
-        "researchguard", "logicguard", "sourceguard", "traceguard", "experimentguard"
-    ):
-        source = json.loads(
-            (ROOT / "skills" / member / ".skillguard" / "contract-source.json").read_text(
-                encoding="utf-8"
-            )
-        )
-        assert source["schema_version"] == "skillguard.contract_source.v2"
-        checks = {row["check_id"]: row for row in source["checks"]}
-        prompt = checks[f"check:{member}:prompt-load"]
-        native = checks[f"check:{member}:native-tests"]
-        assert prompt["args"] == [
-            "scripts/check_prompt_bundles.py", "--member", member, "--json"
-        ]
-        assert native["args"][:2] == ["-m", "pytest"]
-        assert prompt["command"] == native["command"] == "python"
-        assert prompt["expected"] == native["expected"] == {"exit_code": 0}
-        assert prompt["member_skill_id"] == native["member_skill_id"] == member
-        assert prompt["native_route_id"] == native["native_route_id"] == f"route:researchguard:{member}"
-        assert prompt["depends_on_check_ids"] == [f"check:{member}:consumer-contract"]
-        assert native["depends_on_check_ids"] == [f"check:{member}:prompt-load"]
-
     suite_checker = (ROOT / "scripts/check_researchguard_suite.py").read_text(encoding="utf-8")
     assert "check_prompt_bundles.py" not in suite_checker

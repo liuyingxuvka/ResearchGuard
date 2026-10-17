@@ -193,10 +193,6 @@ def _scheduled_identity() -> dict:
     return {
         "scheduler_or_trigger_id":"trigger:traceguard:case-library:nightly",
         "scheduled_execution_id":"execution:traceguard:case-library:2026-07-14",
-        "installation_receipt_id":"install:traceguard:case-library:current",
-        "installation_receipt_hash":"1"*64,
-        "installation_receipt_root_ref":{"path_token":"active_skill_root","relative_path":".skillguard/installation-receipt.json"},
-        "installed_runtime_fingerprint":"2"*64,
     }
 
 

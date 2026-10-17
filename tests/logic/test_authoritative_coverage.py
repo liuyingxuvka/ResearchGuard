@@ -276,31 +276,6 @@ def test_universe_fingerprint_changes_with_authoritative_inventory() -> None:
     assert second.broad_claim_licensed is False
 
 
-def test_skill_contract_binds_authoritative_native_receipt_without_parallel_route() -> None:
-    root = Path(__file__).resolve().parents[2]
-    control = root / "skills" / "logicguard" / ".skillguard"
-    contract = json.loads(
-        (control / "contract-source.json").read_text(encoding="utf-8")
-    )
-    manifest = json.loads(
-        (control / "check-manifest.json").read_text(encoding="utf-8")
-    )
-    checks = {row["check_id"]: row for row in contract["checks"]}
-    manifest_ids = {item["check_id"] for item in manifest["checks"]}
-
-    assert contract["maintenance_unit_id"] == "unit:researchguard-suite"
-    assert contract["member_skill_ids"] == [
-        "researchguard", "logicguard", "sourceguard", "traceguard", "experimentguard"
-    ]
-    assert contract["schema_version"] == "skillguard.contract_source.v2"
-    assert set(checks) == manifest_ids == {
-        "check:logicguard:consumer-contract",
-        "check:logicguard:prompt-load",
-        "check:logicguard:native-tests",
-        "check:logicguard:task-model-closure",
-    }
-    assert contract["native_route_bindings"][0]["native_route_id"] == "route:researchguard:logicguard"
-    assert len(contract["step_bindings"]) == 4
 
 
 def test_low_declared_importance_cannot_remove_an_explicit_shallow_card() -> None:

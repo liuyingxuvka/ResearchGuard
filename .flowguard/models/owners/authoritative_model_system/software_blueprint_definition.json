@@ -14,7 +14,6 @@
     "config_patterns": [
       ".github/**/*",
       ".gitignore",
-      ".skillguard/**/*",
       ".flowguard/project.toml",
       ".flowguard/layout.toml",
       "pyproject.toml",
@@ -316,8 +315,6 @@
     }
   ],
   "owner_overrides": {
-    ".flowguard/models/experimentguard_skill_contract_model.py": "authoritative_model_system",
-    ".flowguard/models/logicguard_skill_contract_model.py": "authoritative_model_system",
     ".flowguard/models/owners/argument_support_closure/model.py": "argument_support_closure",
     ".flowguard/models/owners/authoritative_model_system/model.py": "authoritative_model_system",
     ".flowguard/models/owners/compositional_verification_kernel/model.py": "compositional_verification_kernel",
@@ -328,13 +325,8 @@
     ".flowguard/models/owners/model_test_code_alignment/model.py": "model_test_code_alignment",
     ".flowguard/models/owners/researchguard_suite/model.py": "researchguard_suite",
     ".flowguard/models/owners/trace_domain_export/model.py": "trace_domain_export",
-    ".flowguard/models/researchguard_skill_contract_model.py": "authoritative_model_system",
-    ".flowguard/models/researchguard_skill_contract_model_common.py": "authoritative_model_system",
-    ".flowguard/models/researchguard_skillguard_maintenance_model.py": "authoritative_model_system",
     ".flowguard/models/researchguard_suite_model.py": "researchguard_suite",
     ".flowguard/models/sourceguard_content_anchor_oracle_model.py": "authoritative_model_system",
-    ".flowguard/models/sourceguard_skill_contract_model.py": "authoritative_model_system",
-    ".flowguard/models/traceguard_skill_contract_model.py": "authoritative_model_system",
     ".flowguard/verification/owners/argument_support_closure/run_checks.py": "argument_support_closure",
     ".flowguard/verification/owners/authoritative_model_system/run_checks.py": "authoritative_model_system",
     ".flowguard/verification/owners/compositional_verification_kernel/run_checks.py": "compositional_verification_kernel",
@@ -345,16 +337,12 @@
     ".flowguard/verification/owners/model_test_code_alignment/run_checks.py": "model_test_code_alignment",
     ".flowguard/verification/owners/researchguard_suite/run_checks.py": "researchguard_suite",
     ".flowguard/verification/owners/trace_domain_export/run_checks.py": "trace_domain_export",
-    ".flowguard/verification/run_researchguard_skillguard_maintenance_model.py": "authoritative_model_system",
     ".flowguard/verification/run_researchguard_suite_model.py": "researchguard_suite",
-    "scripts/author/build_skillguard_surface_inventory.py": "authoritative_model_system",
     "scripts/author/refresh_regression_manifest_fingerprints.py": "authoritative_model_system",
     "scripts/build_self_dna_case_mapping.py": "authoritative_model_system",
-    "scripts/build_skillguard_contracts.py": "authoritative_model_system",
     "scripts/check_prompt_bundles.py": "authoritative_model_system",
     "scripts/check_researchguard_privacy.py": "authoritative_model_system",
     "scripts/check_researchguard_suite.py": "authoritative_model_system",
-    "scripts/check_researchguard_test_mesh.py": "authoritative_model_system",
     "scripts/check_zero_residuals.py": "authoritative_model_system",
     "scripts/compile_external_domain_dna_examples.py": "authoritative_model_system",
     "scripts/install_researchguard.py": "authoritative_model_system",
@@ -535,7 +523,6 @@
     ],
     "configuration": [
       ".flowguard/project.toml",
-      ".skillguard/**/*",
       ".github/**/*",
       ".gitignore"
     ],
@@ -557,7 +544,6 @@
     "schema": [
       ".flowguard/models/**/*.json",
       ".flowguard/structure/*.json",
-      ".skillguard/*.json",
       "models/**/*",
       "examples/**/*.json"
     ],
