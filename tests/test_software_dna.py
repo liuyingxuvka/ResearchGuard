@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import importlib.metadata
 import json
 from pathlib import Path
+import shutil
 
 import pytest
 
@@ -15,10 +17,14 @@ from researchguard.software_dna import (
     software_dna_affected_closure,
     software_dna_reverse_trace,
 )
+from researchguard.self_dna import check
 
 
-def test_repository_software_dna_contract() -> None:
-    report = check_software_dna_contract(".")
+def test_repository_software_dna_contract(tmp_path: Path) -> None:
+    current, code = check(".")
+    assert code == 0
+    assert current["status"] == "ready"
+    report = current["software_dna"]
 
     assert report["status"] == "ready"
     assert report["ready"] is True
@@ -33,6 +39,31 @@ def test_repository_software_dna_contract() -> None:
     assert report["counts"]["inventory_adapters"] == 7
     assert report["readiness"]["deepest_proven_layer"] == "static_blueprint_readiness"
     assert report["readiness"]["first_gap"] == ""
+
+    assert current["flowguard"]["version"] == importlib.metadata.version("flowguard")
+    assert current["model_execution"]["status"] == "not_run"
+
+    # Keep the native contract intact while making the actual map stale.
+    source_root = Path(__file__).resolve().parents[1]
+    copied_root = tmp_path / "repository"
+    shutil.copytree(
+        source_root,
+        copied_root,
+        ignore=shutil.ignore_patterns(
+            ".git", "__pycache__", ".pytest_cache", "*.egg-info",
+            "evidence", "history", "authority", "build", "dist",
+        ),
+    )
+    map_path = copied_root / ".flowguard/map.json"
+    stale_map = json.loads(map_path.read_text(encoding="utf-8"))
+    stale_map["components"][0]["entrypoints"].append("missing_source.py:main")
+    map_path.write_text(json.dumps(stale_map), encoding="utf-8")
+    stale, code = check(copied_root)
+    assert code == 1
+    assert stale["status"] == "not_ready"
+    assert stale["software_dna"]["ready"] is True
+    assert any(row["level"] == "error" for row in stale["map_findings"])
+    assert stale["model_execution"]["status"] == "not_run"
 
 
 def test_provider_neutral_denominator_includes_non_python_surface() -> None:

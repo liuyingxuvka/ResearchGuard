@@ -31,10 +31,10 @@ def test_all_suite_version_authorities_are_current() -> None:
     topology = json.loads(JSON_MODEL_PATH.read_text(encoding="utf-8"))
     model = _load_model()
 
-    assert package["project"]["version"] == "0.5.6"
-    assert __version__ == "0.5.6"
-    assert model.CURRENT_RESEARCHGUARD_VERSION == "0.5.6"
-    assert topology["model_id"] == "researchguard.suite.v0.5.6"
+    assert package["project"]["version"] == "0.5.7"
+    assert __version__ == "0.5.7"
+    assert model.CURRENT_RESEARCHGUARD_VERSION == "0.5.7"
+    assert topology["model_id"] == "researchguard.suite.v0.5.7"
     assert topology["software_dna"]["model_path"] == "models/software_dna/researchguard.json"
     assert topology["software_dna"]["root_model_id"] == "researchguard-suite"
     assert topology["software_dna"]["member_model_ids"] == [
@@ -45,4 +45,4 @@ def test_all_suite_version_authorities_are_current() -> None:
     ]
     assert topology["software_dna"]["readiness_layer_count"] == 7
     test_dependencies = package["project"]["optional-dependencies"]["test"]
-    assert "flowguard @ git+https://github.com/liuyingxuvka/FlowGuard.git@v0.70.3" in test_dependencies
+    assert "flowguard @ git+https://github.com/liuyingxuvka/FlowGuard.git@v0.70.4" in test_dependencies

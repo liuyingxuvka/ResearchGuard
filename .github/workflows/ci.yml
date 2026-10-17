@@ -29,7 +29,7 @@ jobs:
       - name: Install
         run: python -m pip install --upgrade pip build && python -m pip install -e ".[test]"
       - name: Verify current public FlowGuard
-        run: python -c "import importlib.metadata as m, flowguard; from flowguard.map.common import SCHEMA; assert m.version('flowguard') == flowguard.__version__ == '0.70.3'; assert SCHEMA == 'flowguard.map.v1'"
+        run: python -c "import importlib.metadata as m, flowguard; from flowguard.map.common import SCHEMA; assert m.version('flowguard') == flowguard.__version__ == '0.70.4'; assert SCHEMA == 'flowguard.map.v1'"
       - name: Complete native suite
         if: runner.os == 'Linux'
         run: python -m pytest

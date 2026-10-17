@@ -10,30 +10,39 @@
   "components": [
     {
       "id": "researchguard-suite",
-      "summary": "Own the public console, source-bound member selection, composition transport, external DNA and native repository DNA indexes.",
+      "summary": "Own shared suite identity, admission and transport contracts, native receipt and target authorities, portable materials and read-only repository DNA qualification.",
       "responsibilities": [
-        "Own the public console, source-bound member selection, composition transport, external DNA and native repository DNA indexes."
+        "Own shared suite identity, admission and transport contracts, native receipt and target authorities, portable materials and read-only repository DNA qualification.",
+        "Expose shared contracts without owning cross-member CLI execution; report static map and DNA readiness separately from executable-model results."
       ],
       "files": [
-        "src/researchguard/*.py",
-        "src/researchguard/resources/*.py"
+        "src/researchguard/__init__.py",
+        "src/researchguard/admission.py",
+        "src/researchguard/external_scope_authority.py",
+        "src/researchguard/model_envelope.py",
+        "src/researchguard/native_receipts.py",
+        "src/researchguard/portable_material.py",
+        "src/researchguard/resources/__init__.py",
+        "src/researchguard/self_dna.py",
+        "src/researchguard/software_dna.py",
+        "src/researchguard/suite.py",
+        "src/researchguard/target_authority.py"
       ],
       "entrypoints": [
-        "src/researchguard/cli.py:main",
-        "src/researchguard/routing.py:select_member_request",
-        "src/researchguard/domain_dna.py:qualify_external_domain_dna",
-        "src/researchguard/self_dna.py:check"
+        "src/researchguard/self_dna.py:check",
+        "src/researchguard/suite.py:suite_identity"
       ],
       "state": [
-        "task facts and composition bindings"
+        "suite identity, shared contract and native authority records"
       ],
       "side_effects": [
-        "read explicitly requested material files"
+        "read current repository source and explicitly supplied native materials"
       ],
       "depends_on": [
         "experimentguard",
         "logicguard",
         "sourceguard",
+        "suite-orchestration",
         "traceguard"
       ],
       "tests": [
@@ -43,7 +52,76 @@
         ".flowguard/models/researchguard_suite_model.py"
       ],
       "status": "confirmed",
-      "fingerprint": "sha256:0403ffb921d39ef4c4a62680f578e1331d06b777b3a9160f37dcf8957ebedfa3"
+      "fingerprint": "sha256:463793e844064059ecb62e5bef98489106cc660e1380a0b4ba84afc4803b1767"
+    },
+    {
+      "id": "suite-orchestration",
+      "summary": "Own unified and member CLI entrypoints, source-bound routing/composition, external DNA qualification and native owner-attestation adapters; preserve each member’s native semantic owner.",
+      "responsibilities": [
+        "Select the minimum sufficient member set and route to the existing native commands.",
+        "Compose external material and replay/attestation bridges without replacing member algorithms or shared receipt authorities.",
+        "Own Trace template-pack CLI adapters that consume the Trace command surface."
+      ],
+      "files": [
+        "src/researchguard/__main__.py",
+        "src/researchguard/cli.py",
+        "src/researchguard/domain_dna.py",
+        "src/researchguard/experiment/cli.py",
+        "src/researchguard/experiment/owner_attestation.py",
+        "src/researchguard/logic/cli.py",
+        "src/researchguard/logic/owner_attestation.py",
+        "src/researchguard/routing.py",
+        "src/researchguard/source/cli.py",
+        "src/researchguard/source/owner_attestation.py",
+        "src/researchguard/trace/cli.py",
+        "src/researchguard/trace/owner_attestation.py",
+        "src/researchguard/trace/template_packs.py"
+      ],
+      "entrypoints": [
+        "src/researchguard/cli.py:main",
+        "src/researchguard/routing.py:select_member_request",
+        "src/researchguard/domain_dna.py:qualify_external_domain_dna",
+        "src/researchguard/logic/cli.py:main",
+        "src/researchguard/source/cli.py:main",
+        "src/researchguard/trace/cli.py:main",
+        "src/researchguard/experiment/cli.py:main",
+        "src/researchguard/logic/owner_attestation.py:replay_native_owner_attestation",
+        "src/researchguard/source/owner_attestation.py:replay_native_owner_attestation",
+        "src/researchguard/trace/owner_attestation.py:replay_native_owner_attestation",
+        "src/researchguard/experiment/owner_attestation.py:replay_native_owner_attestation"
+      ],
+      "state": [
+        "task facts, member selection, composition bindings and native replay transports"
+      ],
+      "side_effects": [
+        "read explicitly supplied material files",
+        "member commands perform their existing explicit native writes"
+      ],
+      "depends_on": [
+        "experimentguard",
+        "logicguard",
+        "researchguard-suite",
+        "sourceguard",
+        "traceguard"
+      ],
+      "tests": [
+        "tests/test_*.py",
+        "tests/logic/**/*.py",
+        "tests/logic/*.py",
+        "tests/logic_template_packs/**/*.py",
+        "tests/source/**/*.py",
+        "tests/source/*.py",
+        "tests/trace/**/*.py",
+        "tests/trace/*.py",
+        "tests/experiment/**/*.py",
+        "tests/experiment/*.py"
+      ],
+      "models": [
+        ".flowguard/models/researchguard_suite_model.py",
+        ".flowguard/models/sourceguard_content_anchor_oracle_model.py"
+      ],
+      "status": "confirmed",
+      "fingerprint": "sha256:0ea954a0558f661bdf6ea25e353cb62d9368e8092bb04dc478fdf7eef19dde3c"
     },
     {
       "id": "logicguard",
@@ -52,13 +130,82 @@
         "Own argument support, source library, structured artifacts, model deepening, synthesis and project library inspection."
       ],
       "files": [
-        "src/researchguard/logic/**/*.py",
-        "src/researchguard/logic/*.py",
-        "src/researchguard/logic_template_packs/**/*.py",
-        "src/researchguard/logic_viewer/**/*.py"
+        "src/researchguard/logic/__init__.py",
+        "src/researchguard/logic/acceptance.py",
+        "src/researchguard/logic/admission.py",
+        "src/researchguard/logic/argument_modeling.py",
+        "src/researchguard/logic/artifact_inventory.py",
+        "src/researchguard/logic/blueprint.py",
+        "src/researchguard/logic/citation_matrix.py",
+        "src/researchguard/logic/counterexample.py",
+        "src/researchguard/logic/delivery.py",
+        "src/researchguard/logic/diagnostics.py",
+        "src/researchguard/logic/evaluation_overlay.py",
+        "src/researchguard/logic/evaluator.py",
+        "src/researchguard/logic/execution_depth.py",
+        "src/researchguard/logic/file_model_store.py",
+        "src/researchguard/logic/fragility.py",
+        "src/researchguard/logic/gap_ledger.py",
+        "src/researchguard/logic/guard_model_contract.py",
+        "src/researchguard/logic/hierarchy.py",
+        "src/researchguard/logic/identity.py",
+        "src/researchguard/logic/importance.py",
+        "src/researchguard/logic/library_viewer.py",
+        "src/researchguard/logic/loader.py",
+        "src/researchguard/logic/localization.py",
+        "src/researchguard/logic/markdown_structure.py",
+        "src/researchguard/logic/mesh_evaluator.py",
+        "src/researchguard/logic/mesh_index.py",
+        "src/researchguard/logic/mesh_invalidation.py",
+        "src/researchguard/logic/mesh_materialization.py",
+        "src/researchguard/logic/mesh_overlay.py",
+        "src/researchguard/logic/mesh_overlay_catalog.py",
+        "src/researchguard/logic/mesh_receipts.py",
+        "src/researchguard/logic/mesh_scc.py",
+        "src/researchguard/logic/mesh_simulator.py",
+        "src/researchguard/logic/mesh_store.py",
+        "src/researchguard/logic/mesh_transaction.py",
+        "src/researchguard/logic/minimal_sets.py",
+        "src/researchguard/logic/model.py",
+        "src/researchguard/logic/model_mesh.py",
+        "src/researchguard/logic/model_store.py",
+        "src/researchguard/logic/provenance.py",
+        "src/researchguard/logic/receipts.py",
+        "src/researchguard/logic/report.py",
+        "src/researchguard/logic/route_execution_depth.py",
+        "src/researchguard/logic/schema.py",
+        "src/researchguard/logic/simulator.py",
+        "src/researchguard/logic/source_intake.py",
+        "src/researchguard/logic/source_library.py",
+        "src/researchguard/logic/source_library_io.py",
+        "src/researchguard/logic/store_transaction.py",
+        "src/researchguard/logic/store_validation.py",
+        "src/researchguard/logic/structure_audit.py",
+        "src/researchguard/logic/structured_artifact.py",
+        "src/researchguard/logic/synthesis.py",
+        "src/researchguard/logic/synthesis_contract.py",
+        "src/researchguard/logic/task_iteration.py",
+        "src/researchguard/logic/validator.py",
+        "src/researchguard/logic/writer.py",
+        "src/researchguard/logic_template_packs/__init__.py",
+        "src/researchguard/logic_template_packs/builder.py",
+        "src/researchguard/logic_template_packs/canonical.py",
+        "src/researchguard/logic_template_packs/catalog.py",
+        "src/researchguard/logic_template_packs/models.py",
+        "src/researchguard/logic_template_packs/native_validators.py",
+        "src/researchguard/logic_template_packs/selection.py",
+        "src/researchguard/logic_viewer/__init__.py",
+        "src/researchguard/logic_viewer/common.py",
+        "src/researchguard/logic_viewer/desktop_app.py",
+        "src/researchguard/logic_viewer/i18n.py",
+        "src/researchguard/logic_viewer/launcher.py",
+        "src/researchguard/logic_viewer/settings.py",
+        "src/researchguard/logic_viewer/software_update.py",
+        "src/researchguard/logic_viewer/store.py",
+        "src/researchguard/logic_viewer/ui_data.py"
       ],
       "entrypoints": [
-        "src/researchguard/logic/cli.py:main"
+        "src/researchguard/logic/blueprint.py:check_blueprint"
       ],
       "state": [
         "native member model"
@@ -76,7 +223,7 @@
       ],
       "models": [],
       "status": "confirmed",
-      "fingerprint": "sha256:edf347082dff4b051165bcdbc77c268c45c7465a4a7108d1ba2d78772ae40a2e"
+      "fingerprint": "sha256:60604dce2ab36a32248984dec2a4268d4914e8b50ad044c78da77b601d63e1a1"
     },
     {
       "id": "sourceguard",
@@ -85,11 +232,27 @@
         "Own evidence discovery, expected-utility search plans, stop decisions and source/anchor qualification."
       ],
       "files": [
-        "src/researchguard/source/**/*.py",
-        "src/researchguard/source/*.py"
+        "src/researchguard/source/__init__.py",
+        "src/researchguard/source/admission.py",
+        "src/researchguard/source/blueprint.py",
+        "src/researchguard/source/depth.py",
+        "src/researchguard/source/graph.py",
+        "src/researchguard/source/guard_contract.py",
+        "src/researchguard/source/handoff.py",
+        "src/researchguard/source/loader.py",
+        "src/researchguard/source/multimodal.py",
+        "src/researchguard/source/planner.py",
+        "src/researchguard/source/report.py",
+        "src/researchguard/source/retrieval.py",
+        "src/researchguard/source/schema.py",
+        "src/researchguard/source/scoring.py",
+        "src/researchguard/source/stop_decision.py",
+        "src/researchguard/source/task_iteration.py",
+        "src/researchguard/source/template_packs.py",
+        "src/researchguard/source/update.py"
       ],
       "entrypoints": [
-        "src/researchguard/source/cli.py:main"
+        "src/researchguard/source/blueprint.py:check_blueprint"
       ],
       "state": [
         "native member model"
@@ -108,7 +271,7 @@
         ".flowguard/models/sourceguard_content_anchor_oracle_model.py"
       ],
       "status": "confirmed",
-      "fingerprint": "sha256:80c5d1a8568d3ffe3c796ce532628a5a637215e808c3cf2be7ea4eb44885e9cf"
+      "fingerprint": "sha256:045b6272ab5370265493ba51c2b298c63d6dc24e9e8714bcff88690404bb0248"
     },
     {
       "id": "traceguard",
@@ -117,11 +280,46 @@
         "Own temporal and causal trace inference, storyline stress, trace blueprints and case library updates."
       ],
       "files": [
-        "src/researchguard/trace/**/*.py",
-        "src/researchguard/trace/*.py"
+        "src/researchguard/trace/__init__.py",
+        "src/researchguard/trace/admission.py",
+        "src/researchguard/trace/blueprint.py",
+        "src/researchguard/trace/diagnostics.py",
+        "src/researchguard/trace/entity_resolution.py",
+        "src/researchguard/trace/evaluator.py",
+        "src/researchguard/trace/export_logicguard.py",
+        "src/researchguard/trace/guard_model/verify.py",
+        "src/researchguard/trace/handoff.py",
+        "src/researchguard/trace/headers.py",
+        "src/researchguard/trace/inference/__init__.py",
+        "src/researchguard/trace/inference/compiler.py",
+        "src/researchguard/trace/inference/contradiction_core.py",
+        "src/researchguard/trace/inference/engine.py",
+        "src/researchguard/trace/inference/explain.py",
+        "src/researchguard/trace/inference/factors/__init__.py",
+        "src/researchguard/trace/inference/factors/entity.py",
+        "src/researchguard/trace/inference/factors/evidence_trace.py",
+        "src/researchguard/trace/inference/factors/storyline_causal.py",
+        "src/researchguard/trace/inference/factors/temporal_stage.py",
+        "src/researchguard/trace/inference/osqp_backend.py",
+        "src/researchguard/trace/inference/policy.py",
+        "src/researchguard/trace/inference/projection.py",
+        "src/researchguard/trace/inference/types.py",
+        "src/researchguard/trace/library.py",
+        "src/researchguard/trace/library_depth.py",
+        "src/researchguard/trace/loader.py",
+        "src/researchguard/trace/purpose_contract.py",
+        "src/researchguard/trace/report.py",
+        "src/researchguard/trace/results.py",
+        "src/researchguard/trace/schema.py",
+        "src/researchguard/trace/soft_logic.py",
+        "src/researchguard/trace/stage_model.py",
+        "src/researchguard/trace/storyline_depth.py",
+        "src/researchguard/trace/task_iteration.py",
+        "src/researchguard/trace/temporal.py",
+        "src/researchguard/trace/validation.py"
       ],
       "entrypoints": [
-        "src/researchguard/trace/cli.py:main"
+        "src/researchguard/trace/blueprint.py:check_blueprint"
       ],
       "state": [
         "native member model"
@@ -138,7 +336,7 @@
       ],
       "models": [],
       "status": "confirmed",
-      "fingerprint": "sha256:c27926d482074d7b5e62d736dbe8ef1d77f199112783976442b21c3b5b34f49a"
+      "fingerprint": "sha256:36f04f239410e620d07495ec0e6ede2a23246a309bd729b9bf292c82096f76af"
     },
     {
       "id": "experimentguard",
@@ -147,11 +345,15 @@
         "Own minimum finite experiment sets that distinguish caller-declared hypotheses."
       ],
       "files": [
-        "src/researchguard/experiment/**/*.py",
-        "src/researchguard/experiment/*.py"
+        "src/researchguard/experiment/__init__.py",
+        "src/researchguard/experiment/admission.py",
+        "src/researchguard/experiment/blueprint.py",
+        "src/researchguard/experiment/engine.py",
+        "src/researchguard/experiment/schema.py"
       ],
       "entrypoints": [
-        "src/researchguard/experiment/cli.py:main"
+        "src/researchguard/experiment/blueprint.py:check_blueprint",
+        "src/researchguard/experiment/engine.py:recommend_experiments"
       ],
       "state": [
         "native member model"
@@ -168,7 +370,7 @@
       ],
       "models": [],
       "status": "confirmed",
-      "fingerprint": "sha256:f58a72ddabad7b1d21e0d8d845fc2ba4289ba16101291de36113ad2bd14a22b8"
+      "fingerprint": "sha256:0b84e7eed8eed26c07b534696be4cb961fb84ef4e5c8ed10f5ad7aabc2b26fa5"
     },
     {
       "id": "author-tools",
@@ -194,6 +396,7 @@
         "logicguard",
         "researchguard-suite",
         "sourceguard",
+        "suite-orchestration",
         "traceguard"
       ],
       "tests": [
@@ -204,7 +407,7 @@
       ],
       "models": [],
       "status": "confirmed",
-      "fingerprint": "sha256:352ec6d9acde199f299bedc9cd63066a429727c4e05b856e787141a82963de1e"
+      "fingerprint": "sha256:83ad8866ead60affe6385913f07feb614e3ce40f5692ab93d55d618ebefdff3e"
     },
     {
       "id": "migration",
@@ -237,15 +440,15 @@
     {
       "id": "direct-member",
       "steps": [
-        "researchguard-suite:main",
-        "logicguard:main"
+        "suite-orchestration:main",
+        "suite-orchestration:bind_member_request"
       ]
     },
     {
       "id": "research-composition",
       "steps": [
-        "researchguard-suite:select_member_request",
-        "researchguard-suite:qualify_external_domain_dna"
+        "suite-orchestration:select_member_request",
+        "suite-orchestration:qualify_external_domain_dna"
       ]
     },
     {

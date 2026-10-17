@@ -51,6 +51,8 @@ from researchguard.source.schema import (
     to_plain,
 )
 from researchguard.source.guard_contract import prove_target_model_contract
+from researchguard.source.graph import build_adjacency
+from researchguard.source.task_iteration import affected_source_obligations
 
 
 SHA_A = "sha256:" + "a" * 64
@@ -461,6 +463,15 @@ def test_source_impact_without_current_qualification_is_atomically_blocked() -> 
 
 
 def test_typed_edge_load_rejects_retired_raw_shape_and_missing_endpoint() -> None:
+    edges = _state().graph_edges[:2]
+    assert build_adjacency([edges[1], edges[0], edges[1]]) == {
+        "lead:1": ["gap:independent"],
+        "gap:independent": ["lead:1", "unit:claim-1"],
+        "unit:claim-1": ["gap:independent"],
+    }
+    with pytest.raises(SchemaError, match="raw graph edges"):
+        build_adjacency([to_plain(edges[0])])
+
     raw = to_plain(_state())
     raw["graph_edges"][0] = {"source": "lead:1", "target": "gap:independent", "relation": "opens_gap"}
     with pytest.raises(SchemaError, match="unknown current-schema fields"):
@@ -866,6 +877,32 @@ def test_unknown_changed_identity_blocks_affected_confidence() -> None:
     assert impact["unknown_ownership"] is True
     assert impact["unknown_dependency_ids"] == ["anchor:not-owned"]
     assert impact["partial_result_suppressed"] is True
+
+    state = _state()
+    state.gaps.append(Gap(gap_id="gap:unrelated", lead_id="lead:1"))
+    before = to_plain(state)
+    for changed in (
+        {"changed_source_ids": ["source:1"]},
+        {"changed_anchor_ids": ["anchor:1"]},
+    ):
+        obligations = affected_source_obligations(state, **changed)
+        assert obligations["changed_anchor_ids"] == ["anchor:1"]
+        assert obligations["affected_gap_ids"] == ["gap:independent"]
+        assert obligations["affected_claim_use_ids"] == ["claim-use:1"]
+        assert obligations["affected_stop_decision_ids"] == ["stop:1"]
+        assert obligations["unaffected_gap_ids"] == ["gap:unrelated"]
+        assert obligations["unknown_dependency_ids"] == []
+        assert obligations["unknown_ownership"] is False
+    unknown = affected_source_obligations(
+        state, changed_anchor_ids=["anchor:not-owned"]
+    )
+    assert unknown["unknown_dependency_ids"] == ["anchor:not-owned"]
+    assert unknown["unknown_ownership"] is True
+    assert unknown["affected_gap_ids"] == []
+    assert unknown["affected_claim_use_ids"] == []
+    assert unknown["affected_stop_decision_ids"] == []
+    assert unknown["unaffected_gap_ids"] == ["gap:independent", "gap:unrelated"]
+    assert to_plain(state) == before
 
 
 @pytest.mark.parametrize(

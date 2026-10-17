@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.5.7 - 2026-10-17
+
+- Rebind four native software-DNA cases to their actual implementation owners and add direct read-only assertions to three existing cases.
+- Preserve all 17 native models, 20 function blocks, domain rejection cases and the distinction between static readiness and model execution.
+- Pin current maintenance and CI to the published FlowGuard 0.70.4 dependency.
+- Separate CLI, composition and native attestation adapters from shared contracts and native members in the living map; preserve all test/model bindings without changing domain implementations.
+
 ## v0.5.6 - 2026-10-17
 
 - Fix portable proof paths across Windows/POSIX and bound process-tree timeout cleanup.

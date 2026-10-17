@@ -1,6 +1,6 @@
 # ResearchGuard maintenance
 
-Use the current FlowGuard 0.70.3 living map in `.flowguard/map.json`.
+Use the current FlowGuard 0.70.4 living map in `.flowguard/map.json`.
 Read the affected component before changing its owned code. Preserve the native
 model/code/test bindings in `models/software_dna/researchguard.json`.
 After a change, update affected descriptions and anchors, run the existing
