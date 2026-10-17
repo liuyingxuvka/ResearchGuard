@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.5.6 - 2026-10-17
+
+- Fix portable proof paths across Windows/POSIX and bound process-tree timeout cleanup.
+- Remove retired SkillGuard controls and fixed ten-owner self-proof/receipt tooling; preserve the 17 native models, 20 code/test/resource bindings and affected/reverse indexes.
+- Install the distribution and five skills through ordinary files with independent package, skill and legacy-manifest restoration.
+- Use the current FlowGuard 0.70.3 map and executable native models; report static currentness separately from execution.
+- Load CLI/member APIs lazily; retire manual closure-ledger helpers; reuse concise views of current Source/Trace results without reducing default Trace stress.
+- Reuse one trusted qualification within external-DNA projections while standalone impact/reverse retain their native validation gate and cheap bad cases.
+- Validation limit: 13 tests requiring an external frozen paper root are skipped when that independently supplied material is unavailable; no paper material or evidence is fabricated.
+
 ## v0.5.5 - 2026-09-21
 
 - Refresh the five current SkillGuard v2 consumer contracts after the A09 documentation and dynamic-model contract repairs.

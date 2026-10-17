@@ -4,10 +4,10 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "researchguard"
-version = "0.5.5"
+version = "0.5.6"
 description = "One versioned research guard suite for argument, source, trace, and experiment-decision reasoning."
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 license = { text = "MIT" }
 authors = [{ name = "Yingxu Liu" }]
 keywords = [
@@ -24,7 +24,6 @@ classifiers = [
   "Intended Audience :: Science/Research",
   "License :: OSI Approved :: MIT License",
   "Programming Language :: Python :: 3",
-  "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Topic :: Scientific/Engineering",
@@ -41,7 +40,7 @@ dependencies = [
 [project.optional-dependencies]
 test = [
   "pytest>=8.0",
-  "flowguard @ git+https://github.com/liuyingxuvka/FlowGuard.git@18443e17db93725cf9484daca22fee25e9d7c1d7",
+  "flowguard @ git+https://github.com/liuyingxuvka/FlowGuard.git@v0.70.3",
 ]
 
 [project.scripts]

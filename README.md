@@ -1,7 +1,7 @@
 # ResearchGuard
 
-**Current version:** `v0.5.5`
-**当前版本：** `v0.5.5`
+**Current version:** `v0.5.6`
+**当前版本：** `v0.5.6`
 
 ResearchGuard is one versioned research-quality guard suite with five direct
 Codex entrypoints:
@@ -25,9 +25,10 @@ subtrees. It independently enumerates Python, declarative, workflow, text,
 and resource surfaces, binds every admitted item to one owner, and reports
 seven readiness layers plus deterministic forward, reverse, and affected-only
 indexes. Generated receipts and canonical projections stay outside the
-denominator. CI resolves FlowGuard from the single immutable public commit
-declared in `pyproject.toml`; this does not alter the already published
-`v0.4.10` tag or release.
+denominator. Current FlowGuard 0.70.3 owns the living `.flowguard/map.json`.
+The check reports static currentness and explicitly leaves model execution as
+`not_run`; the two executable models and native pytest suite run separately.
+CI installs the published FlowGuard v0.70.3 dependency.
 
 The first release was `v0.1.0`.
 

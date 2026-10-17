@@ -1,0 +1,164 @@
+name: Publish ResearchGuard release
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_sha:
+        description: Full 40-character source commit SHA on main
+        required: true
+        type: string
+  push:
+    branches: [main]
+    paths:
+      - pyproject.toml
+      - VERSION
+      - CHANGELOG.md
+      - .github/workflows/publish-release.yml
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: publish-release
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.event.head_commit.message, 'Release ResearchGuard v')
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      SOURCE_SHA: ${{ inputs.source_sha || github.sha }}
+      EVENT_NAME: ${{ github.event_name }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Check out the selected source
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.source_sha || github.sha }}
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Check source identity and publish its stable release
+        shell: bash
+        run: |
+          python - <<'PY'
+          import ast
+          from email.parser import Parser
+          import json
+          import os
+          from pathlib import Path
+          import re
+          import subprocess
+          import sys
+          import tempfile
+          import time
+          import tomllib
+
+          repository = os.environ["GITHUB_REPOSITORY"]
+          source_sha = os.environ["SOURCE_SHA"]
+          assert re.fullmatch(r"[0-9a-fA-F]{40}", source_sha), "source_sha must be a full 40-character commit SHA"
+          source_sha = source_sha.lower()
+
+          def output(*args):
+              return subprocess.check_output(args, text=True).strip()
+
+          def api(path, *, missing_ok=False):
+              result = subprocess.run(["gh", "api", f"repos/{repository}/{path}"], capture_output=True, text=True)
+              if result.returncode:
+                  if missing_ok and "HTTP 404" in result.stderr:
+                      return None
+                  raise RuntimeError(result.stderr.strip() or f"GitHub API failed: {path}")
+              return json.loads(result.stdout)
+
+          def tag_commit(tag):
+              reference = api(f"git/ref/tags/{tag}", missing_ok=True)
+              if reference is None:
+                  return None
+              obj = reference["object"]
+              for _ in range(8):
+                  if obj["type"] == "commit":
+                      return obj["sha"].lower()
+                  assert obj["type"] == "tag", "release tag must resolve to a commit"
+                  obj = api(f"git/tags/{obj['sha']}")["object"]
+              raise RuntimeError("release tag has excessive annotation nesting")
+
+          assert output("git", "rev-parse", "HEAD") == source_sha, "checkout does not match source_sha"
+          project = tomllib.loads(Path("pyproject.toml").read_text(encoding="utf-8"))["project"]
+          assert project["name"] == "researchguard", "source project identity mismatch"
+          version = project["version"]
+          assert re.fullmatch(r"\d+\.\d+\.\d+", version), "publish only a stable three-part version"
+          tag = f"v{version}"
+          if Path("VERSION").exists():
+              assert Path("VERSION").read_text(encoding="utf-8").strip() == version, "VERSION differs from pyproject"
+          identity = ast.parse(Path("src/researchguard/__init__.py").read_text(encoding="utf-8"))
+          versions = [ast.literal_eval(node.value) for node in identity.body if isinstance(node, ast.Assign)
+                      and any(isinstance(target, ast.Name) and target.id == "__version__" for target in node.targets)]
+          assert versions == [version], "source version declaration differs from pyproject"
+          if os.environ["EVENT_NAME"] == "push":
+              assert output("git", "show", "-s", "--format=%s", "HEAD") == f"Release ResearchGuard {tag}", "push release subject must match the current version exactly"
+          changes = Path("CHANGELOG.md").read_text(encoding="utf-8")
+          headings = list(re.finditer(r"(?m)^##[ \t]+([^\n]+)", changes))
+          version_heading = re.compile(rf"(?:v?{re.escape(version)}|\[{re.escape(version)}\])(?:$|[ \t-])")
+          selected = [index for index, heading in enumerate(headings) if version_heading.match(heading.group(1).strip())]
+          assert len(selected) == 1, "CHANGELOG must contain one section for the current version"
+          index = selected[0]
+          notes = changes[headings[index].start():headings[index + 1].start() if index + 1 < len(headings) else None].strip()
+          ci_url = None
+          deadline = time.monotonic() + 1200
+          while time.monotonic() < deadline:
+              runs = api(f"actions/workflows/ci.yml/runs?head_sha={source_sha}&per_page=30")["workflow_runs"]
+              candidates = [run for run in runs if run["head_sha"].lower() == source_sha and run["head_branch"] == "main"
+                            and run["event"] in {"push", "workflow_dispatch"} and run["path"].split("@")[0] == ".github/workflows/ci.yml"]
+              if candidates:
+                  current = max(candidates, key=lambda run: (run["run_number"], run.get("run_attempt", 1)))
+                  if current["status"] == "completed":
+                      assert current["conclusion"] == "success", f"exact-source CI did not succeed: {current['html_url']}"
+                      ci_url = current["html_url"]
+                      break
+              print(f"Waiting for complete ci.yml success at {source_sha}", flush=True)
+              time.sleep(15)
+          else:
+              raise RuntimeError("exact-source ci.yml did not complete successfully within 20 minutes")
+
+          # Recheck main and dereference annotated tags; target_commitish alone is insufficient.
+          assert api("git/ref/heads/main")["object"]["sha"].lower() == source_sha, "main advanced; publish its final frozen source instead"
+          existing_tag = tag_commit(tag)
+          assert existing_tag in (None, source_sha), "existing tag points to a different commit"
+          expected_assets = []
+          existing = api(f"releases/tags/{tag}", missing_ok=True)
+          if existing is not None:
+              assert existing_tag == source_sha and existing["tag_name"] == tag, "existing release tag identity mismatch"
+              assert not existing["draft"] and not existing["prerelease"], "existing release is not stable; do not overwrite it automatically"
+              assets = {asset["name"]: asset for asset in existing["assets"]}
+              assert all(name in assets and assets[name]["size"] > 0 for name in expected_assets), "existing release lacks expected assets; do not clobber or silently repair it"
+              print(f"Existing stable release is unchanged: {existing['html_url']}")
+              raise SystemExit(0)
+
+          with tempfile.TemporaryDirectory(prefix="researchguard-release-", dir=os.environ["RUNNER_TEMP"]) as temporary:
+              work = Path(temporary)
+              assets = []
+
+              notes += f"\n\nSource commit: `{source_sha}`.\n"
+              if ci_url:
+                  notes += f"\n[Successful CI for this source]({ci_url}).\n"
+              notes_path = work / "release-notes.md"
+              notes_path.write_text(notes, encoding="utf-8")
+              # This is the sole publication action. gh creates a missing tag at --target.
+              command = ["gh", "release", "create", tag, *map(str, assets), "--repo", repository,
+                         "--target", source_sha, "--title", f"ResearchGuard {tag}", "--notes-file", str(notes_path),
+                         "--draft=false", "--prerelease=false", "--latest"]
+              if existing_tag is not None:
+                  command.append("--verify-tag")
+              subprocess.run(command, check=True)
+          assert tag_commit(tag) == source_sha, "published tag does not resolve to the selected source"
+          published = api(f"releases/tags/{tag}")
+          assert published["tag_name"] == tag and not published["draft"] and not published["prerelease"], "published release is not stable"
+          assert set(expected_assets) <= {asset["name"] for asset in published["assets"]}, "published release assets are incomplete"
+          print(published["html_url"])
+          PY

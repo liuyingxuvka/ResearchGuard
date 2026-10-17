@@ -601,9 +601,9 @@ def test_blocked_composition_cli_returns_non_success_without_partial_result(
 ) -> None:
     task_facts_path = tmp_path / "task-facts.json"
     task_facts_path.write_text("{}", encoding="utf-8")
+    # Selection is imported lazily by the CLI; patch its actual native owner.
     monkeypatch.setattr(
-        root_cli,
-        "select_member_request",
+        "researchguard.routing.select_member_request",
         lambda *_args, **_kwargs: _blocked_route_composition(),
     )
 

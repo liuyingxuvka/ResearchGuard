@@ -960,6 +960,22 @@ def check_current() -> dict[str, object]:
     }
 
 
+@contextmanager
+def _installation_workspace():
+    temporary_root = Path(tempfile.mkdtemp(prefix="researchguard-install-"))
+    retain = False
+    try:
+        yield temporary_root
+    except InstallError as exc:
+        retain = exc.status == "cleanup_unconfirmed"
+        if retain:
+            exc.cleanup_report["recovery_directory"] = str(temporary_root)
+        raise
+    finally:
+        if not retain:
+            shutil.rmtree(temporary_root)
+
+
 def _install_locked(lock_identity: Mapping[str, object]) -> dict[str, object]:
     _validate_install_paths()
     residuals = _retired_skill_residuals()
@@ -980,8 +996,7 @@ def _install_locked(lock_identity: Mapping[str, object]) -> dict[str, object]:
             f"direct current replacement refuses to downgrade newer ResearchGuard "
             f"distribution {prior_version} to {VERSION}"
         )
-    with tempfile.TemporaryDirectory(prefix="researchguard-install-") as temporary:
-        temporary_root = Path(temporary)
+    with _installation_workspace() as temporary_root:
         prepared = _prepare_skill_stages(temporary_root / "skills")
         wheel_dir = temporary_root / "wheel"
         wheel_dir.mkdir()
@@ -1038,6 +1053,16 @@ def _install_locked(lock_identity: Mapping[str, object]) -> dict[str, object]:
             }
             cleanup_report = {**rollback, "original_failure": failure}
             if rollback["status"] != "passed":
+                # Keep the original byte copies and their existing target map
+                # available for recovery; this is not an install authority.
+                cleanup_report["package_snapshot"] = dict(package_snapshot)
+                if manifest_snapshot.get("status") == "present":
+                    backup = temporary_root / "prior-install-manifest.bin"
+                    try:
+                        backup.write_bytes(bytes(manifest_snapshot["body"]))
+                        cleanup_report["prior_manifest_backup"] = str(backup)
+                    except OSError as backup_error:
+                        cleanup_report["backup_finding"] = str(backup_error)
                 raise InstallError(
                     "suite installation failed and restoration is cleanup_unconfirmed: "
                     f"{json.dumps(cleanup_report, ensure_ascii=False)}",

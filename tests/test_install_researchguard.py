@@ -598,7 +598,8 @@ def test_suite_rollback_is_cleanup_unconfirmed_but_attempts_every_domain(tmp_pat
     assert [row["domain"] for row in result["reports"]] == ["consumers", "python-package", "suite-manifest"]
 
 
-def test_late_install_failure_routes_all_state_through_suite_restoration(tmp_path, monkeypatch):
+@pytest.mark.parametrize("cleanup_fails", [False, True])
+def test_late_install_failure_routes_all_state_through_suite_restoration(tmp_path, monkeypatch, cleanup_fails):
     source, active = _skill_paths(tmp_path, monkeypatch)
     # Prepare real prior distribution files; stage and activate in the actual installer.
     site = tmp_path / "site"
@@ -622,10 +623,23 @@ def test_late_install_failure_routes_all_state_through_suite_restoration(tmp_pat
         package.write_bytes(b"new package")
     monkeypatch.setattr(install_researchguard, "_native_command", install_wheel)
     monkeypatch.setattr(install_researchguard, "check_current", lambda: {"status": "blocked", "findings": ["late failure"]})
+    if cleanup_fails:
+        def failed_package_restore(_snapshot):
+            raise OSError("package restoration unavailable")
+        monkeypatch.setattr(install_researchguard, "_restore_package_state", failed_package_restore)
     with pytest.raises(install_researchguard.InstallError) as caught:
         install_researchguard._install_locked({"kind": "test"})
-    assert caught.value.status == "blocked"
-    assert package.read_bytes() == b"prior package"
+    assert caught.value.status == ("cleanup_unconfirmed" if cleanup_fails else "blocked")
+    if cleanup_fails:
+        recovery = Path(caught.value.cleanup_report["recovery_directory"])
+        assert recovery.is_dir()
+        snapshot = caught.value.cleanup_report["package_snapshot"]
+        assert Path(snapshot["files"][0]["backup"]).read_bytes() == b"prior package"
+        assert Path(caught.value.cleanup_report["prior_manifest_backup"]).read_bytes() == b"prior manifest"
+        assert package.read_bytes() == b"new package"
+        install_researchguard.shutil.rmtree(recovery)
+    else:
+        assert package.read_bytes() == b"prior package"
     assert manifest.read_bytes() == b"prior manifest"
     for member in ("alpha", "beta"):
         assert (active / member / "SKILL.md").read_bytes() == b"prior " + member.encode()

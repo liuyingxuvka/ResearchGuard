@@ -192,6 +192,10 @@ def broken_variants():
 
 
 def conformance():
+    # Replay this checkout's src-layout owner even when a distribution is installed.
+    import sys
+    from pathlib import Path
+    sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
     from flowguard.conformance import ConformanceReport, ConformanceViolation
     from flowguard.replay import ReplayObservation
     from researchguard.source.depth import _anchor_depth_rows

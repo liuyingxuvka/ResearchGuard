@@ -14,7 +14,7 @@ from flowguard import (
 )
 
 FLOWGUARD_MODEL_MARKER = "flowguard-executable-model"
-CURRENT_RESEARCHGUARD_VERSION = "0.5.5"
+CURRENT_RESEARCHGUARD_VERSION = "0.5.6"
 
 # The executable route model consumes the native software-DNA root only for
 # explicit self-DNA qualification; member-domain blueprints remain opaque
@@ -859,6 +859,10 @@ def broken_variants():
 
 
 def conformance():
+    # Replay this checkout's src-layout owner even when a distribution is installed.
+    import sys
+    from pathlib import Path
+    sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
     from flowguard.conformance import ConformanceReport, ConformanceViolation
     from flowguard.replay import ReplayObservation
     from researchguard.routing import RouteBinding, bind_member_request

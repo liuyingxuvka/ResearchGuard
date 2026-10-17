@@ -17,6 +17,6 @@ def test_windows_ci_enables_git_long_paths_before_install() -> None:
 def test_ci_verifies_one_public_flowguard_authority_after_install() -> None:
     workflow = WORKFLOW.read_text(encoding="utf-8")
 
-    assert 'name: Verify public FlowGuard authority' in workflow
-    assert "metadata.version('flowguard') == '0.69.0'" in workflow
-    assert "flowguard.SCHEMA_VERSION == '1.0'" in workflow
+    assert 'name: Verify current public FlowGuard' in workflow
+    assert "m.version('flowguard') == flowguard.__version__ == '0.70.3'" in workflow
+    assert "SCHEMA == 'flowguard.map.v1'" in workflow

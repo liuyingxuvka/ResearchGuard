@@ -79,9 +79,9 @@ ResearchGuard SHALL maintain a target-owned prompt-bundle and load-graph contrac
 - **THEN** the target-owned checker fails with the offending path and ownership relation
 
 ### Requirement: Maintained identities remain synchronized
-The patch release SHALL keep package, module, executable suite model, JSON model, consumer skill, native check, SkillGuard contract-source, compiled-contract, and check-manifest identities synchronized at version `0.4.1`. Author-side SkillGuard artifacts SHALL remain outside consumer runtime behavior.
+The patch release SHALL keep package, module, executable suite model, JSON model, consumer skill, and native check identities synchronized with the current release. Current source, model, and test pointers SHALL remain bound through the living FlowGuard map and the affected native checks.
 
 #### Scenario: Affected validation is current
 - **WHEN** the change is ready for handoff
-- **THEN** the focused routing, prompt-bundle, suite-model, member-contract, and contract-compilation checks pass against the same current source identity
+- **THEN** the focused routing, prompt-bundle, suite-model, and member-contract checks pass against the same current source identity
 

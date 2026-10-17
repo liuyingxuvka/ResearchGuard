@@ -43,7 +43,7 @@
         ".flowguard/models/researchguard_suite_model.py"
       ],
       "status": "confirmed",
-      "fingerprint": "sha256:dd1d50b18be6302a3d9fe147e1a8eb696499d05c3b9921ba095f1759e39e476a"
+      "fingerprint": "sha256:0403ffb921d39ef4c4a62680f578e1331d06b777b3a9160f37dcf8957ebedfa3"
     },
     {
       "id": "logicguard",
@@ -204,7 +204,7 @@
       ],
       "models": [],
       "status": "confirmed",
-      "fingerprint": "sha256:bab5b58a40f132016ec1dfab25edede2bcd82fff34e2552e94fd5f9250e89e27"
+      "fingerprint": "sha256:352ec6d9acde199f299bedc9cd63066a429727c4e05b856e787141a82963de1e"
     },
     {
       "id": "migration",

@@ -3,7 +3,6 @@ name: CI
 on:
   push:
     branches: [main]
-    tags: ["v*"]
   pull_request:
     branches: [main]
 
@@ -18,32 +17,34 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest]
-
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
           cache: pip
-
       - name: Enable Git long paths
         if: runner.os == 'Windows'
         run: git config --global core.longpaths true
-
       - name: Install
         run: python -m pip install --upgrade pip build && python -m pip install -e ".[test]"
-
-      - name: Verify public FlowGuard authority
-        run: python -c "import importlib.metadata as metadata, flowguard; assert metadata.version('flowguard') == '0.69.0'; assert flowguard.SCHEMA_VERSION == '1.0'; print(flowguard.__file__)"
-
-      - name: Test
+      - name: Verify current public FlowGuard
+        run: python -c "import importlib.metadata as m, flowguard; from flowguard.map.common import SCHEMA; assert m.version('flowguard') == flowguard.__version__ == '0.70.3'; assert SCHEMA == 'flowguard.map.v1'"
+      - name: Complete native suite
+        if: runner.os == 'Linux'
         run: python -m pytest
-
-      - name: Validate suite and retired-path residuals
-        run: |
-          python scripts/check_researchguard_suite.py --member all --json
-          python scripts/check_zero_residuals.py --json
-
+      - name: Focused Windows boundaries
+        if: runner.os == 'Windows'
+        run: >-
+          python -m pytest
+          tests/test_install_researchguard.py
+          tests/test_root_cli.py
+          tests/test_suite_checker_bounds.py
+          tests/logic/test_dynamic_model_purpose_contract.py::test_target_paths_cannot_escape_and_baseline_cannot_substitute
+          tests/test_external_domain_dna_real_paper.py::test_native_replay_cache_has_exact_identity_and_never_caches_material_replay
+          tests/test_external_domain_dna_real_paper.py::test_generic_nonpaper_consistent_workflow_uses_the_same_native_path
+          tests/trace/test_inference_kernel.py::test_squared_hinge_qp_matches_analytic_optimum
+          tests/trace/test_inference_kernel.py::test_infeasible_problem_fails_closed_without_fallback
       - name: Build release distributions
+        if: runner.os == 'Linux'
         run: python -m build
