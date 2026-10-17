@@ -1,20 +1,14 @@
-"""FlowGuard-owned software self-DNA entry for ResearchGuard.
+"""Read-only current FlowGuard map and native ResearchGuard DNA check.
 
-This module is deliberately a thin adapter.  ResearchGuard does not define a
-second software-blueprint format and it does not turn its member-domain DNA
-into a repository authority.  The only authority is the current FlowGuard
-self-blueprint API.  Ordinary ResearchGuard commands never call this module;
-``self-dna`` is an explicit, read-only whole-repository operation.  The
-standalone software-DNA materialization is intentionally not part of the
-ResearchGuard console; FlowGuard remains the sole owner of any canonical
-software-blueprint projection. Target-domain transport helpers, when called
-explicitly by an adapter, remain evidence projections and never replace the
-admitted native directory.
+The living map owns repository structure. The existing native software-DNA
+contract owns its model/code/test/resource indexes. This command reports their
+static currentness; executable model and pytest results remain separate.
 """
 
 from __future__ import annotations
 
 import argparse
+from dataclasses import asdict
 import importlib.metadata
 import json
 import sys
@@ -45,7 +39,7 @@ def _package_identity() -> dict[str, str]:
         return {
             "package": "flowguard",
             "version": version,
-            "schema_version": str(flowguard.SCHEMA_VERSION),
+            "schema_version": "flowguard.map.v1",
             "module": str(Path(flowguard.__file__).resolve()),
         }
     except (ImportError, AttributeError) as exc:
@@ -114,56 +108,36 @@ def _run_build(root: Path) -> tuple[dict[str, Any], Any | None]:
 
     software_dna = check_software_dna_contract(root)
     if not software_dna.get("ready", False):
-        return _blocked(
-            root,
-            "software_dna_contract_not_ready",
-            "The native ResearchGuard root/member model, provider-neutral inventory, or bindings are incomplete.",
-            software_dna=software_dna,
-        ), None
+        return _blocked(root, "software_dna_contract_not_ready",
+                        "Native model, code, test or resource bindings are incomplete.",
+                        software_dna=software_dna), None
     try:
-        from flowguard.self_blueprint import (
-            FlowGuardSelfBlueprintError,
-            build_flowguard_self_blueprint,
-        )
-    except (ImportError, AttributeError) as exc:
-        return _blocked(root, "flowguard_toolchain_unavailable", "The current FlowGuard self-blueprint API cannot be imported.", exc=exc, software_dna=software_dna), None
-    try:
-        bundle = build_flowguard_self_blueprint(root)
-    except FlowGuardSelfBlueprintError as exc:
-        return _blocked(root, "flowguard_self_blueprint_not_ready", "FlowGuard rejected the current project authority, definition, inventory, or model evidence; no local substitute is used.", exc=exc, software_dna=software_dna), None
-    except (OSError, ValueError) as exc:
-        return _blocked(root, "flowguard_self_blueprint_input_invalid", "The current FlowGuard self-blueprint inputs are invalid or unavailable.", exc=exc, software_dna=software_dna), None
-
-    ledger = bundle.readiness_ledger.to_dict()
-    qualification = getattr(bundle, "dna_qualification", None)
-    if qualification is None:
-        return _blocked(
-            root,
-            "flowguard_dna_qualification_missing",
-            "The current FlowGuard self-blueprint did not expose its provider-neutral DNA qualification contract.",
-            software_dna=software_dna,
-        ), None
-    qualification_payload = qualification.to_dict()
-    qualified = bool(qualification.qualified)
+        from flowguard.map.mapfile import load_map, ignore_patterns, model_registry
+        from flowguard.map.inventory import build_inventory
+        from flowguard.map.check import run_check
+        data = load_map(root)
+        inventory = build_inventory(root, ignore_patterns(data))
+        findings = run_check(root, data, inventory, strict=True)
+        registry = model_registry(root, data)
+    except Exception as exc:
+        return _blocked(root, "flowguard_map_not_ready",
+                        "Current FlowGuard map could not be checked.", exc=exc,
+                        software_dna=software_dna), None
+    errors = [finding for finding in findings if finding.level == "error"]
+    ok = not errors and not registry.issues
     payload = {
-        "report_kind": REPORT_KIND,
-        "software_id": "researchguard",
-        "target_kind": "software",
-        "status": "ready" if bundle.ok and qualified else "not_ready",
-        "ok": bool(bundle.ok and qualified and software_dna.get("ready", False)),
-        "root": str(root),
-        "claim_boundary": (
-            "This is the FlowGuard repository software-DNA boundary. The four "
-            "member-domain blueprints remain opaque native evidence and are not "
-            "a second whole-repository authority."
-        ),
-        "flowguard": _package_identity(),
-        "readiness": ledger,
-        "dna_qualification": qualification_payload,
-        "software_dna": software_dna,
-        "bundle": bundle.to_dict(),
+        "report_kind": REPORT_KIND, "software_id": "researchguard", "target_kind": "software",
+        "status": "ready" if ok else "not_ready", "ok": ok, "root": str(root),
+        "flowguard": _package_identity(), "software_dna": software_dna,
+        "readiness": {"status": "ready" if ok else "blocked",
+                      "deepest_proven_layer": "static_blueprint_readiness" if ok else "",
+                      "first_gap": errors[0].code if errors else "",
+                      "gap_count": len(errors)},
+        "map_findings": [asdict(finding) for finding in findings],
+        "model_execution": {"status": "not_run", "model_ids": [entry.id for entry in registry.entries]},
+        "claim_boundary": "Current map and native model/code/test/resource bindings only; executable models and native tests run separately.",
     }
-    return payload, bundle
+    return payload, None
 
 
 def check(root: str | Path, *, compact: bool = False) -> tuple[dict[str, Any], int]:
@@ -173,7 +147,7 @@ def check(root: str | Path, *, compact: bool = False) -> tuple[dict[str, Any], i
         readiness = payload.get("readiness", {})
         payload = {
             key: payload[key]
-            for key in ("report_kind", "software_id", "target_kind", "status", "ok", "flowguard", "software_dna")
+            for key in ("report_kind", "software_id", "target_kind", "status", "ok", "flowguard", "software_dna", "model_execution")
             if key in payload
         }
         payload["readiness"] = {

@@ -31,8 +31,6 @@ BCL_CONNECTION_SCHEMA = "researchguard.software-dna-bcl-connection.v1"
 BCL_LEDGER_ARTIFACT_TYPE = "flowguard_behavior_commitment_ledger"
 BCL_LEDGER_SCHEMA_VERSION = "1.0"
 BCL_LEDGER_FORMAT_VERSION = "1"
-NATIVE_OWNER_MANIFEST_PATH = Path(".flowguard/models/regression-manifest.json")
-NATIVE_OWNER_COUNT = 10
 MEMBER_MODEL_IDS = (
     "logicguard",
     "sourceguard",
@@ -639,20 +637,6 @@ def _software_dna_blocks(root_path: Path, contract: Mapping[str, Any]) -> tuple[
     return tuple(blocks)
 
 
-def _native_owner_snapshot(root_path: Path) -> tuple[tuple[str, ...], str]:
-    path = root_path / NATIVE_OWNER_MANIFEST_PATH
-    try:
-        raw = json.loads(path.read_text(encoding="utf-8"))
-        rows = _rows(raw.get("models"), "native owner manifest models")
-    except (OSError, UnicodeError, json.JSONDecodeError, SoftwareDnaError) as exc:
-        raise SoftwareDnaError(f"native_owner_manifest_invalid: {exc}") from exc
-    owner_ids = tuple(str(row.get("model_id", "")) for row in rows)
-    if len(owner_ids) != NATIVE_OWNER_COUNT or any(not item for item in owner_ids) or len(set(owner_ids)) != len(owner_ids):
-        raise SoftwareDnaError(
-            f"native_owner_count_invalid: expected {NATIVE_OWNER_COUNT} unique current owners, got {len(owner_ids)}"
-        )
-    return owner_ids, _sha256(path)
-
 
 def _canonical_model_owner_id(raw_owner: object, model_ids: set[str]) -> str:
     text = str(raw_owner or "").strip().replace("\\", "/")
@@ -771,7 +755,7 @@ def build_researchguard_behavior_commitment_candidate(root: str | Path) -> dict[
     The candidate is intentionally conservative: current native evidence is
     not fabricated.  It is suitable for a private qualification run and is
     expected to remain blocked until every obligation has a real current
-    owner receipt.
+    execution result.
     """
 
     root_path = Path(root).resolve()
@@ -784,7 +768,6 @@ def build_researchguard_behavior_commitment_candidate(root: str | Path) -> dict[
         models = _all_models(contract)
         model_ids = {str(model["model_id"]) for model in models}
         blocks = _software_dna_blocks(root_path, contract)
-        native_owner_ids, native_manifest_fingerprint = _native_owner_snapshot(root_path)
         inventory = static["inventory"]
         source_rows: list[Any] = []
         commitments: list[Any] = []
@@ -861,7 +844,7 @@ def build_researchguard_behavior_commitment_candidate(root: str | Path) -> dict[
                     evidence=evidence,
                     validation_boundary="ResearchGuard software-DNA source/model/code/test binding only",
                     rationale="One real native function block maps to one real model owner and one explicit evidence obligation.",
-                    metadata={"block_id": block_id, "native_owner_boundary": list(native_owner_ids)},
+                    metadata={"block_id": block_id},
                 )
             )
         behavior_inventory = _build_independent_behavior_inventory(api, root_path, blocks, inventory)
@@ -889,11 +872,9 @@ def build_researchguard_behavior_commitment_candidate(root: str | Path) -> dict[
                 "connection_schema": BCL_CONNECTION_SCHEMA,
                 "software_dna_contract_fingerprint": _sha256(root_path / SOFTWARE_DNA_PATH),
                 "provider_neutral_inventory_fingerprint": str(inventory["inventory_fingerprint"]),
-                "native_owner_manifest_fingerprint": native_manifest_fingerprint,
-                "native_owner_ids": list(native_owner_ids),
                 "software_dna_model_ids": sorted(model_ids),
                 "software_dna_function_block_ids": sorted(str(item["block_id"]) for item in blocks),
-                "native_evidence_status": "missing_until_real_owner_receipts_are_bound",
+                "native_evidence_status": "missing_until_actual_execution_is_bound",
             },
         )
         live_audit = api.audit_behavior_commitment_source_inventory(base_ledger, root_path)
@@ -926,11 +907,10 @@ def build_researchguard_behavior_commitment_candidate(root: str | Path) -> dict[
             "counts": {
                 "models": len(models),
                 "function_blocks": len(blocks),
-                "native_owner_count": len(native_owner_ids),
                 "commitments": len(commitments),
                 "source_surfaces": len(final_surfaces),
             },
-            "gaps": [{"code": "current_native_evidence_missing", "message": "Candidate deliberately contains no fabricated native owner receipts."}],
+            "gaps": [{"code": "current_native_evidence_missing", "message": "Candidate deliberately contains no fabricated execution results."}],
             "claim_boundary": "Private BCL candidate only; current native evidence and reverse closure remain unproven.",
         }
     except (OSError, ValueError, TypeError, KeyError, SoftwareDnaError) as exc:
@@ -960,7 +940,7 @@ def _native_evidence_records(evidence: Any) -> tuple[Mapping[str, Any], ...]:
     return ()
 
 
-def _qualify_native_evidence(root_path: Path, commitment: Any, block_id: str, native_owner_ids: set[str]) -> list[dict[str, Any]]:
+def _qualify_native_evidence(root_path: Path, commitment: Any, block_id: str, model_owner_ids: set[str]) -> list[dict[str, Any]]:
     gaps: list[dict[str, Any]] = []
     evidence = commitment.evidence
     records = _native_evidence_records(evidence)
@@ -971,8 +951,8 @@ def _qualify_native_evidence(root_path: Path, commitment: Any, block_id: str, na
     row = matches[0]
     native_owner = str(row.get("native_owner_id", ""))
     normalized_owner = native_owner.removeprefix("owner:").removeprefix("model:")
-    if normalized_owner not in native_owner_ids:
-        gaps.append(_gap("behavior_commitment_evidence_foreign_owner", "native evidence names an owner outside the current 10-owner manifest", commitment_id=commitment.commitment_id, obligation_id=block_id, native_owner_id=native_owner))
+    if normalized_owner not in model_owner_ids:
+        gaps.append(_gap("behavior_commitment_evidence_foreign_owner", "native evidence names an owner outside the current software-DNA model owners", commitment_id=commitment.commitment_id, obligation_id=block_id, native_owner_id=native_owner))
     if str(row.get("model_owner_id", row.get("model_id", ""))) not in {commitment.primary_owner_model_id, commitment.primary_owner_model_id.removeprefix("model:")}:
         gaps.append(_gap("behavior_commitment_evidence_model_mismatch", "native evidence model identity does not match the commitment's primary owner", commitment_id=commitment.commitment_id, obligation_id=block_id))
     if row.get("current") is not True or str(row.get("status", row.get("evidence_state", ""))) not in {"pass", "passed", "current_pass", "green"}:
@@ -1006,8 +986,8 @@ def qualify_researchguard_behavior_commitment_ledger(
     """Qualify one canonical BCL against the current 17-model DNA.
 
     This is a qualification report, not an alternate FlowGuard model.  The
-    ten native FlowGuard owners are only evidence producers; the 17 Research-
-    Guard model IDs remain the software-DNA ownership denominator.
+    ResearchGuard model IDs remain the ownership denominator; retired author
+    manifests and receipt supervisors are not execution authority.
     """
 
     root_path = Path(root).resolve()
@@ -1024,7 +1004,6 @@ def qualify_researchguard_behavior_commitment_ledger(
         model_ids = {str(model["model_id"]) for model in models}
         blocks = _software_dna_blocks(root_path, contract)
         block_by_id = {str(block["block_id"]): block for block in blocks}
-        native_owner_ids, native_manifest_fingerprint = _native_owner_snapshot(root_path)
         metadata = ledger.metadata if isinstance(ledger.metadata, Mapping) else {}
         if str(metadata.get("connection_schema", "")) != BCL_CONNECTION_SCHEMA:
             gaps.append(_gap("behavior_ledger_connection_schema_missing", "ledger does not identify the ResearchGuard BCL connection schema"))
@@ -1032,8 +1011,6 @@ def qualify_researchguard_behavior_commitment_ledger(
             gaps.append(_gap("software_dna_source_identity_stale", "ledger was built from a different software-DNA contract"))
         if str(metadata.get("provider_neutral_inventory_fingerprint", "")) != str(static["inventory"].get("inventory_fingerprint", "")):
             gaps.append(_gap("software_dna_inventory_identity_stale", "ledger was built from a different provider-neutral inventory"))
-        if str(metadata.get("native_owner_manifest_fingerprint", "")) != native_manifest_fingerprint:
-            gaps.append(_gap("native_owner_identity_stale", "ledger was built from a different 10-owner manifest"))
         recorded_models = tuple(str(item) for item in metadata.get("software_dna_model_ids", ()))
         if set(recorded_models) != model_ids or len(recorded_models) != len(model_ids):
             gaps.append(_gap("software_dna_model_identity_mismatch", "ledger model identity set is not the current 17-model set"))
@@ -1084,7 +1061,7 @@ def qualify_researchguard_behavior_commitment_ledger(
                     gaps.append(_gap("behavior_commitment_code_binding_mismatch", "code contract does not bind the named model block", commitment_id=cid))
                 if tuple(evidence.test_evidence_ids) != (expected_test,):
                     gaps.append(_gap("behavior_commitment_test_binding_mismatch", "test evidence does not bind the named model block", commitment_id=cid))
-                gaps.extend(_qualify_native_evidence(root_path, commitment, obligations[0], set(native_owner_ids)))
+                gaps.extend(_qualify_native_evidence(root_path, commitment, obligations[0], model_ids))
         expected_obligations = set(block_by_id)
         if set(obligation_to_commitment) != expected_obligations:
             gaps.append(_gap("behavior_commitment_obligation_denominator_mismatch", "BCL obligations do not exactly cover the current 20 function blocks"))
@@ -1135,7 +1112,6 @@ def qualify_researchguard_behavior_commitment_ledger(
             "counts": {
                 "models": len(models),
                 "function_blocks": len(blocks),
-                "native_owner_count": len(native_owner_ids),
                 "commitments": len(commitments),
                 "source_surfaces": len(surface_by_id),
                 "obligations": len(obligation_to_commitment),
@@ -1521,8 +1497,6 @@ __all__ = [
     "BCL_CONNECTION_SCHEMA",
     "INDEX_KINDS",
     "MEMBER_MODEL_IDS",
-    "NATIVE_OWNER_COUNT",
-    "NATIVE_OWNER_MANIFEST_PATH",
     "READINESS_LAYERS",
     "REPOSITORY_BOUNDARY_FILES",
     "REPOSITORY_BOUNDARY_ROOTS",

@@ -31,12 +31,12 @@ SOFTWARE_DNA_READINESS_LAYER_COUNT = 7
 
 
 MEMBER_BY_INTENT = {
-    "argument_licensing": ("logicguard", "researchguard.logic"),
-    "evidence_discovery": ("sourceguard", "researchguard.source"),
-    "trace_reconstruction": ("traceguard", "researchguard.trace"),
+    "argument_licensing": ("logicguard", "primary:researchguard:logic"),
+    "evidence_discovery": ("sourceguard", "primary:researchguard:source"),
+    "trace_reconstruction": ("traceguard", "primary:researchguard:trace"),
     "experiment_discrimination": (
         "experimentguard",
-        "researchguard.experiment",
+        "primary:researchguard:experiment",
     ),
 }
 MEMBER_PATHS = {member_id: path_id for member_id, path_id in MEMBER_BY_INTENT.values()}
@@ -828,3 +828,52 @@ __all__ = [
     "build_workflow",
     "scenarios",
 ]
+
+
+# Current FlowGuard model contract: real route code and existing native tests.
+MODEL_ID = "researchguard_suite"
+COMPONENTS = ["researchguard-suite"]
+IMPLEMENTED_BY = {"Route": "src/researchguard/routing.py:bind_member_request"}
+TESTED_BY = {
+    "no_alternate_success": ["tests/test_suite_routing.py:test_selected_member_has_no_alternate_binding"],
+    "terminal_failure_stays_terminal": ["tests/test_root_cli.py:test_umbrella_reentry_is_terminal"],
+}
+
+
+def build_explorer():
+    from flowguard.explorer import Explorer
+    inputs = tuple(s.external_input_sequence[0] for s in scenarios()
+                   if isinstance(s.external_input_sequence[0], ResearchRequest))
+    return Explorer(build_workflow(), (RouteState(),), inputs, INVARIANTS)
+
+
+def broken_variants():
+    from flowguard.explorer import Explorer
+    class AlternateRoute(Route):
+        def apply(self, request, state):
+            for result in super().apply(request, state):
+                yield replace(result, new_state=replace(result.new_state, alternate_attempts=1))
+    broken = Workflow((AlternateRoute(), ValidatePromptLoad(), ExecuteMember(), OrchestrateHandoff()))
+    request = ResearchRequest("argument_licensing", entrypoint="logicguard")
+    return {"alternate_route": Explorer(broken, (RouteState(),), (request,), INVARIANTS)}
+
+
+def conformance():
+    from flowguard.conformance import ConformanceReport, ConformanceViolation
+    from flowguard.replay import ReplayObservation
+    from researchguard.routing import RouteBinding, bind_member_request
+    observations = []
+    violations = []
+    for intent, (member_id, path_id) in MEMBER_BY_INTENT.items():
+        actual = bind_member_request(member_id, ("--help",))
+        expected = next(Route().apply(ResearchRequest(intent, entrypoint=member_id), RouteState())).new_state
+        good = isinstance(actual, RouteBinding) and (actual.member_id, actual.primary_path_id) == (expected.member_id, expected.primary_path_id)
+        observations.append(ReplayObservation("Route", member_id, (getattr(actual, "member_id", ""), getattr(actual, "primary_path_id", ""))))
+        if not good:
+            violations.append(ConformanceViolation(step_index=1, message=f"direct route differs: {member_id}", rule_name="direct_route"))
+    blocked = bind_member_request("logicguard", ("--help",), active_request_id="already-routed")
+    if getattr(blocked, "code", "") != "researchguard-recursion":
+        violations.append(ConformanceViolation(step_index=1, message="reentry was not terminal", rule_name="terminal_reentry"))
+    return ConformanceReport(ok=not violations, violations=tuple(violations),
+                             replayed_steps=tuple(observations),
+                             summary="Four direct native route bindings and terminal reentry replayed.")

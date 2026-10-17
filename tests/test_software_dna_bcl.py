@@ -23,14 +23,13 @@ def _candidate() -> dict[str, object]:
     return result
 
 
-def test_bcl_candidate_preserves_separate_17_model_and_10_native_owner_boundaries() -> None:
+def test_bcl_candidate_preserves_native_models_without_inventing_execution() -> None:
     result = _candidate()
 
     assert result["ready"] is False
     assert result["counts"] == {
         "models": 17,
         "function_blocks": 20,
-        "native_owner_count": 10,
         "commitments": 20,
         "source_surfaces": 60,
     }

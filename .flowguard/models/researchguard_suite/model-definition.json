@@ -11,22 +11,22 @@
     },
     {
       "business_intent_id": "researchguard.argument_licensing",
-      "primary_path_id": "researchguard.logic",
+      "primary_path_id": "primary:researchguard:logic",
       "native_owner_id": "logicguard"
     },
     {
       "business_intent_id": "researchguard.evidence_discovery",
-      "primary_path_id": "researchguard.source",
+      "primary_path_id": "primary:researchguard:source",
       "native_owner_id": "sourceguard"
     },
     {
       "business_intent_id": "researchguard.trace_reconstruction",
-      "primary_path_id": "researchguard.trace",
+      "primary_path_id": "primary:researchguard:trace",
       "native_owner_id": "traceguard"
     },
     {
       "business_intent_id": "researchguard.experiment_discrimination",
-      "primary_path_id": "researchguard.experiment",
+      "primary_path_id": "primary:researchguard:experiment",
       "native_owner_id": "experimentguard"
     }
   ],

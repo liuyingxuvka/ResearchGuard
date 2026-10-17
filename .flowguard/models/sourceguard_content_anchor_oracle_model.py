@@ -11,25 +11,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 import json
 
-from flowguard import (
-    FlowGuardCheckPlan,
-    FunctionResult,
-    Invariant,
-    InvariantResult,
-    KnownBadProof,
-    MinimumModelContract,
-    RiskIntent,
-    RiskProfile,
-    Scenario,
-    ScenarioExpectation,
-    StateClosureDimension,
-    StateClosurePlan,
-    TemplateHarvestReview,
-    TemplateReuseReview,
-    Workflow,
-    review_scenarios,
-    run_model_first_checks,
-)
+from flowguard import FunctionResult, Invariant, InvariantResult, Scenario, ScenarioExpectation, Workflow
+
 
 
 MODEL_ID = "researchguard.source.content_anchor_oracle.current"
@@ -192,153 +175,38 @@ def scenarios() -> tuple[Scenario, ...]:
     )
 
 
-def formal_plan() -> FlowGuardCheckPlan:
-    return FlowGuardCheckPlan(
-        workflow=workflow(),
-        initial_states=(AnchorDepthState(),),
-        external_inputs=(CONTENT_GOOD, CONTENT_BAD_ALIGNED),
-        invariants=invariants(),
-        max_sequence_length=1,
-        scenarios=scenarios(),
-        risk_profile=RiskProfile(
-            modeled_boundary=(
-                "SourceGuard content-anchor native finding identity under the existing "
-                "evidence-discovery owner"
-            ),
-            risk_classes=("contract_identity", "fail_closed_gate"),
-            confidence_goal="model_level",
-            risk_intent=RiskIntent(
-                failure_modes=(
-                    "contentless anchor is blocked under a finding code that the target-purpose proof cannot observe",
-                ),
-                protected_error_classes=("native_oracle_finding_drift",),
-                protected_harms=(
-                    "valid SourceGuard target contracts cannot prove their declared known-bad case",
-                ),
-                must_model_state=("content_qualified", "depth_status", "proof_status"),
-                must_model_side_effects=("emitted_findings",),
-                completion_evidence=("declared finding", "native receipt finding", "purpose proof status"),
-                adversarial_inputs=("contentless anchor", "retired finding emission"),
-                hard_invariants=("one current content-anchor finding identity",),
-                known_bad_cases=(CONTENT_BAD_DRIFTED.case_id,),
-                template_no_match_reason="project-specific SourceGuard oracle identity repair",
-                blindspots=("anchor semantic qualification is owned and tested by SourceGuard",),
-            ),
-        ),
-        template_reuse_review=TemplateReuseReview(
-            no_match_reason="project-specific SourceGuard oracle identity repair",
-            searched_layers=("public", "local"),
-        ),
-        minimum_model_contract=MinimumModelContract(
-            protected_error_classes=("native_oracle_finding_drift",),
-            modeled_state=("content_qualified", "depth_status", "proof_status"),
-            modeled_side_effects=("emitted_findings",),
-            completion_evidence=("declared finding", "native receipt finding", "purpose proof status"),
-            known_bad_cases=(CONTENT_BAD_DRIFTED.case_id,),
-        ),
-        known_bad_proofs=(
-            KnownBadProof(
-                CONTENT_BAD_DRIFTED.case_id,
-                protected_error_class="native_oracle_finding_drift",
-                method="scenario_review",
-                observed_status="failed",
-                observed_failure=(
-                    "v0.1.2 depth emitted no_content_qualified_anchor while the content-anchor oracle "
-                    "declared sourceguard_blocked:contentless-anchor"
-                ),
-                evidence_id="reproduction:sourceguard-content-anchor-gate-v0.1.2",
-            ),
-        ),
-        template_harvest_review=TemplateHarvestReview(
-            disposition="not_harvestable",
-            not_harvestable_reason="not_reusable_project_specific",
-        ),
-        state_closure_plan=StateClosurePlan(
-            "sourceguard_content_anchor_closed_state",
-            dimensions=(
-                StateClosureDimension(
-                    "external_input",
-                    "external_input",
-                    policy="open_boundary",
-                    known_values=(CONTENT_GOOD, CONTENT_BAD_ALIGNED),
-                    representative_unknowns=(
-                        AnchorDepthInput("unsupported-input", False, ()),
-                    ),
-                    handling="reject_before_side_effect",
-                ),
-                StateClosureDimension(
-                    "state.depth_status",
-                    "state_field",
-                    policy="closed_enumeration",
-                    known_values=("not_run", "pass", "blocked"),
-                    handling="reject_before_side_effect",
-                ),
-                StateClosureDimension(
-                    "state.proof_status",
-                    "state_field",
-                    policy="closed_enumeration",
-                    known_values=(
-                        "not_run",
-                        "good_proven",
-                        "blocked_proven",
-                        "identity_mismatch",
-                    ),
-                    handling="reject_before_side_effect",
-                ),
-            ),
-            claim_scope="model_level",
-            allow_scoped_confidence=False,
-            notes="Unknown inputs reject before any external side effect.",
-        ),
-        scenario_matrix_config={"enabled": False},
-        metadata={
-            "model_id": MODEL_ID,
-            "parent_model_id": PARENT_MODEL_ID,
-            "claim_boundary": (
-                "Model-level finding identity only; native SourceGuard and release checks remain required."
-            ),
-        },
-    )
+
+COMPONENTS = ["sourceguard"]
+IMPLEMENTED_BY = {"content_qualification": "src/researchguard/source/depth.py:_anchor_depth_rows"}
+TESTED_BY = {"content_anchor_identity_is_singular": ["tests/source/test_semantic_gap_depth.py:test_content_anchor_purpose_contract_observes_catalog_blocking_finding"]}
 
 
-def main() -> int:
-    scenario_report = review_scenarios(scenarios())
-    formal_report = run_model_first_checks(formal_plan())
-    print(scenario_report.format_text(max_counterexamples=3))
-    print(formal_report.format_text())
-    payload = {
-        "artifact_kind": "sourceguard_content_anchor_oracle_flowguard_report",
-        "model_id": MODEL_ID,
-        "parent_model_id": PARENT_MODEL_ID,
-        "scenario_status": "pass" if scenario_report.ok else "failed",
-        "formal_status": formal_report.overall_status,
-        "known_bad_rejected": scenario_report.ok,
-        "claim_boundary": (
-            "This proves the finite content-anchor finding identity relation only; "
-            "native SourceGuard execution and tests remain required."
-        ),
-    }
-    print(json.dumps(payload, indent=2, sort_keys=True))
-    required_sections = {
-        section.name: section.status
-        for section in formal_report.sections
-        if section.name
-        in {
-            "minimum_model_review",
-            "known_bad_proof",
-            "template_harvest_review",
-            "model_quality_audit",
-            "state_closure",
-            "topology_hazard",
-            "model_check",
-            "scenario_review",
-        }
-    }
-    required_pass = required_sections and all(
-        status == "pass" for status in required_sections.values()
-    )
-    return 0 if scenario_report.ok and required_pass else 1
+def build_explorer():
+    from flowguard.explorer import Explorer
+    return Explorer(workflow(), (AnchorDepthState(),), (CONTENT_GOOD, CONTENT_BAD_ALIGNED), invariants())
 
 
-if __name__ == "__main__":
-    raise SystemExit(main())
+def broken_variants():
+    from flowguard.explorer import Explorer
+    return {"retired_finding": Explorer(workflow(), (AnchorDepthState(),), (CONTENT_BAD_DRIFTED,), invariants())}
+
+
+def conformance():
+    from flowguard.conformance import ConformanceReport, ConformanceViolation
+    from flowguard.replay import ReplayObservation
+    from researchguard.source.depth import _anchor_depth_rows
+    from researchguard.source.schema import BeliefState, EvidenceAnchor, SourceRecord
+    observations = []
+    violations = []
+    for content in (True, False):
+        state = BeliefState(sources=[SourceRecord(source_id="source:model", source_type="paper",
+            source_role="primary_source", source_reliability=0.95, access_status="public")],
+            anchors=[EvidenceAnchor(anchor_id="anchor:model", source_id="source:model", anchor_type="paragraph",
+                locator="paragraph:1", modality="text", text="observed content" if content else "",
+                extraction_confidence=0.95, specificity=0.95, supports=["gap:model"], usable_for_claim=True)])
+        qualified = bool(_anchor_depth_rows(state)[0]["qualified"])
+        observations.append(ReplayObservation("content_qualification", qualified, content))
+        if qualified != content:
+            violations.append(ConformanceViolation(step_index=1, message=f"native content qualification differs: {content}", rule_name="content_qualification"))
+    return ConformanceReport(ok=not violations, violations=tuple(violations), replayed_steps=tuple(observations),
+                             summary="Native anchor qualification replayed with and without content; full purpose proof remains the bound native pytest case.")

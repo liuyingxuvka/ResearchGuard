@@ -1,137 +1,63 @@
 from __future__ import annotations
 
-from dataclasses import replace
+import copy
 import importlib.util
 from pathlib import Path
+import shutil
+import sys
 
-import pytest
-
-from flowguard.model_regressions import (
-    ModelRegressionManifest,
-    build_model_instance_ref,
-    resolve_entry_input_inventory,
-)
-
+from flowguard.map.check import run_check
+from flowguard.map.inventory import build_inventory
+from flowguard.map.mapfile import component_files, fingerprint, ignore_patterns, load_map, model_registry
+from flowguard.review import review_scenarios
 
 ROOT = Path(__file__).resolve().parents[1]
-CHILD_MODEL_IDS = (
-    "authoritative_model_system",
-    "compositional_verification_kernel",
-    "hierarchical_model_mesh",
-    "model_test_code_alignment",
-    "logic_synthesis",
-    "logic_selection_contract",
-    "argument_support_closure",
-    "discourse_structure",
-    "trace_domain_export",
-)
 
 
-def _load_suite_runner():
-    path = ROOT / ".flowguard/verification/owners/researchguard_suite/run_checks.py"
-    spec = importlib.util.spec_from_file_location(
-        "researchguard_suite_timeout_contract_runner",
-        path,
-    )
-    assert spec is not None and spec.loader is not None
+def test_current_suite_model_executes_the_declared_scenarios() -> None:
+    path = ROOT / ".flowguard/models/researchguard_suite_model.py"
+    spec = importlib.util.spec_from_file_location("current_suite_model", path)
+    assert spec and spec.loader
     module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
     spec.loader.exec_module(module)
-    return module
+    report = review_scenarios(module.scenarios())
+    assert report.ok, report.format_text()
 
 
-def _nested_owner_paths() -> tuple[str, ...]:
-    return tuple(
-        path
-        for model_id in CHILD_MODEL_IDS
-        for path in (
-            f".flowguard/models/owners/{model_id}/model.py",
-            f".flowguard/verification/owners/{model_id}/run_checks.py",
-        )
-    )
+def test_current_map_binds_real_models_code_and_tests() -> None:
+    data = load_map(ROOT)
+    registry = model_registry(ROOT, data)
+    assert not registry.issues
+    assert {entry.id for entry in registry.entries} == {
+        "researchguard_suite", "researchguard.source.content_anchor_oracle.current"
+    }
+    inventory = build_inventory(ROOT, ignore_patterns(data))
+    findings = run_check(ROOT, data, inventory, strict=True)
+    assert not [f for f in findings if f.level == "error"], [f.line() for f in findings]
 
 
-def test_native_timeout_defaults_to_420_and_accepts_finite_positive_override(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    runner = _load_suite_runner()
-    monkeypatch.delenv("FLOWGUARD_RESEARCHGUARD_NATIVE_TIMEOUT_SECONDS", raising=False)
-    assert runner._positive_timeout_from_env(
-        "FLOWGUARD_RESEARCHGUARD_NATIVE_TIMEOUT_SECONDS",
-        420.0,
-    ) == 420.0
-
-    monkeypatch.setenv("FLOWGUARD_RESEARCHGUARD_NATIVE_TIMEOUT_SECONDS", "123.5")
-    assert runner._positive_timeout_from_env(
-        "FLOWGUARD_RESEARCHGUARD_NATIVE_TIMEOUT_SECONDS",
-        420.0,
-    ) == 123.5
-
-
-@pytest.mark.parametrize("raw", ["0", "-1", "nan", "inf", "not-a-number"])
-def test_native_timeout_rejects_non_positive_or_non_finite_override(
-    monkeypatch: pytest.MonkeyPatch,
-    raw: str,
-) -> None:
-    runner = _load_suite_runner()
-    monkeypatch.setenv("FLOWGUARD_RESEARCHGUARD_NATIVE_TIMEOUT_SECONDS", raw)
-    with pytest.raises(ValueError, match="finite positive number"):
-        runner._positive_timeout_from_env(
-            "FLOWGUARD_RESEARCHGUARD_NATIVE_TIMEOUT_SECONDS",
-            420.0,
-        )
-
-
-def test_suite_manifest_covers_nested_children_and_child_change_stales_root(
-    tmp_path: Path,
-) -> None:
-    manifest = ModelRegressionManifest.load(ROOT)
-    entry = next(
-        item for item in manifest.entries if item.model_id == "researchguard_suite"
-    )
-    nested_paths = _nested_owner_paths()
-    assert entry.timeout_seconds == 1200.0
-    assert set(nested_paths).issubset(set(entry.input_globs))
-
-    root_paths = (
-        entry.model_path,
-        entry.runner[1],
-        *nested_paths,
-    )
-    for relative in root_paths:
-        destination = tmp_path / relative
-        destination.parent.mkdir(parents=True, exist_ok=True)
-        destination.write_bytes((ROOT / relative).read_bytes())
-
-    synthetic_entry = replace(
-        entry,
-        input_globs=root_paths,
-        intent_source_inputs=(),
-    )
-    baseline_inventory = resolve_entry_input_inventory(tmp_path, synthetic_entry)
-    baseline_instance = build_model_instance_ref(
-        tmp_path,
-        logical_model_id=synthetic_entry.model_id,
-        model_kind=synthetic_entry.model_kind,
-        model_path=synthetic_entry.model_path,
-        runner_path=synthetic_entry.runner[1],
-        purpose_closure_fingerprint=synthetic_entry.purpose_closure.closure_fingerprint,
-        input_paths=tuple(item["path"] for item in baseline_inventory),
-    )
-
-    changed_relative = ".flowguard/verification/owners/trace_domain_export/run_checks.py"
-    changed_path = tmp_path / changed_relative
-    changed_path.write_bytes(changed_path.read_bytes() + b"\n")
-    changed_inventory = resolve_entry_input_inventory(tmp_path, synthetic_entry)
-    changed_instance = build_model_instance_ref(
-        tmp_path,
-        logical_model_id=synthetic_entry.model_id,
-        model_kind=synthetic_entry.model_kind,
-        model_path=synthetic_entry.model_path,
-        runner_path=synthetic_entry.runner[1],
-        purpose_closure_fingerprint=synthetic_entry.purpose_closure.closure_fingerprint,
-        input_paths=tuple(item["path"] for item in changed_inventory),
-    )
-
-    assert changed_relative in {item["path"] for item in baseline_inventory}
-    assert baseline_instance.input_inventory_fingerprint != changed_instance.input_inventory_fingerprint
-    assert baseline_instance.fingerprint != changed_instance.fingerprint
+def test_bound_code_change_is_stale_and_missing_test_anchor_is_blocked(tmp_path: Path) -> None:
+    data = copy.deepcopy(load_map(ROOT))
+    component = next(c for c in data["components"] if c["id"] == "researchguard-suite")
+    component["files"] = ["src/researchguard/routing.py"]
+    component["entrypoints"] = []
+    component["depends_on"] = []
+    data.update(components=[component], flows=[])
+    paths = ["src/researchguard/routing.py", ".flowguard/models/researchguard_suite_model.py",
+             "tests/test_suite_routing.py", "tests/test_root_cli.py"]
+    for relative in paths:
+        target = tmp_path / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(ROOT / relative, target)
+    inventory = build_inventory(tmp_path, ignore_patterns(data))
+    component["fingerprint"] = fingerprint(tmp_path, component_files(component, inventory))
+    assert not [f for f in run_check(tmp_path, data, inventory, strict=True) if f.level == "error"]
+    code = tmp_path / paths[0]
+    code.write_text(code.read_text() + "\n# changed implementation\n")
+    changed = run_check(tmp_path, data, build_inventory(tmp_path, ignore_patterns(data)), strict=True)
+    assert "stale" in {f.code for f in changed}
+    test = tmp_path / "tests/test_suite_routing.py"
+    test.write_text(test.read_text().replace("def test_selected_member_has_no_alternate_binding(", "def retired_test(", 1))
+    broken = run_check(tmp_path, data, build_inventory(tmp_path, ignore_patterns(data)), strict=True)
+    assert "model_test_broken" in {f.code for f in broken}

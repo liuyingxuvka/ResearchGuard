@@ -115,24 +115,15 @@ def _assert(condition: bool, message: str, checks: list[dict[str, str]]) -> None
 
 
 def _suite_model_version() -> str:
-    model_path = ROOT / ".flowguard" / "models" / "owners" / "researchguard_suite" / "model.py"
-    spec = importlib.util.spec_from_file_location(
-        "researchguard_suite_currentness_model",
-        model_path,
-    )
-    if spec is None or spec.loader is None:
-        raise RuntimeError(f"cannot load suite model {model_path}")
-    module = importlib.util.module_from_spec(spec)
-    sys.modules[spec.name] = module
-    spec.loader.exec_module(module)
-    for attribute in ("CURRENT_RESEARCHGUARD_VERSION", "MODEL_VERSION", "VERSION"):
-        value = getattr(module, attribute, None)
-        if isinstance(value, str) and value:
-            return value
-    # Current owner wrappers intentionally expose the registered model graph,
-    # while the version lives in the canonical model-definition artifact.
-    # Read that artifact instead of importing the retired flat model path.
-    return _json_model_version()
+    model_path = ROOT / ".flowguard/models/researchguard_suite_model.py"
+    tree = __import__("ast").parse(model_path.read_text(encoding="utf-8"))
+    for node in tree.body:
+        if isinstance(node, __import__("ast").Assign) and any(
+            isinstance(target, __import__("ast").Name)
+            and target.id == "CURRENT_RESEARCHGUARD_VERSION" for target in node.targets
+        ):
+            return str(__import__("ast").literal_eval(node.value))
+    raise RuntimeError("suite model has no current version")
 
 
 def _json_model_version() -> str:

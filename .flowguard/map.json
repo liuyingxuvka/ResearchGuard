@@ -1,0 +1,282 @@
+{
+  "schema": "flowguard.map.v1",
+  "project": "researchguard",
+  "layers": [],
+  "ignore": [
+    "openspec/**",
+    "docs/**"
+  ],
+  "test_command": "python -m pytest -q",
+  "components": [
+    {
+      "id": "researchguard-suite",
+      "summary": "Own the public console, source-bound member selection, composition transport, external DNA and native repository DNA indexes.",
+      "responsibilities": [
+        "Own the public console, source-bound member selection, composition transport, external DNA and native repository DNA indexes."
+      ],
+      "files": [
+        "src/researchguard/*.py",
+        "src/researchguard/resources/*.py"
+      ],
+      "entrypoints": [
+        "src/researchguard/cli.py:main",
+        "src/researchguard/routing.py:select_member_request",
+        "src/researchguard/domain_dna.py:qualify_external_domain_dna",
+        "src/researchguard/self_dna.py:check"
+      ],
+      "state": [
+        "task facts and composition bindings"
+      ],
+      "side_effects": [
+        "read explicitly requested material files"
+      ],
+      "depends_on": [
+        "experimentguard",
+        "logicguard",
+        "sourceguard",
+        "traceguard"
+      ],
+      "tests": [
+        "tests/test_*.py"
+      ],
+      "models": [
+        ".flowguard/models/researchguard_suite_model.py"
+      ],
+      "status": "confirmed",
+      "fingerprint": "sha256:6149a098049edf067c18f89dd00846a12414c2400ba23de9a69a3fb7f1a20257"
+    },
+    {
+      "id": "logicguard",
+      "summary": "Own argument support, source library, structured artifacts, model deepening, synthesis and project library inspection.",
+      "responsibilities": [
+        "Own argument support, source library, structured artifacts, model deepening, synthesis and project library inspection."
+      ],
+      "files": [
+        "src/researchguard/logic/**/*.py",
+        "src/researchguard/logic/*.py",
+        "src/researchguard/logic_template_packs/**/*.py",
+        "src/researchguard/logic_viewer/**/*.py"
+      ],
+      "entrypoints": [
+        "src/researchguard/logic/cli.py:main"
+      ],
+      "state": [
+        "native member model"
+      ],
+      "side_effects": [
+        "native file writes only through explicit commands"
+      ],
+      "depends_on": [
+        "researchguard-suite"
+      ],
+      "tests": [
+        "tests/logic/**/*.py",
+        "tests/logic/*.py",
+        "tests/logic_template_packs/**/*.py"
+      ],
+      "models": [],
+      "status": "confirmed",
+      "fingerprint": "sha256:591a457c8f1ceecd03384427aa6300405366b0f9c7b0b6d85eaa6b21ae1bd4c2"
+    },
+    {
+      "id": "sourceguard",
+      "summary": "Own evidence discovery, expected-utility search plans, stop decisions and source/anchor qualification.",
+      "responsibilities": [
+        "Own evidence discovery, expected-utility search plans, stop decisions and source/anchor qualification."
+      ],
+      "files": [
+        "src/researchguard/source/**/*.py",
+        "src/researchguard/source/*.py"
+      ],
+      "entrypoints": [
+        "src/researchguard/source/cli.py:main"
+      ],
+      "state": [
+        "native member model"
+      ],
+      "side_effects": [
+        "native file writes only through explicit commands"
+      ],
+      "depends_on": [
+        "researchguard-suite"
+      ],
+      "tests": [
+        "tests/source/**/*.py",
+        "tests/source/*.py"
+      ],
+      "models": [
+        ".flowguard/models/sourceguard_content_anchor_oracle_model.py"
+      ],
+      "status": "confirmed",
+      "fingerprint": "sha256:e9c449fda9ba47daca40279be5db9c324747b504c29c63a399c8b1acf64aa6cb"
+    },
+    {
+      "id": "traceguard",
+      "summary": "Own temporal and causal trace inference, storyline stress, trace blueprints and case library updates.",
+      "responsibilities": [
+        "Own temporal and causal trace inference, storyline stress, trace blueprints and case library updates."
+      ],
+      "files": [
+        "src/researchguard/trace/**/*.py",
+        "src/researchguard/trace/*.py"
+      ],
+      "entrypoints": [
+        "src/researchguard/trace/cli.py:main"
+      ],
+      "state": [
+        "native member model"
+      ],
+      "side_effects": [
+        "native file writes only through explicit commands"
+      ],
+      "depends_on": [
+        "researchguard-suite"
+      ],
+      "tests": [
+        "tests/trace/**/*.py",
+        "tests/trace/*.py"
+      ],
+      "models": [],
+      "status": "confirmed",
+      "fingerprint": "sha256:fb294caea7e9f0760723a08762d22a705688a213e4e20e41ca0e9976d0da9184"
+    },
+    {
+      "id": "experimentguard",
+      "summary": "Own minimum finite experiment sets that distinguish caller-declared hypotheses.",
+      "responsibilities": [
+        "Own minimum finite experiment sets that distinguish caller-declared hypotheses."
+      ],
+      "files": [
+        "src/researchguard/experiment/**/*.py",
+        "src/researchguard/experiment/*.py"
+      ],
+      "entrypoints": [
+        "src/researchguard/experiment/cli.py:main"
+      ],
+      "state": [
+        "native member model"
+      ],
+      "side_effects": [
+        "native file writes only through explicit commands"
+      ],
+      "depends_on": [
+        "researchguard-suite"
+      ],
+      "tests": [
+        "tests/experiment/**/*.py",
+        "tests/experiment/*.py"
+      ],
+      "models": [],
+      "status": "confirmed",
+      "fingerprint": "sha256:ab9f68c5bf6b44684bc5613a8e0d0eb2f498ad11f77c4550a81077086c3d4cb4"
+    },
+    {
+      "id": "author-tools",
+      "summary": "Own ordinary package/skill installation, privacy checks, prompt budgets and source validation.",
+      "responsibilities": [
+        "Own ordinary package/skill installation, privacy checks, prompt budgets and source validation."
+      ],
+      "files": [
+        "scripts/**/*.py",
+        "scripts/*.py"
+      ],
+      "entrypoints": [
+        "scripts/install_researchguard.py:install"
+      ],
+      "state": [
+        "distribution and five skill directories"
+      ],
+      "side_effects": [
+        "explicit installation with independent rollback"
+      ],
+      "depends_on": [
+        "experimentguard",
+        "logicguard",
+        "researchguard-suite",
+        "sourceguard",
+        "traceguard"
+      ],
+      "tests": [
+        "tests/test_install_researchguard.py",
+        "tests/test_prompt_bundles.py",
+        "tests/test_suite_checker_bounds.py",
+        "tests/contract/test_privacy_scan.py"
+      ],
+      "models": [],
+      "status": "confirmed",
+      "fingerprint": "sha256:bab5b58a40f132016ec1dfab25edede2bcd82fff34e2552e94fd5f9250e89e27"
+    },
+    {
+      "id": "consumer-skills",
+      "summary": "Own five consumer entrypoints and selected reference/script material.",
+      "responsibilities": [
+        "Own five consumer entrypoints and selected reference/script material."
+      ],
+      "files": [
+        "skills/**/*.py"
+      ],
+      "entrypoints": [],
+      "state": [
+        "static consumer skill files"
+      ],
+      "side_effects": [],
+      "depends_on": [],
+      "tests": [
+        "tests/test_skill_suite.py",
+        "tests/test_prompt_bundles.py"
+      ],
+      "models": [],
+      "status": "confirmed",
+      "fingerprint": "sha256:3b3f17dd2f02b9db78d10457eab05306a2cfc0ac6f73fa325c294e5425edc444"
+    },
+    {
+      "id": "migration",
+      "summary": "Own one-way archive projection authoring without restoring retired control tools.",
+      "responsibilities": [
+        "Own one-way archive projection authoring without restoring retired control tools."
+      ],
+      "files": [
+        "migration/**/*.py",
+        "migration/*.py"
+      ],
+      "entrypoints": [],
+      "state": [],
+      "side_effects": [],
+      "depends_on": [
+        "logicguard",
+        "researchguard-suite",
+        "sourceguard",
+        "traceguard"
+      ],
+      "tests": [
+        "tests/test_zero_residuals.py"
+      ],
+      "models": [],
+      "status": "confirmed",
+      "fingerprint": "sha256:64ea15a7b0769115eaf45da02418db98bd8147decd73f034f7ec3eb04cb1478c"
+    }
+  ],
+  "flows": [
+    {
+      "id": "direct-member",
+      "steps": [
+        "researchguard-suite:main",
+        "logicguard:main"
+      ]
+    },
+    {
+      "id": "research-composition",
+      "steps": [
+        "researchguard-suite:select_member_request",
+        "researchguard-suite:qualify_external_domain_dna"
+      ]
+    },
+    {
+      "id": "installation",
+      "steps": [
+        "author-tools:install"
+      ]
+    }
+  ],
+  "accepted_debts": []
+}
