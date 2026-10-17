@@ -54,24 +54,15 @@ from .experiment.admission import contract_fingerprint as experiment_admission_f
 from .logic.admission import CONTRACT as LOGIC_ADMISSION_CONTRACT
 from .logic.admission import author_admission_evidence as logic_admission_evidence
 from .logic.admission import contract_fingerprint as logic_admission_fingerprint
-from .logic.guard_model_contract import (
-    PORTABLE_TARGET_PROOF_MATERIAL_ID,
-    build_portable_target_contract_material,
-)
+
 from .source.admission import CONTRACT as SOURCE_ADMISSION_CONTRACT
 from .source.admission import author_admission_evidence as source_admission_evidence
 from .source.admission import contract_fingerprint as source_admission_fingerprint
-from .source.guard_contract import (
-    PORTABLE_TARGET_PROOF_MATERIAL_ID as SOURCE_PORTABLE_TARGET_PROOF_MATERIAL_ID,
-    build_portable_target_contract_material as build_source_portable_target_material,
-)
+
 from .trace.admission import CONTRACT as TRACE_ADMISSION_CONTRACT
 from .trace.admission import author_admission_evidence as trace_admission_evidence
 from .trace.admission import contract_fingerprint as trace_admission_fingerprint
-from .trace.purpose_contract import (
-    PORTABLE_TARGET_PROOF_MATERIAL_ID as TRACE_PORTABLE_TARGET_PROOF_MATERIAL_ID,
-    build_portable_target_contract_material as build_trace_portable_target_material,
-)
+
 
 
 MemberID = Literal[
@@ -1690,6 +1681,9 @@ def _embedded_native_receipt_references(
 def _member_portable_native_material_records(
     envelope: MemberModelEnvelope,
 ) -> tuple[dict[str, object], ...]:
+    from .logic.guard_model_contract import PORTABLE_TARGET_PROOF_MATERIAL_ID, build_portable_target_contract_material
+    from .source.guard_contract import PORTABLE_TARGET_PROOF_MATERIAL_ID as SOURCE_PORTABLE_TARGET_PROOF_MATERIAL_ID, build_portable_target_contract_material as build_source_portable_target_material
+    from .trace.purpose_contract import PORTABLE_TARGET_PROOF_MATERIAL_ID as TRACE_PORTABLE_TARGET_PROOF_MATERIAL_ID, build_portable_target_contract_material as build_trace_portable_target_material
     if envelope.member_id == "logicguard":
         if envelope.opaque_payload is None:
             raise ValueError("LogicGuard portable envelope has no native material")
@@ -2474,6 +2468,18 @@ def qualify_portable_composition_bundle(
     trusted_producer_descriptor_fingerprints: Sequence[str] = (),
 ) -> dict[str, object]:
     """Qualify a portable handoff without repository, registry, or authority access."""
+    from .logic.guard_model_contract import (
+        PORTABLE_TARGET_PROOF_MATERIAL_ID,
+        build_portable_target_contract_material,
+    )
+    from .source.guard_contract import (
+        PORTABLE_TARGET_PROOF_MATERIAL_ID as SOURCE_PORTABLE_TARGET_PROOF_MATERIAL_ID,
+        build_portable_target_contract_material as build_source_portable_target_material,
+    )
+    from .trace.purpose_contract import (
+        PORTABLE_TARGET_PROOF_MATERIAL_ID as TRACE_PORTABLE_TARGET_PROOF_MATERIAL_ID,
+        build_portable_target_contract_material as build_trace_portable_target_material,
+    )
 
     trusted_descriptors = {
         str(item).strip() for item in trusted_producer_descriptor_fingerprints

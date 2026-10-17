@@ -8,15 +8,7 @@ from collections.abc import Callable, Sequence
 from pathlib import Path
 
 from . import __version__
-from .routing import (
-    RouteBinding,
-    RouteComposition,
-    TypedGap,
-    bind_member_request,
-    composition_impact,
-    reverse_trace_composition,
-    select_member_request,
-)
+
 
 
 MemberMain = Callable[[list[str] | None], int]
@@ -48,6 +40,8 @@ def _print_machine(payload: RouteBinding | RouteComposition | TypedGap | dict[st
 
 
 def _execute(member_id: str, member_argv: Sequence[str]) -> int:
+    from .routing import TypedGap, bind_member_request
+
     binding = bind_member_request(member_id, member_argv)
     if isinstance(binding, TypedGap):
         _print_machine(binding)
@@ -56,6 +50,8 @@ def _execute(member_id: str, member_argv: Sequence[str]) -> int:
 
 
 def _run_umbrella(argv: Sequence[str]) -> int:
+    from .routing import RouteComposition, TypedGap, composition_impact, reverse_trace_composition, select_member_request
+
     business_intent_id: str | None = None
     active_request_id: str | None = None
     task_facts_path: Path | None = None
@@ -252,6 +248,8 @@ def main(argv: list[str] | None = None) -> int:
         return self_dna_main(command_argv)
     if command in {"logic", "source", "trace", "experiment"}:
         return _execute(f"{command}guard", command_argv)
+    from .routing import TypedGap
+
     print(
         json.dumps(
             TypedGap(
