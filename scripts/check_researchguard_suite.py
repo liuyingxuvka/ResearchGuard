@@ -7,6 +7,7 @@ from contextlib import contextmanager
 import importlib.util
 import json
 import os
+import signal
 import subprocess
 import sys
 import tempfile
@@ -79,14 +80,21 @@ def _python(
     proc = subprocess.Popen(
         [sys.executable, *args], cwd=ROOT, env=env, text=True,
         stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=True,
+        start_new_session=os.name != "nt",
     )
     try:
         stdout, stderr = proc.communicate(timeout=max(1, int(timeout)))
     except subprocess.TimeoutExpired:
-        subprocess.run(
-            ["taskkill", "/PID", str(proc.pid), "/T", "/F"],
-            capture_output=True, text=True, check=False,
-        )
+        if os.name == "nt":
+            subprocess.run(
+                ["taskkill", "/PID", str(proc.pid), "/T", "/F"],
+                capture_output=True, text=True, check=False, timeout=5,
+            )
+        else:
+            try:
+                os.killpg(proc.pid, signal.SIGKILL)
+            except ProcessLookupError:
+                pass
         stdout, stderr = proc.communicate(timeout=5)
         stderr = (stderr or "") + f"\nPROCESS_TREE_TIMEOUT={max(1, int(timeout))}\n"
         return subprocess.CompletedProcess(

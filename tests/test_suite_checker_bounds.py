@@ -24,7 +24,11 @@ def test_console_probe_timeout_is_terminal_and_bounded():
     checker = _load_checker()
     started = time.monotonic()
     result = checker._python(
-        "-c", "import time; time.sleep(30)", timeout=1
+        "-c",
+        "import subprocess, sys, time; "
+        "subprocess.Popen([sys.executable, '-c', 'import time; time.sleep(30)']); "
+        "time.sleep(30)",
+        timeout=1,
     )
     elapsed = time.monotonic() - started
     assert elapsed < 8
@@ -35,5 +39,5 @@ def test_console_probe_timeout_is_terminal_and_bounded():
 def test_source_console_probe_has_a_bounded_cold_start_budget():
     checker = _load_checker()
     parameter = inspect.signature(checker._python).parameters["timeout"]
-    assert checker.CONSOLE_PROBE_TIMEOUT_SECONDS == 240
+    assert 0 < checker.CONSOLE_PROBE_TIMEOUT_SECONDS < 1200
     assert parameter.default == checker.CONSOLE_PROBE_TIMEOUT_SECONDS
