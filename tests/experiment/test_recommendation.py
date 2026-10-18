@@ -72,20 +72,70 @@ def test_reports_indistinguishable_hypothesis_pairs() -> None:
     assert result.unresolved_hypothesis_pairs == (("h1", "h2"),)
 
 
-def test_real_observation_closes_only_with_independent_holdout() -> None:
+@pytest.mark.parametrize("iteration", [0, 1])
+def test_real_observation_closes_only_with_independent_holdout(iteration: int) -> None:
+    prior = observe_experiments(_spec(), ()) if iteration else None
+    spec = _spec(
+        iteration=iteration,
+        prior_receipt_fingerprint=prior.receipt_fingerprint if prior else "",
+        prior_open_gap_ids=() if prior is None else prior.introduced_gap_ids,
+    )
     receipt = observe_experiments(
-        _spec(),
+        spec,
         (
             _observation("e1", "up", role="construction", suffix="a"),
             _observation("e2", "hot", role="holdout", suffix="b"),
         ),
     )
     assert receipt.terminal_reason == "model_closed_for_task"
+    assert receipt.progressed is True
+    assert receipt.resolved_gap_ids == receipt.persisted_gap_ids == receipt.introduced_gap_ids == ()
     assert receipt.holdout_evidence_ids == ("evidence:b",)
+    assert [item.hypothesis_id for item in receipt.hypothesis_dispositions if item.status == "consistent"] == ["h1"]
     assert any(
         item.hypothesis_id == "h2" and item.status == "eliminated"
         for item in receipt.hypothesis_dispositions
     )
+
+
+@pytest.mark.parametrize("iteration, observed, terminal", [(1, False, "progress_stalled"), (4, True, "iteration_limit")])
+def test_iteration_terminal_boundaries(iteration: int, observed: bool, terminal: str) -> None:
+    prior = observe_experiments(_spec(), ())
+    observations = (
+        _observation("e1", "up", role="construction", suffix="a"),
+        _observation("e2", "hot", role="holdout", suffix="b"),
+    ) if observed else ()
+    receipt = observe_experiments(
+        _spec(iteration=iteration, prior_receipt_fingerprint=prior.receipt_fingerprint, prior_open_gap_ids=()),
+        observations,
+    )
+    assert receipt.terminal_reason == terminal
+    if not observed:
+        assert receipt.progressed is False
+
+
+def test_finite_experiment_count_limit_is_not_all_candidates_indistinguishable() -> None:
+    values = {
+        "hypothesis_predictions": (
+            HypothesisPrediction("h1", {"e1": "0", "e2": "0"}),
+            HypothesisPrediction("h2", {"e1": "1", "e2": "0"}),
+            HypothesisPrediction("h3", {"e1": "0", "e2": "1"}),
+        ),
+        "coverage_ids": ("h1", "h2", "h3", "e1", "e2"),
+    }
+    limited = _spec(**values, maximum_experiment_count=1)
+    recommendation = recommend_experiments(limited)
+    assert recommendation.status == "indistinguishable"
+    assert recommendation.reason_code == "no_distinguishing_set_within_declared_limit"
+    assert recommendation.selected_experiment_ids == recommendation.alternative_minimal_sets == ()
+    assert recommendation.unresolved_hypothesis_pairs == ()
+    receipt = observe_experiments(limited, ())
+    assert receipt.recommendation.reason_code == recommendation.reason_code
+    assert receipt.introduced_gap_ids == ("experiment-count-limit-prevents-distinguishing-set",)
+    assert receipt.terminal_reason == "external_input_required"
+    sufficient = recommend_experiments(_spec(**values, maximum_experiment_count=2))
+    assert sufficient.status == "recommended"
+    assert sufficient.alternative_minimal_sets == (("e1", "e2"),)
 
 
 def test_one_survivor_without_holdout_requires_external_input() -> None:

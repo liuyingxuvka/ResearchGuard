@@ -1,4 +1,4 @@
-"""Strict execution-depth validation for LogicGuard internal routes."""
+"""Optional declared-package shape diagnostics for LogicGuard internal routes."""
 
 from __future__ import annotations
 
@@ -12,6 +12,10 @@ from typing import Any, Mapping, Sequence
 
 PACKAGE_SCHEMA = "researchguard.logic.route-execution-package.v1"
 RECEIPT_SCHEMA = "researchguard.logic.route-execution-receipt.v1"
+CLAIM_BOUNDARY = (
+    "Only declared package shape is checked. Native operations, evidence contents, "
+    "target proof and task closure are not verified or licensed by this report."
+)
 
 
 @dataclass(frozen=True)
@@ -241,6 +245,9 @@ def evaluate_route_execution_package(payload: Mapping[str, Any]) -> dict[str, An
     receipt = {
         "schema_version": RECEIPT_SCHEMA,
         "status": "pass" if not errors else "blocked",
+        "evaluation_scope": "declared_package_shape",
+        "native_execution_status": "not_run",
+        "closure_licensed": False,
         "route_id": route_id,
         "run_id": run_id,
         "input_fingerprint": canonical_sha256(payload),
@@ -251,7 +258,7 @@ def evaluate_route_execution_package(payload: Mapping[str, Any]) -> dict[str, An
         "evaluated_unit_ids": sorted(unit_map),
         "errors": errors,
         "blockers": list(blockers),
-        "claim_boundary": claim_boundary,
+        "claim_boundary": CLAIM_BOUNDARY,
     }
     receipt["receipt_sha256"] = canonical_sha256(receipt)
     return receipt
@@ -259,7 +266,7 @@ def evaluate_route_execution_package(payload: Mapping[str, Any]) -> dict[str, An
 
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
-        description="Validate one current LogicGuard internal-route execution package."
+        description="Check declared LogicGuard route-package shape; native execution and closure are not verified."
     )
     parser.add_argument("package", type=Path)
     parser.add_argument("--output", type=Path)

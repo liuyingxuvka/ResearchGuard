@@ -25,7 +25,7 @@ researchguard logic <args>
 9. Run structure audit for cross-block flow and temporal misuse: missing handoff, missing sibling progression, late limitation, overloaded block, orphan block, duplicate claim, unsupported parent goal, missing child obligation, missing downstream consumer, unrecovered conclusion obligation, current-state claims with undated source material, and source dates that are later than covered periods.
 10. Build or reuse the gap ledger when a structure issue or under-modeled block implies missing evidence, a missing bridge, an unanswered rebuttal, a missing downstream consumer, conclusion recovery, or source-backed support. Route source-backed gaps through `route:source-library` instead of resolving them as prose.
 11. Track importance from the start so core claims, fragile bridges, dangerous limitations, structural bridges, and optional background stay distinct.
-12. For source-backed artifacts, require a section, paragraph, page, or slide blueprint before treating structure as ready for final prose. Core artifact units should identify what the unit proves, claim, support, limitation or counterpoint, who says it or which source role supports it, source markers, claim-strength label, structural role supported, downstream use, and final treatment: main text, footnote, appendix, or omitted with reason. Use `logicguard citation matrix`, `logicguard citation audit`, and `outline --paragraph <claim> --with-citations` when a model is available.
+12. For source-backed artifacts, require a section, paragraph, page, or slide blueprint before treating structure as ready for final prose. Core artifact units should identify what the unit proves, claim, support, limitation or counterpoint, who says it or which source role supports it, source markers, claim-strength label, structural role supported, downstream use, and final treatment: main text, footnote, appendix, or omitted with reason. Use `researchguard logic citation matrix`, `researchguard logic citation audit`, and `outline --paragraph <claim> --with-citations` when a model is available.
     When an upper-level writing workflow is active, return this blueprint and
     structure diagnosis to that workflow for final prose integration.
 13. Check that important artifact units have inline citation markers or a clear reason they are uncited framing. A final bibliography alone is not enough for source-backed claims.
@@ -77,69 +77,24 @@ researchguard logic citation matrix examples\engineering_efficiency_argument.yam
 researchguard logic citation audit examples\engineering_efficiency_argument.yaml
 ```
 
-## Native execution-depth receipt gate
+## Native completion and stopping
 
-Before claiming broad structured-artifact coverage or final argument readiness, run `researchguard logic depth <model.yaml> --output <logic-depth-receipt.json>` after the last meaningful model change. Require matching model and authoritative-universe fingerprints, the LogicGuard-owned threshold, complete requested claim scope, every explicit card/block reconciled regardless of low declared importance, only closed non-contributing exclusions, role-complete important cards, every important claim's own connected support/warrant/assumption/boundary/opposition universe, explicit sharing declarations for reused role nodes, no unresolved artifact unit or disconnected important node, resolved conclusion competition, every critical and claim-local applicable perturbation effective, no untested important node, and `broad_claim_licensed: true`. Sampling a few convenient sections or nodes is not broad coverage. LogicGuard exposes one enforced depth route; callers cannot select a lighter profile or threshold. Otherwise report the artifact as partial or narrow the conclusion to the receipt's boundary. The target-owned shallow-negative regression calibrates the gate but cannot replace current task evidence. This is the native LogicGuard route.
+1. Start from the structure model or from-markdown input and build_artifact_map.
+2. Run the native structure audit, preserving cross-unit contributions and claim/source/citation boundaries for the declared task.
+3. For full argument or important delivery-readiness claims, run real native depth and report current gaps and licensed scope.
 
-Then issue the structured-artifact binding with
-`researchguard logic route-depth PACKAGE.json --output RECEIPT.json`
-using target `route:structured-artifact`, owner
-`logicguard.structured-artifact`, and route
-`route:route:structured-artifact:audit`. Every eligible artifact unit must
-show parent goal, structural contribution, support path, opposition or closed
-disposition, downstream consumer, and limitation. Section-order sampling or a
-few polished paragraphs cannot close the full artifact universe, and this
-wrapper cannot promote a bounded native receipt.
-Declare a non-empty authoritative `important_unit_ids` denominator. An important
-or required artifact unit cannot be excluded or reclassified; another exclusion
-needs current hashed evidence, a closed non-contributing/not-applicable disposition,
-and no structural contribution.
+Stop at the structural diagnosis and its visible gaps, native closure, or an explicit non-closure terminal. Broad/final/high-impact claims retain important nodes, opposition, contributions and citation checks; do not shrink the universe to bypass them.
 
-Counts, role-name lists, catalog expansion, whole-receipt hashes, and ordinal
-ranges are not per-obligation evidence. Every satisfied artifact obligation
-must retain its exact target-native semantic object, `evidence_ref`, and
-lowercase content hash; a missing, renamed, overlapping, mechanically generated,
-or summary-only mapping blocks broad artifact closure.
+`researchguard logic route-depth PACKAGE.json` remains an optional declared-package shape diagnostic only. Its pass does not verify native execution, evidence content or task closure.
+
+## Template packs on request
+
+Only when the task requests an existing template pack, load [validated-template-pack.md](../validated-template-pack.md) and use the corresponding native template operation.
 
 
+## Target-model purpose boundary
 
-<!-- BEGIN MANAGED VALIDATED TEMPLATE PACK -->
-## Validated Template Pack Routing
+For a real target model or native closure claim, retain the current native purpose/guard-model contract and its target-bound known-good/known-bad proof, as described in [broad-depth-and-closure.md](../broad-depth-and-closure.md). Use `researchguard logic guard-contract freeze`, `researchguard logic guard-contract bind`, and `researchguard logic guard-contract verify` with the explicit target root and the current `researchguard.logic.guard_model_contract` owner. Missing, late, stale or non-blocking proof remains non-pass. Internal native `target_skill_id` stays `logicguard`. Viewing, saving, searching and package export do not require a new good/bad model.
 
-- Target families: `family:logicguard-template-packs`; native owner: `owner:logicguard-template-packs`.
-- Current catalogs: `catalog:logicguard-template-packs` revision `1.0.0`.
-- Resolve the task through this Guard's native router first, then ask the target-owned adapter for a current neutral projection; never infer a template from wording or a skill name.
-- Preserve the adapter's complete candidate and rejection accounting. Zero candidates may use only the declared validated base; one candidate gets a read-only preview; many candidates require complete dependencies, pairwise compatibility, one field owner, and target-authored dominance or must block as ambiguous.
-- Recompute the projection immediately before applying a preview. A stale request, catalog, route, builder, validator, or content identity blocks all writes.
-- Hand the selected preview to the target-declared builder and consume every target-native validator receipt. Template structure is not domain validity, completion, installation, release, or publication evidence.
-- Record a harvest disposition after creating or materially deepening a reusable model, and keep no-match evidence visible.
-- Declared validated bases: `logicguard.base`.
-- Template inventory: `logicguard.argument`, `logicguard.base`, `logicguard.deepening`, `logicguard.execution-package`, `logicguard.purpose`, `logicguard.source-library`, `logicguard.structured-artifact`, `logicguard.synthesis`.
-- Native validator inventory: `logicguard-template-pack:argument`, `logicguard-template-pack:base`, `logicguard-template-pack:deepening`, `logicguard-template-pack:execution-package`, `logicguard-template-pack:purpose`, `logicguard-template-pack:source-library`, `logicguard-template-pack:structured-artifact`, `logicguard-template-pack:synthesis`.
-- Claim boundaries: This unsealed catalog spec projects current LogicGuard-owned templates for target-owned candidate accounting only. Catalog digests and receipts remain LogicGuard-owned derived records.
-<!-- END MANAGED VALIDATED TEMPLATE PACK -->
-
-<!-- BEGIN MANAGED PURPOSE AND BLOCKABILITY -->
-## LogicGuard purpose and blockability contract
-
-Packaged baseline purpose: Prevent a deck, paper, report, brief, section, or paragraph from being called structurally ready while its unit inventory, contributions, claim/source roles, opposition, handoffs, limitations, or licensed scope is incomplete.
-
-Baseline claim boundary: A pass licenses only the structural readiness of the exact current artifact hierarchy and modeled support paths; it does not prove factual truth or visual/editorial quality.
-
-The repository keeps these representative baseline failures only to prove that the native verifier can block them:
-
-- `Artifact unit inventory is incomplete`: block when a governed page, section, paragraph, or other unit is missing.
-- `Contribution or orphan structure is invalid`: block when a unit lacks a distinct structural job or remains orphaned/duplicated.
-- `Claim/source roles are unsupported`: block when an important claim lacks current source/support role evidence.
-- `Opposition or alternatives are absent`: block when material rebuttals or alternatives have no modeled treatment.
-- `Handoff or limitation is missing`: block when downstream use, transition, limitation, or boundary is absent.
-- `Licensed scope is overreached`: block when the readiness statement exceeds the checked artifact universe.
-
-These packaged examples are not the purpose of a real target model and cannot authorize one. Before building every real model or route result, AI must write a target-local `logicguard.target_model_purpose_declaration.v1` under the explicit target root. AI declares what this exact model is meant to prevent, its bounded claim, the exact candidate path, and one or many current failure declarations. Every current failure binds one LogicGuard-native oracle plus one target-owned known-good and known-bad case. Then AI freezes `.logicguard/guard-purpose-contract.json` while the candidate path is still absent, builds the candidate, binds it to the frozen fingerprint, exhausts every declared proof, and only then requests native closure.
-
-Missing declarations, late declarations, stale fingerprints, non-blocking bad cases, failing good cases, or a candidate that exposes any declared failure are non-pass. There is one enforced route and no selectable mode, threshold, compatibility reader, fallback, or lighter success path. Evidence insufficiency may narrow the final claim, but it does not select a weaker check.
-
-`guard-model/verify.py` is the LogicGuard-native verifier. `guard-model/baseline-*.json` proves only family capability.
-<!-- END MANAGED PURPOSE AND BLOCKABILITY -->
 
 For explicit reconstruction or blueprint qualification, also load `../domain-blueprint-contract.md`. The argument model owns meaning; the independent artifact inventory owns the complete unit/resource denominator. Report structural and exact-content reconstruction separately.

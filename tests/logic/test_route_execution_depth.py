@@ -52,6 +52,9 @@ def test_every_internal_route_has_one_strict_passing_shape() -> None:
     for route_id in ROUTE_POLICIES:
         receipt = evaluate_route_execution_package(_package(route_id))
         assert receipt["status"] == "pass", receipt
+        assert receipt["evaluation_scope"] == "declared_package_shape"
+        assert receipt["native_execution_status"] == "not_run"
+        assert receipt["closure_licensed"] is False
 
 
 def test_unknown_route_does_not_redirect_to_another_owner() -> None:
@@ -60,3 +63,24 @@ def test_unknown_route_does_not_redirect_to_another_owner() -> None:
     receipt = evaluate_route_execution_package(package)
     assert receipt["status"] == "blocked"
     assert "route_id:unknown-internal-route" in receipt["errors"]
+    assert receipt["native_execution_status"] == "not_run"
+    assert receipt["closure_licensed"] is False
+
+
+def test_missing_evidence_cannot_license_native_completion(tmp_path) -> None:
+    package = _package("source-library")
+    missing = tmp_path / "nonexistent-evidence.json"
+    assert not missing.exists()
+    package["obligation_results"][0]["evidence_ref"] = str(missing)
+    package["claim_boundary"] = "All native work and task closure are proven."
+    receipt = evaluate_route_execution_package(package)
+    assert receipt["status"] == "pass"  # Only the declaration shape is checked.
+    assert receipt["native_execution_status"] == "not_run"
+    assert receipt["closure_licensed"] is False
+    assert receipt["claim_boundary"] != package["claim_boundary"]
+
+    del package["run_id"]
+    blocked = evaluate_route_execution_package(package)
+    assert blocked["status"] == "blocked"
+    assert "run_id:required" in blocked["errors"]
+    assert blocked["closure_licensed"] is False

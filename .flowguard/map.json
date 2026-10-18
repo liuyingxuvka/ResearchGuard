@@ -52,7 +52,7 @@
         ".flowguard/models/researchguard_suite_model.py"
       ],
       "status": "confirmed",
-      "fingerprint": "sha256:463793e844064059ecb62e5bef98489106cc660e1380a0b4ba84afc4803b1767"
+      "fingerprint": "sha256:8e4440557897cb4d5e941731ee77f77061f6a909fead6cf3077c2d1bd97e8afb"
     },
     {
       "id": "suite-orchestration",
@@ -121,13 +121,14 @@
         ".flowguard/models/sourceguard_content_anchor_oracle_model.py"
       ],
       "status": "confirmed",
-      "fingerprint": "sha256:0ea954a0558f661bdf6ea25e353cb62d9368e8092bb04dc478fdf7eef19dde3c"
+      "fingerprint": "sha256:8f99f7a0461297f6a1b0b302ce03ab54af5eccec330411c3076bd1a6b6fe6110"
     },
     {
       "id": "logicguard",
       "summary": "Own argument support, source library, structured artifacts, model deepening, synthesis and project library inspection.",
       "responsibilities": [
-        "Own argument support, source library, structured artifacts, model deepening, synthesis and project library inspection."
+        "Own argument support, source library, structured artifacts, model deepening, synthesis and project library inspection.",
+        "Keep optional route-package checks limited to declared shape; native model purpose, depth and synthesis own completion and closure."
       ],
       "files": [
         "src/researchguard/logic/__init__.py",
@@ -223,7 +224,7 @@
       ],
       "models": [],
       "status": "confirmed",
-      "fingerprint": "sha256:60604dce2ab36a32248984dec2a4268d4914e8b50ad044c78da77b601d63e1a1"
+      "fingerprint": "sha256:b0b0bc6b282691bfa3e241b310aa563b34623df31a7a759aaaf91fe3b5b3fb2f"
     },
     {
       "id": "sourceguard",
@@ -277,7 +278,8 @@
       "id": "traceguard",
       "summary": "Own temporal and causal trace inference, storyline stress, trace blueprints and case library updates.",
       "responsibilities": [
-        "Own temporal and causal trace inference, storyline stress, trace blueprints and case library updates."
+        "Own temporal and causal trace inference, storyline stress, trace blueprints and case library updates.",
+        "Report optional library-package shape and inventory declarations as unverified; never turn scheduler, file hashes or declared relationships into native closure."
       ],
       "files": [
         "src/researchguard/trace/__init__.py",
@@ -336,13 +338,14 @@
       ],
       "models": [],
       "status": "confirmed",
-      "fingerprint": "sha256:36f04f239410e620d07495ec0e6ede2a23246a309bd729b9bf292c82096f76af"
+      "fingerprint": "sha256:a0a24f06c5a37974fadf9193b781daee10a7de654e2604f056e02de594a2470b"
     },
     {
       "id": "experimentguard",
-      "summary": "Own minimum finite experiment sets that distinguish caller-declared hypotheses.",
+      "summary": "Own finite minimum experiment sets, evidence-bound iteration, independent holdout and bounded terminal decisions.",
       "responsibilities": [
-        "Own minimum finite experiment sets that distinguish caller-declared hypotheses."
+        "Distinguish hypotheses only within the caller-declared finite experiment-count limit and report limit failures separately from truly indistinguishable pairs.",
+        "License native closure only for a unique consistent hypothesis with current independent holdout and no gaps, while preserving the finite iteration limit first."
       ],
       "files": [
         "src/researchguard/experiment/__init__.py",
@@ -370,7 +373,7 @@
       ],
       "models": [],
       "status": "confirmed",
-      "fingerprint": "sha256:0b84e7eed8eed26c07b534696be4cb961fb84ef4e5c8ed10f5ad7aabc2b26fa5"
+      "fingerprint": "sha256:17b324fb55f6591eef185bb1f65af51568cf35b0a3e4f8e847ef4dd6c43dcc59"
     },
     {
       "id": "author-tools",
@@ -407,7 +410,7 @@
       ],
       "models": [],
       "status": "confirmed",
-      "fingerprint": "sha256:83ad8866ead60affe6385913f07feb614e3ce40f5692ab93d55d618ebefdff3e"
+      "fingerprint": "sha256:4fecd118f9fd68e6084c5ce8cc516b99d24736e4a8617738cf6eb4b7585a6f58"
     },
     {
       "id": "migration",

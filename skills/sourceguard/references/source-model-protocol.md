@@ -2,7 +2,7 @@
 
 SourceGuard is one POMDP-style approximate evidence-discovery planner. It maintains a source/gap belief graph, proposes search actions, ranks expected utility, accepts real observations, updates semantic state, and exports candidate handoffs. Utility is not truth, calibrated probability, or final confidence.
 
-Before any non-trivial model, freeze a target-local `sourceguard.model_guard_contract.v2`: exact prevention purpose, external target-unit/source/gap/lineage/anchor universe, task-specific failures, one SourceGuard-native blocking oracle and target-owned good/bad case per failure, and claim boundary. Bind the candidate to that exact current sidecar. Missing, late, stale, inferred, or family-baseline-substituted purpose blocks.
+Before any non-trivial model, freeze a target-local `researchguard.source.model_guard_contract.v2`: exact prevention purpose, external target-unit/source/gap/lineage/anchor universe, task-specific failures, one SourceGuard-native blocking oracle and target-owned good/bad case per failure, and claim boundary. Bind the candidate to that exact current sidecar. Missing, late, stale, inferred, or family-baseline-substituted purpose blocks.
 
 For native proof and development regression, reuse the same frozen input and prefer a small task-bound structure object; do not rebuild a long prose example for each check. A newly observed gap is a discovery, not automatic quality improvement. When external material is unavailable, keep the existing `external` or `provider` status and its gap visible; never invent a source, observation, or citation to complete the graph.
 

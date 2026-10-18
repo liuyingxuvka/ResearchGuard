@@ -1,9 +1,8 @@
-"""Target-owned execution-depth receipt for the TraceGuard Case Library.
+"""Optional declared-package shape diagnostics for the TraceGuard Case Library.
 
-The library route owns preservation, linkage, selected-scope completeness, and
-write-back state.  Storyline evaluation remains owned by TraceGuard's native
-storyline-depth evaluator; this module only requires its current result where
-the selected library operation claims evaluated closure.
+No library operation, storyline inference, evidence content, scheduler identity
+or task closure is verified here. Native library and inference owners remain
+responsible for their own execution results.
 """
 
 from __future__ import annotations
@@ -21,6 +20,11 @@ NATIVE_OWNER_ID = "researchguard.trace.library"
 NATIVE_ROUTE_ID = "route:traceguard:case-library"
 EVIDENCE_DOMAINS = {"fixture_calibration", "capability_validation", "scheduled_production"}
 SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
+CLAIM_BOUNDARY = (
+    "Only declared package shape is checked. Domain, scheduler identities, "
+    "obligation and relationship statuses, artifact hashes and inference observations "
+    "are unverified declarations; native execution and task closure are not licensed."
+)
 
 REQUIRED_OBLIGATIONS = (
     "selected_scope_identity",
@@ -87,7 +91,7 @@ def build_library_execution_fixture(
     omitted_obligation_id: str = "",
     run_id: str = "",
 ) -> dict[str, Any]:
-    """Build a deterministic package consumed by the real library evaluator."""
+    """Build a deterministic shape fixture; its evidence is unverified."""
 
     def evidence(obligation_id: str) -> dict[str, Any]:
         reference = f"evidence/{obligation_id}.json"
@@ -197,11 +201,11 @@ def build_library_scheduled_production_package(
     scheduled_production_identity: Mapping[str, Any],
     run_id: str,
 ) -> dict[str, Any]:
-    """Discover a real case-library tree and build its production package.
+    """Snapshot a library inventory and hashes with unverified declarations.
 
-    Production never calls or relabels the calibration fixture constructor.
-    Case, direction, source, evidence, event, trace, and gap objects are derived
-    from the current library files, with exact hashes retained for every row.
+    Kept for API compatibility. Discovery does not execute a native library
+    operation, validate relationships or authenticate a scheduler. The package
+    is not a producer of native completion or closure evidence.
     """
 
     if not run_id.strip():
@@ -371,6 +375,16 @@ def build_library_scheduled_production_package(
                     "receipt_sha256": canonical_sha256(row),
                 }
             )
+    # Status labels in this compatibility package are declarations required by
+    # its shape, never verified results derived from finding an object/file.
+    for row in object_results:
+        row["verification_status"] = "unverified"
+        for relationship in row["relationship_results"]:
+            relationship["verification_status"] = "unverified"
+    for row in obligation_results:
+        row["verification_status"] = "unverified"
+    for row in inference_observations:
+        row["verification_status"] = "unverified"
     return {
         "artifact_kind": "traceguard_library_execution_package",
         "target_skill_id": TARGET_SKILL_ID,
@@ -378,8 +392,11 @@ def build_library_scheduled_production_package(
         "native_route_id": NATIVE_ROUTE_ID,
         "run_id": run_id,
         "evidence_domain": "scheduled_production",
+        "evidence_domain_verification_status": "unverified",
         "input_origin": "target_native_scheduled_execution",
+        "input_origin_verification_status": "unverified",
         "scheduled_production_identity": production_identity,
+        "scheduled_production_identity_verification_status": "unverified",
         "native_discovery_root_ref": library_relative.replace("\\", "/"),
         "selected_scope": {
             "library_id": f"library:{library_id}",
@@ -388,6 +405,7 @@ def build_library_scheduled_production_package(
             "scope_fingerprint": fingerprint,
         },
         "operation_status": "pass",
+        "operation_status_verification_status": "unverified",
         "inference_outputs_in_input": [],
         "inference_observations": inference_observations,
         "native_artifacts": [
@@ -396,6 +414,7 @@ def build_library_scheduled_production_package(
                 "artifact_ref": relative(path),
                 "artifact_sha256": file_hash(path),
                 "status": "current",
+                "verification_status": "unverified",
             }
             for path in files
         ],
@@ -414,10 +433,11 @@ def build_library_scheduled_production_package(
         "object_results": object_results,
         "blockers": [],
         "residual_risk": ["Case-library closure is not final factual or causal proof."],
-        "claim_boundary": (
-            "The exact current case-library file and object universe is reconciled, including every discovered source, evidence, event, trace, and open search gap. "
-            "This controlled scheduled execution does not prove the final factual or causal story."
-        ),
+        "evaluation_scope": "declared_package_shape",
+        "native_execution_status": "not_run",
+        "closure_licensed": False,
+        "declaration_verification_status": "unverified",
+        "claim_boundary": CLAIM_BOUNDARY,
     }
 
 
@@ -804,13 +824,22 @@ def evaluate_library_execution_package(payload: Mapping[str, Any]) -> dict[str, 
         "artifact_kind":"traceguard_library_execution_depth_receipt",
         "receipt_version":"researchguard.trace.library-depth.v1",
         "status":"pass" if not errors else "blocked",
+        "evaluation_scope":"declared_package_shape",
+        "native_execution_status":"not_run",
+        "closure_licensed":False,
+        "declaration_verification_status":"unverified",
         "target_skill_id":payload.get("target_skill_id"),
         "native_owner_id":payload.get("native_owner_id"),
         "native_route_id":payload.get("native_route_id"),
         "run_id":run_id,
         "evidence_domain":domain,
+        "evidence_domain_verification_status":"unverified",
         "input_origin":input_origin,
+        "input_origin_verification_status":"unverified",
         "scheduled_production_identity":scheduled_identity,
+        "scheduled_production_identity_verification_status":"unverified",
+        "declared_operation_status":payload.get("operation_status"),
+        "operation_status_verification_status":"unverified",
         "selected_scope":dict(scope),
         "input_fingerprint":input_fingerprint,
         "required_obligation_ids":list(REQUIRED_OBLIGATIONS),
@@ -818,7 +847,8 @@ def evaluate_library_execution_package(payload: Mapping[str, Any]) -> dict[str, 
         "native_obligation_evidence":[
             {
                 "obligation_id":obligation_id,
-                "status":"pass",
+                "status":"declared_unverified",
+                "declared_status":row.get("status"),
                 "native_object_id":f"native-obligation:{TARGET_SKILL_ID}:{obligation_id}",
                 "evidence_ref":row.get("evidence_ref"),
                 "evidence_sha256":row.get("evidence_sha256"),
@@ -829,7 +859,7 @@ def evaluate_library_execution_package(payload: Mapping[str, Any]) -> dict[str, 
             }
             for obligation_id,row in sorted(obligation_map.items())
         ],
-        "native_contribution_ranges":ranges,
+        "native_contribution_ranges":[{**row,"verification_status":"unverified"} for row in ranges],
         "object_universe":{"declared_object_ids":sorted(declared),"discovered_object_ids":sorted(discovered),"required_object_ids":sorted(required),"important_object_ids":sorted(important),"excluded_object_ids":sorted(excluded),"exclusions":sorted(closed_exclusions,key=lambda row:str(row.get("object_id", ""))),"eligible_object_ids":sorted(eligible),"evaluated_object_ids":sorted(evaluated),"object_kind_by_id":{object_id:kind_map[object_id] for object_id in sorted(kind_map)}},
         "per_object_relationship_coverage":[
             {
@@ -844,7 +874,8 @@ def evaluate_library_execution_package(payload: Mapping[str, Any]) -> dict[str, 
                 "relationship_evidence":[
                     {
                         "relationship_id":str(item.get("relationship_id")),
-                        "status":item.get("status"),
+                        "status":"declared_unverified",
+                        "declared_status":item.get("status"),
                         "evidence_ref":item.get("evidence_ref"),
                         "evidence_sha256":item.get("evidence_sha256"),
                     }
@@ -860,13 +891,15 @@ def evaluate_library_execution_package(payload: Mapping[str, Any]) -> dict[str, 
             }
             for object_id,row in sorted(object_map.items())
         ],
-        "native_artifacts":[dict(item) for item in artifacts if isinstance(item, Mapping)],
-        "consumed_inference_observations":[
+        "native_artifacts":[{**item,"declared_status":item.get("status"),"status":"declared_unverified"} for item in artifacts if isinstance(item, Mapping)],
+        "consumed_inference_observations":[],
+        "declared_inference_observations":[
             {
                 "receipt_id":str(item.get("receipt_id", "")),
                 "receipt_ref":str(item.get("receipt_ref", "")),
                 "receipt_sha256":str(item.get("receipt_sha256", "")),
                 "authority":str(item.get("authority", "")),
+                "verification_status":"unverified",
             }
             for item in observations
             if isinstance(item, Mapping)
@@ -874,7 +907,7 @@ def evaluate_library_execution_package(payload: Mapping[str, Any]) -> dict[str, 
         "errors":errors,
         "blockers":list(blockers) if isinstance(blockers,list) else [],
         "residual_risk":payload.get("residual_risk",[]),
-        "claim_boundary":payload.get("claim_boundary", ""),
+        "claim_boundary":CLAIM_BOUNDARY,
     }
     core_hash = canonical_sha256(receipt)
     receipt["receipt_id"] = f"researchguard.trace.library-depth:{run_id or 'missing'}:{core_hash[:16]}"
@@ -883,7 +916,7 @@ def evaluate_library_execution_package(payload: Mapping[str, Any]) -> dict[str, 
 
 
 def main(argv: Sequence[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Issue a target-owned TraceGuard Library execution-depth receipt.")
+    parser = argparse.ArgumentParser(description="Check declared TraceGuard library-package shape; native execution and closure are not verified.")
     parser.add_argument("package", type=Path)
     parser.add_argument("--output", type=Path)
     parser.add_argument("--pretty", action="store_true")

@@ -145,6 +145,13 @@ def _positive() -> dict:
 def test_complete_selected_scope_receipt_passes_and_is_bound_to_library_route() -> None:
     receipt=evaluate_library_execution_package(_positive())
     assert receipt["status"]=="pass",receipt["errors"]
+    assert receipt["evaluation_scope"] == "declared_package_shape"
+    assert receipt["native_execution_status"] == "not_run"
+    assert receipt["closure_licensed"] is False
+    assert receipt["evidence_domain_verification_status"] == "unverified"
+    assert receipt["consumed_inference_observations"] == []
+    assert all(row["verification_status"] == "unverified" for row in receipt["declared_inference_observations"])
+    assert all(row["status"] == "declared_unverified" for row in receipt["native_obligation_evidence"])
     assert receipt["target_skill_id"]==TARGET_SKILL_ID
     assert receipt["native_owner_id"]==NATIVE_OWNER_ID
     assert receipt["receipt_sha256"]
@@ -154,7 +161,7 @@ def test_complete_selected_scope_receipt_passes_and_is_bound_to_library_route() 
             row["relationship_id"] for row in object_row["relationship_evidence"]
         ]
         assert all(
-            row["evidence_ref"] and row["evidence_sha256"]
+            row["evidence_ref"] and row["evidence_sha256"] and row["status"] == "declared_unverified"
             for row in object_row["relationship_evidence"]
         )
 
@@ -219,8 +226,17 @@ def test_capability_and_scheduled_production_evidence_are_typed_and_disjoint(tmp
         scheduled_production_identity=_scheduled_identity(),
         run_id="run:traceguard:case-library:scheduled-production",
     )
+    # The compatibility builder snapshots inventory; the optional wrapper does
+    # not reread it or authenticate the caller's closure or scheduler claims.
+    shutil.rmtree(tmp_path / "library")
+    production["claim_boundary"] = "All native obligations and task closure passed."
     result=evaluate_library_execution_package(production)
     assert result["status"]=="pass",result["errors"]
+    assert result["native_execution_status"] == "not_run"
+    assert result["closure_licensed"] is False
+    assert result["claim_boundary"] != production["claim_boundary"]
+    assert result["scheduled_production_identity_verification_status"] == "unverified"
+    assert all(row["status"] == "declared_unverified" for row in result["native_obligation_evidence"])
     identity = result["scheduled_production_identity"]
     expected = _scheduled_identity()
     assert identity["scheduler_or_trigger_id"] == expected["scheduler_or_trigger_id"]

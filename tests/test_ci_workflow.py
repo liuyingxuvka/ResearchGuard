@@ -18,5 +18,5 @@ def test_ci_verifies_one_public_flowguard_authority_after_install() -> None:
     workflow = WORKFLOW.read_text(encoding="utf-8")
 
     assert 'name: Verify current public FlowGuard' in workflow
-    assert "m.version('flowguard') == flowguard.__version__ == '0.70.4'" in workflow
+    assert "m.version('flowguard') == flowguard.__version__ == '0.70.5'" in workflow
     assert "SCHEMA == 'flowguard.map.v1'" in workflow

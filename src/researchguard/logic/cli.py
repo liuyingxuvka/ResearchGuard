@@ -238,7 +238,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     route_depth = sub.add_parser(
         "route-depth",
-        help="Issue the current LogicGuard internal-route execution-depth receipt.",
+        help="Check declared route-package shape; does not verify native execution or closure.",
     )
     route_depth.add_argument("package")
     route_depth.add_argument("--output")

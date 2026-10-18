@@ -207,101 +207,18 @@ The preferred storyline can ignore live alternatives.
 The saved thesis handoff material is already final prose.
 ```
 
-## Guard model purpose gate
+## Native completion and stopping
 
-Before the AI builds or materially changes a TraceGuard model from a case
-library, it must first write one target-local task-model-instance purpose
-contract. State in plain language what this particular model must prevent and
-what remains outside its boundary; select a non-empty one-or-many set of
-TraceGuard failure ids; retain one task-local native known-good; and bind
-exactly one task-local native known-bad to every selected failure. Pass that
-contract through `library build-model --purpose-contract ...`; construction
-must block until all selected cases pass their TraceGuard-native oracles.
+1. For saving or searching only, use the actual library init/create-case/add-direction/add-source/add-evidence/list/search operation and report its result. Saved material is not an evaluated storyline.
+2. For reconstruction, validate_library, build_model/write_model with the actual purpose contract, then run the current canonical evaluate_model once.
+3. Full, causal or predictive claims retain native storyline depth, real target-local purpose proof and an independent holdout. Use write_back_gaps when needed.
 
-The files under this skill's own `guard-model/` directory are only the
-TraceGuard Library family capability baseline. They prove that the library
-skill's native package checks react to their regression cases. They do not
-choose the purpose of a model built from a real case library, cannot be copied
-as that model's production declaration, and cannot substitute for the
-target-local TraceGuard task contract. The generated candidate must retain the
-exact task-contract/proof binding so the formal TraceGuard bridge can require
-the request, candidate, task contract, one known-good, and every selected
-known-bad as the exact target-input set.
+Stop at the actual operation result or current inference/depth non-closure terminal. Do not invent a scheduler identity or create another library-depth PASS.
 
-This is one fixed `enforced` workflow. There is no routine, functional,
-release, highest-quality, quick, advisory, or other selectable closure mode.
-TraceGuard and TraceGuard Library define their own failure classes, fixtures,
-and native decisions. TraceGuard Library executes and reconciles its declared
-checks and exact current inputs without inventing, broadening, weakening, or
-reinterpreting library or storyline semantics.
+Before building or materially changing a real TraceGuard model, supply the current task-local `researchguard.trace.task_model_purpose.v1` to `researchguard trace library build-model --purpose-contract ...`. Preserve the model id, prevention purpose, boundary, selected native failure ids, one known-good and one known-bad per failure. The runtime `researchguard.trace.purpose_contract` and `researchguard.trace.guard_model.verify` owners retain the actual proof rules and block missing, late, stale or wrong-instance evidence. Saving, searching and exporting material do not create this model-proof obligation.
 
-## Native execution-depth receipt gate
+`researchguard trace library-depth PACKAGE.json` is an optional declared-package shape diagnostic. It does not reread or authenticate evidence, execute inference, verify scheduler/obligation/relationship declarations, or license native closure. The compatibility scheduled-package builder snapshots file inventory and hashes with unverified declarations; it is not a closure producer.
 
-Before claiming non-trivial case-library closure, issue
-`researchguard trace library-depth PACKAGE.json --output RECEIPT.json` for
-target `traceguard.case-library`, owner `traceguard.case-library`, and route
-`route:traceguard:case-library`. The package must freeze the selected
-library/project/case/direction identity; reconcile every declared, discovered,
-required, excluded, and evaluated case, direction, source, evidence item,
-event, lead, trace, and gap; and provide the required relationship rows for
-each eligible object. It must preserve source-before-evidence,
-evidence-before-event/trace, fact-versus-explanation, competing-storyline,
-current evaluation, and gap-write-back boundaries. Saving a few records,
-relabeling the primary TraceGuard storyline receipt, or copying a catalog into
-the evaluated list is shallow and must block. The native library receipt
-records this boundary without taking over storyline evaluation or library writes.
-Declare a non-empty authoritative `important_object_ids` denominator. An
-important or required library object cannot be excluded or reclassified; any
-other exclusion needs current hashed evidence, a closed non-contributing or
-not-applicable disposition, and no relationship/closure contribution.
+## Template packs on request
 
-An object count, relationship-kind list, catalog expansion, whole-receipt hash,
-or ordinal range is not proof of an individual library obligation. Every
-satisfied governed object and required relationship must retain its exact
-target-native semantic object, `evidence_ref`, and lowercase content hash.
-Missing, renamed, overlapping, mechanically generated, or summary-only mappings
-block non-trivial library closure.
-
-## Scheduled-production depth closure
-
-For a real use, capability and calibration fixtures are not closure evidence.
-Before a non-trivial or depth-dependent library claim, write the target-owned
-execution package to
-`.traceguard/case-library-scheduled-production.json` under the task target
-root. The package must identify this exact skill, `traceguard.library`, and
-`route:traceguard:case-library`; carry a target-owned
-`scheduled_production_identity` that binds its trigger, execution, current
-library scope, and runtime fingerprint; reconcile the complete governed library
-object and relationship universe; retain exact per-obligation and per-object
-evidence; and reference every supporting target file by safe relative path and
-content SHA-256. The current depth check evaluates those files under the current
-target-owned run and emits `scheduled_production` evidence. Repository fixtures
-remain `fixture_calibration` or source-only capability evidence and can never
-close production use.
-
-The production package MUST be created by the target-native scheduled
-constructor from the canonical current case-library root and MUST contain
-`input_origin=target_native_scheduled_execution`. The adapter independently
-re-discovers that root, requires the exact case/direction/source/evidence/event/
-trace/gap object and relationship universe to equal the package, resolves the
-declared files, recomputes their hashes, and verifies target/run/route semantic
-ids and native range anchors. Copying or relabeling calibration data, shrinking
-every self-reported universe list together, or supplying generic placeholder
-evidence is invalid production evidence.
-
-
-<!-- BEGIN MANAGED VALIDATED TEMPLATE PACK -->
-## Validated Template Pack Routing
-
-- Target families: `traceguard`; native owner: `traceguard.template_packs`.
-- Current catalogs: `traceguard.template-pack.catalog` revision `1.0.0`.
-- Resolve the task through this Guard's native router first, then ask the target-owned adapter for a current neutral projection; never infer a template from wording or a skill name.
-- Preserve the adapter's complete candidate and rejection accounting. Zero candidates may use only the declared validated base; one candidate gets a read-only preview; many candidates require complete dependencies, pairwise compatibility, one field owner, and target-authored dominance or must block as ambiguous.
-- Recompute the projection immediately before applying a preview. A stale request, catalog, route, builder, validator, or content identity blocks all writes.
-- Hand the selected preview to the target-declared builder and consume every target-native validator receipt. Template structure is not domain validity, completion, installation, release, or publication evidence.
-- Record a harvest disposition after creating or materially deepening a reusable model, and keep no-match evidence visible.
-- Declared validated bases: `purpose`.
-- Template inventory: `case-library`, `causal`, `competing-storyline`, `counterfactual`, `handoff`, `incident`, `purpose`, `research-lineage`, `technology-progression`.
-- Native validator inventory: `traceguard.template_packs.validate_native_payload`.
-- Claim boundaries: TraceGuard template instances are non-factual model skeletons; source rows are not evidence, evidence must precede events, events must precede traces, and generated traces are not validated.
-<!-- END MANAGED VALIDATED TEMPLATE PACK -->
+Only when the task requests an existing template pack, load [validated-template-pack.md](../validated-template-pack.md) and use the corresponding native template operation. Templates remain non-factual model skeletons and never replace native validation.

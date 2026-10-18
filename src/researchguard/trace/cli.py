@@ -807,7 +807,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     library_depth = sub.add_parser(
         "library-depth",
-        help="Issue the current internal case-library execution-depth receipt.",
+        help="Check declared library-package shape; does not verify native execution or closure.",
     )
     library_depth.add_argument("package")
     library_depth.add_argument("--output")

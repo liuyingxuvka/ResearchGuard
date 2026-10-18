@@ -80,12 +80,14 @@ def recommend_experiments(spec: ExperimentSpec) -> ExperimentRecommendation:
         solutions = tuple(selected for selected in combinations(candidates, size) if not _unresolved(selected, pairs, predictions))
         if solutions:
             return ExperimentRecommendation("recommended", solutions[0], solutions, (), "minimum_distinguishing_set_found")
+    unresolved = _unresolved(candidates, pairs, predictions)
     return ExperimentRecommendation(
         "indistinguishable",
         (),
         (),
-        _unresolved(candidates, pairs, predictions),
-        "declared_candidates_cannot_distinguish_all_hypotheses",
+        unresolved,
+        "declared_candidates_cannot_distinguish_all_hypotheses"
+        if unresolved else "no_distinguishing_set_within_declared_limit",
     )
 
 
@@ -200,7 +202,11 @@ def observe_experiments(spec: ExperimentSpec, observations: tuple[ExperimentObse
                 "declared_candidates_exhausted",
             )
         if recommendation.status == "indistinguishable":
-            gaps.add("declared-candidates-indistinguishable")
+            gaps.add(
+                "experiment-count-limit-prevents-distinguishing-set"
+                if recommendation.reason_code == "no_distinguishing_set_within_declared_limit"
+                else "declared-candidates-indistinguishable"
+            )
     elif len(active_ids) == 1:
         recommendation = ExperimentRecommendation("recommended", (), ((),), (), "one_hypothesis_consistent")
         valid_holdout = tuple(
@@ -223,14 +229,15 @@ def observe_experiments(spec: ExperimentSpec, observations: tuple[ExperimentObse
     progressed = bool(resolved or introduced or (spec.iteration == 0 and observations))
     if spec.iteration >= spec.max_iterations:
         terminal = "iteration_limit"
+    elif not current and len(active_ids) == 1:
+        terminal = "model_closed_for_task"
+        progressed = True
     elif current == prior and spec.iteration > 0:
         terminal = "progress_stalled"
-    elif revision_candidate or any(gap.startswith("observation-") for gap in current) or "independent-holdout-required" in current or "declared-candidates-indistinguishable" in current:
+    elif revision_candidate or any(gap.startswith("observation-") for gap in current) or "independent-holdout-required" in current or "declared-candidates-indistinguishable" in current or "experiment-count-limit-prevents-distinguishing-set" in current:
         terminal = "external_input_required"
     elif current:
         terminal = "continue_iteration"
-    elif len(active_ids) == 1:
-        terminal = "model_closed_for_task"
     else:
         terminal = "continue_iteration"
 

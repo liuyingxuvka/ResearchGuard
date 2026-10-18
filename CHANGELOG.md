@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.5.8 - 2026-10-18
+
+- Complete library, viewer, structure, synthesis and deepening tasks through their native owners; keep route-depth and library-depth as optional shape diagnostics that never license native execution or closure.
+- Mark Trace library package, scheduler, obligation, relationship and inference-observation declarations as unverified; retain real purpose, depth and independent holdout checks.
+- Correct current schema names, v3 envelope fields, verifier paths and CLI examples without accepting retired contracts.
+- Close valid later Experiment iterations before same-gap stall detection, retain the iteration limit first, and distinguish a declared experiment-count limit from genuinely indistinguishable candidates.
+- Pin maintenance and CI to the published FlowGuard 0.70.5 dependency.
+
 ## v0.5.7 - 2026-10-17
 
 - Rebind four native software-DNA cases to their actual implementation owners and add direct read-only assertions to three existing cases.
