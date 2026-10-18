@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "researchguard"
-version = "0.5.8"
+version = "0.5.9"
 description = "One versioned research guard suite for argument, source, trace, and experiment-decision reasoning."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -40,7 +40,7 @@ dependencies = [
 [project.optional-dependencies]
 test = [
   "pytest>=8.0",
-  "flowguard @ git+https://github.com/liuyingxuvka/FlowGuard.git@v0.70.5",
+  "flowguard @ git+https://github.com/liuyingxuvka/FlowGuard.git@v0.70.6",
 ]
 
 [project.scripts]

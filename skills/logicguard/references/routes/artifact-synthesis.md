@@ -60,13 +60,15 @@ researchguard logic <args>
 ## Common Commands
 
 ```powershell
-researchguard logic synthesize examples\structured_artifact_deck.yaml --goal "Build a customer validation deck"
-researchguard logic synthesize examples\structured_artifact_deck.yaml --goal "Build a customer validation deck" --profile presentation --delivery
+researchguard logic synthesize examples/logic/structured_artifact_deck.yaml --selection-request <selection-request.json>
+researchguard logic synthesize examples/logic/structured_artifact_deck.yaml --selection-request <selection-request.json> --delivery
 researchguard logic structure from-markdown examples\structured_report_outline.md --artifact-kind report --output report_model.yaml
 researchguard logic outline examples\engineering_efficiency_argument.yaml
 researchguard logic citation matrix examples\engineering_efficiency_argument.yaml
 researchguard logic citation audit examples\engineering_efficiency_argument.yaml
 ```
+
+The selection request uses `researchguard.logic.synthesis-request.v1` and carries the target artifact units and goal; `--delivery` adds delivery guidance.
 
 ## Native completion and stopping
 

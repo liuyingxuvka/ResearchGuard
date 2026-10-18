@@ -535,6 +535,29 @@ def test_changed_stage_is_rejected_before_replacing_active_files(tmp_path, monke
     assert (active / "alpha/SKILL.md").read_bytes() == b"prior alpha"
 
 
+def test_retired_skill_residual_blocks_activation_before_any_member_write(tmp_path, monkeypatch):
+    retired_skills = install_researchguard.RETIRED_SKILLS
+    _, active = _skill_paths(tmp_path, monkeypatch)
+    prepared = install_researchguard._prepare_skill_stages(tmp_path / "stages")
+    retired = active / retired_skills[0]
+    retired.mkdir()
+    (retired / "SKILL.md").write_bytes(b"user retained old skill")
+    monkeypatch.setattr(install_researchguard, "RETIRED_SKILLS", retired_skills)
+    before = install_researchguard._inventory(active)
+    writes = []
+    for name in ("move", "copytree"):
+        original = getattr(install_researchguard.shutil, name)
+        def record_write(*args, _name=name, _original=original, **kwargs):
+            writes.append(_name)
+            return _original(*args, **kwargs)
+        monkeypatch.setattr(install_researchguard.shutil, name, record_write)
+    with pytest.raises(install_researchguard.InstallError, match="retired"):
+        install_researchguard._activate_prepared_skills(prepared)
+    assert writes == []
+    assert install_researchguard._inventory(active) == before
+    assert all(prepared[member]["stage"].is_dir() for member in ("alpha", "beta"))
+
+
 def test_currentness_compares_files_without_an_author_tool_or_manifest(tmp_path, monkeypatch):
     _, active = _skill_paths(tmp_path, monkeypatch)
     prepared = install_researchguard._prepare_skill_stages(tmp_path / "stages")
@@ -596,6 +619,34 @@ def test_suite_rollback_is_cleanup_unconfirmed_but_attempts_every_domain(tmp_pat
     assert manifest.read_bytes() == b"prior legacy manifest"
     assert (active / "beta/SKILL.md").read_bytes() == b"prior beta"
     assert [row["domain"] for row in result["reports"]] == ["consumers", "python-package", "suite-manifest"]
+
+
+def test_member_restore_failure_remains_visible_and_other_restore_domains_continue(tmp_path, monkeypatch):
+    active, package, manifest, snapshots = _changed_states(tmp_path, monkeypatch)
+    move = install_researchguard.shutil.move
+    attempts = []
+    def fail_beta_restore(source, destination, *args, **kwargs):
+        attempts.append(Path(destination).name)
+        if Path(destination) == active / "beta":
+            raise OSError("beta restore failed")
+        return move(source, destination, *args, **kwargs)
+    monkeypatch.setattr(install_researchguard.shutil, "move", fail_beta_restore)
+    cleanup = install_researchguard._rollback_activated_skills(snapshots["activations"])
+    assert attempts == ["beta", "alpha"]
+    assert cleanup["status"] == "cleanup_unconfirmed"
+    assert [(row["skill_id"], row["status"]) for row in cleanup["reports"]] == [
+        ("beta", "cleanup_unconfirmed"), ("alpha", "passed")]
+    assert "beta restore failed" in cleanup["reports"][0]["findings"][0]
+    assert not (active / "beta").exists()
+    assert Path(snapshots["activations"][1]["backup"]).joinpath("SKILL.md").read_bytes() == b"prior beta"
+    assert (active / "alpha/SKILL.md").read_bytes() == b"prior alpha"
+    result = install_researchguard._restore_suite_state(**snapshots, prior_consumer_cleanup=cleanup)
+    assert result["status"] == "cleanup_unconfirmed"
+    assert result["cleanup_confirmed"] is False
+    assert [row["status"] for row in result["reports"]] == ["cleanup_unconfirmed", "passed", "passed"]
+    assert package.read_bytes() == b"prior package"
+    assert manifest.read_bytes() == b"prior legacy manifest"
+    assert attempts == ["beta", "alpha"]
 
 
 @pytest.mark.parametrize("cleanup_fails", [False, True])

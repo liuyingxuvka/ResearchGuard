@@ -100,8 +100,6 @@ def observe_experiments(spec: ExperimentSpec, observations: tuple[ExperimentObse
         raise ValueError("observation evidence fingerprints must be independent")
     predictions = _prediction_map(spec)
     candidates = set(spec.candidate_experiment_ids)
-    construction = tuple(row for row in observations if row.role == "construction")
-    holdouts = tuple(row for row in observations if row.role == "holdout")
     gaps: set[str] = set()
     design_by_candidate: dict[str, list[ExperimentDesignBlock]] = {}
     if spec.design_blocks:
@@ -115,6 +113,7 @@ def observe_experiments(spec: ExperimentSpec, observations: tuple[ExperimentObse
             for item in validate_design_identities(spec)
         )
     valid_construction: list[ExperimentObservation] = []
+    valid_holdouts: list[ExperimentObservation] = []
     unexpected: list[ExperimentObservation] = []
     for row in observations:
         if row.experiment_id not in candidates:
@@ -139,6 +138,8 @@ def observe_experiments(spec: ExperimentSpec, observations: tuple[ExperimentObse
             continue
         if row.role == "construction":
             valid_construction.append(row)
+        else:
+            valid_holdouts.append(row)
 
     dispositions: list[HypothesisDisposition] = []
     active_ids: list[str] = []
@@ -209,14 +210,14 @@ def observe_experiments(spec: ExperimentSpec, observations: tuple[ExperimentObse
             )
     elif len(active_ids) == 1:
         recommendation = ExperimentRecommendation("recommended", (), ((),), (), "one_hypothesis_consistent")
-        valid_holdout = tuple(
-            row
-            for row in holdouts
-            if row.status == "valid"
-            and predictions[active_ids[0]].get(row.experiment_id) == row.observed_outcome
-            and row.evidence_fingerprint not in {item.evidence_fingerprint for item in construction}
+        matching_holdouts = tuple(
+            row for row in valid_holdouts
+            if predictions[active_ids[0]][row.experiment_id] == row.observed_outcome
         )
-        if not valid_holdout:
+        for row in valid_holdouts:
+            if predictions[active_ids[0]][row.experiment_id] != row.observed_outcome:
+                gaps.add(f"holdout-conflict:{row.evidence_id}")
+        if not matching_holdouts:
             gaps.add("independent-holdout-required")
     else:
         recommendation = ExperimentRecommendation("blocked_invalid_input", (), (), (), "prediction_matrix_revision_required")
@@ -232,16 +233,21 @@ def observe_experiments(spec: ExperimentSpec, observations: tuple[ExperimentObse
     elif not current and len(active_ids) == 1:
         terminal = "model_closed_for_task"
         progressed = True
+    elif not current and len(active_ids) > 1 and valid_construction and recommendation.selected_experiment_ids:
+        # Prior gaps/fingerprint cannot prove whether this evidence is historically
+        # new. A concrete remaining experiment permits a bounded next iteration,
+        # without claiming progress or weakening the iteration limit.
+        terminal = "continue_iteration"
     elif current == prior and spec.iteration > 0:
         terminal = "progress_stalled"
-    elif revision_candidate or any(gap.startswith("observation-") for gap in current) or "independent-holdout-required" in current or "declared-candidates-indistinguishable" in current or "experiment-count-limit-prevents-distinguishing-set" in current:
+    elif revision_candidate or any(gap.startswith(("observation-", "holdout-conflict:")) for gap in current) or "independent-holdout-required" in current or "declared-candidates-indistinguishable" in current or "experiment-count-limit-prevents-distinguishing-set" in current:
         terminal = "external_input_required"
     elif current:
         terminal = "continue_iteration"
     else:
         terminal = "continue_iteration"
 
-    holdout_ids = tuple(row.evidence_id for row in holdouts if row.status == "valid")
+    holdout_ids = tuple(row.evidence_id for row in valid_holdouts)
     receipt_material = {
         "task_id": spec.task_id,
         "iteration": spec.iteration,

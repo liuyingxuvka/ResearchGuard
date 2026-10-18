@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+
 import pytest
 
 from researchguard.experiment import (
@@ -112,6 +114,78 @@ def test_iteration_terminal_boundaries(iteration: int, observed: bool, terminal:
     assert receipt.terminal_reason == terminal
     if not observed:
         assert receipt.progressed is False
+
+
+@pytest.mark.parametrize("outcomes", [("cold",), ("hot", "cold"), ("cold", "hot")])
+def test_every_valid_holdout_counterexample_blocks_closure(outcomes, tmp_path, capsys) -> None:
+    from researchguard.experiment.cli import main
+
+    observations = (_observation("e1", "up", role="construction", suffix="a"),) + tuple(
+        _observation("e2", outcome, role="holdout", suffix=suffix)
+        for outcome, suffix in zip(outcomes, ("b", "c"))
+    )
+    spec_path = tmp_path / "spec.json"
+    observations_path = tmp_path / "observations.json"
+    spec_path.write_text(json.dumps(_spec().to_dict()), encoding="utf-8")
+    observations_path.write_text(json.dumps([row.to_dict() for row in observations]), encoding="utf-8")
+    assert main(["observe", str(spec_path), str(observations_path)]) == 2
+    receipt = json.loads(capsys.readouterr().out)
+    assert receipt["terminal_reason"] == "external_input_required"
+    assert any(gap.startswith("holdout-conflict:") for gap in receipt["introduced_gap_ids"])
+    assert receipt["holdout_evidence_ids"] == [row.evidence_id for row in observations[1:]]
+    assert [row["hypothesis_id"] for row in receipt["hypothesis_dispositions"] if row["status"] == "consistent"] == ["h1"]
+
+
+def test_same_gap_partial_evidence_can_continue_without_claiming_historical_progress() -> None:
+    values = dict(
+        hypothesis_predictions=(
+            HypothesisPrediction("h1", {"e1": "up", "e2": "hot"}),
+            HypothesisPrediction("h2", {"e1": "up", "e2": "cold"}),
+            HypothesisPrediction("h3", {"e1": "down", "e2": "cold"}),
+        ),
+        coverage_ids=("h1", "h2", "h3", "e1", "e2"),
+    )
+    prior = observe_experiments(_spec(**values), ())
+    observations = (_observation("e1", "up", role="construction", suffix="a"),)
+    # Replaying the same declared evidence has no provable historical newness.
+    for iteration in range(1, 5):
+        receipt = observe_experiments(_spec(
+            **values, iteration=iteration,
+            prior_receipt_fingerprint=prior.receipt_fingerprint, prior_open_gap_ids=(),
+        ), observations)
+        assert receipt.terminal_reason == ("iteration_limit" if iteration == 4 else "continue_iteration")
+        assert receipt.progressed is False
+        assert receipt.introduced_gap_ids == receipt.persisted_gap_ids == receipt.resolved_gap_ids == ()
+        assert receipt.recommendation.selected_experiment_ids == ("e2",)
+        assert [(row.hypothesis_id, row.status) for row in receipt.hypothesis_dispositions] == [
+            ("h1", "consistent"), ("h2", "consistent"), ("h3", "eliminated")]
+        prior = receipt
+
+
+def test_ordinary_spec_roundtrips_through_native_cli(tmp_path, capsys) -> None:
+    from researchguard.experiment.cli import _load_spec, main
+
+    path = tmp_path / "spec.json"
+    payload = _spec().to_dict()
+    assert not {"design_root_id", "design_blocks", "target_universe"} & payload.keys()
+    path.write_text(json.dumps(payload), encoding="utf-8")
+    loaded = _load_spec(path)
+    assert (loaded.task_id, loaded.purpose, loaded.coverage_ids) == (
+        _spec().task_id, _spec().purpose, _spec().coverage_ids)
+    assert recommend_experiments(loaded) == recommend_experiments(_spec())
+    assert main(["recommend", str(path)]) == 0
+    assert json.loads(capsys.readouterr().out)["selected_experiment_ids"] == ["e1"]
+    observations = tmp_path / "observations.json"
+    observations.write_text(json.dumps([row.to_dict() for row in (
+        _observation("e1", "up", role="construction", suffix="a"),
+        _observation("e2", "hot", role="holdout", suffix="b"),
+    )]), encoding="utf-8")
+    assert main(["observe", str(path), str(observations)]) == 0
+    assert json.loads(capsys.readouterr().out)["terminal_reason"] == "model_closed_for_task"
+    for partial in ({"design_root_id": "root"}, {"design_blocks": []}, {"target_universe": None}):
+        path.write_text(json.dumps(payload | partial), encoding="utf-8")
+        with pytest.raises(ValueError):
+            _load_spec(path)
 
 
 def test_finite_experiment_count_limit_is_not_all_candidates_indistinguishable() -> None:

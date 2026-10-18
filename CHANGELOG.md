@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.5.9 - 2026-10-18
+
+- Keep every validated independent holdout counterexample visible and block closure even when another holdout matches.
+- Continue bounded multi-survivor iterations with a concrete distinguishing next experiment without claiming unprovable historical progress; retain the strict iteration limit.
+- Round-trip ordinary experiment specs without activating blueprint validation; preserve strict partial/nonempty blueprint rejection.
+- Align seven command examples and their repeated references with current required native CLI arguments.
+- Cover ordinary member-restoration failures, continued rollback and suite aggregation, plus retired-skill preflight rejection before active files change.
+- Pin maintenance and CI to the published FlowGuard 0.70.6 dependency.
+
 ## v0.5.8 - 2026-10-18
 
 - Complete library, viewer, structure, synthesis and deepening tasks through their native owners; keep route-depth and library-depth as optional shape diagnostics that never license native execution or closure.

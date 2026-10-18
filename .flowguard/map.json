@@ -52,7 +52,7 @@
         ".flowguard/models/researchguard_suite_model.py"
       ],
       "status": "confirmed",
-      "fingerprint": "sha256:8e4440557897cb4d5e941731ee77f77061f6a909fead6cf3077c2d1bd97e8afb"
+      "fingerprint": "sha256:3233b71cde72e21335e3aed528ddcda5da952d3901548a5a4bc26d3ba5652970"
     },
     {
       "id": "suite-orchestration",
@@ -121,7 +121,7 @@
         ".flowguard/models/sourceguard_content_anchor_oracle_model.py"
       ],
       "status": "confirmed",
-      "fingerprint": "sha256:8f99f7a0461297f6a1b0b302ce03ab54af5eccec330411c3076bd1a6b6fe6110"
+      "fingerprint": "sha256:adaf4038121ad9b29d812d06c9f3e6c5ea0344a91937ac997afa105aa9b72337"
     },
     {
       "id": "logicguard",
@@ -345,7 +345,8 @@
       "summary": "Own finite minimum experiment sets, evidence-bound iteration, independent holdout and bounded terminal decisions.",
       "responsibilities": [
         "Distinguish hypotheses only within the caller-declared finite experiment-count limit and report limit failures separately from truly indistinguishable pairs.",
-        "License native closure only for a unique consistent hypothesis with current independent holdout and no gaps, while preserving the finite iteration limit first."
+        "License native closure only for a unique consistent hypothesis with matching independent holdout, no validated holdout counterexample and no gaps, while preserving the finite iteration limit first.",
+        "Continue a bounded multi-survivor iteration only with a concrete distinguishing next candidate; do not infer historical evidence progress from unchanged gap identifiers. Keep ordinary specs separate from explicitly declared strict blueprints."
       ],
       "files": [
         "src/researchguard/experiment/__init__.py",
@@ -373,7 +374,7 @@
       ],
       "models": [],
       "status": "confirmed",
-      "fingerprint": "sha256:17b324fb55f6591eef185bb1f65af51568cf35b0a3e4f8e847ef4dd6c43dcc59"
+      "fingerprint": "sha256:5fb06a86d970e8dd164cb64ee92ddbea212c13cf405fadd6be4983740d3637fd"
     },
     {
       "id": "author-tools",
@@ -410,7 +411,7 @@
       ],
       "models": [],
       "status": "confirmed",
-      "fingerprint": "sha256:4fecd118f9fd68e6084c5ce8cc516b99d24736e4a8617738cf6eb4b7585a6f58"
+      "fingerprint": "sha256:f15f7de46d754e3e2dfcf475ec4b370687f1ad0df43c85d3f88559b05f0b0c37"
     },
     {
       "id": "migration",

@@ -428,7 +428,7 @@ class ExperimentSpec:
             _unique(tuple(item.block_id for item in self.design_blocks), "design_blocks", allow_empty=False)
 
     def to_dict(self) -> dict[str, object]:
-        return {
+        result = {
             "schema_version": self.schema_version,
             "task_id": self.task_id,
             "purpose": self.purpose,
@@ -439,13 +439,17 @@ class ExperimentSpec:
             "max_iterations": self.max_iterations,
             "hypothesis_predictions": [item.to_dict() for item in self.hypothesis_predictions],
             "candidate_experiment_ids": list(self.candidate_experiment_ids),
-            "design_root_id": self.design_root_id,
-            "design_blocks": [item.to_dict() for item in self.design_blocks],
-            "target_universe": self.target_universe.to_dict() if self.target_universe else None,
             "maximum_experiment_count": self.maximum_experiment_count,
             "prior_receipt_fingerprint": self.prior_receipt_fingerprint,
             "prior_open_gap_ids": list(self.prior_open_gap_ids),
         }
+        if self.design_blocks:
+            result.update(
+                design_root_id=self.design_root_id,
+                design_blocks=[item.to_dict() for item in self.design_blocks],
+                target_universe=self.target_universe.to_dict(),
+            )
+        return result
 
 
 @dataclass(frozen=True)

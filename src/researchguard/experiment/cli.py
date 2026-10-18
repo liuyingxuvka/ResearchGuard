@@ -58,6 +58,8 @@ def _load_spec_payload(payload: object) -> ExperimentSpec:
         key in payload for key in ("design_root_id", "design_blocks", "target_universe")
     )
     if blueprint_current:
+        if not {"design_root_id", "design_blocks", "target_universe"} <= payload.keys():
+            raise ValueError("blueprint-aware specs require root, blocks, and independent target universe")
         _require_exact_keys(
             payload,
             {
