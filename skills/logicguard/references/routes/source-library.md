@@ -30,7 +30,7 @@ researchguard logic <args>
 11. Preserve lightweight temporal clues when available: `source_date` for the source's own date and `coverage_period` for the factual period covered. Keep these separate from library accession time such as `added_at`.
 12. When a LogicGuard gap ledger identifies missing evidence, missing baseline, unanswered rebuttal, scope mismatch, or fragile source support, search existing library nodes first and only then intake/model new candidate material when needed.
 13. For model-mesh projects, preserve the gap handoff fields whenever available: `gap_id`, `model_card_id`, `claim`, `missing_source_role`, `required_strength`, `locator`, `unsafe_wording`, and `safe_interim_wording`.
-14. For project work, select sources, deepen only topic-relevant paths, anchor branches to source nodes or blocks when possible, and link project argument nodes to source nodes, branch nodes, or model-card ids.
+14. For project work, select sources, deepen only topic-relevant paths, anchor branches to source nodes or blocks when possible, and link project argument nodes to source nodes, branch nodes, or model-card ids. Give each project `Evidence` node a `provenance` record with the library `source_id` and the source-model node as `locator`, then run `researchguard logic validate <project model> --library-root <library>`.
 15. When a high-importance project claim depends on a shallow source model, check whether the relevant method, result, evidence, warrant, limitation, or rebuttal is actually exposed. If not, deepen the anchored path or report the claim as under-supported.
 16. Preserve source-role cues for later writing: event fact, official claim, independent report, limiting/counter evidence, expert analysis, historical background, or hypothesis. These roles should be available to a later claim-to-source matrix.
 17. When source work supports a structural contribution graph, preserve `structure_unit_id`, parent goal, contribution type, intended downstream consumer, and the structural role the source can and cannot support, such as background, definition, method choice, validation criterion, validation evidence, limitation, or conclusion recovery.
@@ -89,6 +89,7 @@ researchguard logic library view-graph .logicguard-library source-id --language 
 researchguard logic library deepen-source .logicguard-library source-id --project my-project --topic-focus "Focus" --locator "Section 4" --anchor-node C1
 researchguard logic library search .logicguard-library "query" --project my-project
 researchguard logic gaps project_argument.yaml
+researchguard logic validate project_argument.yaml --library-root .logicguard-library
 researchguard logic library export-package .logicguard-library project.zip --project my-project
 researchguard logic library import-package .logicguard-library project.zip --dry-run
 ```

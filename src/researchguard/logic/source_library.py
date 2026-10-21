@@ -343,6 +343,13 @@ class SourceLibrary:
         """Read source records without creating or mutating library files."""
         return self._load_sources()
 
+    def source_node_ids(self, source_id: str) -> set[str]:
+        """Node ids of one source's logic model, read without creating or changing files."""
+        path = self.source_model_path(source_id)
+        payload = yaml.safe_load(path.read_text(encoding="utf-8")) if path.is_file() else None
+        nodes = payload.get("nodes") if isinstance(payload, dict) else None
+        return {str(key) for key in nodes} if isinstance(nodes, dict) else set()
+
     def list_projects(self) -> list[ProjectBranch]:
         """Read project branches without creating or mutating library files."""
         if not self.projects_dir.exists():

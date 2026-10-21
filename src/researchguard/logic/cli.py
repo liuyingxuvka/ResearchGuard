@@ -69,6 +69,7 @@ def build_parser() -> argparse.ArgumentParser:
     validate = sub.add_parser("validate", help="Validate a YAML/JSON LogicGuard model.")
     validate.add_argument("model")
     validate.add_argument("--output")
+    validate.add_argument("--library-root", default="", help="Check Evidence provenance anchors against this source library.")
     validate.set_defaults(func=_cmd_validate)
 
     evaluate = sub.add_parser("evaluate", help="Evaluate model states and confidence.")
@@ -427,7 +428,12 @@ def build_parser() -> argparse.ArgumentParser:
 
 def _cmd_validate(args: argparse.Namespace) -> int:
     model = load_model(args.model, validate=False)
-    validation = validate_model(model)
+    library = None
+    if args.library_root:
+        library = SourceLibrary(args.library_root)
+        if not library.source_index_path.is_file():
+            raise ValueError(f"source library not found: {args.library_root}")
+    validation = validate_model(model, source_library=library)
     payload = validation.to_dict()
     if args.output:
         _write(args.output, payload)

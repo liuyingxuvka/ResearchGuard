@@ -3,7 +3,7 @@
 Use only the installed `researchguard logic` path.
 
 ```powershell
-researchguard logic validate <model>
+researchguard logic validate <model> [--library-root <library>]
 researchguard logic evaluate <model>
 researchguard logic diagnose <model>
 researchguard logic simulate <model> --mode fragility

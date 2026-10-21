@@ -1,11 +1,18 @@
 from __future__ import annotations
 
 import json
+import subprocess
+import sys
 from pathlib import Path
 
 import pytest
+import yaml
 
 from researchguard.logic import SourceLibrary, SourceLibraryError, load_model
+from researchguard.logic.loader import ModelLoadError, load_model_from_dict
+from researchguard.logic.validator import validate_model
+
+ROOT = Path(__file__).resolve().parents[2]
 
 
 def test_import_source_deduplicates_by_content_hash(tmp_path: Path) -> None:
@@ -323,3 +330,52 @@ def test_source_library_preserves_importance_on_nodes_links_and_search(tmp_path:
     assert link.importance == 0.88
     stored = library.list_links(project.project_id, project_node_id="C1")[0]
     assert stored.salience == "key-evidence"
+
+
+def _evidence_model(**record: str) -> dict:
+    provenance = [{"origin_kind": "external_source", "content_hash": "sha256:" + "a" * 64, **record}]
+    return {
+        "model": {"id": "bound", "root_claim": "C"},
+        "nodes": {
+            "C": {"type": "Claim", "text": "Exposure speeds recovery."},
+            "E": {"type": "Evidence", "text": "Observed correlation.", "provenance": provenance},
+        },
+        "edges": [{"source": "E", "target": "C", "type": "supports"}],
+    }
+
+
+def test_validate_checks_evidence_provenance_against_the_source_library(tmp_path: Path) -> None:
+    source_file = tmp_path / "paper.txt"
+    source_file.write_text("Exposure correlates with faster recovery.", encoding="utf-8")
+    library = SourceLibrary(tmp_path / "library")
+    source_id = library.import_source(source_file, title="Recovery Study", year="2024").source.source_id
+    library.create_source_model(source_id, claim="Exposure correlates with recovery.", evidence="Observed correlation.")
+
+    def run(**record: str) -> subprocess.CompletedProcess[str]:
+        path = tmp_path / "model.yaml"
+        path.write_text(yaml.safe_dump(_evidence_model(**record)), encoding="utf-8")
+        return subprocess.run(
+            [sys.executable, "-m", "researchguard", "logic", "validate", str(path),
+             "--library-root", str(tmp_path / "library")],
+            cwd=ROOT, capture_output=True, text=True,
+        )
+
+    bound = run(source_id=source_id, locator="E1")
+    assert bound.returncode == 0 and bound.stdout.strip() == "validation: OK", bound.stdout
+    unknown = run(source_id="unknown-source", locator="E1")
+    assert unknown.returncode == 2
+    assert "provenance source_id 'unknown-source' is not in the source library" in unknown.stdout
+    wrong_node = run(source_id=source_id, locator="E9")
+    assert wrong_node.returncode == 2
+    assert f"provenance locator 'E9' is not a node of source '{source_id}'" in wrong_node.stdout
+    unanchored = run(source_id=source_id)
+    assert unanchored.returncode == 0
+    assert "Evidence not anchored to a library source node (no source_id + locator): E" in unanchored.stdout
+
+
+def test_evidence_without_provenance_is_a_visible_warning_and_ai_text_is_not_evidence() -> None:
+    result = validate_model(load_model(ROOT / "examples/logic/scientific_causal_claim.yaml"))
+    assert result.ok
+    assert result.warnings == ["Evidence not bound to a source (no provenance): E1"]
+    with pytest.raises(ModelLoadError, match="non-ai_generated"):
+        load_model_from_dict(_evidence_model(origin_kind="ai_generated", source_id="any"))

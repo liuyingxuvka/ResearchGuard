@@ -82,7 +82,7 @@
         ".flowguard/models/sourceguard_content_anchor_oracle_model.py"
       ],
       "status": "confirmed",
-      "fingerprint": "sha256:fa59cad9561f6887290966793f101c0b0c5b079ad98643813d894b203f2404f0"
+      "fingerprint": "sha256:9a427da0fb8aafbc9c99e0c8f8393b6c4cf2b4b48f211d17152a9be60284ce32"
     },
     {
       "id": "logicguard",
@@ -91,7 +91,8 @@
         "Own argument support, source library, structured artifacts, model deepening, synthesis and project library inspection.",
         "Run depth analysis on the model alone; synthesis always computes depth in process.",
         "Run the predict-observe-revise loop on plain model files; the loop never writes model files, so rollback is restoring the previous file.",
-        "Derive a claim's minimal support and attack sets and its wording license with the model's own evaluator."
+        "Derive a claim's minimal support and attack sets and its wording license with the model's own evaluator.",
+        "Bind Evidence to sources: provenance records are checked on load, and validate --library-root resolves their source_id and locator in the source library."
       ],
       "files": [
         "src/researchguard/logic/__init__.py",
@@ -153,7 +154,7 @@
       ],
       "models": [],
       "status": "confirmed",
-      "fingerprint": "sha256:01408772848885d869d158846cda62ae59b26949671f86860a4ad4202068b165"
+      "fingerprint": "sha256:c5a3274e05eb229997eb83d27bb9ee6e80c926cf975cb5fb100867c8c2658287"
     },
     {
       "id": "sourceguard",

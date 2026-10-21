@@ -621,3 +621,17 @@ Default Trace evaluation solves once without storyline depth; trace depth, story
 - `python -m flowguard map confirm traceguard suite-orchestration` — exit 0, 0.272s; `confirmed 2 component(s)`
 - `python -m flowguard map check` — exit 0, 0.328s; `check: 0 error(s), 4 warning(s), 0 info`
 - `python -m flowguard release` — exit 0, 2.08s; `verify: PASS (map, lint and models only; tests not run; run python -m pytest -q separately)`
+
+## RG-52 — completed
+
+Evidence provenance gains an optional locator and native format/origin validation. validate --library-root resolves real source and source-model node IDs; absent provenance/anchor warns, an explicit wrong binding fails. Source-node inventory is read-only and creates no directory. 147 Logic tests passed including real temporary-library bound/unknown-source/wrong-node/unanchored variants; all six current YAML examples validate with visible warnings, missing library rejects. Collection 345; fixed LW43 native 10 passed no skips; exports/map/release passed.
+
+- `python -m pytest tests/logic` — exit 0, 25.2s; `147 passed in 24.63s`
+- `python <external>/probe_rg52.py` — exit 0, 2.339s; `existing boundary rejects Evidence node 'E' requires at least one non-ai_generated evidentiary provenance record`
+- `python <external>/check_exports.py` — exit 0, 0.428s; `exports ok`
+- `python -m pytest -p no:cacheprovider tests/contract/test_researchguard_handoff.py --junitxml <external>/RG-52-lw43-junit.xml --basetemp <external>/RG-52-lw43-temp` — exit 0, 0.544s; `============================== 10 passed in 0.28s ==============================`
+- `python <external>/verify_lw_junit.py <external>/RG-52-lw43-junit.xml` — exit 0, 0.075s; `10 actual PASSED, 0 skipped; real native provider-to-reader bridge PASSED/ready, not version-skipped`
+- `python -m pytest --collect-only` — exit 0, 2.616s; `345 tests collected in 2.02s`
+- `python -m flowguard map confirm logicguard suite-orchestration` — exit 0, 0.406s; `confirmed 2 component(s)`
+- `python -m flowguard map check` — exit 0, 0.41s; `check: 0 error(s), 4 warning(s), 0 info`
+- `python -m flowguard release` — exit 0, 2.017s; `verify: PASS (map, lint and models only; tests not run; run python -m pytest -q separately)`

@@ -11,6 +11,7 @@ from .model import (
     block_interface_receipt_fingerprint,
     interface_model_fingerprint,
 )
+from .provenance import ProvenanceError, ProvenanceRecord, validate_evidence_provenance
 from .schema import ACCEPTANCE_KEYS, EDGE_TYPES, NODE_TYPES, STATES
 
 
@@ -42,13 +43,40 @@ class ValidationResult:
         return "\n".join(lines)
 
 
-def validate_model(model: LogicModel) -> ValidationResult:
+def validate_model(model: LogicModel, *, source_library: Any = None) -> ValidationResult:
+    """Validate model structure; with ``source_library`` also resolve Evidence provenance anchors."""
+
     errors: list[str] = []
     warnings: list[str] = []
     if not model.nodes:
         errors.append("model must define at least one node")
     if model.root_claim and model.root_claim not in model.nodes:
         errors.append(f"root_claim {model.root_claim!r} is not a defined node")
+
+    unbound_evidence: list[str] = []
+    unanchored_evidence: list[str] = []
+    for node_id, node in model.nodes.items():
+        if node.type != "Evidence":
+            continue
+        if not node.provenance:
+            unbound_evidence.append(node_id)
+            continue
+        try:
+            records = validate_evidence_provenance(node_id, node.provenance)
+        except ProvenanceError as exc:
+            errors.append(str(exc))
+            continue
+        if source_library is not None:
+            errors.extend(_library_anchor_problems(node_id, records, source_library))
+            if not any(record.source_id and record.locator for record in records):
+                unanchored_evidence.append(node_id)
+    if unbound_evidence:
+        warnings.append("Evidence not bound to a source (no provenance): " + ", ".join(unbound_evidence))
+    if unanchored_evidence:
+        warnings.append(
+            "Evidence not anchored to a library source node (no source_id + locator): "
+            + ", ".join(unanchored_evidence)
+        )
 
     for node_id, node in model.nodes.items():
         if node.type not in NODE_TYPES:
@@ -275,6 +303,25 @@ def validate_model(model: LogicModel) -> ValidationResult:
                         errors.append(f"material child output {block.id!r}/{output_id!r} is unconsumed")
 
     return ValidationResult(ok=not errors, errors=errors, warnings=warnings)
+
+
+def _library_anchor_problems(node_id: str, records: tuple[ProvenanceRecord, ...], library: Any) -> list[str]:
+    """Each provenance source_id must be a library source; a locator must be a node of its source model."""
+
+    known = {source.source_id for source in library.list_sources()}
+    problems: list[str] = []
+    for record in records:
+        if not record.source_id:
+            continue  # a source_reference (URL, DOI) is not a library anchor
+        if record.source_id not in known:
+            problems.append(
+                f"Evidence node {node_id!r}: provenance source_id {record.source_id!r} is not in the source library"
+            )
+        elif record.locator and record.locator not in library.source_node_ids(record.source_id):
+            problems.append(
+                f"Evidence node {node_id!r}: provenance locator {record.locator!r} is not a node of source {record.source_id!r}"
+            )
+    return problems
 
 
 def _as_list(value: Any) -> list[str]:

@@ -93,6 +93,7 @@ class ProvenanceRecord:
     content_hash: str
     source_id: str | None = None
     source_reference: str | None = None
+    locator: str | None = None
     observed_at: str | None = None
     source_date: str | None = None
     actor: str = ""
@@ -116,6 +117,8 @@ class ProvenanceRecord:
             raise ProvenanceError("provenance requires source_id or source_reference")
         object.__setattr__(self, "source_id", source_id)
         object.__setattr__(self, "source_reference", source_reference)
+        locator = str(self.locator).strip() if self.locator not in (None, "") else None
+        object.__setattr__(self, "locator", locator)
         object.__setattr__(
             self, "observed_at", _validate_temporal_clue(self.observed_at, "observed_at")
         )
@@ -159,6 +162,7 @@ class ProvenanceRecord:
                 "origin_kind": self.origin_kind.value,
                 "source_id": self.source_id,
                 "source_reference": self.source_reference,
+                "locator": self.locator,
                 "content_hash": self.content_hash,
                 "observed_at": self.observed_at,
                 "source_date": self.source_date,
@@ -175,6 +179,7 @@ class ProvenanceRecord:
             origin_kind=str(raw.get("origin_kind", "")),
             source_id=raw.get("source_id"),
             source_reference=raw.get("source_reference"),
+            locator=raw.get("locator"),
             content_hash=str(raw.get("content_hash", "")),
             observed_at=raw.get("observed_at"),
             source_date=raw.get("source_date"),
