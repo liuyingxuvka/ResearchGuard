@@ -198,7 +198,7 @@
         ".flowguard/models/sourceguard_content_anchor_oracle_model.py"
       ],
       "status": "confirmed",
-      "fingerprint": "sha256:8e72578f879ac3264d5f6ee5af7bc15b3e94b46d3d4417911fba8d2f44be0206"
+      "fingerprint": "sha256:fe984a8123555ea29ebcda77aaf136166ce23608a52d66f3b78ee82021f570e9"
     },
     {
       "id": "traceguard",

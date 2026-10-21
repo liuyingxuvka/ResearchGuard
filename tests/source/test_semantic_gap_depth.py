@@ -349,45 +349,6 @@ def test_complete_native_source_portfolio_can_license_broad_depth() -> None:
     assert all(item.status == "pass" for item in receipt.coverage_universe.object_depth_rows)
 
 
-def test_native_receipt_preserves_exact_evidence_for_each_gap_obligation() -> None:
-    receipt = build_source_depth_receipt(_broad_state(), _broad_observation())
-
-    assert receipt.native_obligation_evidence
-    for row in receipt.coverage_universe.object_depth_rows:
-        evidence_by_obligation: dict[str, list[dict[str, object]]] = {}
-        for evidence in row.obligation_evidence:
-            for obligation_id in evidence["target_obligation_ids"]:
-                evidence_by_obligation.setdefault(str(obligation_id), []).append(evidence)
-            assert str(evidence["evidence_ref"]).startswith("sourceguard:")
-            assert len(str(evidence["evidence_sha256"])) == 64
-            assert str(evidence["evidence_sha256"]) == str(evidence["evidence_sha256"]).lower()
-        for portfolio_class in row.required_portfolio_classes:
-            assert evidence_by_obligation[f"{row.gap_id}:portfolio:{portfolio_class}"]
-        for index in range(1, row.required_lineage_count + 1):
-            lineage_rows = evidence_by_obligation[f"{row.gap_id}:lineage:{index}"]
-            assert all(item.get("lineage_id") for item in lineage_rows)
-        assert evidence_by_obligation[f"{row.gap_id}:content-anchor"]
-        assert evidence_by_obligation[f"{row.gap_id}:target-unit"]
-
-    changed = _broad_observation()
-    changed.observed_anchors[0].normalized_summary += " Content-addressed change."
-    changed_receipt = build_source_depth_receipt(_broad_state(), changed)
-    original_hashes = {
-        (str(row["native_object_id"]), str(row["evidence_ref"])): str(row["evidence_sha256"])
-        for row in receipt.native_obligation_evidence
-    }
-    changed_hashes = {
-        (str(row["native_object_id"]), str(row["evidence_ref"])): str(row["evidence_sha256"])
-        for row in changed_receipt.native_obligation_evidence
-    }
-    changed_ref = "sourceguard:anchor:a:s-direct"
-    assert any(
-        original_hashes[key] != changed_hashes[key]
-        for key in original_hashes.keys() & changed_hashes.keys()
-        if key[1] == changed_ref
-    )
-
-
 def test_dependent_sources_do_not_satisfy_independent_lineage_floor() -> None:
     receipt = build_source_depth_receipt(
         _broad_state(),

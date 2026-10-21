@@ -896,7 +896,6 @@ class SourceObjectDepthRow:
     anchor_ids: list[str] = field(default_factory=list)
     explicit_lineage_ids: list[str] = field(default_factory=list)
     required_lineage_count: int = 0
-    obligation_evidence: list[dict[str, Any]] = field(default_factory=list)
     status: str = "fail"
     findings: list[str] = field(default_factory=list)
 
@@ -1110,7 +1109,6 @@ class SourceDepthReceipt:
     covered_claim_scope: str = "planning_only"
     adequacy_status: str = "not_run"
     critical_uncovered_ids: list[str] = field(default_factory=list)
-    native_obligation_evidence: list[dict[str, Any]] = field(default_factory=list)
     broad_claim_licensed: bool = False
     status: str = "planning_only"
     claim_boundary: str = (

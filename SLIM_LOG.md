@@ -529,3 +529,18 @@ Deleted the explicitly retired SourceGuard contract code/options/fixtures and si
 - `python -m flowguard map models` — exit 0, 2.919s; `models: 2 passed, 0 failed`
 - `python -m pytest tests/source/test_task_iteration.py::test_cli_freeze_rejects_old_shape_and_emits_v2` — exit 0, 0.783s; `1 passed in 0.31s`
 - `python -m pytest` — exit 0, 102.096s; `355 passed in 101.64s (0:01:41)`
+
+## RG-46 — completed
+
+Removed only duplicate per-obligation/source-anchor evidence hashes and the dedicated copy test. Exact native broad-analysis result compares identical after omitting those deleted keys (36198 to 14591 JSON chars); CLI examples 8477/11214 bytes, content/lineage/coverage/gaps unchanged. Source tests 63 passed, collection 354; exports, fixed LW43 actual bridge 10 passed no skips, map and local release passed (both models executed).
+
+- `python <external>/capture_rg46_before.py` — exit 0, 0.3s; `captured exact broad native result before removal pass 36198`
+- `python -m pytest tests/source` — exit 0, 10.705s; `63 passed in 9.92s`
+- `python <external>/probe_rg46.py` — exit 0, 2.168s; `real CLI output bytes 11214 status planning_only`
+- `python <external>/check_exports.py` — exit 0, 1.673s; `exports ok`
+- `python -m pytest -p no:cacheprovider tests/contract/test_researchguard_handoff.py --junitxml <external>/RG-46-lw43-junit.xml --basetemp <external>/RG-46-lw43-temp` — exit 0, 1.343s; `============================== 10 passed in 0.70s ==============================`
+- `python <external>/verify_lw_junit.py <external>/RG-46-lw43-junit.xml` — exit 0, 0.075s; `10 actual PASSED, 0 skipped; real native provider-to-reader bridge PASSED/ready, not version-skipped`
+- `python -m pytest --collect-only` — exit 0, 3.827s; `354 tests collected in 3.25s`
+- `python -m flowguard map confirm sourceguard` — exit 0, 0.27s; `confirmed 1 component(s)`
+- `python -m flowguard map check` — exit 0, 0.353s; `check: 0 error(s), 4 warning(s), 0 info`
+- `python -m flowguard release` — exit 0, 5.33s; `verify: PASS (map, lint and models only; tests not run; run python -m pytest -q separately)`

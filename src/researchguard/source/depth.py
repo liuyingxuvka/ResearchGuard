@@ -38,16 +38,6 @@ def model_fingerprint(belief_state: BeliefState) -> str:
     return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
 
-def _canonical_sha256(value: object) -> str:
-    canonical = json.dumps(
-        value,
-        ensure_ascii=False,
-        sort_keys=True,
-        separators=(",", ":"),
-    )
-    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
-
-
 def _action_order(plan: PlanResult) -> list[str]:
     return [action.action_id for action in plan.selected_actions]
 
@@ -184,35 +174,6 @@ def _anchor_depth_rows(belief_state: BeliefState) -> list[dict[str, object]]:
                 "selected": bool(source and portfolio_class and linked_gap_ids),
                 "qualified": qualified,
                 "content_present": content_present,
-                "evidence_ref": f"sourceguard:anchor:{anchor.anchor_id}",
-                "evidence_sha256": _canonical_sha256(
-                    {
-                        "anchor": {
-                            "anchor_id": anchor.anchor_id,
-                            "source_id": anchor.source_id,
-                            "locator": anchor.locator,
-                            "text": anchor.text,
-                            "normalized_summary": anchor.normalized_summary,
-                            "extraction_confidence": anchor.extraction_confidence,
-                            "specificity": anchor.specificity,
-                            "supports": sorted(set(anchor.supports)),
-                            "limits": sorted(set(anchor.limits)),
-                            "usable_for_claim": anchor.usable_for_claim,
-                        },
-                        "source": (
-                            {
-                                "source_id": source.source_id,
-                                "source_status": source.source_status,
-                                "source_reliability": source.source_reliability,
-                                "source_role": source.source_role,
-                                "lineage_id": source.lineage_id,
-                                "access_status": source.access_status,
-                            }
-                            if source
-                            else None
-                        ),
-                    }
-                ),
             }
         )
     return rows
@@ -462,71 +423,6 @@ def build_source_coverage_universe(
             row_findings.append("independent_lineage_floor_not_met")
         if not qualified_rows:
             row_findings.append("sourceguard_blocked:contentless-anchor")
-        obligation_evidence: list[dict[str, object]] = []
-        for portfolio_class in sorted(required_classes):
-            for evidence_row in qualified_rows:
-                if evidence_row["portfolio_class"] != portfolio_class:
-                    continue
-                obligation_evidence.append(
-                    {
-                        "target_obligation_ids": [
-                            f"{gap_id}:portfolio:{portfolio_class}"
-                        ],
-                        "evidence_kind": "qualified_source_anchor",
-                        "evidence_ref": evidence_row["evidence_ref"],
-                        "evidence_sha256": evidence_row["evidence_sha256"],
-                        "anchor_id": evidence_row["anchor_id"],
-                        "source_id": evidence_row["source_id"],
-                        "portfolio_class": portfolio_class,
-                        "lineage_id": evidence_row["lineage_id"],
-                    }
-                )
-        for index, lineage_id in enumerate(gap_lineages, start=1):
-            matching_rows = [
-                evidence_row
-                for evidence_row in qualified_rows
-                if evidence_row["lineage_id"] == lineage_id
-            ]
-            for evidence_row in matching_rows:
-                obligation_evidence.append(
-                    {
-                        "target_obligation_ids": [f"{gap_id}:lineage:{index}"],
-                        "evidence_kind": "independent_lineage_anchor",
-                        "evidence_ref": evidence_row["evidence_ref"],
-                        "evidence_sha256": evidence_row["evidence_sha256"],
-                        "anchor_id": evidence_row["anchor_id"],
-                        "source_id": evidence_row["source_id"],
-                        "lineage_id": lineage_id,
-                    }
-                )
-        for evidence_row in qualified_rows:
-            obligation_evidence.append(
-                {
-                    "target_obligation_ids": [f"{gap_id}:content-anchor"],
-                    "evidence_kind": "content_bearing_anchor",
-                    "evidence_ref": evidence_row["evidence_ref"],
-                    "evidence_sha256": evidence_row["evidence_sha256"],
-                    "anchor_id": evidence_row["anchor_id"],
-                    "source_id": evidence_row["source_id"],
-                }
-            )
-        if gap.structure_unit_id:
-            target_unit_content = {
-                "gap_id": gap_id,
-                "target_unit_id": gap.structure_unit_id,
-                "gap_type": gap.gap_type,
-                "blocking": gap.blocking,
-                "importance": gap.importance,
-            }
-            obligation_evidence.append(
-                {
-                    "target_obligation_ids": [f"{gap_id}:target-unit"],
-                    "evidence_kind": "target_unit_binding",
-                    "evidence_ref": f"sourceguard:gap:{gap_id}:target-unit",
-                    "evidence_sha256": _canonical_sha256(target_unit_content),
-                    **target_unit_content,
-                }
-            )
         object_depth_rows.append(
             SourceObjectDepthRow(
                 gap_id=gap_id,
@@ -538,7 +434,6 @@ def build_source_coverage_universe(
                 anchor_ids=sorted({str(row["anchor_id"]) for row in qualified_rows}),
                 explicit_lineage_ids=gap_lineages,
                 required_lineage_count=policy.minimum_independent_lineages,
-                obligation_evidence=obligation_evidence,
                 status="pass" if not row_findings else "fail",
                 findings=row_findings,
             )
@@ -833,14 +728,6 @@ def apply_observation_and_replan(
         covered_claim_scope=coverage_universe.covered_claim_scope,
         adequacy_status=coverage_universe.adequacy_status,
         critical_uncovered_ids=coverage_universe.critical_uncovered_ids,
-        native_obligation_evidence=[
-            {
-                "native_object_id": row.gap_id,
-                **evidence,
-            }
-            for row in coverage_universe.object_depth_rows
-            for evidence in row.obligation_evidence
-        ],
         broad_claim_licensed=broad_claim_licensed,
         status=status,
         deepest_proven_layer=(
