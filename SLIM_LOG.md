@@ -85,3 +85,12 @@ Removed only six-key portable-header machinery; schema_version and native refere
 - `python <external>/probe_rg06.py` — exit 0, 0.947s; `bare metadata schema_version only accepted; real trace_count1; no header machinery residual`
 - `python -m pytest --collect-only` — exit 0, 3.692s; `888 tests collected in 3.29s`
 - `python -m flowguard map check` — exit 0, 0.569s; `check: 0 error(s), 10 warning(s), 0 info`
+
+## RG-07 — completed
+
+Removed the export-time exact suite-version gate and five example metadata version pins; old model version0.5.8 is preserved as information in both exports. Kept native schema identifiers and package version. Source125passed; collection888; realexport0; map0errors.
+
+- `python -m pytest tests/source` — exit 0, 14.322s; `125 passed in 13.86s`
+- `python <external>/probe_rg07.py` — exit 0, 0.501s; `old release export accepted; example metadata version pins removed; native schema identifiers unchanged`
+- `python -m pytest --collect-only` — exit 0, 4.175s; `888 tests collected in 3.64s`
+- `python -m flowguard map check` — exit 0, 1.455s; `check: 0 error(s), 10 warning(s), 0 info`

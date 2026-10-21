@@ -31,3 +31,10 @@ def test_metadata_boundary_exists():
     bundle = export_logicguard_source_candidates(load_model("examples/source/starter_researchguard.source.yaml", "examples/source/starter_researchguard.source.contract.json"))
     assert seed["metadata"]["boundary"]
     assert bundle["metadata"]["boundary"]
+
+
+def test_exports_accept_a_model_written_by_an_older_release():
+    state = load_model("examples/source/fuel_cell_project_discovery.yaml", "examples/source/fuel_cell_project_discovery.contract.json")
+    state.metadata["version"] = "0.5.8"
+    assert export_traceguard_seed(state)["metadata"]["source_model_version"] == "0.5.8"
+    assert export_logicguard_source_candidates(state)["metadata"]["source_model_version"] == "0.5.8"

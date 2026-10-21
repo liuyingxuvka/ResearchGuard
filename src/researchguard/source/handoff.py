@@ -9,7 +9,6 @@ Boundary: Source candidates and evidence anchors require downstream TraceGuard/L
 
 from __future__ import annotations
 
-from researchguard import __version__
 
 from .loader import dump_yaml
 from .schema import BeliefState, to_plain
@@ -26,14 +25,6 @@ LOGICGUARD_BOUNDARY = (
 )
 
 
-def _require_suite_version(belief_state: BeliefState) -> str:
-    version = belief_state.metadata.get("version")
-    if version != __version__:
-        raise ValueError(
-            "SourceGuard model version must equal the active ResearchGuard "
-            f"suite version {__version__}; got {version!r}"
-        )
-    return version
 
 
 def export_traceguard_seed(belief_state: BeliefState) -> dict:
@@ -41,7 +32,7 @@ def export_traceguard_seed(belief_state: BeliefState) -> dict:
         "metadata": {
             "generated_by": "SourceGuard",
             "boundary": TRACEGUARD_BOUNDARY,
-            "source_model_version": _require_suite_version(belief_state),
+            "source_model_version": str(belief_state.metadata.get("version", "")),
         },
         "sources": [to_plain(source) for source in belief_state.sources],
         "evidence_anchors": [to_plain(anchor) for anchor in belief_state.anchors],
@@ -82,7 +73,7 @@ def export_logicguard_source_candidates(belief_state: BeliefState) -> dict:
         "metadata": {
             "generated_by": "SourceGuard",
             "boundary": LOGICGUARD_BOUNDARY,
-            "source_model_version": _require_suite_version(belief_state),
+            "source_model_version": str(belief_state.metadata.get("version", "")),
         },
         "source_candidates": candidates,
         "source_gap_rows": [to_plain(gap) for gap in belief_state.gaps],
