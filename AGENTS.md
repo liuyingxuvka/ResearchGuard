@@ -10,5 +10,6 @@ components. Run one complete pytest gate only after the release source freezes.
 Use `python -m flowguard change` after edits and `python -m flowguard release`
 before a release.
 
-Every completed action is committed and pushed to main. A release increments
-only the patch version and records the exact tested commit.
+Every completed action is committed and pushed to main. A release records the
+exact tested commit and uses the maintainer-selected three-part version. Unless
+the maintainer explicitly changes the policy, increment only the patch version.

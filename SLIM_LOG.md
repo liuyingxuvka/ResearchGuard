@@ -721,3 +721,16 @@ User override applied: release version is0.5.10, with native package/pyproject/C
 - `python -m flowguard read --component researchguard-suite` — exit 0, 7.911s; `  used by: logicguard, suite-orchestration`
 - `python -m pytest` — exit 0, 88.277s; `344 passed in 87.69s (0:01:27)`
 - `python -m flowguard map models` — exit 0, 3.554s; `models: 2 passed, 0 failed`
+
+## RG-58 — completed
+
+Recorded the maintainer-selected three-part version and patch-only increment policy, preserving the first sentence and all earlier maintenance paragraphs. Explicit user policy supersedes the handoff behavior-to-minor rule; version remains0.5.10. FlowGuard change selects0 of49 tests for AGENTS.md; collection344, fixed LW43 native10 passed zero skips, exports/map/release passed.
+
+- `python -c import pathlib,subprocess;p=pathlib.Path("AGENTS.md");old=subprocess.check_output(["git","show","HEAD:AGENTS.md"],text=True);new=p.read_text();assert new.split("Every completed action")[0]==old.split("Every completed action")[0];assert "Every completed action is committed and pushed to main." in new;assert "increment only the patch version." in new and "minor version" not in new;print("\n".join(new.splitlines()[-3:]));assert new.count("Use the FlowGuard living map in")==1` — exit 0, 0.057s; `the maintainer explicitly changes the policy, increment only the patch version.`
+- `python -m flowguard change` — exit 0, 0.367s; `tests to run (0 of 49): -`
+- `python <external>/check_exports.py` — exit 0, 0.845s; `exports ok`
+- `python -m pytest -p no:cacheprovider tests/contract/test_researchguard_handoff.py --junitxml <external>/RG-58-lw43-junit.xml --basetemp <external>/RG-58-lw43-temp` — exit 0, 1.699s; `============================== 10 passed in 0.90s ==============================`
+- `python <external>/verify_lw_junit.py <external>/RG-58-lw43-junit.xml` — exit 0, 0.247s; `10 actual PASSED, 0 skipped; real native provider-to-reader bridge PASSED/ready, not version-skipped`
+- `python -m pytest --collect-only` — exit 0, 4.669s; `344 tests collected in 3.85s`
+- `python -m flowguard map check` — exit 0, 0.4s; `check: 0 error(s), 3 warning(s), 0 info`
+- `python -m flowguard release` — exit 0, 4.023s; `verify: PASS (map, lint and models only; tests not run; run python -m pytest -q separately)`
