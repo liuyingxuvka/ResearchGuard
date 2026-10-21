@@ -867,45 +867,6 @@ def test_logic_model_and_inventory_fingerprints_are_global_stable_seeds() -> Non
         assert impact["affected_artifact_unit_ids"] == ["unit:document", "unit:section"]
 
 
-def test_logic_blueprint_cli_uses_one_grouped_native_surface(tmp_path, capsys) -> None:
-    from researchguard.logic.cli import main
-
-    model = _model()
-    inventory = _inventory()
-    bindings = _bindings(inventory)
-    model_path = tmp_path / "logic-model.json"
-    inventory_path = tmp_path / "logic-inventory.json"
-    bindings_path = tmp_path / "logic-bindings.json"
-    export_path = tmp_path / "logic-blueprint-export.json"
-    model_path.write_text(json.dumps(model.to_dict()), encoding="utf-8")
-    inventory_path.write_text(json.dumps(inventory.to_dict()), encoding="utf-8")
-    bindings_path.write_text(
-        json.dumps({"realizations": [item.to_dict() for item in bindings]}),
-        encoding="utf-8",
-    )
-    common = [str(model_path), "--inventory", str(inventory_path), "--bindings", str(bindings_path)]
-
-    assert main(["blueprint", "check", *common]) == 3
-    assert json.loads(capsys.readouterr().out)["status"] == "incomplete"
-    assert main(["blueprint", "impact", *common, "--changed-id", "citation:leaf"]) == 0
-    blocked_depth = json.loads(capsys.readouterr().out)
-    assert blocked_depth["query_status"] == "blocked"
-    assert blocked_depth["native_depth_status"] == "not_run"
-    assert blocked_depth["affected_argument_block_ids"] == []
-    assert main(
-        ["blueprint", "impact", *common, "--changed-id", "citation:leaf", "--changed-id", "foreign:unowned"]
-    ) == 0
-    blocked = json.loads(capsys.readouterr().out)
-    assert blocked["partial_result_suppressed"] is True
-    assert blocked["affected_argument_block_ids"] == []
-    assert main(["blueprint", "trace", *common, "--artifact-unit-id", "unit:section"]) == 0
-    blocked_trace = json.loads(capsys.readouterr().out)
-    assert blocked_trace["query_status"] == "blocked"
-    assert blocked_trace["artifact_unit"] == {}
-    assert main(["blueprint", "export", *common, "--output", str(export_path)]) == 3
-    exported_check = json.loads(export_path.read_text(encoding="utf-8"))["check"]
-    assert exported_check["status"] == "incomplete"
-    assert exported_check["native_depth_status"] == "not_run"
 
 
 def test_reverse_trace_empty_output_chain_is_never_complete() -> None:

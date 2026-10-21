@@ -13,14 +13,6 @@ from .delivery import adapt_delivery
 from .evaluator import evaluate_model
 from .execution_depth import _build_native_depth_analysis, build_logic_depth_receipt
 from .argument_modeling import create_argument_model
-from .artifact_inventory import ArtifactInventory
-from .blueprint import (
-    ArtifactRealizationBinding,
-    check_blueprint,
-    export_blueprint,
-    impact_blueprint,
-    reverse_trace_artifact,
-)
 from .citation_matrix import (
     audit_claim_source_paragraph_matrix,
     build_claim_source_paragraph_matrix,
@@ -236,15 +228,6 @@ def build_parser() -> argparse.ArgumentParser:
     depth.add_argument("--output")
     depth.set_defaults(func=_cmd_depth)
 
-    route_depth = sub.add_parser(
-        "route-depth",
-        help="Check declared route-package shape; does not verify native execution or closure.",
-    )
-    route_depth.add_argument("package")
-    route_depth.add_argument("--output")
-    route_depth.add_argument("--pretty", action="store_true")
-    route_depth.set_defaults(func=_cmd_route_depth)
-
     report = sub.add_parser("report", help="Generate a full Markdown report.")
     report.add_argument("model")
     report.add_argument("--output")
@@ -308,25 +291,6 @@ def build_parser() -> argparse.ArgumentParser:
     structure_audit.add_argument("--json", action="store_true")
     structure_audit.add_argument("--output")
     structure_audit.set_defaults(func=_cmd_structure_audit)
-
-    blueprint = sub.add_parser("blueprint", help="Check, inspect, or export the native LogicGuard blueprint.")
-    blueprint_sub = blueprint.add_subparsers(required=True)
-    for operation, handler in (
-        ("check", _cmd_blueprint_check),
-        ("impact", _cmd_blueprint_impact),
-        ("trace", _cmd_blueprint_trace),
-        ("export", _cmd_blueprint_export),
-    ):
-        command = blueprint_sub.add_parser(operation)
-        command.add_argument("model")
-        command.add_argument("--inventory", required=True)
-        command.add_argument("--bindings", required=True)
-        command.add_argument("--output")
-        if operation == "impact":
-            command.add_argument("--changed-id", action="append", required=True)
-        if operation == "trace":
-            command.add_argument("--artifact-unit-id", required=True)
-        command.set_defaults(func=handler)
 
     import_handoff = sub.add_parser("import-handoff", help="Turn a TraceGuard export-logicguard bundle into a starter model.")
     import_handoff.add_argument("bundle")
@@ -527,15 +491,6 @@ def _cmd_evaluate(args: argparse.Namespace) -> int:
     return 0
 
 
-def _cmd_route_depth(args: argparse.Namespace) -> int:
-    from .route_execution_depth import main as route_depth_main
-
-    argv = [str(args.package)]
-    if args.output:
-        argv.extend(["--output", str(args.output)])
-    if args.pretty:
-        argv.append("--pretty")
-    return route_depth_main(argv)
 
 
 def _cmd_library_viewer(args: argparse.Namespace) -> int:
@@ -850,56 +805,16 @@ def _cmd_structure_audit(args: argparse.Namespace) -> int:
     return 0
 
 
-def _load_blueprint_inputs(args: argparse.Namespace):
-    model = load_model(args.model)
-    inventory = ArtifactInventory.from_dict(_load_json_object(args.inventory))
-    raw = _load_json_object(args.bindings)
-    rows = raw.get("realizations")
-    if not isinstance(rows, list):
-        raise ValueError("blueprint bindings must contain a realizations list")
-    bindings = tuple(
-        ArtifactRealizationBinding(
-            artifact_unit_id=str(item["artifact_unit_id"]),
-            argument_block_id=str(item["argument_block_id"]),
-            node_ids=tuple(str(value) for value in item.get("node_ids", [])),
-            resource_ids=tuple(str(value) for value in item.get("resource_ids", [])),
-            disposition=str(item.get("disposition", "bound")),
-            consumed_content_fingerprint=str(item.get("consumed_content_fingerprint", "")),
-        )
-        for item in rows
-    )
-    return model, inventory, bindings
 
 
-def _emit_blueprint(args: argparse.Namespace, payload: dict[str, Any], *, ok: bool = True) -> int:
-    if args.output:
-        _write(args.output, payload)
-    else:
-        print(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True))
-    return 0 if ok else 3
 
 
-def _cmd_blueprint_check(args: argparse.Namespace) -> int:
-    model, inventory, bindings = _load_blueprint_inputs(args)
-    result = check_blueprint(model, inventory, bindings)
-    return _emit_blueprint(args, result.to_dict(), ok=result.status == "complete")
 
 
-def _cmd_blueprint_impact(args: argparse.Namespace) -> int:
-    model, inventory, bindings = _load_blueprint_inputs(args)
-    result = impact_blueprint(model, inventory, bindings, args.changed_id)
-    return _emit_blueprint(args, result, ok=not result["unknown_ownership"])
 
 
-def _cmd_blueprint_trace(args: argparse.Namespace) -> int:
-    model, inventory, bindings = _load_blueprint_inputs(args)
-    return _emit_blueprint(args, reverse_trace_artifact(model, inventory, bindings, args.artifact_unit_id))
 
 
-def _cmd_blueprint_export(args: argparse.Namespace) -> int:
-    model, inventory, bindings = _load_blueprint_inputs(args)
-    result = export_blueprint(model, inventory, bindings)
-    return _emit_blueprint(args, result, ok=result["check"]["status"] == "complete")
 
 
 def _cmd_synthesize(args: argparse.Namespace) -> int:

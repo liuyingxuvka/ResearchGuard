@@ -252,3 +252,18 @@ Experiment技能删蓝图说明，新增原样可执行最小spec并记observe�
 - `python -m flowguard map models` — exit 0, 1.015s; `models: 2 passed, 0 failed`
 - `python -m flowguard map check` — exit 0, 0.575s; `check: 0 error(s), 10 warning(s), 0 info`
 - `python -m pytest tests/test_member_model_envelope.py` — exit 0, 74.678s; `26 passed in 74.03s (0:01:14)`
+
+Coordinator grant: after all RG-38 purpose checks pass, continue RG-39–RG-54 against the exact committed read-only LW-43 snapshot (`0d55ca52a9e0`), with external JUnit and no pytest/bytecode cache writes to that snapshot. RG-47/RG-48 require actual native PASSED/ready and verified source origin, not version-selected skips. Stop after RG-54 until the current FlowGuard FG-98 grant. The RG-01–RG-38 immutable baseline dependencies are unchanged.
+
+## RG-25 — completed
+
+删除四CLI蓝图组及route-depth/library-depth，仅删三个CLI入口测试和两个声明包检查器及其测试；深度/import-handoff/案例存储保留。239pass、LW44pass、收集834、四help零残留；全量821pass13skip，双模型通过，map0error10阶段性WARN。
+
+- `python <external>/probe_rg25.py` — exit 0, 1.662s; `only intentionally deferred guard_model_contract docstring remains`
+- `python -m pytest -p no:cacheprovider tests/contract/test_researchguard_handoff.py tests/e2e/test_production_reader_pipeline.py tests/contract/test_production_reader_native_lifecycle.py` — exit 0, 5.223s; `============================== 44 passed in 4.60s ==============================`
+- `python -m pytest --collect-only` — exit 0, 7.816s; `834 tests collected in 6.88s`
+- `python -m flowguard map check` — exit 0, 2.034s; `check: 0 error(s), 10 warning(s), 0 info`
+- `python -m pytest tests/logic/test_cli.py tests/logic/test_artifact_inventory.py tests/source/test_blueprint_graph.py tests/trace/test_blueprint_hierarchy.py tests/trace/test_traceguard.py tests/experiment tests/test_root_cli.py` — exit 0, 138.107s; `239 passed in 137.30s (0:02:17)`
+- `python -m pytest` — exit 0, 407.622s; `821 passed, 13 skipped in 406.86s (0:06:46)`
+- `python -m flowguard map models` — exit 0, 1.471s; `models: 2 passed, 0 failed`
+- `python -m flowguard map check` — exit 0, 0.54s; `check: 0 error(s), 10 warning(s), 0 info`

@@ -1006,34 +1006,6 @@ def test_source_retrieval_identity_change_is_never_silently_reused(
     assert impact["unknown_ownership"] is False
 
 
-def test_source_blueprint_cli_uses_one_grouped_native_surface(tmp_path: Path, capsys) -> None:
-    from researchguard.source.cli import main
-
-    state = _state()
-    universe, contract_path = _current_native_universe(state, tmp_path)
-    model_path = tmp_path / "source-model.json"
-    universe_path = tmp_path / "source-universe.json"
-    export_path = tmp_path / "source-blueprint-export.json"
-    model_path.write_text(json.dumps(to_plain(state)), encoding="utf-8")
-    universe_path.write_text(json.dumps(universe.to_dict()), encoding="utf-8")
-    common = [str(model_path), "--model-contract", str(contract_path), "--universe", str(universe_path)]
-
-    assert main(["blueprint", "check", *common]) == 0
-    assert json.loads(capsys.readouterr().out)["status"] == "complete"
-    assert main(["blueprint", "impact", *common, "--changed-id", "anchor:1"]) == 0
-    assert json.loads(capsys.readouterr().out)["affected_claim_use_ids"] == ["claim-use:1"]
-    assert main(
-        ["blueprint", "impact", *common, "--changed-id", "anchor:1", "--changed-id", "foreign:unowned"]
-    ) == 3
-    blocked = json.loads(capsys.readouterr().out)
-    assert blocked["partial_result_suppressed"] is True
-    assert blocked["affected_claim_use_ids"] == []
-    assert main(["blueprint", "trace", *common, "--claim-use-id", "claim-use:1"]) == 0
-    assert json.loads(capsys.readouterr().out)["claim_use_id"] == "claim-use:1"
-    assert main(["blueprint", "export", *common, "--output", str(export_path)]) == 0
-    export_notice = json.loads(capsys.readouterr().out)
-    assert export_notice["ok"] is True
-    assert json.loads(export_path.read_text(encoding="utf-8"))["check"]["status"] == "complete"
 
 
 def test_information_blueprint_cannot_clear_its_own_required_denominator(tmp_path: Path) -> None:

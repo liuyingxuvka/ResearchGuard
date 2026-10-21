@@ -10,7 +10,6 @@ from typing import Mapping
 from ..native_receipts import NativeReceiptReference
 from ..target_authority import TargetPurposeAuthority
 
-from .blueprint import check_blueprint, export_blueprint, impact_blueprint, reverse_trace_experiment
 from .engine import observe_experiments, recommend_experiments
 from .schema import (
     EXPERIMENT_SPEC_SCHEMA,
@@ -335,38 +334,11 @@ def _main(argv: list[str] | None = None) -> int:
     observe = subparsers.add_parser("observe")
     observe.add_argument("spec", type=Path)
     observe.add_argument("observations", type=Path)
-    blueprint = subparsers.add_parser("blueprint")
-    blueprint_subparsers = blueprint.add_subparsers(dest="blueprint_operation", required=True)
-    blueprint_check = blueprint_subparsers.add_parser("check")
-    blueprint_check.add_argument("spec", type=Path)
-    blueprint_impact = blueprint_subparsers.add_parser("impact")
-    blueprint_impact.add_argument("spec", type=Path)
-    blueprint_impact.add_argument("changed_ids", nargs="+")
-    blueprint_trace = blueprint_subparsers.add_parser("trace")
-    blueprint_trace.add_argument("spec", type=Path)
-    blueprint_trace.add_argument("experiment_id")
-    blueprint_export = blueprint_subparsers.add_parser("export")
-    blueprint_export.add_argument("spec", type=Path)
     args = parser.parse_args(argv)
     if args.command == "recommend":
         result = recommend_experiments(_load_spec(args.spec))
         print(json.dumps(result.to_dict(), ensure_ascii=False, sort_keys=True))
         return 0 if result.status == "recommended" else 2
-    if args.command == "blueprint" and args.blueprint_operation == "check":
-        result = check_blueprint(_load_spec(args.spec))
-        print(json.dumps(result.to_dict(), ensure_ascii=False, sort_keys=True))
-        return 0 if result.status == "complete" else 2
-    if args.command == "blueprint" and args.blueprint_operation == "impact":
-        result = impact_blueprint(_load_spec(args.spec), args.changed_ids)
-        print(json.dumps(result, ensure_ascii=False, sort_keys=True))
-        return 3 if result["unknown_ownership"] else 0
-    if args.command == "blueprint" and args.blueprint_operation == "trace":
-        print(json.dumps(reverse_trace_experiment(_load_spec(args.spec), args.experiment_id), ensure_ascii=False, sort_keys=True))
-        return 0
-    if args.command == "blueprint" and args.blueprint_operation == "export":
-        result = export_blueprint(_load_spec(args.spec))
-        print(json.dumps(result, ensure_ascii=False, sort_keys=True))
-        return 0 if result["check"]["status"] == "complete" else 2
     receipt = observe_experiments(_load_spec(args.spec), _load_observations(args.observations))
     print(json.dumps(receipt.to_dict(), ensure_ascii=False, sort_keys=True))
     return 0 if receipt.terminal_reason == "model_closed_for_task" else 2
