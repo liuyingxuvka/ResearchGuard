@@ -2,7 +2,7 @@
 
 Use this existing loop when one selected search action should predict its result before a real observation arrives: predict, observe, revise, so the source model grows with the research.
 
-Freeze the selected action and its expected gap reduction, lineage independence, counterevidence and cost before the observation (`search-iteration freeze`). The action and every `--protect-gap` gap must exist in the model; the prediction remembers the model's fingerprint, so a prediction made against an older model is reported as stale. Task id, purpose, coverage, assumptions, unknowns and the iteration bound are optional.
+Freeze the selected action and its expected gap reduction, lineage independence, counterevidence and cost before the observation (`search-iteration freeze`). The action and every `--protect-gap` and `--coverage-id` gap must exist in the model; the prediction remembers the model's fingerprint, so a prediction made against an older model is reported as stale. Task id, purpose, coverage, assumptions, unknowns and the iteration bound are optional.
 
 After a real observation, `search-iteration run` creates candidate v2 through the native update/replan path and writes it to `--candidate-output`; the baseline file is never changed. Keep observation validity separate from prediction error. Acceptance requires an explicit decision, unchanged utility weights, a completed native depth check that passes the requested claim scope, and preserved protected gaps. `accepted` means the candidate file becomes your current model; otherwise keep the baseline. Roll back by keeping or restoring the previous model file (for example from git).
 

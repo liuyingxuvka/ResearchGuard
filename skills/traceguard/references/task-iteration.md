@@ -2,7 +2,7 @@
 
 Use the existing independent task loop when later evidence or a future event should test a frozen prediction: predict, observe, revise, so the trace model grows with the investigation.
 
-Freeze the target storyline or hypothesis, the expected evidence footprint or future event, the expected order when material, and a falsifier (`--weakens-when`) before the observation timestamp. The target must exist in the model; the prediction remembers the model file's sha256, so a prediction made against a changed model is reported as stale. Task id, purpose, coverage, assumptions, unknowns and the iteration bound are optional. An observation lists evidence, event and source ids; each must already exist in the model.
+Freeze the target storyline or hypothesis, the expected evidence footprint or future event, the expected order when material, and a falsifier (`--weakens-when`) before the observation timestamp. The target, every `--expected-evidence` and `--expected-event` id, and every `--coverage-id` (evidence, event, source, trace or hypothesis id) must exist in the model; the prediction remembers the model file's sha256, so a prediction made against a changed model is reported as stale. Task id, purpose, coverage, assumptions, unknowns and the iteration bound are optional. An observation lists evidence, event and source ids; each must already exist in the model.
 
 An introduced gap is a finding about the evidence boundary, not proof of quality improvement. A missing future event, provider, or external observation stays explicitly unavailable with its current gap; no synthetic event or source may fill it.
 

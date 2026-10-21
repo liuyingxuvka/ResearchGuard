@@ -90,7 +90,7 @@
       "responsibilities": [
         "Own argument support, source library, structured artifacts, model deepening, synthesis and project library inspection.",
         "Run depth analysis on the model alone; synthesis always computes depth in process.",
-        "Run the predict-observe-revise loop on plain model files; the loop never writes model files, so rollback is restoring the previous file.",
+        "Run the predict-observe-revise loop on plain model files; the loop never writes model files, so rollback is restoring the previous file; every claim, node and coverage id a prediction names must exist in the model when it is frozen.",
         "Derive a claim's minimal support and attack sets and its wording license with the model's own evaluator.",
         "Bind Evidence to sources: provenance records are checked on load, and validate --library-root resolves their source_id and locator in the source library."
       ],
@@ -154,14 +154,14 @@
       ],
       "models": [],
       "status": "confirmed",
-      "fingerprint": "sha256:c5a3274e05eb229997eb83d27bb9ee6e80c926cf975cb5fb100867c8c2658287"
+      "fingerprint": "sha256:6144fd78cf8312711ee6d5f297c0012853a99c35e390ffa3e7facdb5ff0b7966"
     },
     {
       "id": "sourceguard",
       "summary": "Own evidence discovery, expected-utility search plans, stop decisions and source/anchor qualification.",
       "responsibilities": [
         "Own evidence discovery, expected-utility search plans, stop decisions and source/anchor qualification.",
-        "Load, plan, update and iterate on a model file alone; models carry no contract.",
+        "Load, plan, update and iterate on a model file alone; models carry no contract; the action and every protected or coverage gap a prediction names must exist in the model when it is frozen.",
         "Decide whether to keep searching from the model itself: the top planned action, the open blocking gaps and the caller-declared budget."
       ],
       "files": [
@@ -196,7 +196,7 @@
         ".flowguard/models/sourceguard_content_anchor_oracle_model.py"
       ],
       "status": "confirmed",
-      "fingerprint": "sha256:fde916883a0dba45768dc70d03ffa71f13fd133f3074ec3d5e0a07735870837f"
+      "fingerprint": "sha256:dc587c97f5e001dc8a8b71f56a42f9b71b1c2098c25a25cfd763dbcb09d47768"
     },
     {
       "id": "traceguard",
@@ -204,7 +204,8 @@
       "responsibilities": [
         "Own temporal and causal trace inference, storyline stress and case library updates.",
         "Keep command output to analysis results; full JSON is written only with --output.",
-        "Run storyline depth only in trace depth; evaluate solves the model once without it."
+        "Run storyline depth only in trace depth; evaluate solves the model once without it.",
+        "Freeze a prediction only when its target, its expected evidence and event ids, and every coverage id exist in the model."
       ],
       "files": [
         "src/researchguard/trace/__init__.py",
@@ -254,7 +255,7 @@
       ],
       "models": [],
       "status": "confirmed",
-      "fingerprint": "sha256:0059e20b637be1443fd4cbff1427c3049249a7d38c2e8de75362b65a7db459a5"
+      "fingerprint": "sha256:1acef159af804f136142037b1022da08f997ba4058c30c2eebe03bd5b0009e47"
     },
     {
       "id": "experimentguard",

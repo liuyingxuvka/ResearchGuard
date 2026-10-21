@@ -316,6 +316,9 @@ def freeze_search_outcome_prediction(
         if gap_id not in baseline.gap_by_id():
             raise ValueError(f"protected gap is missing from baseline: {gap_id}")
     coverage = tuple(str(item) for item in coverage_ids)
+    missing_coverage = [item for item in coverage if item not in baseline.gap_by_id()]
+    if missing_coverage:
+        raise ValueError("coverage gaps are missing from baseline: " + ", ".join(missing_coverage))
     return SearchOutcomePrediction(
         prediction_id=prediction_id or f"prediction-{uuid.uuid4().hex}",
         baseline_fingerprint=model_fingerprint(baseline),

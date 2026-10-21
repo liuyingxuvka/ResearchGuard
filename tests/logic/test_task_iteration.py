@@ -94,6 +94,8 @@ def test_prediction_needs_only_claim_mode_and_target() -> None:
     assert "coverage_fingerprint" not in prediction.to_dict()
     with pytest.raises(ValueError, match="missing or not a Claim"):
         _prediction(baseline, holdout_claim_ids=("P2",))
+    with pytest.raises(ValueError, match="coverage nodes are missing from the model: X9"):
+        _prediction(baseline, coverage_ids=("C0", "X9"))
 
 
 def test_loaded_prediction_accepts_missing_optional_task_fields() -> None:

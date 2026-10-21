@@ -144,6 +144,8 @@ def test_prediction_needs_only_the_action_and_expected_outcome() -> None:
     assert prediction.iteration == 0
     with pytest.raises(ValueError, match="missing from baseline"):
         _prediction(state, action_id="a-missing")
+    with pytest.raises(ValueError, match="coverage gaps are missing from baseline: g-unknown"):
+        _prediction(state, coverage_ids=("g-target", "g-unknown"))
 
 
 def test_stale_baseline_is_rejected() -> None:

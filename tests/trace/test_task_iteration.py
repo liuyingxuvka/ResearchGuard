@@ -124,6 +124,10 @@ def test_prediction_needs_only_a_known_target_and_an_expectation() -> None:
     assert "snapshot_fingerprint" not in prediction.to_dict()
     with pytest.raises(TaskIterationError, match="target is missing from the model"):
         _prediction(target_id="trace_unknown")
+    with pytest.raises(TaskIterationError, match="coverage ids are missing from the model: ev_unknown"):
+        _prediction(coverage_ids=["ev_pr_fix", "ev_unknown"])
+    with pytest.raises(TaskIterationError, match="expected evidence or event ids are missing from the model: ev_typo"):
+        _prediction(expected_evidence_ids=["ev_typo"])
 
 
 def test_loaded_prediction_accepts_missing_optional_task_fields() -> None:

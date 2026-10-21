@@ -289,6 +289,25 @@ def freeze_prediction(
     if target_id not in known_targets:
         raise TaskIterationError(f"prediction target is missing from the model: {target_id}")
     coverage = list(coverage_ids)
+    known_coverage = (
+        set(model.evidence_by_id())
+        | set(model.event_by_id())
+        | set(model.source_by_id())
+        | {item.trace_id for item in model.traces}
+        | {item.hypothesis_id for item in model.storyline_hypotheses}
+    )
+    missing_coverage = [item for item in coverage if item not in known_coverage]
+    if missing_coverage:
+        raise TaskIterationError("coverage ids are missing from the model: " + ", ".join(missing_coverage))
+    expected_evidence_ids = list(expected_evidence_ids)
+    expected_event_ids = list(expected_event_ids)
+    missing_expected = [item for item in expected_evidence_ids if item not in model.evidence_by_id()] + [
+        item for item in expected_event_ids if item not in model.event_by_id()
+    ]
+    if missing_expected:
+        raise TaskIterationError(
+            "expected evidence or event ids are missing from the model: " + ", ".join(missing_expected)
+        )
     payload = {
         "schema_version": PREDICTION_SCHEMA,
         "prediction_id": prediction_id,
