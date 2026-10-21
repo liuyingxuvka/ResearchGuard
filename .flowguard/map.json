@@ -315,7 +315,9 @@
         "tests/contract/test_privacy_scan.py",
         "tests/test_install_skill.py"
       ],
-      "models": [],
+      "models": [
+        ".flowguard/models/researchguard_suite_model.py"
+      ],
       "status": "confirmed",
       "fingerprint": "sha256:7feaea02daff65fd7b9a298e36648910ba31bc35d24725c6faf8fb858cad0158"
     }

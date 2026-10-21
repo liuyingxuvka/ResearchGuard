@@ -1,9 +1,8 @@
-"""FlowGuard child model for SourceGuard content-anchor oracle alignment.
+"""FlowGuard contract model: SourceGuard blocks a contentless anchor with one finding.
 
-Claim boundary: this model proves only the finite relation between a
-content-anchor condition, the native blocking decision, and the emitted
-finding identity. Native SourceGuard execution and tests remain separate
-required evidence.
+Bound to the real code: conformance replays `_anchor_depth_rows` with and
+without anchor content and reads `src/researchguard/source/depth.py` to check
+that it emits the declared finding and never the retired one.
 """
 
 from __future__ import annotations
@@ -212,5 +211,11 @@ def conformance():
         observations.append(ReplayObservation("content_qualification", qualified, content))
         if qualified != content:
             violations.append(ConformanceViolation(step_index=1, message=f"native content qualification differs: {content}", rule_name="content_qualification"))
+    # Code facts: the depth owner emits exactly the declared finding identity.
+    source = (Path(__file__).resolve().parents[2] / "src" / "researchguard" / "source" / "depth.py").read_text(encoding="utf-8")
+    emitted = (f'"{DECLARED_FINDING}"' in source, f'"{RETIRED_FINDING}"' in source)
+    observations.append(ReplayObservation("finding_identity", emitted, (True, False)))
+    if emitted != (True, False):
+        violations.append(ConformanceViolation(step_index=1, message=f"depth.py finding identity differs: declared/retired present = {emitted}", rule_name="finding_identity"))
     return ConformanceReport(ok=not violations, violations=tuple(violations), replayed_steps=tuple(observations),
-                             summary="Native anchor qualification replayed with and without content; the depth-level finding is the bound native pytest case.")
+                             summary="Native anchor qualification replayed with and without content; the emitted finding identity read from depth.py.")

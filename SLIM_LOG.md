@@ -667,3 +667,21 @@ Consolidated one researchguard skill and four routes, moving 29 domain files wit
 - `python -m flowguard map check` — exit 0, 0.293s; `check: 0 error(s), 4 warning(s), 0 info`
 - `python -m flowguard release` — exit 0, 2.892s; `verify: PASS (map, lint and models only; tests not run; run python -m pytest -q separately)`
 - `python -m pytest` — exit 0, 71.114s; `344 passed in 70.49s (0:01:10)`
+
+## RG-55 — completed
+
+Replaced retired suite model behavior with one skill/four routes, native console/installer replay and current skill/member facts; content-anchor model now checks the native finding identity. Three actual mutants fail and exact original product bytes restore before positive replay. 38 focused tests, collection344, LW43 actual native10 passed no skip; oldFG0.70.6 and privately installed exact FG98/0.70.7 both pass two models and release. Old non-Python-anchor warning and new unmatched-route-invariant bad-variant warning are recorded as non-gating; no new-FG check skipped.
+
+- `python <external>/setup_newfg.py` — exit 0, 11.952s; `private new FlowGuard installed from exact committed archive bc8c519be928cfc18292a7c66b47ece27b10d31a snapshot <workspace>/consumer-snapshots/FlowGuard-FG98-bc8c519be928 python <workspace>/venvs/researchguard-newfg/bin/python`
+- `python -m flowguard map models` — exit 0, 1.976s; `models: 2 passed, 0 failed`
+- `python-newfg -c import flowguard,researchguard,importlib.metadata as m;print("FlowGuard",flowguard.__version__,flowguard.__file__,m.version("flowguard"));print("ResearchGuard",researchguard.__version__,researchguard.__file__);assert flowguard.__version__==m.version("flowguard")=="0.70.7"` — exit 0, 0.097s; `ResearchGuard 0.5.9 <workspace>/repos/ResearchGuard/src/researchguard/__init__.py`
+- `python <external>/probe_rg55.py` — exit 0, 10.366s; `3 actual native/code-fact mutants rejected; exact predecessor bytes restored, no live product mutation remains`
+- `python -m pytest tests/contract/test_privacy_scan.py tests/source/test_semantic_gap_depth.py tests/test_install_skill.py tests/test_prompt_bundles.py tests/test_root_cli.py tests/test_skill_suite.py` — exit 0, 3.071s; `38 passed in 2.68s`
+- `python <external>/check_exports.py` — exit 0, 0.727s; `exports ok`
+- `python -m pytest -p no:cacheprovider tests/contract/test_researchguard_handoff.py --junitxml <external>/RG-55-lw43-junit.xml --basetemp <external>/RG-55-lw43-temp` — exit 0, 0.721s; `============================== 10 passed in 0.34s ==============================`
+- `python <external>/verify_lw_junit.py <external>/RG-55-lw43-junit.xml` — exit 0, 0.213s; `10 actual PASSED, 0 skipped; real native provider-to-reader bridge PASSED/ready, not version-skipped`
+- `python -m pytest --collect-only` — exit 0, 2.458s; `344 tests collected in 1.99s`
+- `python -m flowguard map check` — exit 0, 0.477s; `check: 0 error(s), 3 warning(s), 0 info`
+- `python -m flowguard release` — exit 0, 4.423s; `verify: PASS (map, lint and models only; tests not run; run python -m pytest -q separately)`
+- `python-newfg -m flowguard map models` — exit 0, 4.078s; `models: 2 passed, 0 failed`
+- `python-newfg -m flowguard release` — exit 0, 8.76s; `verify: PASS (map, lint and models only; tests not run; run python -m pytest -q separately)`
