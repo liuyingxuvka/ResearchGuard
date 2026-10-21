@@ -23,8 +23,8 @@ Native recommendations use the experiment spec only.
 
 - Require unique hypothesis IDs, a finite experiment inventory, and explicit
   comparable predictions.
-- Task-local iteration also requires frozen task identity, purpose, coverage and
-  fingerprint, assumptions, unknowns, bound, and predecessor receipt.
+- Task-local iteration may add a task id, an iteration bound and the previous
+  open gaps; every other loop field is optional.
 - Missing declarations, valid observations, or holdout evidence remain visible
   as unresolved; never guess them.
 - A sibling member is never a retry.
@@ -71,8 +71,8 @@ Missing declarations stay visible. Minimal spec (all other fields are optional):
 - Never invent hypotheses, outcomes, probabilities, results, or evidence.
 - Every selected or tied set must distinguish every declared pair within the
   finite bound; unresolved pairs remain visible.
-- `invalid` and `not_run` observations create gaps. One survivor closes only
-  after valid independent holdout evidence not used for construction.
+- `invalid` and `not_run` observations create gaps. A holdout observation is
+  optional; a holdout that contradicts the one survivor keeps the task open.
 - Zero survivors are a prediction-matrix miss requiring an immutable revision
   candidate and new iteration, never a silent rewrite or success.
 - Recommendation status proves only finite-prediction discrimination.
@@ -80,18 +80,18 @@ Missing declarations stay visible. Minimal spec (all other fields are optional):
 ## Conditional Task-Local Experiment Iteration
 
 Trigger the loop for a larger task, a real observation, a matrix miss, an
-addressable gap, or requested predictive closure. Freeze task identity, purpose,
-coverage and fingerprint, assumptions, unknowns, bound, predecessor receipt,
-and exact inventories. Each observation carries an evidence ID, content
-fingerprint, source, time, construction or holdout role, and `valid`, `invalid`,
-or `not_run` status. Invalid and not-run evidence create visible gaps.
+addressable gap, or requested predictive closure. Freeze the hypotheses,
+candidate experiments and predicted outcomes in the spec before observing. Each
+observation carries an evidence ID, source, time, construction or holdout role,
+and `valid`, `invalid`, or `not_run` status. Invalid and not-run evidence create
+visible gaps.
 
 With valid observations, compute dispositions and rebuild the minimum set.
 Zero survivors emit an immutable revision candidate and require a new iteration.
-One survivor closes only with valid independent holdout evidence. Record gap
-lineage, next experiments, native receipt identity, rollback base, and terminal
-reason. Continue to `model_closed_for_task`, or stop with `iteration_limit`,
-`progress_stalled`, or `external_input_required`.
+One survivor closes unless a holdout observation contradicts it. Record gap
+lineage, next experiments and terminal reason; on the next round put the open
+gaps into `prior_open_gap_ids`. Continue to `model_closed_for_task`, or stop
+with `iteration_limit`, `progress_stalled`, or `external_input_required`.
 
 ## Local Route
 

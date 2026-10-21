@@ -496,3 +496,19 @@ Trace iteration drops detached snapshot/observation/result fingerprints and hand
 - `python -m flowguard map check` — exit 0, 0.429s; `check: 0 error(s), 4 warning(s), 0 info`
 - `python -m pytest tests/trace tests/test_prompt_bundles.py tests/test_skill_suite.py` — exit 0, 43.674s; `101 passed in 43.26s`
 - `python -m flowguard release` — exit 0, 2.021s; `verify: PASS (map, lint and models only; tests not run; run python -m pytest -q separately)`
+
+## RG-44 — completed
+
+Experiment iteration returns a result with optional holdout observations and no receipt/evidence hashes. Native actual minimal-spec CLI closes one survivor without a holdout (1961 bytes); contradictory holdouts, duplicate evidence IDs, zero-survivor matrix misses and finite stopping checks remain in 21 passing tests. Minimum-set search and functional matrix fingerprint ASTs unchanged. Prompt check passed, collection 364, exports/map/release passed; fixed LW43 actual native compatibility 10 passed 0 skipped.
+
+- `python -m pytest tests/experiment` — exit 0, 0.501s; `21 passed in 0.18s`
+- `python scripts/check_prompt_bundles.py` — exit 0, 0.045s; `pass`
+- `python scripts/check_prompt_bundles.py --json` — exit 0, 0.043s; `}`
+- `python <external>/check_exports.py` — exit 0, 0.534s; `exports ok`
+- `python -m pytest -p no:cacheprovider tests/contract/test_researchguard_handoff.py --junitxml <external>/RG-44-lw43-junit.xml --basetemp <external>/RG-44-lw43-temp` — exit 0, 0.817s; `============================== 10 passed in 0.35s ==============================`
+- `python <external>/verify_lw_junit.py <external>/RG-44-lw43-junit.xml` — exit 0, 0.058s; `10 actual PASSED, 0 skipped; real native provider-to-reader bridge PASSED/ready, not version-skipped`
+- `python -m pytest --collect-only` — exit 0, 3.831s; `364 tests collected in 3.21s`
+- `python -m flowguard map confirm experimentguard suite-orchestration` — exit 0, 0.208s; `confirmed 2 component(s)`
+- `python -m flowguard map check` — exit 0, 0.264s; `check: 0 error(s), 4 warning(s), 0 info`
+- `python -m flowguard release` — exit 0, 2.656s; `verify: PASS (map, lint and models only; tests not run; run python -m pytest -q separately)`
+- `python <external>/probe_rg44.py` — exit 0, 0.208s; `tests/experiment/test_recommendation.py:216:    assert "receipt_fingerprint" not in result.to_dict()`

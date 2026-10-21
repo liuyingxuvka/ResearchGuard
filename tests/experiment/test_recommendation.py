@@ -44,7 +44,6 @@ def _observation(
         experiment_id=experiment_id,
         observed_outcome=outcome,
         evidence_id=f"evidence:{suffix}",
-        evidence_fingerprint=f"sha256:{suffix * 64}"[:71],
         source_ref=f"source:{suffix}",
         observed_at="2026-07-31T12:00:00+00:00",
         role=role,
@@ -79,7 +78,6 @@ def test_real_observation_closes_only_with_independent_holdout(iteration: int) -
     prior = observe_experiments(_spec(), ()) if iteration else None
     spec = _spec(
         iteration=iteration,
-        prior_receipt_fingerprint=prior.receipt_fingerprint if prior else "",
         prior_open_gap_ids=() if prior is None else prior.introduced_gap_ids,
     )
     receipt = observe_experiments(
@@ -108,7 +106,7 @@ def test_iteration_terminal_boundaries(iteration: int, observed: bool, terminal:
         _observation("e2", "hot", role="holdout", suffix="b"),
     ) if observed else ()
     receipt = observe_experiments(
-        _spec(iteration=iteration, prior_receipt_fingerprint=prior.receipt_fingerprint, prior_open_gap_ids=()),
+        _spec(iteration=iteration, prior_open_gap_ids=()),
         observations,
     )
     assert receipt.terminal_reason == terminal
@@ -150,8 +148,7 @@ def test_same_gap_partial_evidence_can_continue_without_claiming_historical_prog
     # Replaying the same declared evidence has no provable historical newness.
     for iteration in range(1, 5):
         receipt = observe_experiments(_spec(
-            **values, iteration=iteration,
-            prior_receipt_fingerprint=prior.receipt_fingerprint, prior_open_gap_ids=(),
+            **values, iteration=iteration, prior_open_gap_ids=(),
         ), observations)
         assert receipt.terminal_reason == ("iteration_limit" if iteration == 4 else "continue_iteration")
         assert receipt.progressed is False
@@ -209,13 +206,14 @@ def test_finite_experiment_count_limit_is_not_all_candidates_indistinguishable()
     assert sufficient.alternative_minimal_sets == (("e1", "e2"),)
 
 
-def test_one_survivor_without_holdout_requires_external_input() -> None:
-    receipt = observe_experiments(
+def test_one_survivor_closes_without_a_holdout() -> None:
+    result = observe_experiments(
         _spec(),
         (_observation("e1", "up", role="construction", suffix="a"),),
     )
-    assert receipt.terminal_reason == "external_input_required"
-    assert "independent-holdout-required" in receipt.introduced_gap_ids
+    assert result.terminal_reason == "model_closed_for_task"
+    assert result.holdout_evidence_ids == ()
+    assert "receipt_fingerprint" not in result.to_dict()
 
 
 def test_zero_survivors_is_model_miss_and_never_closes() -> None:
@@ -240,18 +238,17 @@ def test_nonvalid_observation_is_explicit_gap(status: str) -> None:
     assert f"observation-{status}:e1" in receipt.introduced_gap_ids
 
 
-def test_reused_evidence_fingerprint_is_rejected() -> None:
+def test_reused_evidence_id_is_rejected() -> None:
     first = _observation("e1", "up", role="construction", suffix="a")
     second = ExperimentObservation(
         experiment_id="e2",
         observed_outcome="hot",
-        evidence_id="evidence:b",
-        evidence_fingerprint=first.evidence_fingerprint,
+        evidence_id=first.evidence_id,
         source_ref="source:b",
         observed_at="2026-07-31T12:01:00+00:00",
         role="holdout",
     )
-    with pytest.raises(ValueError, match="fingerprints must be independent"):
+    with pytest.raises(ValueError, match="evidence_id values must be unique"):
         observe_experiments(_spec(), (first, second))
 
 

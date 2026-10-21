@@ -38,7 +38,6 @@ def _load_spec_payload(payload: object) -> ExperimentSpec:
         unknowns=tuple(str(item) for item in payload.get("unknowns", [])),
         iteration=int(payload.get("iteration", 0)),
         max_iterations=int(payload.get("max_iterations", 1)),
-        prior_receipt_fingerprint=str(payload.get("prior_receipt_fingerprint", "")),
         prior_open_gap_ids=tuple(str(item) for item in payload.get("prior_open_gap_ids", [])),
         hypothesis_predictions=tuple(
             HypothesisPrediction(
@@ -75,7 +74,6 @@ def _load_observations(path: Path) -> tuple[ExperimentObservation, ...]:
             experiment_id=str(item["experiment_id"]),
             observed_outcome=str(item["observed_outcome"]),
             evidence_id=str(item["evidence_id"]),
-            evidence_fingerprint=str(item["evidence_fingerprint"]),
             source_ref=str(item["source_ref"]),
             observed_at=str(item["observed_at"]),
             role=str(item["role"]),
@@ -108,9 +106,9 @@ def _main(argv: list[str] | None = None) -> int:
         result = recommend_experiments(_load_spec(args.spec))
         print(json.dumps(result.to_dict(), ensure_ascii=False, sort_keys=True))
         return 0 if result.status == "recommended" else 2
-    receipt = observe_experiments(_load_spec(args.spec), _load_observations(args.observations))
-    print(json.dumps(receipt.to_dict(), ensure_ascii=False, sort_keys=True))
-    return 0 if receipt.terminal_reason == "model_closed_for_task" else 2
+    result = observe_experiments(_load_spec(args.spec), _load_observations(args.observations))
+    print(json.dumps(result.to_dict(), ensure_ascii=False, sort_keys=True))
+    return 0 if result.terminal_reason == "model_closed_for_task" else 2
 
 
 if __name__ == "__main__":

@@ -65,9 +65,11 @@ umbrella; ambiguous requests read one compact admission index and choose the
 unique smallest set covering every primary responsibility. One sufficient member
 stays single. A necessary multi-member set must declare exact order, dependencies,
 responsibilities, handoffs, field owners, and claim boundary before the umbrella
-can emit composition-planning evidence. Each member's task-local loop still binds purpose,
-coverage, assumptions, unknowns, iteration lineage, predictions, native
-receipts, computed gap transitions, addressable next actions, and exact stop
-reasons. LogicGuard, TraceGuard, and ExperimentGuard require independent
-holdout evidence for predictive closure; SourceGuard preserves provider and
+can emit composition-planning evidence. Each member's task-local loop
+(predict, observe, revise) works on plain model files and keeps purpose,
+coverage, assumptions, unknowns, predictions, computed gap transitions,
+addressable next actions, and exact stop reasons. A holdout claim or
+observation is optional; when given, it must be independent of the evidence
+used to build the model. The loop never writes the model file, so rolling back
+means restoring the previous file. SourceGuard preserves provider and
 finite-action stop boundaries.

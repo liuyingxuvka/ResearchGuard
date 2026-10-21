@@ -86,7 +86,7 @@
         ".flowguard/models/sourceguard_content_anchor_oracle_model.py"
       ],
       "status": "confirmed",
-      "fingerprint": "sha256:c0c7c7ee763804bb6ed8c35cb1f406fb255e159e33e8973778ee3d1f07c0245d"
+      "fingerprint": "sha256:fac230f8479cd6eef96fc63ab5872b680f2cfeecfca3781fa31459934ab9c8e0"
     },
     {
       "id": "logicguard",
@@ -260,10 +260,10 @@
     },
     {
       "id": "experimentguard",
-      "summary": "Own finite minimum experiment sets, evidence-bound iteration, independent holdout and bounded terminal decisions.",
+      "summary": "Own finite minimum experiment sets, observation-driven iteration, optional holdout checks and bounded terminal decisions.",
       "responsibilities": [
         "Distinguish hypotheses only within the caller-declared finite experiment-count limit and report limit failures separately from truly indistinguishable pairs.",
-        "License native closure only for a unique consistent hypothesis with matching independent holdout, no validated holdout counterexample and no gaps, while preserving the finite iteration limit first.",
+        "License native closure only for a unique consistent hypothesis with no holdout counterexample and no gaps, while preserving the finite iteration limit first; holdout observations are optional.",
         "Continue a bounded multi-survivor iteration only with a concrete distinguishing next candidate; do not infer historical evidence progress from unchanged gap identifiers; malformed specs return one JSON error."
       ],
       "files": [
@@ -287,7 +287,7 @@
       ],
       "models": [],
       "status": "confirmed",
-      "fingerprint": "sha256:3d67bf6950bb064d38f099369fa71a70e065ee9d768b40e2dc3cd8af22f29c71"
+      "fingerprint": "sha256:4c1208b6e346f046c50898c49a61484cf7a201bcba233e1313f2476f2d26e04b"
     },
     {
       "id": "author-tools",

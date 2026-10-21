@@ -10,7 +10,7 @@ _PUBLIC_API = {
         'recommend_experiments',
     ),
     'researchguard.experiment.schema': (
-        'ExperimentIterationReceipt',
+        'ExperimentIterationResult',
         'ExperimentObservation',
         'ExperimentRecommendation',
         'ExperimentSpec',
@@ -23,7 +23,7 @@ _PUBLIC_API = {
 _LAZY_EXPORTS = {name: module for module, names in _PUBLIC_API.items() for name in names}
 
 __all__ = [
-    'ExperimentIterationReceipt',
+    'ExperimentIterationResult',
     'ExperimentObservation',
     'ExperimentRecommendation',
     'ExperimentSpec',

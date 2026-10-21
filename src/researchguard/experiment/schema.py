@@ -1,23 +1,13 @@
-"""Strict, current-only ExperimentGuard task and receipt schemas."""
+"""Strict, current-only ExperimentGuard task and iteration-result schemas."""
 
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
-import hashlib
-import json
-import re
 from typing import Literal
 
 
-
 EXPERIMENT_SPEC_SCHEMA = "researchguard.experiment.task-spec.v3"
-EXPERIMENT_ITERATION_SCHEMA = "researchguard.experiment.iteration-receipt.v2"
-_SHA256 = re.compile(r"^sha256:[0-9a-f]{64}$")
-
-
-def _digest(value: object) -> str:
-    body = json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
-    return f"sha256:{hashlib.sha256(body.encode('utf-8')).hexdigest()}"
+EXPERIMENT_ITERATION_SCHEMA = "researchguard.experiment.iteration-result.v1"
 
 
 def _unique(values: tuple[str, ...], field: str, *, allow_empty: bool = True) -> None:
@@ -44,22 +34,6 @@ class HypothesisPrediction:
         return asdict(self)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 @dataclass(frozen=True)
 class ExperimentSpec:
     task_id: str
@@ -72,7 +46,6 @@ class ExperimentSpec:
     hypothesis_predictions: tuple[HypothesisPrediction, ...]
     candidate_experiment_ids: tuple[str, ...]
     maximum_experiment_count: int | None = None
-    prior_receipt_fingerprint: str = ""
     prior_open_gap_ids: tuple[str, ...] = ()
     schema_version: str = EXPERIMENT_SPEC_SCHEMA
 
@@ -88,8 +61,6 @@ class ExperimentSpec:
         _unique(self.prior_open_gap_ids, "prior_open_gap_ids")
         if self.iteration < 0 or self.max_iterations < 1:
             raise ValueError("iteration must be non-negative and max_iterations positive")
-        if self.iteration and not self.prior_receipt_fingerprint.startswith("sha256:"):
-            raise ValueError("later iterations require prior_receipt_fingerprint")
         hypothesis_ids = tuple(item.hypothesis_id for item in self.hypothesis_predictions)
         _unique(hypothesis_ids, "hypothesis_predictions", allow_empty=False)
         if len(hypothesis_ids) < 2:
@@ -113,7 +84,6 @@ class ExperimentSpec:
             "hypothesis_predictions": [item.to_dict() for item in self.hypothesis_predictions],
             "candidate_experiment_ids": list(self.candidate_experiment_ids),
             "maximum_experiment_count": self.maximum_experiment_count,
-            "prior_receipt_fingerprint": self.prior_receipt_fingerprint,
             "prior_open_gap_ids": list(self.prior_open_gap_ids),
         }
         return result
@@ -124,7 +94,6 @@ class ExperimentObservation:
     experiment_id: str
     observed_outcome: str
     evidence_id: str
-    evidence_fingerprint: str
     source_ref: str
     observed_at: str
     role: Literal["construction", "holdout"]
@@ -136,14 +105,11 @@ class ExperimentObservation:
         required = (
             self.experiment_id,
             self.evidence_id,
-            self.evidence_fingerprint,
             self.source_ref,
             self.observed_at,
         )
         if any(not value.strip() for value in required):
             raise ValueError("experiment observation identity fields are required")
-        if not self.evidence_fingerprint.startswith("sha256:"):
-            raise ValueError("evidence_fingerprint must be sha256-bound")
         if self.status == "valid" and not self.observed_outcome.strip():
             raise ValueError("valid observations require observed_outcome")
 
@@ -192,7 +158,7 @@ class ExperimentRecommendation:
 
 
 @dataclass(frozen=True)
-class ExperimentIterationReceipt:
+class ExperimentIterationResult:
     task_id: str
     iteration: int
     base_matrix_fingerprint: str
@@ -206,10 +172,8 @@ class ExperimentIterationReceipt:
     introduced_gap_ids: tuple[str, ...]
     open_hypothesis_pairs: tuple[tuple[str, str], ...]
     next_experiment_ids: tuple[str, ...]
-    native_receipt_id: str
     revision_candidate: PredictionMatrixRevisionCandidate | None
     holdout_evidence_ids: tuple[str, ...]
-    rollback_matrix_fingerprint: str
     terminal_reason: Literal[
         "continue_iteration",
         "model_closed_for_task",
@@ -218,10 +182,7 @@ class ExperimentIterationReceipt:
         "iteration_limit",
     ]
     progressed: bool
-    receipt_fingerprint: str
-    design_fingerprint: str = ""
     affected_obligation_ids: tuple[str, ...] = ()
-    deepest_proven_layer: str = "native-recommendation"
     first_unresolved_gap: str = ""
     schema_version: str = EXPERIMENT_ITERATION_SCHEMA
 
@@ -241,16 +202,11 @@ class ExperimentIterationReceipt:
             "introduced_gap_ids": list(self.introduced_gap_ids),
             "open_hypothesis_pairs": [list(item) for item in self.open_hypothesis_pairs],
             "next_experiment_ids": list(self.next_experiment_ids),
-            "native_receipt_id": self.native_receipt_id,
             "revision_candidate": self.revision_candidate.to_dict() if self.revision_candidate else None,
             "holdout_evidence_ids": list(self.holdout_evidence_ids),
-            "rollback_matrix_fingerprint": self.rollback_matrix_fingerprint,
             "terminal_reason": self.terminal_reason,
             "progressed": self.progressed,
-            "receipt_fingerprint": self.receipt_fingerprint,
-            "design_fingerprint": self.design_fingerprint,
             "affected_obligation_ids": list(self.affected_obligation_ids),
-            "deepest_proven_layer": self.deepest_proven_layer,
             "first_unresolved_gap": self.first_unresolved_gap,
         }
 
@@ -258,7 +214,7 @@ class ExperimentIterationReceipt:
 __all__ = [
     "EXPERIMENT_ITERATION_SCHEMA",
     "EXPERIMENT_SPEC_SCHEMA",
-    "ExperimentIterationReceipt",
+    "ExperimentIterationResult",
     "ExperimentObservation",
     "ExperimentRecommendation",
     "ExperimentSpec",
