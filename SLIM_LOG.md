@@ -184,3 +184,12 @@ Experiment recommend补默认非领域循环字段，坏输入给JSON/CLI2，删
 - `python -m pytest tests/logic/test_public_api.py tests/test_suite_routing.py` — exit 0, 36.03s; `28 passed in 35.44s`
 - `python <external>/probe_rg17.py` — exit 0, 0.32s; `version authority scans passed; truthful journal preserved`
 - `python -m pytest --collect-only` — exit 0, 5.218s; `866 tests collected in 4.57s`
+
+## RG-18 — completed
+
+提示词检查器仅保留字节预算、引用声明和禁止急切加载；删除清单明确的术语锁定/索引重复测试，预算反例仍保。checker pass，10pass，收集861且无routing/render/self_dna残留。
+
+- `python scripts/check_prompt_bundles.py` — exit 0, 0.066s; `pass`
+- `python -m pytest tests/test_prompt_bundles.py tests/test_skill_suite.py` — exit 0, 2.53s; `10 passed in 2.05s`
+- `python -m pytest --collect-only` — exit 0, 4.242s; `861 tests collected in 3.76s`
+- `python -c from pathlib import Path; s=Path("scripts/check_prompt_bundles.py").read_text(); assert not any(x in s for x in ("routing","render_member_admission_index","conditional_blueprint_boundaries","self_dna")); print("checker only retains budget, declared references and eager-member-load limits")` — exit 0, 0.046s; `checker only retains budget, declared references and eager-member-load limits`

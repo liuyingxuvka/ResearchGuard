@@ -14,46 +14,9 @@ SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
-from researchguard.routing import MEMBER_ADMISSION_CONTRACTS  # noqa: E402
 
 
 MANIFEST_PATH = ROOT / "researchguard" / "prompt_bundle_manifest.json"
-INDEX_PATH = ROOT / "skills" / "researchguard" / "references" / "member-admission-index.md"
-
-
-def render_member_admission_index() -> str:
-    lines = [
-        "# ResearchGuard Member Admission Index",
-        "",
-        "Generated from the four current member-owned admission contracts. Do not infer a route from wording or load member skills to classify the request.",
-        "",
-        "Only source-bound `primary_action` facts create responsibilities to cover. Context facts may satisfy required inputs or expose forbidden conditions but do not create another responsibility. Every forbidden condition needs its exact disposition.",
-        "",
-    ]
-    for member, contract in MEMBER_ADMISSION_CONTRACTS.items():
-        lines.extend((f"## {member}", ""))
-        for row in contract["positive_conditions"]:
-            lines.extend(
-                (
-                    f"- Positive `{row['condition_id']}`: `{', '.join(row['any_fact_kinds'])}`",
-                    f"  - First action: {row['first_action']}",
-                    f"  - First reference: `{row['first_reference']}`",
-                )
-            )
-        for row in contract["required_conditions"]:
-            lines.append(f"- Required `{row['condition_id']}`: `{', '.join(row['any_fact_kinds'])}`")
-        for row in contract["forbidden_conditions"]:
-            lines.append(f"- Forbidden `{row['condition_id']}`: `{', '.join(row['any_fact_kinds'])}`")
-        lines.append("")
-    lines.extend(
-        (
-            "## Decision boundary",
-            "",
-            "Choose the unique minimum-cardinality applicable member set that covers every primary responsibility. One sufficient member stays single. A necessary multi-member set requires a declarative composition with exact members, order, dependencies, responsibilities, handoffs, single field ownership, and one claim boundary. Zero coverage, equal-minimum ambiguity, over-selection, invalid composition, missing/unknown forbidden review, stale fingerprints, unknown kinds, or missing source spans block before execution. Direct member requests bypass this index.",
-            "",
-        )
-    )
-    return "\n".join(lines)
 
 
 def _read_manifest(path: Path = MANIFEST_PATH) -> Mapping[str, Any]:
@@ -117,117 +80,6 @@ def check_prompt_bundles(
         if relative_reference not in declaration or trigger not in declaration:
             failures.append({"code": "reference-edge-undeclared", "skill_id": str(edge.get("skill_id", "")), "detail": f"{trigger}:{relative_reference}"})
 
-    reference_edges = {
-        (
-            str(edge.get("skill_id", "")),
-            str(edge.get("trigger_id", "")),
-            str(edge.get("reference", "")),
-        )
-        for edge in manifest.get("reference_edges", [])
-    }
-    boundary_rows = [
-        row
-        for row in manifest.get("conditional_blueprint_boundaries", [])
-        if member == "all" or str(row.get("skill_id", "")) == member
-    ]
-    expected_boundary_skills = {
-        skill_id for skill_id in bundle_entries if member == "all" or skill_id == member
-    }
-    actual_boundary_skills = [str(row.get("skill_id", "")) for row in boundary_rows]
-    if set(actual_boundary_skills) != expected_boundary_skills or len(actual_boundary_skills) != len(
-        set(actual_boundary_skills)
-    ):
-        failures.append(
-            {
-                "code": "blueprint-boundary-inventory-mismatch",
-                "skill_id": member,
-                "detail": ",".join(actual_boundary_skills),
-            }
-        )
-
-    for row in boundary_rows:
-        skill_id = str(row.get("skill_id", ""))
-        trigger_id = str(row.get("trigger_id", ""))
-        reference = str(row.get("reference", ""))
-        role = str(row.get("role", ""))
-        if (skill_id, trigger_id, reference) not in reference_edges:
-            failures.append(
-                {
-                    "code": "blueprint-boundary-edge-missing",
-                    "skill_id": skill_id,
-                    "detail": f"{trigger_id}:{reference}",
-                }
-            )
-            continue
-        if role not in {"composition-transport", "member-domain-dna"}:
-            failures.append(
-                {
-                    "code": "blueprint-boundary-role-invalid",
-                    "skill_id": skill_id,
-                    "detail": role,
-                }
-            )
-            continue
-        target = ROOT / reference
-        if not target.is_file():
-            continue
-        reference_text = target.read_text(encoding="utf-8")
-        required_reference_terms = {
-            "ResearchGuard repository software-DNA root",
-            "FlowGuard-owned",
-            "member-domain DNA",
-        }
-        if role == "composition-transport":
-            required_reference_terms.add("composition transport")
-        missing_reference_terms = sorted(
-            term for term in required_reference_terms if term not in reference_text
-        )
-        if missing_reference_terms:
-            failures.append(
-                {
-                    "code": "blueprint-reference-boundary-missing",
-                    "skill_id": skill_id,
-                    "detail": ",".join(missing_reference_terms),
-                }
-            )
-        entry_text = bundle_entries.get(skill_id, "")
-        missing_entry_terms = sorted(
-            term
-            for term in (
-                "ResearchGuard repository software-DNA root",
-                "FlowGuard-owned",
-                "member-domain DNA",
-            )
-            if term not in entry_text
-        )
-        if missing_entry_terms:
-            failures.append(
-                {
-                    "code": "blueprint-entry-boundary-missing",
-                    "skill_id": skill_id,
-                    "detail": ",".join(missing_entry_terms),
-                }
-            )
-        eager_terms = sorted(
-            str(term)
-            for term in manifest.get("prohibited_eager_self_dna_terms", [])
-            if str(term) and str(term) in entry_text
-        )
-        if eager_terms:
-            failures.append(
-                {
-                    "code": "blueprint-self-dna-detail-eager",
-                    "skill_id": skill_id,
-                    "detail": ",".join(eager_terms),
-                }
-            )
-
-    expected_index = render_member_admission_index()
-    if member in {"all", "researchguard"} and (
-        not INDEX_PATH.is_file() or INDEX_PATH.read_text(encoding="utf-8") != expected_index
-    ):
-        failures.append({"code": "member-admission-index-stale", "skill_id": "researchguard", "detail": INDEX_PATH.relative_to(ROOT).as_posix()})
-
     if member in {"all", "researchguard"}:
         umbrella = (ROOT / "skills" / "researchguard" / "SKILL.md").read_text(encoding="utf-8")
         for prohibited in manifest.get("prohibited_eager_member_paths", []):
@@ -245,13 +97,9 @@ def check_prompt_bundles(
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--render-index", action="store_true")
     parser.add_argument("--member", choices=("all", "researchguard", "logicguard", "sourceguard", "traceguard", "experimentguard"), default="all")
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args(argv)
-    if args.render_index:
-        print(render_member_admission_index(), end="")
-        return 0
     result = check_prompt_bundles(member=args.member)
     print(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True) if args.json else result["status"])
     return 0 if result["status"] == "pass" else 1

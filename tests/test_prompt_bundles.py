@@ -12,33 +12,6 @@ assert SPEC is not None and SPEC.loader is not None
 MODULE = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(MODULE)
 
-BLUEPRINT_BOUNDARIES = {
-    "researchguard": (
-        "route:member-model-envelope",
-        "skills/researchguard/references/member-model-envelope.md",
-        "composition-transport",
-    ),
-    "logicguard": (
-        "route:domain-blueprint",
-        "skills/logicguard/references/domain-blueprint-contract.md",
-        "member-domain-dna",
-    ),
-    "sourceguard": (
-        "route:information-blueprint",
-        "skills/sourceguard/references/information-blueprint.md",
-        "member-domain-dna",
-    ),
-    "traceguard": (
-        "route:trace-blueprint",
-        "skills/traceguard/references/trace-blueprint-contract.md",
-        "member-domain-dna",
-    ),
-    "experimentguard": (
-        "route:experiment-blueprint",
-        "skills/experimentguard/references/experiment-model-protocol.md",
-        "member-domain-dna",
-    ),
-}
 
 
 def manifest() -> dict:
@@ -73,9 +46,6 @@ def test_missing_or_untriggered_reference_edge_fails() -> None:
     assert "reference-edge-undeclared" in {row["code"] for row in result["failures"]}
 
 
-def test_generated_member_index_is_exact() -> None:
-    index = ROOT / "skills" / "researchguard" / "references" / "member-admission-index.md"
-    assert index.read_text(encoding="utf-8") == MODULE.render_member_admission_index()
 
 
 def test_manifest_forbids_eager_sibling_skill_paths() -> None:
@@ -85,78 +55,8 @@ def test_manifest_forbids_eager_sibling_skill_paths() -> None:
     assert prohibited.isdisjoint(path for path in prohibited if path in umbrella)
 
 
-def test_blueprint_references_are_conditionally_reachable_without_eager_detail() -> None:
-    payload = manifest()
-    expected = {
-        (skill_id, trigger_id): reference
-        for skill_id, (trigger_id, reference, _role) in BLUEPRINT_BOUNDARIES.items()
-    }
-    actual = {
-        (row["skill_id"], row["trigger_id"]): row["reference"]
-        for row in payload["reference_edges"]
-    }
-    assert {key: actual[key] for key in expected} == expected
-    for reference in expected.values():
-        assert (ROOT / reference).is_file()
-
-    boundary_rows = {
-        row["skill_id"]: (row["trigger_id"], row["reference"], row["role"])
-        for row in payload["conditional_blueprint_boundaries"]
-    }
-    assert boundary_rows == BLUEPRINT_BOUNDARIES
-    bundles = {row["skill_id"]: row for row in payload["bundles"]}
-    for skill_id, (_trigger_id, reference, role) in BLUEPRINT_BOUNDARIES.items():
-        entry_text = "\n".join(
-            (ROOT / path).read_text(encoding="utf-8")
-            for path in bundles[skill_id]["entry_files"]
-        )
-        reference_text = (ROOT / reference).read_text(encoding="utf-8")
-        for term in (
-            "member-domain DNA",
-            "ResearchGuard repository software-DNA root",
-            "FlowGuard-owned",
-        ):
-            assert term in entry_text
-            assert term in reference_text
-        assert ("composition transport" in reference_text) is (
-            role == "composition-transport"
-        )
-        assert not any(
-            term in entry_text
-            for term in payload["prohibited_eager_self_dna_terms"]
-        )
-
-    detailed_contract_terms = {
-        "producer_native_receipt_fingerprint",
-        "required_procedure_step_ids",
-        "observation_receipt_fingerprint",
-        "consumer-payload-fingerprint-mismatch",
-    }
-    entry_text = "\n".join(
-        (ROOT / path).read_text(encoding="utf-8")
-        for bundle in payload["bundles"]
-        for path in bundle["entry_files"]
-        if path.endswith(("SKILL.md", "openai.yaml"))
-    )
-    assert not any(term in entry_text for term in detailed_contract_terms)
 
 
-def test_blueprint_boundary_manifest_mismatch_and_eager_detail_fail() -> None:
-    payload = manifest()
-    payload["conditional_blueprint_boundaries"][0]["reference"] = (
-        "skills/researchguard/references/member-admission-index.md"
-    )
-    result = MODULE.check_prompt_bundles(payload)
-    assert "blueprint-boundary-edge-missing" in {
-        row["code"] for row in result["failures"]
-    }
-
-    payload = manifest()
-    payload["prohibited_eager_self_dna_terms"].append("member-domain DNA")
-    result = MODULE.check_prompt_bundles(payload)
-    assert "blueprint-self-dna-detail-eager" in {
-        row["code"] for row in result["failures"]
-    }
 
 
 def test_reported_prompt_byte_totals_equal_exact_entry_files() -> None:
