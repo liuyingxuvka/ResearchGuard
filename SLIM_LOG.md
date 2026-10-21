@@ -750,3 +750,22 @@ Real CLI stop-decision now starts from paper citation search and from an actual 
 - `python -m pytest --collect-only` — exit 0, 2.203s; `344 tests collected in 1.69s`
 - `python -m flowguard map check` — exit 0, 0.397s; `check: 0 error(s), 3 warning(s), 0 info`
 - `python -m flowguard release` — exit 0, 4.062s; `verify: PASS (map, lint and models only; tests not run; run python -m pytest -q separately)`
+
+## RG-60 — completed
+
+Completed CHANGELOG RG58–60 checkpoint under user target0.5.10 and maintainer patch-only version policy. Full344 passed; collection344; fixed LW43 native10 actual passed zero skips; exports and old/new real FG map0errors3warnings/models2passed/release PASS. No optional newFG skip, no tag or publication.
+
+- `python <external>/edit_rg60.py` — exit 0, 0.087s; `changelog RG58..60; maintainer patch-only override retained`
+- `python -c from pathlib import Path;import researchguard; s=Path("CHANGELOG.md").read_text(); assert s.splitlines()[2].startswith("## v0.5.10 - "); assert s.splitlines()[4].endswith("RG-57, RG-58, RG-59, RG-60."); assert researchguard.__version__=="0.5.10"; assert "patch-only version policy" in s; print("version0.5.10; all60 Done; maintainer patch-only policy")` — exit 0, 0.047s; `version0.5.10; all60 Done; maintainer patch-only policy`
+- `python -m flowguard change` — exit 0, 0.633s; `tests to run (0 of 49): -`
+- `python <external>/check_exports.py` — exit 0, 0.86s; `exports ok`
+- `python -m pytest -p no:cacheprovider tests/contract/test_researchguard_handoff.py --junitxml <external>/RG-60-lw43-junit.xml --basetemp <external>/RG-60-lw43-temp` — exit 0, 1.298s; `============================== 10 passed in 0.69s ==============================`
+- `python <external>/verify_lw_junit.py <external>/RG-60-lw43-junit.xml` — exit 0, 0.098s; `10 actual PASSED, 0 skipped; real native provider-to-reader bridge PASSED/ready, not version-skipped`
+- `python -m pytest --collect-only` — exit 0, 2.896s; `344 tests collected in 2.34s`
+- `python -m flowguard map check` — exit 0, 0.334s; `check: 0 error(s), 3 warning(s), 0 info`
+- `python -m flowguard release` — exit 0, 2.974s; `verify: PASS (map, lint and models only; tests not run; run python -m pytest -q separately)`
+- `python -m pytest` — exit 0, 80.272s; `344 passed in 79.79s (0:01:19)`
+- `python -m flowguard map models` — exit 0, 1.92s; `models: 2 passed, 0 failed`
+- `python-newfg -m flowguard map check` — exit 0, 16.901s; `check: 0 error(s), 3 warning(s), 0 info`
+- `python-newfg -m flowguard map models` — exit 0, 2.601s; `models: 2 passed, 0 failed`
+- `python-newfg -m flowguard release` — exit 0, 3.058s; `verify: PASS (map, lint and models only; tests not run; run python -m pytest -q separately)`

@@ -2,7 +2,7 @@
 
 ## v0.5.10 - 2026-10-21
 
-- Done: RG-01, RG-02, RG-03, RG-04, RG-05, RG-06, RG-07, RG-08, RG-09, RG-10, RG-11, RG-12, RG-13, RG-14, RG-15, RG-16, RG-17, RG-18, RG-19, RG-20, RG-21, RG-22, RG-23, RG-24, RG-25, RG-26, RG-27, RG-28, RG-29, RG-30, RG-31, RG-32, RG-33, RG-34, RG-35, RG-36, RG-37, RG-38, RG-39, RG-40, RG-41, RG-42, RG-43, RG-44, RG-45, RG-46, RG-47, RG-48, RG-49, RG-50, RG-51, RG-52, RG-53, RG-54, RG-55, RG-56, RG-57.
+- Done: RG-01, RG-02, RG-03, RG-04, RG-05, RG-06, RG-07, RG-08, RG-09, RG-10, RG-11, RG-12, RG-13, RG-14, RG-15, RG-16, RG-17, RG-18, RG-19, RG-20, RG-21, RG-22, RG-23, RG-24, RG-25, RG-26, RG-27, RG-28, RG-29, RG-30, RG-31, RG-32, RG-33, RG-34, RG-35, RG-36, RG-37, RG-38, RG-39, RG-40, RG-41, RG-42, RG-43, RG-44, RG-45, RG-46, RG-47, RG-48, RG-49, RG-50, RG-51, RG-52, RG-53, RG-54, RG-55, RG-56, RG-57, RG-58, RG-59, RG-60.
 - Skipped: none.
 - One `researchguard` skill with a route table (logic, source, trace, experiment) replaces the five skill entries;
   the installer copies it into `--target`, removes the retired member skill folders and offers `--check`/`--dry-run`.
@@ -16,6 +16,8 @@
   event ids) that are not in the model.
 - The two self-models replay the real console, installer and SourceGuard depth code; `flowguard release` passes with
   FlowGuard 0.70.6 and the new FlowGuard.
+- `AGENTS.md`: a release records the exact tested commit and follows the maintainer's three-part,
+  patch-only version policy. The `stop-decision` CLI test runs on real SourceGuard example models.
 
 ## v0.5.9 - 2026-10-18
 
