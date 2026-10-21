@@ -73,6 +73,8 @@ def test_stop_decision_cli_prints_its_inputs_and_the_decision(tmp_path) -> None:
     searching = json.loads(result.stdout)
     assert searching["status"] == "continue_search"
     assert searching["inputs"]["remaining_budget"] == 1.0
+    # The model still has open gaps, so the scope is not sufficient yet.
+    assert searching["inputs"]["evidence_sufficient_for_scope"] is False
     assert searching["inputs"]["unresolved_critical_gap_ids"] == ["gap-baseline", "gap-counter"]
     assert searching["selected_search_id"] == searching["inputs"]["candidate_search_ids"][0]
 

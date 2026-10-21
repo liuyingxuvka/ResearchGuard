@@ -769,3 +769,42 @@ Completed CHANGELOG RG58–60 checkpoint under user target0.5.10 and maintainer 
 - `python-newfg -m flowguard map check` — exit 0, 16.901s; `check: 0 error(s), 3 warning(s), 0 info`
 - `python-newfg -m flowguard map models` — exit 0, 2.601s; `models: 2 passed, 0 failed`
 - `python-newfg -m flowguard release` — exit 0, 3.058s; `verify: PASS (map, lint and models only; tests not run; run python -m pytest -q separately)`
+
+## Final section5 verification
+
+All 61 ordered actions were handled; no action was skipped. The final RG61 product tree passed 344 tests and collected 344. The single full RG61 run also serves section5 on the same source. Fixed read-only LW43 compatibility executed 10 tests, zero skips, including the real native provider-to-reader ready bridge; original consumer hashes and source origins were verified. Old private FlowGuard0.70.6 and actually installed private FlowGuard0.70.7 both passed map, two executable models and release checks. No global installation, push, merge, tag or publication was performed; source freezes for root cross-review after the final commit.
+
+The one-skill/four-route package, deterministic prompt entry bytes, all exports, native CLI smoke and failure exit codes, retained source bytes, residual/version scans and three strict OpenSpec specs passed. Three known map warnings remain. The new FlowGuard reports a non-gating missing known-bad variant for route_matches_member; both required model variants and three actual code-fact mutations were exercised and rejected. The final residual probe initially used a case-insensitive search beyond the documented command, matching ordinary Local Material Routing headings; corrected to the exact case-sensitive command, with original failure/raw output retained externally. No product change resulted.
+
+Measured source Python lines: 33882 (baseline 79850); test Python lines: 7925 (baseline 26555); tracked files: 318 (baseline 597); tracked bytes before this final journal: 2536614 (baseline 12835053). Final committed bytes including the journal are recorded externally. One skill contains 31 files with a 268-character description.
+
+## RG-61 — completed
+
+Added the real open-gap CLI sufficiency=False assertion without changing native source. Positive stop5 passed; an actual always-sufficient native mutation failed exactly the target test (1 failed,4 passed), then source bytes restored. Final same-tree full344 passed/344 collected; fixed LW43 native10 actually passed zero skips; old/new real FG map0errors3warnings/models2passed/release PASS; section5 CLI/prompt/exports/residual/version/OpenSpec checks passed. Initial overbroad external residual probe failure retained and corrected; no product change or duplicate full rerun. Version0.5.10 and patch-only user policy preserved; all61 complete, ready to freeze for root XR.
+
+- `python <external>/edit_rg61.py` — exit 0, 0.095s; `stop-decision sufficiency checked; patch-only changelog policy retained`
+- `python -m pytest tests/source/test_stop_decision.py` — exit 0, 2.231s; `5 passed in 1.19s`
+- `python <external>/probe_rg61.py` — exit 0, 0.883s; `always-sufficient bad variant rejected, source bytes restored exactly`
+- `python -m flowguard change` — exit 0, 7.138s; `run: python -m pytest -q tests/source/test_stop_decision.py`
+- `python -m pytest` — exit 0, 87.777s; `344 passed in 86.89s (0:01:26)`
+- `python -m pytest --collect-only` — exit 0, 4.868s; `344 tests collected in 3.84s`
+- `python -m flowguard release` — exit 0, 4.872s; `verify: PASS (map, lint and models only; tests not run; run python -m pytest -q separately)`
+- `python -m flowguard map models` — exit 0, 3.174s; `models: 2 passed, 0 failed`
+- `python -m flowguard map check` — exit 0, 0.582s; `check: 0 error(s), 3 warning(s), 0 info`
+- `python -m flowguard change src/researchguard/source/planner.py` — exit 0, 1.011s; `ARCH WARN duplicate_code experimentguard: 4 identical bodies (58 AST nodes) in ['experimentguard', 'logicguard', 'sourceguard', 'traceguard']: src/researchguard/experiment/__init__.py:__getattr__, src/researchguard/logic/__init__.py:__getattr__, src/researchguard/source/__init__.py:__getattr__, src/researchguard/trace/__init__.py:__getattr__`
+- `python scripts/check_prompt_bundles.py` — exit 0, 0.068s; `pass`
+- `python scripts/check_prompt_bundles.py --json` — exit 0, 0.099s; `}`
+- `python <external>/check_exports.py` — exit 0, 0.518s; `exports ok`
+- `python <external>/probe_consumer_origin.py` — exit 0, 0.121s; `}`
+- `python -m pytest -p no:cacheprovider tests/contract/test_researchguard_handoff.py --junitxml <external>/RG-61-section5-lw43.xml --basetemp <external>/RG-61-section5-lw43-temp` — exit 0, 1.359s; `============================== 10 passed in 0.76s ==============================`
+- `python <external>/verify_lw_junit.py <external>/RG-61-section5-lw43.xml` — exit 0, 0.071s; `10 actual PASSED, 0 skipped; real native provider-to-reader bridge PASSED/ready, not version-skipped`
+- `python <external>/final_smoke.py` — exit 0, 15.639s; `all section5 native CLI smoke assertions passed; exact expected failure exits preserved`
+- `python <external>/final_residual_measure.py` — exit 1, 0.202s; `AssertionError: ['skills/researchguard/references/routes/experiment.md:13:## Local Material Routing', 'skills/researchguard/references/routes/trace.md:18:## Local Material Routing', 'skills/researchguard/references/routes/source.md:13:## Local Material Routing', 'skills/researchguard/references/routes/logic.md:24:## Local Material Routing', 'src/researchguard/trace/inference/engine.py:530:    # public console for routing, schema checks, or ``--help`` remains bounded.', 'src/researchguard/logic/gap_ledger.py:1:"""Gap-ledger routing for LogicGuard diagnostics and simulations."""']`
+- `python <external>/final_residual_measure.py` — exit 0, 0.167s; `all61 changelog and maintainer patch-only policy verified`
+- `python <external>/probe_versions.py final-section5` — exit 0, 0.089s; `user0.5.10 authority only; retained historical TraceGuard0.6.0; journal exclusion limited to root SLIM_LOG`
+- `<external>/openspec-runtime/node_modules/.bin/openspec list` — exit 0, 0.375s; `No active changes found.`
+- `<external>/openspec-runtime/node_modules/.bin/openspec validate --specs --strict` — exit 0, 0.394s; `Totals: 3 passed, 0 failed (3 items)`
+- `python-newfg -m flowguard map check` — exit 0, 4.226s; `check: 0 error(s), 3 warning(s), 0 info`
+- `python-newfg -m flowguard map models` — exit 0, 2.2s; `models: 2 passed, 0 failed`
+- `python-newfg -m flowguard release` — exit 0, 2.394s; `verify: PASS (map, lint and models only; tests not run; run python -m pytest -q separately)`
+- `git diff --check` — exit 0, 0.005s; `(no output)`
