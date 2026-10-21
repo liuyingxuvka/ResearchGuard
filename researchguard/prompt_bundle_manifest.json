@@ -16,7 +16,7 @@
         "skills/logicguard/SKILL.md",
         "skills/logicguard/agents/openai.yaml"
       ],
-      "max_entry_bytes": 10000,
+      "max_entry_bytes": 7500,
       "minimum_headroom_bytes": 1000
     },
     {
@@ -25,7 +25,7 @@
         "skills/sourceguard/SKILL.md",
         "skills/sourceguard/agents/openai.yaml"
       ],
-      "max_entry_bytes": 10000,
+      "max_entry_bytes": 7200,
       "minimum_headroom_bytes": 1000
     },
     {
@@ -34,7 +34,7 @@
         "skills/traceguard/SKILL.md",
         "skills/traceguard/agents/openai.yaml"
       ],
-      "max_entry_bytes": 10000,
+      "max_entry_bytes": 7000,
       "minimum_headroom_bytes": 1000
     },
     {
@@ -197,12 +197,6 @@
       "trigger_id": "trigger:safe-output",
       "declared_in": "skills/traceguard/SKILL.md",
       "reference": "skills/traceguard/references/safe-output.md"
-    },
-    {
-      "skill_id": "experimentguard",
-      "trigger_id": "route:experiment-blueprint",
-      "declared_in": "skills/experimentguard/SKILL.md",
-      "reference": "skills/experimentguard/references/experiment-model-protocol.md"
     }
   ],
   "prohibited_eager_member_paths": [

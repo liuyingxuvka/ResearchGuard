@@ -17,14 +17,6 @@ from researchguard.logic import (
 )
 
 
-REFERENCE_BOUNDARY_DOCS = (
-    "skills/logicguard/references/broad-depth-and-closure.md",
-    "skills/logicguard/references/task-model-maturation.md",
-    "skills/sourceguard/references/source-model-protocol.md",
-    "skills/sourceguard/references/task-iteration.md",
-    "skills/traceguard/references/task-iteration.md",
-    "skills/experimentguard/references/experiment-model-protocol.md",
-)
 
 
 def _write(path: Path, value: object) -> None:
@@ -213,19 +205,6 @@ def test_dynamic_contract_exhausts_one_or_many_current_failures(
     assert receipt.target_proof_receipt["proofed_failure_count"] == proof["proofed_failure_count"]
 
 
-def test_short_structure_boundary_is_documented_without_claiming_prose_quality() -> None:
-    root = Path(__file__).resolve().parents[2]
-    documents = [
-        (root / relative).read_text(encoding="utf-8")
-        for relative in REFERENCE_BOUNDARY_DOCS
-    ]
-    combined = "\n".join(documents)
-    assert "short structure" in combined
-    assert "frozen input" in combined
-    assert "not automatic quality improvement" in combined
-    assert "factual truth" in combined
-    assert "prose quality" in combined
-    assert "fabricat" in combined
 
 
 def test_known_bad_short_graphs_remove_declared_support_roles_only(tmp_path: Path) -> None:

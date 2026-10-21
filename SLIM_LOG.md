@@ -231,3 +231,12 @@ Trace技能去蓝图/模板/目的契约说明，保数学推理、事件/解释
 - `python scripts/check_prompt_bundles.py --json` — exit 0, 0.053s; `}`
 - `python -m pytest tests/test_prompt_bundles.py tests/test_skill_suite.py` — exit 0, 2.089s; `10 passed in 1.78s`
 - `python -c import subprocess,sys; p=subprocess.run(["rg","-n","-i","issuer|DNA|FlowGuard-owned|blueprint|template pack|purpose-contract|purpose contract|library-depth|guard_model","skills/traceguard"],capture_output=True,text=True);print(p.stdout,end="");assert p.returncode==1;p=subprocess.run([sys.executable,"-m","researchguard","trace","iterate","decide","--help"],capture_output=True,text=True);assert p.returncode==0;assert p.stdout.count("--holdout-observation")==2;print("removed terms absent; native decide help declares holdout twice")` — exit 0, 0.434s; `removed terms absent; native decide help declares holdout twice`
+
+## RG-23 — completed
+
+Experiment技能删蓝图说明，新增原样可执行最小spec并记observe；holdout和零幸存者Hard Gates及现循环指导保留，降低四成员预算。入口4633字节，真实示例推荐e1/e2，22pass/收集859，JSON/残留/目录检查通过。
+
+- `python <external>/probe_rg23.py` — exit 0, 0.437s; `JSON valid; exact skill example recommended both experiments; residual and directories clean`
+- `python scripts/check_prompt_bundles.py --json` — exit 0, 0.074s; `}`
+- `python -m pytest tests/test_prompt_bundles.py tests/test_skill_suite.py tests/logic/test_dynamic_model_purpose_contract.py` — exit 0, 2.936s; `22 passed in 2.55s`
+- `python -m pytest --collect-only` — exit 0, 5.515s; `859 tests collected in 5.03s`

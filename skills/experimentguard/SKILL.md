@@ -17,10 +17,7 @@ not execute experiments, decide causal truth, or replace another member.
 
 ## Local Material Routing
 
-Native recommendations use the experiment contract only. For explicit blueprint
-qualification, impact, trace, or export, read
-`references/experiment-model-protocol.md` under `route:experiment-blueprint`
-after admission fixes the target and denominator.
+Native recommendations use the experiment spec only.
 
 ## Entrypoint Acceptance Map
 
@@ -28,10 +25,9 @@ after admission fixes the target and denominator.
   comparable predictions.
 - Task-local iteration also requires frozen task identity, purpose, coverage and
   fingerprint, assumptions, unknowns, bound, and predecessor receipt.
-- Missing declarations, valid observations, holdout evidence, or the current
-  native receipt remain visible as unresolved; never guess them.
-- Direct and umbrella routing reach the same `researchguard.experiment` owner;
-  a sibling is never a retry.
+- Missing declarations, valid observations, or holdout evidence remain visible
+  as unresolved; never guess them.
+- A sibling member is never a retry.
 
 ## Use When
 
@@ -48,8 +44,18 @@ Route those requests to the responsible ResearchGuard member.
 
 Require unique hypothesis IDs, a finite candidate inventory, and a declared
 outcome for each hypothesis/experiment relationship used for discrimination.
-Missing declarations stay visible. For umbrella admission, the program derives
-applicability from the current contract; direct requests bypass admission.
+Missing declarations stay visible. Minimal spec (all other fields are optional):
+
+```json
+{
+  "hypothesis_predictions": [
+    {"hypothesis_id": "h1", "outcomes_by_experiment": {"e1": "up", "e2": "up"}},
+    {"hypothesis_id": "h2", "outcomes_by_experiment": {"e1": "down", "e2": "up"}},
+    {"hypothesis_id": "h3", "outcomes_by_experiment": {"e1": "up", "e2": "down"}}
+  ],
+  "candidate_experiment_ids": ["e1", "e2"]
+}
+```
 
 ## Required Workflow
 
@@ -73,14 +79,6 @@ applicability from the current contract; direct requests bypass admission.
 
 ## Conditional Task-Local Experiment Iteration
 
-Blueprint qualification, impact, trace, or export uses
-`route:experiment-blueprint` and its protocol. This is member-domain DNA; the
-ResearchGuard repository software-DNA root is FlowGuard-owned.
-
-Admission fixes target and denominator. Replay a persistent anchor and immutable
-hashes; cache is not authority. Direct use is unverified; a different target
-needs a separate anchor. No generic issuer or inline candidate-authoring.
-
 Trigger the loop for a larger task, a real observation, a matrix miss, an
 addressable gap, or requested predictive closure. Freeze task identity, purpose,
 coverage and fingerprint, assumptions, unknowns, bound, predecessor receipt,
@@ -97,10 +95,11 @@ reason. Continue to `model_closed_for_task`, or stop with `iteration_limit`,
 
 ## Local Route
 
-Use `researchguard experiment recommend <spec.json>`. Direct and umbrella
-routing reach `researchguard.experiment`; never invoke a sibling after failure.
+Use `researchguard experiment recommend <spec.json>`; apply observations with
+`researchguard experiment observe <spec.json> <observations.json>`. Never invoke
+a sibling after failure.
 
 ## Output Requirements
 
 Return the native result, evidence and claim boundary, blockers and next action.
-Include machine receipts or diagnostics only when needed or requested.
+Include full JSON only when it is needed or requested.
