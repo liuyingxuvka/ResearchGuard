@@ -128,12 +128,6 @@
     },
     {
       "skill_id": "sourceguard",
-      "trigger_id": "route:information-blueprint",
-      "declared_in": "skills/sourceguard/SKILL.md",
-      "reference": "skills/sourceguard/references/information-blueprint.md"
-    },
-    {
-      "skill_id": "sourceguard",
       "trigger_id": "trigger:retrieval-workflow",
       "declared_in": "skills/sourceguard/SKILL.md",
       "reference": "skills/sourceguard/references/retrieval-workflow.md"
@@ -161,12 +155,6 @@
       "trigger_id": "trigger:safe-output",
       "declared_in": "skills/sourceguard/SKILL.md",
       "reference": "skills/sourceguard/references/safe-output.md"
-    },
-    {
-      "skill_id": "sourceguard",
-      "trigger_id": "trigger:template-pack",
-      "declared_in": "skills/sourceguard/SKILL.md",
-      "reference": "skills/sourceguard/references/validated-template-pack.md"
     },
     {
       "skill_id": "traceguard",

@@ -63,15 +63,6 @@ def _guard(state: BeliefState, model_id: str = "test-sourceguard-depth") -> Beli
     )
 
 
-def test_sourceguard_prompt_requires_exact_per_obligation_evidence() -> None:
-    raw_prompt = (ROOT / "skills/sourceguard/SKILL.md").read_text(encoding="utf-8")
-    assert "\n+Keep only" not in raw_prompt
-    prompt = " ".join(raw_prompt.split())
-    assert "not proof of an individual SourceGuard obligation" in prompt
-    assert "`evidence_ref`" in prompt
-    assert "lowercase content hash" in prompt
-
-
 def _gap() -> Gap:
     return Gap(
         gap_id="g1",

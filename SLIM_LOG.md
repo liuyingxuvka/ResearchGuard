@@ -212,3 +212,14 @@ LogicGuard技能仅删清单指定蓝图/模板/目的契约说明，保推理�
 - `python -m pytest` — exit 0, 437.788s; `848 passed, 13 skipped in 437.21s (0:07:17)`
 - `python -m flowguard map models` — exit 0, 1.429s; `models: 2 passed, 0 failed`
 - `python -m flowguard map check` — exit 0, 0.923s; `check: 0 error(s), 10 warning(s), 0 info`
+
+Coordinator scheduling update: independent review permits RG-39–RG-54 after a real committed LW-43 snapshot instead of waiting for LW-59. Still stop at RG-38 and wait for the coordinator’s explicit grant and read-only snapshot, then stop at RG-54 for current FlowGuard. RG-47/RG-48 compatibility must prove actual native PASSED/ready and source origin; skipped tests selected by the interim self-reported version are not compatibility evidence.
+
+## RG-21 — completed
+
+SourceGuard删信息蓝图/模板/目的证明和手填每义务哈希说明，保真实source depth/源角色/独立性和契约可用性；仅删术语字符串锁定测试。入口5744字节，136pass，收集860，指定残留为空。
+
+- `python scripts/check_prompt_bundles.py --json` — exit 0, 0.173s; `}`
+- `python -m pytest tests/test_prompt_bundles.py tests/test_skill_suite.py tests/source` — exit 0, 14.89s; `136 passed in 14.21s`
+- `python -m pytest --collect-only` — exit 0, 4.492s; `860 tests collected in 4.00s`
+- `python -c import subprocess; p=subprocess.run(["rg","-n","-i","issuer|DNA|FlowGuard-owned|blueprint|template pack|purpose proof","skills/sourceguard"],capture_output=True,text=True); print(p.stdout,end=""); assert p.returncode==1; print("SourceGuard removed-boundary terms absent")` — exit 0, 0.05s; `SourceGuard removed-boundary terms absent`
