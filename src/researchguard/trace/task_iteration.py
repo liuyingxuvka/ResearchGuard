@@ -401,13 +401,6 @@ def compare_prediction_observation(
 
     baseline_result = evaluate_model(model)
     native_depth = evaluate_storyline_depth(model, baseline_result)
-    from .blueprint import impact_blueprint
-
-    native_impact = impact_blueprint(
-        model,
-        baseline_result.inference_receipt,
-        (*observation.source_refs, *observation.evidence_ids, *observation.event_ids),
-    )
     native_gap_ids = tuple(
         sorted(
             {
@@ -538,15 +531,6 @@ def compare_prediction_observation(
         "native_depth_receipt_id": native_depth.receipt_id,
         "hierarchy_fingerprint": native_depth.hierarchy_fingerprint,
         "interface_fingerprint": native_depth.interface_fingerprint,
-        "affected_object_ids": sorted(
-            {
-                *native_impact["affected_source_ids"],
-                *native_impact["affected_evidence_ids"],
-                *native_impact["affected_event_ids"],
-                *native_impact["affected_trace_ids"],
-                *native_impact["affected_hypothesis_ids"],
-            }
-        ),
         "live_alternative_ids": list(native_depth.live_alternative_ids),
         "causal_boundaries": list(native_depth.causal_boundaries),
         "deepest_proven_layer": native_depth.deepest_proven_layer,
@@ -662,20 +646,6 @@ def decide_candidate_revision(
         if item is None or supplied != f"sha256:{fingerprint(asdict(item))}":
             raise TaskIterationError(f"holdout source binding is missing or stale: {source_id}")
     candidate_depth = evaluate_storyline_depth(candidate_model, candidate_result)
-    from .blueprint import impact_blueprint
-
-    candidate_impact = impact_blueprint(
-        candidate_model,
-        candidate_result.inference_receipt,
-        (
-            *observation.source_refs,
-            *observation.evidence_ids,
-            *observation.event_ids,
-            *holdout_observation.source_refs,
-            *holdout_observation.evidence_ids,
-            *holdout_observation.event_ids,
-        ),
-    )
     mismatch_ids = {
         str(item.get("mismatch_id", ""))
         for item in comparison.get("mismatches", [])
@@ -783,15 +753,6 @@ def decide_candidate_revision(
         "native_depth_receipt_id": candidate_depth.receipt_id,
         "hierarchy_fingerprint": candidate_depth.hierarchy_fingerprint,
         "interface_fingerprint": candidate_depth.interface_fingerprint,
-        "affected_object_ids": sorted(
-            {
-                *candidate_impact["affected_source_ids"],
-                *candidate_impact["affected_evidence_ids"],
-                *candidate_impact["affected_event_ids"],
-                *candidate_impact["affected_trace_ids"],
-                *candidate_impact["affected_hypothesis_ids"],
-            }
-        ),
         "live_alternative_ids": list(candidate_depth.live_alternative_ids),
         "causal_boundaries": list(candidate_depth.causal_boundaries),
         "deepest_proven_layer": candidate_depth.deepest_proven_layer,

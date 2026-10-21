@@ -157,3 +157,14 @@ Experiment recommend补默认非领域循环字段，坏输入给JSON/CLI2，删
 - `python -m pytest tests/experiment` — exit 0, 19.436s; `66 passed in 18.92s`
 - `python <external>/probe_rg14.py` — exit 0, 0.953s; `rc 2`
 - `python -m pytest --collect-only` — exit 0, 6.135s; `869 tests collected in 5.36s`
+
+## RG-15 — completed
+
+仅删两次无universe必blocked的蓝图impact调用和两个空affected_object_ids字段；缺口转移和native_depth_receipt保留。针对性10pass/收集869；完整检查点856pass13skip，双模型通过，map0error10阶段性WARN。
+
+- `python -m pytest tests/trace/test_task_iteration.py` — exit 0, 2.889s; `10 passed in 2.51s`
+- `python <external>/probe_rg15.py` — exit 0, 0.032s; `no misleading impact fields or blueprint calls; native transitions/receipts retained`
+- `python -m pytest --collect-only` — exit 0, 3.52s; `869 tests collected in 3.10s`
+- `python -m pytest` — exit 0, 422.451s; `856 passed, 13 skipped in 421.66s (0:07:01)`
+- `python -m flowguard map models` — exit 0, 1.451s; `models: 2 passed, 0 failed`
+- `python -m flowguard map check` — exit 0, 0.877s; `check: 0 error(s), 10 warning(s), 0 info`
