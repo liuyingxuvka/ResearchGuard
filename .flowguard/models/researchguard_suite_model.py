@@ -833,9 +833,9 @@ __all__ = [
 # Current FlowGuard model contract: real route code and existing native tests.
 MODEL_ID = "researchguard_suite"
 COMPONENTS = ["researchguard-suite"]
-IMPLEMENTED_BY = {"Route": "src/researchguard/routing.py:bind_member_request"}
+IMPLEMENTED_BY = {"Route": "src/researchguard/cli.py:_member_main"}
 TESTED_BY = {
-    "no_alternate_success": ["tests/test_suite_routing.py:test_selected_member_has_no_alternate_binding"],
+    "no_alternate_success": ["tests/test_root_cli.py:test_direct_member_request_does_not_require_task_facts"],
     "terminal_failure_stays_terminal": ["tests/test_root_cli.py:test_retired_standalone_routes_are_unknown_commands"],
 }
 
@@ -860,24 +860,27 @@ def broken_variants():
 
 def conformance():
     # Replay this checkout's src-layout owner even when a distribution is installed.
+    import contextlib
+    import io
     import sys
     from pathlib import Path
     sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
     from flowguard.conformance import ConformanceReport, ConformanceViolation
     from flowguard.replay import ReplayObservation
-    from researchguard.routing import RouteBinding, bind_member_request
+    from researchguard.cli import _member_main, main
     observations = []
     violations = []
     for intent, (member_id, path_id) in MEMBER_BY_INTENT.items():
-        actual = bind_member_request(member_id, ("--help",))
+        owner = _member_main(member_id)
+        actual = "primary:" + owner.__module__.rsplit(".", 1)[0].replace(".", ":")
         expected = next(Route().apply(ResearchRequest(intent, entrypoint=member_id), RouteState())).new_state
-        good = isinstance(actual, RouteBinding) and (actual.member_id, actual.primary_path_id) == (expected.member_id, expected.primary_path_id)
-        observations.append(ReplayObservation("Route", member_id, (getattr(actual, "member_id", ""), getattr(actual, "primary_path_id", ""))))
-        if not good:
+        observations.append(ReplayObservation("Route", member_id, (member_id, actual)))
+        if (member_id, actual) != (expected.member_id, expected.primary_path_id):
             violations.append(ConformanceViolation(step_index=1, message=f"direct route differs: {member_id}", rule_name="direct_route"))
-    blocked = bind_member_request("logicguard", ("--help",), active_request_id="already-routed")
-    if getattr(blocked, "code", "") != "researchguard-recursion":
-        violations.append(ConformanceViolation(step_index=1, message="reentry was not terminal", rule_name="terminal_reentry"))
+    with contextlib.redirect_stdout(io.StringIO()):
+        retired = main(["run"])
+    if retired != 2:
+        violations.append(ConformanceViolation(step_index=1, message="retired umbrella route was not terminal", rule_name="terminal_reentry"))
     return ConformanceReport(ok=not violations, violations=tuple(violations),
                              replayed_steps=tuple(observations),
-                             summary="Four direct native route bindings and terminal reentry replayed.")
+                             summary="Four direct member owners and the retired umbrella route replayed.")

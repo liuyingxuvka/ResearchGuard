@@ -182,10 +182,7 @@ def test_ordinary_spec_roundtrips_through_native_cli(tmp_path, capsys) -> None:
     )]), encoding="utf-8")
     assert main(["observe", str(path), str(observations)]) == 0
     assert json.loads(capsys.readouterr().out)["terminal_reason"] == "model_closed_for_task"
-    for partial in ({"design_root_id": "root"}, {"design_blocks": []}, {"target_universe": None}):
-        path.write_text(json.dumps(payload | partial), encoding="utf-8")
-        with pytest.raises(ValueError):
-            _load_spec(path)
+
 
 
 def test_finite_experiment_count_limit_is_not_all_candidates_indistinguishable() -> None:

@@ -1997,7 +1997,6 @@ def evaluate_storyline_depth(
         "untested_count": len(candidates) - len(executed_ids),
         "critical_uncovered_count": len(critical_uncovered),
     }
-    from .blueprint import hierarchy_fingerprint, interface_fingerprint
 
     inference_receipt = baseline_result.inference_receipt
     live_alternative_ids = tuple(
@@ -2118,8 +2117,6 @@ def evaluate_storyline_depth(
             "executed perturbations, and covered claim scope. "
             "It does not prove factual truth, causal identification, calibrated probability, or future real-world outcomes."
         ),
-        hierarchy_fingerprint=hierarchy_fingerprint(model),
-        interface_fingerprint=interface_fingerprint(model),
         affected_object_ids=tuple(sorted(affected_object_ids)),
         live_alternative_ids=live_alternative_ids,
         causal_boundaries=causal_boundaries,

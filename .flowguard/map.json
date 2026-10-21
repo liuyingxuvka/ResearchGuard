@@ -17,13 +17,9 @@
       ],
       "files": [
         "src/researchguard/__init__.py",
-        "src/researchguard/admission.py",
-        "src/researchguard/model_envelope.py",
-        "src/researchguard/native_receipts.py",
         "src/researchguard/portable_material.py",
         "src/researchguard/resources/__init__.py",
-        "src/researchguard/suite.py",
-        "src/researchguard/target_authority.py"
+        "src/researchguard/suite.py"
       ],
       "entrypoints": [
         "src/researchguard/suite.py:suite_identity"
@@ -34,13 +30,7 @@
       "side_effects": [
         "read current repository source and explicitly supplied native materials"
       ],
-      "depends_on": [
-        "experimentguard",
-        "logicguard",
-        "sourceguard",
-        "suite-orchestration",
-        "traceguard"
-      ],
+      "depends_on": [],
       "tests": [
         "tests/test_*.py"
       ],
@@ -62,27 +52,17 @@
         "src/researchguard/__main__.py",
         "src/researchguard/cli.py",
         "src/researchguard/experiment/cli.py",
-        "src/researchguard/experiment/owner_attestation.py",
         "src/researchguard/logic/cli.py",
-        "src/researchguard/logic/owner_attestation.py",
-        "src/researchguard/routing.py",
         "src/researchguard/source/cli.py",
-        "src/researchguard/source/owner_attestation.py",
         "src/researchguard/trace/cli.py",
-        "src/researchguard/trace/owner_attestation.py",
         "src/researchguard/trace/template_packs.py"
       ],
       "entrypoints": [
         "src/researchguard/cli.py:main",
-        "src/researchguard/routing.py:select_member_request",
         "src/researchguard/logic/cli.py:main",
         "src/researchguard/source/cli.py:main",
         "src/researchguard/trace/cli.py:main",
-        "src/researchguard/experiment/cli.py:main",
-        "src/researchguard/logic/owner_attestation.py:replay_native_owner_attestation",
-        "src/researchguard/source/owner_attestation.py:replay_native_owner_attestation",
-        "src/researchguard/trace/owner_attestation.py:replay_native_owner_attestation",
-        "src/researchguard/experiment/owner_attestation.py:replay_native_owner_attestation"
+        "src/researchguard/experiment/cli.py:main"
       ],
       "state": [
         "task facts, member selection, composition bindings and native replay transports"
@@ -127,10 +107,7 @@
       "files": [
         "src/researchguard/logic/__init__.py",
         "src/researchguard/logic/acceptance.py",
-        "src/researchguard/logic/admission.py",
         "src/researchguard/logic/argument_modeling.py",
-        "src/researchguard/logic/artifact_inventory.py",
-        "src/researchguard/logic/blueprint.py",
         "src/researchguard/logic/citation_matrix.py",
         "src/researchguard/logic/counterexample.py",
         "src/researchguard/logic/delivery.py",
@@ -199,9 +176,7 @@
         "src/researchguard/logic_viewer/store.py",
         "src/researchguard/logic_viewer/ui_data.py"
       ],
-      "entrypoints": [
-        "src/researchguard/logic/blueprint.py:check_blueprint"
-      ],
+      "entrypoints": [],
       "state": [
         "native member model"
       ],
@@ -228,8 +203,6 @@
       ],
       "files": [
         "src/researchguard/source/__init__.py",
-        "src/researchguard/source/admission.py",
-        "src/researchguard/source/blueprint.py",
         "src/researchguard/source/depth.py",
         "src/researchguard/source/graph.py",
         "src/researchguard/source/guard_contract.py",
@@ -246,9 +219,7 @@
         "src/researchguard/source/template_packs.py",
         "src/researchguard/source/update.py"
       ],
-      "entrypoints": [
-        "src/researchguard/source/blueprint.py:check_blueprint"
-      ],
+      "entrypoints": [],
       "state": [
         "native member model"
       ],
@@ -277,8 +248,6 @@
       ],
       "files": [
         "src/researchguard/trace/__init__.py",
-        "src/researchguard/trace/admission.py",
-        "src/researchguard/trace/blueprint.py",
         "src/researchguard/trace/diagnostics.py",
         "src/researchguard/trace/entity_resolution.py",
         "src/researchguard/trace/evaluator.py",
@@ -312,9 +281,7 @@
         "src/researchguard/trace/temporal.py",
         "src/researchguard/trace/validation.py"
       ],
-      "entrypoints": [
-        "src/researchguard/trace/blueprint.py:check_blueprint"
-      ],
+      "entrypoints": [],
       "state": [
         "native member model"
       ],
@@ -342,13 +309,10 @@
       ],
       "files": [
         "src/researchguard/experiment/__init__.py",
-        "src/researchguard/experiment/admission.py",
-        "src/researchguard/experiment/blueprint.py",
         "src/researchguard/experiment/engine.py",
         "src/researchguard/experiment/schema.py"
       ],
       "entrypoints": [
-        "src/researchguard/experiment/blueprint.py:check_blueprint",
         "src/researchguard/experiment/engine.py:recommend_experiments"
       ],
       "state": [
@@ -357,9 +321,7 @@
       "side_effects": [
         "native file writes only through explicit commands"
       ],
-      "depends_on": [
-        "researchguard-suite"
-      ],
+      "depends_on": [],
       "tests": [
         "tests/experiment/**/*.py",
         "tests/experiment/*.py"
@@ -435,13 +397,7 @@
       "id": "direct-member",
       "steps": [
         "suite-orchestration:main",
-        "suite-orchestration:bind_member_request"
-      ]
-    },
-    {
-      "id": "research-composition",
-      "steps": [
-        "suite-orchestration:select_member_request"
+        "suite-orchestration:_member_main"
       ]
     },
     {

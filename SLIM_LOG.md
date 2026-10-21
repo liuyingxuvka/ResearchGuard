@@ -299,3 +299,20 @@ Full command logs, actual return codes, pre/post installer content hashes and in
 - `python <external>/check_exports.py` — exit 0, 0.774s; `exports ok`
 - `python -m pytest --collect-only` — exit 0, 3.454s; `805 tests collected in 3.01s`
 - `python -m flowguard map check` — exit 0, 0.794s; `check: 0 error(s), 10 warning(s), 0 info`
+
+## RG-28 — completed
+
+按明确授权删证明传输层及4成员蓝图/专测/自动测试密钥夹具；保suite_fingerprint/identity、原生最小实验集/holdout、结构分析及Trace求解。直接owner重播模型通过，exports ok；原生67pass、模板16pass、LW44pass、收集566；仅2预期catalog指纹重封存，6条实际无用依赖精确删后map0error11阶段性WARN，指定残留仅3条注释/退后测试名。
+
+- `python -c from pathlib import Path; files=list(Path("src").rglob("*.py"));[compile(p.read_text(),str(p),"exec") for p in files];print("compiled source",len(files),"without writing bytecode")` — exit 0, 0.453s; `compiled source 133 without writing bytecode`
+- `python <external>/check_exports.py` — exit 0, 0.679s; `exports ok`
+- `python scripts/reseal_member_catalogs.py` — exit 0, 0.727s; `ResearchGuard member catalogs resealed; logic=1 source=1 trace=1 source_examples=0`
+- `python -m flowguard map check` — exit 1, 0.968s; `check: 2 error(s), 11 warning(s), 0 info`
+- `python -m flowguard map check` — exit 0, 0.481s; `check: 0 error(s), 11 warning(s), 0 info`
+- `python -m pytest tests/experiment tests/test_root_cli.py tests/logic/test_structured_artifact.py tests/logic/test_citation_matrix.py tests/trace/test_storyline_depth.py tests/test_prompt_bundles.py tests/test_skill_suite.py` — exit 0, 14.046s; `67 passed in 13.69s`
+- `python -m pytest tests/logic_template_packs` — exit 0, 1.695s; `16 passed in 1.39s`
+- `python -m flowguard map models` — exit 0, 1.405s; `models: 2 passed, 0 failed`
+- `python -c import subprocess;p=subprocess.run(["rg","-n","-g","*.py",r"routing|model_envelope|native_receipts|target_authority|owner_attestation|artifact_inventory import|from \.blueprint|admission_fixtures","src/researchguard","tests","scripts",".flowguard/models"],capture_output=True,text=True);print(p.stdout,end="");rows=p.stdout.splitlines();assert len(rows)==3,rows;assert all(any(x in r for x in ("public console for routing","Gap-ledger routing","test_public_depth_requires_explicit_target_authority")) for r in rows);print("only three explicitly deferred comments/test-name references remain")` — exit 0, 0.05s; `only three explicitly deferred comments/test-name references remain`
+- `python <external>/probe_rg23.py` — exit 0, 0.12s; `JSON valid; exact skill example recommended both experiments; residual and directories clean`
+- `python -m pytest -p no:cacheprovider tests/contract/test_researchguard_handoff.py tests/e2e/test_production_reader_pipeline.py tests/contract/test_production_reader_native_lifecycle.py` — exit 0, 2.506s; `============================== 44 passed in 2.22s ==============================`
+- `python -m pytest --collect-only` — exit 0, 2.63s; `566 tests collected in 2.18s`

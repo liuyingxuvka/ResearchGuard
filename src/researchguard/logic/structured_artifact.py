@@ -8,7 +8,6 @@ from typing import Any, Iterable
 from .hierarchy import build_children_index, hierarchy_roots
 from .importance import importance_for_node
 from .model import LogicModel
-from .artifact_inventory import ArtifactInventory
 
 
 STRUCTURAL_NODE_TYPES = {"Document", "Section", "ArgumentBlock"}
@@ -75,7 +74,7 @@ class ArtifactMap:
 def build_artifact_map(
     model: LogicModel,
     *,
-    inventory: ArtifactInventory | None = None,
+    inventory: Any = None,
     realizations: Iterable[object] = (),
 ) -> ArtifactMap:
     artifact_kind = str(model.metadata.get("artifact_kind", "structured-artifact"))

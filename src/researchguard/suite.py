@@ -7,7 +7,6 @@ from pathlib import Path
 from typing import Any
 
 from . import MEMBER_IDS, SUITE_ID, __version__
-from .model_envelope import HANDOFF_FIELD_CONTRACT_SCHEMA, MEMBER_MODEL_ENVELOPE_SCHEMA
 
 
 _PACKAGE_ROOT = Path(__file__).resolve().parent
@@ -55,29 +54,9 @@ def suite_identity() -> dict[str, Any]:
         "distribution": "researchguard",
         "console_script": "researchguard",
         "fingerprint": suite_fingerprint(),
-        "composition_transport": {
-            "member_envelope_schema": MEMBER_MODEL_ENVELOPE_SCHEMA,
-            "handoff_field_schema": HANDOFF_FIELD_CONTRACT_SCHEMA,
-            "member_payload_semantics": "opaque",
-        },
     }
 
 
-def suite_composition_projection(composition: Any) -> dict[str, Any]:
-    """Project umbrella transport state without importing member-native schemas."""
-
-    return {
-        "status": composition.status,
-        "task_id": composition.task_id,
-        "composition_fingerprint": composition.composition_fingerprint,
-        "member_ids": list(composition.member_ids),
-        "member_envelopes": list(composition.member_envelopes),
-        "handoff_field_contracts": list(composition.handoff_field_contracts),
-        "stale_step_ids": list(composition.stale_step_ids),
-        "blocking_member_ids": list(composition.blocking_member_ids),
-        "composition_gaps": list(composition.composition_gaps),
-        "member_payload_semantics": "opaque",
-    }
 
 
-__all__ = ["governed_file_manifest", "suite_composition_projection", "suite_fingerprint", "suite_identity"]
+__all__ = ["governed_file_manifest", "suite_fingerprint", "suite_identity"]

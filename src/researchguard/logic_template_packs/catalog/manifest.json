@@ -53,7 +53,7 @@
       "profile_id": "researchguard.logic.structured-artifact",
       "family": "structured-artifact",
       "path": "profiles/structured-artifact.json",
-      "sha256": "51810cd787e1efe12449c7996886651fe5c3e00090b262091259ff70bdddbdb4"
+      "sha256": "9e69e2fdbc934204f33f8204daf15170c53c50bf11b557f222673f9f35249f43"
     },
     {
       "profile_id": "researchguard.logic.synthesis",
@@ -62,5 +62,5 @@
       "sha256": "aff71e7c5cd44291b840845d48f8630b41ca3e1ad35f964e9dbe4b401945333f"
     }
   ],
-  "catalog_digest": "1941c631036ddcab7c5d5110425dd5d2eabd195f4359f7403782924e7952c83d"
+  "catalog_digest": "e595aa65c86faf72fe9204cb800144215bd382d77d44631d92700652f98b9b82"
 }
