@@ -3,11 +3,8 @@
 from __future__ import annotations
 
 import copy
-from dataclasses import replace
 import hashlib
 import json
-import math
-from pathlib import Path
 from collections import Counter, deque
 from datetime import datetime, timezone
 from typing import Any, Iterable, Mapping
@@ -1339,155 +1336,12 @@ def _claim_perturbation_coverage(
     return tuple(rows)
 
 
-def _native_obligation_observations(
-    model: LogicModel,
-    universe: ArgumentCoverageUniverse,
-    coverage: DepthCoverageSummary,
-    plan: tuple[PerturbationPlanItem, ...],
-    effectiveness: tuple[PerturbationEffectiveness, ...],
-    claim_perturbations: tuple[ClaimPerturbationCoverage, ...],
-) -> tuple[dict[str, Any], ...]:
-    """Project exact LogicGuard-owned evidence for every depth obligation."""
-
-    coverage_by_node = {item.node_id: item.to_dict() for item in coverage.items}
-    plan_by_node = {item.node_id: item.to_dict() for item in plan}
-    effect_by_node = {item.node_id: item.to_dict() for item in effectiveness}
-    claim_perturbation_by_id = {
-        item.claim_id: item.to_dict() for item in claim_perturbations
-    }
-    observations: list[dict[str, Any]] = []
-
-    def add(
-        native_object_id: str,
-        obligation_id: str,
-        content: dict[str, Any],
-    ) -> None:
-        observations.append(
-            {
-                "native_object_id": native_object_id,
-                "target_obligation_ids": [obligation_id],
-                "evidence_ref": f"logicguard:{native_object_id}",
-                "evidence_sha256": _canonical_sha256(content),
-                "content": content,
-            }
-        )
-
-    for unit_id in universe.target_unit_ids:
-        member_nodes = []
-        for node in model.nodes.values():
-            declared_units = {
-                unit
-                for key in UNIT_METADATA_KEYS
-                for unit in _string_tuple(node.metadata.get(key))
-            }
-            if unit_id in declared_units:
-                member_nodes.append(node.to_dict())
-        add(
-            f"target-unit:{unit_id}",
-            "obligation:logicguard-authoritative-universe",
-            {
-                "target_unit_id": unit_id,
-                "modeled": unit_id in universe.modeled_target_unit_ids,
-                "member_nodes": member_nodes,
-                "universe_fingerprint": universe.universe_fingerprint,
-            },
-        )
-
-    for node_id in universe.important_node_ids:
-        node = model.nodes.get(node_id)
-        add(
-            f"important-node:{node_id}",
-            "obligation:logicguard-authoritative-universe",
-            {
-                "node": node.to_dict() if node else None,
-                "coverage": coverage_by_node.get(node_id),
-                "reachable": node_id in universe.reachable_node_ids,
-                "universe_fingerprint": universe.universe_fingerprint,
-            },
-        )
-
-    for card in universe.role_coverage:
-        for role in card.required_roles:
-            role_node_ids = [
-                node_id
-                for node_id in card.node_ids
-                if node_id in model.nodes and model.nodes[node_id].type in ROLE_GROUPS[role]
-            ]
-            add(
-                f"card-role:{card.card_id}:{role}",
-                "obligation:logicguard-role-completeness",
-                {
-                    "card": card.to_dict(),
-                    "role": role,
-                    "role_nodes": [model.nodes[node_id].to_dict() for node_id in role_node_ids],
-                    "terminal_disposition": card.terminal_dispositions.get(role, ""),
-                },
-            )
-
-    for claim in universe.claim_role_coverage:
-        for role in claim.required_roles:
-            role_node_ids = list(claim.connected_role_node_ids.get(role, ()))
-            add(
-                f"claim-role:{claim.claim_id}:{role}",
-                "obligation:logicguard-claim-role-completeness",
-                {
-                    "claim": claim.to_dict(),
-                    "role": role,
-                    "role_nodes": [
-                        model.nodes[node_id].to_dict()
-                        for node_id in role_node_ids
-                        if node_id in model.nodes
-                    ],
-                    "terminal_disposition": claim.terminal_dispositions.get(role, ""),
-                },
-            )
-
-    for node_id in universe.critical_perturbable_node_ids:
-        add(
-            f"critical-perturbation:{node_id}",
-            "obligation:logicguard-critical-perturbations",
-            {
-                "node": model.nodes[node_id].to_dict() if node_id in model.nodes else None,
-                "plan": plan_by_node.get(node_id),
-                "effect": effect_by_node.get(node_id),
-            },
-        )
-
-    for claim in universe.claim_role_coverage:
-        claim_coverage = claim_perturbation_by_id.get(claim.claim_id)
-        for node_id in claim.applicable_perturbation_node_ids:
-            add(
-                f"claim-perturbation:{claim.claim_id}:{node_id}",
-                "obligation:logicguard-claim-perturbations",
-                {
-                    "claim_id": claim.claim_id,
-                    "node": model.nodes[node_id].to_dict() if node_id in model.nodes else None,
-                    "plan": plan_by_node.get(node_id),
-                    "effect": effect_by_node.get(node_id),
-                    "claim_coverage": claim_coverage,
-                },
-            )
-
-    for claim_id in universe.claim_scope.requested_node_ids:
-        add(
-            f"claim-scope:{claim_id}",
-            "obligation:logicguard-claim-scope",
-            {
-                "claim_node": model.nodes[claim_id].to_dict() if claim_id in model.nodes else None,
-                "claim_scope": universe.claim_scope.to_dict(),
-            },
-        )
-    return tuple(observations)
-
-
 def _build_native_depth_analysis(
     model: LogicModel,
     *,
     budget: int = 6,
     requested_claim_scope_ids: Iterable[str] | None = None,
     result: EvaluationResult | None = None,
-    artifact_inventory: object | None = None,
-    artifact_binding_unit_ids: Iterable[str] = (),
     interface_receipt_refs: Iterable[str] = (),
 ) -> LogicDepthReceipt:
     # Synthesis already evaluated this model.  Reuse that result when supplied
@@ -1572,15 +1426,6 @@ def _build_native_depth_analysis(
         )
         if not row.applicable_node_ids and row.status != "pass":
             gaps.append(f"claim_perturbation_set_missing:{row.claim_id}")
-    inventory_fingerprint = ""
-    if artifact_inventory is not None:
-        inventory_fingerprint = str(getattr(artifact_inventory, "fingerprint", ""))
-        bound_units = set(str(item) for item in artifact_binding_unit_ids)
-        for unit in getattr(artifact_inventory, "units", ()):
-            if unit.unit_id not in bound_units:
-                gaps.append(f"artifact_inventory_unit_unbound:{unit.unit_id}")
-            if unit.parse_disposition == "unparsed":
-                gaps.append(f"artifact_inventory_parse_gap:{unit.unit_id}")
     receipt_refs = tuple(sorted(set(str(item) for item in interface_receipt_refs if str(item))))
     required_receipt_refs = {
         item.parent_receipt_id
@@ -1623,87 +1468,13 @@ def _build_native_depth_analysis(
             "its covered claim scope, role-complete important cards, and effective critical perturbations. "
             "They do not establish factual truth or alternatives absent from the supplied artifact inventory."
         ),
-        native_obligation_evidence=_native_obligation_observations(
-            model,
-            universe,
-            coverage,
-            plan,
-            effectiveness,
-            claim_perturbations,
-        ),
         profile="enforced",
         coverage_universe=universe,
         critical_perturbation_coverage=critical_coverage,
         claim_perturbation_coverage=claim_perturbations,
         requested_claim_scope="complete",
         covered_claim_scope=covered_claim_scope,
-        artifact_inventory_fingerprint=inventory_fingerprint,
         interface_receipt_refs=receipt_refs,
         deepest_proven_layer=("native-semantics" if gaps else "native-semantics-and-blueprint-inputs"),
         first_unresolved_gap=gaps[0] if gaps else "",
-    )
-
-
-def build_logic_depth_receipt(
-    model: LogicModel,
-    *,
-    target_root: str | Path,
-    guard_contract: str | Path,
-    budget: int = 6,
-    requested_claim_scope_ids: Iterable[str] | None = None,
-    artifact_inventory: object | None = None,
-    artifact_binding_unit_ids: Iterable[str] = (),
-    interface_receipt_refs: Iterable[str] = (),
-) -> LogicDepthReceipt:
-    """Issue the public receipt only after current target-purpose proof passes."""
-
-    from ..portable_material import portable_native_material_bytes_by_id
-    from .guard_model_contract import (
-        PORTABLE_TARGET_PROOF_MATERIAL_ID,
-        verify_portable_target_contract_material,
-        verify_target_contract,
-    )
-
-    portable_material = portable_native_material_bytes_by_id(
-        member_id="logicguard",
-        material_id=PORTABLE_TARGET_PROOF_MATERIAL_ID,
-    )
-    if portable_material is None:
-        proof = verify_target_contract(
-            target_root=target_root,
-            contract_path=guard_contract,
-            expected_target_skill_id="logicguard",
-        )
-    else:
-        proof = verify_portable_target_contract_material(
-            portable_material,
-            target_root=target_root,
-            contract_path=guard_contract,
-            expected_target_skill_id="logicguard",
-        )
-    comparison_model = copy.deepcopy(model)
-    comparison_model.metadata.pop("source_path", None)
-    if model_fingerprint(comparison_model) != proof["native_model_fingerprint"]:
-        raise ValueError(
-            "logicguard_blocked:guarded-depth-model-mismatch: supplied model is not the contract-bound candidate"
-        )
-    native = _build_native_depth_analysis(
-        model,
-        budget=budget,
-        requested_claim_scope_ids=requested_claim_scope_ids,
-        artifact_inventory=artifact_inventory,
-        artifact_binding_unit_ids=artifact_binding_unit_ids,
-        interface_receipt_refs=interface_receipt_refs,
-    )
-    return replace(
-        native,
-        receipt_version="researchguard.logic.depth.v3",
-        target_contract_id=str(proof["contract_id"]),
-        target_contract_fingerprint=str(proof["contract_fingerprint"]),
-        target_purpose=str(proof["prevented_failure_purpose"]),
-        target_proof_receipt=dict(proof),
-        claim_boundary=(
-            f"{proof['claim_boundary']} "
-            "This guarded receipt also remains bounded by LogicGuard structural licensing and does not establish factual truth."
-        ),
     )

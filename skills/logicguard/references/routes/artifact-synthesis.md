@@ -72,7 +72,7 @@ The selection request uses `researchguard.logic.synthesis-request.v1` and carrie
 
 ## Native completion and stopping
 
-1. Prepare the exact selection request, current model and real source bindings. Without a depth receipt, `synthesize` runs the native depth analysis itself.
+1. Prepare the exact selection request, current model and real source bindings. `synthesize` runs the native depth analysis on the current model itself.
 2. Call synthesize_artifact_plan, preserving descendant structure-gap propagation to ancestors.
 3. Return the ready/blocked plan, target units and source/claim matrix. Final prose remains owned by the active writing/document owner.
 

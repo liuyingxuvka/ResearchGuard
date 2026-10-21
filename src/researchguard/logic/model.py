@@ -1011,18 +1011,12 @@ class LogicDepthReceipt:
     status: str
     broad_claim_licensed: bool
     claim_boundary: str
-    native_obligation_evidence: tuple[dict[str, Any], ...]
     profile: str = "enforced"
     coverage_universe: ArgumentCoverageUniverse | None = None
     critical_perturbation_coverage: dict[str, Any] = field(default_factory=dict)
     claim_perturbation_coverage: tuple[ClaimPerturbationCoverage, ...] = ()
     requested_claim_scope: str = "complete"
     covered_claim_scope: str = "not_run"
-    target_contract_id: str = ""
-    target_contract_fingerprint: str = ""
-    target_purpose: str = ""
-    target_proof_receipt: dict[str, Any] = field(default_factory=dict)
-    artifact_inventory_fingerprint: str = ""
     interface_receipt_refs: tuple[str, ...] = ()
     deepest_proven_layer: str = "native-semantics"
     first_unresolved_gap: str = ""
@@ -1044,9 +1038,6 @@ class LogicDepthReceipt:
             "status": self.status,
             "broad_claim_licensed": self.broad_claim_licensed,
             "claim_boundary": self.claim_boundary,
-            "native_obligation_evidence": [
-                dict(item) for item in self.native_obligation_evidence
-            ],
             "profile": self.profile,
             "coverage_universe": self.coverage_universe.to_dict() if self.coverage_universe else None,
             "critical_perturbation_coverage": dict(self.critical_perturbation_coverage),
@@ -1055,11 +1046,6 @@ class LogicDepthReceipt:
             ],
             "requested_claim_scope": self.requested_claim_scope,
             "covered_claim_scope": self.covered_claim_scope,
-            "target_contract_id": self.target_contract_id,
-            "target_contract_fingerprint": self.target_contract_fingerprint,
-            "target_purpose": self.target_purpose,
-            "target_proof_receipt": dict(self.target_proof_receipt),
-            "artifact_inventory_fingerprint": self.artifact_inventory_fingerprint,
             "interface_receipt_refs": list(self.interface_receipt_refs),
             "deepest_proven_layer": self.deepest_proven_layer,
             "first_unresolved_gap": self.first_unresolved_gap,

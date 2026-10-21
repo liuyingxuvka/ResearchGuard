@@ -38,23 +38,6 @@ def _unit(unit_id, claim_id, *, parent=None, predecessors=(), relation="establis
     }
 
 
-def test_public_or_persisted_depth_mapping_cannot_use_private_v2_shape_as_proof():
-    model = load_model_from_dict(
-        {
-            "model": {"id": "native-depth-contract", "root_claim": "C0"},
-            "nodes": {"C0": {"type": "Claim", "text": "Conclusion", "importance": 0.9}},
-        }
-    )
-    request = _request(model, units=[_unit("u0", "C0", relation="concludes")], body_order=["u0"])
-    private_receipt = _build_native_depth_analysis(model, budget=8)
-    persisted = private_receipt.to_dict()
-
-    plan = synthesize_artifact_plan(model, selection_request=request, native_depth_receipt=persisted)
-
-    assert plan.status == "blocked_support_gap"
-    assert "native_depth_receipt_not_public" in plan.open_gaps
-
-
 def test_grandchild_native_structure_gap_propagates_to_real_ancestors():
     model = load_model_from_dict(
         {
@@ -81,120 +64,18 @@ def test_grandchild_native_structure_gap_propagates_to_real_ancestors():
     assert not any(finding.code == "unrecovered_conclusion_obligation" for finding in report.findings)
 
 
-def test_private_receipt_object_remains_usable_for_existing_narrow_native_fixture():
+def test_synthesis_computes_native_depth_itself():
     model = load_model_from_dict(
         {
-            "model": {"id": "narrow-native-fixture", "root_claim": "C0"},
+            "model": {"id": "in-process-depth", "root_claim": "C0"},
             "nodes": {"C0": {"type": "Claim", "text": "Conclusion", "importance": 0.9}},
         }
     )
     request = _request(model, units=[_unit("u0", "C0", relation="concludes")], body_order=["u0"])
-    receipt = _build_native_depth_analysis(model, budget=8)
-    plan = synthesize_artifact_plan(model, selection_request=request, native_depth_receipt=receipt)
-
-    # The object is still consumed by the native owner in narrow in-process
-    # tests; persisted/path handoffs use the public-v3 gate above.
-    assert "native_depth_receipt_not_public" not in plan.open_gaps
-
-
-def test_public_depth_receipt_rejects_forged_target_proof_shape():
-    model = load_model_from_dict(
-        {
-            "model": {"id": "forged-target-proof", "root_claim": "C0"},
-            "nodes": {"C0": {"type": "Claim", "text": "Conclusion", "importance": 0.9}},
-        }
-    )
-    request = _request(model, units=[_unit("u0", "C0", relation="concludes")], body_order=["u0"])
-    payload = _build_native_depth_analysis(model, budget=8).to_dict()
-    payload.update(
-        {
-            "receipt_version": "researchguard.logic.depth.v3",
-            "target_contract_id": "contract:forged",
-            "target_contract_fingerprint": "fingerprint:forged",
-            "target_purpose": "forged purpose",
-            "target_proof_receipt": {
-                "schema_version": "researchguard.logic.target_model_purpose_proof.v1",
-                "status": "pass",
-                "contract_role": "target_model_instance",
-                "target_skill_id": "logicguard",
-                "contract_id": "contract:forged",
-                "contract_fingerprint": "fingerprint:forged",
-                "model_id": model.id,
-                "candidate_relative_path": "models/current.json",
-                "candidate_model_fingerprint": payload["model_fingerprint"],
-                "native_model_fingerprint": payload["model_fingerprint"],
-                "native_owner_id": "forged-owner",
-                "native_route_id": "forged-route",
-                "prevented_failure_purpose": "forged purpose",
-                "claim_boundary": "forged boundary",
-                "selectable_modes": [],
-                "failure_proofs": [],
-                "proofed_failure_count": 0,
-            },
-        }
-    )
-
-    plan = synthesize_artifact_plan(model, selection_request=request, native_depth_receipt=payload)
+    plan = synthesize_artifact_plan(model, selection_request=request)
+    expected = _build_native_depth_analysis(model, budget=8, requested_claim_scope_ids=["C0"])
 
     assert plan.status == "blocked_support_gap"
-    assert "native_depth_receipt_target_proof_failure_proofs_missing" in plan.open_gaps
-    assert "native_depth_receipt_target_proof_count_invalid" not in plan.open_gaps
-
-
-def test_public_depth_receipt_rejects_inconsistent_target_failure_proof():
-    model = load_model_from_dict(
-        {
-            "model": {"id": "inconsistent-target-proof", "root_claim": "C0"},
-            "nodes": {"C0": {"type": "Claim", "text": "Conclusion", "importance": 0.9}},
-        }
-    )
-    request = _request(model, units=[_unit("u0", "C0", relation="concludes")], body_order=["u0"])
-    payload = _build_native_depth_analysis(model, budget=8).to_dict()
-    payload.update(
-        {
-            "receipt_version": "researchguard.logic.depth.v3",
-            "target_contract_id": "contract:current",
-            "target_contract_fingerprint": "fingerprint:current",
-            "target_purpose": "current purpose",
-            "target_proof_receipt": {
-                "schema_version": "researchguard.logic.target_model_purpose_proof.v1",
-                "status": "pass",
-                "contract_role": "target_model_instance",
-                "target_skill_id": "logicguard",
-                "contract_id": "contract:other",
-                "contract_fingerprint": "fingerprint:other",
-                "model_id": model.id,
-                "candidate_relative_path": "models/current.json",
-                "candidate_model_fingerprint": payload["model_fingerprint"],
-                "native_model_fingerprint": "different-model",
-                "native_owner_id": "owner",
-                "native_route_id": "route",
-                "prevented_failure_purpose": "other purpose",
-                "claim_boundary": "bounded",
-                "selectable_modes": [],
-                "failure_proofs": [
-                    {
-                        "failure_id": "failure:one",
-                        "oracle": {
-                            "kind": "primary_depth_gap_prefix",
-                            "finding_code": "missing_role",
-                        },
-                        "known_good_sha256": "good",
-                        "known_bad_sha256": "bad",
-                        "known_good_status": "pass",
-                        "known_bad_status": "blocked",
-                        "candidate_status": "pass",
-                        "finding_observed_in_bad": True,
-                        "finding_absent_from_good_and_candidate": True,
-                    }
-                ],
-                "proofed_failure_count": 1,
-            },
-        }
-    )
-
-    plan = synthesize_artifact_plan(model, selection_request=request, native_depth_receipt=payload)
-
-    assert "native_depth_receipt_target_proof_target_contract_id_mismatch" in plan.open_gaps
-    assert "native_depth_receipt_target_proof_native_model_fingerprint_mismatch" in plan.open_gaps
-    assert "native_depth_receipt_target_proof_target_purpose_mismatch" in plan.open_gaps
+    assert "native_depth_not_licensed" in plan.open_gaps
+    assert all(f"native_depth_gap:{gap}" in plan.open_gaps for gap in expected.unresolved_gaps)
+    assert not any("receipt" in gap for gap in plan.open_gaps)

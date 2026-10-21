@@ -8,9 +8,6 @@ selects a top-N story by itself.
 from __future__ import annotations
 
 from dataclasses import dataclass, field, replace
-import copy
-import json
-from pathlib import Path
 import re
 from typing import Any, Iterable, Mapping
 
@@ -18,160 +15,11 @@ from .citation_matrix import ClaimSourceParagraphMatrix, build_claim_source_para
 from .execution_depth import _build_native_depth_analysis, build_argument_coverage_universe, model_fingerprint
 from .evaluator import evaluate_model
 from .importance import ImportanceRecord, summarize_importance
-from .model import LogicDepthReceipt, LogicModel
+from .model import LogicModel
 from .schema import STATE_IN
 from .structure_audit import audit_structure
 from .synthesis_contract import SelectionRequest, SYNTHESIS_REQUEST_SCHEMA, validate_selection_request
 from .loader import load_model
-
-
-# ``_build_native_depth_analysis`` is still useful to the native depth owner
-# and to narrow in-process tests, but persisted/public depth evidence has a
-# separate versioned contract.  Keep both version strings visible here so a
-# caller cannot pass an arbitrary mapping that merely happens to contain
-# ``status=pass``.
-_NATIVE_DEPTH_RECEIPT_VERSIONS = {
-    "researchguard.logic.depth.v2",
-    "researchguard.logic.depth.v3",
-}
-_PUBLIC_NATIVE_DEPTH_RECEIPT_VERSION = "researchguard.logic.depth.v3"
-_TARGET_PROOF_SCHEMA = "researchguard.logic.target_model_purpose_proof.v1"
-_TARGET_PROOF_ROLE = "target_model_instance"
-_TARGET_PROOF_SKILL_ID = "logicguard"
-_TARGET_PROOF_ORACLE_KINDS = {
-    "primary_depth_gap_prefix",
-    "primary_diagnostic_code",
-}
-
-
-def _target_proof_receipt_gaps(
-    payload: Mapping[str, Any],
-    *,
-    expected_native_model_fingerprint: str = "",
-) -> list[str]:
-    """Validate the target-purpose proof carried by a public depth receipt.
-
-    The native owner creates this proof after replaying the frozen target
-    contract.  Synthesis cannot replay the target files itself, but it must
-    still reject a hand-written proof that only copies the contract labels or
-    a claimed model fingerprint.  Check the complete producer shape and all
-    cross-field identities here; the target owner remains responsible for the
-    actual good/bad case replay.
-    """
-
-    gaps: list[str] = []
-    proof = payload.get("target_proof_receipt")
-    if not isinstance(proof, Mapping):
-        return ["native_depth_receipt_target_proof_invalid"]
-
-    if proof.get("schema_version") != _TARGET_PROOF_SCHEMA:
-        gaps.append("native_depth_receipt_target_proof_schema_invalid")
-    if proof.get("status") != "pass":
-        gaps.append("native_depth_receipt_target_proof_not_pass")
-    if proof.get("contract_role") != _TARGET_PROOF_ROLE:
-        gaps.append("native_depth_receipt_target_proof_role_invalid")
-    if proof.get("target_skill_id") != _TARGET_PROOF_SKILL_ID:
-        gaps.append("native_depth_receipt_target_proof_skill_mismatch")
-    if proof.get("selectable_modes") != []:
-        gaps.append("native_depth_receipt_target_proof_selectable_modes_invalid")
-
-    identity_pairs = (
-        ("target_contract_id", "contract_id"),
-        ("target_contract_fingerprint", "contract_fingerprint"),
-        ("target_purpose", "prevented_failure_purpose"),
-        ("model_id", "model_id"),
-    )
-    for receipt_field, proof_field in identity_pairs:
-        expected = payload.get(receipt_field)
-        actual = proof.get(proof_field)
-        if type(expected) is not str or not expected.strip():
-            gaps.append(f"native_depth_receipt_target_{receipt_field}_invalid")
-        elif actual != expected:
-            gaps.append(f"native_depth_receipt_target_proof_{receipt_field}_mismatch")
-
-    for field in (
-        "contract_id",
-        "contract_fingerprint",
-        "model_id",
-        "candidate_relative_path",
-        "candidate_model_fingerprint",
-        "native_model_fingerprint",
-        "native_owner_id",
-        "native_route_id",
-        "prevented_failure_purpose",
-        "claim_boundary",
-    ):
-        value = proof.get(field)
-        if type(value) is not str or not value.strip():
-            gaps.append(f"native_depth_receipt_target_proof_missing:{field}")
-
-    if (
-        expected_native_model_fingerprint
-        and proof.get("native_model_fingerprint") != expected_native_model_fingerprint
-    ):
-        gaps.append("native_depth_receipt_target_proof_native_model_fingerprint_mismatch")
-
-    raw_proofs = proof.get("failure_proofs")
-    if not isinstance(raw_proofs, list) or not raw_proofs:
-        gaps.append("native_depth_receipt_target_proof_failure_proofs_missing")
-        raw_proofs = []
-    raw_count = proof.get("proofed_failure_count")
-    if type(raw_count) is not int or isinstance(raw_count, bool):
-        gaps.append("native_depth_receipt_target_proof_count_invalid")
-    elif raw_count != len(raw_proofs):
-        gaps.append("native_depth_receipt_target_proof_count_mismatch")
-
-    seen_failure_ids: set[str] = set()
-    required_failure_fields = (
-        "failure_id",
-        "known_good_sha256",
-        "known_bad_sha256",
-        "known_good_status",
-        "known_bad_status",
-        "candidate_status",
-        "finding_observed_in_bad",
-        "finding_absent_from_good_and_candidate",
-    )
-    for index, row in enumerate(raw_proofs):
-        prefix = f"native_depth_receipt_target_proof_failure:{index}"
-        if not isinstance(row, Mapping):
-            gaps.append(f"{prefix}:not_mapping")
-            continue
-        failure_id = row.get("failure_id")
-        if type(failure_id) is not str or not failure_id.strip():
-            gaps.append(f"{prefix}:missing_failure_id")
-        elif failure_id in seen_failure_ids:
-            gaps.append(f"{prefix}:duplicate_failure_id")
-        else:
-            seen_failure_ids.add(failure_id)
-        for field in required_failure_fields:
-            if field not in row:
-                gaps.append(f"{prefix}:missing:{field}")
-        oracle = row.get("oracle")
-        if not isinstance(oracle, Mapping):
-            gaps.append(f"{prefix}:oracle_invalid")
-        else:
-            if oracle.get("kind") not in _TARGET_PROOF_ORACLE_KINDS:
-                gaps.append(f"{prefix}:oracle_kind_invalid")
-            finding_code = oracle.get("finding_code")
-            if type(finding_code) is not str or not finding_code.strip():
-                gaps.append(f"{prefix}:oracle_finding_invalid")
-        if row.get("known_good_status") != "pass":
-            gaps.append(f"{prefix}:known_good_not_pass")
-        if row.get("known_bad_status") != "blocked":
-            gaps.append(f"{prefix}:known_bad_not_blocked")
-        if row.get("candidate_status") != "pass":
-            gaps.append(f"{prefix}:candidate_not_pass")
-        if row.get("finding_observed_in_bad") is not True:
-            gaps.append(f"{prefix}:bad_finding_not_observed")
-        if row.get("finding_absent_from_good_and_candidate") is not True:
-            gaps.append(f"{prefix}:good_candidate_finding_not_absent")
-        for field in ("known_good_sha256", "known_bad_sha256"):
-            value = row.get(field)
-            if type(value) is not str or not value.strip():
-                gaps.append(f"{prefix}:{field}_invalid")
-
-    return list(dict.fromkeys(gaps))
 
 
 @dataclass(frozen=True)
@@ -288,7 +136,6 @@ class SynthesisPlan:
     structure_findings: tuple[dict[str, Any], ...] = ()
     native_evaluation: dict[str, Any] = field(default_factory=dict)
     native_coverage: dict[str, Any] = field(default_factory=dict)
-    native_depth_receipt_ref: str = ""
     # Preserve the exact request-side source branch bindings at the public
     # handoff boundary.  The native planner validates these rows; consumers
     # must not reconstruct them from candidate ids or unit text.
@@ -310,7 +157,6 @@ class SynthesisPlan:
                 "structure_findings": [dict(item) for item in self.structure_findings],
                 "native_evaluation": dict(self.native_evaluation),
                 "native_coverage": dict(self.native_coverage),
-                "native_depth_receipt_ref": self.native_depth_receipt_ref,
                 "source_branch_bindings": [dict(item) for item in self.source_branch_bindings]}
 
     def to_markdown(self) -> str:
@@ -337,7 +183,6 @@ def synthesize_artifact_plan(
     *,
     selection_request: Mapping[str, Any] | SelectionRequest,
     source_branches: Iterable[Any] = (),
-    native_depth_receipt: LogicDepthReceipt | Mapping[str, Any] | str | Path | None = None,
     source_library: Any | None = None,
 ) -> SynthesisPlan:
     """Build a bounded plan from one explicit reader request.
@@ -383,7 +228,7 @@ def synthesize_artifact_plan(
         requested_claim_scope_ids=claims,
     )
     open_gaps: list[str] = []
-    open_gaps.extend(_native_scope_gaps(model, request, evaluation, coverage, native_depth_receipt))
+    open_gaps.extend(_native_scope_gaps(model, request, evaluation, coverage))
 
     raw_branch_data = [_branch_data(branch) for branch in source_branches]
     branch_items: list[SynthesisItem] = []
@@ -605,7 +450,6 @@ def synthesize_artifact_plan(
         structure_findings=structure_findings,
         native_evaluation=_evaluation_summary(evaluation),
         native_coverage=coverage.to_dict(),
-        native_depth_receipt_ref=request.native_depth_receipt_ref,
         source_branch_bindings=tuple(dict(item) for item in request.source_branch_bindings),
     )
 
@@ -634,31 +478,6 @@ def _dedupe_items(items: Iterable[SynthesisItem]) -> list[SynthesisItem]:
     return result
 
 
-def _load_artifact(value: Any) -> Mapping[str, Any] | None:
-    """Load a JSON/YAML receipt without accepting arbitrary object attributes."""
-    if isinstance(value, Mapping):
-        return dict(value)
-    if isinstance(value, LogicDepthReceipt):
-        return value.to_dict()
-    if isinstance(value, (str, Path)):
-        path = Path(value)
-        if not path.exists() or not path.is_file():
-            return None
-        try:
-            text = path.read_text(encoding="utf-8")
-            if path.suffix.lower() in {".yaml", ".yml"}:
-                import yaml
-
-                loaded = yaml.safe_load(text)
-            else:
-                loaded = json.loads(text)
-        except (OSError, ValueError, TypeError):
-            return None
-        return dict(loaded) if isinstance(loaded, Mapping) else None
-    if hasattr(value, "to_dict"):
-        loaded = value.to_dict()
-        return dict(loaded) if isinstance(loaded, Mapping) else None
-    return None
 
 
 def _native_scope_gaps(
@@ -666,7 +485,6 @@ def _native_scope_gaps(
     request: SelectionRequest,
     evaluation: Any,
     coverage: Any,
-    native_depth_receipt: Any,
 ) -> list[str]:
     gaps: list[str] = []
     selected_claims = tuple(
@@ -685,134 +503,43 @@ def _native_scope_gaps(
         for unit in request.units
     )
     if required_assertion:
-        reference = native_depth_receipt if native_depth_receipt is not None else request.native_depth_receipt_ref
-        if reference in (None, ""):
-            reference = _build_native_depth_analysis(
-                model,
-                budget=max(6, len(model.nodes)),
-                requested_claim_scope_ids=selected_claims,
-                result=evaluation,
-            )
-        if reference is not None:
-            payload = _load_artifact(reference)
-            if payload is None:
-                gaps.append("native_depth_receipt_unresolved")
-            else:
-                receipt_version = payload.get("receipt_version")
-                if receipt_version not in _NATIVE_DEPTH_RECEIPT_VERSIONS:
-                    gaps.append("native_depth_receipt_version_invalid")
-                elif not isinstance(reference, LogicDepthReceipt) and receipt_version != _PUBLIC_NATIVE_DEPTH_RECEIPT_VERSION:
-                    # A persisted or caller-supplied object must come from the
-                    # public target-contract-bound owner.  The in-memory v2
-                    # object remains available to the native owner itself and
-                    # to narrow unit tests, but cannot be smuggled in as a
-                    # JSON/path success artifact.
-                    gaps.append("native_depth_receipt_not_public")
-                if str(payload.get("model_id", "")) != model.id:
-                    gaps.append("native_depth_receipt_model_mismatch")
-                if str(payload.get("model_fingerprint", "")) != model_fingerprint(model):
-                    gaps.append("native_depth_receipt_model_fingerprint_mismatch")
-                if str(payload.get("status", "")) != "pass" or payload.get("broad_claim_licensed") is not True:
-                    gaps.append("native_depth_receipt_not_licensed")
-                if receipt_version == _PUBLIC_NATIVE_DEPTH_RECEIPT_VERSION:
-                    for field in ("target_contract_id", "target_contract_fingerprint", "target_purpose", "target_proof_receipt"):
-                        value = payload.get(field)
-                        if value in (None, "", {}):
-                            gaps.append(f"native_depth_receipt_missing:{field}")
-                    comparison_model = copy.deepcopy(model)
-                    comparison_model.metadata.pop("source_path", None)
-                    gaps.extend(
-                        _target_proof_receipt_gaps(
-                            payload,
-                            expected_native_model_fingerprint=model_fingerprint(comparison_model),
-                        )
-                    )
-                if request.request_fingerprint and payload.get("selection_request_fingerprint") not in (None, "", request.request_fingerprint):
-                    gaps.append("native_depth_receipt_request_mismatch")
-                unresolved = payload.get("unresolved_gaps", ())
-                if isinstance(unresolved, (list, tuple)) and unresolved:
-                    gaps.extend(f"native_depth_receipt_gap:{value}" for value in unresolved)
-                receipt_scope = payload.get("coverage_universe")
-                if isinstance(receipt_scope, Mapping):
-                    covered = set(receipt_scope.get("important_node_ids", ()))
-                    gaps.extend(f"native_depth_receipt_scope_missing:{claim_id}" for claim_id in selected_claims if claim_id not in covered)
-                    claim_scope = receipt_scope.get("claim_scope")
-                    # The private in-memory v2 helper historically omitted an
-                    # explicit requested scope when called without one.  Keep
-                    # that narrow diagnostic fixture usable, while requiring
-                    # the scope on every persisted/public v3 handoff.
-                    if isinstance(claim_scope, Mapping):
-                        requested_scope = set(claim_scope.get("requested_node_ids", ()))
-                        if receipt_version == _PUBLIC_NATIVE_DEPTH_RECEIPT_VERSION or not isinstance(reference, LogicDepthReceipt):
-                            gaps.extend(
-                                f"native_depth_receipt_requested_scope_missing:{claim_id}"
-                                for claim_id in selected_claims
-                                if claim_id not in requested_scope
-                            )
-                    elif receipt_version == _PUBLIC_NATIVE_DEPTH_RECEIPT_VERSION or not isinstance(reference, LogicDepthReceipt):
-                        gaps.append("native_depth_receipt_claim_scope_missing")
-                else:
-                    gaps.append("native_depth_receipt_coverage_universe_missing")
-                receipt_coverage = payload.get("coverage")
-                if isinstance(receipt_coverage, Mapping) and receipt_coverage.get("semantic_coverage_passed") is not True:
-                    gaps.append("native_depth_receipt_semantic_coverage_incomplete")
-                elif not isinstance(receipt_coverage, Mapping):
-                    gaps.append("native_depth_receipt_coverage_missing")
-                tournament = payload.get("tournament")
-                if isinstance(tournament, Mapping):
-                    unresolved_competitors = tournament.get("unresolved_competitor_ids", ())
-                    if isinstance(unresolved_competitors, (list, tuple)):
-                        gaps.extend(
-                            f"native_depth_receipt_unresolved_competitor:{item}"
-                            for item in unresolved_competitors
-                            if str(item)
-                        )
-                    if str(tournament.get("status", "")) in {"bounded", "unresolved", "blocked"}:
-                        gaps.append(f"native_depth_receipt_competition:{tournament.get('status')}")
-                else:
-                    gaps.append("native_depth_receipt_tournament_missing")
-                critical_perturbation = payload.get("critical_perturbation_coverage")
-                if isinstance(critical_perturbation, Mapping):
-                    for key in ("uncovered_ids", "ineffective_ids"):
-                        values = critical_perturbation.get(key, ())
-                        if isinstance(values, (list, tuple)):
-                            gaps.extend(f"native_depth_receipt_critical_{key}:{item}" for item in values if str(item))
-                else:
-                    gaps.append("native_depth_receipt_critical_perturbation_coverage_missing")
-                perturbation_rows = payload.get("claim_perturbation_coverage", ())
-                if isinstance(perturbation_rows, (list, tuple)):
-                    by_claim = {str(row.get("claim_id", "")): row for row in perturbation_rows if isinstance(row, Mapping)}
-                    for claim_id in selected_claims:
-                        row = by_claim.get(claim_id)
-                        if row is None:
-                            gaps.append(f"native_depth_receipt_claim_perturbation_missing:{claim_id}")
-                        elif str(row.get("status", "")) != "pass":
-                            gaps.append(f"native_depth_receipt_perturbation_blocked:{claim_id}")
-                else:
-                    gaps.append("native_depth_receipt_claim_perturbation_coverage_missing")
-
-                expected_inventory_fp = str(model.metadata.get("artifact_inventory_fingerprint", "") or "")
-                if expected_inventory_fp and payload.get("artifact_inventory_fingerprint") != expected_inventory_fp:
-                    gaps.append("native_depth_receipt_artifact_inventory_fingerprint_mismatch")
-                expected_interface_refs = {
-                    str(item.parent_receipt_id)
-                    for item in getattr(model, "block_interfaces", ())
-                    if str(getattr(item, "consumer_status", "")) == "consumed"
-                    and str(getattr(item, "parent_receipt_id", ""))
-                }
-                supplied_interface_refs = {
-                    str(item)
-                    for item in payload.get("interface_receipt_refs", ())
-                    if str(item)
-                } if isinstance(payload.get("interface_receipt_refs", ()), (list, tuple)) else set()
-                gaps.extend(
-                    f"native_depth_receipt_interface_missing:{item}"
-                    for item in sorted(expected_interface_refs - supplied_interface_refs)
-                )
-                gaps.extend(
-                    f"native_depth_receipt_interface_foreign:{item}"
-                    for item in sorted(supplied_interface_refs - expected_interface_refs)
-                )
+        # Depth is always computed here, on the current model; no external
+        # depth result is accepted.
+        depth = _build_native_depth_analysis(
+            model,
+            budget=max(6, len(model.nodes)),
+            requested_claim_scope_ids=selected_claims,
+            result=evaluation,
+        ).to_dict()
+        if depth.get("status") != "pass" or depth.get("broad_claim_licensed") is not True:
+            gaps.append("native_depth_not_licensed")
+        gaps.extend(f"native_depth_gap:{value}" for value in depth.get("unresolved_gaps", ()))
+        covered = set((depth.get("coverage_universe") or {}).get("important_node_ids", ()))
+        gaps.extend(f"native_depth_scope_missing:{claim_id}" for claim_id in selected_claims if claim_id not in covered)
+        if (depth.get("coverage") or {}).get("semantic_coverage_passed") is not True:
+            gaps.append("native_depth_semantic_coverage_incomplete")
+        tournament = depth.get("tournament") or {}
+        gaps.extend(
+            f"native_depth_unresolved_competitor:{item}"
+            for item in tournament.get("unresolved_competitor_ids", ())
+            if str(item)
+        )
+        if str(tournament.get("status", "")) in {"bounded", "unresolved", "blocked"}:
+            gaps.append(f"native_depth_competition:{tournament.get('status')}")
+        critical = depth.get("critical_perturbation_coverage") or {}
+        for key in ("uncovered_ids", "ineffective_ids"):
+            gaps.extend(f"native_depth_critical_{key}:{item}" for item in critical.get(key, ()) if str(item))
+        by_claim = {
+            str(row.get("claim_id", "")): row
+            for row in depth.get("claim_perturbation_coverage", ())
+            if isinstance(row, Mapping)
+        }
+        for claim_id in selected_claims:
+            row = by_claim.get(claim_id)
+            if row is None:
+                gaps.append(f"native_depth_claim_perturbation_missing:{claim_id}")
+            elif str(row.get("status", "")) != "pass":
+                gaps.append(f"native_depth_perturbation_blocked:{claim_id}")
 
     for claim_id in selected_claims:
         result = getattr(evaluation, "node_results", {}).get(claim_id)

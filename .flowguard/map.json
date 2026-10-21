@@ -16,7 +16,6 @@
       ],
       "files": [
         "src/researchguard/__init__.py",
-        "src/researchguard/portable_material.py",
         "src/researchguard/suite.py"
       ],
       "entrypoints": [
@@ -37,7 +36,7 @@
         ".flowguard/models/researchguard_suite_model.py"
       ],
       "status": "confirmed",
-      "fingerprint": "sha256:e12cb1f85126e48d0f39465ba0df4f2f82f0fb77636f060a4b726720125781cf"
+      "fingerprint": "sha256:d8599ebdc452f9a536f9a2e3ebee1fc5f804ba4bf8486d21b56d01c8707f1e23"
     },
     {
       "id": "suite-orchestration",
@@ -86,14 +85,14 @@
         ".flowguard/models/sourceguard_content_anchor_oracle_model.py"
       ],
       "status": "confirmed",
-      "fingerprint": "sha256:6c0d2cd9666af93597200d88edd25788d11ca6cd44087d7346eab3741ba7e195"
+      "fingerprint": "sha256:4868686caea44c6ca45d8224b4a4ce1b123b073e96c39785b7f01e8dce5ab777"
     },
     {
       "id": "logicguard",
       "summary": "Own argument support, source library, structured artifacts, model deepening, synthesis and project library inspection.",
       "responsibilities": [
         "Own argument support, source library, structured artifacts, model deepening, synthesis and project library inspection.",
-        "Run depth analysis without a contract; synthesis computes depth in process when no depth receipt is supplied.",
+        "Run depth analysis on the model alone; synthesis always computes depth in process.",
         "Run the predict-observe-revise loop on plain model files; the loop never writes model files, so rollback is restoring the previous file."
       ],
       "files": [
@@ -106,7 +105,6 @@
         "src/researchguard/logic/evaluator.py",
         "src/researchguard/logic/execution_depth.py",
         "src/researchguard/logic/gap_ledger.py",
-        "src/researchguard/logic/guard_model_contract.py",
         "src/researchguard/logic/hierarchy.py",
         "src/researchguard/logic/identity.py",
         "src/researchguard/logic/importance.py",
@@ -157,7 +155,7 @@
       ],
       "models": [],
       "status": "confirmed",
-      "fingerprint": "sha256:3522eaf499a32ea48bf503e9df689a9c12e345c6fba9d552d864219101d71108"
+      "fingerprint": "sha256:0c178fceea6a2a43e73317434cdbcc849a920d9e5291fa5b79c7c2969e59669f"
     },
     {
       "id": "sourceguard",

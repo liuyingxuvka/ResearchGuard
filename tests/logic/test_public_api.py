@@ -60,5 +60,5 @@ def test_model_identity_provenance_and_depth_api_is_exported() -> None:
         "QualifiedNodeRef",
         "ProvenanceRecord",
         "LogicDepthReceipt",
-        "build_logic_depth_receipt",
     } <= exported
+    assert "build_logic_depth_receipt" not in exported

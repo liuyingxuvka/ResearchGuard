@@ -46,7 +46,6 @@ class SelectionRequest:
     units: tuple[dict[str, Any], ...]
     source_branch_bindings: tuple[dict[str, Any], ...]
     request_fingerprint: str
-    native_depth_receipt_ref: str = ""
     claim_use_dispositions: tuple[dict[str, Any], ...] = ()
 
     def to_dict(self) -> dict[str, Any]:
@@ -66,7 +65,6 @@ class SelectionRequest:
             "max_body_units": self.max_body_units,
             "units": [_row(unit) for unit in self.units],
             "source_branch_bindings": [_row(binding) for binding in self.source_branch_bindings],
-            "native_depth_receipt_ref": self.native_depth_receipt_ref,
             "claim_use_dispositions": [_row(item) for item in self.claim_use_dispositions],
         }
 
@@ -105,7 +103,6 @@ def validate_selection_request(
     allowed_request_keys = {
         "schema",
         *required,
-        "native_depth_receipt_ref",
         "claim_use_dispositions",
     }
     errors.extend(
@@ -208,12 +205,6 @@ def validate_selection_request(
     if isinstance(raw_budget, bool):
         # bool is an int subclass; keep a stable, specific diagnostic.
         errors.append("max_body_units_bool_forbidden")
-
-    optional_depth_ref = request.get("native_depth_receipt_ref", "")
-    if optional_depth_ref not in (None, "") and type(optional_depth_ref) is not str:
-        errors.append("native_depth_receipt_ref_not_string")
-        optional_depth_ref = ""
-
 
     raw_claim_use = request.get("claim_use_dispositions", ())
     if isinstance(raw_claim_use, Mapping):
@@ -413,7 +404,6 @@ def validate_selection_request(
         "max_body_units": max_body_units,
         "units": [dict(unit) for unit in units],
         "source_branch_bindings": [dict(binding) for binding in normalized_bindings],
-        "native_depth_receipt_ref": str(optional_depth_ref or ""),
         "claim_use_dispositions": [dict(item) for item in claim_use_rows],
     }
     normalized = SelectionRequest(
@@ -429,7 +419,6 @@ def validate_selection_request(
         units=units,
         source_branch_bindings=normalized_bindings,
         request_fingerprint=request_fingerprint(canonical),
-        native_depth_receipt_ref=str(optional_depth_ref or ""),
         claim_use_dispositions=tuple(dict(item) for item in claim_use_rows),
     )
     return normalized, ()

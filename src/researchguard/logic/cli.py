@@ -11,7 +11,7 @@ from . import __version__
 from .diagnostics import diagnose_model
 from .delivery import adapt_delivery
 from .evaluator import evaluate_model
-from .execution_depth import _build_native_depth_analysis, build_logic_depth_receipt
+from .execution_depth import _build_native_depth_analysis
 from .argument_modeling import create_argument_model
 from .citation_matrix import (
     audit_claim_source_paragraph_matrix,
@@ -19,11 +19,6 @@ from .citation_matrix import (
     render_matrix_audit,
 )
 from .gap_ledger import build_gap_ledger
-from .guard_model_contract import (
-    bind_target_candidate,
-    freeze_target_contract,
-    verify_target_contract,
-)
 from .importance import summarize_importance
 from .library_viewer import build_library_view_payload, build_source_graph_payload
 from .loader import load_model
@@ -161,41 +156,10 @@ def build_parser() -> argparse.ArgumentParser:
     gaps.add_argument("--output")
     gaps.set_defaults(func=_cmd_gaps)
 
-    guard_contract = sub.add_parser(
-        "guard-contract",
-        help="Freeze, bind, or verify the mandatory target-local model purpose contract.",
-    )
-    guard_contract_sub = guard_contract.add_subparsers(required=True)
-    guard_freeze = guard_contract_sub.add_parser(
-        "freeze", help="Freeze the AI declaration before candidate construction."
-    )
-    guard_freeze.add_argument("--target-root", required=True)
-    guard_freeze.add_argument("--declaration", required=True)
-    guard_freeze.add_argument("--contract", required=True)
-    guard_freeze.add_argument("--output")
-    guard_freeze.set_defaults(func=_cmd_guard_contract_freeze)
-    guard_bind = guard_contract_sub.add_parser(
-        "bind", help="Bind the current candidate to the exact frozen contract."
-    )
-    guard_bind.add_argument("--target-root", required=True)
-    guard_bind.add_argument("--contract", required=True)
-    guard_bind.add_argument("--output")
-    guard_bind.set_defaults(func=_cmd_guard_contract_bind)
-    guard_verify = guard_contract_sub.add_parser(
-        "verify", help="Exhaust every declared good/bad/candidate native proof."
-    )
-    guard_verify.add_argument("--target-root", required=True)
-    guard_verify.add_argument("--contract", required=True)
-    guard_verify.add_argument("--target-skill-id")
-    guard_verify.add_argument("--output")
-    guard_verify.set_defaults(func=_cmd_guard_contract_verify)
-
     depth = sub.add_parser(
         "depth", help="Check argument depth (role coverage, competing conclusions, perturbations) and print the gap summary."
     )
     depth.add_argument("model")
-    depth.add_argument("--target-root")
-    depth.add_argument("--guard-contract")
     depth.add_argument(
         "--budget",
         type=int,
@@ -586,70 +550,25 @@ def _cmd_import_handoff(args: argparse.Namespace) -> int:
 
 def _cmd_depth(args: argparse.Namespace) -> int:
     model = load_model(args.model)
-    if args.target_root is None and args.guard_contract is None:
-        analysis = _build_native_depth_analysis(
-            model, budget=args.budget, requested_claim_scope_ids=args.claim_scope_node,
+    analysis = _build_native_depth_analysis(
+        model, budget=args.budget, requested_claim_scope_ids=args.claim_scope_node
+    )
+    if args.output:
+        _write(args.output, analysis.to_dict())
+    print(
+        json.dumps(
+            {
+                "model_id": analysis.model_id,
+                "status": analysis.status,
+                "broad_claim_licensed": analysis.broad_claim_licensed,
+                "covered_claim_scope": analysis.covered_claim_scope,
+                "unresolved_gaps": list(analysis.unresolved_gaps),
+                "untested_high_impact_node_ids": list(analysis.untested_high_impact_node_ids),
+            },
+            indent=2,
         )
-        if args.output:
-            _write(args.output, analysis.to_dict())
-        print(json.dumps({
-            "model_id": analysis.model_id,
-            "status": analysis.status,
-            "broad_claim_licensed": analysis.broad_claim_licensed,
-            "covered_claim_scope": analysis.covered_claim_scope,
-            "unresolved_gaps": list(analysis.unresolved_gaps),
-            "untested_high_impact_node_ids": list(analysis.untested_high_impact_node_ids),
-        }, indent=2))
-        return 0 if analysis.status == "pass" else 3
-    if args.target_root is None or args.guard_contract is None:
-        raise ValueError("logic depth needs both --target-root and --guard-contract, or neither")
-    receipt = build_logic_depth_receipt(
-        model,
-        target_root=args.target_root,
-        guard_contract=args.guard_contract,
-        budget=args.budget,
-        requested_claim_scope_ids=args.claim_scope_node,
     )
-    payload = receipt.to_dict()
-    if args.output:
-        _write(args.output, payload)
-    else:
-        print(json.dumps(payload, indent=2))
-    return 0 if receipt.status == "pass" else 3
-
-
-def _emit_guard_contract_result(args: argparse.Namespace, payload: dict[str, Any]) -> int:
-    if args.output:
-        _write(args.output, payload)
-    else:
-        print(json.dumps(payload, ensure_ascii=False, indent=2))
-    return 0
-
-
-def _cmd_guard_contract_freeze(args: argparse.Namespace) -> int:
-    payload = freeze_target_contract(
-        target_root=args.target_root,
-        declaration_path=args.declaration,
-        output_path=args.contract,
-    )
-    return _emit_guard_contract_result(args, payload)
-
-
-def _cmd_guard_contract_bind(args: argparse.Namespace) -> int:
-    payload = bind_target_candidate(
-        target_root=args.target_root,
-        contract_path=args.contract,
-    )
-    return _emit_guard_contract_result(args, payload)
-
-
-def _cmd_guard_contract_verify(args: argparse.Namespace) -> int:
-    payload = verify_target_contract(
-        target_root=args.target_root,
-        contract_path=args.contract,
-        expected_target_skill_id=args.target_skill_id,
-    )
-    return _emit_guard_contract_result(args, payload)
+    return 0 if analysis.status == "pass" else 3
 
 
 def _cmd_report(args: argparse.Namespace) -> int:

@@ -544,3 +544,19 @@ Removed only duplicate per-obligation/source-anchor evidence hashes and the dedi
 - `python -m flowguard map confirm sourceguard` — exit 0, 0.27s; `confirmed 1 component(s)`
 - `python -m flowguard map check` — exit 0, 0.353s; `check: 0 error(s), 4 warning(s), 0 info`
 - `python -m flowguard release` — exit 0, 5.33s; `verify: PASS (map, lint and models only; tests not run; run python -m pytest -q separately)`
+
+## RG-47 — completed
+
+After verifying immutable LW43 source origin, all 353 hashes and absence of retired depth/suite consumers, removed the external depth receipt/purpose-contract chain and duplicate obligation hashes. Synthesis always computes current native depth in process: actual missing warrant still blocks, external depth request key now rejects, retired CLI flags reject. Logic tests 143 passed (Tk available), collection 338; fixed LW43 real native bridge actually ready/PASSED with 10 passed and zero skips; exports/map/release passed.
+
+- `python <external>/probe_consumer_origin.py` — exit 0, 0.105s; `}`
+- `python -c import subprocess;p=subprocess.run(["rg","-n","-g","*.py","guard-contract|native_depth_receipt|suite_fingerprint|researchguard\\.suite","<LW43-snapshot>"],capture_output=True,text=True);print(p.stdout,end="");assert p.returncode==1;print("LW43 committed snapshot has no retired depth/suite consumer chain")` — exit 0, 0.044s; `LW43 committed snapshot has no retired depth/suite consumer chain`
+- `python -m pytest tests/logic` — exit 0, 25.328s; `143 passed in 24.86s`
+- `python <external>/check_exports.py` — exit 0, 0.606s; `exports ok`
+- `python <external>/probe_rg47.py` — exit 0, 3.136s; `LW43 retirement precondition exact regex passed; no external depth admission; actual native warrant gap remains`
+- `python -m pytest -p no:cacheprovider tests/contract/test_researchguard_handoff.py --junitxml <external>/RG-47-lw43-junit.xml --basetemp <external>/RG-47-lw43-temp` — exit 0, 1.582s; `============================== 10 passed in 0.80s ==============================`
+- `python <external>/verify_lw_junit.py <external>/RG-47-lw43-junit.xml` — exit 0, 0.21s; `10 actual PASSED, 0 skipped; real native provider-to-reader bridge PASSED/ready, not version-skipped`
+- `python -m pytest --collect-only` — exit 0, 6.926s; `338 tests collected in 4.67s`
+- `python -m flowguard map confirm logicguard researchguard-suite suite-orchestration` — exit 0, 0.926s; `confirmed 3 component(s)`
+- `python -m flowguard map check` — exit 0, 0.36s; `check: 0 error(s), 4 warning(s), 0 info`
+- `python -m flowguard release` — exit 0, 5.174s; `verify: PASS (map, lint and models only; tests not run; run python -m pytest -q separately)`

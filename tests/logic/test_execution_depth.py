@@ -79,51 +79,8 @@ def test_native_depth_receipt_is_model_bound_and_serializable() -> None:
     assert payload["coverage"]["semantic_coverage_passed"] is True
     assert payload["perturbation_plan"]
     assert payload["effective_perturbation_count"] >= 1
-    assert payload["native_obligation_evidence"]
-    assert {
-            "obligation:logicguard-authoritative-universe",
-            "obligation:logicguard-role-completeness",
-            "obligation:logicguard-claim-role-completeness",
-            "obligation:logicguard-claim-perturbations",
-            "obligation:logicguard-claim-scope",
-    } <= {
-        obligation_id
-        for observation in payload["native_obligation_evidence"]
-        for obligation_id in observation["target_obligation_ids"]
-    }
-    if receipt.coverage_universe and receipt.coverage_universe.critical_perturbable_node_ids:
-        assert any(
-            "obligation:logicguard-critical-perturbations"
-            in observation["target_obligation_ids"]
-            for observation in payload["native_obligation_evidence"]
-        )
-    for observation in payload["native_obligation_evidence"]:
-        assert observation["native_object_id"]
-        assert str(observation["evidence_ref"]).startswith("logicguard:")
-        assert len(observation["evidence_sha256"]) == 64
-        assert observation["evidence_sha256"] == observation["evidence_sha256"].lower()
-        assert observation["content"]
+    assert "native_obligation_evidence" not in payload
     assert "factual truth" in payload["claim_boundary"]
-
-
-def test_native_obligation_hash_tracks_exact_logic_node_content() -> None:
-    baseline_model = _model()
-    baseline = build_logic_depth_receipt(baseline_model, budget=8)
-    changed_model = _model()
-    changed_model.nodes["E1"].text = "Changed exact evidence content"
-    changed = build_logic_depth_receipt(changed_model, budget=8)
-
-    native_object_id = "important-node:E1"
-    baseline_row = next(
-        item for item in baseline.native_obligation_evidence
-        if item["native_object_id"] == native_object_id
-    )
-    changed_row = next(
-        item for item in changed.native_obligation_evidence
-        if item["native_object_id"] == native_object_id
-    )
-    assert baseline_row["evidence_ref"] == changed_row["evidence_ref"]
-    assert baseline_row["evidence_sha256"] != changed_row["evidence_sha256"]
 
 
 def test_active_important_objection_without_response_blocks_coverage() -> None:

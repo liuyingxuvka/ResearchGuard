@@ -3,7 +3,6 @@ from __future__ import annotations
 from dataclasses import replace
 
 from researchguard.logic import adapt_delivery, load_model_from_dict, model_fingerprint, synthesize_artifact_plan
-from researchguard.logic.execution_depth import _build_native_depth_analysis
 
 
 def _model():
@@ -54,7 +53,7 @@ def _unit(unit_id, claim_ids, placement, *, required=False, predecessors=(), rel
     }
 
 
-def _ready_plan(with_receipt=True):
+def _ready_plan():
     model = _model()
     request = {
         "schema": "researchguard.logic.synthesis-request.v1",
@@ -76,8 +75,7 @@ def _ready_plan(with_receipt=True):
         ],
         "source_branch_bindings": [],
     }
-    receipt = _build_native_depth_analysis(model, budget=20) if with_receipt else None
-    plan = synthesize_artifact_plan(model, selection_request=request, native_depth_receipt=receipt)
+    plan = synthesize_artifact_plan(model, selection_request=request)
     assert plan.status == "research_handoff_ready", plan.open_gaps
     return plan
 
@@ -134,4 +132,6 @@ def test_delivery_rejects_unknown_or_duplicate_body_order():
 
 
 def test_ready_plan_needs_no_external_depth_receipt():
-    assert _ready_plan(with_receipt=False).status == "research_handoff_ready"
+    plan = _ready_plan()
+    assert plan.status == "research_handoff_ready"
+    assert "native_depth_receipt_ref" not in plan.to_dict()
