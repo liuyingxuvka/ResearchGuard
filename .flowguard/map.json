@@ -31,7 +31,8 @@
       ],
       "depends_on": [],
       "tests": [
-        "tests/test_*.py"
+        "tests/test_root_cli.py",
+        "tests/test_skill_suite.py"
       ],
       "models": [
         ".flowguard/models/researchguard_suite_model.py"
@@ -78,16 +79,11 @@
         "traceguard"
       ],
       "tests": [
-        "tests/test_*.py",
-        "tests/logic/**/*.py",
-        "tests/logic/*.py",
-        "tests/logic_template_packs/**/*.py",
-        "tests/source/**/*.py",
-        "tests/source/*.py",
-        "tests/trace/**/*.py",
-        "tests/trace/*.py",
-        "tests/experiment/**/*.py",
-        "tests/experiment/*.py"
+        "tests/test_root_cli.py",
+        "tests/logic/test_cli.py",
+        "tests/source/test_cli.py",
+        "tests/trace/test_traceguard.py",
+        "tests/experiment/test_recommendation.py"
       ],
       "models": [
         ".flowguard/models/researchguard_suite_model.py",

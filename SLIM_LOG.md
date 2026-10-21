@@ -402,3 +402,11 @@ Windows冒烟改6个现存功能测试文件，删不存在VERSION的push触发�
 - `python -m pytest tests/test_install_skill.py tests/test_root_cli.py tests/logic/test_cli.py tests/source/test_cli.py tests/trace/test_inference_kernel.py tests/experiment/test_recommendation.py` — exit 0, 29.606s; `53 passed in 28.92s`
 - `python -c import yaml;from pathlib import Path;[yaml.safe_load(Path(p).read_text()) for p in (".github/workflows/ci.yml",".github/workflows/publish-release.yml")];s=Path(".github/workflows/publish-release.yml").read_text();rows=[l.strip() for l in s.splitlines() if "VERSION" in l];print("yaml ok");print("\n".join(rows));assert len(rows)==2 and any("if Path(\"VERSION\").exists():" in l for l in rows)` — exit 0, 0.073s; `assert Path("VERSION").read_text(encoding="utf-8").strip() == version, "VERSION differs from pyproject"`
 - `python -m pytest --collect-only` — exit 0, 3.781s; `547 tests collected in 3.18s`
+
+## RG-37 — completed
+
+仅收窄两个suite组件的tests到真正归属，成员tests/files/depends/fingerprints不改。真实planner change显示direct sourceguard与18 of69（不再全选）；双模型通过，map0error且无test_missing。
+
+- `python -m flowguard change src/researchguard/source/planner.py` — exit 0, 1.076s; `ARCH WARN duplicate_code sourceguard: 2 identical bodies (216 AST nodes) in ['sourceguard', 'suite-orchestration']: src/researchguard/source/template_packs.py:verify_template_instance, src/researchguard/trace/template_packs.py:verify_template_instance`
+- `python -m flowguard map models` — exit 0, 3.627s; `models: 2 passed, 0 failed`
+- `python -m flowguard map check` — exit 0, 0.64s; `check: 0 error(s), 11 warning(s), 0 info`
