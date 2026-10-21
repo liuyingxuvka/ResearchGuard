@@ -512,3 +512,20 @@ Experiment iteration returns a result with optional holdout observations and no 
 - `python -m flowguard map check` — exit 0, 0.264s; `check: 0 error(s), 4 warning(s), 0 info`
 - `python -m flowguard release` — exit 0, 2.656s; `verify: PASS (map, lint and models only; tests not run; run python -m pytest -q separately)`
 - `python <external>/probe_rg44.py` — exit 0, 0.208s; `tests/experiment/test_recommendation.py:216:    assert "receipt_fingerprint" not in result.to_dict()`
+
+## RG-45 — completed
+
+Deleted the explicitly retired SourceGuard contract code/options/fixtures and sidecars; old YAML contract blocks are ignored while native planning, graph checks, qualification and contentless-anchor rejection remain. Initial finite run: 111 passed and one test retained an obsolete CLI flag; removed that flag per action and exact failed case passed. Final prescribed complete checkpoint: 355 passed (Tk available), collection 355, both models passed; actual old-model validate/native plan/retired-option rejection, fixed LW43 native 10 passed without skip, exports/map/release passed. Journal paths normalized to portable placeholders without changing historical facts.
+
+- `python <external>/probe_rg45.py` — exit 0, 0.675s; `old model with contract block loads; plain model plan works; retired flag rejects; only 2 approved names remain`
+- `python <external>/check_exports.py` — exit 0, 1.666s; `exports ok`
+- `python -m pytest -p no:cacheprovider tests/contract/test_researchguard_handoff.py --junitxml <external>/RG-45-lw43-junit.xml --basetemp <external>/RG-45-lw43-temp` — exit 0, 0.639s; `============================== 10 passed in 0.33s ==============================`
+- `python <external>/verify_lw_junit.py <external>/RG-45-lw43-junit.xml` — exit 0, 0.051s; `10 actual PASSED, 0 skipped; real native provider-to-reader bridge PASSED/ready, not version-skipped`
+- `python -m pytest --collect-only` — exit 0, 3.296s; `355 tests collected in 2.79s`
+- `python -m flowguard map confirm sourceguard suite-orchestration` — exit 0, 1.196s; `confirmed 2 component(s)`
+- `python -m flowguard map check` — exit 0, 0.717s; `check: 0 error(s), 4 warning(s), 0 info`
+- `python -m pytest tests/source tests/test_prompt_bundles.py tests/test_skill_suite.py tests/trace/test_traceguard.py` — exit 1, 45.459s; `1 failed, 111 passed in 45.12s`
+- `python -m flowguard release` — exit 0, 3.466s; `verify: PASS (map, lint and models only; tests not run; run python -m pytest -q separately)`
+- `python -m flowguard map models` — exit 0, 2.919s; `models: 2 passed, 0 failed`
+- `python -m pytest tests/source/test_task_iteration.py::test_cli_freeze_rejects_old_shape_and_emits_v2` — exit 0, 0.783s; `1 passed in 0.31s`
+- `python -m pytest` — exit 0, 102.096s; `355 passed in 101.64s (0:01:41)`

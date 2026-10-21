@@ -135,7 +135,7 @@ def invariants() -> tuple[Invariant, ...]:
     return (
         Invariant(
             "content_anchor_identity_is_singular",
-            "Content-anchor depth and purpose proof use one catalog-declared finding.",
+            "Content-anchor depth reports one finding for contentless anchors.",
             content_anchor_identity_is_singular,
         ),
     )
@@ -178,7 +178,7 @@ def scenarios() -> tuple[Scenario, ...]:
 
 COMPONENTS = ["sourceguard"]
 IMPLEMENTED_BY = {"content_qualification": "src/researchguard/source/depth.py:_anchor_depth_rows"}
-TESTED_BY = {"content_anchor_identity_is_singular": ["tests/source/test_semantic_gap_depth.py:test_content_anchor_purpose_contract_observes_catalog_blocking_finding"]}
+TESTED_BY = {"content_anchor_identity_is_singular": ["tests/source/test_semantic_gap_depth.py:test_contentless_anchor_is_blocked_by_source_depth"]}
 
 
 def build_explorer():
@@ -213,4 +213,4 @@ def conformance():
         if qualified != content:
             violations.append(ConformanceViolation(step_index=1, message=f"native content qualification differs: {content}", rule_name="content_qualification"))
     return ConformanceReport(ok=not violations, violations=tuple(violations), replayed_steps=tuple(observations),
-                             summary="Native anchor qualification replayed with and without content; full purpose proof remains the bound native pytest case.")
+                             summary="Native anchor qualification replayed with and without content; the depth-level finding is the bound native pytest case.")

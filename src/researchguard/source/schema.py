@@ -3,14 +3,12 @@ Purpose: Define SourceGuard belief-state, source, anchor, gap, action, observati
 Repository: https://github.com/liuyingxuvka/ResearchGuard
 Skill: SourceGuard
 Math boundary: Expected utility ranks search value, not factual truth or calibrated probability.
-CLI: researchguard source validate <model.yaml> --model-contract <model.contract.json>
+CLI: researchguard source validate <model.yaml>
 Boundary: Source candidates and evidence anchors require downstream TraceGuard/LogicGuard review before final claims.
 """
 
 from __future__ import annotations
 
-import hashlib
-import json
 from dataclasses import asdict, dataclass, field, is_dataclass
 from datetime import datetime, timezone
 from typing import Any, Mapping
@@ -18,51 +16,6 @@ from typing import Any, Mapping
 
 class SchemaError(ValueError):
     """Raised when a SourceGuard model violates the declared schema."""
-
-
-SOURCEGUARD_MODEL_CONTRACT_SCHEMA_VERSION = "researchguard.source.model_guard_contract.v2"
-
-# This is a catalog of SourceGuard-native observations, not a list of failures
-# that every target model must claim to prevent.  A target-authored failure id
-# maps to exactly one of these capabilities and supplies its own good/bad case.
-SOURCEGUARD_NATIVE_ORACLE_CATALOG: dict[str, dict[str, str]] = {
-    "oracle:sourceguard:source-qualification": {
-        "mutation_id": "make-all-anchors-unusable",
-        "finding_code": "sourceguard_blocked:unqualified-candidate-promotion",
-    },
-    "oracle:sourceguard:direct-primary": {
-        "mutation_id": "remove-direct-source",
-        "finding_code": "sourceguard_blocked:missing-direct-primary",
-    },
-    "oracle:sourceguard:independent": {
-        "mutation_id": "remove-independent-source",
-        "finding_code": "sourceguard_blocked:missing-independent-source",
-    },
-    "oracle:sourceguard:counter-limiting": {
-        "mutation_id": "remove-limiting-source",
-        "finding_code": "sourceguard_blocked:missing-counter-limiting",
-    },
-    "oracle:sourceguard:lineage-independence": {
-        "mutation_id": "collapse-source-lineages",
-        "finding_code": "sourceguard_blocked:false-lineage-independence",
-    },
-    "oracle:sourceguard:content-anchor": {
-        "mutation_id": "remove-anchor-content",
-        "finding_code": "sourceguard_blocked:contentless-anchor",
-    },
-    "oracle:sourceguard:target-unit-reconciliation": {
-        "mutation_id": "shrink-target-unit-inventory",
-        "finding_code": "sourceguard_blocked:target-unit-universe-shrink",
-    },
-}
-SOURCEGUARD_NATIVE_ORACLE_CATALOG_FINGERPRINT = hashlib.sha256(
-    json.dumps(
-        SOURCEGUARD_NATIVE_ORACLE_CATALOG,
-        ensure_ascii=False,
-        sort_keys=True,
-        separators=(",", ":"),
-    ).encode("utf-8")
-).hexdigest().upper()
 
 
 SOURCE_TYPES = {
@@ -969,192 +922,7 @@ class SourceCoverageUniverse:
 
 
 @dataclass
-class SourceGuardProofCase:
-    case_id: str
-    observation_path: str
-    expected_native_status: str
-    mutation_id: str = ""
-    expected_native_finding: str = ""
-
-    @classmethod
-    def from_dict(cls, data: Mapping[str, Any], field_name: str) -> "SourceGuardProofCase":
-        data = require_mapping(data, field_name)
-        allowed = {
-            "case_id",
-            "observation_path",
-            "expected_native_status",
-            "mutation_id",
-            "expected_native_finding",
-        }
-        unknown = sorted(set(data).difference(allowed))
-        if unknown:
-            raise SchemaError(f"{field_name} contains unknown fields {unknown!r}")
-        return cls(
-            case_id=as_string(data.get("case_id")),
-            observation_path=as_string(data.get("observation_path")),
-            expected_native_status=as_string(data.get("expected_native_status")),
-            mutation_id=as_string(data.get("mutation_id")),
-            expected_native_finding=as_string(data.get("expected_native_finding")),
-        )
-
-    def to_dict(self) -> dict[str, str]:
-        return {
-            "case_id": self.case_id,
-            "observation_path": self.observation_path,
-            "expected_native_status": self.expected_native_status,
-            "mutation_id": self.mutation_id,
-            "expected_native_finding": self.expected_native_finding,
-        }
-
-
-@dataclass
-class SourceGuardPreventedFailure:
-    failure_id: str
-    title: str
-    block_when: str
-    oracle_id: str
-    known_good: SourceGuardProofCase
-    known_bad: SourceGuardProofCase
-
-    @classmethod
-    def from_dict(cls, data: Mapping[str, Any]) -> "SourceGuardPreventedFailure":
-        data = require_mapping(data, "guard_contract.prevented_failures")
-        allowed = {"failure_id", "title", "block_when", "oracle_id", "known_good", "known_bad"}
-        unknown = sorted(set(data).difference(allowed))
-        if unknown:
-            raise SchemaError(
-                f"guard_contract.prevented_failures contains unknown fields {unknown!r}"
-            )
-        return cls(
-            failure_id=as_string(data.get("failure_id")),
-            title=as_string(data.get("title")),
-            block_when=as_string(data.get("block_when")),
-            oracle_id=as_string(data.get("oracle_id")),
-            known_good=SourceGuardProofCase.from_dict(
-                data.get("known_good") or {},
-                "guard_contract.prevented_failures.known_good",
-            ),
-            known_bad=SourceGuardProofCase.from_dict(
-                data.get("known_bad") or {},
-                "guard_contract.prevented_failures.known_bad",
-            ),
-        )
-
-    def to_dict(self) -> dict[str, Any]:
-        return {
-            "failure_id": self.failure_id,
-            "title": self.title,
-            "block_when": self.block_when,
-            "oracle_id": self.oracle_id,
-            "known_good": self.known_good.to_dict(),
-            "known_bad": self.known_bad.to_dict(),
-        }
-
-
-@dataclass
-class SourceGuardModelContract:
-    model_id: str
-    purpose: str
-    prevented_failures: list[SourceGuardPreventedFailure]
-    external_universe: dict[str, list[str]]
-    claim_boundary: str
-    native_oracle_catalog_fingerprint: str = SOURCEGUARD_NATIVE_ORACLE_CATALOG_FINGERPRINT
-    purpose_frozen: bool = True
-    purpose_freeze_sequence: int = 1
-    candidate_construction_sequence: int = 2
-    schema_version: str = SOURCEGUARD_MODEL_CONTRACT_SCHEMA_VERSION
-
-    @classmethod
-    def from_dict(cls, data: Mapping[str, Any] | None) -> "SourceGuardModelContract":
-        if data is None:
-            raise SchemaError("guard_contract is required before candidate construction")
-        data = require_mapping(data, "guard_contract")
-        allowed = {
-            "schema_version",
-            "model_id",
-            "purpose",
-            "prevented_failures",
-            "external_universe",
-            "claim_boundary",
-            "native_oracle_catalog_fingerprint",
-            "purpose_frozen",
-            "purpose_freeze_sequence",
-            "candidate_construction_sequence",
-        }
-        unknown = sorted(set(data).difference(allowed))
-        if unknown:
-            raise SchemaError(f"guard_contract contains unknown fields {unknown!r}")
-        external = require_mapping(data.get("external_universe") or {}, "guard_contract.external_universe")
-        external_allowed = {
-            "gap_ids",
-            "target_unit_ids",
-            "source_role_ids",
-            "lineage_slot_ids",
-            "anchor_requirement_ids",
-            "handoff_ids",
-        }
-        external_unknown = sorted(set(external).difference(external_allowed))
-        if external_unknown:
-            raise SchemaError(
-                f"guard_contract.external_universe contains unknown fields {external_unknown!r}"
-            )
-        return cls(
-            schema_version=as_string(data.get("schema_version")),
-            model_id=as_string(data.get("model_id")),
-            purpose=as_string(data.get("purpose")),
-            prevented_failures=[
-                SourceGuardPreventedFailure.from_dict(item)
-                for item in list_of_mappings(
-                    data.get("prevented_failures"),
-                    "guard_contract.prevented_failures",
-                )
-            ],
-            external_universe={
-                "gap_ids": list_of_strings(external.get("gap_ids")),
-                "target_unit_ids": list_of_strings(external.get("target_unit_ids")),
-                "source_role_ids": list_of_strings(external.get("source_role_ids")),
-                "lineage_slot_ids": list_of_strings(external.get("lineage_slot_ids")),
-                "anchor_requirement_ids": list_of_strings(external.get("anchor_requirement_ids")),
-                "handoff_ids": list_of_strings(external.get("handoff_ids")),
-            },
-            claim_boundary=as_string(data.get("claim_boundary")),
-            native_oracle_catalog_fingerprint=as_string(
-                data.get("native_oracle_catalog_fingerprint")
-            ),
-            purpose_frozen=as_bool(data.get("purpose_frozen"), False),
-            purpose_freeze_sequence=int(data.get("purpose_freeze_sequence", 0)),
-            candidate_construction_sequence=int(data.get("candidate_construction_sequence", 0)),
-        )
-
-    def to_dict(self) -> dict[str, Any]:
-        return {
-            "schema_version": self.schema_version,
-            "model_id": self.model_id,
-            "purpose": self.purpose,
-            "prevented_failures": [item.to_dict() for item in self.prevented_failures],
-            "external_universe": {
-                key: list(self.external_universe.get(key, []))
-                for key in (
-                    "gap_ids",
-                    "target_unit_ids",
-                    "source_role_ids",
-                    "lineage_slot_ids",
-                    "anchor_requirement_ids",
-                    "handoff_ids",
-                )
-            },
-            "claim_boundary": self.claim_boundary,
-            "native_oracle_catalog_fingerprint": self.native_oracle_catalog_fingerprint,
-            "purpose_frozen": self.purpose_frozen,
-            "purpose_freeze_sequence": self.purpose_freeze_sequence,
-            "candidate_construction_sequence": self.candidate_construction_sequence,
-        }
-
-
-@dataclass
 class BeliefState:
-    guard_contract: SourceGuardModelContract | None = None
-    candidate_contract_fingerprint: str = ""
     metadata: dict[str, Any] = field(default_factory=dict)
     leads: list[Lead] = field(default_factory=list)
     sources: list[SourceRecord] = field(default_factory=list)
@@ -1180,12 +948,6 @@ class BeliefState:
         if not isinstance(graph_edges, list):
             raise SchemaError("graph_edges must be a list")
         state = cls(
-            guard_contract=(
-                SourceGuardModelContract.from_dict(data["guard_contract"])
-                if data.get("guard_contract") is not None
-                else None
-            ),
-            candidate_contract_fingerprint=as_string(data.get("candidate_contract_fingerprint")),
             metadata=dict(metadata),
             leads=[Lead.from_dict(item) for item in list_of_mappings(data.get("leads"), "leads")],
             sources=[SourceRecord.from_dict(item) for item in list_of_mappings(data.get("sources"), "sources")],
@@ -1198,7 +960,6 @@ class BeliefState:
             depth_policy=SourceDepthPolicy.from_dict(data.get("depth_policy")),
             generated_at=as_string(data.get("generated_at"), utc_now()),
         )
-        validate_model_guard_binding(state)
         validate_graph_edges(state)
         return state
 
@@ -1256,134 +1017,6 @@ def validate_graph_edges(state: BeliefState) -> None:
                 raise SchemaError(
                     f"graph edge {edge.edge_id!r} endpoint {object_id!r} declares {declared_type!r}, actual {actual_type!r}"
                 )
-
-
-def sourceguard_model_contract_fingerprint(contract: SourceGuardModelContract) -> str:
-    payload = json.dumps(
-        contract.to_dict(),
-        ensure_ascii=False,
-        sort_keys=True,
-        separators=(",", ":"),
-    )
-    return hashlib.sha256(payload.encode("utf-8")).hexdigest().upper()
-
-
-def build_sourceguard_model_contract(
-    *,
-    model_id: str,
-    purpose: str,
-    prevented_failures: list[SourceGuardPreventedFailure],
-    gap_ids: list[str],
-    target_unit_ids: list[str],
-    claim_boundary: str,
-    source_role_ids: list[str] | None = None,
-    lineage_slot_ids: list[str] | None = None,
-    anchor_requirement_ids: list[str] | None = None,
-    handoff_ids: list[str] | None = None,
-    purpose_freeze_sequence: int = 1,
-    candidate_construction_sequence: int = 2,
-) -> SourceGuardModelContract:
-    return SourceGuardModelContract(
-        model_id=model_id,
-        purpose=purpose,
-        prevented_failures=list(prevented_failures),
-        external_universe={
-            "gap_ids": sorted(set(gap_ids)),
-            "target_unit_ids": sorted(set(target_unit_ids)),
-            "source_role_ids": sorted(set(source_role_ids or [])),
-            "lineage_slot_ids": sorted(set(lineage_slot_ids or [])),
-            "anchor_requirement_ids": sorted(set(anchor_requirement_ids or [])),
-            "handoff_ids": sorted(set(handoff_ids or [])),
-        },
-        claim_boundary=claim_boundary,
-        purpose_frozen=True,
-        purpose_freeze_sequence=purpose_freeze_sequence,
-        candidate_construction_sequence=candidate_construction_sequence,
-    )
-
-
-def bind_sourceguard_model_contract(
-    state: BeliefState,
-    *,
-    contract: SourceGuardModelContract,
-) -> BeliefState:
-    state.guard_contract = contract
-    state.candidate_contract_fingerprint = sourceguard_model_contract_fingerprint(contract)
-    validate_model_guard_binding(state)
-    return state
-
-
-def validate_model_guard_binding(state: BeliefState) -> None:
-    contract = state.guard_contract
-    if contract is None:
-        return
-    if contract.schema_version != SOURCEGUARD_MODEL_CONTRACT_SCHEMA_VERSION:
-        raise SchemaError("guard_contract.schema_version is not current")
-    if not contract.model_id or not contract.purpose or not contract.claim_boundary:
-        raise SchemaError("guard_contract model_id, purpose, and claim_boundary are required")
-    if (
-        contract.native_oracle_catalog_fingerprint
-        != SOURCEGUARD_NATIVE_ORACLE_CATALOG_FINGERPRINT
-    ):
-        raise SchemaError("guard_contract native oracle catalog fingerprint is stale or foreign")
-    if not contract.prevented_failures:
-        raise SchemaError("guard_contract requires one or more prevented failures")
-    failure_ids: set[str] = set()
-    case_ids: set[str] = set()
-    for failure in contract.prevented_failures:
-        if not failure.failure_id or failure.failure_id in failure_ids:
-            raise SchemaError("guard_contract prevented failure ids must be non-empty and unique")
-        failure_ids.add(failure.failure_id)
-        if not failure.title or not failure.block_when:
-            raise SchemaError(f"guard_contract prevented failure is incomplete: {failure.failure_id}")
-        oracle = SOURCEGUARD_NATIVE_ORACLE_CATALOG.get(failure.oracle_id)
-        if oracle is None:
-            raise SchemaError(f"guard_contract maps an unsupported native oracle: {failure.oracle_id}")
-        good = failure.known_good
-        bad = failure.known_bad
-        if any(not case.case_id or case.case_id in case_ids for case in (good, bad)):
-            raise SchemaError("guard_contract proof case ids must be non-empty and unique")
-        case_ids.update((good.case_id, bad.case_id))
-        if not good.observation_path or good.expected_native_status != "pass":
-            raise SchemaError(f"guard_contract known-good is incomplete: {failure.failure_id}")
-        if good.mutation_id or good.expected_native_finding:
-            raise SchemaError("guard_contract known-good cannot carry a bad-case mutation or finding")
-        if (
-            not bad.observation_path
-            or bad.expected_native_status != "blocked"
-            or bad.mutation_id != oracle["mutation_id"]
-            or not bad.expected_native_finding
-        ):
-            raise SchemaError(f"guard_contract known-bad is incomplete or unmapped: {failure.failure_id}")
-    if not contract.purpose_frozen:
-        raise SchemaError("guard_contract purpose must be frozen before candidate construction")
-    if contract.purpose_freeze_sequence < 1 or (
-        contract.candidate_construction_sequence <= contract.purpose_freeze_sequence
-    ):
-        raise SchemaError("candidate construction must occur after the frozen purpose contract")
-    declared_gaps = contract.external_universe.get("gap_ids", [])
-    actual_gaps = sorted({gap.gap_id for gap in state.gaps})
-    if declared_gaps != actual_gaps:
-        raise SchemaError("guard_contract gap universe does not match the candidate model")
-    declared_units = contract.external_universe.get("target_unit_ids", [])
-    actual_units = sorted({gap.structure_unit_id for gap in state.gaps if gap.structure_unit_id})
-    if declared_units != actual_units:
-        raise SchemaError("guard_contract target-unit universe does not match the candidate model")
-    exact_optional_universes = {
-        "source_role_ids": sorted(
-            {f"source-role:{gap.gap_id}:{role}" for gap in state.gaps for role in gap.suggested_source_roles}
-        ),
-        "lineage_slot_ids": sorted({f"lineage:{source.lineage_id}" for source in state.sources if source.lineage_id}),
-        "anchor_requirement_ids": sorted(anchor.anchor_id for anchor in state.anchors),
-        "handoff_ids": sorted(str(item) for item in state.metadata.get("handoff_ids", [])),
-    }
-    for field_name, actual in exact_optional_universes.items():
-        declared = contract.external_universe.get(field_name, [])
-        if declared and declared != actual:
-            raise SchemaError(f"guard_contract {field_name} universe does not match the candidate model")
-    expected_fingerprint = sourceguard_model_contract_fingerprint(contract)
-    if state.candidate_contract_fingerprint != expected_fingerprint:
-        raise SchemaError("candidate_contract_fingerprint does not match the frozen guard_contract")
 
 
 @dataclass

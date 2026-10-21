@@ -15,7 +15,6 @@ from .schema import (
     ScoredAction,
     SearchAction,
     clamp01,
-    validate_model_guard_binding,
 )
 
 
@@ -282,6 +281,5 @@ def score_action(action: SearchAction, belief_state: BeliefState) -> ScoredActio
 
 
 def score_actions(belief_state: BeliefState) -> list[ScoredAction]:
-    validate_model_guard_binding(belief_state)
     scored = [score_action(action, belief_state) for action in belief_state.actions if action.status not in {"blocked", "rejected", "completed"}]
     return sorted(scored, key=lambda item: item.total_score, reverse=True)

@@ -20,7 +20,6 @@ import yaml
 from researchguard import __version__
 
 from .depth import apply_observation_and_replan
-from .guard_contract import load_target_contract, prove_target_model_contract
 from .handoff import export_logicguard_source_candidates, export_traceguard_seed
 from .loader import load_model, validate_model, write_yaml
 from .planner import frontier_summary, plan_next_actions
@@ -28,7 +27,6 @@ from .report import render_json, render_markdown, render_text
 from .schema import (
     BeliefState,
     Observation,
-    sourceguard_model_contract_fingerprint,
     to_plain,
 )
 from .scoring import score_actions
@@ -41,7 +39,7 @@ from .task_iteration import (
 )
 
 
-def starter_model_dict(model_contract_path: str | Path | None = None) -> dict[str, Any]:
+def starter_model_dict() -> dict[str, Any]:
     payload = {
         "metadata": {
             "purpose": "Starter SourceGuard belief state",
@@ -105,11 +103,6 @@ def starter_model_dict(model_contract_path: str | Path | None = None) -> dict[st
         "graph_edges": [],
         "weights": {},
     }
-    if model_contract_path is None:
-        return payload
-    contract = load_target_contract(model_contract_path)
-    payload["guard_contract"] = contract.to_dict()
-    payload["candidate_contract_fingerprint"] = sourceguard_model_contract_fingerprint(contract)
     return payload
 
 
@@ -128,33 +121,27 @@ def build_parser() -> argparse.ArgumentParser:
 
     create = sub.add_parser("create")
     create.add_argument("--output", required=True)
-    create.add_argument("--model-contract")
 
     validate = sub.add_parser("validate")
     validate.add_argument("model")
-    validate.add_argument("--model-contract")
     validate.add_argument("--pretty", action="store_true")
 
     plan = sub.add_parser("plan")
     plan.add_argument("model")
-    plan.add_argument("--model-contract")
     plan.add_argument("--limit", type=int, default=5)
     plan.add_argument("--all-scores", action="store_true", help="Also print every scored candidate action.")
     plan.add_argument("--pretty", action="store_true")
 
     score = sub.add_parser("score-actions")
     score.add_argument("model")
-    score.add_argument("--model-contract")
     score.add_argument("--pretty", action="store_true")
 
     frontier = sub.add_parser("frontier")
     frontier.add_argument("model")
-    frontier.add_argument("--model-contract")
     frontier.add_argument("--pretty", action="store_true")
 
     depth = sub.add_parser("depth")
     depth.add_argument("model")
-    depth.add_argument("--model-contract")
     depth.add_argument("--observation", default="")
     depth.add_argument(
         "--provider-status",
@@ -164,15 +151,12 @@ def build_parser() -> argparse.ArgumentParser:
     depth.add_argument("--limit", type=int, default=5)
     depth.add_argument("--output", default="")
     depth.add_argument("--updated-model-output", default="")
-    depth.add_argument("--updated-model-contract-output", default="")
     depth.add_argument("--pretty", action="store_true")
 
     add_obs = sub.add_parser("add-observation")
     add_obs.add_argument("model")
-    add_obs.add_argument("--model-contract")
     add_obs.add_argument("--observation", required=True)
     add_obs.add_argument("--output", required=True)
-    add_obs.add_argument("--output-model-contract")
     add_obs.add_argument("--pretty", action="store_true")
 
     iteration = sub.add_parser(
@@ -184,7 +168,6 @@ def build_parser() -> argparse.ArgumentParser:
         "freeze", help="Freeze expected search outcomes before applying an observation."
     )
     iteration_freeze.add_argument("model")
-    iteration_freeze.add_argument("--model-contract")
     iteration_freeze.add_argument("--action-id", required=True)
     iteration_freeze.add_argument(
         "--expected-gap-reduction",
@@ -221,7 +204,6 @@ def build_parser() -> argparse.ArgumentParser:
         "run", help="Apply one supplied observation and decide candidate v2."
     )
     iteration_run.add_argument("model")
-    iteration_run.add_argument("--model-contract")
     iteration_run.add_argument("--prediction", required=True)
     iteration_run.add_argument("--observation", default="")
     iteration_run.add_argument(
@@ -233,7 +215,6 @@ def build_parser() -> argparse.ArgumentParser:
     iteration_run.add_argument("--decision", choices=["accept", "reject"], default="reject")
     iteration_run.add_argument("--limit", type=int, default=5)
     iteration_run.add_argument("--candidate-output", required=True)
-    iteration_run.add_argument("--candidate-model-contract-output")
     iteration_run.add_argument("--output", required=True)
     iteration_run.add_argument("--pretty", action="store_true")
     iteration_run.set_defaults(func=_cmd_search_iteration_run)
@@ -241,17 +222,14 @@ def build_parser() -> argparse.ArgumentParser:
 
     report = sub.add_parser("report")
     report.add_argument("model")
-    report.add_argument("--model-contract")
     report.add_argument("--format", choices=["markdown", "txt", "json"], default="markdown")
 
     trace = sub.add_parser("export-traceguard")
     trace.add_argument("model")
-    trace.add_argument("--model-contract")
     trace.add_argument("--output", required=True)
 
     logic = sub.add_parser("export-logicguard")
     logic.add_argument("model")
-    logic.add_argument("--model-contract")
     logic.add_argument("--output", required=True)
 
     simulate = sub.add_parser("simulate")
@@ -261,14 +239,11 @@ def build_parser() -> argparse.ArgumentParser:
         required=True,
     )
     simulate.add_argument("--model", default="")
-    simulate.add_argument("--model-contract")
     simulate.add_argument("--pretty", action="store_true")
 
     compare = sub.add_parser("compare")
     compare.add_argument("before")
     compare.add_argument("after")
-    compare.add_argument("--before-model-contract")
-    compare.add_argument("--after-model-contract")
     compare.add_argument("--pretty", action="store_true")
 
     return parser
@@ -299,10 +274,10 @@ def _action_summary(action: Any) -> dict[str, Any]:
     }
 
 
-def _simulate_gap_closure(model_path: str, model_contract_path: str) -> dict[str, Any]:
+def _simulate_gap_closure(model_path: str) -> dict[str, Any]:
     if not model_path:
         raise ValueError("simulate --mode gap-closure requires --model <path>")
-    model = load_model(model_path, model_contract_path)
+    model = load_model(model_path)
     plan = plan_next_actions(model)
     frontier = frontier_summary(model)
     selected_gap_ids = sorted({action.target_gap_id for action in plan.selected_actions if action.target_gap_id})
@@ -310,7 +285,6 @@ def _simulate_gap_closure(model_path: str, model_contract_path: str) -> dict[str
         "ok": True,
         "mode": "gap-closure",
         "model": model_path,
-        "model_contract": model_contract_path or "",
         "frontier": frontier,
         "open_gaps": [_gap_summary(gap) for gap in plan.open_gaps],
         "blocking_gaps": [_gap_summary(gap) for gap in plan.blocked_gaps],
@@ -324,9 +298,9 @@ def _simulate_gap_closure(model_path: str, model_contract_path: str) -> dict[str
     }
 
 
-def _simulate(mode: str, model_path: str = "", model_contract_path: str | None = None) -> dict[str, Any]:
+def _simulate(mode: str, model_path: str = "") -> dict[str, Any]:
     if mode == "gap-closure":
-        return _simulate_gap_closure(model_path, model_contract_path)
+        return _simulate_gap_closure(model_path)
     return {
         "ok": True,
         "mode": mode,
@@ -390,14 +364,9 @@ def _changed_actions(before: BeliefState, after: BeliefState) -> list[dict[str, 
     return changed
 
 
-def _compare_models(
-    before_path: str,
-    after_path: str,
-    before_contract_path: str,
-    after_contract_path: str,
-) -> dict[str, Any]:
-    before = load_model(before_path, before_contract_path)
-    after = load_model(after_path, after_contract_path)
+def _compare_models(before_path: str, after_path: str) -> dict[str, Any]:
+    before = load_model(before_path)
+    after = load_model(after_path)
     before_sources = _ids_by(before.sources, "source_id")
     after_sources = _ids_by(after.sources, "source_id")
     before_anchors = _ids_by(before.anchors, "anchor_id")
@@ -434,10 +403,10 @@ def _compare_models(
 
 def _cmd_search_iteration_freeze(args: argparse.Namespace) -> int:
     _require_new_outputs(
-        inputs=[item for item in (args.model, args.model_contract) if item],
+        inputs=[args.model],
         outputs=[args.output],
     )
-    baseline = load_model(args.model, args.model_contract)
+    baseline = load_model(args.model)
     prediction = freeze_search_outcome_prediction(
         baseline,
         action_id=args.action_id,
@@ -466,17 +435,15 @@ def _cmd_search_iteration_run(args: argparse.Namespace) -> int:
     _require_new_outputs(
         inputs=[
             args.model,
-            *([args.model_contract] if args.model_contract else []),
             args.prediction,
             *([args.observation] if args.observation else []),
         ],
         outputs=[
             args.candidate_output,
-            *([args.candidate_model_contract_output] if args.candidate_model_contract_output else []),
             args.output,
         ],
     )
-    baseline = load_model(args.model, args.model_contract)
+    baseline = load_model(args.model)
     prediction = SearchOutcomePrediction.from_dict(
         _load_json_object(args.prediction)
     )
@@ -491,11 +458,6 @@ def _cmd_search_iteration_run(args: argparse.Namespace) -> int:
         provider_status=args.provider_status,
     )
     write_yaml(args.candidate_output, candidate)
-    if args.candidate_model_contract_output and candidate.guard_contract is not None:
-        _write_json(
-            args.candidate_model_contract_output,
-            candidate.guard_contract.to_dict(),
-        )
     _write_json(args.output, result.to_dict())
     _json_out({"ok": True, **result.to_dict()}, args.pretty)
     if args.decision == "accept" and result.effective_disposition != "accepted":
@@ -508,25 +470,22 @@ def run(args: argparse.Namespace) -> int:
     if command_func is not None:
         return command_func(args)
     if args.command == "create":
-        model = BeliefState.from_dict(starter_model_dict(args.model_contract))
-        if args.model_contract:
-            prove_target_model_contract(model, args.model_contract)
+        model = BeliefState.from_dict(starter_model_dict())
         write_yaml(args.output, model)
         _json_out(
             {
                 "ok": True,
                 "output": args.output,
-                "model_contract": args.model_contract,
                 "boundary": model.metadata["boundary"],
             },
             True,
         )
         return 0
     if args.command == "validate":
-        _json_out(validate_model(args.model, args.model_contract), args.pretty)
+        _json_out(validate_model(args.model), args.pretty)
         return 0
     if args.command == "plan":
-        model = load_model(args.model, args.model_contract)
+        model = load_model(args.model)
         payload = to_plain(plan_next_actions(model, limit=args.limit))
         if not args.all_scores:
             payload.pop("scored_actions", None)
@@ -536,19 +495,19 @@ def run(args: argparse.Namespace) -> int:
         _json_out(
             {
                 "ok": True,
-                "scored_actions": score_actions(load_model(args.model, args.model_contract)),
+                "scored_actions": score_actions(load_model(args.model)),
             },
             args.pretty,
         )
         return 0
     if args.command == "frontier":
         _json_out(
-            {"ok": True, **frontier_summary(load_model(args.model, args.model_contract))},
+            {"ok": True, **frontier_summary(load_model(args.model))},
             args.pretty,
         )
         return 0
     if args.command == "depth":
-        model = load_model(args.model, args.model_contract)
+        model = load_model(args.model)
         observation = _load_observation(args.observation) if args.observation else None
         updated, receipt = apply_observation_and_replan(
             model,
@@ -564,38 +523,23 @@ def run(args: argparse.Namespace) -> int:
             )
         if args.updated_model_output:
             write_yaml(args.updated_model_output, updated)
-            if args.updated_model_contract_output and updated.guard_contract is not None:
-                Path(args.updated_model_contract_output).write_text(
-                    json.dumps(updated.guard_contract.to_dict(), ensure_ascii=False, indent=2) + "\n",
-                    encoding="utf-8",
-                )
-        elif args.updated_model_contract_output:
-            raise ValueError(
-                "--updated-model-contract-output requires --updated-model-output"
-            )
         _json_out(payload, args.pretty)
         return 0
     if args.command == "add-observation":
-        model = load_model(args.model, args.model_contract)
+        model = load_model(args.model)
         updated = apply_observation(model, _load_observation(args.observation))
         write_yaml(args.output, updated)
-        if args.output_model_contract and updated.guard_contract is not None:
-            Path(args.output_model_contract).write_text(
-                json.dumps(updated.guard_contract.to_dict(), ensure_ascii=False, indent=2) + "\n",
-                encoding="utf-8",
-            )
         _json_out(
             {
                 "ok": True,
                 "output": args.output,
-                "output_model_contract": args.output_model_contract,
                 "warnings": updated.metadata.get("warnings", []),
             },
             args.pretty,
         )
         return 0
     if args.command == "report":
-        model = load_model(args.model, args.model_contract)
+        model = load_model(args.model)
         if args.format == "markdown":
             print(render_markdown(model), end="")
         elif args.format == "txt":
@@ -606,28 +550,23 @@ def run(args: argparse.Namespace) -> int:
     if args.command == "export-traceguard":
         write_yaml(
             args.output,
-            export_traceguard_seed(load_model(args.model, args.model_contract)),
+            export_traceguard_seed(load_model(args.model)),
         )
         _json_out({"ok": True, "output": args.output}, True)
         return 0
     if args.command == "export-logicguard":
         write_yaml(
             args.output,
-            export_logicguard_source_candidates(load_model(args.model, args.model_contract)),
+            export_logicguard_source_candidates(load_model(args.model)),
         )
         _json_out({"ok": True, "output": args.output}, True)
         return 0
     if args.command == "simulate":
-        _json_out(_simulate(args.mode, args.model, args.model_contract), args.pretty)
+        _json_out(_simulate(args.mode, args.model), args.pretty)
         return 0
     if args.command == "compare":
         _json_out(
-            _compare_models(
-                args.before,
-                args.after,
-                args.before_model_contract,
-                args.after_model_contract,
-            ),
+            _compare_models(args.before, args.after),
             args.pretty,
         )
         return 0

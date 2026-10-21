@@ -14,33 +14,13 @@ from typing import Any
 
 import yaml
 
-from .guard_contract import load_target_contract
-from .schema import (
-    BeliefState,
-    SchemaError,
-    sourceguard_model_contract_fingerprint,
-    to_plain,
-)
+from .schema import BeliefState, to_plain
 
-
-def load_model(path: str | Path, model_contract_path: str | Path | None = None) -> BeliefState:
+def load_model(path: str | Path) -> BeliefState:
     data = yaml.safe_load(Path(path).read_text(encoding="utf-8"))
     if data is None:
         data = {}
-    belief_state = BeliefState.from_dict(data)
-    if model_contract_path is None:
-        return belief_state
-    external_contract = load_target_contract(model_contract_path)
-    if belief_state.guard_contract is None:
-        raise SchemaError("candidate is missing its target contract snapshot")
-    if external_contract.to_dict() != belief_state.guard_contract.to_dict():
-        raise SchemaError("explicit model contract does not match the candidate snapshot")
-    if belief_state.candidate_contract_fingerprint != sourceguard_model_contract_fingerprint(
-        external_contract
-    ):
-        raise SchemaError("explicit model contract fingerprint does not match the candidate")
-    return belief_state
-
+    return BeliefState.from_dict(data)
 
 def dump_yaml(data: Any) -> str:
     return yaml.safe_dump(to_plain(data), sort_keys=False, allow_unicode=True)
@@ -54,12 +34,11 @@ def model_to_dict(belief_state: BeliefState) -> dict[str, Any]:
     return to_plain(belief_state)
 
 
-def validate_model(path: str | Path, model_contract_path: str | Path | None = None) -> dict[str, Any]:
-    belief_state = load_model(path, model_contract_path)
+def validate_model(path: str | Path) -> dict[str, Any]:
+    belief_state = load_model(path)
     return {
         "ok": True,
         "path": str(path),
-        "model_contract_path": str(model_contract_path or ""),
         "lead_count": len(belief_state.leads),
         "source_count": len(belief_state.sources),
         "anchor_count": len(belief_state.anchors),

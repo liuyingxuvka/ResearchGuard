@@ -12,7 +12,7 @@ from __future__ import annotations
 from dataclasses import replace
 from typing import Iterable
 
-from .schema import BeliefState, Gap, PlanResult, SearchAction, validate_model_guard_binding
+from .schema import BeliefState, Gap, PlanResult, SearchAction
 from .scoring import score_action
 
 
@@ -218,7 +218,6 @@ def _dedupe(actions: Iterable[SearchAction], existing: Iterable[SearchAction]) -
 
 
 def generate_actions_from_gaps(belief_state: BeliefState) -> list[SearchAction]:
-    validate_model_guard_binding(belief_state)
     generated: list[SearchAction] = []
     for gap in belief_state.gaps:
         generated.extend(_actions_for_gap(gap, belief_state))
@@ -246,7 +245,6 @@ def generate_actions_from_leads(belief_state: BeliefState) -> list[SearchAction]
 
 
 def plan_next_actions(belief_state: BeliefState, limit: int = 5) -> PlanResult:
-    validate_model_guard_binding(belief_state)
     generated = generate_actions_from_gaps(belief_state) + generate_actions_from_leads(belief_state)
     state_for_scoring = replace(belief_state, actions=_dedupe(generated, belief_state.actions))
     gap_by_id = belief_state.gap_by_id()
@@ -294,7 +292,6 @@ def plan_next_actions(belief_state: BeliefState, limit: int = 5) -> PlanResult:
 
 
 def frontier_summary(belief_state: BeliefState) -> dict:
-    validate_model_guard_binding(belief_state)
     open_gaps = [
         gap
         for gap in belief_state.gaps

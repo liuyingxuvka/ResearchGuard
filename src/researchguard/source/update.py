@@ -3,7 +3,7 @@ Purpose: Apply SourceGuard observations to a belief state without converting can
 Repository: https://github.com/liuyingxuvka/ResearchGuard
 Skill: SourceGuard
 Math boundary: Expected utility ranks search value, not factual truth or calibrated probability.
-CLI: researchguard source add-observation <model.yaml> --model-contract <model.contract.json> --observation observation.yaml --output updated.yaml --output-model-contract updated.contract.json
+CLI: researchguard source add-observation <model.yaml> --observation observation.yaml --output updated.yaml
 Boundary: Source candidates and evidence anchors require downstream TraceGuard/LogicGuard review before final claims.
 """
 
@@ -20,10 +20,8 @@ from .schema import (
     Lead,
     Observation,
     SourceRecord,
-    bind_sourceguard_model_contract,
     clamp01,
     utc_now,
-    validate_model_guard_binding,
 )
 
 
@@ -251,8 +249,6 @@ def update_frontier(belief_state: BeliefState) -> BeliefState:
 
 
 def apply_observation(belief_state: BeliefState, observation: Observation) -> BeliefState:
-    validate_model_guard_binding(belief_state)
-    frozen_contract = belief_state.guard_contract
     state = belief_state
     warnings = list(state.metadata.get("warnings", []))
     for source in observation.observed_sources:
@@ -284,41 +280,4 @@ def apply_observation(belief_state: BeliefState, observation: Observation) -> Be
     state = replace(state, observations=_upsert_by_id(state.observations, observation, "observation_id"))
     metadata = dict(state.metadata)
     metadata["warnings"] = warnings
-    successor = update_frontier(replace(state, metadata=metadata))
-    if frozen_contract is None:
-        return successor
-    # Preserve the AI-authored purpose, failure declarations, proof cases, and
-    # claim boundary.  A newly observed gap expands only the successor's exact
-    # external universe and construction sequence, producing a new fingerprint
-    # that must be written as a new explicit sidecar before later reuse.
-    successor_contract = replace(
-        frozen_contract,
-        external_universe={
-            "gap_ids": sorted({gap.gap_id for gap in successor.gaps}),
-            "target_unit_ids": sorted(
-                {gap.structure_unit_id for gap in successor.gaps if gap.structure_unit_id}
-            ),
-            "source_role_ids": sorted(
-                {
-                    f"source-role:{gap.gap_id}:{role}"
-                    for gap in successor.gaps
-                    for role in gap.suggested_source_roles
-                }
-            ),
-            "lineage_slot_ids": sorted(
-                {
-                    f"lineage:{source.lineage_id}"
-                    for source in successor.sources
-                    if source.lineage_id
-                }
-            ),
-            "anchor_requirement_ids": sorted(
-                anchor.anchor_id for anchor in successor.anchors
-            ),
-            "handoff_ids": sorted(
-                str(item) for item in successor.metadata.get("handoff_ids", [])
-            ),
-        },
-        candidate_construction_sequence=frozen_contract.candidate_construction_sequence + 1,
-    )
-    return bind_sourceguard_model_contract(successor, contract=successor_contract)
+    return update_frontier(replace(state, metadata=metadata))

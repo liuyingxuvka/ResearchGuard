@@ -5,38 +5,12 @@ from researchguard.source.schema import (
     Gap,
     SearchAction,
     SourceRecord,
-    SourceGuardPreventedFailure,
-    SourceGuardProofCase,
-    bind_sourceguard_model_contract,
-    build_sourceguard_model_contract,
 )
 from researchguard.source.scoring import score_action
 
 
 def _guard_state(state: BeliefState, model_id: str) -> BeliefState:
-    gap_id = state.gaps[0].gap_id if state.gaps else "test-gap"
-    failure = SourceGuardPreventedFailure(
-        failure_id=f"failure:{model_id}:unsafe-ranking",
-        title="Unsafe source route is preferred",
-        block_when="an unqualified result is treated as closing the ranked gap",
-        oracle_id="oracle:sourceguard:source-qualification",
-        known_good=SourceGuardProofCase("good:test", "good.yaml", "pass"),
-        known_bad=SourceGuardProofCase(
-            "bad:test", "good.yaml", "blocked",
-            "make-all-anchors-unusable", f"gaps:{gap_id}"
-        ),
-    )
-    return bind_sourceguard_model_contract(
-        state,
-        contract=build_sourceguard_model_contract(
-            model_id=model_id,
-            purpose="Prevent source-action scoring from preferring shallow or unsafe evidence routes.",
-            prevented_failures=[failure],
-            gap_ids=[gap.gap_id for gap in state.gaps],
-            target_unit_ids=[gap.structure_unit_id for gap in state.gaps if gap.structure_unit_id],
-            claim_boundary="Action ranking only; the score does not establish factual truth.",
-        ),
-    )
+    return state
 
 
 def _state(*, gap_type="missing_independent_source", blocking=True):

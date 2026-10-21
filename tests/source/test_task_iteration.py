@@ -15,12 +15,6 @@ from researchguard.source import (
     SearchAction,
     SourceRecord,
 )
-from researchguard.source.schema import (
-    SourceGuardPreventedFailure,
-    SourceGuardProofCase,
-    bind_sourceguard_model_contract,
-    build_sourceguard_model_contract,
-)
 from researchguard.source.depth import model_fingerprint
 from researchguard.source.task_iteration import (
     SearchOutcomePrediction,
@@ -76,31 +70,7 @@ def _state() -> BeliefState:
             ),
         ],
     )
-    failure = SourceGuardPreventedFailure(
-        failure_id="failure:task-local:unqualified-closure",
-        title="Unqualified source observation closes a gap",
-        block_when="an observation without claim-usable anchors closes a gap",
-        oracle_id="oracle:sourceguard:source-qualification",
-        known_good=SourceGuardProofCase("good", "good.yaml", "pass"),
-        known_bad=SourceGuardProofCase(
-            "bad",
-            "good.yaml",
-            "blocked",
-            "make-all-anchors-unusable",
-            "gaps:g-target",
-        ),
-    )
-    return bind_sourceguard_model_contract(
-        state,
-        contract=build_sourceguard_model_contract(
-            model_id="task-local-source-model",
-            purpose="Prevent source closure without current qualified evidence.",
-            prevented_failures=[failure],
-            gap_ids=["g-target", "g-holdout"],
-            target_unit_ids=[],
-            claim_boundary="Task-local source discovery only.",
-        ),
-    )
+    return state
 
 
 def _prediction(state: BeliefState, **overrides) -> SearchOutcomePrediction:
@@ -248,8 +218,7 @@ def test_cli_freeze_rejects_old_shape_and_emits_v2(tmp_path: Path) -> None:
     result = subprocess.run(
         [
             sys.executable, "-m", "researchguard", "source", "search-iteration", "freeze",
-            "examples/source/starter_researchguard.source.yaml", "--model-contract",
-            "examples/source/starter_researchguard.source.contract.json", "--action-id",
+            "examples/source/starter_researchguard.source.yaml", "--action-id",
             "action-independent-search-1", "--expected-gap-reduction", "closed",
             "--expected-independent-lineage", "true", "--expected-counterevidence", "false",
             "--expected-cost", "0.3", "--output", str(output),

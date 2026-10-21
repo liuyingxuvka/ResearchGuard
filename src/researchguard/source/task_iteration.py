@@ -22,7 +22,6 @@ from .schema import (
     SourceDepthReceipt,
     to_plain,
     utc_now,
-    validate_model_guard_binding,
 )
 
 
@@ -310,7 +309,6 @@ def freeze_search_outcome_prediction(
 ) -> SearchOutcomePrediction:
     """Freeze expected search outcomes without applying any observation."""
 
-    validate_model_guard_binding(baseline)
     action = _bound_action(baseline, action_id)
     if not action.target_gap_id or action.target_gap_id not in baseline.gap_by_id():
         raise ValueError("selected search action must target an existing gap")
@@ -345,7 +343,6 @@ def validate_search_prediction_binding(
     baseline: BeliefState,
     prediction: SearchOutcomePrediction,
 ) -> SearchAction:
-    validate_model_guard_binding(baseline)
     actual = model_fingerprint(baseline)
     if actual != prediction.baseline_fingerprint:
         raise ValueError(
@@ -457,7 +454,6 @@ def review_search_candidate(
     candidate: BeliefState,
     protected_gap_ids: Sequence[str],
 ) -> SearchCandidateReview:
-    validate_model_guard_binding(candidate)
     rows: list[ProtectedGapRevalidation] = []
     before = baseline.gap_by_id()
     after = candidate.gap_by_id()

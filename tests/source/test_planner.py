@@ -3,39 +3,11 @@ from researchguard.source.planner import generate_actions_from_gaps, plan_next_a
 from researchguard.source.schema import (
     BeliefState,
     Gap,
-    SourceGuardPreventedFailure,
-    SourceGuardProofCase,
-    build_sourceguard_model_contract,
-    bind_sourceguard_model_contract,
 )
 
 
 def _guard(state: BeliefState, model_id: str) -> BeliefState:
-    failure = SourceGuardPreventedFailure(
-        failure_id=f"failure:{model_id}:unqualified-candidate",
-        title="Unqualified candidate is promoted",
-        block_when="a candidate without a usable anchor closes a gap",
-        oracle_id="oracle:sourceguard:source-qualification",
-        known_good=SourceGuardProofCase("good:test:qualified", "good.yaml", "pass"),
-        known_bad=SourceGuardProofCase(
-            "bad:test:unqualified",
-            "good.yaml",
-            "blocked",
-            "make-all-anchors-unusable",
-            f"gaps:{state.gaps[0].gap_id}" if state.gaps else "gaps:test",
-        ),
-    )
-    return bind_sourceguard_model_contract(
-        state,
-        contract=build_sourceguard_model_contract(
-            model_id=model_id,
-            purpose="Prevent incomplete or misleading source-discovery plans.",
-            prevented_failures=[failure],
-            gap_ids=[gap.gap_id for gap in state.gaps],
-            target_unit_ids=[gap.structure_unit_id for gap in state.gaps if gap.structure_unit_id],
-            claim_boundary="Planning quality only; factual truth remains downstream.",
-        ),
-    )
+    return state
 
 
 def test_gap_types_generate_reasonable_actions():
@@ -73,10 +45,7 @@ def test_missing_execution_evidence_not_only_plain_text_search():
 
 
 def test_structural_source_gap_generates_structural_roles():
-    state = load_model(
-        "examples/source/structural_source_gap.yaml",
-        "examples/source/structural_source_gap.contract.json",
-    )
+    state = load_model("examples/source/structural_source_gap.yaml")
     actions = generate_actions_from_gaps(state)
     assert actions
     assert {action.expected_source_role for action in actions} & {"bridge_evidence", "method_source"}
@@ -95,10 +64,7 @@ def test_permission_gap_blocked_when_policy_disallows():
 
 
 def test_plan_next_actions_returns_reasons():
-    state = load_model(
-        "examples/source/fuel_cell_project_discovery.yaml",
-        "examples/source/fuel_cell_project_discovery.contract.json",
-    )
+    state = load_model("examples/source/fuel_cell_project_discovery.yaml")
     result = plan_next_actions(state, limit=3)
     assert result.ok
     assert result.selected_actions

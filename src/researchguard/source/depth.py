@@ -20,7 +20,6 @@ from .schema import (
     SourceDepthReceipt,
     SourceObjectDepthRow,
     to_plain,
-    validate_model_guard_binding,
 )
 from .update import DEFAULT_QUALIFICATION_THRESHOLDS, apply_observation
 
@@ -755,7 +754,6 @@ def apply_observation_and_replan(
     explicitly NOT_RUN or PROVIDER_UNAVAILABLE and cannot create closure depth.
     """
 
-    validate_model_guard_binding(belief_state)
     baseline = deepcopy(belief_state)
     before_plan = plan_next_actions(baseline, limit=limit)
     normalized_provider = str(provider_status or "NOT_RUN").upper()

@@ -4,39 +4,12 @@ from researchguard.source.schema import (
     Gap,
     Observation,
     SourceRecord,
-    SourceGuardPreventedFailure,
-    SourceGuardProofCase,
-    build_sourceguard_model_contract,
-    bind_sourceguard_model_contract,
 )
 from researchguard.source.update import apply_observation
 
 
 def _guard(state: BeliefState, model_id: str) -> BeliefState:
-    gap_id = state.gaps[0].gap_id if state.gaps else "test-gap"
-    return bind_sourceguard_model_contract(
-        state,
-        contract=build_sourceguard_model_contract(
-            model_id=model_id,
-            purpose="Prevent observations from creating unsupported source-gap closure.",
-            prevented_failures=[
-                SourceGuardPreventedFailure(
-                    failure_id=f"failure:{model_id}:unqualified-closure",
-                    title="Unqualified observation closes a gap",
-                    block_when="an observation without a usable anchor closes a gap",
-                    oracle_id="oracle:sourceguard:source-qualification",
-                    known_good=SourceGuardProofCase("good:test", "good.yaml", "pass"),
-                    known_bad=SourceGuardProofCase(
-                        "bad:test", "good.yaml", "blocked",
-                        "make-all-anchors-unusable", f"gaps:{gap_id}"
-                    ),
-                )
-            ],
-            gap_ids=[gap.gap_id for gap in state.gaps],
-            target_unit_ids=[gap.structure_unit_id for gap in state.gaps if gap.structure_unit_id],
-            claim_boundary="Belief-state update only; final claims require downstream review.",
-        ),
-    )
+    return state
 
 
 def test_observation_can_add_source_and_anchor():

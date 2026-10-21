@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import json
 from pathlib import Path
 
 import pytest
@@ -17,50 +16,15 @@ from researchguard.source import (
     build_source_depth_receipt,
 )
 from researchguard.source.planner import generate_actions_from_gaps
-from researchguard.source.guard_contract import prove_target_model_contract
-from researchguard.source.loader import load_model
 from researchguard.source.update import apply_observation
-from researchguard.source.schema import (
-    SchemaError,
-    SourceGuardPreventedFailure,
-    SourceGuardProofCase,
-    bind_sourceguard_model_contract,
-    build_sourceguard_model_contract,
-    sourceguard_model_contract_fingerprint,
-    to_plain,
-)
+from researchguard.source.schema import SchemaError
 
 
 ROOT = Path(__file__).resolve().parents[2]
 
 
 def _guard(state: BeliefState, model_id: str = "test-sourceguard-depth") -> BeliefState:
-    gap_id = state.gaps[0].gap_id if state.gaps else "test-gap"
-    failure = SourceGuardPreventedFailure(
-        failure_id=f"failure:{model_id}:unqualified-candidate",
-        title="Unqualified source evidence licenses closure",
-        block_when="a gap closes although the supplied anchor is not claim-usable",
-        oracle_id="oracle:sourceguard:source-qualification",
-        known_good=SourceGuardProofCase("good:test:qualified", "good.yaml", "pass"),
-        known_bad=SourceGuardProofCase(
-            "bad:test:unqualified",
-            "good.yaml",
-            "blocked",
-            "make-all-anchors-unusable",
-            f"gaps:{gap_id}",
-        ),
-    )
-    return bind_sourceguard_model_contract(
-        state,
-        contract=build_sourceguard_model_contract(
-            model_id=model_id,
-            purpose="Prevent shallow source evidence from licensing unsupported closure or broad claims.",
-            prevented_failures=[failure],
-            gap_ids=[gap.gap_id for gap in state.gaps],
-            target_unit_ids=[gap.structure_unit_id for gap in state.gaps if gap.structure_unit_id],
-            claim_boundary="Source discovery and evidence-depth closure only; factual truth remains downstream.",
-        ),
-    )
+    return state
 
 
 def _gap() -> Gap:
@@ -149,31 +113,9 @@ def test_locator_only_anchor_does_not_close_or_become_claim_usable() -> None:
 
 
 def test_retired_gap_status_is_rejected_before_runtime() -> None:
-    contract = build_sourceguard_model_contract(
-        model_id="test-legacy-closed",
-        purpose="Prevent retired gap status labels from entering normal runtime.",
-        prevented_failures=[
-            SourceGuardPreventedFailure(
-                failure_id="failure:test-legacy:unqualified-closure",
-                title="Retired status projection is accepted",
-                block_when="a retired gap status field is accepted",
-                oracle_id="oracle:sourceguard:source-qualification",
-                known_good=SourceGuardProofCase("good:test-legacy", "good.yaml", "pass"),
-                known_bad=SourceGuardProofCase(
-                    "bad:test-legacy", "good.yaml", "blocked",
-                    "make-all-anchors-unusable", "gaps:legacy"
-                ),
-            )
-        ],
-        gap_ids=["legacy"],
-        target_unit_ids=[],
-        claim_boundary="Current gap schema admission only; factual truth remains downstream.",
-    )
     with pytest.raises(SchemaError, match="gap.status is retired"):
         BeliefState.from_dict(
             {
-                "guard_contract": contract.to_dict(),
-                "candidate_contract_fingerprint": sourceguard_model_contract_fingerprint(contract),
                 "gaps": [
                     {
                         "gap_id": "legacy",
@@ -354,64 +296,20 @@ def _broad_observation(*, shared_lineage: bool = False) -> Observation:
     )
 
 
-def test_content_anchor_purpose_contract_observes_catalog_blocking_finding(
-    tmp_path: Path,
-) -> None:
-    model = _broad_state()
-    observation = _broad_observation()
-    contract = build_sourceguard_model_contract(
-        model_id="test-content-anchor-purpose-proof",
-        purpose="Prevent contentless anchors from satisfying governed source depth.",
-        prevented_failures=[
-            SourceGuardPreventedFailure(
-                failure_id="failure:test:contentless-anchor",
-                title="Contentless anchor satisfies governed source depth",
-                block_when=(
-                    "a governed gap passes although every linked anchor lacks extracted "
-                    "text and a normalized content summary"
-                ),
-                oracle_id="oracle:sourceguard:content-anchor",
-                known_good=SourceGuardProofCase(
-                    "good:test:content-bearing",
-                    "content-anchor-observation.json",
-                    "pass",
-                ),
-                known_bad=SourceGuardProofCase(
-                    "bad:test:contentless",
-                    "content-anchor-observation.json",
-                    "blocked",
-                    "remove-anchor-content",
-                    "sourceguard_blocked:contentless-anchor",
-                ),
-            )
-        ],
-        gap_ids=[gap.gap_id for gap in model.gaps],
-        target_unit_ids=["unit:central-claim"],
-        claim_boundary=(
-            "Content-anchor depth identity only; factual truth remains downstream."
-        ),
+def test_contentless_anchor_is_blocked_by_source_depth() -> None:
+    passing = build_source_depth_receipt(_broad_state(), _broad_observation())
+    assert all(row.status == "pass" for row in passing.coverage_universe.object_depth_rows)
+
+    contentless = _broad_observation()
+    for anchor in contentless.observed_anchors:
+        anchor.text = ""
+        anchor.normalized_summary = ""
+    blocked = build_source_depth_receipt(_broad_state(), contentless)
+    assert blocked.broad_claim_licensed is False
+    assert any(
+        "sourceguard_blocked:contentless-anchor" in row.findings
+        for row in blocked.coverage_universe.object_depth_rows
     )
-    bind_sourceguard_model_contract(model, contract=contract)
-
-    model_path = tmp_path / "content-anchor-model.json"
-    contract_path = tmp_path / "content-anchor-model.contract.json"
-    observation_path = tmp_path / "content-anchor-observation.json"
-    model_path.write_text(json.dumps(to_plain(model), indent=2), encoding="utf-8")
-    contract_path.write_text(json.dumps(contract.to_dict(), indent=2), encoding="utf-8")
-    observation_path.write_text(
-        json.dumps(to_plain(observation), indent=2), encoding="utf-8"
-    )
-
-    loaded = load_model(model_path, contract_path)
-    proof = prove_target_model_contract(loaded, contract_path)
-
-    assert proof["status"] == "pass"
-    assert proof["failure_results"][0]["known_good"]["status"] == "pass"
-    assert proof["failure_results"][0]["known_bad"] == {
-        "status": "blocked",
-        "observation_path": "content-anchor-observation.json",
-        "native_finding": "sourceguard_blocked:contentless-anchor",
-    }
 
 
 def test_one_gap_one_source_cannot_license_broad_source_depth() -> None:

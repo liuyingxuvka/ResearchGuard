@@ -18,39 +18,25 @@ def test_create_validate_plan_report_and_export_smoke(tmp_path):
     trace = tmp_path / "trace.yaml"
     logic = tmp_path / "logic.yaml"
 
-    result = _run(
-        "create",
-        "--output",
-        str(created),
-        "--model-contract",
-        "examples/source/starter_researchguard.source.contract.json",
-    )
+    result = _run("create", "--output", str(created))
     assert result.returncode == 0, result.stderr
     assert created.exists()
 
-    result = _run("validate", str(created), "--model-contract", "examples/source/starter_researchguard.source.contract.json", "--pretty")
+    result = _run("validate", str(created), "--pretty")
     assert result.returncode == 0, result.stderr
     assert '"ok": true' in result.stdout
 
-    result = _run("plan", "examples/source/fuel_cell_project_discovery.yaml", "--model-contract", "examples/source/fuel_cell_project_discovery.contract.json", "--limit", "3", "--pretty")
+    result = _run("plan", "examples/source/fuel_cell_project_discovery.yaml", "--limit", "3", "--pretty")
     assert result.returncode == 0, result.stderr
     assert "selected_actions" in result.stdout
 
-    result = _run("depth", str(created), "--model-contract", "examples/source/starter_researchguard.source.contract.json", "--pretty")
+    result = _run("depth", str(created), "--pretty")
     assert result.returncode == 0, result.stderr
     depth_payload = json.loads(result.stdout)
     assert depth_payload["status"] == "planning_only"
     assert depth_payload["observation_depth_completed"] is False
 
-    result = _run(
-        "depth",
-        "examples/source/starter_researchguard.source.yaml",
-        "--model-contract",
-        "examples/source/starter_researchguard.source.contract.json",
-        "--observation",
-        "examples/source/qualified_observation.yaml",
-        "--pretty",
-    )
+    result = _run("depth", "examples/source/starter_researchguard.source.yaml", "--observation", "examples/source/qualified_observation.yaml", "--pretty")
     assert result.returncode == 0, result.stderr
     observed_depth = json.loads(result.stdout)
     assert observed_depth["observation_depth_completed"] is True
@@ -62,30 +48,21 @@ def test_create_validate_plan_report_and_export_smoke(tmp_path):
     assert observed_depth["coverage_universe"]["universe_fingerprint"]
     assert observed_depth["replan_comparison"]["removed_action_ids"]
 
-    result = _run("report", "examples/source/fuel_cell_project_discovery.yaml", "--model-contract", "examples/source/fuel_cell_project_discovery.contract.json", "--format", "markdown")
+    result = _run("report", "examples/source/fuel_cell_project_discovery.yaml", "--format", "markdown")
     assert result.returncode == 0, result.stderr
     assert "SourceGuard Summary" in result.stdout
 
-    result = _run("export-traceguard", "examples/source/fuel_cell_project_discovery.yaml", "--model-contract", "examples/source/fuel_cell_project_discovery.contract.json", "--output", str(trace))
+    result = _run("export-traceguard", "examples/source/fuel_cell_project_discovery.yaml", "--output", str(trace))
     assert result.returncode == 0, result.stderr
     assert trace.exists()
 
-    result = _run("export-logicguard", "examples/source/fuel_cell_project_discovery.yaml", "--model-contract", "examples/source/fuel_cell_project_discovery.contract.json", "--output", str(logic))
+    result = _run("export-logicguard", "examples/source/fuel_cell_project_discovery.yaml", "--output", str(logic))
     assert result.returncode == 0, result.stderr
     assert logic.exists()
 
 
 def test_model_backed_simulate_and_compare(tmp_path):
-    result = _run(
-        "simulate",
-        "--mode",
-        "gap-closure",
-        "--model",
-        "examples/source/fuel_cell_project_discovery.yaml",
-        "--model-contract",
-        "examples/source/fuel_cell_project_discovery.contract.json",
-        "--pretty",
-    )
+    result = _run("simulate", "--mode", "gap-closure", "--model", "examples/source/fuel_cell_project_discovery.yaml", "--pretty")
     assert result.returncode == 0, result.stderr
     payload = json.loads(result.stdout)
     assert payload["mode"] == "gap-closure"
@@ -99,29 +76,20 @@ def test_model_backed_simulate_and_compare(tmp_path):
     after = tmp_path / "after.yaml"
     after.write_text(yaml.safe_dump(data, sort_keys=False), encoding="utf-8")
 
-    result = _run(
-        "compare",
-        str(before),
-        str(after),
-        "--before-model-contract",
-        "examples/source/fuel_cell_project_discovery.contract.json",
-        "--after-model-contract",
-        "examples/source/fuel_cell_project_discovery.contract.json",
-        "--pretty",
-    )
+    result = _run("compare", str(before), str(after), "--pretty")
     assert result.returncode == 2
     assert "gap.status is retired" in result.stderr
 
 
 def test_failure_returns_2():
-    result = _run("validate", "missing-file.yaml", "--model-contract", "missing-contract.json", "--pretty")
+    result = _run("validate", "missing-file.yaml", "--pretty")
     assert result.returncode == 2
     assert '"ok": false' in result.stderr
 
 
 def test_grown_model_still_loads_after_evidence_for_the_guarded_gap(tmp_path):
-    for name in ("paper_citation_discovery.yaml", "paper_citation_discovery.contract.json", "model-purpose-observation.yaml"):
-        (tmp_path / name).write_bytes((ROOT / "examples" / "source" / name).read_bytes())
+    name = "paper_citation_discovery.yaml"
+    (tmp_path / name).write_text((ROOT / "examples" / "source" / name).read_text(encoding="utf-8"), encoding="utf-8")
     observation = {
         "observation_id": "obs-baseline-1",
         "observed_sources": [{"source_id": "src-history-1", "title": "Historical baseline paper",
@@ -135,17 +103,14 @@ def test_grown_model_still_loads_after_evidence_for_the_guarded_gap(tmp_path):
     }
     path = tmp_path / "obs.yaml"
     path.write_text(yaml.safe_dump(observation), encoding="utf-8")
-    result = _run("add-observation", str(tmp_path / "paper_citation_discovery.yaml"),
-                  "--model-contract", str(tmp_path / "paper_citation_discovery.contract.json"),
-                  "--observation", str(path), "--output", str(tmp_path / "v2.yaml"),
-                  "--output-model-contract", str(tmp_path / "v2.contract.json"))
+    result = _run("add-observation", str(tmp_path / "paper_citation_discovery.yaml"), "--observation", str(path), "--output", str(tmp_path / "v2.yaml"))
     assert result.returncode == 0, result.stdout + result.stderr
-    result = _run("validate", str(tmp_path / "v2.yaml"), "--model-contract", str(tmp_path / "v2.contract.json"))
+    result = _run("validate", str(tmp_path / "v2.yaml"))
     assert result.returncode == 0, result.stdout + result.stderr
 
 
 def test_plan_prints_scores_only_on_request():
-    argv = ("plan", "examples/source/fuel_cell_project_discovery.yaml", "--model-contract", "examples/source/fuel_cell_project_discovery.contract.json")
+    argv = ("plan", "examples/source/fuel_cell_project_discovery.yaml",)
     ordinary = _run(*argv)
     detailed = _run(*argv, "--all-scores")
     assert ordinary.returncode == detailed.returncode == 0

@@ -6,18 +6,11 @@ from researchguard.source.schema import (
     SchemaError,
     SearchAction,
     SourceRecord,
-    SourceGuardPreventedFailure,
-    SourceGuardProofCase,
-    build_sourceguard_model_contract,
-    sourceguard_model_contract_fingerprint,
 )
 
 
 def test_valid_yaml_can_load():
-    model = load_model(
-        "examples/source/starter_researchguard.source.yaml",
-        "examples/source/starter_researchguard.source.contract.json",
-    )
+    model = load_model("examples/source/starter_researchguard.source.yaml")
     assert len(model.leads) == 1
     assert len(model.gaps) == 1
     assert model.metadata["math_boundary"]
@@ -42,35 +35,8 @@ def test_model_root_must_be_mapping():
 
 
 def test_source_candidate_does_not_auto_become_evidence():
-    contract = build_sourceguard_model_contract(
-        model_id="test-source-candidate-boundary",
-        purpose="Prevent source candidates from being promoted into evidence without anchors.",
-        prevented_failures=[
-            SourceGuardPreventedFailure(
-                failure_id="failure:test:unqualified-candidate",
-                title="Unqualified candidate is promoted",
-                block_when="a candidate without a usable anchor is promoted",
-                oracle_id="oracle:sourceguard:source-qualification",
-                known_good=SourceGuardProofCase(
-                    "good:test:qualified", "good.yaml", "pass"
-                ),
-                known_bad=SourceGuardProofCase(
-                    "bad:test:unqualified",
-                    "good.yaml",
-                    "blocked",
-                    "make-all-anchors-unusable",
-                    "gaps:test",
-                ),
-            )
-        ],
-        gap_ids=[],
-        target_unit_ids=[],
-        claim_boundary="Candidate admission only; factual evidence requires qualified anchors.",
-    )
     model = BeliefState.from_dict(
         {
-            "guard_contract": contract.to_dict(),
-            "candidate_contract_fingerprint": sourceguard_model_contract_fingerprint(contract),
             "sources": [{"source_id": "s1", "source_type": "web_page", "source_status": "candidate"}],
             "anchors": [],
         }
