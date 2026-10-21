@@ -68,13 +68,13 @@ researchguard logic <args>
 ## Common Commands
 
 ```powershell
-researchguard logic structure map examples\structured_artifact_deck.yaml
-researchguard logic structure from-markdown examples\structured_report_outline.md --artifact-kind report --output report_model.yaml
-researchguard logic structure audit examples\structured_artifact_deck.yaml
-researchguard logic importance examples\structured_artifact_deck.yaml
-researchguard logic diagnose examples\structured_artifact_deck.yaml
-researchguard logic citation matrix examples\engineering_efficiency_argument.yaml
-researchguard logic citation audit examples\engineering_efficiency_argument.yaml
+researchguard logic structure map examples/logic/structured_artifact_deck.yaml
+researchguard logic structure from-markdown examples/logic/structured_report_outline.md --artifact-kind report --output report_model.yaml
+researchguard logic structure audit examples/logic/structured_artifact_deck.yaml
+researchguard logic importance examples/logic/structured_artifact_deck.yaml
+researchguard logic diagnose examples/logic/structured_artifact_deck.yaml
+researchguard logic citation matrix examples/logic/engineering_efficiency_argument.yaml
+researchguard logic citation audit examples/logic/engineering_efficiency_argument.yaml
 ```
 
 ## Native completion and stopping
@@ -84,17 +84,3 @@ researchguard logic citation audit examples\engineering_efficiency_argument.yaml
 3. For full argument or important delivery-readiness claims, run real native depth and report current gaps and licensed scope.
 
 Stop at the structural diagnosis and its visible gaps, native closure, or an explicit non-closure terminal. Broad/final/high-impact claims retain important nodes, opposition, contributions and citation checks; do not shrink the universe to bypass them.
-
-`researchguard logic route-depth PACKAGE.json` remains an optional declared-package shape diagnostic only. Its pass does not verify native execution, evidence content or task closure.
-
-## Template packs on request
-
-Only when the task requests an existing template pack, load [validated-template-pack.md](../validated-template-pack.md) and use the corresponding native template operation.
-
-
-## Target-model purpose boundary
-
-For a real target model or native closure claim, retain the current native purpose/guard-model contract and its target-bound known-good/known-bad proof, as described in [broad-depth-and-closure.md](../broad-depth-and-closure.md). Use `researchguard logic guard-contract freeze`, `researchguard logic guard-contract bind`, and `researchguard logic guard-contract verify` with the explicit target root and the current `researchguard.logic.guard_model_contract` owner. Missing, late, stale or non-blocking proof remains non-pass. Internal native `target_skill_id` stays `logicguard`. Viewing, saving, searching and package export do not require a new good/bad model.
-
-
-For explicit reconstruction or blueprint qualification, also load `../domain-blueprint-contract.md`. The argument model owns meaning; the independent artifact inventory owns the complete unit/resource denominator. Report structural and exact-content reconstruction separately.

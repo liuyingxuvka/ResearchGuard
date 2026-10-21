@@ -201,3 +201,14 @@ Experiment recommend补默认非领域循环字段，坏输入给JSON/CLI2，删
 - `python scripts/check_prompt_bundles.py --json` — exit 0, 0.044s; `}`
 - `python -m pytest tests/test_prompt_bundles.py tests/test_skill_suite.py` — exit 0, 2.079s; `10 passed in 1.77s`
 - `python -c from pathlib import Path; p=Path("skills/researchguard/references"); assert not p.exists() or not list(p.iterdir()); print("0 umbrella references")` — exit 0, 0.031s; `0 umbrella references`
+
+## RG-20 — completed
+
+LogicGuard技能仅删清单指定蓝图/模板/目的契约说明，保推理与来源/结构指导，修11个示例路径并补revision-store更严格provenance/holdout说明。入口5942字节；14pass、四真实示例CLI0、指定残留为空；完整检查点848pass13skip、双模型通过、map0error10阶段性WARN。
+
+- `python scripts/check_prompt_bundles.py --json` — exit 0, 0.053s; `}`
+- `python -m pytest tests/test_prompt_bundles.py tests/test_skill_suite.py tests/logic/test_diagram_semantics_guidance.py tests/logic/test_ai_modeled_source_intake_guidance.py` — exit 0, 2.624s; `14 passed in 2.28s`
+- `python <external>/probe_rg20.py` — exit 0, 2.351s; `LogicGuard guidance residuals clean and four real example commands passed`
+- `python -m pytest` — exit 0, 437.788s; `848 passed, 13 skipped in 437.21s (0:07:17)`
+- `python -m flowguard map models` — exit 0, 1.429s; `models: 2 passed, 0 failed`
+- `python -m flowguard map check` — exit 0, 0.923s; `check: 0 error(s), 10 warning(s), 0 info`

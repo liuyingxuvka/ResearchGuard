@@ -151,18 +151,4 @@ Next route: source-library for evidence, then artifact-synthesis for final parag
 2. Extend only relevant important nodes, opposition, sources or dependencies and run the current native perturbation/depth evaluation once.
 3. For further rounds use the existing argument-iteration freeze/run/rollback route; record actual changes and remaining gaps.
 
-Stop at model_closed_for_task or iteration_limit/progress_stalled/external_input_required. Preserve the current purpose contract, finite budget, independent holdout and native blockers; do not add a role package after stopping.
-
-`researchguard logic route-depth PACKAGE.json` remains an optional declared-package shape diagnostic only. Its pass does not verify native execution, evidence content or task closure.
-
-## Template packs on request
-
-Only when the task requests an existing template pack, load [validated-template-pack.md](../validated-template-pack.md) and use the corresponding native template operation.
-
-
-## Target-model purpose boundary
-
-For a real target model or native closure claim, retain the current native purpose/guard-model contract and its target-bound known-good/known-bad proof, as described in [broad-depth-and-closure.md](../broad-depth-and-closure.md). Use `researchguard logic guard-contract freeze`, `researchguard logic guard-contract bind`, and `researchguard logic guard-contract verify` with the explicit target root and the current `researchguard.logic.guard_model_contract` owner. Missing, late, stale or non-blocking proof remains non-pass. Internal native `target_skill_id` stays `logicguard`. Viewing, saving, searching and package export do not require a new good/bad model.
-
-
-When deepening is also used to qualify a reconstructable artifact blueprint, load `../domain-blueprint-contract.md`. Preserve every newly exposed child output, parent input, realization binding, independent inventory unit, resource, and receipt in the affected denominator; depth cannot hide an unresolved leaf or shrink the inventory.
+Stop at model_closed_for_task or iteration_limit/progress_stalled/external_input_required. Preserve the finite budget, independent holdout and native blockers; do not add a role package after stopping.

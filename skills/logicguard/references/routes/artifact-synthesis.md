@@ -62,29 +62,18 @@ researchguard logic <args>
 ```powershell
 researchguard logic synthesize examples/logic/structured_artifact_deck.yaml --selection-request <selection-request.json>
 researchguard logic synthesize examples/logic/structured_artifact_deck.yaml --selection-request <selection-request.json> --delivery
-researchguard logic structure from-markdown examples\structured_report_outline.md --artifact-kind report --output report_model.yaml
-researchguard logic outline examples\engineering_efficiency_argument.yaml
-researchguard logic citation matrix examples\engineering_efficiency_argument.yaml
-researchguard logic citation audit examples\engineering_efficiency_argument.yaml
+researchguard logic structure from-markdown examples/logic/structured_report_outline.md --artifact-kind report --output report_model.yaml
+researchguard logic outline examples/logic/engineering_efficiency_argument.yaml
+researchguard logic citation matrix examples/logic/engineering_efficiency_argument.yaml
+researchguard logic citation audit examples/logic/engineering_efficiency_argument.yaml
 ```
 
 The selection request uses `researchguard.logic.synthesis-request.v1` and carries the target artifact units and goal; `--delivery` adds delivery guidance.
 
 ## Native completion and stopping
 
-1. Prepare the exact selection request, current model, real source bindings and required native depth receipt.
-2. Call synthesize_artifact_plan, preserving descendant structure-gap propagation to ancestors and current target-proof checks.
+1. Prepare the exact selection request, current model and real source bindings. Without a depth receipt, `synthesize` runs the native depth analysis itself.
+2. Call synthesize_artifact_plan, preserving descendant structure-gap propagation to ancestors.
 3. Return the ready/blocked plan, target units and source/claim matrix. Final prose remains owned by the active writing/document owner.
 
 Stop at the native plan terminal. Graphs, hashes and package shape do not establish synthesis closure; no second handwritten execution package is required.
-
-`researchguard logic route-depth PACKAGE.json` remains an optional declared-package shape diagnostic only. Its pass does not verify native execution, evidence content or task closure.
-
-## Template packs on request
-
-Only when the task requests an existing template pack, load [validated-template-pack.md](../validated-template-pack.md) and use the corresponding native template operation.
-
-
-## Target-model purpose boundary
-
-For a real target model or native closure claim, retain the current native purpose/guard-model contract and its target-bound known-good/known-bad proof, as described in [broad-depth-and-closure.md](../broad-depth-and-closure.md). Use `researchguard logic guard-contract freeze`, `researchguard logic guard-contract bind`, and `researchguard logic guard-contract verify` with the explicit target root and the current `researchguard.logic.guard_model_contract` owner. Missing, late, stale or non-blocking proof remains non-pass. Internal native `target_skill_id` stays `logicguard`. Viewing, saving, searching and package export do not require a new good/bad model.

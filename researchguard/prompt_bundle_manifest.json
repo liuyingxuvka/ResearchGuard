@@ -86,12 +86,6 @@
     },
     {
       "skill_id": "logicguard",
-      "trigger_id": "route:domain-blueprint",
-      "declared_in": "skills/logicguard/SKILL.md",
-      "reference": "skills/logicguard/references/domain-blueprint-contract.md"
-    },
-    {
-      "skill_id": "logicguard",
       "trigger_id": "trigger:task-model-maturation",
       "declared_in": "skills/logicguard/SKILL.md",
       "reference": "skills/logicguard/references/task-model-maturation.md"
@@ -119,12 +113,6 @@
       "trigger_id": "trigger:commands",
       "declared_in": "skills/logicguard/SKILL.md",
       "reference": "skills/logicguard/references/commands.md"
-    },
-    {
-      "skill_id": "logicguard",
-      "trigger_id": "trigger:template-pack",
-      "declared_in": "skills/logicguard/SKILL.md",
-      "reference": "skills/logicguard/references/validated-template-pack.md"
     },
     {
       "skill_id": "logicguard",

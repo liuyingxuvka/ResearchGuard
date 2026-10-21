@@ -2,6 +2,8 @@
 
 This is the existing LogicGuard task loop, not a separate route or understanding level.
 
+`argument-iteration run` loads the model into a revision store with stricter rules than `logic validate`: every Evidence node needs `provenance: [{origin_kind: external_source, source_id: <library source id>, content_hash: "sha256:<hash>"}]`, and the holdout claim must differ from the root claim.
+
 Freeze task id, purpose, explicit coverage and fingerprint, assumptions, unknowns, iteration bound, and predecessor receipt on later iterations. For every important covered node, record a concrete prediction and falsifier before the observation or perturbation. Native depth analysis, simulation, and current source/trace receipts—not caller prose—produce input, resolved, persisted, and introduced gaps.
 
 Separate native task proof and development regression from any separately authorized real-prose or style evaluation. For the first two, a bounded short graph is sufficient when the contract needs a case: keep one valid target graph and remove the declared support or warrant for a known-bad variant, without changing task identity, native oracle, frozen order, or candidate binding. Passing this structural example says nothing about factual truth or the quality of a long article.
