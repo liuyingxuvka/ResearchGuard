@@ -31,13 +31,6 @@ def test_suite_identity_is_single_and_complete() -> None:
     assert identity["fingerprint"].startswith("sha256:")
 
 
-def test_suite_identity_does_not_hash_its_generated_dna_back_into_itself() -> None:
-    paths = {path for path, _fingerprint in governed_file_manifest()}
-
-    assert "domain_dna.py" in paths
-    assert not any(
-        path.startswith("resources/external_domain_dna/") for path in paths
-    )
 
 
 def test_direct_member_binding_skips_umbrella() -> None:

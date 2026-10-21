@@ -18,7 +18,6 @@
       "files": [
         "src/researchguard/__init__.py",
         "src/researchguard/admission.py",
-        "src/researchguard/external_scope_authority.py",
         "src/researchguard/model_envelope.py",
         "src/researchguard/native_receipts.py",
         "src/researchguard/portable_material.py",
@@ -62,7 +61,6 @@
       "files": [
         "src/researchguard/__main__.py",
         "src/researchguard/cli.py",
-        "src/researchguard/domain_dna.py",
         "src/researchguard/experiment/cli.py",
         "src/researchguard/experiment/owner_attestation.py",
         "src/researchguard/logic/cli.py",
@@ -77,7 +75,6 @@
       "entrypoints": [
         "src/researchguard/cli.py:main",
         "src/researchguard/routing.py:select_member_request",
-        "src/researchguard/domain_dna.py:qualify_external_domain_dna",
         "src/researchguard/logic/cli.py:main",
         "src/researchguard/source/cli.py:main",
         "src/researchguard/trace/cli.py:main",
@@ -444,8 +441,7 @@
     {
       "id": "research-composition",
       "steps": [
-        "suite-orchestration:select_member_request",
-        "suite-orchestration:qualify_external_domain_dna"
+        "suite-orchestration:select_member_request"
       ]
     },
     {

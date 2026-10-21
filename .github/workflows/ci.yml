@@ -38,8 +38,6 @@ jobs:
           tests/test_install_skill.py
           tests/test_root_cli.py
           tests/logic/test_dynamic_model_purpose_contract.py::test_target_paths_cannot_escape_and_baseline_cannot_substitute
-          tests/test_external_domain_dna_real_paper.py::test_native_replay_cache_has_exact_identity_and_never_caches_material_replay
-          tests/test_external_domain_dna_real_paper.py::test_generic_nonpaper_consistent_workflow_uses_the_same_native_path
           tests/trace/test_inference_kernel.py::test_squared_hinge_qp_matches_analytic_optimum
           tests/trace/test_inference_kernel.py::test_infeasible_problem_fails_closed_without_fallback
       - name: Build release distributions

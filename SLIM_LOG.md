@@ -289,3 +289,13 @@ Full command logs, actual return codes, pre/post installer content hashes and in
 - `python -c import subprocess;p=subprocess.run(["rg","-n","native_receipts|_native_evidence_reference_gaps|native_evidence_missing","src/researchguard/logic/synthesis.py","src/researchguard/logic/synthesis_contract.py"],capture_output=True,text=True);print(p.stdout,end="");assert p.returncode==1;print("receipt gate removed; data/native-depth/source binding paths retained")` — exit 0, 0.036s; `receipt gate removed; data/native-depth/source binding paths retained`
 - `python -m pytest -p no:cacheprovider tests/contract/test_researchguard_handoff.py tests/e2e/test_production_reader_pipeline.py tests/contract/test_production_reader_native_lifecycle.py` — exit 0, 2.163s; `============================== 44 passed in 1.85s ==============================`
 - `python -m pytest --collect-only` — exit 0, 3.342s; `834 tests collected in 2.89s`
+
+## RG-27 — completed
+
+按授权删无CLI外部领域DNA/签名范围与6份测试密钥夹具/编译器及其专测，删其懒导出和Windows点名测试；root retired-command拒绝仍保。26pass、exports ok、收集805、map0error；指定残留仅两行未知命令测试变量，models目录已无。
+
+- `python -c import subprocess;from pathlib import Path;p=subprocess.run(["rg","-n","domain_dna|external_scope_authority|external_domain","src/researchguard","scripts","tests",".github","skills","pyproject.toml","README.md","AGENTS.md"],capture_output=True,text=True);print(p.stdout,end="");rows=p.stdout.splitlines();assert rows and all(r.startswith("tests/test_root_cli.py:") and "domain_dna" in r for r in rows);assert not Path("models").exists();print("only retired-command rejection variables remain; models directory removed")` — exit 0, 0.052s; `only retired-command rejection variables remain; models directory removed`
+- `python -m pytest tests/test_suite_routing.py tests/test_root_cli.py` — exit 0, 20.313s; `26 passed in 19.92s`
+- `python <external>/check_exports.py` — exit 0, 0.774s; `exports ok`
+- `python -m pytest --collect-only` — exit 0, 3.454s; `805 tests collected in 3.01s`
+- `python -m flowguard map check` — exit 0, 0.794s; `check: 0 error(s), 10 warning(s), 0 info`
