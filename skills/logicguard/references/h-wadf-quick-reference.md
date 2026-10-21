@@ -22,6 +22,10 @@ Each node has separate `state` and `confidence`:
 
 Confidence is not probability.
 
+`Evidence` nodes may carry `provenance`, a list of records saying where the material came from:
+`provenance: [{origin_kind: external_source, source_id: <library source id>, content_hash: "sha256:<hash of the cited text>", source_date: 2024-05-01}]`.
+`origin_kind` is one of `external_source`, `observed_event`, `user_attestation`, `test_result`, `human_observation`, `instrument_measurement`, `imported_record` (`ai_generated` and `derived` are not evidence). `source_reference` (for example a URL or DOI) may replace `source_id`.
+
 ## Core Node Types
 
 - `Claim`: assertion or conclusion.

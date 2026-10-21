@@ -9,13 +9,10 @@ from pathlib import Path
 import pytest
 
 import researchguard.logic.task_iteration as task_iteration_module
-from researchguard.logic.file_model_store import FileModelStore
 from researchguard.logic.loader import load_model_from_dict
-from researchguard.logic.execution_depth import model_fingerprint
 from researchguard.logic.task_iteration import (
     ArgumentPrediction,
     freeze_argument_prediction,
-    rollback_argument_revision,
     run_argument_iteration,
     validate_prediction_binding,
 )
@@ -84,40 +81,29 @@ def _prediction(baseline, **overrides):
 
 
 def _native_pass(model, prediction):
-    digest = model_fingerprint(model)
-    return {
-        "receipt_version": "researchguard.logic.depth.v3",
-        "model_fingerprint": digest,
-        "status": "pass",
-        "unresolved_gaps": [],
-    }, ()
+    return ()
 
 
-def test_current_prediction_requires_task_coverage_and_holdout() -> None:
+def test_prediction_needs_only_claim_mode_and_target() -> None:
     baseline, _ = _baseline_and_candidate()
-    with pytest.raises(TypeError):
-        freeze_argument_prediction(
-            baseline,
-            expected_state="IN",
-            mode="assumption-flip",
-            root_claim="C0",
-            node_id="A1",
-        )
-    prediction = _prediction(baseline)
-    assert prediction.coverage_fingerprint.startswith("sha256:")
-    assert prediction.holdout_claim_ids == ("C2",)
+    prediction = freeze_argument_prediction(
+        baseline, expected_state="IN", mode="assumption-flip", root_claim="C0", node_id="A1",
+    )
+    assert prediction.holdout_claim_ids == ()
+    assert prediction.iteration == 0
+    assert "coverage_fingerprint" not in prediction.to_dict()
+    with pytest.raises(ValueError, match="missing or not a Claim"):
+        _prediction(baseline, holdout_claim_ids=("P2",))
 
 
-def test_loaded_prediction_rejects_implicit_or_rebound_task_scope() -> None:
+def test_loaded_prediction_accepts_missing_optional_task_fields() -> None:
     baseline, _ = _baseline_and_candidate()
     raw = _prediction(baseline).to_dict()
-    raw.pop("assumptions")
-    with pytest.raises(ValueError, match="missing task fields"):
-        ArgumentPrediction.from_dict(raw)
-    raw = _prediction(baseline).to_dict()
-    raw["coverage_ids"] = ["C0"]
-    with pytest.raises(ValueError, match="does not bind"):
-        ArgumentPrediction.from_dict(raw)
+    for key in ("task_id", "purpose", "coverage_ids", "assumptions", "unknowns", "holdout_claim_ids"):
+        raw.pop(key)
+    loaded = ArgumentPrediction.from_dict(raw)
+    assert loaded.coverage_ids == ()
+    assert loaded.baseline_digest == raw["baseline_digest"]
 
 
 def test_stale_baseline_binding_is_rejected() -> None:
@@ -128,108 +114,96 @@ def test_stale_baseline_binding_is_rejected() -> None:
         validate_prediction_binding(baseline, prediction)
 
 
-def test_real_native_depth_gaps_override_matching_local_prediction(tmp_path: Path) -> None:
+def test_real_native_depth_gaps_override_matching_local_prediction() -> None:
     baseline, _ = _baseline_and_candidate()
     prediction = _prediction(baseline, expected_state="OUT")
-    receipt = run_argument_iteration(
-        FileModelStore(tmp_path / "store"), baseline, prediction, decision="accept"
+    result = run_argument_iteration(
+        baseline, prediction, decision="accept"
     )
-    assert receipt.terminal_reason != "model_closed_for_task"
-    assert receipt.native_depth_receipt_id
-    assert receipt.open_gap_ids
+    assert result.terminal_reason != "model_closed_for_task"
+    assert result.open_gap_ids
 
 
-def test_candidate_acceptance_binds_native_receipt_and_independent_holdout(
-    tmp_path: Path, monkeypatch
-) -> None:
+def test_candidate_acceptance_checks_protected_and_holdout_claims(monkeypatch) -> None:
     monkeypatch.setattr(task_iteration_module, "_native_depth", _native_pass)
     baseline, candidate = _baseline_and_candidate()
-    receipt = run_argument_iteration(
-        FileModelStore(tmp_path / "store"),
+    result = run_argument_iteration(
         baseline,
         _prediction(baseline),
         candidate=candidate,
         decision="accept",
     )
-    assert receipt.effective_disposition == "accepted"
-    assert receipt.terminal_reason == "model_closed_for_task"
-    assert all(item.passed for item in receipt.holdout_claims)
-    assert receipt.receipt_fingerprint.startswith("sha256:")
+    assert result.effective_disposition == "accepted"
+    assert result.terminal_reason == "model_closed_for_task"
+    assert all(item.passed for item in result.holdout_claims)
+    assert "receipt_fingerprint" not in result.to_dict()
 
 
-def test_holdout_regression_blocks_candidate_even_when_target_matches(
-    tmp_path: Path, monkeypatch
-) -> None:
+def test_holdout_regression_blocks_candidate_even_when_target_matches(monkeypatch) -> None:
     monkeypatch.setattr(task_iteration_module, "_native_depth", _native_pass)
     baseline, candidate = _baseline_and_candidate()
     candidate.nodes["P2"].confidence = 0.0
-    receipt = run_argument_iteration(
-        FileModelStore(tmp_path / "store"),
+    result = run_argument_iteration(
         baseline,
         _prediction(baseline),
         candidate=candidate,
         decision="accept",
     )
-    assert "independent-holdout-regression" in receipt.open_gap_ids
-    assert receipt.terminal_reason != "model_closed_for_task"
+    assert "independent-holdout-regression" in result.open_gap_ids
+    assert result.terminal_reason != "model_closed_for_task"
 
 
-def test_unchanged_gap_set_is_progress_stalled(tmp_path: Path) -> None:
+def test_unchanged_gap_set_is_progress_stalled() -> None:
     baseline, _ = _baseline_and_candidate()
     first = run_argument_iteration(
-        FileModelStore(tmp_path / "first"), baseline, _prediction(baseline, expected_state="OUT"), decision="accept"
+        baseline, _prediction(baseline, expected_state="OUT"), decision="accept"
     )
     second_prediction = _prediction(
         baseline,
         expected_state="OUT",
         iteration=1,
-        prior_receipt_fingerprint=first.receipt_fingerprint,
         prior_open_gap_ids=first.open_gap_ids,
     )
     second = run_argument_iteration(
-        FileModelStore(tmp_path / "second"), baseline, second_prediction, decision="accept"
+        baseline, second_prediction, decision="accept"
     )
     assert second.terminal_reason == "progress_stalled"
     assert second.persisted_gap_ids == first.open_gap_ids
 
 
-def test_accepted_revision_can_be_rolled_back(tmp_path: Path, monkeypatch) -> None:
-    monkeypatch.setattr(task_iteration_module, "_native_depth", _native_pass)
+def test_cli_freeze_and_run_leave_the_model_files_untouched(tmp_path: Path) -> None:
     baseline, candidate = _baseline_and_candidate()
-    store = FileModelStore(tmp_path / "store")
-    accepted = run_argument_iteration(
-        store, baseline, _prediction(baseline), candidate=candidate, decision="accept"
-    )
-    rollback = rollback_argument_revision(
-        store,
-        model_id=baseline.id,
-        source_revision=accepted.baseline_revision,
-    )
-    assert rollback.compensating_revision != accepted.baseline_revision
-    assert store.get(baseline.id).content_digest == _prediction(baseline).baseline_digest
-
-
-def test_cli_freeze_emits_only_current_strict_prediction(tmp_path: Path) -> None:
-    baseline, _ = _baseline_and_candidate()
     baseline_path = tmp_path / "baseline.json"
-    output = tmp_path / "prediction.json"
+    candidate_path = tmp_path / "candidate.json"
+    prediction_path = tmp_path / "prediction.json"
+    result_path = tmp_path / "result.json"
     baseline_path.write_text(json.dumps(baseline.to_dict()), encoding="utf-8")
-    result = subprocess.run(
-        [
-            sys.executable, "-m", "researchguard", "logic", "argument-iteration", "freeze",
-            str(baseline_path), "--expected-state", "IN", "--mode", "assumption-flip",
-            "--root", "C0", "--node", "A1", "--protect-claim", "C1",
-            "--holdout-claim", "C2", "--task-id", "argument-task-cli",
-            "--purpose", "exercise strict CLI", "--coverage-id", "C0",
-            "--coverage-id", "C1", "--coverage-id", "C2", "--iteration", "0",
-            "--max-iterations", "4", "--prediction-id", "prediction-cli",
-            "--output", str(output),
-        ],
-        cwd=ROOT,
-        capture_output=True,
-        text=True,
+    candidate_path.write_text(json.dumps(candidate.to_dict()), encoding="utf-8")
+    before = (baseline_path.read_bytes(), candidate_path.read_bytes())
+
+    def cli(*args: str) -> subprocess.CompletedProcess[str]:
+        return subprocess.run(
+            [sys.executable, "-m", "researchguard", "logic", "argument-iteration", *args],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+        )
+
+    frozen = cli(
+        "freeze", str(baseline_path), "--expected-state", "IN", "--mode", "assumption-flip",
+        "--root", "C0", "--node", "A1", "--protect-claim", "C1", "--holdout-claim", "C2",
+        "--output", str(prediction_path),
     )
-    assert result.returncode == 0, result.stderr
-    payload = json.loads(output.read_text(encoding="utf-8"))
+    assert frozen.returncode == 0, frozen.stderr
+    payload = json.loads(prediction_path.read_text(encoding="utf-8"))
     assert payload["schema_version"] == "researchguard.logic.argument-prediction.v2"
-    assert "prior_gap_fingerprints" not in payload
+    assert "coverage_fingerprint" not in payload
+    ran = cli(
+        "run", str(baseline_path), "--prediction", str(prediction_path),
+        "--candidate", str(candidate_path), "--decision", "accept", "--output", str(result_path),
+    )
+    assert ran.returncode == 0, ran.stderr
+    outcome = json.loads(result_path.read_text(encoding="utf-8"))
+    assert outcome["schema_version"] == "researchguard.logic.argument-iteration-result.v1"
+    assert outcome["effective_disposition"] in {"accepted", "continue_iteration"}
+    assert (baseline_path.read_bytes(), candidate_path.read_bytes()) == before

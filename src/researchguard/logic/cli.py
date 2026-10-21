@@ -37,10 +37,8 @@ from .task_iteration import (
     ArgumentPrediction,
     SUPPORTED_PREDICTION_MODES,
     freeze_argument_prediction,
-    rollback_argument_revision,
     run_argument_iteration,
 )
-from .file_model_store import FileModelStore
 from .structure_audit import audit_structure
 from .structured_artifact import build_artifact_map
 from .synthesis import synthesize_artifact_plan
@@ -115,7 +113,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     iteration = sub.add_parser(
         "argument-iteration",
-        help="Freeze, run, or roll back one task-local argument-model iteration.",
+        help="Freeze or run one task-local argument-model iteration.",
     )
     iteration_sub = iteration.add_subparsers(required=True)
     iteration_freeze = iteration_sub.add_parser(
@@ -135,42 +133,27 @@ def build_parser() -> argparse.ArgumentParser:
         help="Claim whose unperturbed native status must remain unchanged; repeat as needed.",
     )
     iteration_freeze.add_argument("--prediction-id")
-    iteration_freeze.add_argument("--task-id", required=True)
-    iteration_freeze.add_argument("--purpose", required=True)
-    iteration_freeze.add_argument("--coverage-id", action="append", required=True)
+    iteration_freeze.add_argument("--task-id", default="")
+    iteration_freeze.add_argument("--purpose", default="")
+    iteration_freeze.add_argument("--coverage-id", action="append", default=[])
     iteration_freeze.add_argument("--assumption", action="append", default=[])
     iteration_freeze.add_argument("--unknown", action="append", default=[])
-    iteration_freeze.add_argument("--iteration", type=int, required=True)
-    iteration_freeze.add_argument("--max-iterations", type=int, required=True)
-    iteration_freeze.add_argument("--prior-receipt-fingerprint", default="")
+    iteration_freeze.add_argument("--iteration", type=int, default=0)
+    iteration_freeze.add_argument("--max-iterations", type=int, default=8)
     iteration_freeze.add_argument("--prior-open-gap-id", action="append", default=[])
-    iteration_freeze.add_argument("--holdout-claim", action="append", required=True)
+    iteration_freeze.add_argument("--holdout-claim", action="append", default=[])
     iteration_freeze.add_argument("--output", required=True)
     iteration_freeze.set_defaults(func=_cmd_argument_iteration_freeze)
 
     iteration_run = iteration_sub.add_parser(
-        "run", help="Observe a frozen prediction and accept or reject a candidate revision."
+        "run", help="Observe a frozen prediction and accept or reject a candidate model."
     )
     iteration_run.add_argument("baseline")
     iteration_run.add_argument("--prediction", required=True)
     iteration_run.add_argument("--candidate")
-    iteration_run.add_argument("--store-root", required=True)
     iteration_run.add_argument("--decision", choices=["accept", "reject"], default="reject")
-    iteration_run.add_argument("--actor", default="logicguard-task-iteration")
-    iteration_run.add_argument("--idempotency-key")
     iteration_run.add_argument("--output", required=True)
     iteration_run.set_defaults(func=_cmd_argument_iteration_run)
-
-    iteration_rollback = iteration_sub.add_parser(
-        "rollback", help="Append a compensating revision from a historical snapshot."
-    )
-    iteration_rollback.add_argument("--store-root", required=True)
-    iteration_rollback.add_argument("--model-id", required=True)
-    iteration_rollback.add_argument("--source-revision", required=True)
-    iteration_rollback.add_argument("--actor", default="logicguard-task-iteration")
-    iteration_rollback.add_argument("--idempotency-key")
-    iteration_rollback.add_argument("--output", required=True)
-    iteration_rollback.set_defaults(func=_cmd_argument_iteration_rollback)
 
     gaps = sub.add_parser("gaps", help="Generate a routeable gap ledger from diagnostics and simulation.")
     gaps.add_argument("model")
@@ -491,8 +474,6 @@ def _cmd_evaluate(args: argparse.Namespace) -> int:
     return 0
 
 
-
-
 def _cmd_library_viewer(args: argparse.Namespace) -> int:
     from researchguard.logic_viewer.launcher import main as viewer_main
 
@@ -558,7 +539,6 @@ def _cmd_argument_iteration_freeze(args: argparse.Namespace) -> int:
         unknowns=args.unknown,
         iteration=args.iteration,
         max_iterations=args.max_iterations,
-        prior_receipt_fingerprint=args.prior_receipt_fingerprint,
         prior_open_gap_ids=args.prior_open_gap_id,
         holdout_claim_ids=args.holdout_claim,
     )
@@ -570,28 +550,13 @@ def _cmd_argument_iteration_run(args: argparse.Namespace) -> int:
     baseline = load_model(args.baseline)
     candidate = load_model(args.candidate) if args.candidate else None
     prediction = ArgumentPrediction.from_dict(_load_json_object(args.prediction))
-    receipt = run_argument_iteration(
-        FileModelStore(args.store_root),
+    result = run_argument_iteration(
         baseline,
         prediction,
         candidate=candidate,
         decision=args.decision,
-        actor=args.actor,
-        idempotency_key=args.idempotency_key,
     )
-    _write(args.output, receipt.to_dict())
-    return 0 if receipt.effective_disposition not in {"conflict"} else 3
-
-
-def _cmd_argument_iteration_rollback(args: argparse.Namespace) -> int:
-    receipt = rollback_argument_revision(
-        FileModelStore(args.store_root),
-        model_id=args.model_id,
-        source_revision=args.source_revision,
-        actor=args.actor,
-        idempotency_key=args.idempotency_key,
-    )
-    _write(args.output, receipt.to_dict())
+    _write(args.output, result.to_dict())
     return 0
 
 
@@ -803,18 +768,6 @@ def _cmd_structure_audit(args: argparse.Namespace) -> int:
     else:
         print(json.dumps(payload, indent=2) if isinstance(payload, dict) else payload)
     return 0
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 def _cmd_synthesize(args: argparse.Namespace) -> int:

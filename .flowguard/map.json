@@ -86,14 +86,15 @@
         ".flowguard/models/sourceguard_content_anchor_oracle_model.py"
       ],
       "status": "confirmed",
-      "fingerprint": "sha256:ea23f861ebfb02f7dfc0ee50c19ff6628d5d63273f1f63029ce72554fd3bad9b"
+      "fingerprint": "sha256:ad04891d59926a094d8b197d604af02e642a3d50fccd5424a2e124c338701617"
     },
     {
       "id": "logicguard",
       "summary": "Own argument support, source library, structured artifacts, model deepening, synthesis and project library inspection.",
       "responsibilities": [
         "Own argument support, source library, structured artifacts, model deepening, synthesis and project library inspection.",
-        "Run depth analysis without a contract; synthesis computes depth in process when no depth receipt is supplied."
+        "Run depth analysis without a contract; synthesis computes depth in process when no depth receipt is supplied.",
+        "Run the predict-observe-revise loop on plain model files; the loop never writes model files, so rollback is restoring the previous file."
       ],
       "files": [
         "src/researchguard/logic/__init__.py",
@@ -102,10 +103,8 @@
         "src/researchguard/logic/citation_matrix.py",
         "src/researchguard/logic/delivery.py",
         "src/researchguard/logic/diagnostics.py",
-        "src/researchguard/logic/evaluation_overlay.py",
         "src/researchguard/logic/evaluator.py",
         "src/researchguard/logic/execution_depth.py",
-        "src/researchguard/logic/file_model_store.py",
         "src/researchguard/logic/gap_ledger.py",
         "src/researchguard/logic/guard_model_contract.py",
         "src/researchguard/logic/hierarchy.py",
@@ -117,17 +116,13 @@
         "src/researchguard/logic/markdown_structure.py",
         "src/researchguard/logic/minimal_sets.py",
         "src/researchguard/logic/model.py",
-        "src/researchguard/logic/model_store.py",
         "src/researchguard/logic/provenance.py",
-        "src/researchguard/logic/receipts.py",
         "src/researchguard/logic/report.py",
         "src/researchguard/logic/schema.py",
         "src/researchguard/logic/simulator.py",
         "src/researchguard/logic/source_intake.py",
         "src/researchguard/logic/source_library.py",
         "src/researchguard/logic/source_library_io.py",
-        "src/researchguard/logic/store_transaction.py",
-        "src/researchguard/logic/store_validation.py",
         "src/researchguard/logic/structure_audit.py",
         "src/researchguard/logic/structured_artifact.py",
         "src/researchguard/logic/synthesis.py",
@@ -162,7 +157,7 @@
       ],
       "models": [],
       "status": "confirmed",
-      "fingerprint": "sha256:d6f6b6521caed843696374cf80c5d5b0e3a39c3fb169084ded12e9f438db606c"
+      "fingerprint": "sha256:3522eaf499a32ea48bf503e9df689a9c12e345c6fba9d552d864219101d71108"
     },
     {
       "id": "sourceguard",

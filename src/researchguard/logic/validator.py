@@ -5,15 +5,13 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
-from .identity import BlockId, EdgeId, ModelId, NodeId
 from .model import (
     LogicModel,
     block_interface_payload_fingerprint,
     block_interface_receipt_fingerprint,
     interface_model_fingerprint,
 )
-from .provenance import ProvenanceError, validate_evidence_provenance
-from .schema import ACCEPTANCE_KEYS, EDGE_TYPES, NODE_TYPES, SCHEMA_VERSION, STATES, STATE_UNDECIDED
+from .schema import ACCEPTANCE_KEYS, EDGE_TYPES, NODE_TYPES, STATES
 
 
 _EXECUTABLE_BLOCK_NODE_KEYS = {
@@ -26,7 +24,6 @@ _EXECUTABLE_BLOCK_NODE_KEYS = {
     "local_rebuttals",
     "acceptance_conditions",
 }
-_TRANSIENT_NODE_KEYS = {"forced_state", "evaluated_state", "evaluation_state", "runtime_state"}
 
 
 @dataclass
@@ -45,20 +42,13 @@ class ValidationResult:
         return "\n".join(lines)
 
 
-def validate_model(model: LogicModel, *, durable: bool = False) -> ValidationResult:
+def validate_model(model: LogicModel) -> ValidationResult:
     errors: list[str] = []
     warnings: list[str] = []
     if not model.nodes:
         errors.append("model must define at least one node")
     if model.root_claim and model.root_claim not in model.nodes:
         errors.append(f"root_claim {model.root_claim!r} is not a defined node")
-    if durable and model.schema_version != SCHEMA_VERSION:
-        errors.append(
-            f"model schema {model.schema_version!r} is not current {SCHEMA_VERSION!r}; "
-            "use the explicit import-to-current boundary"
-        )
-    if durable:
-        _check_portable_id("model", model.id, ModelId, errors)
 
     for node_id, node in model.nodes.items():
         if node.type not in NODE_TYPES:
@@ -69,23 +59,6 @@ def validate_model(model: LogicModel, *, durable: bool = False) -> ValidationRes
             errors.append(f"node {node_id!r} confidence must be between 0 and 1")
         if node.importance is not None and not 0.0 <= node.importance <= 1.0:
             errors.append(f"node {node_id!r} importance must be between 0 and 1")
-        if durable:
-            _check_portable_id("node", node_id, NodeId, errors)
-            if node.id != node_id:
-                errors.append(f"node registry key {node_id!r} disagrees with node.id {node.id!r}")
-            if node.state != STATE_UNDECIDED:
-                errors.append(
-                    f"node {node_id!r} persists evaluated state {node.state!r}; "
-                    "durable evaluated state belongs in an EvaluationOverlay"
-                )
-            transient = sorted(_TRANSIENT_NODE_KEYS.intersection(node.metadata))
-            if transient:
-                errors.append(f"node {node_id!r} contains transient simulation fields {transient!r}")
-            if node.type == "Evidence":
-                try:
-                    validate_evidence_provenance(node_id, node.provenance)
-                except ProvenanceError as exc:
-                    errors.append(str(exc))
 
     for index, edge in enumerate(model.edges):
         if edge.source not in model.nodes:
@@ -98,11 +71,6 @@ def validate_model(model: LogicModel, *, durable: bool = False) -> ValidationRes
             errors.append(f"edge {index} weight must be between 0 and 1")
         if edge.importance is not None and not 0.0 <= edge.importance <= 1.0:
             errors.append(f"edge {index} importance must be between 0 and 1")
-        if durable:
-            if not edge.id:
-                errors.append(f"edge {index} has no stable id")
-            else:
-                _check_portable_id("edge", edge.id, EdgeId, errors)
 
     edge_ids = [edge.id for edge in model.edges if edge.id]
     if len(edge_ids) != len(set(edge_ids)):
@@ -159,8 +127,6 @@ def validate_model(model: LogicModel, *, durable: bool = False) -> ValidationRes
     for block_id, block in model.blocks.items():
         if block.id != block_id:
             errors.append(f"block registry key {block_id!r} disagrees with block.id {block.id!r}")
-        if durable:
-            _check_portable_id("block", block_id, BlockId, errors)
         if len(block.member_nodes) != len(set(block.member_nodes)):
             errors.append(f"block {block_id!r}.member_nodes contains duplicates")
         members = set(block.member_node_ids())
@@ -180,12 +146,9 @@ def validate_model(model: LogicModel, *, durable: bool = False) -> ValidationRes
         for ref in members:
             if ref not in model.nodes:
                 errors.append(f"block {block_id!r}.member_nodes references unknown node {ref!r}")
-        if block.root_claim is None:
-            if durable:
-                errors.append(f"block {block_id!r} must declare one root_claim")
-        elif block.root_claim not in model.nodes:
+        if block.root_claim is not None and block.root_claim not in model.nodes:
             errors.append(f"block {block_id!r}.root_claim references unknown node {block.root_claim!r}")
-        else:
+        elif block.root_claim is not None:
             if block.root_claim not in members:
                 errors.append(f"block {block_id!r}.root_claim must be a member node")
             if model.nodes[block.root_claim].type != "Claim":
@@ -218,7 +181,7 @@ def validate_model(model: LogicModel, *, durable: bool = False) -> ValidationRes
                 )
             if block.title and structural.text and block.title != structural.text:
                 message = f"block {block_id!r} title disagrees with its structural-node projection"
-                (errors if durable else warnings).append(message)
+                warnings.append(message)
             if block.parent and structural.parent and block.parent != structural.parent:
                 message = f"block {block_id!r} parent disagrees with its structural-node projection"
                 errors.append(message)
@@ -322,13 +285,6 @@ def _as_list(value: Any) -> list[str]:
     if isinstance(value, (list, tuple, set)):
         return [str(item) for item in value]
     return [str(value)]
-
-
-def _check_portable_id(kind: str, value: str, identity_type: Any, errors: list[str]) -> None:
-    try:
-        identity_type.parse(value)
-    except ValueError as exc:
-        errors.append(f"{kind} id {value!r} is not portable: {exc}")
 
 
 def _find_cycle(graph: dict[str, list[str]]) -> list[str]:

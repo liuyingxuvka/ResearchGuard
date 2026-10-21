@@ -453,3 +453,18 @@ Windows冒烟改6个现存功能测试文件，删不存在VERSION的push触发�
 - `python -m flowguard map models` — exit 0, 1.476s; `models: 2 passed, 0 failed`
 - `python -m flowguard map check` — exit 0, 0.282s; `check: 0 error(s), 4 warning(s), 0 info`
 - `python -m flowguard release` — exit 0, 1.765s; `verify: PASS (map, lint and models only; tests not run; run python -m pytest -q separately)`
+
+## RG-41 — completed
+
+Removed the explicitly retired ModelStore/overlay/rollback stack and receipt fields. The plain-file prediction loop keeps identical native binding, simulation, claim protection, gap lineage and stopping functions; old prediction digest matches and changed models still reject stale predictions. Optional metadata/holdouts work, real native gaps remain visible, CLI leaves baseline/candidate bytes untouched. Logic tests 159 passed; collection 363; fixed LW43 consumer 10 passed with actual native ready/PASSED and no skip (historical 11-case count adapted); exports/map/release passed.
+
+- `python <external>/probe_rg41_old_digest.py` — exit 0, 0.414s; `old ModelStore digest equals direct canonical model digest; pre-change frozen prediction saved externally sha256:5699042f513204a03f8b943799e1d008594747e825eca757bca1ae7686cce655`
+- `python -m pytest tests/logic` — exit 0, 18.616s; `159 passed in 18.12s`
+- `python <external>/probe_rg41.py` — exit 0, 1.783s; `old store residues absent; native CLI/bad flags/model bytes verified`
+- `python <external>/check_exports.py` — exit 0, 0.486s; `exports ok`
+- `python -m pytest --collect-only` — exit 0, 2.159s; `363 tests collected in 1.67s`
+- `python -m flowguard map confirm logicguard suite-orchestration` — exit 0, 0.416s; `confirmed 2 component(s)`
+- `python -m flowguard map check` — exit 0, 0.338s; `check: 0 error(s), 4 warning(s), 0 info`
+- `python -m flowguard release` — exit 0, 1.77s; `verify: PASS (map, lint and models only; tests not run; run python -m pytest -q separately)`
+- `python -m pytest -p no:cacheprovider tests/contract/test_researchguard_handoff.py --junitxml <external>/RG-41-lw43-junit.xml --basetemp <external>/RG-41-lw43-temp` — exit 0, 0.786s; `============================== 10 passed in 0.43s ==============================`
+- `python <external>/verify_lw_junit.py <external>/RG-41-lw43-junit.xml` — exit 0, 0.077s; `10 actual PASSED, 0 skipped; real native provider-to-reader bridge PASSED/ready, not version-skipped`

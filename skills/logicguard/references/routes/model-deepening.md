@@ -149,6 +149,6 @@ Next route: source-library for evidence, then artifact-synthesis for final parag
 
 1. Use diagnose/importance on the current model to identify a real gap affecting the target conclusion.
 2. Extend only relevant important nodes, opposition, sources or dependencies and run the current native perturbation/depth evaluation once.
-3. For further rounds use the existing argument-iteration freeze/run/rollback route; record actual changes and remaining gaps.
+3. For further rounds use the existing argument-iteration freeze/run route (see `task-model-maturation.md`); record actual changes and remaining gaps.
 
-Stop at model_closed_for_task or iteration_limit/progress_stalled/external_input_required. Preserve the finite budget, independent holdout and native blockers; do not add a role package after stopping.
+Stop at model_closed_for_task or iteration_limit/progress_stalled/external_input_required. Preserve the finite budget, any declared holdout claims and native blockers; do not add a role package after stopping.

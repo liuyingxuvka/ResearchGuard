@@ -2,14 +2,8 @@
 
 from __future__ import annotations
 
-# One current durable authority.  Direct YAML/JSON authoring may omit these
-# markers, but every ModelStore artifact must declare the exact current value.
+# Schema id of a LogicGuard model; YAML/JSON models may omit it.
 SCHEMA_VERSION = "researchguard.logic.model-store.v1"
-MODEL_SNAPSHOT_SCHEMA = "researchguard.logic.model-snapshot.v1"
-MANIFEST_SCHEMA = "researchguard.logic.model-store-manifest.v2"
-JOURNAL_SCHEMA = "researchguard.logic.model-store-journal.v1"
-EVALUATION_OVERLAY_SCHEMA = "researchguard.logic.evaluation-overlay.v1"
-RECEIPT_SCHEMA = "researchguard.logic.model-store-receipt.v1"
 
 STATE_IN = "IN"
 STATE_OUT = "OUT"

@@ -48,7 +48,7 @@ def test_structured_artifact_api_is_exported() -> None:
     assert "audit_claim_source_paragraph_matrix" in exported
 
 
-def test_model_store_overlay_and_native_depth_api_is_exported() -> None:
+def test_model_identity_provenance_and_depth_api_is_exported() -> None:
     exported = set(researchguard.logic.__all__)
     assert {
         "SCHEMA_VERSION",
@@ -59,12 +59,6 @@ def test_model_store_overlay_and_native_depth_api_is_exported() -> None:
         "BlockId",
         "QualifiedNodeRef",
         "ProvenanceRecord",
-        "ModelSnapshot",
-        "ModelStore",
-        "ModelTransaction",
-        "FileModelStore",
-        "EvaluationOverlay",
-        "evaluate_snapshot",
         "LogicDepthReceipt",
         "build_logic_depth_receipt",
     } <= exported

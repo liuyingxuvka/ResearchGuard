@@ -1,7 +1,9 @@
-"""Task-local prediction, observation, and immutable argument-model revision.
+"""Task-local prediction, observation and candidate decision for an argument model.
 
 This module coordinates existing LogicGuard authorities.  It does not change
-evaluation or simulation semantics and it never edits Guard policy.
+evaluation or simulation semantics and it never edits Guard policy.  It never
+writes model files: the baseline and the candidate stay as they are, so a
+rollback is keeping (or restoring from git) the previous model file.
 """
 
 from __future__ import annotations
@@ -10,26 +12,18 @@ import uuid
 import hashlib
 import json
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from typing import Any, Mapping, Sequence
 
 from .evaluator import evaluate_model
 from .model import LogicModel
-from .model_store import (
-    ModelSnapshot,
-    ModelStore,
-    TransactionConflictError,
-    canonical_digest,
-    canonical_model_payload,
-)
-from .receipts import utc_now
 from .schema import STATES
 from .simulator import simulate_model
 from .execution_depth import _build_native_depth_analysis
 
 
 ARGUMENT_PREDICTION_SCHEMA = "researchguard.logic.argument-prediction.v2"
-ARGUMENT_ITERATION_RECEIPT_SCHEMA = "researchguard.logic.argument-iteration-receipt.v2"
-ARGUMENT_ROLLBACK_RECEIPT_SCHEMA = "researchguard.logic.argument-rollback-receipt.v1"
+ARGUMENT_ITERATION_RESULT_SCHEMA = "researchguard.logic.argument-iteration-result.v1"
 SUPPORTED_PREDICTION_MODES = frozenset(
     {
         "premise-removal",
@@ -49,11 +43,10 @@ MODEL_TERMINALS = frozenset(
         "iteration_limit",
     }
 )
-ARGUMENT_ITERATION_CLAIM_BOUNDARY = (
-    "This receipt proves one task-local prediction, native LogicGuard observation, "
-    "declared protected-claim checks, and immutable revision disposition. It does "
-    "not prove factual truth or the completeness of undeclared claims."
-)
+
+
+def utc_now() -> str:
+    return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
 
 
 def _canonical_sha256(value: Any) -> str:
@@ -61,13 +54,12 @@ def _canonical_sha256(value: Any) -> str:
     return f"sha256:{hashlib.sha256(body.encode('utf-8')).hexdigest()}"
 
 
-def _native_depth(model: LogicModel, prediction: "ArgumentPrediction") -> tuple[Mapping[str, Any], tuple[str, ...]]:
-    receipt = _build_native_depth_analysis(
+def _native_depth(model: LogicModel, prediction: "ArgumentPrediction") -> tuple[str, ...]:
+    analysis = _build_native_depth_analysis(
         model,
-        requested_claim_scope_ids=prediction.coverage_ids,
+        requested_claim_scope_ids=prediction.coverage_ids or None,
     )
-    payload = receipt.to_dict()
-    return payload, tuple(sorted(str(item) for item in receipt.unresolved_gaps))
+    return tuple(sorted(str(item) for item in analysis.unresolved_gaps))
 
 
 def _gap_lineage(
@@ -78,24 +70,6 @@ def _gap_lineage(
         tuple(sorted(before - after)),
         tuple(sorted(before & after)),
         tuple(sorted(after - before)),
-    )
-
-
-def _receipt_fingerprint(
-    prediction: "ArgumentPrediction",
-    baseline_digest: str,
-    candidate_digest: str | None,
-    open_gap_ids: Sequence[str],
-    terminal_reason: str,
-) -> str:
-    return _canonical_sha256(
-        {
-            "prediction": prediction.to_dict(),
-            "baseline_digest": baseline_digest,
-            "candidate_digest": candidate_digest,
-            "open_gap_ids": sorted(open_gap_ids),
-            "terminal_reason": terminal_reason,
-        }
     )
 
 
@@ -112,17 +86,15 @@ class ArgumentPrediction:
     max_size: int
     protected_claim_ids: tuple[str, ...]
     frozen_at: str
-    task_id: str
-    purpose: str
-    coverage_ids: tuple[str, ...]
-    coverage_fingerprint: str
-    assumptions: tuple[str, ...]
-    unknowns: tuple[str, ...]
-    iteration: int
-    max_iterations: int
-    prior_receipt_fingerprint: str
-    prior_open_gap_ids: tuple[str, ...]
-    holdout_claim_ids: tuple[str, ...]
+    task_id: str = ""
+    purpose: str = ""
+    coverage_ids: tuple[str, ...] = ()
+    assumptions: tuple[str, ...] = ()
+    unknowns: tuple[str, ...] = ()
+    iteration: int = 0
+    max_iterations: int = 8
+    prior_open_gap_ids: tuple[str, ...] = ()
+    holdout_claim_ids: tuple[str, ...] = ()
     schema_version: str = ARGUMENT_PREDICTION_SCHEMA
 
     def __post_init__(self) -> None:
@@ -150,32 +122,12 @@ class ArgumentPrediction:
             raise ValueError("protected_claim_ids must not contain duplicates")
         if not self.frozen_at:
             raise ValueError("frozen_at must not be empty")
-        if not self.task_id.strip() or not self.purpose.strip():
-            raise ValueError("task_id and purpose are required")
-        if not self.coverage_ids:
-            raise ValueError("task-local argument predictions require coverage_ids")
-        if not self.coverage_fingerprint.startswith("sha256:"):
-            raise ValueError("coverage_fingerprint is required")
-        expected_coverage_fingerprint = _canonical_sha256(
-            {
-                "task_id": self.task_id,
-                "purpose": self.purpose,
-                "coverage_ids": sorted(self.coverage_ids),
-                "model_id": self.model_id,
-            }
-        )
-        if self.coverage_fingerprint != expected_coverage_fingerprint:
-            raise ValueError("coverage_fingerprint does not bind the task coverage")
         if len(set(self.coverage_ids)) != len(self.coverage_ids):
             raise ValueError("coverage_ids must not contain duplicates")
         if self.iteration < 0 or self.max_iterations < 1:
             raise ValueError("iteration must be non-negative and max_iterations must be positive")
-        if self.iteration and not self.prior_receipt_fingerprint.startswith("sha256:"):
-            raise ValueError("later iterations require prior_receipt_fingerprint")
         if len(set(self.prior_open_gap_ids)) != len(self.prior_open_gap_ids):
             raise ValueError("prior_open_gap_ids must not contain duplicates")
-        if not self.holdout_claim_ids:
-            raise ValueError("at least one independent holdout_claim_id is required")
         if len(set(self.holdout_claim_ids)) != len(self.holdout_claim_ids):
             raise ValueError("holdout_claim_ids must not contain duplicates")
         if set(self.holdout_claim_ids) & set(self.protected_claim_ids):
@@ -198,37 +150,16 @@ class ArgumentPrediction:
             "task_id": self.task_id,
             "purpose": self.purpose,
             "coverage_ids": list(self.coverage_ids),
-            "coverage_fingerprint": self.coverage_fingerprint,
             "assumptions": list(self.assumptions),
             "unknowns": list(self.unknowns),
             "iteration": self.iteration,
             "max_iterations": self.max_iterations,
-            "prior_receipt_fingerprint": self.prior_receipt_fingerprint,
             "prior_open_gap_ids": list(self.prior_open_gap_ids),
             "holdout_claim_ids": list(self.holdout_claim_ids),
         }
 
     @classmethod
     def from_dict(cls, raw: Mapping[str, Any]) -> "ArgumentPrediction":
-        required_task_fields = {
-            "task_id",
-            "purpose",
-            "coverage_ids",
-            "coverage_fingerprint",
-            "assumptions",
-            "unknowns",
-            "iteration",
-            "max_iterations",
-            "prior_receipt_fingerprint",
-            "prior_open_gap_ids",
-            "holdout_claim_ids",
-        }
-        missing = sorted(required_task_fields - set(raw))
-        if missing:
-            raise ValueError(
-                "current argument prediction is missing task fields: "
-                + ", ".join(missing)
-            )
         return cls(
             schema_version=str(raw.get("schema_version", "")),
             prediction_id=str(raw.get("prediction_id", "")),
@@ -249,12 +180,10 @@ class ArgumentPrediction:
             task_id=str(raw.get("task_id", "")),
             purpose=str(raw.get("purpose", "")),
             coverage_ids=tuple(str(item) for item in (raw.get("coverage_ids") or ())),
-            coverage_fingerprint=str(raw.get("coverage_fingerprint", "")),
             assumptions=tuple(str(item) for item in (raw.get("assumptions") or ())),
             unknowns=tuple(str(item) for item in (raw.get("unknowns") or ())),
             iteration=int(raw.get("iteration", 0)),
             max_iterations=int(raw.get("max_iterations", 8)),
-            prior_receipt_fingerprint=str(raw.get("prior_receipt_fingerprint", "")),
             prior_open_gap_ids=tuple(str(item) for item in (raw.get("prior_open_gap_ids") or ())),
             holdout_claim_ids=tuple(str(item) for item in (raw.get("holdout_claim_ids") or ())),
         )
@@ -313,7 +242,7 @@ class ProtectedClaimRevalidation:
 
 
 @dataclass(frozen=True)
-class ArgumentIterationReceipt:
+class ArgumentIterationResult:
     prediction: ArgumentPrediction
     baseline_observation: ArgumentObservation
     baseline_comparison: ArgumentPredictionComparison
@@ -321,17 +250,11 @@ class ArgumentIterationReceipt:
     candidate_comparison: ArgumentPredictionComparison | None
     protected_claims: tuple[ProtectedClaimRevalidation, ...]
     holdout_claims: tuple[ProtectedClaimRevalidation, ...]
-    native_depth_receipt: Mapping[str, Any]
-    native_depth_receipt_id: str
     requested_disposition: str
     effective_disposition: str
     disposition_reason: str
-    baseline_revision: str
-    candidate_revision: str | None
-    store_receipt: Mapping[str, Any] | None
     completed_at: str
-    schema_version: str = ARGUMENT_ITERATION_RECEIPT_SCHEMA
-    claim_boundary: str = ARGUMENT_ITERATION_CLAIM_BOUNDARY
+    schema_version: str = ARGUMENT_ITERATION_RESULT_SCHEMA
     input_gap_ids: tuple[str, ...] = ()
     resolved_gap_ids: tuple[str, ...] = ()
     persisted_gap_ids: tuple[str, ...] = ()
@@ -341,7 +264,6 @@ class ArgumentIterationReceipt:
     next_actions: tuple[str, ...] = ()
     terminal_reason: str = "continue_iteration"
     progressed: bool = False
-    receipt_fingerprint: str = ""
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -361,18 +283,10 @@ class ArgumentIterationReceipt:
             ),
             "protected_claims": [item.to_dict() for item in self.protected_claims],
             "holdout_claims": [item.to_dict() for item in self.holdout_claims],
-            "native_depth_receipt": dict(self.native_depth_receipt),
-            "native_depth_receipt_id": self.native_depth_receipt_id,
             "requested_disposition": self.requested_disposition,
             "effective_disposition": self.effective_disposition,
             "disposition_reason": self.disposition_reason,
-            "baseline_revision": self.baseline_revision,
-            "candidate_revision": self.candidate_revision,
-            "store_receipt": (
-                dict(self.store_receipt) if self.store_receipt is not None else None
-            ),
             "completed_at": self.completed_at,
-            "claim_boundary": self.claim_boundary,
             "input_gap_ids": list(self.input_gap_ids),
             "resolved_gap_ids": list(self.resolved_gap_ids),
             "persisted_gap_ids": list(self.persisted_gap_ids),
@@ -382,31 +296,6 @@ class ArgumentIterationReceipt:
             "next_actions": list(self.next_actions),
             "terminal_reason": self.terminal_reason,
             "progressed": self.progressed,
-            "receipt_fingerprint": self.receipt_fingerprint,
-        }
-
-
-@dataclass(frozen=True)
-class ArgumentRollbackReceipt:
-    model_id: str
-    rollback_source_revision: str
-    prior_head_revision: str
-    compensating_revision: str
-    store_receipt: Mapping[str, Any]
-    completed_at: str
-    schema_version: str = ARGUMENT_ROLLBACK_RECEIPT_SCHEMA
-    claim_boundary: str = ARGUMENT_ITERATION_CLAIM_BOUNDARY
-
-    def to_dict(self) -> dict[str, Any]:
-        return {
-            "schema_version": self.schema_version,
-            "model_id": self.model_id,
-            "rollback_source_revision": self.rollback_source_revision,
-            "prior_head_revision": self.prior_head_revision,
-            "compensating_revision": self.compensating_revision,
-            "store_receipt": dict(self.store_receipt),
-            "completed_at": self.completed_at,
-            "claim_boundary": self.claim_boundary,
         }
 
 
@@ -421,16 +310,15 @@ def freeze_argument_prediction(
     max_size: int = 2,
     protected_claim_ids: Sequence[str] = (),
     prediction_id: str | None = None,
-    task_id: str,
-    purpose: str,
-    coverage_ids: Sequence[str],
+    task_id: str = "",
+    purpose: str = "",
+    coverage_ids: Sequence[str] = (),
     assumptions: Sequence[str] = (),
     unknowns: Sequence[str] = (),
-    iteration: int,
-    max_iterations: int,
-    prior_receipt_fingerprint: str = "",
+    iteration: int = 0,
+    max_iterations: int = 8,
     prior_open_gap_ids: Sequence[str] = (),
-    holdout_claim_ids: Sequence[str],
+    holdout_claim_ids: Sequence[str] = (),
 ) -> ArgumentPrediction:
     """Freeze an expectation without running the native simulator."""
 
@@ -457,14 +345,6 @@ def freeze_argument_prediction(
         if holdout_id == claim_id:
             raise ValueError("the perturbed target claim cannot also be a holdout")
     coverage = tuple(str(item) for item in coverage_ids)
-    coverage_fingerprint = _canonical_sha256(
-        {
-            "task_id": task_id,
-            "purpose": purpose,
-            "coverage_ids": sorted(coverage),
-            "model_id": model.id,
-        }
-    )
     return ArgumentPrediction(
         prediction_id=prediction_id or f"prediction-{uuid.uuid4().hex}",
         model_id=model.id,
@@ -480,12 +360,10 @@ def freeze_argument_prediction(
         task_id=task_id,
         purpose=purpose,
         coverage_ids=coverage,
-        coverage_fingerprint=coverage_fingerprint,
         assumptions=tuple(str(item) for item in assumptions),
         unknowns=tuple(str(item) for item in unknowns),
         iteration=iteration,
         max_iterations=max_iterations,
-        prior_receipt_fingerprint=prior_receipt_fingerprint,
         prior_open_gap_ids=tuple(str(item) for item in prior_open_gap_ids),
         holdout_claim_ids=tuple(str(item) for item in holdout_claim_ids),
     )
@@ -630,26 +508,24 @@ def _argument_open_gaps(
 
 
 def run_argument_iteration(
-    store: ModelStore,
     baseline: LogicModel,
     prediction: ArgumentPrediction,
     *,
     candidate: LogicModel | None = None,
     decision: str = "reject",
-    actor: str = "logicguard-task-iteration",
-    idempotency_key: str | None = None,
-) -> ArgumentIterationReceipt:
-    """Observe a prediction and close only on current native depth evidence."""
+) -> ArgumentIterationResult:
+    """Observe a prediction and decide on a candidate; never writes model files."""
 
     if decision not in {"accept", "reject"}:
         raise ValueError("decision must be 'accept' or 'reject'")
     validate_prediction_binding(baseline, prediction)
-    baseline_snapshot = _ensure_baseline_snapshot(store, baseline, prediction, actor)
     baseline_observation = observe_argument_prediction(baseline, prediction)
     baseline_comparison = compare_argument_prediction(prediction, baseline_observation)
-    baseline_depth, baseline_depth_gaps = _native_depth(baseline, prediction)
     baseline_gaps = tuple(
-        sorted(set(_argument_open_gaps(baseline, baseline_observation, prediction)) | set(baseline_depth_gaps))
+        sorted(
+            set(_argument_open_gaps(baseline, baseline_observation, prediction))
+            | set(_native_depth(baseline, prediction))
+        )
     )
 
     def terminal_for(gaps: Sequence[str], *, external: bool = False) -> str:
@@ -661,20 +537,17 @@ def run_argument_iteration(
             return "progress_stalled"
         return "continue_iteration" if gaps else "model_closed_for_task"
 
-    def make_receipt(
+    def make_result(
         *,
         candidate_observation: ArgumentObservation | None,
         candidate_comparison: ArgumentPredictionComparison | None,
         protected: tuple[ProtectedClaimRevalidation, ...],
         holdout: tuple[ProtectedClaimRevalidation, ...],
-        native_depth: Mapping[str, Any],
-        candidate_revision: str | None,
-        store_receipt: Mapping[str, Any] | None,
         effective: str,
         reason: str,
         gaps: Sequence[str],
         terminal: str,
-    ) -> ArgumentIterationReceipt:
+    ) -> ArgumentIterationResult:
         resolved, persisted, introduced = _gap_lineage(
             prediction.prior_open_gap_ids, gaps
         )
@@ -683,17 +556,7 @@ def run_argument_iteration(
             **{gap: "persisted" for gap in persisted},
             **{gap: "introduced" for gap in introduced},
         }
-        candidate_digest = (
-            candidate_observation.model_digest if candidate_observation else None
-        )
-        receipt_fingerprint = _receipt_fingerprint(
-            prediction,
-            baseline_observation.model_digest,
-            candidate_digest,
-            gaps,
-            terminal,
-        )
-        return ArgumentIterationReceipt(
+        return ArgumentIterationResult(
             prediction=prediction,
             baseline_observation=baseline_observation,
             baseline_comparison=baseline_comparison,
@@ -701,18 +564,9 @@ def run_argument_iteration(
             candidate_comparison=candidate_comparison,
             protected_claims=protected,
             holdout_claims=holdout,
-            native_depth_receipt=native_depth,
-            native_depth_receipt_id=(
-                str(native_depth.get("receipt_version", "logic-depth"))
-                + ":"
-                + str(native_depth.get("model_fingerprint", ""))[:20]
-            ),
             requested_disposition=decision,
             effective_disposition=effective,
             disposition_reason=reason,
-            baseline_revision=str(baseline_snapshot.revision),
-            candidate_revision=candidate_revision,
-            store_receipt=store_receipt,
             completed_at=utc_now(),
             input_gap_ids=prediction.prior_open_gap_ids,
             resolved_gap_ids=resolved,
@@ -723,23 +577,19 @@ def run_argument_iteration(
             next_actions=("deepen_logic_model",) if gaps else ("no_model_change_needed",),
             terminal_reason=terminal,
             progressed=bool(resolved or introduced or (prediction.iteration == 0 and gaps)),
-            receipt_fingerprint=receipt_fingerprint,
         )
 
     if baseline_comparison.matches and not baseline_gaps:
         holdout = revalidate_protected_claims(
             baseline, baseline, prediction.holdout_claim_ids
         )
-        return make_receipt(
+        return make_result(
             candidate_observation=None,
             candidate_comparison=None,
             protected=(),
             holdout=holdout,
-            native_depth=baseline_depth,
-            candidate_revision=None,
-            store_receipt=None,
             effective="no_revision_needed",
-            reason="baseline prediction and current native depth receipt pass",
+            reason="baseline prediction and current native depth pass",
             gaps=(),
             terminal="model_closed_for_task",
         )
@@ -749,14 +599,11 @@ def run_argument_iteration(
         external = not baseline_comparison.matches
         if external:
             gaps.add("candidate-model-required")
-        return make_receipt(
+        return make_result(
             candidate_observation=None,
             candidate_comparison=None,
             protected=(),
             holdout=(),
-            native_depth=baseline_depth,
-            candidate_revision=None,
-            store_receipt=None,
             effective="external_input_required" if external else "continue_iteration",
             reason=(
                 "a candidate model is required after the frozen prediction mismatch"
@@ -771,8 +618,9 @@ def run_argument_iteration(
         candidate, prediction, require_baseline_binding=False
     )
     candidate_comparison = compare_argument_prediction(prediction, candidate_observation)
-    candidate_depth, candidate_depth_gaps = _native_depth(candidate, prediction)
-    gaps = set(_argument_open_gaps(candidate, candidate_observation, prediction)) | set(candidate_depth_gaps)
+    gaps = set(_argument_open_gaps(candidate, candidate_observation, prediction)) | set(
+        _native_depth(candidate, prediction)
+    )
     protected = revalidate_protected_claims(baseline, candidate, prediction.protected_claim_ids)
     holdout = revalidate_protected_claims(baseline, candidate, prediction.holdout_claim_ids)
     if not candidate_comparison.matches:
@@ -782,43 +630,14 @@ def run_argument_iteration(
     if any(not item.passed for item in holdout):
         gaps.add("independent-holdout-regression")
 
-    transaction = store.begin(
-        baseline.id,
-        baseline_snapshot.revision,
-        idempotency_key or f"{prediction.prediction_id}:candidate",
-        actor,
-    )
-    transaction.stage(candidate)
-    staged_revision = transaction.staged_snapshot.revision
-    can_accept = decision == "accept" and not gaps
-    if can_accept:
-        try:
-            committed = transaction.commit()
-        except TransactionConflictError as exc:
-            conflict_gaps = tuple(sorted(set(gaps) | {"model-store-conflict"}))
-            return make_receipt(
-                candidate_observation=candidate_observation,
-                candidate_comparison=candidate_comparison,
-                protected=protected,
-                holdout=holdout,
-                native_depth=candidate_depth,
-                candidate_revision=str(staged_revision),
-                store_receipt=exc.receipt.to_dict() if exc.receipt else None,
-                effective="conflict",
-                reason=str(exc),
-                gaps=conflict_gaps,
-                terminal=terminal_for(conflict_gaps),
-            )
-        return make_receipt(
+    if decision == "accept" and not gaps:
+        return make_result(
             candidate_observation=candidate_observation,
             candidate_comparison=candidate_comparison,
             protected=protected,
             holdout=holdout,
-            native_depth=candidate_depth,
-            candidate_revision=str(committed.revision),
-            store_receipt=committed.to_dict(),
             effective="accepted",
-            reason="candidate prediction, native depth, protected claims, and independent holdout pass",
+            reason="candidate prediction, native depth, protected claims and holdout claims pass",
             gaps=(),
             terminal="model_closed_for_task",
         )
@@ -829,16 +648,12 @@ def run_argument_iteration(
         gaps.add("candidate-rejected")
     if gaps:
         reasons.append("candidate retains current LogicGuard closure gaps")
-    aborted = transaction.abort("; ".join(reasons))
     ordered_gaps = tuple(sorted(gaps))
-    return make_receipt(
+    return make_result(
         candidate_observation=candidate_observation,
         candidate_comparison=candidate_comparison,
         protected=protected,
         holdout=holdout,
-        native_depth=candidate_depth,
-        candidate_revision=str(staged_revision),
-        store_receipt=aborted.to_dict(),
         effective="rejected" if decision == "reject" else "continue_iteration",
         reason="; ".join(reasons),
         gaps=ordered_gaps,
@@ -846,86 +661,23 @@ def run_argument_iteration(
     )
 
 
-def rollback_argument_revision(
-    store: ModelStore,
-    *,
-    model_id: str,
-    source_revision: str,
-    actor: str = "logicguard-task-iteration",
-    idempotency_key: str | None = None,
-) -> ArgumentRollbackReceipt:
-    """Append a compensating revision whose payload equals a historical revision."""
-
-    prior_head = store.head(model_id)
-    if prior_head is None:
-        raise ValueError(f"cannot roll back model without a current head: {model_id}")
-    historical = store.get(model_id, source_revision)
-    transaction = store.begin(
-        model_id,
-        prior_head,
-        idempotency_key
-        or f"rollback:{source_revision}:{uuid.uuid4().hex}",
-        actor,
-    )
-    transaction.stage(historical.authoring_payload())
-    commit_receipt = transaction.commit()
-    return ArgumentRollbackReceipt(
-        model_id=model_id,
-        rollback_source_revision=str(historical.revision),
-        prior_head_revision=str(prior_head),
-        compensating_revision=str(commit_receipt.revision),
-        store_receipt=commit_receipt.to_dict(),
-        completed_at=utc_now(),
-    )
-
-
-def _ensure_baseline_snapshot(
-    store: ModelStore,
-    baseline: LogicModel,
-    prediction: ArgumentPrediction,
-    actor: str,
-) -> ModelSnapshot:
-    head = store.head(baseline.id)
-    if head is None:
-        transaction = store.begin(
-            baseline.id,
-            None,
-            f"{prediction.prediction_id}:baseline",
-            actor,
-        )
-        transaction.stage(baseline)
-        receipt = transaction.commit()
-        return store.get(baseline.id, receipt.revision)
-    snapshot = store.get(baseline.id)
-    if snapshot.content_digest != prediction.baseline_digest:
-        raise ValueError(
-            "stored model head does not match the prediction-bound baseline: "
-            f"{snapshot.content_digest} != {prediction.baseline_digest}"
-        )
-    return snapshot
-
-
 def _model_digest(model: LogicModel) -> str:
-    return canonical_digest(canonical_model_payload(model))
+    return _canonical_sha256(model.canonical_dict())
 
 
 __all__ = [
-    "ARGUMENT_ITERATION_CLAIM_BOUNDARY",
-    "ARGUMENT_ITERATION_RECEIPT_SCHEMA",
+    "ARGUMENT_ITERATION_RESULT_SCHEMA",
     "ARGUMENT_PREDICTION_SCHEMA",
-    "ARGUMENT_ROLLBACK_RECEIPT_SCHEMA",
     "SUPPORTED_PREDICTION_MODES",
-    "ArgumentIterationReceipt",
+    "ArgumentIterationResult",
     "ArgumentObservation",
     "ArgumentPrediction",
     "ArgumentPredictionComparison",
-    "ArgumentRollbackReceipt",
     "ProtectedClaimRevalidation",
     "compare_argument_prediction",
     "freeze_argument_prediction",
     "observe_argument_prediction",
     "revalidate_protected_claims",
-    "rollback_argument_revision",
     "run_argument_iteration",
     "validate_prediction_binding",
 ]

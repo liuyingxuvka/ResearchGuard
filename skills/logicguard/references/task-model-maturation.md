@@ -1,15 +1,11 @@
 # Task-Local Model Maturation
 
-This is the existing LogicGuard task loop, not a separate route or understanding level.
+This is the existing LogicGuard task loop, not a separate route or understanding level: predict, observe, revise, so the model grows with the research.
 
-`argument-iteration run` loads the model into a revision store with stricter rules than `logic validate`: every Evidence node needs `provenance: [{origin_kind: external_source, source_id: <library source id>, content_hash: "sha256:<hash>"}]`, and the holdout claim must differ from the root claim.
+1. `argument-iteration freeze` records the expected state of one claim under one perturbation before you look (`--expected-state`, `--mode`, `--root`, `--node`). Every named claim and node must exist in the model; the prediction remembers the model's content digest, so a prediction made against an older model is reported as stale.
+2. `argument-iteration run` replays the perturbation on the baseline (and on `--candidate` when you revised the model), compares the result with the prediction, re-checks every `--protect-claim` claim and, when given, every `--holdout-claim` claim, and adds the native depth gaps. It loads models exactly like `logic validate`.
+3. Revise while an addressable gap or a prediction mismatch remains. On the next round pass `--iteration <n>` and the previous `open_gap_ids` as `--prior-open-gap-id`, so an unchanged gap set stops as `progress_stalled`.
 
-Freeze task id, purpose, explicit coverage and fingerprint, assumptions, unknowns, iteration bound, and predecessor receipt on later iterations. For every important covered node, record a concrete prediction and falsifier before the observation or perturbation. Native depth analysis, simulation, and current source/trace receipts—not caller prose—produce input, resolved, persisted, and introduced gaps.
+The loop never writes model files. `accepted` means the candidate file becomes your current model; `rejected` or `continue_iteration` means you keep the baseline. Roll back by keeping or restoring the previous model file (for example from git).
 
-Separate native task proof and development regression from any separately authorized real-prose or style evaluation. For the first two, a bounded short graph is sufficient when the contract needs a case: keep one valid target graph and remove the declared support or warrant for a known-bad variant, without changing task identity, native oracle, frozen order, or candidate binding. Passing this structural example says nothing about factual truth or the quality of a long article.
-
-Revise while an addressable gap or predictive weakness remains. Every iteration returns one addressable next action. Candidate acceptance must preserve protected claims and pass a separately declared holdout claim that is neither the root nor a protected claim. Keep accepted revisions immutable; rollback appends a compensating revision instead of rewriting history.
-
-Use the native `argument-iteration freeze`, `run`, and `rollback` commands from `commands.md`. The loop may change only the current task model. It must not tune LogicGuard evaluators, thresholds, templates, defaults, or another Guard.
-
-Close only when current native depth, prediction, protected-claim checks, independent holdout, and covered-gap reconciliation all pass. Otherwise return `progress_stalled`, `iteration_limit`, `external_input_required`, or `scope_excluded` with open gaps visible.
+The loop may change only the current task model. It must not tune LogicGuard evaluators, thresholds, defaults, or another Guard. Close only when the prediction, native depth, protected claims and any holdout claims all pass; otherwise stop with `progress_stalled`, `iteration_limit`, or `external_input_required` and keep the open gaps visible. Evidence nodes may carry `provenance` (see `h-wadf-quick-reference.md`).
