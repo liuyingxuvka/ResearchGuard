@@ -103,3 +103,12 @@ SourceGuard exports actual TraceGuard v2 sources/evidence and moves source gaps/
 - `python -m pytest tests/source` — exit 0, 11.984s; `126 passed in 11.68s`
 - `python <external>/probe_rg08.py` — exit 0, 4.159s; `structural_source_gap: validTraceGuardV2; schema_ok=true;trace_count0;ok=false;rc0`
 - `python -m pytest --collect-only` — exit 0, 3.544s; `889 tests collected in 3.00s`
+
+## RG-09 — completed
+
+Added a small TraceGuard export bundle→starter LogicGuard model converter and CLI, retaining evidence/support and limitation/qualifies edges. Realexport/import/validate succeeds while missing_warrant remains; SourceGuard seed rejects rc1. CLI9passed,collection890,map0errors; no change to TraceGuard export claims/handoffs.
+
+- `python -m pytest tests/logic/test_cli.py` — exit 0, 29.046s; `9 passed in 28.73s`
+- `python <external>/probe_rg09.py` — exit 0, 3.338s; `Trace export→logic import→validateOK; missing_warrant preserved; SourceGuard seed rejected rc1`
+- `python -m pytest --collect-only` — exit 0, 5.124s; `890 tests collected in 4.50s`
+- `python -m flowguard map check` — exit 0, 0.996s; `check: 0 error(s), 10 warning(s), 0 info`

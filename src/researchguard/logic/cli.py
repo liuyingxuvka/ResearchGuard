@@ -328,6 +328,11 @@ def build_parser() -> argparse.ArgumentParser:
             command.add_argument("--artifact-unit-id", required=True)
         command.set_defaults(func=handler)
 
+    import_handoff = sub.add_parser("import-handoff", help="Turn a TraceGuard export-logicguard bundle into a starter model.")
+    import_handoff.add_argument("bundle")
+    import_handoff.add_argument("--output", required=True)
+    import_handoff.set_defaults(func=_cmd_import_handoff)
+
     synthesize = sub.add_parser("synthesize", help="Validate an explicit target artifact unit request.")
     synthesize.add_argument("model")
     synthesize.add_argument("--selection-request", required=True, help="JSON file containing researchguard.logic.synthesis-request.v1.")
@@ -645,6 +650,17 @@ def _cmd_gaps(args: argparse.Namespace) -> int:
         _write(args.output, payload)
     else:
         print(json.dumps(payload, indent=2))
+    return 0
+
+
+def _cmd_import_handoff(args: argparse.Namespace) -> int:
+    import yaml
+    from .trace_import import model_dict_from_trace_bundle
+
+    bundle = yaml.safe_load(Path(args.bundle).read_text(encoding="utf-8"))
+    model = model_dict_from_trace_bundle(bundle)
+    Path(args.output).write_text(yaml.safe_dump(model, sort_keys=False, allow_unicode=True), encoding="utf-8")
+    print(json.dumps({"ok": True, "output": args.output, "root_claim": model["model"]["root_claim"], "node_count": len(model["nodes"])}, indent=2))
     return 0
 
 

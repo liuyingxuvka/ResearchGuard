@@ -370,3 +370,17 @@ def test_cli_depth_without_contract_prints_gap_summary(tmp_path: Path) -> None:
     assert summary["status"] == "blocked"
     assert "claim_role_missing:C0:warrant" in summary["unresolved_gaps"]
     assert json.loads(output.read_text(encoding="utf-8"))["status"] == "blocked"
+
+
+def test_cli_import_handoff_reads_a_traceguard_bundle(tmp_path: Path) -> None:
+    bundle = tmp_path / "bundle.yaml"
+    model = tmp_path / "model.yaml"
+    result = subprocess.run([sys.executable, "-m", "researchguard", "trace", "export-logicguard",
+                             "examples/trace/incident_response_storyline.yaml", "--output", str(bundle)],
+                            cwd=ROOT, check=False, capture_output=True, text=True)
+    assert result.returncode == 0, result.stdout + result.stderr
+    imported = _run("import-handoff", str(bundle), "--output", str(model))
+    assert imported.returncode == 0, imported.stdout + imported.stderr
+    assert json.loads(imported.stdout)["root_claim"] == "claim_trace_metadata_incident"
+    assert "validation: OK" in _run("validate", str(model)).stdout
+    assert "missing_warrant" in _run("diagnose", str(model)).stdout

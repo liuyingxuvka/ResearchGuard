@@ -183,6 +183,7 @@
         "src/researchguard/logic/synthesis.py",
         "src/researchguard/logic/synthesis_contract.py",
         "src/researchguard/logic/task_iteration.py",
+        "src/researchguard/logic/trace_import.py",
         "src/researchguard/logic/validator.py",
         "src/researchguard/logic/writer.py",
         "src/researchguard/logic_template_packs/__init__.py",
