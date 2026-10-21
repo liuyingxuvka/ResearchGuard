@@ -2,15 +2,13 @@
 
 The coordinator reuses SourceGuard's existing observation update and replanning
 path.  It never changes utility weights, qualification thresholds, or Guard
-policy.
+policy, and it never overwrites the baseline model: the candidate is written to
+a new file, so a rollback is keeping (or restoring from git) the baseline file.
 """
 
 from __future__ import annotations
 
-import hashlib
-import json
 import uuid
-from copy import deepcopy
 from dataclasses import dataclass
 from typing import Any, Mapping, Sequence
 
@@ -29,14 +27,8 @@ from .schema import (
 
 
 SEARCH_OUTCOME_PREDICTION_SCHEMA = "researchguard.source.search-outcome-prediction.v2"
-SEARCH_ITERATION_RECEIPT_SCHEMA = "researchguard.source.search-iteration-receipt.v2"
-SEARCH_ROLLBACK_RECEIPT_SCHEMA = "researchguard.source.search-rollback-receipt.v1"
+SEARCH_ITERATION_RESULT_SCHEMA = "researchguard.source.search-iteration-result.v1"
 GAP_REDUCTION_LEVELS = frozenset({"none", "partial", "closed"})
-SEARCH_ITERATION_CLAIM_BOUNDARY = (
-    "This receipt proves one task-local search-outcome prediction, one supplied "
-    "observation update, deterministic error reporting, and the declared candidate "
-    "disposition. It does not prove source truth or change SourceGuard policy."
-)
 
 
 @dataclass(frozen=True)
@@ -52,16 +44,14 @@ class SearchOutcomePrediction:
     cost_tolerance: float
     protected_gap_ids: tuple[str, ...]
     frozen_at: str
-    task_id: str
-    purpose: str
-    coverage_ids: tuple[str, ...]
-    coverage_fingerprint: str
-    assumptions: tuple[str, ...]
-    unknowns: tuple[str, ...]
-    iteration: int
-    max_iterations: int
-    prior_receipt_fingerprint: str
-    prior_open_gap_ids: tuple[str, ...]
+    task_id: str = ""
+    purpose: str = ""
+    coverage_ids: tuple[str, ...] = ()
+    assumptions: tuple[str, ...] = ()
+    unknowns: tuple[str, ...] = ()
+    iteration: int = 0
+    max_iterations: int = 8
+    prior_open_gap_ids: tuple[str, ...] = ()
     schema_version: str = SEARCH_OUTCOME_PREDICTION_SCHEMA
 
     def __post_init__(self) -> None:
@@ -89,32 +79,10 @@ class SearchOutcomePrediction:
             raise ValueError("target gap cannot also be protected")
         if not self.frozen_at:
             raise ValueError("frozen_at must not be empty")
-        if not self.task_id.strip() or not self.purpose.strip():
-            raise ValueError("task_id and purpose are required")
-        if not self.coverage_ids:
-            raise ValueError("task-local search predictions require coverage_ids")
-        if not self.coverage_fingerprint.startswith("sha256:"):
-            raise ValueError("coverage_fingerprint is required")
-        expected_coverage_fingerprint = "sha256:" + hashlib.sha256(
-            json.dumps(
-                {
-                    "task_id": self.task_id,
-                    "purpose": self.purpose,
-                    "coverage_ids": sorted(self.coverage_ids),
-                    "baseline_fingerprint": self.baseline_fingerprint,
-                },
-                sort_keys=True,
-                separators=(",", ":"),
-            ).encode("utf-8")
-        ).hexdigest()
-        if self.coverage_fingerprint != expected_coverage_fingerprint:
-            raise ValueError("coverage_fingerprint does not bind the task coverage")
         if len(set(self.coverage_ids)) != len(self.coverage_ids):
             raise ValueError("coverage_ids must not contain duplicates")
         if self.iteration < 0 or self.max_iterations < 1:
             raise ValueError("iteration must be non-negative and max_iterations must be positive")
-        if self.iteration and not self.prior_receipt_fingerprint.startswith("sha256:"):
-            raise ValueError("later iterations require prior_receipt_fingerprint")
         if len(set(self.prior_open_gap_ids)) != len(self.prior_open_gap_ids):
             raise ValueError("prior_open_gap_ids must not contain duplicates")
 
@@ -135,35 +103,15 @@ class SearchOutcomePrediction:
             "task_id": self.task_id,
             "purpose": self.purpose,
             "coverage_ids": list(self.coverage_ids),
-            "coverage_fingerprint": self.coverage_fingerprint,
             "assumptions": list(self.assumptions),
             "unknowns": list(self.unknowns),
             "iteration": self.iteration,
             "max_iterations": self.max_iterations,
-            "prior_receipt_fingerprint": self.prior_receipt_fingerprint,
             "prior_open_gap_ids": list(self.prior_open_gap_ids),
         }
 
     @classmethod
     def from_dict(cls, raw: Mapping[str, Any]) -> "SearchOutcomePrediction":
-        required_task_fields = {
-            "task_id",
-            "purpose",
-            "coverage_ids",
-            "coverage_fingerprint",
-            "assumptions",
-            "unknowns",
-            "iteration",
-            "max_iterations",
-            "prior_receipt_fingerprint",
-            "prior_open_gap_ids",
-        }
-        missing = sorted(required_task_fields - set(raw))
-        if missing:
-            raise ValueError(
-                "current search prediction is missing task fields: "
-                + ", ".join(missing)
-            )
         return cls(
             schema_version=str(raw.get("schema_version", "")),
             prediction_id=str(raw.get("prediction_id", "")),
@@ -188,12 +136,10 @@ class SearchOutcomePrediction:
             task_id=str(raw.get("task_id", "")),
             purpose=str(raw.get("purpose", "")),
             coverage_ids=tuple(str(item) for item in (raw.get("coverage_ids") or ())),
-            coverage_fingerprint=str(raw.get("coverage_fingerprint", "")),
             assumptions=tuple(str(item) for item in (raw.get("assumptions") or ())),
             unknowns=tuple(str(item) for item in (raw.get("unknowns") or ())),
             iteration=int(raw.get("iteration", 0)),
             max_iterations=int(raw.get("max_iterations", 8)),
-            prior_receipt_fingerprint=str(raw.get("prior_receipt_fingerprint", "")),
             prior_open_gap_ids=tuple(str(item) for item in (raw.get("prior_open_gap_ids") or ())),
         )
 
@@ -278,10 +224,6 @@ class SearchCandidateReview:
 
 @dataclass(frozen=True)
 class NativeDepthRevalidation:
-    receipt_version_current: bool
-    baseline_binding_current: bool
-    candidate_binding_current: bool
-    observation_binding_current: bool
     depth_completed: bool
     scope_status_passed: bool
     status: str
@@ -291,10 +233,6 @@ class NativeDepthRevalidation:
 
     def to_dict(self) -> dict[str, Any]:
         return {
-            "receipt_version_current": self.receipt_version_current,
-            "baseline_binding_current": self.baseline_binding_current,
-            "candidate_binding_current": self.candidate_binding_current,
-            "observation_binding_current": self.observation_binding_current,
             "depth_completed": self.depth_completed,
             "scope_status_passed": self.scope_status_passed,
             "status": self.status,
@@ -305,21 +243,17 @@ class NativeDepthRevalidation:
 
 
 @dataclass(frozen=True)
-class SearchIterationReceipt:
+class SearchIterationResult:
     prediction: SearchOutcomePrediction
     realized_outcome: RealizedSearchOutcome
     prediction_error: SearchPredictionError
     candidate_review: SearchCandidateReview
     native_depth_revalidation: NativeDepthRevalidation
-    native_depth_receipt: Mapping[str, Any]
-    candidate_fingerprint: str
     requested_disposition: str
     effective_disposition: str
     disposition_reason: str
-    selected_model_fingerprint: str
     completed_at: str
-    schema_version: str = SEARCH_ITERATION_RECEIPT_SCHEMA
-    claim_boundary: str = SEARCH_ITERATION_CLAIM_BOUNDARY
+    schema_version: str = SEARCH_ITERATION_RESULT_SCHEMA
     input_gap_ids: tuple[str, ...] = ()
     resolved_gap_ids: tuple[str, ...] = ()
     persisted_gap_ids: tuple[str, ...] = ()
@@ -329,7 +263,6 @@ class SearchIterationReceipt:
     next_actions: tuple[str, ...] = ()
     terminal_reason: str = "continue_iteration"
     progressed: bool = False
-    receipt_fingerprint: str = ""
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -339,14 +272,10 @@ class SearchIterationReceipt:
             "prediction_error": self.prediction_error.to_dict(),
             "candidate_review": self.candidate_review.to_dict(),
             "native_depth_revalidation": self.native_depth_revalidation.to_dict(),
-            "native_depth_receipt": dict(self.native_depth_receipt),
-            "candidate_fingerprint": self.candidate_fingerprint,
             "requested_disposition": self.requested_disposition,
             "effective_disposition": self.effective_disposition,
             "disposition_reason": self.disposition_reason,
-            "selected_model_fingerprint": self.selected_model_fingerprint,
             "completed_at": self.completed_at,
-            "claim_boundary": self.claim_boundary,
             "input_gap_ids": list(self.input_gap_ids),
             "resolved_gap_ids": list(self.resolved_gap_ids),
             "persisted_gap_ids": list(self.persisted_gap_ids),
@@ -356,29 +285,6 @@ class SearchIterationReceipt:
             "next_actions": list(self.next_actions),
             "terminal_reason": self.terminal_reason,
             "progressed": self.progressed,
-            "receipt_fingerprint": self.receipt_fingerprint,
-        }
-
-
-@dataclass(frozen=True)
-class SearchRollbackReceipt:
-    accepted_receipt_fingerprint: str
-    accepted_candidate_fingerprint: str
-    restored_baseline_fingerprint: str
-    effective_disposition: str
-    completed_at: str
-    schema_version: str = SEARCH_ROLLBACK_RECEIPT_SCHEMA
-    claim_boundary: str = SEARCH_ITERATION_CLAIM_BOUNDARY
-
-    def to_dict(self) -> dict[str, Any]:
-        return {
-            "schema_version": self.schema_version,
-            "accepted_receipt_fingerprint": self.accepted_receipt_fingerprint,
-            "accepted_candidate_fingerprint": self.accepted_candidate_fingerprint,
-            "restored_baseline_fingerprint": self.restored_baseline_fingerprint,
-            "effective_disposition": self.effective_disposition,
-            "completed_at": self.completed_at,
-            "claim_boundary": self.claim_boundary,
         }
 
 
@@ -393,14 +299,13 @@ def freeze_search_outcome_prediction(
     cost_tolerance: float = 0.1,
     protected_gap_ids: Sequence[str] = (),
     prediction_id: str | None = None,
-    task_id: str,
-    purpose: str,
-    coverage_ids: Sequence[str],
+    task_id: str = "",
+    purpose: str = "",
+    coverage_ids: Sequence[str] = (),
     assumptions: Sequence[str] = (),
     unknowns: Sequence[str] = (),
-    iteration: int,
-    max_iterations: int,
-    prior_receipt_fingerprint: str = "",
+    iteration: int = 0,
+    max_iterations: int = 8,
     prior_open_gap_ids: Sequence[str] = (),
 ) -> SearchOutcomePrediction:
     """Freeze expected search outcomes without applying any observation."""
@@ -413,18 +318,6 @@ def freeze_search_outcome_prediction(
         if gap_id not in baseline.gap_by_id():
             raise ValueError(f"protected gap is missing from baseline: {gap_id}")
     coverage = tuple(str(item) for item in coverage_ids)
-    coverage_fingerprint = "sha256:" + hashlib.sha256(
-        json.dumps(
-            {
-                "task_id": task_id,
-                "purpose": purpose,
-                "coverage_ids": sorted(coverage),
-                "baseline_fingerprint": model_fingerprint(baseline),
-            },
-            sort_keys=True,
-            separators=(",", ":"),
-        ).encode("utf-8")
-    ).hexdigest()
     return SearchOutcomePrediction(
         prediction_id=prediction_id or f"prediction-{uuid.uuid4().hex}",
         baseline_fingerprint=model_fingerprint(baseline),
@@ -440,12 +333,10 @@ def freeze_search_outcome_prediction(
         task_id=task_id,
         purpose=purpose,
         coverage_ids=coverage,
-        coverage_fingerprint=coverage_fingerprint,
         assumptions=tuple(str(item) for item in assumptions),
         unknowns=tuple(str(item) for item in unknowns),
         iteration=iteration,
         max_iterations=max_iterations,
-        prior_receipt_fingerprint=prior_receipt_fingerprint,
         prior_open_gap_ids=tuple(str(item) for item in prior_open_gap_ids),
     )
 
@@ -606,26 +497,8 @@ def revalidate_native_depth_receipt(
     observation: Observation | None,
     receipt: SourceDepthReceipt,
 ) -> NativeDepthRevalidation:
-    """Fail closed unless native depth covers this exact candidate update."""
+    """Check that native depth completed and passes the requested claim scope."""
 
-    baseline_current = receipt.model_fingerprint == model_fingerprint(baseline)
-    candidate_current = (
-        receipt.result_model_fingerprint == model_fingerprint(candidate)
-    )
-    observation_current = bool(
-        (
-            observation is not None
-            and receipt.provider_status == "OBSERVATION_SUPPLIED"
-            and receipt.observation_status == "APPLIED"
-            and receipt.observations_used == [observation.observation_id]
-        )
-        or (
-            observation is None
-            and receipt.provider_status in {"NOT_RUN", "PROVIDER_UNAVAILABLE"}
-            and receipt.observation_status in {"NOT_RUN", "PROVIDER_UNAVAILABLE"}
-            and not receipt.observations_used
-        )
-    )
     depth_completed = bool(
         receipt.planning_depth_completed
         and (receipt.observation_depth_completed if observation is not None else True)
@@ -646,33 +519,13 @@ def revalidate_native_depth_receipt(
             and receipt.status in {"bounded", "pass"}
             and receipt.adequacy_status in {"bounded", "pass"}
         )
-    version_current = receipt.receipt_version == "researchguard.source.depth.v2"
     reasons: list[str] = []
-    if not version_current:
-        reasons.append("native depth receipt version is not current")
-    if not baseline_current:
-        reasons.append("native depth receipt is not bound to the baseline")
-    if not candidate_current:
-        reasons.append("native depth receipt is not bound to the candidate")
-    if not observation_current:
-        reasons.append("native depth receipt is not bound to the supplied observation")
     if not depth_completed:
         reasons.append("native planning and observation depth did not complete")
     if not scope_passed:
         reasons.append("native depth status does not pass the requested claim scope")
-    passed = bool(
-        version_current
-        and baseline_current
-        and candidate_current
-        and observation_current
-        and depth_completed
-        and scope_passed
-    )
+    passed = bool(depth_completed and scope_passed)
     return NativeDepthRevalidation(
-        receipt_version_current=version_current,
-        baseline_binding_current=baseline_current,
-        candidate_binding_current=candidate_current,
-        observation_binding_current=observation_current,
         depth_completed=depth_completed,
         scope_status_passed=scope_passed,
         status=receipt.status,
@@ -744,7 +597,7 @@ def run_search_iteration(
     decision: str = "reject",
     limit: int = 5,
     provider_status: str = "OBSERVATION_SUPPLIED",
-) -> tuple[BeliefState, SearchIterationReceipt]:
+) -> tuple[BeliefState, SearchIterationResult]:
     """Create and explicitly accept or reject one cloned candidate successor."""
 
     if decision not in {"accept", "reject"}:
@@ -799,7 +652,6 @@ def run_search_iteration(
     native_review = revalidate_native_depth_receipt(
         baseline, candidate, observation, depth_receipt
     )
-    candidate_fingerprint = model_fingerprint(candidate)
     candidate_gap_map = candidate.gap_by_id()
     coverage_gaps = {
         gap_id
@@ -820,10 +672,8 @@ def run_search_iteration(
     if can_close:
         effective = "accepted"
         reason = (
-            "candidate bindings and native depth receipt are current, weights are "
-            "unchanged, and protected gaps pass"
+            "native depth passes, weights are unchanged, and protected gaps pass"
         )
-        selected_fingerprint = candidate_fingerprint
     else:
         effective = "rejected"
         reasons: list[str] = []
@@ -838,7 +688,6 @@ def run_search_iteration(
         if open_gap_ids:
             reasons.append("native SourceGuard gaps remain open")
         reason = "; ".join(reasons)
-        selected_fingerprint = prediction.baseline_fingerprint
         if decision == "accept" and review.passed and native_review.passed and open_gap_ids:
             effective = "continue_iteration"
     addressable_action_ids = tuple(
@@ -871,31 +720,15 @@ def run_search_iteration(
         **{gap: "persisted" for gap in persisted_gap_ids},
         **{gap: "introduced" for gap in introduced_gap_ids},
     }
-    receipt_fingerprint = "sha256:" + hashlib.sha256(
-        json.dumps(
-            {
-                "prediction": prediction.to_dict(),
-                "candidate_fingerprint": candidate_fingerprint,
-                "native_depth_receipt": to_plain(depth_receipt),
-                "open_gap_ids": open_gap_ids,
-                "terminal_reason": terminal_reason,
-            },
-            sort_keys=True,
-            separators=(",", ":"),
-        ).encode("utf-8")
-    ).hexdigest()
-    receipt = SearchIterationReceipt(
+    result = SearchIterationResult(
         prediction=prediction,
         realized_outcome=realized,
         prediction_error=error,
         candidate_review=review,
         native_depth_revalidation=native_review,
-        native_depth_receipt=to_plain(depth_receipt),
-        candidate_fingerprint=candidate_fingerprint,
         requested_disposition=decision,
         effective_disposition=effective,
         disposition_reason=reason,
-        selected_model_fingerprint=selected_fingerprint,
         completed_at=utc_now(),
         input_gap_ids=prediction.prior_open_gap_ids,
         resolved_gap_ids=resolved_gap_ids,
@@ -914,40 +747,8 @@ def run_search_iteration(
         ),
         terminal_reason=terminal_reason,
         progressed=bool(resolved_gap_ids or introduced_gap_ids or (prediction.iteration == 0 and observation is not None)),
-        receipt_fingerprint=receipt_fingerprint,
     )
-    return candidate, receipt
-
-
-def rollback_search_iteration(
-    baseline: BeliefState,
-    accepted_receipt: Mapping[str, Any],
-) -> tuple[BeliefState, SearchRollbackReceipt]:
-    """Return a new baseline-equivalent projection after verifying acceptance."""
-
-    validate_model_guard_binding(baseline)
-    if accepted_receipt.get("schema_version") != SEARCH_ITERATION_RECEIPT_SCHEMA:
-        raise ValueError("rollback requires a current search iteration receipt")
-    if accepted_receipt.get("effective_disposition") != "accepted":
-        raise ValueError("rollback requires an accepted search iteration receipt")
-    prediction = accepted_receipt.get("prediction")
-    if not isinstance(prediction, Mapping):
-        raise ValueError("accepted receipt is missing its frozen prediction")
-    baseline_fingerprint = model_fingerprint(baseline)
-    if prediction.get("baseline_fingerprint") != baseline_fingerprint:
-        raise ValueError("accepted receipt is not bound to the supplied baseline")
-    candidate_fingerprint = str(accepted_receipt.get("candidate_fingerprint", ""))
-    if not candidate_fingerprint:
-        raise ValueError("accepted receipt is missing candidate fingerprint")
-    restored = deepcopy(baseline)
-    receipt = SearchRollbackReceipt(
-        accepted_receipt_fingerprint=_mapping_fingerprint(accepted_receipt),
-        accepted_candidate_fingerprint=candidate_fingerprint,
-        restored_baseline_fingerprint=model_fingerprint(restored),
-        effective_disposition="rolled_back",
-        completed_at=utc_now(),
-    )
-    return restored, receipt
+    return candidate, result
 
 
 def _bound_action(baseline: BeliefState, action_id: str) -> SearchAction:
@@ -965,16 +766,6 @@ def _gap_reduction(before: Gap, after: Gap) -> str:
     return "none"
 
 
-def _mapping_fingerprint(value: Mapping[str, Any]) -> str:
-    canonical = json.dumps(
-        dict(value),
-        ensure_ascii=False,
-        sort_keys=True,
-        separators=(",", ":"),
-    )
-    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
-
-
 def _required_bool(value: Any, field_name: str) -> bool:
     if not isinstance(value, bool):
         raise ValueError(f"{field_name} must be a boolean")
@@ -984,24 +775,20 @@ def _required_bool(value: Any, field_name: str) -> bool:
 __all__ = [
     "GAP_REDUCTION_LEVELS",
     "NativeDepthRevalidation",
-    "SEARCH_ITERATION_CLAIM_BOUNDARY",
-    "SEARCH_ITERATION_RECEIPT_SCHEMA",
+    "SEARCH_ITERATION_RESULT_SCHEMA",
     "SEARCH_OUTCOME_PREDICTION_SCHEMA",
-    "SEARCH_ROLLBACK_RECEIPT_SCHEMA",
     "ProtectedGapRevalidation",
     "RealizedSearchOutcome",
     "SearchCandidateReview",
-    "SearchIterationReceipt",
+    "SearchIterationResult",
     "SearchOutcomePrediction",
     "SearchPredictionError",
-    "SearchRollbackReceipt",
     "compare_search_outcome",
     "derive_realized_search_outcome",
     "freeze_search_outcome_prediction",
     "affected_source_obligations",
     "revalidate_native_depth_receipt",
     "review_search_candidate",
-    "rollback_search_iteration",
     "run_search_iteration",
     "validate_search_prediction_binding",
 ]

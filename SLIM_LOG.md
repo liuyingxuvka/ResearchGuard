@@ -468,3 +468,17 @@ Removed the explicitly retired ModelStore/overlay/rollback stack and receipt fie
 - `python -m flowguard release` — exit 0, 1.77s; `verify: PASS (map, lint and models only; tests not run; run python -m pytest -q separately)`
 - `python -m pytest -p no:cacheprovider tests/contract/test_researchguard_handoff.py --junitxml <external>/RG-41-lw43-junit.xml --basetemp <external>/RG-41-lw43-temp` — exit 0, 0.786s; `============================== 10 passed in 0.43s ==============================`
 - `python <external>/verify_lw_junit.py <external>/RG-41-lw43-junit.xml` — exit 0, 0.077s; `10 actual PASSED, 0 skipped; real native provider-to-reader bridge PASSED/ready, not version-skipped`
+
+## RG-42 — completed
+
+Source search iteration now returns a result without receipt bindings, accepts optional task metadata, and has no rollback command. Actual native create/freeze/observe/accept closes the qualified example, writes a separate candidate and leaves baseline bytes unchanged. Four native obligation/protected-gap/weight/error/stale-binding functions retain identical ASTs. 82 focused tests passed; collection 363; fixed LW43 actual native bridge passed, 10 cases and 0 skips; exports/map/release passed.
+
+- `python -m pytest tests/source tests/test_prompt_bundles.py tests/test_skill_suite.py` — exit 0, 5.826s; `82 passed in 5.50s`
+- `python <external>/probe_rg42.py` — exit 0, 0.893s; `researchguard source search-iteration: error: argument iteration_command: invalid choice: 'rollback' (choose from 'freeze', 'run')`
+- `python <external>/check_exports.py` — exit 0, 0.522s; `exports ok`
+- `python -m pytest -p no:cacheprovider tests/contract/test_researchguard_handoff.py --junitxml <external>/RG-42-lw43-junit.xml --basetemp <external>/RG-42-lw43-temp` — exit 0, 0.829s; `============================== 10 passed in 0.38s ==============================`
+- `python <external>/verify_lw_junit.py <external>/RG-42-lw43-junit.xml` — exit 0, 0.056s; `10 actual PASSED, 0 skipped; real native provider-to-reader bridge PASSED/ready, not version-skipped`
+- `python -m pytest --collect-only` — exit 0, 2.062s; `363 tests collected in 1.66s`
+- `python -m flowguard map confirm sourceguard suite-orchestration` — exit 0, 0.269s; `confirmed 2 component(s)`
+- `python -m flowguard map check` — exit 0, 0.279s; `check: 0 error(s), 4 warning(s), 0 info`
+- `python -m flowguard release` — exit 0, 2.067s; `verify: PASS (map, lint and models only; tests not run; run python -m pytest -q separately)`

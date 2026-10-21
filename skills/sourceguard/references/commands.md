@@ -11,9 +11,8 @@ researchguard source frontier <model.yaml> --pretty
 researchguard source depth <model.yaml> --pretty
 researchguard source depth <model.yaml> --observation <observation.yaml> --output <receipt.json> --updated-model-output <updated.yaml> --pretty
 researchguard source add-observation <model.yaml> --observation <observation.yaml> --output <updated.yaml> --pretty
-researchguard source search-iteration freeze <model.yaml> --action-id <id> --expected-gap-reduction <none|partial|closed> --expected-independent-lineage <true|false> --expected-counterevidence <true|false> --expected-cost <0..1> --task-id <task> --purpose <purpose> --coverage-id <id> --iteration 0 --max-iterations 4 --output <prediction.json>
-researchguard source search-iteration run <model.yaml> --prediction <prediction.json> --observation <observation.yaml> --actual-cost <0..1> --decision <accept|reject> --candidate-output <candidate.yaml> --receipt-output <receipt.json>
-researchguard source search-iteration rollback <baseline.yaml> --accepted-receipt <receipt.json> --output <restored.yaml> --receipt-output <rollback.json>
+researchguard source search-iteration freeze <model.yaml> --action-id <id> --expected-gap-reduction <none|partial|closed> --expected-independent-lineage <true|false> --expected-counterevidence <true|false> --expected-cost <0..1> [--protect-gap <gap>] [--iteration <n> --prior-open-gap-id <gap>] --output <prediction.json>
+researchguard source search-iteration run <model.yaml> --prediction <prediction.json> --observation <observation.yaml> --actual-cost <0..1> --decision <accept|reject> --candidate-output <candidate.yaml> --output <result.json>
 researchguard source report <model.yaml> --format markdown
 researchguard source export-traceguard <model.yaml> --output <seed.yaml>
 researchguard source export-logicguard <model.yaml> --output <candidates.yaml>

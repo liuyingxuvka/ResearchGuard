@@ -1,11 +1,11 @@
 # Task-Local Search Iteration
 
-Use this existing loop when one selected search action should predict its result before a real observation arrives.
+Use this existing loop when one selected search action should predict its result before a real observation arrives: predict, observe, revise, so the source model grows with the research.
 
-Freeze task id, purpose, coverage and fingerprint, assumptions, unknowns, iteration bound, predecessor receipt, selected action, expected gap reduction, expected lineage independence, expected counterevidence, expected cost, protected gaps, prediction, and falsifier. The prediction precedes the observation and binds the exact baseline plus model contract.
+Freeze the selected action and its expected gap reduction, lineage independence, counterevidence and cost before the observation (`search-iteration freeze`). The action and every `--protect-gap` gap must exist in the model; the prediction remembers the model's fingerprint, so a prediction made against an older model is reported as stale. Task id, purpose, coverage, assumptions, unknowns and the iteration bound are optional.
 
-The native and regression lanes reuse one frozen input rather than reconstructing it as prose. A new gap records information discovered by the observation; it is not by itself a quality gain. If a provider or external source is missing, preserve that current status and the named gap instead of fabricating a source or observation.
+After a real observation, `search-iteration run` creates candidate v2 through the native update/replan path and writes it to `--candidate-output`; the baseline file is never changed. Keep observation validity separate from prediction error. Acceptance requires an explicit decision, unchanged utility weights, a completed native depth check that passes the requested claim scope, and preserved protected gaps. `accepted` means the candidate file becomes your current model; otherwise keep the baseline. Roll back by keeping or restoring the previous model file (for example from git).
 
-After a real observation, create candidate v2 through the native cloned-baseline update/replan path. Keep observation validity separate from prediction error. Acceptance requires an explicit decision, unchanged utility weights, current contract bindings, native depth receipts for baseline/candidate/observation, and preserved protected gaps. Never overwrite baseline, prediction, observation, candidate, contract, or receipt; rollback writes a new baseline-equivalent projection.
+A new gap records information discovered by the observation; it is not by itself a quality gain. If a provider or external source is missing, preserve that status and the named gap instead of fabricating a source or observation. On the next round pass `--iteration <n>` and the previous `open_gap_ids` as `--prior-open-gap-id`.
 
 The loop may change only this task's belief state, observations, gaps, leads, and action ordering. It cannot tune global weights, thresholds, defaults, templates, or another Guard. Caller-supplied gap transitions and self-reported understanding are not closure evidence.

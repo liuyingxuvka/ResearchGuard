@@ -21,10 +21,10 @@ from researchguard.source.schema import (
     bind_sourceguard_model_contract,
     build_sourceguard_model_contract,
 )
+from researchguard.source.depth import model_fingerprint
 from researchguard.source.task_iteration import (
     SearchOutcomePrediction,
     freeze_search_outcome_prediction,
-    rollback_search_iteration,
     run_search_iteration,
     validate_search_prediction_binding,
 )
@@ -124,16 +124,14 @@ def _prediction(state: BeliefState, **overrides) -> SearchOutcomePrediction:
     return freeze_search_outcome_prediction(state, **values)
 
 
-def test_loaded_prediction_rejects_implicit_or_rebound_task_scope() -> None:
+def test_loaded_prediction_accepts_missing_optional_task_fields() -> None:
     state = _state()
     raw = _prediction(state).to_dict()
-    raw.pop("unknowns")
-    with pytest.raises(ValueError, match="missing task fields"):
-        SearchOutcomePrediction.from_dict(raw)
-    raw = _prediction(state).to_dict()
-    raw["coverage_ids"] = ["g-target"]
-    with pytest.raises(ValueError, match="does not bind"):
-        SearchOutcomePrediction.from_dict(raw)
+    for key in ("task_id", "purpose", "coverage_ids", "assumptions", "unknowns"):
+        raw.pop(key)
+    loaded = SearchOutcomePrediction.from_dict(raw)
+    assert loaded.coverage_ids == ()
+    assert "coverage_fingerprint" not in loaded.to_dict()
 
 
 def _observation(*, close_holdout: bool = False) -> Observation:
@@ -166,18 +164,16 @@ def _observation(*, close_holdout: bool = False) -> Observation:
     )
 
 
-def test_current_prediction_requires_task_scope() -> None:
+def test_prediction_needs_only_the_action_and_expected_outcome() -> None:
     state = _state()
-    with pytest.raises(TypeError):
-        freeze_search_outcome_prediction(
-            state,
-            action_id="a1",
-            expected_gap_reduction="closed",
-            expected_independent_lineage=True,
-            expected_counterevidence=False,
-            expected_cost=0.2,
-        )
-    assert _prediction(state).coverage_fingerprint.startswith("sha256:")
+    prediction = freeze_search_outcome_prediction(
+        state, action_id="a1", expected_gap_reduction="closed", expected_independent_lineage=True,
+        expected_counterevidence=False, expected_cost=0.2,
+    )
+    assert prediction.target_gap_id == "g-target"
+    assert prediction.iteration == 0
+    with pytest.raises(ValueError, match="missing from baseline"):
+        _prediction(state, action_id="a-missing")
 
 
 def test_stale_baseline_is_rejected() -> None:
@@ -190,17 +186,17 @@ def test_stale_baseline_is_rejected() -> None:
 
 def test_open_native_gap_forces_continuation_after_local_success() -> None:
     state = _state()
-    _, receipt = run_search_iteration(
+    _, result = run_search_iteration(
         state, _prediction(state), _observation(), actual_cost=0.2, decision="accept"
     )
-    assert "g-holdout" in receipt.open_gap_ids
-    assert receipt.terminal_reason == "continue_iteration"
-    assert receipt.next_actions == ("a2",)
+    assert "g-holdout" in result.open_gap_ids
+    assert result.terminal_reason == "continue_iteration"
+    assert result.next_actions == ("a2",)
 
 
 def test_provider_unavailable_has_exact_visible_terminal() -> None:
     state = _state()
-    _, receipt = run_search_iteration(
+    _, result = run_search_iteration(
         state,
         _prediction(state),
         None,
@@ -208,9 +204,9 @@ def test_provider_unavailable_has_exact_visible_terminal() -> None:
         decision="accept",
         provider_status="PROVIDER_UNAVAILABLE",
     )
-    assert receipt.terminal_reason == "provider_access_required"
-    assert receipt.next_actions == ("a1", "a2") or receipt.next_actions == ("a1",)
-    assert receipt.effective_disposition != "accepted"
+    assert result.terminal_reason == "provider_access_required"
+    assert result.next_actions == ("a1", "a2") or result.next_actions == ("a1",)
+    assert result.effective_disposition != "accepted"
 
 
 def test_same_gap_set_is_progress_stalled() -> None:
@@ -221,7 +217,6 @@ def test_same_gap_set_is_progress_stalled() -> None:
     second_prediction = _prediction(
         state,
         iteration=1,
-        prior_receipt_fingerprint=first.receipt_fingerprint,
         prior_open_gap_ids=first.open_gap_ids,
     )
     _, second = run_search_iteration(
@@ -231,21 +226,21 @@ def test_same_gap_set_is_progress_stalled() -> None:
     assert second.persisted_gap_ids == first.open_gap_ids
 
 
-def test_all_current_native_gaps_can_close_and_rollback() -> None:
+def test_closing_every_gap_leaves_the_baseline_untouched() -> None:
     state = _state()
-    candidate, receipt = run_search_iteration(
+    before = model_fingerprint(state)
+    candidate, result = run_search_iteration(
         state,
         _prediction(state),
         _observation(close_holdout=True),
         actual_cost=0.2,
         decision="accept",
     )
-    if receipt.effective_disposition == "accepted":
-        restored, rollback = rollback_search_iteration(state, receipt.to_dict())
-        assert rollback.effective_disposition == "rolled_back"
-        assert restored.guard_contract == state.guard_contract
-    else:
-        assert receipt.native_depth_revalidation.passed is False or receipt.open_gap_ids
+    assert model_fingerprint(state) == before
+    assert model_fingerprint(candidate) != before
+    assert result.effective_disposition == "accepted"
+    assert result.terminal_reason == "model_closed_for_task"
+    assert "receipt_fingerprint" not in result.to_dict()
 
 
 def test_cli_freeze_rejects_old_shape_and_emits_v2(tmp_path: Path) -> None:
@@ -257,9 +252,7 @@ def test_cli_freeze_rejects_old_shape_and_emits_v2(tmp_path: Path) -> None:
             "examples/source/starter_researchguard.source.contract.json", "--action-id",
             "action-independent-search-1", "--expected-gap-reduction", "closed",
             "--expected-independent-lineage", "true", "--expected-counterevidence", "false",
-            "--expected-cost", "0.3", "--task-id", "source-cli-task", "--purpose",
-            "exercise strict source CLI", "--coverage-id", "gap-independent-source-1",
-            "--iteration", "0", "--max-iterations", "4", "--output", str(output),
+            "--expected-cost", "0.3", "--output", str(output),
         ],
         cwd=ROOT,
         capture_output=True,
@@ -268,4 +261,4 @@ def test_cli_freeze_rejects_old_shape_and_emits_v2(tmp_path: Path) -> None:
     assert result.returncode == 0, result.stderr
     payload = json.loads(output.read_text(encoding="utf-8"))
     assert payload["schema_version"] == "researchguard.source.search-outcome-prediction.v2"
-    assert "prior_gap_fingerprints" not in payload
+    assert "coverage_fingerprint" not in payload

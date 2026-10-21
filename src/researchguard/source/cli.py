@@ -37,7 +37,6 @@ from .task_iteration import (
     GAP_REDUCTION_LEVELS,
     SearchOutcomePrediction,
     freeze_search_outcome_prediction,
-    rollback_search_iteration,
     run_search_iteration,
 )
 
@@ -178,7 +177,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     iteration = sub.add_parser(
         "search-iteration",
-        help="Freeze, run, or roll back one task-local search-model iteration.",
+        help="Freeze or run one task-local search-model iteration.",
     )
     iteration_sub = iteration.add_subparsers(dest="iteration_command", required=True)
     iteration_freeze = iteration_sub.add_parser(
@@ -207,14 +206,13 @@ def build_parser() -> argparse.ArgumentParser:
         help="Gap whose complete task-local state must remain unchanged; repeat as needed.",
     )
     iteration_freeze.add_argument("--prediction-id")
-    iteration_freeze.add_argument("--task-id", required=True)
-    iteration_freeze.add_argument("--purpose", required=True)
-    iteration_freeze.add_argument("--coverage-id", action="append", required=True)
+    iteration_freeze.add_argument("--task-id", default="")
+    iteration_freeze.add_argument("--purpose", default="")
+    iteration_freeze.add_argument("--coverage-id", action="append", default=[])
     iteration_freeze.add_argument("--assumption", action="append", default=[])
     iteration_freeze.add_argument("--unknown", action="append", default=[])
-    iteration_freeze.add_argument("--iteration", type=int, required=True)
-    iteration_freeze.add_argument("--max-iterations", type=int, required=True)
-    iteration_freeze.add_argument("--prior-receipt-fingerprint", default="")
+    iteration_freeze.add_argument("--iteration", type=int, default=0)
+    iteration_freeze.add_argument("--max-iterations", type=int, default=8)
     iteration_freeze.add_argument("--prior-open-gap-id", action="append", default=[])
     iteration_freeze.add_argument("--output", required=True)
     iteration_freeze.set_defaults(func=_cmd_search_iteration_freeze)
@@ -236,21 +234,10 @@ def build_parser() -> argparse.ArgumentParser:
     iteration_run.add_argument("--limit", type=int, default=5)
     iteration_run.add_argument("--candidate-output", required=True)
     iteration_run.add_argument("--candidate-model-contract-output")
-    iteration_run.add_argument("--receipt-output", required=True)
+    iteration_run.add_argument("--output", required=True)
     iteration_run.add_argument("--pretty", action="store_true")
     iteration_run.set_defaults(func=_cmd_search_iteration_run)
 
-    iteration_rollback = iteration_sub.add_parser(
-        "rollback", help="Write a new baseline-equivalent projection from an accepted receipt."
-    )
-    iteration_rollback.add_argument("model")
-    iteration_rollback.add_argument("--model-contract")
-    iteration_rollback.add_argument("--accepted-receipt", required=True)
-    iteration_rollback.add_argument("--output", required=True)
-    iteration_rollback.add_argument("--output-model-contract")
-    iteration_rollback.add_argument("--receipt-output", required=True)
-    iteration_rollback.add_argument("--pretty", action="store_true")
-    iteration_rollback.set_defaults(func=_cmd_search_iteration_rollback)
 
     report = sub.add_parser("report")
     report.add_argument("model")
@@ -468,7 +455,6 @@ def _cmd_search_iteration_freeze(args: argparse.Namespace) -> int:
         unknowns=args.unknown,
         iteration=args.iteration,
         max_iterations=args.max_iterations,
-        prior_receipt_fingerprint=args.prior_receipt_fingerprint,
         prior_open_gap_ids=args.prior_open_gap_id,
     )
     _write_json(args.output, prediction.to_dict())
@@ -487,7 +473,7 @@ def _cmd_search_iteration_run(args: argparse.Namespace) -> int:
         outputs=[
             args.candidate_output,
             *([args.candidate_model_contract_output] if args.candidate_model_contract_output else []),
-            args.receipt_output,
+            args.output,
         ],
     )
     baseline = load_model(args.model, args.model_contract)
@@ -495,7 +481,7 @@ def _cmd_search_iteration_run(args: argparse.Namespace) -> int:
         _load_json_object(args.prediction)
     )
     observation = _load_observation(args.observation) if args.observation else None
-    candidate, receipt = run_search_iteration(
+    candidate, result = run_search_iteration(
         baseline,
         prediction,
         observation,
@@ -510,27 +496,10 @@ def _cmd_search_iteration_run(args: argparse.Namespace) -> int:
             args.candidate_model_contract_output,
             candidate.guard_contract.to_dict(),
         )
-    _write_json(args.receipt_output, receipt.to_dict())
-    _json_out({"ok": True, **receipt.to_dict()}, args.pretty)
-    if args.decision == "accept" and receipt.effective_disposition != "accepted":
+    _write_json(args.output, result.to_dict())
+    _json_out({"ok": True, **result.to_dict()}, args.pretty)
+    if args.decision == "accept" and result.effective_disposition != "accepted":
         return 3
-    return 0
-
-
-def _cmd_search_iteration_rollback(args: argparse.Namespace) -> int:
-    _require_new_outputs(
-        inputs=[item for item in (args.model, args.model_contract, args.accepted_receipt) if item],
-        outputs=[item for item in (args.output, args.output_model_contract, args.receipt_output) if item],
-    )
-    baseline = load_model(args.model, args.model_contract)
-    restored, receipt = rollback_search_iteration(
-        baseline, _load_json_object(args.accepted_receipt)
-    )
-    write_yaml(args.output, restored)
-    if args.output_model_contract and restored.guard_contract is not None:
-        _write_json(args.output_model_contract, restored.guard_contract.to_dict())
-    _write_json(args.receipt_output, receipt.to_dict())
-    _json_out({"ok": True, **receipt.to_dict()}, args.pretty)
     return 0
 
 
@@ -663,8 +632,6 @@ def run(args: argparse.Namespace) -> int:
         )
         return 0
     raise ValueError(f"Unknown command {args.command!r}")
-
-
 
 
 def _load_json_object(path: str | Path) -> dict[str, Any]:
