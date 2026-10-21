@@ -1,6 +1,6 @@
 # Trace Depth and Closure
 
-Broad, complete, causal, deep, robust, or predictive wording requires the canonical inference receipt plus current target-owned storyline-depth execution evidence.
+Broad, complete, causal, deep, robust, or predictive wording requires the canonical inference receipt plus current target-owned storyline-depth execution evidence: run `researchguard trace depth <model.yaml> --output <depth.json>` (`trace evaluate` does not run depth).
 
 Preserve primary and alternative hypotheses; traces/events/evidence; causal mechanisms, confounders, alternatives, scope; perturbation plan; baseline and perturbed receipts; object and candidate-universe fingerprints; eligible/critical/selected/executed/effective counts; per-kind coverage; critical-uncovered ids; requested/covered scope; and predictive holdout status.
 

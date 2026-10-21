@@ -316,7 +316,7 @@ def cmd_simulate(args: argparse.Namespace) -> int:
             model, result = _load_and_evaluate(args.model)
             if not model.traces:
                 raise ValueError("storyline-depth simulation requires at least one trace")
-            _print_json(result.storyline_depth.to_dict(), pretty=args.pretty)
+            _print_json(evaluate_storyline_depth(model, result).to_dict(), pretty=args.pretty)
             return 0
         except (OSError, SchemaError, ValueError, InferenceError) as exc:
             _print_json({"ok": False, "error": str(exc)}, pretty=args.pretty)

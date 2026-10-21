@@ -20,20 +20,16 @@ researchguard trace library validate <case-library> --pretty
 researchguard trace library build-model <case-library> <case-id> --output <model.yaml> --pretty
 ```
 
-Read results with `trace report --format markdown` (3–5 KB). `evaluate` and `depth` with `--output` print a short summary and write the full JSON to the file.
+Read results with `trace report --format markdown` (2–4 KB). `evaluate` and `depth` with `--output` print a short summary and write the full JSON to the file.
 
 TraceGuard → LogicGuard includes trace/model-card/structure ids, validated and missing steps, alternatives, causal weakest link, conclusion-transfer status, downstream consumer, and safe/unsafe wording. TraceGuard → SourceGuard includes exact trace gap, evidence role/class, locator, counter/limiting need, and bridge need. Handoffs remain `awaiting_owner`; they never execute the sibling.
 
 
 ## One evaluation, several views
 
-The public `evaluate_model` default keeps `include_storyline_depth=True`.
-Run the required solve and critical perturbations once for the current model;
-reuse that current result for summary, weaknesses and gap reporting. The command
-list above is a menu, not a sequence to rerun every solve for one unchanged model.
-
-Only an explicitly bounded evidence-chain task may use the existing
-`evaluate_model(model, include_storyline_depth=False)` API. That result cannot
-claim broad, causal, robust, predictive or closed storyline coverage. Native why,
-causal, what-if and robustness requests keep their required depth and all critical
-perturbations. Full JSON remains available on demand.
+`evaluate` (and the `evaluate_model` API) solves the model once and does not run
+storyline depth. Run `trace depth` once for the current model when the wording is
+broad, causal, robust, predictive or closed; it runs every critical perturbation.
+Reuse each result for summary, weaknesses and gap reporting. The command list above
+is a menu, not a sequence to rerun for one unchanged model. Full JSON remains
+available on demand.

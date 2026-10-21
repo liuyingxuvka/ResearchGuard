@@ -82,7 +82,7 @@
         ".flowguard/models/sourceguard_content_anchor_oracle_model.py"
       ],
       "status": "confirmed",
-      "fingerprint": "sha256:29f2d494bdc0e4b6e4795b7412044b58ba1adf00225e27209be6d893dc89dfd3"
+      "fingerprint": "sha256:fa59cad9561f6887290966793f101c0b0c5b079ad98643813d894b203f2404f0"
     },
     {
       "id": "logicguard",
@@ -202,7 +202,8 @@
       "summary": "Own temporal and causal trace inference, storyline stress and case library updates.",
       "responsibilities": [
         "Own temporal and causal trace inference, storyline stress and case library updates.",
-        "Keep command output to analysis results; full JSON is written only with --output."
+        "Keep command output to analysis results; full JSON is written only with --output.",
+        "Run storyline depth only in trace depth; evaluate solves the model once without it."
       ],
       "files": [
         "src/researchguard/trace/__init__.py",
@@ -252,7 +253,7 @@
       ],
       "models": [],
       "status": "confirmed",
-      "fingerprint": "sha256:317e40af8921c67f19918a5a578a8ea722c0b1f464b42fabd309891b5a96a2b5"
+      "fingerprint": "sha256:0059e20b637be1443fd4cbff1427c3049249a7d38c2e8de75362b65a7db459a5"
     },
     {
       "id": "experimentguard",

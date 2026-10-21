@@ -16,7 +16,7 @@ from .schema import TraceGuardModel
 def evaluate_model(
     model: TraceGuardModel,
     *,
-    include_storyline_depth: bool = True,
+    include_storyline_depth: bool = False,
 ) -> EvaluationResult:
     """TraceGuardModel x evaluation options -> EvaluationResult."""
 

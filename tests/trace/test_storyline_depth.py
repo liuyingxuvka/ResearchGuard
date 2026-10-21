@@ -112,7 +112,7 @@ def test_broad_causal_storyline_without_alternative_records_gap():
     data["scenario_perturbations"] = []
     data["expected_sensitivities"] = []
 
-    receipt = evaluate_model(_model(data)).storyline_depth
+    receipt = evaluate_model(_model(data), include_storyline_depth=True).storyline_depth
 
     assert receipt.closure_status == "BLOCKED"
     assert {"missing_alternative", "unresolved_confounder_review"} <= {
@@ -147,7 +147,7 @@ def test_important_causal_storyline_without_mechanism_or_confounder_blocks_depth
         }
     ]
 
-    receipt = evaluate_model(_model(data)).storyline_depth
+    receipt = evaluate_model(_model(data), include_storyline_depth=True).storyline_depth
 
     assert receipt.closure_status == "BLOCKED"
     assert {
@@ -235,7 +235,7 @@ def test_unlinked_fixed_event_is_ineffective_and_does_not_count_toward_depth():
 
 
 def test_native_receipt_binds_baseline_alternatives_plan_effects_and_gaps():
-    receipt = evaluate_model(_model(_data())).storyline_depth
+    receipt = evaluate_model(_model(_data()), include_storyline_depth=True).storyline_depth
 
     assert receipt.schema_version == "researchguard.trace.storyline_depth.v2"
     assert len(receipt.model_fingerprint) == 64
@@ -315,7 +315,7 @@ def test_cli_depth_and_model_backed_simulation_expose_native_receipt():
 
 def test_nonpassing_baseline_cannot_receive_storyline_depth_pass() -> None:
     negative = ROOT / "examples" / "trace" / "operation_before_tender_contradiction.yaml"
-    receipt = evaluate_model(_model(yaml.safe_load(negative.read_text(encoding="utf-8")))).storyline_depth
+    receipt = evaluate_model(_model(yaml.safe_load(negative.read_text(encoding="utf-8"))), include_storyline_depth=True).storyline_depth
 
     assert receipt.closure_status == "BLOCKED"
     assert receipt.broad_claim_licensed is False
@@ -330,7 +330,7 @@ def test_default_plan_executes_every_critical_candidate() -> None:
         for item in candidates
         if item.priority_score >= CRITICAL_PERTURBATION_THRESHOLD
     }
-    receipt = evaluate_model(model).storyline_depth
+    receipt = evaluate_model(model, include_storyline_depth=True).storyline_depth
     executed_ids = {effect.perturbation.perturbation_id for effect in receipt.effects}
 
     assert critical_ids
@@ -388,10 +388,10 @@ def test_bounded_request_never_becomes_broad_license() -> None:
 
 
 def test_candidate_universe_fingerprint_changes_with_authoritative_model() -> None:
-    first = evaluate_model(_model(_data())).storyline_depth
+    first = evaluate_model(_model(_data()), include_storyline_depth=True).storyline_depth
     changed_data = _data()
     changed_data["events"][0]["importance"] = 0.01
-    second = evaluate_model(_model(changed_data)).storyline_depth
+    second = evaluate_model(_model(changed_data), include_storyline_depth=True).storyline_depth
 
     assert first.candidate_universe_fingerprint != second.candidate_universe_fingerprint
 
@@ -409,7 +409,7 @@ def test_single_event_noncausal_trace_cannot_license_broad_depth() -> None:
     data["scenario_perturbations"] = []
     data["expected_sensitivities"] = []
 
-    receipt = evaluate_model(_model(data)).storyline_depth
+    receipt = evaluate_model(_model(data), include_storyline_depth=True).storyline_depth
 
     assert receipt.broad_claim_licensed is False
     assert receipt.closure_status == "BLOCKED"
@@ -455,7 +455,7 @@ def test_one_ineffective_critical_perturbation_is_not_hidden_by_effective_ones()
         }
     )
 
-    receipt = evaluate_model(_model(data)).storyline_depth
+    receipt = evaluate_model(_model(data), include_storyline_depth=True).storyline_depth
 
     assert "evidence_ablation:remove_unlinked_control" in receipt.critical_ineffective_ids
     assert receipt.broad_claim_licensed is False
@@ -468,7 +468,7 @@ def test_expected_sensitivity_must_match_same_engine_support_effect() -> None:
     data = _data()
     data["expected_sensitivities"][0]["expected_direction"] = "increase"
 
-    receipt = evaluate_model(_model(data)).storyline_depth
+    receipt = evaluate_model(_model(data), include_storyline_depth=True).storyline_depth
 
     assert receipt.sensitivity_mismatch_ids == (
         "sensitivity_without_strong_signals",
@@ -483,7 +483,7 @@ def test_critical_event_without_time_blocks_object_depth() -> None:
     data = _data()
     next(item for item in data["events"] if item["event_id"] == "event_funding")["time_interval"] = None
 
-    receipt = evaluate_model(_model(data)).storyline_depth
+    receipt = evaluate_model(_model(data), include_storyline_depth=True).storyline_depth
 
     assert receipt.closure_status == "BLOCKED"
     assert any(
@@ -497,7 +497,7 @@ def test_traceguard_never_promotes_internal_perturbation_to_future_prediction() 
     data = _data()
     data["metadata"]["storyline_depth_policy"] = {"prediction_requested": True}
 
-    receipt = evaluate_model(_model(data)).storyline_depth
+    receipt = evaluate_model(_model(data), include_storyline_depth=True).storyline_depth
 
     assert receipt.predictive_holdout_status == "unsupported_without_native_future_holdout"
     assert receipt.predictive_claim_licensed is False
@@ -508,7 +508,7 @@ def test_traceguard_never_promotes_internal_perturbation_to_future_prediction() 
 
 
 def test_object_universe_fingerprint_changes_with_trace_inventory() -> None:
-    first = evaluate_model(_model(_data())).storyline_depth
+    first = evaluate_model(_model(_data()), include_storyline_depth=True).storyline_depth
     changed = _data()
     changed["sources"].append(
         {
@@ -531,7 +531,7 @@ def test_object_universe_fingerprint_changes_with_trace_inventory() -> None:
             "usable_as_trace_evidence": True,
         }
     )
-    second = evaluate_model(_model(changed)).storyline_depth
+    second = evaluate_model(_model(changed), include_storyline_depth=True).storyline_depth
 
     assert first.object_universe_fingerprint != second.object_universe_fingerprint
 
@@ -548,7 +548,7 @@ def test_low_importance_explicit_trace_cannot_escape_broad_object_denominator() 
         }
     )
 
-    receipt = evaluate_model(_model(data)).storyline_depth
+    receipt = evaluate_model(_model(data), include_storyline_depth=True).storyline_depth
     row = next(
         item
         for item in receipt.object_depth_rows
@@ -656,3 +656,16 @@ def test_target_policy_can_raise_but_not_lower_native_trace_depth() -> None:
     assert row["status"] == "fail"
     assert row["temporal"]["required_qualified_event_count"] == 100
     assert "trace_qualified_event_ratio_below_policy_floor" in row["findings"]
+
+
+def test_evaluate_leaves_storyline_depth_to_trace_depth() -> None:
+    def cli(command: str) -> dict:
+        result = subprocess.run(
+            [sys.executable, "-m", "researchguard", "trace", command, str(EXAMPLE)],
+            cwd=ROOT, capture_output=True, text=True,
+        )
+        assert result.returncode == 0, result.stdout + result.stderr
+        return json.loads(result.stdout)
+
+    assert cli("evaluate")["storyline_depth"] is None
+    assert cli("depth")["schema_version"] == "researchguard.trace.storyline_depth.v2"

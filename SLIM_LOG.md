@@ -606,3 +606,18 @@ Added minimal-sets CLI and a model-native evaluator adapter; existing minimizati
 - `python -m flowguard map confirm logicguard suite-orchestration` — exit 0, 0.343s; `confirmed 2 component(s)`
 - `python -m flowguard map check` — exit 0, 0.245s; `check: 0 error(s), 4 warning(s), 0 info`
 - `python -m flowguard release` — exit 0, 2.262s; `verify: PASS (map, lint and models only; tests not run; run python -m pytest -q separately)`
+
+## RG-51 — completed
+
+Default Trace evaluation solves once without storyline depth; trace depth, storyline-depth simulation and iteration retain explicit native depth. Fifteen depth tests opt in; final focused run 93 passed after correcting an external script fence-selection error that initially appended prose to the new test (original collection failure retained). Actual CLI evaluate output is 15897 saved/12907 printed bytes with depth null; explicit depth PASS and validate NOT_RUN. Two example timings saved as observations only (cold-start order not a speed guarantee). Collection 343; exports, fixed LW43 native 10 passed no skip, map/release passed.
+
+- `python -m pytest tests/trace` — exit 2, 1.313s; `1 error in 0.88s`
+- `python -m pytest tests/trace` — exit 0, 42.072s; `93 passed in 41.63s`
+- `python <external>/probe_rg51.py` — exit 0, 4.802s; `native depth, task iteration and report owners unchanged`
+- `python <external>/check_exports.py` — exit 0, 0.507s; `exports ok`
+- `python -m pytest -p no:cacheprovider tests/contract/test_researchguard_handoff.py --junitxml <external>/RG-51-lw43-junit.xml --basetemp <external>/RG-51-lw43-temp` — exit 0, 0.64s; `============================== 10 passed in 0.31s ==============================`
+- `python <external>/verify_lw_junit.py <external>/RG-51-lw43-junit.xml` — exit 0, 0.063s; `10 actual PASSED, 0 skipped; real native provider-to-reader bridge PASSED/ready, not version-skipped`
+- `python -m pytest --collect-only` — exit 0, 2.28s; `343 tests collected in 1.81s`
+- `python -m flowguard map confirm traceguard suite-orchestration` — exit 0, 0.272s; `confirmed 2 component(s)`
+- `python -m flowguard map check` — exit 0, 0.328s; `check: 0 error(s), 4 warning(s), 0 info`
+- `python -m flowguard release` — exit 0, 2.08s; `verify: PASS (map, lint and models only; tests not run; run python -m pytest -q separately)`
