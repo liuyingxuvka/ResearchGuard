@@ -258,6 +258,9 @@ def cmd_export_logicguard(args: argparse.Namespace) -> int:
 
 
 def cmd_create(args: argparse.Namespace) -> int:
+    if args.purpose_contract is None:
+        Path(args.output).write_text(dump_yaml(STARTER_MODEL), encoding="utf-8")
+        return 0
     try:
         text = dump_yaml(
             bind_task_guard_purpose(
@@ -631,7 +634,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     create = sub.add_parser("create")
     create.add_argument("--output", required=True)
-    create.add_argument("--purpose-contract", required=True)
+    create.add_argument("--purpose-contract")
     create.set_defaults(handler=cmd_create)
 
     simulate = sub.add_parser("simulate")
@@ -809,7 +812,7 @@ def build_parser() -> argparse.ArgumentParser:
     build_model.add_argument("root")
     build_model.add_argument("case_id")
     build_model.add_argument("--output", required=True)
-    build_model.add_argument("--purpose-contract", required=True)
+    build_model.add_argument("--purpose-contract")
     build_model.add_argument("--direction", action="append")
     build_model.add_argument("--pretty", action="store_true")
     build_model.set_defaults(handler=cmd_library)

@@ -382,7 +382,7 @@ def build_model(
     case_id: str,
     *,
     directions: Iterable[str] = (),
-    purpose_contract: str | Path,
+    purpose_contract: str | Path | None = None,
     candidate_path: str | Path,
 ) -> dict[str, Any]:
     paths = require_library(root)
@@ -421,6 +421,8 @@ def build_model(
         },
         **merged,
     }
+    if purpose_contract is None:
+        return model
     return bind_task_guard_purpose(
         model,
         contract_path=purpose_contract,
@@ -434,7 +436,7 @@ def write_model(
     output: str | Path,
     *,
     directions: Iterable[str] = (),
-    purpose_contract: str | Path,
+    purpose_contract: str | Path | None = None,
 ) -> dict[str, Any]:
     model = build_model(
         root,

@@ -646,3 +646,13 @@ def test_case_library_writeback_records_a_failed_evaluation(tmp_path: Path):
     assert case_library.write_back_gaps(root, "incident-a", result_path)["ok"] is False
     records = case_library.read_yaml(case_library.LibraryPaths(root).case_ledger("incident-a", "gaps.yaml"), [])
     assert [row["gap_id"] for row in records] == ["evaluation_failed"]
+
+
+def test_create_and_build_model_need_no_purpose_contract(tmp_path: Path):
+    starter = tmp_path / "starter.yaml"
+    proc = subprocess.run([sys.executable, "-m", "researchguard", "trace", "create", "--output", str(starter)], cwd=ROOT, text=True, capture_output=True)
+    assert proc.returncode == 0, proc.stderr
+    load_model(starter)
+    built = case_library.write_model(copy_case_library(tmp_path), "metadata-api-incident", tmp_path / "built.yaml")
+    assert "guard_purpose_contract" not in built["metadata"]
+    assert evaluate_model(load_model(tmp_path / "built.yaml")).traces[0].trace_id == "trace_metadata_incident"

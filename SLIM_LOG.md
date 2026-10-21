@@ -168,3 +168,11 @@ Experiment recommend补默认非领域循环字段，坏输入给JSON/CLI2，删
 - `python -m pytest` — exit 0, 422.451s; `856 passed, 13 skipped in 421.66s (0:07:01)`
 - `python -m flowguard map models` — exit 0, 1.451s; `models: 2 passed, 0 failed`
 - `python -m flowguard map check` — exit 0, 0.877s; `check: 0 error(s), 10 warning(s), 0 info`
+
+## RG-16 — completed
+
+目的契约可选，显式提供仍走原绑定路径。47测试通过；真实无契约空starter schema_ok/trace0/okfalse，案例模型trace1/oktrue且深度BLOCKED仍可见；收集870。
+
+- `python -m pytest tests/trace/test_traceguard.py tests/trace/test_guard_model_purpose_contract.py` — exit 0, 61.447s; `47 passed in 60.91s (0:01:00)`
+- `python <external>/probe_rg16.py` — exit 0, 2.457s; `contract-free starter and library model are honest and valid`
+- `python -m pytest --collect-only` — exit 0, 5.48s; `870 tests collected in 4.90s`
