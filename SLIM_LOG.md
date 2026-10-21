@@ -280,3 +280,12 @@ Cross-repository review found that the RG-12 copied installer used shallow stat 
 - `python -m flowguard map check` — exit 0, 0 errors / 10 interim warnings; component description/confirmation remains scheduled at RG-38.
 
 Full command logs, actual return codes, pre/post installer content hashes and independent-review evidence are external.
+
+## RG-26 — completed
+
+仅删来源分支receipt门/解析器与请求中该字段必填，保分支身份、锚点、模型/来源库绑定检查及native_evidence_ref数据兼容、现native_depth。24pass、LW44pass、收集834，指定收据门残留为空。
+
+- `python -m pytest tests/logic/test_synthesis_contract.py tests/logic/test_artifact_synthesis.py tests/logic/test_synthesis_native_closure.py tests/logic/test_delivery_contract.py` — exit 0, 0.784s; `24 passed in 0.51s`
+- `python -c import subprocess;p=subprocess.run(["rg","-n","native_receipts|_native_evidence_reference_gaps|native_evidence_missing","src/researchguard/logic/synthesis.py","src/researchguard/logic/synthesis_contract.py"],capture_output=True,text=True);print(p.stdout,end="");assert p.returncode==1;print("receipt gate removed; data/native-depth/source binding paths retained")` — exit 0, 0.036s; `receipt gate removed; data/native-depth/source binding paths retained`
+- `python -m pytest -p no:cacheprovider tests/contract/test_researchguard_handoff.py tests/e2e/test_production_reader_pipeline.py tests/contract/test_production_reader_native_lifecycle.py` — exit 0, 2.163s; `============================== 44 passed in 1.85s ==============================`
+- `python -m pytest --collect-only` — exit 0, 3.342s; `834 tests collected in 2.89s`

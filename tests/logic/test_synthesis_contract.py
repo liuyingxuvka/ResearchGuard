@@ -140,7 +140,6 @@ def test_source_branch_identity_anchor_and_receipt_are_independent_gates():
     plan = synthesize_artifact_plan(model, selection_request=request, source_branches=branches)
     assert plan.status == "blocked_support_gap"
     assert any("anchor_mismatch" in gap for gap in plan.open_gaps)
-    assert any("native_evidence_mismatch" in gap for gap in plan.open_gaps)
     assert len([row for row in plan.candidate_dispositions if row.candidate_kind == "SourceBranch"]) == 1
 
 

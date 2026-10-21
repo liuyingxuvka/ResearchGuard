@@ -355,7 +355,7 @@ def validate_selection_request(
             destination = ""
         elif destination not in known_ids:
             errors.append(f"binding[{index}]:unknown_destination_unit:{destination}")
-        for key in ("branch_id", "source_id", "current_native_evidence_ref"):
+        for key in ("branch_id", "source_id"):
             if type(binding.get(key)) is not str or not binding.get(key, "").strip():
                 errors.append(f"binding[{index}]:invalid:{key}")
         for key in ("project_id", "source_model_fingerprint"):

@@ -1112,14 +1112,6 @@ def _branch_binding_gaps(binding: Mapping[str, Any], candidate: SynthesisItem, *
         gaps.append("candidate_exactly_one_anchor_required")
     if not request_anchor or request_anchor != candidate_anchor:
         gaps.append("anchor_mismatch")
-    binding_refs = str(binding.get("current_native_evidence_ref", "") or "")
-    candidate_ref = candidate.native_evidence_ref
-    if not candidate_ref:
-        gaps.append("native_evidence_missing")
-    elif binding_refs != candidate_ref:
-        gaps.append("native_evidence_mismatch")
-    else:
-        gaps.extend(_native_evidence_reference_gaps(candidate_ref, candidate))
     branch_project = candidate.source_project_id
     if binding.get("project_id") not in (None, "") and str(binding.get("project_id")) != branch_project:
         gaps.append("project_id_mismatch")
@@ -1139,78 +1131,6 @@ def _branch_binding_gaps(binding: Mapping[str, Any], candidate: SynthesisItem, *
     if source_library is not None:
         gaps.extend(_source_library_binding_gaps(binding, candidate, source_library))
     return list(dict.fromkeys(gaps))
-
-
-def _native_evidence_reference_gaps(reference: str, candidate: SynthesisItem) -> list[str]:
-    """Require a resolvable, identity-bound branch receipt before admission."""
-
-    path = Path(reference)
-    if not path.exists() or not path.is_file():
-        return ["native_evidence_unresolved"]
-    payload = _load_artifact(path)
-    if payload is None:
-        return ["native_evidence_unresolved"]
-
-    # Prefer the repository's immutable native-receipt resolver when the
-    # source branch carries a signed/current receipt.  Merely matching a few
-    # JSON labels is not equivalent to reopening the receipt bytes, producer,
-    # and binding identity.
-    if "schema_version" in payload and "receipt_id" in payload:
-        try:
-            from ..native_receipts import NativeReceiptReference, resolve_native_receipt_reference
-
-            receipt = NativeReceiptReference.from_dict(payload)
-            gaps = [f"{code}:{detail}" for code, detail in resolve_native_receipt_reference(receipt)]
-        except Exception:
-            return ["native_evidence_invalid"]
-        if receipt.status != "passed":
-            gaps.append(f"native_evidence_not_current:{receipt.status}")
-        if receipt.native_model_id not in (candidate.source_id, candidate.source_id.rsplit(":", 1)[-1]):
-            gaps.append("native_evidence_native_model_mismatch")
-        expected_anchor = candidate.anchor_node_id or candidate.anchor_block_id
-        if expected_anchor and receipt.expected_target_anchor_id != expected_anchor:
-            gaps.append("native_evidence_anchor_mismatch")
-        if candidate.source_model_fingerprint and receipt.model_fingerprint != candidate.source_model_fingerprint:
-            gaps.append("native_evidence_model_fingerprint_mismatch")
-        elif not receipt.model_fingerprint:
-            gaps.append("native_evidence_model_fingerprint_missing")
-        return list(dict.fromkeys(gaps))
-
-    # Unsigned local native outputs are allowed as a bounded source-library
-    # fact only when the file still carries enough immutable identity for the
-    # resolver/producer to re-check it.  A status/source/branch trio is a
-    # spoofable label and is therefore deliberately rejected.
-    identity_missing = [
-        key
-        for key in ("receipt_id", "source_id", "branch_id", "model_fingerprint")
-        if not str(payload.get(key, "") or "").strip()
-    ]
-    anchor_value = str(
-        payload.get("anchor_node_id", "")
-        or payload.get("anchor_block_id", "")
-        or payload.get("anchor_id", "")
-        or ""
-    ).strip()
-    if not anchor_value:
-        identity_missing.append("anchor")
-    if not any(str(payload.get(key, "") or "").strip() for key in ("receipt_fingerprint", "content_hash", "fingerprint", "result_fingerprint")):
-        identity_missing.append("receipt_fingerprint")
-    if identity_missing:
-        return [f"native_evidence_identity_incomplete:{','.join(identity_missing)}"]
-    gaps: list[str] = []
-    if payload.get("source_id") not in (None, "", candidate.source_id):
-        gaps.append("native_evidence_source_mismatch")
-    if payload.get("branch_id") not in (None, "", candidate.branch_id):
-        gaps.append("native_evidence_branch_mismatch")
-    status = str(payload.get("status", payload.get("receipt_status", "current")) or "")
-    if status not in {"pass", "passed", "current", "ready"}:
-        gaps.append(f"native_evidence_not_current:{status or 'missing_status'}")
-    expected_anchor = candidate.anchor_node_id or candidate.anchor_block_id
-    if anchor_value != expected_anchor:
-        gaps.append("native_evidence_anchor_mismatch")
-    if candidate.source_model_fingerprint and payload.get("model_fingerprint") != candidate.source_model_fingerprint:
-        gaps.append("native_evidence_model_fingerprint_mismatch")
-    return gaps
 
 
 def _source_library_binding_gaps(binding: Mapping[str, Any], candidate: SynthesisItem, library: Any) -> list[str]:
