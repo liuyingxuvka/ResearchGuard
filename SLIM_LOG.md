@@ -394,3 +394,11 @@ Source契约可选：缺省直接运行模型并正常观察更新，嵌入/显�
 - `python -m pytest` — exit 0, 107.683s; `547 passed in 107.22s (0:01:47)`
 - `python -m flowguard map models` — exit 0, 1.975s; `models: 2 passed, 0 failed`
 - `python -m flowguard map check` — exit 0, 0.497s; `check: 0 error(s), 11 warning(s), 0 info`
+
+## RG-36 — completed
+
+Windows冒烟改6个现存功能测试文件，删不存在VERSION的push触发但保存在时一致性检查；FG唯一test extra来源、精确SHA CI/publisher门和Linux全量保持。53pass、双workflow YAML解析通过、VERSION仅条件检查2行，收集547。
+
+- `python -m pytest tests/test_install_skill.py tests/test_root_cli.py tests/logic/test_cli.py tests/source/test_cli.py tests/trace/test_inference_kernel.py tests/experiment/test_recommendation.py` — exit 0, 29.606s; `53 passed in 28.92s`
+- `python -c import yaml;from pathlib import Path;[yaml.safe_load(Path(p).read_text()) for p in (".github/workflows/ci.yml",".github/workflows/publish-release.yml")];s=Path(".github/workflows/publish-release.yml").read_text();rows=[l.strip() for l in s.splitlines() if "VERSION" in l];print("yaml ok");print("\n".join(rows));assert len(rows)==2 and any("if Path(\"VERSION\").exists():" in l for l in rows)` — exit 0, 0.073s; `assert Path("VERSION").read_text(encoding="utf-8").strip() == version, "VERSION differs from pyproject"`
+- `python -m pytest --collect-only` — exit 0, 3.781s; `547 tests collected in 3.18s`

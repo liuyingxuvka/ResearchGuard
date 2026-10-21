@@ -37,9 +37,10 @@ jobs:
           python -m pytest
           tests/test_install_skill.py
           tests/test_root_cli.py
-          tests/logic/test_dynamic_model_purpose_contract.py::test_target_paths_cannot_escape_and_baseline_cannot_substitute
-          tests/trace/test_inference_kernel.py::test_squared_hinge_qp_matches_analytic_optimum
-          tests/trace/test_inference_kernel.py::test_infeasible_problem_fails_closed_without_fallback
+          tests/logic/test_cli.py
+          tests/source/test_cli.py
+          tests/trace/test_inference_kernel.py
+          tests/experiment/test_recommendation.py
       - name: Build release distributions
         if: runner.os == 'Linux'
         run: python -m build
