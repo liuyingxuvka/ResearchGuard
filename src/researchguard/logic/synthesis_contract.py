@@ -47,7 +47,6 @@ class SelectionRequest:
     source_branch_bindings: tuple[dict[str, Any], ...]
     request_fingerprint: str
     native_depth_receipt_ref: str = ""
-    native_mesh_overlay_ref: str = ""
     claim_use_dispositions: tuple[dict[str, Any], ...] = ()
 
     def to_dict(self) -> dict[str, Any]:
@@ -68,7 +67,6 @@ class SelectionRequest:
             "units": [_row(unit) for unit in self.units],
             "source_branch_bindings": [_row(binding) for binding in self.source_branch_bindings],
             "native_depth_receipt_ref": self.native_depth_receipt_ref,
-            "native_mesh_overlay_ref": self.native_mesh_overlay_ref,
             "claim_use_dispositions": [_row(item) for item in self.claim_use_dispositions],
         }
 
@@ -108,7 +106,6 @@ def validate_selection_request(
         "schema",
         *required,
         "native_depth_receipt_ref",
-        "native_mesh_overlay_ref",
         "claim_use_dispositions",
     }
     errors.extend(
@@ -213,13 +210,10 @@ def validate_selection_request(
         errors.append("max_body_units_bool_forbidden")
 
     optional_depth_ref = request.get("native_depth_receipt_ref", "")
-    optional_mesh_ref = request.get("native_mesh_overlay_ref", "")
     if optional_depth_ref not in (None, "") and type(optional_depth_ref) is not str:
         errors.append("native_depth_receipt_ref_not_string")
         optional_depth_ref = ""
-    if optional_mesh_ref not in (None, "") and type(optional_mesh_ref) is not str:
-        errors.append("native_mesh_overlay_ref_not_string")
-        optional_mesh_ref = ""
+
 
     raw_claim_use = request.get("claim_use_dispositions", ())
     if isinstance(raw_claim_use, Mapping):
@@ -420,7 +414,6 @@ def validate_selection_request(
         "units": [dict(unit) for unit in units],
         "source_branch_bindings": [dict(binding) for binding in normalized_bindings],
         "native_depth_receipt_ref": str(optional_depth_ref or ""),
-        "native_mesh_overlay_ref": str(optional_mesh_ref or ""),
         "claim_use_dispositions": [dict(item) for item in claim_use_rows],
     }
     normalized = SelectionRequest(
@@ -437,7 +430,6 @@ def validate_selection_request(
         source_branch_bindings=normalized_bindings,
         request_fingerprint=request_fingerprint(canonical),
         native_depth_receipt_ref=str(optional_depth_ref or ""),
-        native_mesh_overlay_ref=str(optional_mesh_ref or ""),
         claim_use_dispositions=tuple(dict(item) for item in claim_use_rows),
     )
     return normalized, ()

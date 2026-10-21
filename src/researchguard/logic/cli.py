@@ -834,11 +834,6 @@ def _cmd_synthesize(args: argparse.Namespace) -> int:
         selection_request=selection_request,
         source_branches=source_branches,
         source_library=library,
-        native_mesh_overlay=(
-            selection_request.get("native_mesh_overlay_ref")
-            if isinstance(selection_request, dict)
-            else None
-        ),
     )
     if args.delivery:
         guidance = adapt_delivery(plan, profile=plan.profile)

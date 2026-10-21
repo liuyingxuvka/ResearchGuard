@@ -1490,9 +1490,8 @@ def _build_native_depth_analysis(
     artifact_binding_unit_ids: Iterable[str] = (),
     interface_receipt_refs: Iterable[str] = (),
 ) -> LogicDepthReceipt:
-    # Mesh evaluation already owns an exact native result for every pinned
-    # model.  Reuse it when supplied instead of evaluating the same immutable
-    # model a second time before depth analysis.
+    # Synthesis already evaluated this model.  Reuse that result when supplied
+    # instead of evaluating the same model a second time before depth analysis.
     result = result or evaluate_model(model)
     policy = derive_importance_policy()
     universe = build_argument_coverage_universe(

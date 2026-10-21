@@ -11,23 +11,6 @@ JOURNAL_SCHEMA = "researchguard.logic.model-store-journal.v1"
 EVALUATION_OVERLAY_SCHEMA = "researchguard.logic.evaluation-overlay.v1"
 RECEIPT_SCHEMA = "researchguard.logic.model-store-receipt.v1"
 
-# Product-runtime ModelMesh is additive to, and never an alias for, the P0
-# ModelStore schema above.  Every P1 durable artifact declares both its exact
-# artifact schema and this one current mesh schema version.
-MESH_SCHEMA_VERSION = "researchguard.logic.model-mesh.v1"
-MESH_MANIFEST_SCHEMA = "researchguard.logic.model-mesh-manifest.v1"
-MESH_SNAPSHOT_SCHEMA = "researchguard.logic.model-mesh-snapshot.v1"
-MESH_INDEX_SHARD_SCHEMA = "researchguard.logic.model-mesh-index-shard.v1"
-MESH_JOURNAL_SCHEMA = "researchguard.logic.model-mesh-journal.v1"
-MESH_RECEIPT_SCHEMA = "researchguard.logic.model-mesh-receipt.v1"
-MESH_EVALUATION_OVERLAY_SCHEMA = "researchguard.logic.model-mesh-evaluation-overlay.v1"
-MESH_OVERLAY_CATALOG_MANIFEST_SCHEMA = "researchguard.logic.model-mesh-overlay-catalog-manifest.v1"
-MESH_OVERLAY_CATALOG_SNAPSHOT_SCHEMA = "researchguard.logic.model-mesh-overlay-catalog-snapshot.v1"
-MESH_OVERLAY_DEPENDENCY_SHARD_SCHEMA = "researchguard.logic.model-mesh-overlay-dependency-shard.v1"
-MESH_INVALIDATION_RECEIPT_SCHEMA = "researchguard.logic.model-mesh-invalidation-receipt.v1"
-MESH_SIMULATION_RECEIPT_SCHEMA = "researchguard.logic.model-mesh-simulation-receipt.v1"
-MESH_SCALE_RECEIPT_SCHEMA = "researchguard.logic.model-mesh-scale-receipt.v1"
-
 STATE_IN = "IN"
 STATE_OUT = "OUT"
 STATE_UNDECIDED = "UNDECIDED"

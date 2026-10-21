@@ -436,3 +436,20 @@ Windows冒烟改6个现存功能测试文件，删不存在VERSION的push触发�
 - `python -m flowguard map check` — exit 0, 0.301s; `check: 0 error(s), 4 warning(s), 0 info`
 - `python -m flowguard release` — exit 0, 1.755s; `verify: PASS (map, lint and models only; tests not run; run python -m pytest -q separately)`
 - `python -m flowguard map models` — exit 0, 1.26s; `models: 2 passed, 0 failed`
+
+## RG-40 — completed
+
+删12 ModelMesh模块/专测/夹具/overlay分支和122退役导出，保普通身份类型、native depth receipt路径及技能通用模型卡方法。26pass/exports/strict residual；LW43 exact快照10全部passed0skip且native reader bridge实际ready，差1计数已记录。完整415pass、双模型pass、map0error4warn、本地releasePASS。
+
+- `python -m flowguard map confirm logicguard suite-orchestration` — exit 0, 0.855s; `confirmed 2 component(s)`
+- `python -m pytest tests/logic/test_synthesis_contract.py tests/logic/test_synthesis_native_closure.py tests/logic/test_public_api.py tests/logic/test_cli.py` — exit 0, 33.754s; `26 passed in 32.95s`
+- `python <external>/check_exports.py` — exit 0, 0.966s; `exports ok`
+- `python -m pytest -p no:cacheprovider tests/contract/test_researchguard_handoff.py --junitxml <external>/RG-40-lw43-junit.xml --basetemp <external>/RG-40-lw43-temp` — exit 0, 0.698s; `============================== 10 passed in 0.38s ==============================`
+- `python <external>/verify_lw_junit.py <external>/RG-40-lw43-junit.xml` — exit 0, 0.46s; `10 actual PASSED, 0 skipped; real native provider-to-reader bridge PASSED/ready, not version-skipped`
+- `python -c import subprocess;p=subprocess.run(["rg","-n","-i","-g","*.py","mesh","src/researchguard"],capture_output=True,text=True);print(p.stdout,end="");assert p.returncode==1;p=subprocess.run(["rg","-n","mesh_|model_mesh|native_mesh|MeshId|ModelMesh","tests","scripts","skills",".flowguard","pyproject.toml",".github"],capture_output=True,text=True);print(p.stdout,end="");assert p.returncode==1;print("ModelMesh code/API residues absent; generic skill modeling wording retained")` — exit 0, 0.071s; `ModelMesh code/API residues absent; generic skill modeling wording retained`
+- `python -m pytest --collect-only` — exit 0, 6.666s; `415 tests collected in 6.03s`
+- `python -m flowguard map check` — exit 0, 1.271s; `check: 0 error(s), 4 warning(s), 0 info`
+- `python -m pytest` — exit 0, 79.993s; `415 passed in 79.48s (0:01:19)`
+- `python -m flowguard map models` — exit 0, 1.476s; `models: 2 passed, 0 failed`
+- `python -m flowguard map check` — exit 0, 0.282s; `check: 0 error(s), 4 warning(s), 0 info`
+- `python -m flowguard release` — exit 0, 1.765s; `verify: PASS (map, lint and models only; tests not run; run python -m pytest -q separately)`

@@ -107,39 +107,21 @@ class ReceiptId(_StringIdentity):
     kind: ClassVar[str] = "receipt_id"
 
 
-@dataclass(frozen=True, order=True)
-class MeshId(_StringIdentity):
-    kind: ClassVar[str] = "mesh_id"
 
 
-@dataclass(frozen=True, order=True)
-class MeshRevision(_StringIdentity):
-    kind: ClassVar[str] = "mesh_revision"
 
 
-@dataclass(frozen=True, order=True)
-class MeshTransactionId(_StringIdentity):
-    kind: ClassVar[str] = "mesh_transaction_id"
 
 
-@dataclass(frozen=True, order=True)
-class MeshReceiptId(_StringIdentity):
-    kind: ClassVar[str] = "mesh_receipt_id"
 
 
-@dataclass(frozen=True, order=True)
-class MeshEvaluationId(_StringIdentity):
-    kind: ClassVar[str] = "mesh_evaluation_id"
 
 
-@dataclass(frozen=True, order=True)
-class OverlayCatalogRevision(_StringIdentity):
-    kind: ClassVar[str] = "overlay_catalog_revision"
 
 
 @dataclass(frozen=True, order=True)
 class QualifiedModelRef:
-    """One exact immutable physical model version selected by a mesh."""
+    """One exact immutable physical model version."""
 
     model_id: ModelId
     revision: ModelRevision
@@ -230,15 +212,9 @@ __all__ = [
     "EdgeId",
     "EvaluationId",
     "IdentityError",
-    "MeshEvaluationId",
-    "MeshId",
-    "MeshReceiptId",
-    "MeshRevision",
-    "MeshTransactionId",
     "ModelId",
     "ModelRevision",
     "NodeId",
-    "OverlayCatalogRevision",
     "QualifiedModelRef",
     "QualifiedNodeRef",
     "ReceiptId",

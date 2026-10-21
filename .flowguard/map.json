@@ -86,7 +86,7 @@
         ".flowguard/models/sourceguard_content_anchor_oracle_model.py"
       ],
       "status": "confirmed",
-      "fingerprint": "sha256:64a7eeb4db2d688999f85c081a37671367ba131922c273a763e9790d744549e6"
+      "fingerprint": "sha256:ea23f861ebfb02f7dfc0ee50c19ff6628d5d63273f1f63029ce72554fd3bad9b"
     },
     {
       "id": "logicguard",
@@ -115,20 +115,8 @@
         "src/researchguard/logic/loader.py",
         "src/researchguard/logic/localization.py",
         "src/researchguard/logic/markdown_structure.py",
-        "src/researchguard/logic/mesh_evaluator.py",
-        "src/researchguard/logic/mesh_index.py",
-        "src/researchguard/logic/mesh_invalidation.py",
-        "src/researchguard/logic/mesh_materialization.py",
-        "src/researchguard/logic/mesh_overlay.py",
-        "src/researchguard/logic/mesh_overlay_catalog.py",
-        "src/researchguard/logic/mesh_receipts.py",
-        "src/researchguard/logic/mesh_scc.py",
-        "src/researchguard/logic/mesh_simulator.py",
-        "src/researchguard/logic/mesh_store.py",
-        "src/researchguard/logic/mesh_transaction.py",
         "src/researchguard/logic/minimal_sets.py",
         "src/researchguard/logic/model.py",
-        "src/researchguard/logic/model_mesh.py",
         "src/researchguard/logic/model_store.py",
         "src/researchguard/logic/provenance.py",
         "src/researchguard/logic/receipts.py",
@@ -174,7 +162,7 @@
       ],
       "models": [],
       "status": "confirmed",
-      "fingerprint": "sha256:8e27c3e68cd237b650bcd1b2911ebd9f136365b2c146a5ac9ee3b80befdea635"
+      "fingerprint": "sha256:d6f6b6521caed843696374cf80c5d5b0e3a39c3fb169084ded12e9f438db606c"
     },
     {
       "id": "sourceguard",
