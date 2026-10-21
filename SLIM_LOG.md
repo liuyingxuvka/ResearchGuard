@@ -410,3 +410,14 @@ Windows冒烟改6个现存功能测试文件，删不存在VERSION的push触发�
 - `python -m flowguard change src/researchguard/source/planner.py` — exit 0, 1.076s; `ARCH WARN duplicate_code sourceguard: 2 identical bodies (216 AST nodes) in ['sourceguard', 'suite-orchestration']: src/researchguard/source/template_packs.py:verify_template_instance, src/researchguard/trace/template_packs.py:verify_template_instance`
 - `python -m flowguard map models` — exit 0, 3.627s; `models: 2 passed, 0 failed`
 - `python -m flowguard map check` — exit 0, 0.64s; `check: 0 error(s), 11 warning(s), 0 info`
+
+## RG-38 — completed
+
+按现状更新7组件描述并由FlowGuard confirm写指纹，未手改指纹/债务/flows。地图0error4entrypoint警告且无stale，描述残留为空；完整547pass（tkinter可用）、双模型通过；本地release明确2declared/2executed verifyPASS（其自身不跑pytest，已单独跑过）。满足根预授权，随后39–54仅用exactLW43只读快照。
+
+- `python -m flowguard map confirm researchguard-suite suite-orchestration logicguard sourceguard traceguard experimentguard author-tools` — exit 0, 0.205s; `confirmed 7 component(s)`
+- `python -m flowguard map check` — exit 0, 0.567s; `check: 0 error(s), 4 warning(s), 0 info`
+- `python -c import subprocess;p=subprocess.run(["rg","-n","admission|blueprint|DNA|receipt and target",".flowguard/map.json"],capture_output=True,text=True);print(p.stdout,end="");assert p.returncode==1;print("component descriptions match current ownership; old authority/blueprint descriptions absent")` — exit 0, 0.045s; `component descriptions match current ownership; old authority/blueprint descriptions absent`
+- `python -m pytest` — exit 0, 143.145s; `547 passed in 142.64s (0:02:22)`
+- `python -m flowguard map models` — exit 0, 2.575s; `models: 2 passed, 0 failed`
+- `python -m flowguard release` — exit 0, 2.616s; `verify: PASS (map, lint and models only; tests not run; run python -m pytest -q separately)`

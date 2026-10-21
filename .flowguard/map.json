@@ -10,10 +10,9 @@
   "components": [
     {
       "id": "researchguard-suite",
-      "summary": "Own shared suite identity, admission and transport contracts, native receipt and target authorities, portable materials and read-only repository DNA qualification.",
+      "summary": "Own the package version and the suite identity and fingerprint that LogicWriting reads.",
       "responsibilities": [
-        "Own shared suite identity, admission and transport contracts, native receipt and target authorities, portable materials and read-only repository DNA qualification.",
-        "Expose shared contracts without owning cross-member CLI execution; report static map and DNA readiness separately from executable-model results."
+        "Own __version__, SUITE_ID, MEMBER_IDS and suite_identity/suite_fingerprint; hold no member logic and no routing."
       ],
       "files": [
         "src/researchguard/__init__.py",
@@ -24,10 +23,10 @@
         "src/researchguard/suite.py:suite_identity"
       ],
       "state": [
-        "suite identity, shared contract and native authority records"
+        "package version and suite identity"
       ],
       "side_effects": [
-        "read current repository source and explicitly supplied native materials"
+        "read current package source files to compute the suite fingerprint"
       ],
       "depends_on": [],
       "tests": [
@@ -38,15 +37,14 @@
         ".flowguard/models/researchguard_suite_model.py"
       ],
       "status": "confirmed",
-      "fingerprint": "sha256:3233b71cde72e21335e3aed528ddcda5da952d3901548a5a4bc26d3ba5652970"
+      "fingerprint": "sha256:e12cb1f85126e48d0f39465ba0df4f2f82f0fb77636f060a4b726720125781cf"
     },
     {
       "id": "suite-orchestration",
-      "summary": "Own unified and member CLI entrypoints, source-bound routing/composition, external DNA qualification and native owner-attestation adapters; preserve each member’s native semantic owner.",
+      "summary": "Own the researchguard console and the four member command lines; dispatch each member command directly to its owner.",
       "responsibilities": [
-        "Select the minimum sufficient member set and route to the existing native commands.",
-        "Compose external material and replay/attestation bridges without replacing member algorithms or shared receipt authorities.",
-        "Own Trace template-pack CLI adapters that consume the Trace command surface."
+        "Dispatch researchguard logic|source|trace|experiment straight to the member main; unknown commands return one typed JSON error.",
+        "Own the member command-line surfaces and the Trace template-pack adapters that consume the Trace command surface."
       ],
       "files": [
         "src/researchguard/__main__.py",
@@ -65,11 +63,10 @@
         "src/researchguard/experiment/cli.py:main"
       ],
       "state": [
-        "task facts, member selection, composition bindings and native replay transports"
+        "command arguments only"
       ],
       "side_effects": [
-        "read explicitly supplied material files",
-        "member commands perform their existing explicit native writes"
+        "member commands perform their existing explicit file writes"
       ],
       "depends_on": [
         "experimentguard",
@@ -90,14 +87,14 @@
         ".flowguard/models/sourceguard_content_anchor_oracle_model.py"
       ],
       "status": "confirmed",
-      "fingerprint": "sha256:adaf4038121ad9b29d812d06c9f3e6c5ea0344a91937ac997afa105aa9b72337"
+      "fingerprint": "sha256:9c1b2eec3d6eadaffb50f4c7e6064fc02fa4c19e7217626679dddd0e3951ed2c"
     },
     {
       "id": "logicguard",
       "summary": "Own argument support, source library, structured artifacts, model deepening, synthesis and project library inspection.",
       "responsibilities": [
         "Own argument support, source library, structured artifacts, model deepening, synthesis and project library inspection.",
-        "Keep optional route-package checks limited to declared shape; native model purpose, depth and synthesis own completion and closure."
+        "Run depth analysis without a contract; synthesis computes depth in process when no depth receipt is supplied."
       ],
       "files": [
         "src/researchguard/logic/__init__.py",
@@ -186,13 +183,14 @@
       ],
       "models": [],
       "status": "confirmed",
-      "fingerprint": "sha256:b0b0bc6b282691bfa3e241b310aa563b34623df31a7a759aaaf91fe3b5b3fb2f"
+      "fingerprint": "sha256:cb6dab1450faa613aa2843c9e9cd0f0d9360bbf6775068a9674a5ad68c4f7215"
     },
     {
       "id": "sourceguard",
       "summary": "Own evidence discovery, expected-utility search plans, stop decisions and source/anchor qualification.",
       "responsibilities": [
-        "Own evidence discovery, expected-utility search plans, stop decisions and source/anchor qualification."
+        "Own evidence discovery, expected-utility search plans, stop decisions and source/anchor qualification.",
+        "Load, plan and update a model on its own; an optional model contract is checked only when one is supplied."
       ],
       "files": [
         "src/researchguard/source/__init__.py",
@@ -228,14 +226,14 @@
         ".flowguard/models/sourceguard_content_anchor_oracle_model.py"
       ],
       "status": "confirmed",
-      "fingerprint": "sha256:045b6272ab5370265493ba51c2b298c63d6dc24e9e8714bcff88690404bb0248"
+      "fingerprint": "sha256:5e53e6c8bb8eee7eb18d7d25829852b325dc1d992f1f40f44a87b71ea63d9552"
     },
     {
       "id": "traceguard",
-      "summary": "Own temporal and causal trace inference, storyline stress, trace blueprints and case library updates.",
+      "summary": "Own temporal and causal trace inference, storyline stress and case library updates.",
       "responsibilities": [
-        "Own temporal and causal trace inference, storyline stress, trace blueprints and case library updates.",
-        "Report optional library-package shape and inventory declarations as unverified; never turn scheduler, file hashes or declared relationships into native closure."
+        "Own temporal and causal trace inference, storyline stress and case library updates.",
+        "Keep command output to analysis results; full JSON is written only with --output."
       ],
       "files": [
         "src/researchguard/trace/__init__.py",
@@ -285,7 +283,7 @@
       ],
       "models": [],
       "status": "confirmed",
-      "fingerprint": "sha256:a0a24f06c5a37974fadf9193b781daee10a7de654e2604f056e02de594a2470b"
+      "fingerprint": "sha256:19236fd20f6ddfa0834e6e5d57b37939795a6be51c938825de3a41870f20f0d1"
     },
     {
       "id": "experimentguard",
@@ -293,7 +291,7 @@
       "responsibilities": [
         "Distinguish hypotheses only within the caller-declared finite experiment-count limit and report limit failures separately from truly indistinguishable pairs.",
         "License native closure only for a unique consistent hypothesis with matching independent holdout, no validated holdout counterexample and no gaps, while preserving the finite iteration limit first.",
-        "Continue a bounded multi-survivor iteration only with a concrete distinguishing next candidate; do not infer historical evidence progress from unchanged gap identifiers. Keep ordinary specs separate from explicitly declared strict blueprints."
+        "Continue a bounded multi-survivor iteration only with a concrete distinguishing next candidate; do not infer historical evidence progress from unchanged gap identifiers; malformed specs return one JSON error."
       ],
       "files": [
         "src/researchguard/experiment/__init__.py",
@@ -316,11 +314,11 @@
       ],
       "models": [],
       "status": "confirmed",
-      "fingerprint": "sha256:5fb06a86d970e8dd164cb64ee92ddbea212c13cf405fadd6be4983740d3637fd"
+      "fingerprint": "sha256:3d67bf6950bb064d38f099369fa71a70e065ee9d768b40e2dc3cd8af22f29c71"
     },
     {
       "id": "author-tools",
-      "summary": "Own ordinary package/skill installation, privacy checks, prompt budgets and source validation.",
+      "summary": "Own skill installation by copy, privacy checks, prompt budgets and template-catalog resealing.",
       "responsibilities": [
         "Own ordinary package/skill installation, privacy checks, prompt budgets and source validation."
       ],
@@ -332,10 +330,10 @@
         "scripts/install_skill.py:main"
       ],
       "state": [
-        "distribution and five skill directories"
+        "five skill directories"
       ],
       "side_effects": [
-        "explicit installation with independent rollback"
+        "copy the five skill folders into the given skills directory"
       ],
       "depends_on": [
         "logicguard",
@@ -350,7 +348,7 @@
       ],
       "models": [],
       "status": "confirmed",
-      "fingerprint": "sha256:f15f7de46d754e3e2dfcf475ec4b370687f1ad0df43c85d3f88559b05f0b0c37"
+      "fingerprint": "sha256:ee9b4f141ba041086b9d860edee12ff9f47cdaa2d53478217294df6a342a270a"
     }
   ],
   "flows": [
