@@ -253,7 +253,6 @@ def update_frontier(belief_state: BeliefState) -> BeliefState:
 def apply_observation(belief_state: BeliefState, observation: Observation) -> BeliefState:
     validate_model_guard_binding(belief_state)
     frozen_contract = belief_state.guard_contract
-    assert frozen_contract is not None
     state = belief_state
     warnings = list(state.metadata.get("warnings", []))
     for source in observation.observed_sources:
@@ -286,6 +285,8 @@ def apply_observation(belief_state: BeliefState, observation: Observation) -> Be
     metadata = dict(state.metadata)
     metadata["warnings"] = warnings
     successor = update_frontier(replace(state, metadata=metadata))
+    if frozen_contract is None:
+        return successor
     # Preserve the AI-authored purpose, failure declarations, proof cases, and
     # claim boundary.  A newly observed gap expands only the successor's exact
     # external universe and construction sequence, producing a new fingerprint

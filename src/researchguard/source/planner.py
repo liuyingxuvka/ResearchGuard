@@ -3,7 +3,7 @@ Purpose: Generate, score, and summarize SourceGuard next-search plans from leads
 Repository: https://github.com/liuyingxuvka/ResearchGuard
 Skill: SourceGuard
 Math boundary: Expected utility ranks search value, not factual truth or calibrated probability.
-CLI: researchguard source plan <model.yaml> --model-contract <model.contract.json>
+CLI: researchguard source plan <model.yaml>
 Boundary: Source candidates and evidence anchors require downstream TraceGuard/LogicGuard review before final claims.
 """
 

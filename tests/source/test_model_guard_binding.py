@@ -38,11 +38,11 @@ def test_every_current_model_uses_an_explicit_task_contract_and_native_proof() -
     assert set(declaration_counts) == {1}
 
 
-def test_model_without_guard_contract_is_rejected_before_execution() -> None:
+def test_model_without_guard_contract_loads_without_proof() -> None:
     raw = _raw_model()
     raw.pop("guard_contract")
-    with pytest.raises(SchemaError, match="guard_contract is required"):
-        BeliefState.from_dict(raw)
+    raw.pop("candidate_contract_fingerprint", None)
+    assert BeliefState.from_dict(raw).guard_contract is None
 
 
 def test_candidate_with_stale_purpose_fingerprint_is_rejected() -> None:

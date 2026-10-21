@@ -3,7 +3,7 @@ Purpose: Render SourceGuard belief states and plans as text, Markdown, or JSON r
 Repository: https://github.com/liuyingxuvka/ResearchGuard
 Skill: SourceGuard
 Math boundary: Expected utility ranks search value, not factual truth or calibrated probability.
-CLI: researchguard source report <model.yaml> --model-contract <model.contract.json> --format markdown
+CLI: researchguard source report <model.yaml> --format markdown
 Boundary: Source candidates and evidence anchors require downstream TraceGuard/LogicGuard review before final claims.
 """
 

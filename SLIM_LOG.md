@@ -316,3 +316,13 @@ Full command logs, actual return codes, pre/post installer content hashes and in
 - `python <external>/probe_rg23.py` — exit 0, 0.12s; `JSON valid; exact skill example recommended both experiments; residual and directories clean`
 - `python -m pytest -p no:cacheprovider tests/contract/test_researchguard_handoff.py tests/e2e/test_production_reader_pipeline.py tests/contract/test_production_reader_native_lifecycle.py` — exit 0, 2.506s; `============================== 44 passed in 2.22s ==============================`
 - `python -m pytest --collect-only` — exit 0, 2.63s; `566 tests collected in 2.18s`
+
+## RG-29 — completed
+
+Source契约可选：缺省直接运行模型并正常观察更新，嵌入/显式旧契约仍校验一致，旧iteration侧车可选但原循环和native判断不变。99pass、真实create/validate/含旧嵌入契约示例plan无侧车均0、唯一可选文档说明/提示词通过；收集567/map0error。
+
+- `python -m pytest tests/source tests/logic_template_packs` — exit 0, 7.107s; `99 passed in 6.74s`
+- `python <external>/probe_rg29.py` — exit 0, 0.729s; `model-only CLI works; optional contract is documented once`
+- `python scripts/check_prompt_bundles.py` — exit 0, 0.043s; `pass`
+- `python -m pytest --collect-only` — exit 0, 3.324s; `567 tests collected in 2.89s`
+- `python -m flowguard map check` — exit 0, 0.719s; `check: 0 error(s), 11 warning(s), 0 info`

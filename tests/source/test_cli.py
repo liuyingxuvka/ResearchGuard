@@ -151,3 +151,17 @@ def test_plan_prints_scores_only_on_request():
     assert ordinary.returncode == detailed.returncode == 0
     assert "scored_actions" not in json.loads(ordinary.stdout)
     assert json.loads(detailed.stdout)["scored_actions"]
+
+
+def test_create_plan_and_add_observation_need_no_model_contract(tmp_path):
+    starter = tmp_path / "starter.yaml"
+    grown = tmp_path / "grown.yaml"
+    result = _run("create", "--output", str(starter))
+    assert result.returncode == 0, result.stderr
+    result = _run("plan", str(starter), "--limit", "2")
+    assert result.returncode == 0, result.stderr
+    assert "selected_actions" in json.loads(result.stdout)
+    result = _run("add-observation", str(starter), "--observation", "examples/source/qualified_observation.yaml", "--output", str(grown))
+    assert result.returncode == 0, result.stderr
+    result = _run("validate", str(grown))
+    assert result.returncode == 0, result.stderr

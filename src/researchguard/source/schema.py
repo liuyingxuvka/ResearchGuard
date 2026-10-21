@@ -1180,7 +1180,11 @@ class BeliefState:
         if not isinstance(graph_edges, list):
             raise SchemaError("graph_edges must be a list")
         state = cls(
-            guard_contract=SourceGuardModelContract.from_dict(data.get("guard_contract")),
+            guard_contract=(
+                SourceGuardModelContract.from_dict(data["guard_contract"])
+                if data.get("guard_contract") is not None
+                else None
+            ),
             candidate_contract_fingerprint=as_string(data.get("candidate_contract_fingerprint")),
             metadata=dict(metadata),
             leads=[Lead.from_dict(item) for item in list_of_mappings(data.get("leads"), "leads")],
@@ -1312,7 +1316,7 @@ def bind_sourceguard_model_contract(
 def validate_model_guard_binding(state: BeliefState) -> None:
     contract = state.guard_contract
     if contract is None:
-        raise SchemaError("guard_contract is required before SourceGuard model execution")
+        return
     if contract.schema_version != SOURCEGUARD_MODEL_CONTRACT_SCHEMA_VERSION:
         raise SchemaError("guard_contract.schema_version is not current")
     if not contract.model_id or not contract.purpose or not contract.claim_boundary:

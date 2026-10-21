@@ -3,7 +3,7 @@ Purpose: Export SourceGuard candidate material to TraceGuard or LogicGuard witho
 Repository: https://github.com/liuyingxuvka/ResearchGuard
 Skill: SourceGuard
 Math boundary: Expected utility ranks search value, not factual truth or calibrated probability.
-CLI: researchguard source export-traceguard <model.yaml> --model-contract <model.contract.json> --output traceguard_seed.yaml
+CLI: researchguard source export-traceguard <model.yaml> --output traceguard_seed.yaml
 Boundary: Source candidates and evidence anchors require downstream TraceGuard/LogicGuard review before final claims.
 """
 

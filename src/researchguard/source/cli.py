@@ -42,14 +42,14 @@ from .task_iteration import (
 )
 
 
-def starter_model_dict(model_contract_path: str | Path) -> dict[str, Any]:
+def starter_model_dict(model_contract_path: str | Path | None = None) -> dict[str, Any]:
     payload = {
         "metadata": {
             "purpose": "Starter SourceGuard belief state",
             "repository": "https://github.com/liuyingxuvka/ResearchGuard",
             "skill": "SourceGuard",
             "math_boundary": "POMDP-inspired approximate planner; utility ranks source discovery value, not truth.",
-            "cli": "researchguard source plan starter_researchguard.source.yaml --model-contract starter_researchguard.source.contract.json",
+            "cli": "researchguard source plan starter_researchguard.source.yaml",
             "boundary": "Candidate sources are not evidence; anchors are not events; handoff is not downstream validation.",
             "version": __version__,
             "source_policy": "public_only",
@@ -106,6 +106,8 @@ def starter_model_dict(model_contract_path: str | Path) -> dict[str, Any]:
         "graph_edges": [],
         "weights": {},
     }
+    if model_contract_path is None:
+        return payload
     contract = load_target_contract(model_contract_path)
     payload["guard_contract"] = contract.to_dict()
     payload["candidate_contract_fingerprint"] = sourceguard_model_contract_fingerprint(contract)
@@ -127,33 +129,33 @@ def build_parser() -> argparse.ArgumentParser:
 
     create = sub.add_parser("create")
     create.add_argument("--output", required=True)
-    create.add_argument("--model-contract", required=True)
+    create.add_argument("--model-contract")
 
     validate = sub.add_parser("validate")
     validate.add_argument("model")
-    validate.add_argument("--model-contract", required=True)
+    validate.add_argument("--model-contract")
     validate.add_argument("--pretty", action="store_true")
 
     plan = sub.add_parser("plan")
     plan.add_argument("model")
-    plan.add_argument("--model-contract", required=True)
+    plan.add_argument("--model-contract")
     plan.add_argument("--limit", type=int, default=5)
     plan.add_argument("--all-scores", action="store_true", help="Also print every scored candidate action.")
     plan.add_argument("--pretty", action="store_true")
 
     score = sub.add_parser("score-actions")
     score.add_argument("model")
-    score.add_argument("--model-contract", required=True)
+    score.add_argument("--model-contract")
     score.add_argument("--pretty", action="store_true")
 
     frontier = sub.add_parser("frontier")
     frontier.add_argument("model")
-    frontier.add_argument("--model-contract", required=True)
+    frontier.add_argument("--model-contract")
     frontier.add_argument("--pretty", action="store_true")
 
     depth = sub.add_parser("depth")
     depth.add_argument("model")
-    depth.add_argument("--model-contract", required=True)
+    depth.add_argument("--model-contract")
     depth.add_argument("--observation", default="")
     depth.add_argument(
         "--provider-status",
@@ -168,10 +170,10 @@ def build_parser() -> argparse.ArgumentParser:
 
     add_obs = sub.add_parser("add-observation")
     add_obs.add_argument("model")
-    add_obs.add_argument("--model-contract", required=True)
+    add_obs.add_argument("--model-contract")
     add_obs.add_argument("--observation", required=True)
     add_obs.add_argument("--output", required=True)
-    add_obs.add_argument("--output-model-contract", required=True)
+    add_obs.add_argument("--output-model-contract")
     add_obs.add_argument("--pretty", action="store_true")
 
     iteration = sub.add_parser(
@@ -183,7 +185,7 @@ def build_parser() -> argparse.ArgumentParser:
         "freeze", help="Freeze expected search outcomes before applying an observation."
     )
     iteration_freeze.add_argument("model")
-    iteration_freeze.add_argument("--model-contract", required=True)
+    iteration_freeze.add_argument("--model-contract")
     iteration_freeze.add_argument("--action-id", required=True)
     iteration_freeze.add_argument(
         "--expected-gap-reduction",
@@ -221,7 +223,7 @@ def build_parser() -> argparse.ArgumentParser:
         "run", help="Apply one supplied observation and decide candidate v2."
     )
     iteration_run.add_argument("model")
-    iteration_run.add_argument("--model-contract", required=True)
+    iteration_run.add_argument("--model-contract")
     iteration_run.add_argument("--prediction", required=True)
     iteration_run.add_argument("--observation", default="")
     iteration_run.add_argument(
@@ -233,7 +235,7 @@ def build_parser() -> argparse.ArgumentParser:
     iteration_run.add_argument("--decision", choices=["accept", "reject"], default="reject")
     iteration_run.add_argument("--limit", type=int, default=5)
     iteration_run.add_argument("--candidate-output", required=True)
-    iteration_run.add_argument("--candidate-model-contract-output", required=True)
+    iteration_run.add_argument("--candidate-model-contract-output")
     iteration_run.add_argument("--receipt-output", required=True)
     iteration_run.add_argument("--pretty", action="store_true")
     iteration_run.set_defaults(func=_cmd_search_iteration_run)
@@ -242,27 +244,27 @@ def build_parser() -> argparse.ArgumentParser:
         "rollback", help="Write a new baseline-equivalent projection from an accepted receipt."
     )
     iteration_rollback.add_argument("model")
-    iteration_rollback.add_argument("--model-contract", required=True)
+    iteration_rollback.add_argument("--model-contract")
     iteration_rollback.add_argument("--accepted-receipt", required=True)
     iteration_rollback.add_argument("--output", required=True)
-    iteration_rollback.add_argument("--output-model-contract", required=True)
+    iteration_rollback.add_argument("--output-model-contract")
     iteration_rollback.add_argument("--receipt-output", required=True)
     iteration_rollback.add_argument("--pretty", action="store_true")
     iteration_rollback.set_defaults(func=_cmd_search_iteration_rollback)
 
     report = sub.add_parser("report")
     report.add_argument("model")
-    report.add_argument("--model-contract", required=True)
+    report.add_argument("--model-contract")
     report.add_argument("--format", choices=["markdown", "txt", "json"], default="markdown")
 
     trace = sub.add_parser("export-traceguard")
     trace.add_argument("model")
-    trace.add_argument("--model-contract", required=True)
+    trace.add_argument("--model-contract")
     trace.add_argument("--output", required=True)
 
     logic = sub.add_parser("export-logicguard")
     logic.add_argument("model")
-    logic.add_argument("--model-contract", required=True)
+    logic.add_argument("--model-contract")
     logic.add_argument("--output", required=True)
 
     simulate = sub.add_parser("simulate")
@@ -272,14 +274,14 @@ def build_parser() -> argparse.ArgumentParser:
         required=True,
     )
     simulate.add_argument("--model", default="")
-    simulate.add_argument("--model-contract", default="")
+    simulate.add_argument("--model-contract")
     simulate.add_argument("--pretty", action="store_true")
 
     compare = sub.add_parser("compare")
     compare.add_argument("before")
     compare.add_argument("after")
-    compare.add_argument("--before-model-contract", required=True)
-    compare.add_argument("--after-model-contract", required=True)
+    compare.add_argument("--before-model-contract")
+    compare.add_argument("--after-model-contract")
     compare.add_argument("--pretty", action="store_true")
 
     return parser
@@ -313,8 +315,6 @@ def _action_summary(action: Any) -> dict[str, Any]:
 def _simulate_gap_closure(model_path: str, model_contract_path: str) -> dict[str, Any]:
     if not model_path:
         raise ValueError("simulate --mode gap-closure requires --model <path>")
-    if not model_contract_path:
-        raise ValueError("simulate --mode gap-closure requires --model-contract <path>")
     model = load_model(model_path, model_contract_path)
     plan = plan_next_actions(model)
     frontier = frontier_summary(model)
@@ -323,7 +323,7 @@ def _simulate_gap_closure(model_path: str, model_contract_path: str) -> dict[str
         "ok": True,
         "mode": "gap-closure",
         "model": model_path,
-        "model_contract": model_contract_path,
+        "model_contract": model_contract_path or "",
         "frontier": frontier,
         "open_gaps": [_gap_summary(gap) for gap in plan.open_gaps],
         "blocking_gaps": [_gap_summary(gap) for gap in plan.blocked_gaps],
@@ -337,7 +337,7 @@ def _simulate_gap_closure(model_path: str, model_contract_path: str) -> dict[str
     }
 
 
-def _simulate(mode: str, model_path: str = "", model_contract_path: str = "") -> dict[str, Any]:
+def _simulate(mode: str, model_path: str = "", model_contract_path: str | None = None) -> dict[str, Any]:
     if mode == "gap-closure":
         return _simulate_gap_closure(model_path, model_contract_path)
     return {
@@ -447,7 +447,7 @@ def _compare_models(
 
 def _cmd_search_iteration_freeze(args: argparse.Namespace) -> int:
     _require_new_outputs(
-        inputs=[args.model, args.model_contract],
+        inputs=[item for item in (args.model, args.model_contract) if item],
         outputs=[args.output],
     )
     baseline = load_model(args.model, args.model_contract)
@@ -480,13 +480,13 @@ def _cmd_search_iteration_run(args: argparse.Namespace) -> int:
     _require_new_outputs(
         inputs=[
             args.model,
-            args.model_contract,
+            *([args.model_contract] if args.model_contract else []),
             args.prediction,
             *([args.observation] if args.observation else []),
         ],
         outputs=[
             args.candidate_output,
-            args.candidate_model_contract_output,
+            *([args.candidate_model_contract_output] if args.candidate_model_contract_output else []),
             args.receipt_output,
         ],
     )
@@ -505,11 +505,11 @@ def _cmd_search_iteration_run(args: argparse.Namespace) -> int:
         provider_status=args.provider_status,
     )
     write_yaml(args.candidate_output, candidate)
-    assert candidate.guard_contract is not None
-    _write_json(
-        args.candidate_model_contract_output,
-        candidate.guard_contract.to_dict(),
-    )
+    if args.candidate_model_contract_output and candidate.guard_contract is not None:
+        _write_json(
+            args.candidate_model_contract_output,
+            candidate.guard_contract.to_dict(),
+        )
     _write_json(args.receipt_output, receipt.to_dict())
     _json_out({"ok": True, **receipt.to_dict()}, args.pretty)
     if args.decision == "accept" and receipt.effective_disposition != "accepted":
@@ -519,16 +519,16 @@ def _cmd_search_iteration_run(args: argparse.Namespace) -> int:
 
 def _cmd_search_iteration_rollback(args: argparse.Namespace) -> int:
     _require_new_outputs(
-        inputs=[args.model, args.model_contract, args.accepted_receipt],
-        outputs=[args.output, args.output_model_contract, args.receipt_output],
+        inputs=[item for item in (args.model, args.model_contract, args.accepted_receipt) if item],
+        outputs=[item for item in (args.output, args.output_model_contract, args.receipt_output) if item],
     )
     baseline = load_model(args.model, args.model_contract)
     restored, receipt = rollback_search_iteration(
         baseline, _load_json_object(args.accepted_receipt)
     )
     write_yaml(args.output, restored)
-    assert restored.guard_contract is not None
-    _write_json(args.output_model_contract, restored.guard_contract.to_dict())
+    if args.output_model_contract and restored.guard_contract is not None:
+        _write_json(args.output_model_contract, restored.guard_contract.to_dict())
     _write_json(args.receipt_output, receipt.to_dict())
     _json_out({"ok": True, **receipt.to_dict()}, args.pretty)
     return 0
@@ -540,7 +540,8 @@ def run(args: argparse.Namespace) -> int:
         return command_func(args)
     if args.command == "create":
         model = BeliefState.from_dict(starter_model_dict(args.model_contract))
-        prove_target_model_contract(model, args.model_contract)
+        if args.model_contract:
+            prove_target_model_contract(model, args.model_contract)
         write_yaml(args.output, model)
         _json_out(
             {
@@ -593,16 +594,12 @@ def run(args: argparse.Namespace) -> int:
                 encoding="utf-8",
             )
         if args.updated_model_output:
-            if not args.updated_model_contract_output:
-                raise ValueError(
-                    "--updated-model-output requires --updated-model-contract-output"
-                )
             write_yaml(args.updated_model_output, updated)
-            assert updated.guard_contract is not None
-            Path(args.updated_model_contract_output).write_text(
-                json.dumps(updated.guard_contract.to_dict(), ensure_ascii=False, indent=2) + "\n",
-                encoding="utf-8",
-            )
+            if args.updated_model_contract_output and updated.guard_contract is not None:
+                Path(args.updated_model_contract_output).write_text(
+                    json.dumps(updated.guard_contract.to_dict(), ensure_ascii=False, indent=2) + "\n",
+                    encoding="utf-8",
+                )
         elif args.updated_model_contract_output:
             raise ValueError(
                 "--updated-model-contract-output requires --updated-model-output"
@@ -613,11 +610,11 @@ def run(args: argparse.Namespace) -> int:
         model = load_model(args.model, args.model_contract)
         updated = apply_observation(model, _load_observation(args.observation))
         write_yaml(args.output, updated)
-        assert updated.guard_contract is not None
-        Path(args.output_model_contract).write_text(
-            json.dumps(updated.guard_contract.to_dict(), ensure_ascii=False, indent=2) + "\n",
-            encoding="utf-8",
-        )
+        if args.output_model_contract and updated.guard_contract is not None:
+            Path(args.output_model_contract).write_text(
+                json.dumps(updated.guard_contract.to_dict(), ensure_ascii=False, indent=2) + "\n",
+                encoding="utf-8",
+            )
         _json_out(
             {
                 "ok": True,

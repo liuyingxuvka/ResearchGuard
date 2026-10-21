@@ -3,7 +3,7 @@ Purpose: Load, validate, serialize, and write SourceGuard YAML belief-state mode
 Repository: https://github.com/liuyingxuvka/ResearchGuard
 Skill: SourceGuard
 Math boundary: Expected utility ranks search value, not factual truth or calibrated probability.
-CLI: researchguard source validate <model.yaml> --model-contract <model.contract.json>
+CLI: researchguard source validate <model.yaml>
 Boundary: Source candidates and evidence anchors require downstream TraceGuard/LogicGuard review before final claims.
 """
 
@@ -23,11 +23,13 @@ from .schema import (
 )
 
 
-def load_model(path: str | Path, model_contract_path: str | Path) -> BeliefState:
+def load_model(path: str | Path, model_contract_path: str | Path | None = None) -> BeliefState:
     data = yaml.safe_load(Path(path).read_text(encoding="utf-8"))
     if data is None:
         data = {}
     belief_state = BeliefState.from_dict(data)
+    if model_contract_path is None:
+        return belief_state
     external_contract = load_target_contract(model_contract_path)
     if belief_state.guard_contract is None:
         raise SchemaError("candidate is missing its target contract snapshot")
@@ -52,12 +54,12 @@ def model_to_dict(belief_state: BeliefState) -> dict[str, Any]:
     return to_plain(belief_state)
 
 
-def validate_model(path: str | Path, model_contract_path: str | Path) -> dict[str, Any]:
+def validate_model(path: str | Path, model_contract_path: str | Path | None = None) -> dict[str, Any]:
     belief_state = load_model(path, model_contract_path)
     return {
         "ok": True,
         "path": str(path),
-        "model_contract_path": str(model_contract_path),
+        "model_contract_path": str(model_contract_path or ""),
         "lead_count": len(belief_state.leads),
         "source_count": len(belief_state.sources),
         "anchor_count": len(belief_state.anchors),
