@@ -685,3 +685,19 @@ Replaced retired suite model behavior with one skill/four routes, native console
 - `python -m flowguard release` — exit 0, 4.423s; `verify: PASS (map, lint and models only; tests not run; run python -m pytest -q separately)`
 - `python-newfg -m flowguard map models` — exit 0, 4.078s; `models: 2 passed, 0 failed`
 - `python-newfg -m flowguard release` — exit 0, 8.76s; `verify: PASS (map, lint and models only; tests not run; run python -m pytest -q separately)`
+
+## RG-56 — completed
+
+OpenSpec1.14.1 installed only in an external private prefix, then performed actual skip-specs archives: 2 retired changes removed, 2 completed and 3 abandoned archived, and 3 current specs rewritten. Official CLI list has no active changes; strict specs validation 3 passed. All 23 protected original archive/config/OpenSpec-skill files byte-identical. Collection344, fixed LW43 native10 passed zero skips, exports/map/release passed; no global install.
+
+- `npm install --prefix <external>/openspec-runtime --cache <external>/npm-cache --no-audit --no-fund @fission-ai/openspec@1.14.1` — exit 0, 7.965s; `npm notice`
+- `python <external>/edit_rg56.py` — exit 0, 1.342s; `2 retired changes deleted;2 complete+3 abandoned archived;3 native specs rewritten; original archive/config/6 OpenSpec skills byte-preserved 23`
+- `<external>/openspec-runtime/node_modules/.bin/openspec list` — exit 0, 0.413s; `No active changes found.`
+- `<external>/openspec-runtime/node_modules/.bin/openspec validate --specs --strict` — exit 0, 0.422s; `Totals: 3 passed, 0 failed (3 items)`
+- `python -c import hashlib,json,pathlib,subprocess;r=pathlib.Path("<external-root>/results/ResearchGuard");b=json.loads((r/"RG-56-protected-before.json").read_text());assert all(hashlib.sha256(pathlib.Path(p).read_bytes()).hexdigest()==v for p,v in b.items());assert len(list(pathlib.Path(".codex/skills").glob("openspec-*")))==6;p=subprocess.run(["rg","-n","-i","--glob","!archive/**","skillguard","openspec"],capture_output=True,text=True);active=[x for x in p.stdout.splitlines() if not x.startswith("openspec/changes/archive/")];print("preserved files",len(b),"archived dirs",len(list(pathlib.Path("openspec/changes/archive").iterdir())),"active retired hits",active);assert not active` — exit 0, 0.077s; `preserved files 23 archived dirs 8 active retired hits []`
+- `python <external>/check_exports.py` — exit 0, 0.494s; `exports ok`
+- `python -m pytest -p no:cacheprovider tests/contract/test_researchguard_handoff.py --junitxml <external>/RG-56-lw43-junit.xml --basetemp <external>/RG-56-lw43-temp` — exit 0, 0.716s; `============================== 10 passed in 0.41s ==============================`
+- `python <external>/verify_lw_junit.py <external>/RG-56-lw43-junit.xml` — exit 0, 0.049s; `10 actual PASSED, 0 skipped; real native provider-to-reader bridge PASSED/ready, not version-skipped`
+- `python -m pytest --collect-only` — exit 0, 2.085s; `344 tests collected in 1.65s`
+- `python -m flowguard map check` — exit 0, 4.214s; `check: 0 error(s), 3 warning(s), 0 info`
+- `python -m flowguard release` — exit 0, 2.791s; `verify: PASS (map, lint and models only; tests not run; run python -m pytest -q separately)`

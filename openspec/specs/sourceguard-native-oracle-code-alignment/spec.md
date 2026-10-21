@@ -1,53 +1,30 @@
-# SourceGuard Native Oracle Code Alignment
+# sourceguard-native-oracle-code-alignment Specification
 
 ## Purpose
-
-Define the single current finding identity that binds SourceGuard's
-content-anchor oracle to its native depth owner while preserving fail-closed
-source-depth behavior.
+Keep one finding identity for SourceGuard's contentless-anchor block, so source depth fails visibly when an anchor carries no content.
 
 ## Requirements
+### Requirement: A contentless anchor blocks object depth with one finding
+SourceGuard source depth SHALL report `sourceguard_blocked:contentless-anchor` for a governed gap whose linked anchors carry no extracted text or normalized summary.
 
-### Requirement: Content-anchor bad cases expose the declared native finding
+#### Scenario: Content-bearing anchor
+- **WHEN** the observation's anchors carry content and pass the qualification thresholds
+- **THEN** the object-depth rows SHALL pass without the contentless-anchor finding
 
-The SourceGuard target-purpose gate SHALL observe
-`sourceguard_blocked:contentless-anchor` when the content-anchor oracle removes
-all extracted text and normalized summaries from anchors needed by a governed
-gap.
+#### Scenario: Contentless anchor
+- **WHEN** the same anchors have their text and normalized summary removed
+- **THEN** broad claim licensing SHALL be false and an object-depth row SHALL contain `sourceguard_blocked:contentless-anchor`
 
-#### Scenario: Content-bearing known-good case
+### Requirement: The retired finding is never emitted
+SourceGuard depth MUST NOT emit `no_content_qualified_anchor` as an alternate finding for this condition.
 
-- **WHEN** a target purpose contract selects the content-anchor oracle and its supplied observation contains a content-qualified anchor
-- **THEN** the known-good proof completes without the content-anchor blocking finding
+#### Scenario: The self-model checks the code
+- **WHEN** `python -m flowguard map models` runs the content-anchor self-model
+- **THEN** its conformance SHALL read `src/researchguard/source/depth.py` and fail if the declared finding is missing or the retired finding is present
 
-#### Scenario: Contentless known-bad case
+### Requirement: Other depth failures stay visible
+The contentless-anchor finding SHALL coexist with SourceGuard's portfolio, lineage and target-unit findings, and a locator without content SHALL NOT become claim-usable evidence.
 
-- **WHEN** the same target purpose contract executes its declared `remove-anchor-content` bad-case mutation
-- **THEN** the native depth result contains exactly `sourceguard_blocked:contentless-anchor` for the affected object-depth row and the target-purpose proof records the bad case as blocked
-
-### Requirement: Content-anchor finding has one current identity
-
-The current SourceGuard depth path MUST NOT emit or accept
-`no_content_qualified_anchor` as an alternate success or compatibility finding
-for the content-anchor oracle.
-
-#### Scenario: Current receipt is inspected
-
-- **WHEN** a contentless anchor blocks object depth
-- **THEN** the receipt uses the catalog-declared finding and contains no retired alternate finding for that condition
-
-### Requirement: Unrelated depth semantics remain unchanged
-
-The correction SHALL preserve SourceGuard's existing portfolio, lineage,
-target-unit, adequacy, and broad-claim gates, and SHALL NOT promote a
-contentless or locator-only anchor into claim-usable evidence.
-
-#### Scenario: Locator exists without content
-
-- **WHEN** an anchor has a locator but no extracted text or normalized content summary
-- **THEN** object depth remains failed and broad claim licensing remains false
-
-#### Scenario: Content finding coexists with other depth failures
-
-- **WHEN** the same governed gap also lacks required portfolio classes or independent lineages
-- **THEN** those native failures remain visible alongside the single current content-anchor finding
+#### Scenario: Locator without content
+- **WHEN** an anchor has a locator but no content
+- **THEN** object depth SHALL remain failed and broad claim licensing SHALL remain false
