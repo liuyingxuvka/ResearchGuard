@@ -421,3 +421,18 @@ Windows冒烟改6个现存功能测试文件，删不存在VERSION的push触发�
 - `python -m pytest` — exit 0, 143.145s; `547 passed in 142.64s (0:02:22)`
 - `python -m flowguard map models` — exit 0, 2.575s; `models: 2 passed, 0 failed`
 - `python -m flowguard release` — exit 0, 2.616s; `verify: PASS (map, lint and models only; tests not run; run python -m pytest -q separately)`
+
+## RG-39 — completed
+
+删3套无CLI模板包/夹具/封存脚本与包数据，只留viewer真实assets；build_artifact_map/synthesize本体保留。173pass、exports、2模型pass、509收集；精确删预告author3无用依赖并confirm4组件后map0error4warnings/releasePASS。LW43只读快照353文件hash与当前RG/FG源码origin已核实；无遗留模板命名空间缓存需清理。
+
+- `python <external>/probe_consumer_origin.py` — exit 0, 0.086s; `}`
+- `python -m flowguard map check` — exit 1, 1.396s; `check: 1 error(s), 8 warning(s), 0 info`
+- `python -m flowguard map confirm author-tools logicguard sourceguard suite-orchestration` — exit 0, 0.135s; `confirmed 4 component(s)`
+- `python -m pytest tests/source tests/trace tests/test_prompt_bundles.py tests/test_skill_suite.py` — exit 0, 48.806s; `173 passed in 48.45s`
+- `python <external>/check_exports.py` — exit 0, 0.638s; `exports ok`
+- `python -c import subprocess;p=subprocess.run(["rg","-n","-i","template.pack|reseal|logic_template_packs","src","scripts","tests","skills","docs","README.md","pyproject.toml",".github"],capture_output=True,text=True);print(p.stdout,end="");assert p.returncode==1;print("template/reseal active residues absent; real core functions and viewer asset package-data retained")` — exit 0, 0.056s; `template/reseal active residues absent; real core functions and viewer asset package-data retained`
+- `python -m pytest --collect-only` — exit 0, 3.438s; `509 tests collected in 3.02s`
+- `python -m flowguard map check` — exit 0, 0.301s; `check: 0 error(s), 4 warning(s), 0 info`
+- `python -m flowguard release` — exit 0, 1.755s; `verify: PASS (map, lint and models only; tests not run; run python -m pytest -q separately)`
+- `python -m flowguard map models` — exit 0, 1.26s; `models: 2 passed, 0 failed`

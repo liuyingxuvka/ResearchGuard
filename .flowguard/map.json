@@ -44,7 +44,7 @@
       "summary": "Own the researchguard console and the four member command lines; dispatch each member command directly to its owner.",
       "responsibilities": [
         "Dispatch researchguard logic|source|trace|experiment straight to the member main; unknown commands return one typed JSON error.",
-        "Own the member command-line surfaces and the Trace template-pack adapters that consume the Trace command surface."
+        "Own the member command-line surfaces."
       ],
       "files": [
         "src/researchguard/__main__.py",
@@ -52,8 +52,7 @@
         "src/researchguard/experiment/cli.py",
         "src/researchguard/logic/cli.py",
         "src/researchguard/source/cli.py",
-        "src/researchguard/trace/cli.py",
-        "src/researchguard/trace/template_packs.py"
+        "src/researchguard/trace/cli.py"
       ],
       "entrypoints": [
         "src/researchguard/cli.py:main",
@@ -87,7 +86,7 @@
         ".flowguard/models/sourceguard_content_anchor_oracle_model.py"
       ],
       "status": "confirmed",
-      "fingerprint": "sha256:9c1b2eec3d6eadaffb50f4c7e6064fc02fa4c19e7217626679dddd0e3951ed2c"
+      "fingerprint": "sha256:64a7eeb4db2d688999f85c081a37671367ba131922c273a763e9790d744549e6"
     },
     {
       "id": "logicguard",
@@ -149,13 +148,6 @@
         "src/researchguard/logic/trace_import.py",
         "src/researchguard/logic/validator.py",
         "src/researchguard/logic/writer.py",
-        "src/researchguard/logic_template_packs/__init__.py",
-        "src/researchguard/logic_template_packs/builder.py",
-        "src/researchguard/logic_template_packs/canonical.py",
-        "src/researchguard/logic_template_packs/catalog.py",
-        "src/researchguard/logic_template_packs/models.py",
-        "src/researchguard/logic_template_packs/native_validators.py",
-        "src/researchguard/logic_template_packs/selection.py",
         "src/researchguard/logic_viewer/__init__.py",
         "src/researchguard/logic_viewer/common.py",
         "src/researchguard/logic_viewer/desktop_app.py",
@@ -178,12 +170,11 @@
       ],
       "tests": [
         "tests/logic/**/*.py",
-        "tests/logic/*.py",
-        "tests/logic_template_packs/**/*.py"
+        "tests/logic/*.py"
       ],
       "models": [],
       "status": "confirmed",
-      "fingerprint": "sha256:cb6dab1450faa613aa2843c9e9cd0f0d9360bbf6775068a9674a5ad68c4f7215"
+      "fingerprint": "sha256:8e27c3e68cd237b650bcd1b2911ebd9f136365b2c146a5ac9ee3b80befdea635"
     },
     {
       "id": "sourceguard",
@@ -205,7 +196,6 @@
         "src/researchguard/source/scoring.py",
         "src/researchguard/source/stop_decision.py",
         "src/researchguard/source/task_iteration.py",
-        "src/researchguard/source/template_packs.py",
         "src/researchguard/source/update.py"
       ],
       "entrypoints": [],
@@ -226,7 +216,7 @@
         ".flowguard/models/sourceguard_content_anchor_oracle_model.py"
       ],
       "status": "confirmed",
-      "fingerprint": "sha256:5e53e6c8bb8eee7eb18d7d25829852b325dc1d992f1f40f44a87b71ea63d9552"
+      "fingerprint": "sha256:0088643635df63ebe34f6b282ad807cd40165913a101941db3531110acb8561f"
     },
     {
       "id": "traceguard",
@@ -318,7 +308,7 @@
     },
     {
       "id": "author-tools",
-      "summary": "Own skill installation by copy, privacy checks, prompt budgets and template-catalog resealing.",
+      "summary": "Own skill installation by copy, privacy checks and prompt budgets.",
       "responsibilities": [
         "Own ordinary package/skill installation, privacy checks, prompt budgets and source validation."
       ],
@@ -336,10 +326,7 @@
         "copy the five skill folders into the given skills directory"
       ],
       "depends_on": [
-        "logicguard",
-        "researchguard-suite",
-        "sourceguard",
-        "suite-orchestration"
+        "researchguard-suite"
       ],
       "tests": [
         "tests/test_prompt_bundles.py",
@@ -348,7 +335,7 @@
       ],
       "models": [],
       "status": "confirmed",
-      "fingerprint": "sha256:ee9b4f141ba041086b9d860edee12ff9f47cdaa2d53478217294df6a342a270a"
+      "fingerprint": "sha256:7cce2f2d2f15368ffe45e62ae57f20fe824324c413d697985babd1c11fdab33c"
     }
   ],
   "flows": [

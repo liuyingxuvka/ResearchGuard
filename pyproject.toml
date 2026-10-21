@@ -51,14 +51,7 @@ where = ["src"]
 include = ["researchguard*"]
 
 [tool.setuptools.package-data]
-"researchguard.logic_template_packs" = [
-  "catalog/*.json",
-  "catalog/*.md",
-  "catalog/profiles/*.json",
-]
 "researchguard.logic_viewer" = ["assets/*"]
-"researchguard.source" = ["template_pack_catalog.json"]
-"researchguard.trace" = ["template_pack_catalog.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
