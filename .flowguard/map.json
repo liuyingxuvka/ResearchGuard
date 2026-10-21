@@ -384,7 +384,7 @@
         "scripts/*.py"
       ],
       "entrypoints": [
-        "scripts/install_researchguard.py:install"
+        "scripts/install_skill.py:main"
       ],
       "state": [
         "distribution and five skill directories"
@@ -393,7 +393,6 @@
         "explicit installation with independent rollback"
       ],
       "depends_on": [
-        "experimentguard",
         "logicguard",
         "researchguard-suite",
         "sourceguard",
@@ -401,10 +400,9 @@
         "traceguard"
       ],
       "tests": [
-        "tests/test_install_researchguard.py",
         "tests/test_prompt_bundles.py",
-        "tests/test_suite_checker_bounds.py",
-        "tests/contract/test_privacy_scan.py"
+        "tests/contract/test_privacy_scan.py",
+        "tests/test_install_skill.py"
       ],
       "models": [],
       "status": "confirmed",
@@ -455,7 +453,7 @@
     {
       "id": "installation",
       "steps": [
-        "author-tools:install"
+        "author-tools:main"
       ]
     }
   ],

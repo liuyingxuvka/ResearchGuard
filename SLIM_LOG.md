@@ -131,3 +131,13 @@ Source plan默认只省略scored_actions，--all-scores恢复完整评分；127�
 - `python -m pytest tests/source` — exit 0, 14.475s; `127 passed in 13.97s`
 - `python <external>/probe_rg11.py` — exit 0, 0.903s; `default_bytes 8449 all_scores_bytes 28413 same native selected actions`
 - `python -m pytest --collect-only` — exit 0, 3.523s; `892 tests collected in 3.10s`
+
+## RG-12 — completed
+
+安装器复用只读FG基线的标准库复制/比对逻辑，五技能支持软链接目标；10项测试及系统Python安装/check通过，移除清单预告的唯一无用依赖后地图0错误；收集867。
+
+- `python -m pytest tests/test_install_skill.py tests/test_prompt_bundles.py` — exit 0, 1.16s; `10 passed in 0.70s`
+- `python -m flowguard map check` — exit 1, 0.618s; `check: 1 error(s), 10 warning(s), 0 info`
+- `python <external>/probe_rg12.py` — exit 0, 0.163s; `standard-library install/check and active residual scan passed`
+- `python -m flowguard map check` — exit 0, 0.562s; `check: 0 error(s), 10 warning(s), 0 info`
+- `python -m pytest --collect-only` — exit 0, 4.166s; `867 tests collected in 3.59s`

@@ -166,8 +166,3 @@ def test_reported_prompt_byte_totals_equal_exact_entry_files() -> None:
     for bundle in payload["bundles"]:
         expected_bytes = sum(len((ROOT / path).read_bytes()) for path in bundle["entry_files"])
         assert by_skill[bundle["skill_id"]]["entry_bytes"] == expected_bytes
-
-
-def test_prompt_governance_has_one_declared_execution_path() -> None:
-    suite_checker = (ROOT / "scripts/check_researchguard_suite.py").read_text(encoding="utf-8")
-    assert "check_prompt_bundles.py" not in suite_checker

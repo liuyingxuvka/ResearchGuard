@@ -22,6 +22,18 @@ load legacy package formats.
 
 The first release was `v0.1.0`.
 
+## Install
+
+```bash
+python -m pip install -e .
+python scripts/install_skill.py --target "$CODEX_HOME/skills"   # or ~/.claude/skills
+python scripts/install_skill.py --target "$CODEX_HOME/skills" --check
+```
+
+The first line installs the `researchguard` console; the second copies the five
+skill folders (`researchguard`, `logicguard`, `sourceguard`, `traceguard`,
+`experimentguard`) into the agent's skills directory.
+
 ## Codex-facing source intake contract
 
 The CLI preservation step is not enough by itself. When concrete source

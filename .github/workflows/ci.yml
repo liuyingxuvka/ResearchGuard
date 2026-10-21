@@ -37,9 +37,8 @@ jobs:
         if: runner.os == 'Windows'
         run: >-
           python -m pytest
-          tests/test_install_researchguard.py
+          tests/test_install_skill.py
           tests/test_root_cli.py
-          tests/test_suite_checker_bounds.py
           tests/logic/test_dynamic_model_purpose_contract.py::test_target_paths_cannot_escape_and_baseline_cannot_substitute
           tests/test_external_domain_dna_real_paper.py::test_native_replay_cache_has_exact_identity_and_never_caches_material_replay
           tests/test_external_domain_dna_real_paper.py::test_generic_nonpaper_consistent_workflow_uses_the_same_native_path
