@@ -15,15 +15,6 @@ def test_public_version_matches_pyproject() -> None:
     assert researchguard.logic.__version__ == pyproject["project"]["version"]
 
 
-def test_public_version_matches_readme_and_changelog() -> None:
-    version = researchguard.logic.__version__
-    readme = (ROOT / "README.md").read_text(encoding="utf-8")
-    changelog = (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
-    assert f"**Current version:** `v{version}`" in readme
-    assert f"**当前版本：** `v{version}`" in readme
-    assert re.search(rf"^## v{re.escape(version)} - ", changelog, re.MULTILINE)
-
-
 def test_source_library_api_is_exported() -> None:
     exported = set(researchguard.logic.__all__)
     assert "SourceLibrary" in exported

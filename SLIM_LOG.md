@@ -176,3 +176,11 @@ Experiment recommend补默认非领域循环字段，坏输入给JSON/CLI2，删
 - `python -m pytest tests/trace/test_traceguard.py tests/trace/test_guard_model_purpose_contract.py` — exit 0, 61.447s; `47 passed in 60.91s (0:01:00)`
 - `python <external>/probe_rg16.py` — exit 0, 2.457s; `contract-free starter and library model are honest and valid`
 - `python -m pytest --collect-only` — exit 0, 5.48s; `870 tests collected in 4.90s`
+
+## RG-17 — completed
+
+移除精确版本测试和CI固定FG断言，FG唯一git test-extra与publisher一致性门保留。28pass/收集866；产品活跃版本命中完全符合清单，原始/journal/active扫描分别外存。按根统一规则仅额外排除SLIM_LOG.md，保留其真实历史版本/命令。
+
+- `python -m pytest tests/logic/test_public_api.py tests/test_suite_routing.py` — exit 0, 36.03s; `28 passed in 35.44s`
+- `python <external>/probe_rg17.py` — exit 0, 0.32s; `version authority scans passed; truthful journal preserved`
+- `python -m pytest --collect-only` — exit 0, 5.218s; `866 tests collected in 4.57s`

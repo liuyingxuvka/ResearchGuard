@@ -1,6 +1,7 @@
 # ResearchGuard maintenance
 
-Use the current FlowGuard 0.70.6 living map in `.flowguard/map.json`.
+Use the FlowGuard living map in `.flowguard/map.json`. Maintenance needs
+FlowGuard >= 0.70.6 (`pip install -e <FlowGuard checkout>`).
 Read the affected component before changing its owned code.
 After a change, update affected descriptions and anchors, run the existing
 focused native tests and relevant executable model, and confirm affected map
