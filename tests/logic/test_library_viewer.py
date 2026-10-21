@@ -181,39 +181,6 @@ def test_source_graph_payload_localizes_model_content_and_view_modes(tmp_path: P
     assert detail_zh["graph"]["nodes"][0]["text"] != graph_en["nodes"][0]["text"]
 
 
-def test_desktop_graph_canvas_supports_pan_zoom_reset_and_text_only_nodes() -> None:
-    source = (
-        Path(__file__).resolve().parents[2]
-        / "src"
-        / "researchguard"
-        / "logic_viewer"
-        / "desktop_app.py"
-    ).read_text(encoding="utf-8")
-    draw_method = source.split("def _draw_graph_node", 1)[1].split("def _refresh_after_language_change", 1)[0]
-
-    assert "on_pan_start" in source
-    assert "on_pan_move" in source
-    assert "on_zoom" in source
-    assert "reset_graph_view" in source
-    assert "graph_interaction_hint" in source
-    assert "_recommended_graph_view_id" in source
-    assert "recommended_graph" in source
-    assert "argument_map_tab" not in source
-    assert "research_flow_tab" not in source
-    assert "_draw_process_timeline" in source
-    assert "diagram_kind" in source
-    assert "reset_button.place" in source
-    assert "fit_scale = max(0.68" in source
-    assert "pad - min_y * fit_scale" in source
-    assert "Projects: Uncategorized" not in source
-    assert "draw_reset_button" in source
-    assert 'cursor="hand2"' in source
-    assert "reset_button.bind(\"<Enter>\"" in source
-    assert "reset_button.bind(\"<ButtonRelease-1>\"" in source
-    assert "_round_rect" not in draw_method
-    assert "create_text" in draw_method
-    assert "fill=TEXT" in draw_method
-    assert "create_oval" in draw_method
 
 
 def test_detail_header_meta_hides_internal_source_noise() -> None:

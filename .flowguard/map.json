@@ -381,9 +381,7 @@
         "sourceguard",
         "traceguard"
       ],
-      "tests": [
-        "tests/test_zero_residuals.py"
-      ],
+      "tests": [],
       "models": [],
       "status": "confirmed",
       "fingerprint": "sha256:15760db8ad012ae9b30a85c6dc13406ce0b3133be6c15f04cb69c1ecc23d6584"

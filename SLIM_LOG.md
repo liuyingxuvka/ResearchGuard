@@ -349,3 +349,12 @@ Source契约可选：缺省直接运行模型并正常观察更新，嵌入/显�
 - `python <external>/probe_rg31.py` — exit 0, 2.154s; `Trace obligation-content copies absent; native effects/coverage/gaps remain`
 - `python -m pytest --collect-only` — exit 0, 6.221s; `559 tests collected in 5.20s`
 - `python -m flowguard map check` — exit 0, 0.517s; `check: 0 error(s), 11 warning(s), 0 info`
+
+## RG-32 — completed
+
+仅删指定锁文字/源码/退役清单测试和重复zero-residual脚本，去旧路径过滤；实际技能入口/内部路由/retired projection拒绝/CLI行为、GUI元信息功能与历史CHANGELOG保留。17pass（tkinter可用），活跃skillguard残留为空，收集548/map0error。
+
+- `python -m pytest tests/test_skill_suite.py tests/logic/test_library_viewer.py tests/contract` — exit 0, 1.671s; `17 passed in 1.34s`
+- `python -c import subprocess;p=subprocess.run(["rg","-n","-i","skillguard","scripts","tests","src/researchguard","skills"],capture_output=True,text=True);print(p.stdout,end="");assert p.returncode==1;print("SkillGuard active residuals absent; historical CHANGELOG retained")` — exit 0, 0.054s; `SkillGuard active residuals absent; historical CHANGELOG retained`
+- `python -m pytest --collect-only` — exit 0, 2.757s; `548 tests collected in 2.32s`
+- `python -m flowguard map check` — exit 0, 0.581s; `check: 0 error(s), 11 warning(s), 0 info`

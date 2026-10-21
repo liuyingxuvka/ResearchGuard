@@ -29,7 +29,6 @@ FORBIDDEN_COMPONENTS = frozenset(
     {
         ".git",
         ".flowguard",
-        ".skillguard",
         "__pycache__",
         ".pytest_cache",
         "evidence",
@@ -75,7 +74,7 @@ class Finding:
 
 def _normal_relative(path: str | Path) -> str:
     # Remove only explicit ``./`` prefixes.  A leading dot is meaningful for
-    # control directories such as ``.skillguard`` and ``.flowguard`` and must
+    # control directories such as ``.flowguard`` and must
     # remain visible to the path policy.
     value = Path(path).as_posix()
     while value.startswith("./"):

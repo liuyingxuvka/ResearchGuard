@@ -20,16 +20,6 @@ MEMBERS = (
     "traceguard",
     "experimentguard",
 )
-RETIRED_SKILL_IDS = (
-    "logicguard-source-library",
-    "logicguard-structured-artifact",
-    "logicguard-model-deepening",
-    "logicguard-artifact-synthesis",
-    "logicguard-project-library-viewer",
-    "traceguard-library",
-)
-
-
 
 
 def test_consumer_skill_inventory_and_metadata_are_exact() -> None:
@@ -70,21 +60,6 @@ def test_internal_route_inventory_is_exact() -> None:
     ).is_file()
 
 
-def test_consumer_projection_has_no_retired_skill_or_launcher() -> None:
-    text = "\n".join(
-        path.read_text(encoding="utf-8")
-        for path in (ROOT / "skills").rglob("*")
-        if path.is_file()
-        and ".skillguard" not in path.parts
-        and path.suffix.lower() in {".md", ".py", ".yaml", ".yml"}
-    )
-    assert not any(skill_id in text for skill_id in RETIRED_SKILL_IDS)
-    assert "python -m logicguard" not in text
-    assert "python -m sourceguard" not in text
-    assert "python -m traceguard" not in text
-    assert "run_logicguard.py" not in text
-    assert "run_sourceguard.py" not in text
-    assert "run_traceguard.py" not in text
 
 
 
