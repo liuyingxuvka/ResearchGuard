@@ -567,6 +567,13 @@ def search_library(root: str | Path, query: str, *, case_id: str | None = None) 
 def write_back_gaps(root: str | Path, case_id: str, result_path: str | Path) -> dict[str, Any]:
     paths = require_library(root)
     result = json.loads(Path(result_path).read_text(encoding="utf-8"))
+    if result.get("ok") is False:
+        message = str(result.get("error") or "TraceGuard evaluation failed")
+        record = {"gap_id": "evaluation_failed", "message": message,
+                  "case_id": slug(case_id), "followup_status": "open", "written_at": now_iso()}
+        append_unique_by_id(paths.case_ledger(case_id, "gaps.yaml"), record, "gap_id")
+        return {"ok": False, "error": message, "gaps_written": 1,
+                "contradictions_written": 0, "inference_receipt_written": False}
     gaps: list[dict[str, Any]] = []
     contradictions: list[dict[str, Any]] = []
     handoff_followups: list[dict[str, Any]] = []

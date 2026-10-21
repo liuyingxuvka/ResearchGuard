@@ -635,3 +635,14 @@ def test_cli_evaluate_and_depth_output_write_full_json_and_print_summary(tmp_pat
         assert expected_key in json.loads(result.stdout)
         assert len(result.stdout) < 5000
         assert len(output.read_text(encoding="utf-8")) > len(result.stdout)
+
+
+def test_case_library_writeback_records_a_failed_evaluation(tmp_path: Path):
+    root = tmp_path / "library"
+    case_library.init_library(root, name="Investigation Memory")
+    case_library.create_case(root, "Incident A", title="Incident A", topic="metadata")
+    result_path = tmp_path / "failed.json"
+    result_path.write_text(json.dumps({"ok": False, "error": "compiled problem has no latent atom or factor"}))
+    assert case_library.write_back_gaps(root, "incident-a", result_path)["ok"] is False
+    records = case_library.read_yaml(case_library.LibraryPaths(root).case_ledger("incident-a", "gaps.yaml"), [])
+    assert [row["gap_id"] for row in records] == ["evaluation_failed"]

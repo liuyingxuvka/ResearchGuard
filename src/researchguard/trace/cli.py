@@ -541,7 +541,7 @@ def cmd_library(args: argparse.Namespace) -> int:
         _print_json({"ok": False, "error": str(exc)}, pretty=args.pretty)
         return 2
     _print_json(payload, pretty=args.pretty)
-    return 0
+    return 2 if isinstance(payload, dict) and payload.get("ok") is False else 0
 
 
 def cmd_library_depth(args: argparse.Namespace) -> int:

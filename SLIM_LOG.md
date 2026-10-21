@@ -141,3 +141,11 @@ Source plan默认只省略scored_actions，--all-scores恢复完整评分；127�
 - `python <external>/probe_rg12.py` — exit 0, 0.163s; `standard-library install/check and active residual scan passed`
 - `python -m flowguard map check` — exit 0, 0.562s; `check: 0 error(s), 10 warning(s), 0 info`
 - `python -m pytest --collect-only` — exit 0, 4.166s; `867 tests collected in 3.59s`
+
+## RG-13 — completed
+
+失败评估追加evaluation_failed开放缺口并返回ok:false/CLI2；成功写回及append_unique_by_id不变。39项Trace测试、真实失败CLI与868项收集通过。
+
+- `python -m pytest tests/trace/test_traceguard.py` — exit 0, 50.129s; `39 passed in 49.57s`
+- `python <external>/probe_rg13.py` — exit 0, 2.393s; `rc 2`
+- `python -m pytest --collect-only` — exit 0, 7.69s; `868 tests collected in 6.83s`
