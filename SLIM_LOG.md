@@ -808,3 +808,9 @@ Added the real open-gap CLI sufficiency=False assertion without changing native 
 - `python-newfg -m flowguard map models` — exit 0, 2.2s; `models: 2 passed, 0 failed`
 - `python-newfg -m flowguard release` — exit 0, 2.394s; `verify: PASS (map, lint and models only; tests not run; run python -m pytest -q separately)`
 - `git diff --check` — exit 0, 0.005s; `(no output)`
+
+## Cross-repository implementation handoff
+
+Implemented repository changes: XR-04. Their affected checks and real cross-repository native paths passed; exact commands and failures/adaptations are retained in the external XR_LOG and results/CrossReview.
+Shared XR02–14 checks used the new Python 3.12 editable joint environment. XR15 final native bridge and final frozen Release-SHA full suites, official GitHub CI/publication and local FlowGuard update remain pending at the time of this journal entry. No final deployment or all-invariant-coverage claim is made.
+User-selected patch-only version policy remains intact; original future minor targets were not restored.

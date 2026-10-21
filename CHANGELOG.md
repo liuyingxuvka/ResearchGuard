@@ -19,6 +19,7 @@
 - `AGENTS.md`: a release records the exact tested commit and follows the maintainer's three-part,
   patch-only version policy. The `stop-decision` CLI test runs on real SourceGuard example models and checks that a model with open
   gaps is not reported as sufficient.
+- Cross-repo pass: XR-04; skipped none. Details in the cross-repo action list.
 
 ## v0.5.9 - 2026-10-18
 
