@@ -53,3 +53,12 @@ Removed only repeated target-purpose proof during model loading; retained contra
 - `python -m pytest tests/source` — exit 0, 10.791s; `125 passed in 10.45s`
 - `python -m pytest --collect-only` — exit 0, 3.437s; `885 tests collected in 2.97s`
 - `python -m flowguard map check` — exit 0, 0.452s; `check: 0 error(s), 8 warning(s), 0 info`
+
+## RG-04 — completed
+
+logic depth now computes native depth without a contract and prints the real six-field gap summary (516bytes, blocked rc3); specifying only one old contract option remains an error rc1. The old two-option receipt path is untouched; focused28passed and baseline LW44passed; collection886.
+
+- `python -m pytest tests/logic/test_cli.py tests/logic/test_dynamic_model_purpose_contract.py tests/logic/test_execution_depth.py` — exit 0, 23.394s; `28 passed in 22.60s`
+- `python <external>/probe_rg04.py` — exit 0, 1.119s; `native gap summary rc3: 516 bytes;partial options rc1; warrant gap retained`
+- `python -m pytest -p no:cacheprovider tests/contract/test_researchguard_handoff.py tests/e2e/test_production_reader_pipeline.py tests/contract/test_production_reader_native_lifecycle.py` — exit 0, 2.087s; `============================== 44 passed in 1.82s ==============================`
+- `python -m pytest --collect-only` — exit 0, 3.786s; `886 tests collected in 3.40s`

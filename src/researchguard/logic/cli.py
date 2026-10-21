@@ -11,7 +11,7 @@ from . import __version__
 from .diagnostics import diagnose_model
 from .delivery import adapt_delivery
 from .evaluator import evaluate_model
-from .execution_depth import build_logic_depth_receipt
+from .execution_depth import _build_native_depth_analysis, build_logic_depth_receipt
 from .argument_modeling import create_argument_model
 from .artifact_inventory import ArtifactInventory
 from .blueprint import (
@@ -216,11 +216,11 @@ def build_parser() -> argparse.ArgumentParser:
     guard_verify.set_defaults(func=_cmd_guard_contract_verify)
 
     depth = sub.add_parser(
-        "depth", help="Emit a target-contract-bound native execution-depth receipt."
+        "depth", help="Check argument depth (role coverage, competing conclusions, perturbations) and print the gap summary."
     )
     depth.add_argument("model")
-    depth.add_argument("--target-root", required=True)
-    depth.add_argument("--guard-contract", required=True)
+    depth.add_argument("--target-root")
+    depth.add_argument("--guard-contract")
     depth.add_argument(
         "--budget",
         type=int,
@@ -650,6 +650,23 @@ def _cmd_gaps(args: argparse.Namespace) -> int:
 
 def _cmd_depth(args: argparse.Namespace) -> int:
     model = load_model(args.model)
+    if args.target_root is None and args.guard_contract is None:
+        analysis = _build_native_depth_analysis(
+            model, budget=args.budget, requested_claim_scope_ids=args.claim_scope_node,
+        )
+        if args.output:
+            _write(args.output, analysis.to_dict())
+        print(json.dumps({
+            "model_id": analysis.model_id,
+            "status": analysis.status,
+            "broad_claim_licensed": analysis.broad_claim_licensed,
+            "covered_claim_scope": analysis.covered_claim_scope,
+            "unresolved_gaps": list(analysis.unresolved_gaps),
+            "untested_high_impact_node_ids": list(analysis.untested_high_impact_node_ids),
+        }, indent=2))
+        return 0 if analysis.status == "pass" else 3
+    if args.target_root is None or args.guard_contract is None:
+        raise ValueError("logic depth needs both --target-root and --guard-contract, or neither")
     receipt = build_logic_depth_receipt(
         model,
         target_root=args.target_root,

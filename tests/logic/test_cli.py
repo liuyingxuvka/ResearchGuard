@@ -360,3 +360,13 @@ def test_cli_structure_from_markdown(tmp_path: Path) -> None:
     assert payload["model"]["artifact_kind"] == "report"
     assert payload["model"]["root_claim"] == "C1"
     assert payload["hierarchy"]["B1"] == ["C1", "E1"]
+
+
+def test_cli_depth_without_contract_prints_gap_summary(tmp_path: Path) -> None:
+    output = tmp_path / "depth.json"
+    result = _run("depth", "examples/logic/scientific_causal_claim.yaml", "--output", str(output))
+    assert result.returncode == 3
+    summary = json.loads(result.stdout)
+    assert summary["status"] == "blocked"
+    assert "claim_role_missing:C0:warrant" in summary["unresolved_gaps"]
+    assert json.loads(output.read_text(encoding="utf-8"))["status"] == "blocked"
