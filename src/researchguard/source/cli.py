@@ -12,6 +12,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from dataclasses import asdict
 from pathlib import Path
 from typing import Any, Mapping
 
@@ -30,6 +31,7 @@ from .schema import (
     to_plain,
 )
 from .scoring import score_actions
+from .stop_decision import decide_model_search_stop
 from .update import apply_observation
 from .task_iteration import (
     GAP_REDUCTION_LEVELS,
@@ -139,6 +141,12 @@ def build_parser() -> argparse.ArgumentParser:
     frontier = sub.add_parser("frontier")
     frontier.add_argument("model")
     frontier.add_argument("--pretty", action="store_true")
+
+    stop = sub.add_parser("stop-decision", help="Decide whether the search should continue.")
+    stop.add_argument("model")
+    stop.add_argument("--budget", type=float, required=True, help="Remaining search budget, in the units of action cost.")
+    stop.add_argument("--sufficient", action="store_true", help="Declare that the evidence already suffices for the claim scope.")
+    stop.add_argument("--pretty", action="store_true")
 
     depth = sub.add_parser("depth")
     depth.add_argument("model")
@@ -505,6 +513,14 @@ def run(args: argparse.Namespace) -> int:
             {"ok": True, **frontier_summary(load_model(args.model))},
             args.pretty,
         )
+        return 0
+    if args.command == "stop-decision":
+        inputs, decision = decide_model_search_stop(
+            load_model(args.model),
+            remaining_budget=args.budget,
+            evidence_sufficient_for_scope=args.sufficient,
+        )
+        _json_out({"ok": True, "inputs": asdict(inputs), **decision.to_dict()}, args.pretty)
         return 0
     if args.command == "depth":
         model = load_model(args.model)

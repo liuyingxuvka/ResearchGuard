@@ -82,7 +82,7 @@
         ".flowguard/models/sourceguard_content_anchor_oracle_model.py"
       ],
       "status": "confirmed",
-      "fingerprint": "sha256:4868686caea44c6ca45d8224b4a4ce1b123b073e96c39785b7f01e8dce5ab777"
+      "fingerprint": "sha256:b6a9799fcffe6cc300288175b21ae551e60c2f38024a6ae2831de5ce6dca31de"
     },
     {
       "id": "logicguard",
@@ -159,7 +159,8 @@
       "summary": "Own evidence discovery, expected-utility search plans, stop decisions and source/anchor qualification.",
       "responsibilities": [
         "Own evidence discovery, expected-utility search plans, stop decisions and source/anchor qualification.",
-        "Load, plan, update and iterate on a model file alone; models carry no contract."
+        "Load, plan, update and iterate on a model file alone; models carry no contract.",
+        "Decide whether to keep searching from the model itself: the top planned action, the open blocking gaps and the caller-declared budget."
       ],
       "files": [
         "src/researchguard/source/__init__.py",
@@ -193,7 +194,7 @@
         ".flowguard/models/sourceguard_content_anchor_oracle_model.py"
       ],
       "status": "confirmed",
-      "fingerprint": "sha256:fe984a8123555ea29ebcda77aaf136166ce23608a52d66f3b78ee82021f570e9"
+      "fingerprint": "sha256:fde916883a0dba45768dc70d03ffa71f13fd133f3074ec3d5e0a07735870837f"
     },
     {
       "id": "traceguard",

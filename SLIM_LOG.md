@@ -577,3 +577,17 @@ Retired the caller-free suite fingerprint module after exact consumer preconditi
 - `python -m flowguard release` — exit 0, 4.637s; `verify: PASS (map, lint and models only; tests not run; run python -m pytest -q separately)`
 - `python -m pytest` — exit 0, 77.397s; `338 passed in 76.81s (0:01:16)`
 - `python -m flowguard map models` — exit 0, 1.905s; `models: 2 passed, 0 failed`
+
+## RG-49 — completed
+
+Added the read-only model adapter and stop-decision CLI, which passes the native top action score/cost, blocking gaps and caller budget to the unchanged stop owner. Actual CLI shows continue at budget 1, blocked critical at 0.1, sufficient for the empty model and missing-budget exit 2. 65 source tests passed; collection 340; fixed LW43 native bridge 10 passed no skips, exports/map/release passed.
+
+- `python -m pytest tests/source` — exit 0, 4.563s; `65 passed in 4.24s`
+- `python <external>/probe_rg49.py` — exit 0, 0.735s; `researchguard source stop-decision: error: the following arguments are required: --budget`
+- `python <external>/check_exports.py` — exit 0, 0.473s; `exports ok`
+- `python -m pytest -p no:cacheprovider tests/contract/test_researchguard_handoff.py --junitxml <external>/RG-49-lw43-junit.xml --basetemp <external>/RG-49-lw43-temp` — exit 0, 0.546s; `============================== 10 passed in 0.28s ==============================`
+- `python <external>/verify_lw_junit.py <external>/RG-49-lw43-junit.xml` — exit 0, 0.047s; `10 actual PASSED, 0 skipped; real native provider-to-reader bridge PASSED/ready, not version-skipped`
+- `python -m pytest --collect-only` — exit 0, 2.022s; `340 tests collected in 1.63s`
+- `python -m flowguard map confirm sourceguard suite-orchestration` — exit 0, 0.221s; `confirmed 2 component(s)`
+- `python -m flowguard map check` — exit 0, 0.356s; `check: 0 error(s), 4 warning(s), 0 info`
+- `python -m flowguard release` — exit 0, 1.76s; `verify: PASS (map, lint and models only; tests not run; run python -m pytest -q separately)`

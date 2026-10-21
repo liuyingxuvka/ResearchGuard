@@ -3,7 +3,10 @@
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
-from typing import Literal
+from typing import TYPE_CHECKING, Literal
+
+if TYPE_CHECKING:
+    from .schema import BeliefState
 
 
 SearchStopStatus = Literal[
@@ -122,9 +125,43 @@ def decide_search_stop(inputs: SearchStopInput) -> SearchStopDecision:
     )
 
 
+def decide_model_search_stop(
+    belief_state: "BeliefState",
+    *,
+    remaining_budget: float,
+    evidence_sufficient_for_scope: bool = False,
+) -> tuple[SearchStopInput, SearchStopDecision]:
+    """Read the stop-decision inputs from a SourceGuard model, then decide.
+
+    The next search is the top action of ``plan_next_actions``: its utility
+    score is the marginal value and its declared ``cost`` is the cost.  Open
+    blocking gaps are the critical gaps; a model without open gaps is
+    sufficient.  The budget and any sufficiency declaration come from the caller.
+    """
+
+    from .planner import plan_next_actions
+
+    plan = plan_next_actions(belief_state, limit=1)
+    top = plan.selected_actions[0] if plan.selected_actions else None
+    score = next(
+        (item.total_score for item in plan.scored_actions if top is not None and item.action_id == top.action_id),
+        0.0,
+    )
+    inputs = SearchStopInput(
+        marginal_information_value=float(score),
+        next_search_cost=float(top.cost) if top is not None else 0.0,
+        remaining_budget=float(remaining_budget),
+        evidence_sufficient_for_scope=bool(evidence_sufficient_for_scope) or not plan.open_gaps,
+        unresolved_critical_gap_ids=tuple(gap.gap_id for gap in plan.open_gaps if gap.blocking),
+        candidate_search_ids=(top.action_id,) if top is not None else (),
+    )
+    return inputs, decide_search_stop(inputs)
+
+
 __all__ = [
     "SearchStopDecision",
     "SearchStopInput",
     "SearchStopStatus",
+    "decide_model_search_stop",
     "decide_search_stop",
 ]

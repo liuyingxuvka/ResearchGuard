@@ -8,6 +8,7 @@ researchguard source validate <model.yaml> --pretty
 researchguard source plan <model.yaml> --limit 5 --pretty
 researchguard source score-actions <model.yaml> --pretty
 researchguard source frontier <model.yaml> --pretty
+researchguard source stop-decision <model.yaml> --budget <remaining budget> [--sufficient] --pretty
 researchguard source depth <model.yaml> --pretty
 researchguard source depth <model.yaml> --observation <observation.yaml> --output <receipt.json> --updated-model-output <updated.yaml> --pretty
 researchguard source add-observation <model.yaml> --observation <observation.yaml> --output <updated.yaml> --pretty
