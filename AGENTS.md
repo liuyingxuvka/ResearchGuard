@@ -1,14 +1,20 @@
 # ResearchGuard maintenance
 
-Use the FlowGuard living map in `.flowguard/map.json`. Maintenance needs
-FlowGuard >= 0.70.6 (`pip install -e <FlowGuard checkout>`).
-Read the affected component before changing its owned code.
-After a change, update affected descriptions and anchors, run the existing
-focused native tests and relevant executable model, and confirm affected map
-components. Run one complete pytest gate only after the release source freezes.
+<!-- BEGIN FLOWGUARD PROJECT RULES -->
 
-Use `python -m flowguard change` after edits and `python -m flowguard release`
-before a release.
+## FlowGuard map and model maintenance
+
+1. Start each session with `python -m flowguard read` before opening source.
+2. Before adding behavior, use `python -m flowguard read --find WORDS`; extend its existing owner.
+3. Open only the affected component's files (`python -m flowguard read --component ID`).
+4. After editing, run `python -m flowguard change`, fix errors, and run the affected tests and models it selects.
+5. Re-read each REVIEW component, update its description if behavior changed, then `python -m flowguard map confirm ID`.
+6. At final release, freeze the source and run the full suite and `python -m flowguard release` once on that revision (same-SHA CI may provide this); report failures and unrun checks honestly.
+
+Maintenance needs FlowGuard at or above the tag in the `test` extra of `pyproject.toml` (install with `python -m pip install -e ".[test]"`; the PyPI package named `flowguard` is a different project).
+Raise that tag only when this repository starts using a newer FlowGuard feature; a FlowGuard release alone is no reason to change it or to release this repository.
+
+<!-- END FLOWGUARD PROJECT RULES -->
 
 Every completed action is committed and pushed to main. A release records the
 exact tested commit and uses the maintainer-selected three-part version. Unless
