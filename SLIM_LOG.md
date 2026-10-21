@@ -240,3 +240,15 @@ Experiment技能删蓝图说明，新增原样可执行最小spec并记observe�
 - `python scripts/check_prompt_bundles.py --json` — exit 0, 0.074s; `}`
 - `python -m pytest tests/test_prompt_bundles.py tests/test_skill_suite.py tests/logic/test_dynamic_model_purpose_contract.py` — exit 0, 2.936s; `22 passed in 2.55s`
 - `python -m pytest --collect-only` — exit 0, 5.515s; `859 tests collected in 5.03s`
+
+## RG-24 — completed
+
+删除run及逐成员预绑定证明，保_member_main懒加载/版本格式和未知命令JSON；8+26测试通过，真实run返回unknown-command/2，importtime不加载routing，logic validate通过，LW44pass，收集852、双模型通过/map0error。
+
+- `python -m pytest tests/test_root_cli.py tests/test_skill_suite.py` — exit 0, 2.205s; `8 passed in 1.66s`
+- `python <external>/probe_rg24.py` — exit 0, 2.913s; `validation: OK`
+- `python -m pytest -p no:cacheprovider tests/contract/test_researchguard_handoff.py tests/e2e/test_production_reader_pipeline.py tests/contract/test_production_reader_native_lifecycle.py` — exit 0, 4.55s; `============================== 44 passed in 2.77s ==============================`
+- `python -m pytest --collect-only` — exit 0, 3.883s; `852 tests collected in 3.45s`
+- `python -m flowguard map models` — exit 0, 1.015s; `models: 2 passed, 0 failed`
+- `python -m flowguard map check` — exit 0, 0.575s; `check: 0 error(s), 10 warning(s), 0 info`
+- `python -m pytest tests/test_member_model_envelope.py` — exit 0, 74.678s; `26 passed in 74.03s (0:01:14)`

@@ -14,7 +14,6 @@ import textwrap
 
 import pytest
 
-import researchguard.cli as root_cli
 import researchguard.model_envelope as envelope_transport
 
 from admission_fixtures import (
@@ -583,43 +582,3 @@ def test_blocked_composition_impact_is_atomic_before_dependency_projection() -> 
     assert impact["affected_handoff_field_ids"] == []
     assert impact["affected_claim_boundary_ids"] == []
     assert impact["unaffected_step_ids"] == []
-
-
-@pytest.mark.parametrize(
-    ("operation_args", "result_key"),
-    [
-        (("--changed-id", "field:any"), "affected_step_ids"),
-        (("--reverse-trace-output", "unknown-before-qualification"), "steps"),
-    ],
-)
-def test_blocked_composition_cli_returns_non_success_without_partial_result(
-    tmp_path: Path,
-    monkeypatch: pytest.MonkeyPatch,
-    capsys: pytest.CaptureFixture[str],
-    operation_args: tuple[str, str],
-    result_key: str,
-) -> None:
-    task_facts_path = tmp_path / "task-facts.json"
-    task_facts_path.write_text("{}", encoding="utf-8")
-    # Selection is imported lazily by the CLI; patch its actual native owner.
-    monkeypatch.setattr(
-        "researchguard.routing.select_member_request",
-        lambda *_args, **_kwargs: _blocked_route_composition(),
-    )
-
-    exit_code = root_cli._run_umbrella(
-        [
-            "--business-intent-id",
-            INTENT,
-            "--task-facts",
-            str(task_facts_path),
-            *operation_args,
-            "--",
-        ]
-    )
-
-    payload = json.loads(capsys.readouterr().out)
-    assert exit_code == 3
-    assert payload["composition_status"] == "composition_blocked"
-    assert payload["partial_result_suppressed"] is True
-    assert payload[result_key] == []

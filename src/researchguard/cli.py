@@ -5,7 +5,6 @@ from __future__ import annotations
 import json
 import sys
 from collections.abc import Callable, Sequence
-from pathlib import Path
 
 from . import __version__
 
@@ -34,194 +33,20 @@ def _member_main(member_id: str) -> MemberMain:
     raise ValueError(f"unknown member: {member_id}")
 
 
-def _print_machine(payload: RouteBinding | RouteComposition | TypedGap | dict[str, object]) -> None:
-    value = payload.to_dict() if hasattr(payload, "to_dict") else payload
-    print(json.dumps(value, ensure_ascii=False, sort_keys=True))
-
-
 def _execute(member_id: str, member_argv: Sequence[str]) -> int:
-    from .routing import TypedGap, bind_member_request
-
-    binding = bind_member_request(member_id, member_argv)
-    if isinstance(binding, TypedGap):
-        _print_machine(binding)
-        return 2
-    return _member_main(binding.member_id)(list(member_argv))
-
-
-def _run_umbrella(argv: Sequence[str]) -> int:
-    from .routing import RouteComposition, TypedGap, composition_impact, reverse_trace_composition, select_member_request
-
-    business_intent_id: str | None = None
-    active_request_id: str | None = None
-    task_facts_path: Path | None = None
-    native_attestations_path: Path | None = None
-    changed_ids: list[str] = []
-    reverse_trace_output: str | None = None
-    member_argv: list[str] = []
-    index = 0
-    while index < len(argv):
-        token = argv[index]
-        if token == "--":
-            member_argv = list(argv[index + 1 :])
-            break
-        if token in {
-            "--task-facts",
-            "--native-owner-attestations",
-            "--business-intent-id",
-            "--active-request-id",
-            "--changed-id",
-            "--reverse-trace-output",
-        }:
-            if index + 1 >= len(argv):
-                gap = TypedGap(
-                    status="blocked",
-                    code="missing-option-value",
-                    message=f"{token} requires a value.",
-                )
-                _print_machine(gap)
-                return 2
-            value = argv[index + 1]
-            if token == "--task-facts":
-                task_facts_path = Path(value)
-            elif token == "--native-owner-attestations":
-                native_attestations_path = Path(value)
-            elif token == "--business-intent-id":
-                business_intent_id = value
-            elif token == "--changed-id":
-                changed_ids.append(value)
-            elif token == "--reverse-trace-output":
-                reverse_trace_output = value
-            else:
-                active_request_id = value
-            index += 2
-            continue
-        gap = TypedGap(
-            status="blocked",
-            code="unknown-umbrella-option",
-            message=(
-                f"Unknown umbrella option {token!r}. Put member arguments after "
-                "`--`."
-            ),
-        )
-        _print_machine(gap)
-        return 2
-    if not business_intent_id or task_facts_path is None:
-        gap = TypedGap(
-            status="blocked",
-            code="member-admission-required",
-            message=(
-                "The umbrella requires --business-intent-id and one current "
-                "--task-facts artifact with source-bound facts and exact forbidden reviews."
-            ),
-        )
-        _print_machine(gap)
-        return 2
-    try:
-        task_facts_payload = json.loads(
-            task_facts_path.read_text(encoding="utf-8")
-        )
-    except (OSError, json.JSONDecodeError) as exc:
-        gap = TypedGap(
-            status="blocked",
-            code="task-facts-unreadable",
-            message=str(exc),
-        )
-        _print_machine(gap)
-        return 2
-    if not isinstance(task_facts_payload, dict):
-        gap = TypedGap(
-            status="blocked",
-            code="task-facts-invalid",
-            message="Task facts must be a JSON object.",
-        )
-        _print_machine(gap)
-        return 2
-    native_attestations_payload: list[dict[str, object]] = []
-    if native_attestations_path is not None:
-        try:
-            loaded_attestations = json.loads(
-                native_attestations_path.read_text(encoding="utf-8")
-            )
-        except (OSError, json.JSONDecodeError) as exc:
-            _print_machine(
-                TypedGap(
-                    status="blocked",
-                    code="native-owner-attestations-unreadable",
-                    message=str(exc),
-                )
-            )
-            return 2
-        if not isinstance(loaded_attestations, list) or any(
-            not isinstance(item, dict) for item in loaded_attestations
-        ):
-            _print_machine(
-                TypedGap(
-                    status="blocked",
-                    code="native-owner-attestations-invalid",
-                    message="Native owner attestations must be a JSON array of current objects.",
-                )
-            )
-            return 2
-        native_attestations_payload = loaded_attestations
-    binding = select_member_request(
-        task_facts_payload,
-        member_argv,
-        business_intent_id=business_intent_id,
-        active_request_id=active_request_id,
-        native_owner_attestations=native_attestations_payload,
-    )
-    if isinstance(binding, TypedGap):
-        _print_machine(binding)
-        return 2
-    if isinstance(binding, RouteComposition):
-        # The umbrella coordinates the minimum sufficient set but never guesses
-        # member-specific arguments or treats a plan as completed native work.
-        if sum(bool(item) for item in (changed_ids, reverse_trace_output)) > 1:
-            _print_machine(
-                TypedGap(
-                    status="blocked",
-                    code="composition-operation-conflict",
-                    message=(
-                        "Select exactly one of affected-only impact or reverse trace "
-                        "for one umbrella call."
-                    ),
-                )
-            )
-            return 2
-        if changed_ids:
-            payload = composition_impact(binding, changed_ids)
-            _print_machine(payload)
-            return 3 if payload["unknown_ownership"] or payload["partial_result_suppressed"] else 0
-        if reverse_trace_output:
-            try:
-                payload = reverse_trace_composition(binding, reverse_trace_output)
-                _print_machine(payload)
-                return 3 if payload["partial_result_suppressed"] else 0
-            except ValueError as exc:
-                _print_machine(
-                    TypedGap(status="blocked", code="composition-trace-unresolved", message=str(exc))
-                )
-                return 2
-        _print_machine(binding)
-        return 0 if binding.status == "composition_ready" else 3
-    return _member_main(binding.member_id)(member_argv)
+    return _member_main(member_id)(list(member_argv))
 
 
 def _print_help() -> None:
     print(
         "\n".join(
             (
-                "usage: researchguard {run|logic|source|trace|experiment} ...",
+                "usage: researchguard {logic|source|trace|experiment} ...",
                 "",
-                "run     route to one member or emit one minimum-sufficient composition",
                 "logic   execute the LogicGuard native owner",
                 "source  execute the SourceGuard native owner",
                 "trace   execute the TraceGuard native owner",
                 "experiment  execute the ExperimentGuard recommendation owner",
-                "",
-                "umbrella form:",
-                "  researchguard run --business-intent-id ID --task-facts FILE [--native-owner-attestations FILE] [--changed-id ID | --reverse-trace-output ID] -- ARGS",
             )
         )
     )
@@ -237,19 +62,11 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     command = args[0]
     command_argv = args[1:]
-    if command == "run":
-        return _run_umbrella(command_argv)
     if command in {"logic", "source", "trace", "experiment"}:
         return _execute(f"{command}guard", command_argv)
-    from .routing import TypedGap
-
     print(
         json.dumps(
-            TypedGap(
-                status="blocked",
-                code="unknown-command",
-                message=f"Unknown ResearchGuard command: {command}",
-            ).to_dict(),
+            {"status": "blocked", "code": "unknown-command", "message": f"Unknown ResearchGuard command: {command}"},
             ensure_ascii=False,
             sort_keys=True,
         )

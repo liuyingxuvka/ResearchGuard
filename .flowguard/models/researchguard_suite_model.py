@@ -836,7 +836,7 @@ COMPONENTS = ["researchguard-suite"]
 IMPLEMENTED_BY = {"Route": "src/researchguard/routing.py:bind_member_request"}
 TESTED_BY = {
     "no_alternate_success": ["tests/test_suite_routing.py:test_selected_member_has_no_alternate_binding"],
-    "terminal_failure_stays_terminal": ["tests/test_root_cli.py:test_umbrella_reentry_is_terminal"],
+    "terminal_failure_stays_terminal": ["tests/test_root_cli.py:test_retired_standalone_routes_are_unknown_commands"],
 }
 
 
