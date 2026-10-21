@@ -14,7 +14,7 @@ from typing import Any
 
 import yaml
 
-from .guard_contract import load_target_contract, prove_target_model_contract
+from .guard_contract import load_target_contract
 from .schema import (
     BeliefState,
     SchemaError,
@@ -37,7 +37,6 @@ def load_model(path: str | Path, model_contract_path: str | Path) -> BeliefState
         external_contract
     ):
         raise SchemaError("explicit model contract fingerprint does not match the candidate")
-    prove_target_model_contract(belief_state, model_contract_path)
     return belief_state
 
 

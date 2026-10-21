@@ -44,3 +44,12 @@ Removed the explicit self-DNA command, duplicate DNA files and its test/runner-o
 - `python <external>/probe_rg02.py` — exit 0, 0.267s; `help current; self-dna unknown-command rc2; remaining literal-only references: ['scripts/check_prompt_bundles.py', 'tests/test_prompt_bundles.py', 'tests/test_skill_suite.py', 'tests/test_suite_model_currentness.py']`
 - `python -m pytest --collect-only` — exit 0, 3.29s; `884 tests collected in 2.84s`
 - `python -m flowguard map check` — exit 0, 0.521s; `check: 0 error(s), 7 warning(s), 0 info`
+
+## RG-03 — completed
+
+Removed only repeated target-purpose proof during model loading; retained contract snapshot/schema checks and create-time proof. The new grown-model regression failed before the fix (expected exit1) and tests/source then passed125; collection885/map0errors.
+
+- `python -m pytest tests/source/test_cli.py::test_grown_model_still_loads_after_evidence_for_the_guarded_gap` — exit 1, 1.211s; `1 failed in 0.93s`
+- `python -m pytest tests/source` — exit 0, 10.791s; `125 passed in 10.45s`
+- `python -m pytest --collect-only` — exit 0, 3.437s; `885 tests collected in 2.97s`
+- `python -m flowguard map check` — exit 0, 0.452s; `check: 0 error(s), 8 warning(s), 0 info`

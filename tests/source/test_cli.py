@@ -117,3 +117,28 @@ def test_failure_returns_2():
     result = _run("validate", "missing-file.yaml", "--model-contract", "missing-contract.json", "--pretty")
     assert result.returncode == 2
     assert '"ok": false' in result.stderr
+
+
+def test_grown_model_still_loads_after_evidence_for_the_guarded_gap(tmp_path):
+    for name in ("paper_citation_discovery.yaml", "paper_citation_discovery.contract.json", "model-purpose-observation.yaml"):
+        (tmp_path / name).write_bytes((ROOT / "examples" / "source" / name).read_bytes())
+    observation = {
+        "observation_id": "obs-baseline-1",
+        "observed_sources": [{"source_id": "src-history-1", "title": "Historical baseline paper",
+                              "source_type": "paper", "source_status": "saved", "source_reliability": 0.9,
+                              "source_role": "historical_background", "lineage_id": "lineage-history-1", "access_status": "public"}],
+        "observed_anchors": [{"anchor_id": "anchor-history-1", "source_id": "src-history-1", "anchor_type": "paragraph",
+                              "locator": "section=background;paragraph=2", "normalized_summary": "A historical paper states the baseline rate.",
+                              "modality": "text", "extraction_confidence": 0.9, "specificity": 0.9,
+                              "supports": ["gap-baseline"], "usable_for_claim": True}],
+        "new_entities": [], "new_leads": [], "new_gaps": [], "contradictions": [],
+    }
+    path = tmp_path / "obs.yaml"
+    path.write_text(yaml.safe_dump(observation), encoding="utf-8")
+    result = _run("add-observation", str(tmp_path / "paper_citation_discovery.yaml"),
+                  "--model-contract", str(tmp_path / "paper_citation_discovery.contract.json"),
+                  "--observation", str(path), "--output", str(tmp_path / "v2.yaml"),
+                  "--output-model-contract", str(tmp_path / "v2.contract.json"))
+    assert result.returncode == 0, result.stdout + result.stderr
+    result = _run("validate", str(tmp_path / "v2.yaml"), "--model-contract", str(tmp_path / "v2.contract.json"))
+    assert result.returncode == 0, result.stdout + result.stderr
