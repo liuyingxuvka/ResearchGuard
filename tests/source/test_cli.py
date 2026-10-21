@@ -142,3 +142,12 @@ def test_grown_model_still_loads_after_evidence_for_the_guarded_gap(tmp_path):
     assert result.returncode == 0, result.stdout + result.stderr
     result = _run("validate", str(tmp_path / "v2.yaml"), "--model-contract", str(tmp_path / "v2.contract.json"))
     assert result.returncode == 0, result.stdout + result.stderr
+
+
+def test_plan_prints_scores_only_on_request():
+    argv = ("plan", "examples/source/fuel_cell_project_discovery.yaml", "--model-contract", "examples/source/fuel_cell_project_discovery.contract.json")
+    ordinary = _run(*argv)
+    detailed = _run(*argv, "--all-scores")
+    assert ordinary.returncode == detailed.returncode == 0
+    assert "scored_actions" not in json.loads(ordinary.stdout)
+    assert json.loads(detailed.stdout)["scored_actions"]

@@ -145,6 +145,7 @@ def build_parser() -> argparse.ArgumentParser:
     plan.add_argument("model")
     plan.add_argument("--model-contract", required=True)
     plan.add_argument("--limit", type=int, default=5)
+    plan.add_argument("--all-scores", action="store_true", help="Also print every scored candidate action.")
     plan.add_argument("--pretty", action="store_true")
 
     score = sub.add_parser("score-actions")
@@ -591,7 +592,10 @@ def run(args: argparse.Namespace) -> int:
         return 0
     if args.command == "plan":
         model = load_model(args.model, args.model_contract)
-        _json_out(plan_next_actions(model, limit=args.limit), args.pretty)
+        payload = to_plain(plan_next_actions(model, limit=args.limit))
+        if not args.all_scores:
+            payload.pop("scored_actions", None)
+        _json_out(payload, args.pretty)
         return 0
     if args.command == "score-actions":
         _json_out(

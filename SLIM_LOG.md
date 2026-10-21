@@ -123,3 +123,11 @@ Added evaluate/depth --output while preserving complete JSON and old no-output b
 - `python -m pytest` — exit 0, 474.062s; `878 passed, 13 skipped in 473.54s (0:07:53)`
 - `python -m flowguard map models` — exit 0, 0.946s; `models: 2 passed, 0 failed`
 - `python -m flowguard map check` — exit 0, 0.611s; `check: 0 error(s), 10 warning(s), 0 info`
+
+## RG-11 — completed
+
+Source plan默认只省略scored_actions，--all-scores恢复完整评分；127项Source测试与原生选项对照通过，默认8449字节/完整28413字节，选中行动一致。
+
+- `python -m pytest tests/source` — exit 0, 14.475s; `127 passed in 13.97s`
+- `python <external>/probe_rg11.py` — exit 0, 0.903s; `default_bytes 8449 all_scores_bytes 28413 same native selected actions`
+- `python -m pytest --collect-only` — exit 0, 3.523s; `892 tests collected in 3.10s`
