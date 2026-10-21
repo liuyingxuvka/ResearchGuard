@@ -23,6 +23,7 @@ from .importance import summarize_importance
 from .library_viewer import build_library_view_payload, build_source_graph_payload
 from .loader import load_model
 from .markdown_structure import markdown_to_model_dict
+from .minimal_sets import license_model_claim
 from .report import generate_markdown_report
 from .source_library import SourceLibrary
 from .source_library_io import export_library_package, import_library_package, inspect_library_package
@@ -155,6 +156,14 @@ def build_parser() -> argparse.ArgumentParser:
     gaps.add_argument("--no-simulation", action="store_true")
     gaps.add_argument("--output")
     gaps.set_defaults(func=_cmd_gaps)
+
+    minimal = sub.add_parser(
+        "minimal-sets", help="Print one claim's minimal support and attack sets and its wording license."
+    )
+    minimal.add_argument("model")
+    minimal.add_argument("--claim", required=True)
+    minimal.add_argument("--output")
+    minimal.set_defaults(func=_cmd_minimal_sets)
 
     depth = sub.add_parser(
         "depth", help="Check argument depth (role coverage, competing conclusions, perturbations) and print the gap summary."
@@ -530,6 +539,15 @@ def _cmd_gaps(args: argparse.Namespace) -> int:
     diagnostics = diagnose_model(model, result)
     ledger = build_gap_ledger(model, result=result, diagnostics=diagnostics, include_simulation=not args.no_simulation)
     payload = ledger.to_dict()
+    if args.output:
+        _write(args.output, payload)
+    else:
+        print(json.dumps(payload, indent=2))
+    return 0
+
+
+def _cmd_minimal_sets(args: argparse.Namespace) -> int:
+    payload = license_model_claim(load_model(args.model), args.claim).to_dict()
     if args.output:
         _write(args.output, payload)
     else:

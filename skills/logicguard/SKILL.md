@@ -63,7 +63,7 @@ Do not use LogicGuard to decide factual truth, discover missing external evidenc
 3. Build or inspect the executable model before drafting a conclusion; record support, warrant, assumption, boundary, opposition, and downstream contribution.
 4. Run the native predict-validate-revise loop and the exact native checks required by the route.
 5. Close only with current target-native evidence, or return the visible non-closure terminal and the smallest typed handoff.
-6. Return the required evidence and claim boundary with safe wording (`assert`, `qualify`, or `withhold`).
+6. Return the required evidence and claim boundary with safe wording (`assert`, `qualify`, or `withhold`; `researchguard logic minimal-sets <model> --claim <id>` prints it with the minimal support and attack sets).
 
 ## Hard Gates
 

@@ -10,6 +10,7 @@ researchguard logic simulate <model> --mode fragility
 researchguard logic argument-iteration freeze <baseline> --expected-state <IN|OUT|UNDECIDED> --mode <mode> --root <claim> --node <node> [--protect-claim <claim>] [--holdout-claim <claim>] [--iteration <n> --prior-open-gap-id <gap>] --output <prediction.json>
 researchguard logic argument-iteration run <baseline> --prediction <prediction.json> [--candidate <candidate>] --decision <accept|reject> --output <result.json>
 researchguard logic gaps <model>
+researchguard logic minimal-sets <model> --claim <claim> [--output <sets.json>]
 researchguard logic report <model>
 researchguard logic outline <model>
 researchguard logic structure from-markdown <outline.md> --artifact-kind report --output <model>

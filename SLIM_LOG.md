@@ -591,3 +591,18 @@ Added the read-only model adapter and stop-decision CLI, which passes the native
 - `python -m flowguard map confirm sourceguard suite-orchestration` — exit 0, 0.221s; `confirmed 2 component(s)`
 - `python -m flowguard map check` — exit 0, 0.356s; `check: 0 error(s), 4 warning(s), 0 info`
 - `python -m flowguard release` — exit 0, 1.76s; `verify: PASS (map, lint and models only; tests not run; run python -m pytest -q separately)`
+
+## RG-50 — completed
+
+Added minimal-sets CLI and a model-native evaluator adapter; existing minimization/license algorithms and simulator are unchanged. Actual deck claim returns assert with deletion-minimal E1/L1/W1, unsupported causal claim withholds, non-Claim and missing claim reject. Root CLI still lazily imports only one researchguard module. Logic tests 145 passed (Tk available), collection 342; prompt, exports, fixed LW43 native 10 passed no skip, map/release passed.
+
+- `python -m pytest tests/logic` — exit 0, 33.768s; `145 passed in 33.36s`
+- `python <external>/probe_rg50.py` — exit 0, 1.351s; `root import RG module lines 1 ['import time:       879 |       4751 | researchguard.cli']`
+- `python scripts/check_prompt_bundles.py` — exit 0, 0.064s; `pass`
+- `python <external>/check_exports.py` — exit 0, 0.511s; `exports ok`
+- `python -m pytest -p no:cacheprovider tests/contract/test_researchguard_handoff.py --junitxml <external>/RG-50-lw43-junit.xml --basetemp <external>/RG-50-lw43-temp` — exit 0, 0.801s; `============================== 10 passed in 0.36s ==============================`
+- `python <external>/verify_lw_junit.py <external>/RG-50-lw43-junit.xml` — exit 0, 0.088s; `10 actual PASSED, 0 skipped; real native provider-to-reader bridge PASSED/ready, not version-skipped`
+- `python -m pytest --collect-only` — exit 0, 3.459s; `342 tests collected in 2.72s`
+- `python -m flowguard map confirm logicguard suite-orchestration` — exit 0, 0.343s; `confirmed 2 component(s)`
+- `python -m flowguard map check` — exit 0, 0.245s; `check: 0 error(s), 4 warning(s), 0 info`
+- `python -m flowguard release` — exit 0, 2.262s; `verify: PASS (map, lint and models only; tests not run; run python -m pytest -q separately)`
