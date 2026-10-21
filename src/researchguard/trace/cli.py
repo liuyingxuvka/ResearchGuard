@@ -161,7 +161,16 @@ def cmd_evaluate(args: argparse.Namespace) -> int:
     except (OSError, SchemaError, ValueError, InferenceError) as exc:
         _print_json({"ok": False, "error": str(exc)}, pretty=args.pretty)
         return 2
-    _print_json(result.to_dict(), pretty=args.pretty)
+    payload = result.to_dict()
+    if args.output:
+        Path(args.output).write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+        _print_json({
+            "ok": payload.get("ok"), "output": args.output,
+            "traces": [{key: trace.get(key) for key in ("trace_id", "validation_status", "support")} for trace in payload.get("traces", [])],
+            "gaps": payload.get("gaps"), "contradictions": payload.get("contradictions"),
+        }, pretty=args.pretty)
+        return 0
+    _print_json(payload, pretty=args.pretty)
     return 0
 
 
@@ -178,7 +187,17 @@ def cmd_depth(args: argparse.Namespace) -> int:
     except (OSError, SchemaError, ValueError, InferenceError) as exc:
         _print_json({"ok": False, "error": str(exc)}, pretty=args.pretty)
         return 2
-    _print_json(receipt.to_dict(), pretty=args.pretty)
+    payload = receipt.to_dict()
+    if args.output:
+        Path(args.output).write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+        summary = {key: payload.get(key) for key in (
+            "closure_status", "broad_claim_licensed", "covered_claim_scope", "unresolved_gaps",
+            "untested_high_impact", "critical_uncovered_ids", "live_alternative_ids",
+        )}
+        summary["output"] = args.output
+        _print_json(summary, pretty=args.pretty)
+        return 0
+    _print_json(payload, pretty=args.pretty)
     return 0
 
 
@@ -592,6 +611,8 @@ def build_parser() -> argparse.ArgumentParser:
     ]:
         command = sub.add_parser(name)
         command.add_argument("model")
+        if name in {"evaluate", "depth"}:
+            command.add_argument("--output")
         if name == "depth":
             command.add_argument("--max-perturbations", type=int)
             command.add_argument("--claim-scope", choices=["bounded", "broad"], default="broad")

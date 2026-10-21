@@ -112,3 +112,14 @@ Added a small TraceGuard export bundle→starter LogicGuard model converter and 
 - `python <external>/probe_rg09.py` — exit 0, 3.338s; `Trace export→logic import→validateOK; missing_warrant preserved; SourceGuard seed rejected rc1`
 - `python -m pytest --collect-only` — exit 0, 5.124s; `890 tests collected in 4.50s`
 - `python -m flowguard map check` — exit 0, 0.996s; `check: 0 error(s), 10 warning(s), 0 info`
+
+## RG-10 — completed
+
+Added evaluate/depth --output while preserving complete JSON and old no-output behavior; removed only exported storyline_depth duplicate. Targeted164passed; nativefile195043bytes,summary968bytes (longer owned output path),depthsummary8keys,export11218bytes. Collection891; checkpoint878passed13skipped in473.54s,2models pass,map0errors.
+
+- `python -m pytest tests/trace tests/logic/test_cli.py` — exit 0, 126.066s; `164 passed in 125.14s (0:02:05)`
+- `python <external>/probe_rg10.py` — exit 0, 4.239s; `{"depth": {"file_bytes": 152706, "stdout_bytes": 326, "summary_keys": ["broad_claim_licensed", "closure_status", "covered_claim_scope", "critical_uncovered_ids", "live_alternative_ids", "output", "unresolved_gaps", "untested_high_impact"]}, "evaluate": {"file_bytes": 195043, "stdout_bytes": 968, "summary_keys": ["contradictions", "gaps", "ok", "output", "traces"]}, "export": {"file_bytes": 11218, "storyline_depth_present": false}}`
+- `python -m pytest --collect-only` — exit 0, 3.648s; `891 tests collected in 3.20s`
+- `python -m pytest` — exit 0, 474.062s; `878 passed, 13 skipped in 473.54s (0:07:53)`
+- `python -m flowguard map models` — exit 0, 0.946s; `models: 2 passed, 0 failed`
+- `python -m flowguard map check` — exit 0, 0.611s; `check: 0 error(s), 10 warning(s), 0 info`

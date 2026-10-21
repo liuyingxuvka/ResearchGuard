@@ -151,7 +151,6 @@ def logicguard_bundle(result: EvaluationResult) -> dict[str, object]:
         "claims": claims,
         "handoffs": [_as_dict(item) for item in getattr(result, "handoffs", ()) if hasattr(item, "to_dict")],
         "consolidation_findings": [_as_dict(item) for item in getattr(result, "consolidation_findings", ()) if hasattr(item, "to_dict")],
-        "storyline_depth": _as_dict(getattr(result, "storyline_depth", None)) or None,
     }
 
 

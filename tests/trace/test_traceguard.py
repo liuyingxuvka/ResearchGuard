@@ -623,3 +623,15 @@ def test_hand_written_model_needs_only_schema_version(tmp_path):
     path = tmp_path / "bare.yaml"
     path.write_text(yaml.safe_dump(data), encoding="utf-8")
     assert load_model(path).traces
+
+
+def test_cli_evaluate_and_depth_output_write_full_json_and_print_summary(tmp_path: Path):
+    for command, expected_key in (("evaluate", "traces"), ("depth", "closure_status")):
+        output = tmp_path / f"{command}.json"
+        result = subprocess.run([sys.executable, "-m", "researchguard", "trace", command,
+                                 "examples/trace/incident_response_storyline.yaml", "--output", str(output)],
+                                cwd=ROOT, text=True, capture_output=True)
+        assert result.returncode == 0, result.stdout + result.stderr
+        assert expected_key in json.loads(result.stdout)
+        assert len(result.stdout) < 5000
+        assert len(output.read_text(encoding="utf-8")) > len(result.stdout)
