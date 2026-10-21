@@ -15,7 +15,7 @@ SPEC.loader.exec_module(MODULE)
 
 
 def manifest() -> dict:
-    return json.loads((ROOT / "researchguard" / "prompt_bundle_manifest.json").read_text(encoding="utf-8"))
+    return json.loads((ROOT / "scripts" / "prompt_bundle_manifest.json").read_text(encoding="utf-8"))
 
 
 def test_current_prompt_bundles_and_index_pass() -> None:

@@ -382,3 +382,15 @@ Source契约可选：缺省直接运行模型并正常观察更新，嵌入/显�
 - `python -m flowguard map models` — exit 0, 1.659s; `models: 2 passed, 0 failed`
 - `python -m pytest --collect-only` — exit 0, 2.967s; `547 tests collected in 2.35s`
 - `python -m flowguard map check` — exit 0, 0.345s; `check: 0 error(s), 11 warning(s), 0 info`
+
+## RG-35 — completed
+
+预算manifest仅移到scripts并改两个消费者路径/说明，内容不变，同名顶层researchguard目录移除。checker pass/5pass、旧路径残留为空、收集547；完整检查点547pass（tkinter可用）、双模型通过、map0error11阶段性WARN。
+
+- `python scripts/check_prompt_bundles.py` — exit 0, 0.048s; `pass`
+- `python -m pytest tests/test_prompt_bundles.py` — exit 0, 0.263s; `5 passed in 0.02s`
+- `python -c from pathlib import Path;import subprocess;assert not Path("researchguard").exists();p=subprocess.run(["rg","-n",r"\"researchguard\" / \"prompt_bundle_manifest.json\"","scripts","tests"],capture_output=True,text=True);print(p.stdout,end="");assert p.returncode==1;print("same-name root namespace directory absent; manifest content retained")` — exit 0, 0.046s; `same-name root namespace directory absent; manifest content retained`
+- `python -m pytest --collect-only` — exit 0, 2.529s; `547 tests collected in 2.14s`
+- `python -m pytest` — exit 0, 107.683s; `547 passed in 107.22s (0:01:47)`
+- `python -m flowguard map models` — exit 0, 1.975s; `models: 2 passed, 0 failed`
+- `python -m flowguard map check` — exit 0, 0.497s; `check: 0 error(s), 11 warning(s), 0 info`

@@ -1,4 +1,4 @@
-"""Check ResearchGuard entry budgets, conditional reference edges, and admission index."""
+"""Check ResearchGuard entry budgets and conditional reference edges."""
 
 from __future__ import annotations
 
@@ -16,7 +16,7 @@ if str(SRC) not in sys.path:
 
 
 
-MANIFEST_PATH = ROOT / "researchguard" / "prompt_bundle_manifest.json"
+MANIFEST_PATH = ROOT / "scripts" / "prompt_bundle_manifest.json"
 
 
 def _read_manifest(path: Path = MANIFEST_PATH) -> Mapping[str, Any]:
