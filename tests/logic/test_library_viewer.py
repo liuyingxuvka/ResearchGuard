@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+
 from researchguard.logic import SourceLibrary, build_library_view_payload, build_source_graph_payload
 from researchguard.logic_viewer.ui_data import build_card_detail_payload, build_route_view_payload, build_search_payload
 
@@ -215,6 +217,7 @@ def test_desktop_graph_canvas_supports_pan_zoom_reset_and_text_only_nodes() -> N
 
 
 def test_detail_header_meta_hides_internal_source_noise() -> None:
+    pytest.importorskip("tkinter")
     from researchguard.logic_viewer.desktop_app import _detail_header_meta_line
 
     card = {
