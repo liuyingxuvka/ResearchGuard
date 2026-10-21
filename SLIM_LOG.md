@@ -267,3 +267,16 @@ Coordinator grant: after all RG-38 purpose checks pass, continue RG-39–RG-54 a
 - `python -m pytest` — exit 0, 407.622s; `821 passed, 13 skipped in 406.86s (0:06:46)`
 - `python -m flowguard map models` — exit 0, 1.471s; `models: 2 passed, 0 failed`
 - `python -m flowguard map check` — exit 0, 0.54s; `check: 0 error(s), 10 warning(s), 0 info`
+
+## RG-SUP-01 — completed (separate coordinator-authorized fix)
+
+Cross-repository review found that the RG-12 copied installer used shallow stat comparisons. An independent temporary-directory probe confirmed that a one-byte same-size change with restored mtime was falsely called current (CLI 0); the new assertion failed before the fix. Compare every existing common file with `read_bytes()` instead, keep the directory traversal and existing diagnostics, and report common-funny type/stat mismatches and read errors. No manifest or receipt owner is added.
+
+- Before fix: real CLI incorrectly returned current/0; targeted regression failed (expected exit 1).
+- After fix: `python -m pytest tests/test_install_skill.py` — exit 0, 2 passed; existing test includes equal-stat byte drift, ordinary drift and file/directory mismatch.
+- Real CLI now returns 1 with `logicguard: differs: SKILL.md`; equal bytes still pass.
+- Same-process probe: equal bytes pass; same-stat changed bytes fail; restored bytes pass; type mismatch fails.
+- System Python installation/check remains current/0.
+- `python -m flowguard map check` — exit 0, 0 errors / 10 interim warnings; component description/confirmation remains scheduled at RG-38.
+
+Full command logs, actual return codes, pre/post installer content hashes and independent-review evidence are external.
