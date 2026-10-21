@@ -10,22 +10,19 @@
   "components": [
     {
       "id": "researchguard-suite",
-      "summary": "Own the package version and the suite identity and fingerprint that LogicWriting reads.",
+      "summary": "Own the package version and the suite constants SUITE_ID and MEMBER_IDS.",
       "responsibilities": [
-        "Own __version__, SUITE_ID, MEMBER_IDS and suite_identity/suite_fingerprint; hold no member logic and no routing."
+        "Own __version__, SUITE_ID and MEMBER_IDS; hold no member logic and no routing."
       ],
       "files": [
-        "src/researchguard/__init__.py",
-        "src/researchguard/suite.py"
+        "src/researchguard/__init__.py"
       ],
-      "entrypoints": [
-        "src/researchguard/suite.py:suite_identity"
-      ],
+      "entrypoints": [],
       "state": [
-        "package version and suite identity"
+        "package version"
       ],
       "side_effects": [
-        "read current package source files to compute the suite fingerprint"
+        "none"
       ],
       "depends_on": [],
       "tests": [
@@ -36,7 +33,7 @@
         ".flowguard/models/researchguard_suite_model.py"
       ],
       "status": "confirmed",
-      "fingerprint": "sha256:d8599ebdc452f9a536f9a2e3ebee1fc5f804ba4bf8486d21b56d01c8707f1e23"
+      "fingerprint": "sha256:2406227c0251358fad4f46de190b46eafcf16a1308edbc430cb03f5ce854196a"
     },
     {
       "id": "suite-orchestration",

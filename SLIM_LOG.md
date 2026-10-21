@@ -560,3 +560,20 @@ After verifying immutable LW43 source origin, all 353 hashes and absence of reti
 - `python -m flowguard map confirm logicguard researchguard-suite suite-orchestration` — exit 0, 0.926s; `confirmed 3 component(s)`
 - `python -m flowguard map check` — exit 0, 0.36s; `check: 0 error(s), 4 warning(s), 0 info`
 - `python -m flowguard release` — exit 0, 5.174s; `verify: PASS (map, lint and models only; tests not run; run python -m pytest -q separately)`
+
+## RG-48 — completed
+
+Retired the caller-free suite fingerprint module after exact consumer preconditions passed. Package version/constants and native member CLI/version output remain. 19 focused suite/install/contract tests passed; complete checkpoint 338 passed with Tk available; both models passed, fixed LW43 native bridge actual ready/PASSED 10 passed zero skips; active residual scan, exports/map/local release passed.
+
+- `python -c import subprocess;p=subprocess.run(["rg","-n",r"suite_fingerprint|suite_identity|governed_file_manifest|researchguard\.suite\b","src","tests","scripts",".flowguard/models"],capture_output=True,text=True);print(p.stdout,end="");assert p.returncode==0 and all(x.startswith("src/researchguard/suite.py:") for x in p.stdout.splitlines());p=subprocess.run(["rg","-n","-g","*.py",r"guard-contract|native_depth_receipt|suite_fingerprint|researchguard\.suite","<LW43-snapshot>"],capture_output=True,text=True);assert p.returncode==1;print("only retired suite module self references; no immutable LW43 callers")` — exit 0, 0.073s; `only retired suite module self references; no immutable LW43 callers`
+- `python -m pytest tests/test_root_cli.py tests/test_skill_suite.py tests/test_prompt_bundles.py tests/test_install_skill.py tests/contract` — exit 0, 3.651s; `19 passed in 2.59s`
+- `python -c import subprocess;p=subprocess.run(["rg","-n","-i",r"suite_fingerprint|suite_identity|governed_file_manifest|researchguard\.suite\b|suite fingerprint","src","tests","scripts","skills","docs","README.md",".flowguard/models","pyproject.toml",".github"],capture_output=True,text=True);print(p.stdout,end="");assert p.returncode==1;print("retired suite fingerprint surface absent")` — exit 0, 0.145s; `retired suite fingerprint surface absent`
+- `python <external>/check_exports.py` — exit 0, 1.825s; `exports ok`
+- `python -m pytest -p no:cacheprovider tests/contract/test_researchguard_handoff.py --junitxml <external>/RG-48-lw43-junit.xml --basetemp <external>/RG-48-lw43-temp` — exit 0, 1.04s; `============================== 10 passed in 0.54s ==============================`
+- `python <external>/verify_lw_junit.py <external>/RG-48-lw43-junit.xml` — exit 0, 0.076s; `10 actual PASSED, 0 skipped; real native provider-to-reader bridge PASSED/ready, not version-skipped`
+- `python -m pytest --collect-only` — exit 0, 2.998s; `338 tests collected in 2.47s`
+- `python -m flowguard map confirm researchguard-suite` — exit 0, 0.146s; `confirmed 1 component(s)`
+- `python -m flowguard map check` — exit 0, 0.317s; `check: 0 error(s), 4 warning(s), 0 info`
+- `python -m flowguard release` — exit 0, 4.637s; `verify: PASS (map, lint and models only; tests not run; run python -m pytest -q separately)`
+- `python -m pytest` — exit 0, 77.397s; `338 passed in 76.81s (0:01:16)`
+- `python -m flowguard map models` — exit 0, 1.905s; `models: 2 passed, 0 failed`

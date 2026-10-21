@@ -11,8 +11,8 @@ Codex entrypoints:
 - `experimentguard` recommends minimum finite experiment sets that distinguish
   caller-declared hypotheses.
 
-All five entrypoints use one `researchguard` Python distribution, one suite
-version, and one suite fingerprint. A selected member failure is terminal.
+All five entrypoints use one `researchguard` Python distribution and one suite
+version. A selected member failure is terminal.
 ResearchGuard does not retry through another member, silently downgrade, or
 load legacy package formats.
 
