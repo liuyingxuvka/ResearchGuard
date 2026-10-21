@@ -170,12 +170,6 @@
     },
     {
       "skill_id": "traceguard",
-      "trigger_id": "route:trace-blueprint",
-      "declared_in": "skills/traceguard/SKILL.md",
-      "reference": "skills/traceguard/references/trace-blueprint-contract.md"
-    },
-    {
-      "skill_id": "traceguard",
       "trigger_id": "route:case-library",
       "declared_in": "skills/traceguard/SKILL.md",
       "reference": "skills/traceguard/references/routes/case-library.md"
@@ -203,12 +197,6 @@
       "trigger_id": "trigger:safe-output",
       "declared_in": "skills/traceguard/SKILL.md",
       "reference": "skills/traceguard/references/safe-output.md"
-    },
-    {
-      "skill_id": "traceguard",
-      "trigger_id": "trigger:template-pack",
-      "declared_in": "skills/traceguard/SKILL.md",
-      "reference": "skills/traceguard/references/validated-template-pack.md"
     },
     {
       "skill_id": "experimentguard",

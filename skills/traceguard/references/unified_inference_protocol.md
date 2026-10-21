@@ -112,7 +112,7 @@ claim boundary. Every reported factor id resolves inside that same receipt.
    final statuses.
 4. Declare mechanism, confounders, alternatives, chronology, and scope for
    causal exploration.
-5. Run canonical evaluation and read the inference receipt.
+5. Run canonical evaluation (`researchguard trace report <model.yaml> --format markdown`, or `evaluate --output <file>` for the full JSON).
 6. Run same-engine perturbations for why/what-if/evidence-importance questions.
 7. Report support, opposition, binding constraints, gaps, and bounded wording.
 8. Hand consequential final claim licensing to LogicGuard.
@@ -129,5 +129,3 @@ responds to declared changes.
 
 It does not by itself establish factual truth, statistically identify causal
 effects, predict an intervention, or license final prose.
-
-When a trace blueprint is requested, the blueprint may project this receipt's identities, contributions, alternatives, and bounded causal status. It must verify current model/problem fingerprints and cannot rescore, reinterpret solver failure, or substitute an authored pass receipt. See `trace-blueprint-contract.md`.

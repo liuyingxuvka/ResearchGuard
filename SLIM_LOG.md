@@ -223,3 +223,11 @@ SourceGuard删信息蓝图/模板/目的证明和手填每义务哈希说明，�
 - `python -m pytest tests/test_prompt_bundles.py tests/test_skill_suite.py tests/source` — exit 0, 14.89s; `136 passed in 14.21s`
 - `python -m pytest --collect-only` — exit 0, 4.492s; `860 tests collected in 4.00s`
 - `python -c import subprocess; p=subprocess.run(["rg","-n","-i","issuer|DNA|FlowGuard-owned|blueprint|template pack|purpose proof","skills/sourceguard"],capture_output=True,text=True); print(p.stdout,end=""); assert p.returncode==1; print("SourceGuard removed-boundary terms absent")` — exit 0, 0.05s; `SourceGuard removed-boundary terms absent`
+
+## RG-22 — completed
+
+Trace技能去蓝图/模板/目的契约说明，保数学推理、事件/解释/结果边界及案例保存未评估声明；命令改短摘要/output，补真实required holdout。入口5557字节，10pass，指定残留为空，decide原生help中holdout声明2处。
+
+- `python scripts/check_prompt_bundles.py --json` — exit 0, 0.053s; `}`
+- `python -m pytest tests/test_prompt_bundles.py tests/test_skill_suite.py` — exit 0, 2.089s; `10 passed in 1.78s`
+- `python -c import subprocess,sys; p=subprocess.run(["rg","-n","-i","issuer|DNA|FlowGuard-owned|blueprint|template pack|purpose-contract|purpose contract|library-depth|guard_model","skills/traceguard"],capture_output=True,text=True);print(p.stdout,end="");assert p.returncode==1;p=subprocess.run([sys.executable,"-m","researchguard","trace","iterate","decide","--help"],capture_output=True,text=True);assert p.returncode==0;assert p.stdout.count("--holdout-observation")==2;print("removed terms absent; native decide help declares holdout twice")` — exit 0, 0.434s; `removed terms absent; native decide help declares holdout twice`

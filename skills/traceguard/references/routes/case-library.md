@@ -28,23 +28,19 @@ Do not use it as a replacement for LogicGuard source library. LogicGuard source 
 3. Save sources before extracted evidence.
 4. Save evidence before events and traces.
 5. Keep event facts separate from explanation candidates such as motive, effect, or future impact.
-6. Before model construction, declare and prove this model instance's
-   target-local prevention purpose, boundary, selected failure ids, one
-   known-good, and one known-bad per selected failure.
-7. Build or update the TraceGuard model from the library with that exact
-   purpose contract.
-8. Run TraceGuard's one canonical HL-MRF/QP evaluation.
-9. Write gaps, contradictions, limiting evidence needs, execution-chain needs, handoff follow-ups, and same-class review findings back into the case.
-10. When native storyline-depth evaluation runs, write unresolved alternatives,
+6. Build or update the TraceGuard model from the library.
+7. Run TraceGuard's one canonical HL-MRF/QP evaluation.
+8. Write gaps, contradictions, limiting evidence needs, execution-chain needs, handoff follow-ups, and same-class review findings back into the case.
+9. When native storyline-depth evaluation runs, write unresolved alternatives,
     causal-mechanism/confounder gaps, the complete candidate-universe
     fingerprint, every untested high-impact perturbation,
     critical-uncovered ids, expected-sensitivity mismatches, and the canonical
     inference receipt id back into the case as an immutable observation; do
     not copy inferred status, rank, support, or causal license into input
     ledgers and do not reproduce the evaluator inside the library route.
-11. For non-trivial investigations, preserve trace-card coverage: leads detected, trace cards created, layer coverage, missing roles, access gaps, live alternatives, and downstream handoff ids.
-12. Use LogicGuard later for final claim support checks when writing a research-backed final artifact such as a report, paper, memo, brief, article, deck storyline, or public conclusion.
-13. Preserve native case-library validation, saved model identities, evaluation
+10. For non-trivial investigations, preserve trace-card coverage: leads detected, trace cards created, layer coverage, missing roles, access gaps, live alternatives, and downstream handoff ids.
+11. Use LogicGuard later for final claim support checks when writing a research-backed final artifact such as a report, paper, memo, brief, article, deck storyline, or public conclusion.
+12. Preserve native case-library validation, saved model identities, evaluation
     results and actual gap writeback. If a case has only been saved, state
     saved-but-not-evaluated. The manual case-library ledger-field helper is
     retired; it adds no native inference or writeback evidence. Final prose
@@ -177,8 +173,8 @@ researchguard trace library add-source <library-root> <case-id> <direction-id> -
 researchguard trace library add-evidence <library-root> <case-id> <direction-id> --evidence-id <evidence-id> --source-id <source-id> --text "<evidence text>"
 researchguard trace library list <library-root> --pretty
 researchguard trace library search <library-root> <query> --pretty
-researchguard trace library build-model <library-root> <case-id> --purpose-contract <task-purpose.json> --output <model.yaml> --pretty
-researchguard trace evaluate <model.yaml> --pretty
+researchguard trace library build-model <library-root> <case-id> --output <model.yaml> --pretty
+researchguard trace evaluate <model.yaml> --output <evaluation.json>
 researchguard trace library write-back-gaps <library-root> <case-id> --result <evaluation.json> --pretty
 researchguard trace library validate <library-root> --pretty
 ```
@@ -210,15 +206,7 @@ The saved thesis handoff material is already final prose.
 ## Native completion and stopping
 
 1. For saving or searching only, use the actual library init/create-case/add-direction/add-source/add-evidence/list/search operation and report its result. Saved material is not an evaluated storyline.
-2. For reconstruction, validate_library, build_model/write_model with the actual purpose contract, then run the current canonical evaluate_model once.
-3. Full, causal or predictive claims retain native storyline depth, real target-local purpose proof and an independent holdout. Use write_back_gaps when needed.
+2. For reconstruction, validate_library, build_model/write_model, then run the current canonical evaluate_model once.
+3. Full, causal or predictive claims retain native storyline depth and an independent holdout. Use write_back_gaps when needed.
 
-Stop at the actual operation result or current inference/depth non-closure terminal. Do not invent a scheduler identity or create another library-depth PASS.
-
-Before building or materially changing a real TraceGuard model, supply the current task-local `researchguard.trace.task_model_purpose.v1` to `researchguard trace library build-model --purpose-contract ...`. Preserve the model id, prevention purpose, boundary, selected native failure ids, one known-good and one known-bad per failure. The runtime `researchguard.trace.purpose_contract` and `researchguard.trace.guard_model.verify` owners retain the actual proof rules and block missing, late, stale or wrong-instance evidence. Saving, searching and exporting material do not create this model-proof obligation.
-
-`researchguard trace library-depth PACKAGE.json` is an optional declared-package shape diagnostic. It does not reread or authenticate evidence, execute inference, verify scheduler/obligation/relationship declarations, or license native closure. The compatibility scheduled-package builder snapshots file inventory and hashes with unverified declarations; it is not a closure producer.
-
-## Template packs on request
-
-Only when the task requests an existing template pack, load [validated-template-pack.md](../validated-template-pack.md) and use the corresponding native template operation. Templates remain non-factual model skeletons and never replace native validation.
+Stop at the actual operation result or current inference/depth non-closure terminal. Do not invent a scheduler identity.
