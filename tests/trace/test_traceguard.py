@@ -15,7 +15,6 @@ from researchguard.trace.evaluator import evaluate_model
 from researchguard.trace.handoff import derive_trace_handoffs, review_trace_consolidation
 from researchguard.trace.loader import load_model
 from researchguard.trace.schema import EntityMention, SchemaError, TraceGuardModel
-from researchguard.trace.soft_logic import implication_violation, soft_and, soft_not, soft_or, weighted_loss
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -56,14 +55,6 @@ def test_generic_predicate_bypass_is_rejected() -> None:
         TraceGuardModel.from_dict(data)
 
 
-def test_soft_logic_operators_and_loss() -> None:
-    assert soft_not(0.25) == pytest.approx(0.75)
-    assert soft_and(0.8, 0.7) == pytest.approx(0.5)
-    assert soft_and(0.9, 0.9, 0.9) == pytest.approx(0.7)
-    assert soft_or(0.6, 0.7) == pytest.approx(1.0)
-    assert implication_violation(0.8, 0.3) == pytest.approx(0.5)
-    assert weighted_loss(0.5, 2.0) == pytest.approx(1.0)
-    assert weighted_loss(0.5, 2.0, squared=True) == pytest.approx(0.5)
 
 
 def test_project_radar_candidate_report_boundaries() -> None:

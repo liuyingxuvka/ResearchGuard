@@ -369,3 +369,16 @@ Source契约可选：缺省直接运行模型并正常观察更新，嵌入/显�
 - `python <external>/probe_rg33.py` — exit 0, 0.154s; `version authority scans passed; truthful journal preserved`
 - `python -m pytest --collect-only` — exit 0, 5.003s; `548 tests collected in 3.17s`
 - `python -m flowguard map check` — exit 0, 0.291s; `check: 0 error(s), 11 warning(s), 0 info`
+
+## RG-34 — completed
+
+删明确授权无人读取的存档/迁移/资源副本/旧参考及5空壳模块，保真正viewer图标、技能推理协议和simulator函数。41pass，4图标hash前后全同、双模型通过、547收集/map0error。原目录探针因ignored __pycache__多一项exit1，保原始列举/期望；不清理此缓存，限定排除后git ls-files恰2模型且活跃残留为空。
+
+- `python <external>/probe_rg34_assets.py before` — exit 0, 0.032s; `4 duplicate icon copies exactly match retained native viewer assets`
+- `python -m pytest tests/trace/test_traceguard.py tests/logic/test_report.py` — exit 0, 23.47s; `41 passed in 23.10s`
+- `python <external>/probe_rg34_assets.py after` — exit 0, 0.05s; `4 native viewer icons remain byte-identical; only duplicate resources removed`
+- `python <external>/probe_rg34.py` — exit 1, 0.038s; `AssertionError: {'researchguard_suite_model.py', '__pycache__', 'sourceguard_content_anchor_oracle_model.py'}`
+- `python <external>/probe_rg34_product_inventory.py` — exit 0, 0.066s; `unused directories/active references absent; true inference reference and simulator functions retained`
+- `python -m flowguard map models` — exit 0, 1.659s; `models: 2 passed, 0 failed`
+- `python -m pytest --collect-only` — exit 0, 2.967s; `547 tests collected in 2.35s`
+- `python -m flowguard map check` — exit 0, 0.345s; `check: 0 error(s), 11 warning(s), 0 info`

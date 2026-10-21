@@ -18,7 +18,6 @@
       "files": [
         "src/researchguard/__init__.py",
         "src/researchguard/portable_material.py",
-        "src/researchguard/resources/__init__.py",
         "src/researchguard/suite.py"
       ],
       "entrypoints": [
@@ -109,14 +108,12 @@
         "src/researchguard/logic/acceptance.py",
         "src/researchguard/logic/argument_modeling.py",
         "src/researchguard/logic/citation_matrix.py",
-        "src/researchguard/logic/counterexample.py",
         "src/researchguard/logic/delivery.py",
         "src/researchguard/logic/diagnostics.py",
         "src/researchguard/logic/evaluation_overlay.py",
         "src/researchguard/logic/evaluator.py",
         "src/researchguard/logic/execution_depth.py",
         "src/researchguard/logic/file_model_store.py",
-        "src/researchguard/logic/fragility.py",
         "src/researchguard/logic/gap_ledger.py",
         "src/researchguard/logic/guard_model_contract.py",
         "src/researchguard/logic/hierarchy.py",
@@ -208,10 +205,8 @@
         "src/researchguard/source/guard_contract.py",
         "src/researchguard/source/handoff.py",
         "src/researchguard/source/loader.py",
-        "src/researchguard/source/multimodal.py",
         "src/researchguard/source/planner.py",
         "src/researchguard/source/report.py",
-        "src/researchguard/source/retrieval.py",
         "src/researchguard/source/schema.py",
         "src/researchguard/source/scoring.py",
         "src/researchguard/source/stop_decision.py",
@@ -272,7 +267,6 @@
         "src/researchguard/trace/report.py",
         "src/researchguard/trace/results.py",
         "src/researchguard/trace/schema.py",
-        "src/researchguard/trace/soft_logic.py",
         "src/researchguard/trace/stage_model.py",
         "src/researchguard/trace/storyline_depth.py",
         "src/researchguard/trace/task_iteration.py",
@@ -361,30 +355,6 @@
       "models": [],
       "status": "confirmed",
       "fingerprint": "sha256:f15f7de46d754e3e2dfcf475ec4b370687f1ad0df43c85d3f88559b05f0b0c37"
-    },
-    {
-      "id": "migration",
-      "summary": "Own one-way archive projection authoring without restoring retired control tools.",
-      "responsibilities": [
-        "Own one-way archive projection authoring without restoring retired control tools."
-      ],
-      "files": [
-        "migration/**/*.py",
-        "migration/*.py"
-      ],
-      "entrypoints": [],
-      "state": [],
-      "side_effects": [],
-      "depends_on": [
-        "logicguard",
-        "researchguard-suite",
-        "sourceguard",
-        "traceguard"
-      ],
-      "tests": [],
-      "models": [],
-      "status": "confirmed",
-      "fingerprint": "sha256:15760db8ad012ae9b30a85c6dc13406ce0b3133be6c15f04cb69c1ecc23d6584"
     }
   ],
   "flows": [
