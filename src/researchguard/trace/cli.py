@@ -13,7 +13,6 @@ from .export_logicguard import render_logicguard_yaml
 from .inference.types import InferenceError
 from . import library as case_library
 from .loader import dump_yaml, load_model
-from .purpose_contract import GuardPurposeContractError, bind_task_guard_purpose
 from .report import render_markdown, render_text
 from .schema import SchemaError
 from .validation import validate_references
@@ -251,21 +250,7 @@ def cmd_export_logicguard(args: argparse.Namespace) -> int:
 
 
 def cmd_create(args: argparse.Namespace) -> int:
-    if args.purpose_contract is None:
-        Path(args.output).write_text(dump_yaml(STARTER_MODEL), encoding="utf-8")
-        return 0
-    try:
-        text = dump_yaml(
-            bind_task_guard_purpose(
-                STARTER_MODEL,
-                contract_path=args.purpose_contract,
-                candidate_path=args.output,
-            )
-        )
-    except GuardPurposeContractError as exc:
-        _print_json({"ok": False, "error_code": exc.code, "error": str(exc)})
-        return 2
-    Path(args.output).write_text(text, encoding="utf-8")
+    Path(args.output).write_text(dump_yaml(STARTER_MODEL), encoding="utf-8")
     return 0
 
 
@@ -524,7 +509,6 @@ def cmd_library(args: argparse.Namespace) -> int:
                 args.case_id,
                 args.output,
                 directions=args.direction or [],
-                purpose_contract=args.purpose_contract,
             )
             payload = {"ok": True, "output": args.output, "case_id": args.case_id, "directions": payload["metadata"]["directions"]}
         elif args.library_command == "validate":
@@ -577,7 +561,6 @@ def build_parser() -> argparse.ArgumentParser:
 
     create = sub.add_parser("create")
     create.add_argument("--output", required=True)
-    create.add_argument("--purpose-contract")
     create.set_defaults(handler=cmd_create)
 
     simulate = sub.add_parser("simulate")
@@ -734,7 +717,6 @@ def build_parser() -> argparse.ArgumentParser:
     build_model.add_argument("root")
     build_model.add_argument("case_id")
     build_model.add_argument("--output", required=True)
-    build_model.add_argument("--purpose-contract")
     build_model.add_argument("--direction", action="append")
     build_model.add_argument("--pretty", action="store_true")
     build_model.set_defaults(handler=cmd_library)

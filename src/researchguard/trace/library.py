@@ -20,7 +20,6 @@ from typing import Any, Iterable
 import yaml
 
 from .loader import dump_yaml, load_model
-from .purpose_contract import bind_task_guard_purpose
 
 
 LIBRARY_VERSION = "0.3"
@@ -382,8 +381,6 @@ def build_model(
     case_id: str,
     *,
     directions: Iterable[str] = (),
-    purpose_contract: str | Path | None = None,
-    candidate_path: str | Path,
 ) -> dict[str, Any]:
     paths = require_library(root)
     cid = slug(case_id)
@@ -421,13 +418,7 @@ def build_model(
         },
         **merged,
     }
-    if purpose_contract is None:
-        return model
-    return bind_task_guard_purpose(
-        model,
-        contract_path=purpose_contract,
-        candidate_path=candidate_path,
-    )
+    return model
 
 
 def write_model(
@@ -436,14 +427,11 @@ def write_model(
     output: str | Path,
     *,
     directions: Iterable[str] = (),
-    purpose_contract: str | Path | None = None,
 ) -> dict[str, Any]:
     model = build_model(
         root,
         case_id,
         directions=directions,
-        purpose_contract=purpose_contract,
-        candidate_path=output,
     )
     write_yaml(Path(output), model)
     load_model(output)

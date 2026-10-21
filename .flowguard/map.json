@@ -252,7 +252,6 @@
         "src/researchguard/trace/entity_resolution.py",
         "src/researchguard/trace/evaluator.py",
         "src/researchguard/trace/export_logicguard.py",
-        "src/researchguard/trace/guard_model/verify.py",
         "src/researchguard/trace/handoff.py",
         "src/researchguard/trace/inference/__init__.py",
         "src/researchguard/trace/inference/compiler.py",
@@ -270,7 +269,6 @@
         "src/researchguard/trace/inference/types.py",
         "src/researchguard/trace/library.py",
         "src/researchguard/trace/loader.py",
-        "src/researchguard/trace/purpose_contract.py",
         "src/researchguard/trace/report.py",
         "src/researchguard/trace/results.py",
         "src/researchguard/trace/schema.py",
@@ -353,8 +351,7 @@
         "logicguard",
         "researchguard-suite",
         "sourceguard",
-        "suite-orchestration",
-        "traceguard"
+        "suite-orchestration"
       ],
       "tests": [
         "tests/test_prompt_bundles.py",

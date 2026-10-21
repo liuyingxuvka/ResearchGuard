@@ -58,7 +58,7 @@ include = ["researchguard*"]
 ]
 "researchguard.logic_viewer" = ["assets/*"]
 "researchguard.source" = ["template_pack_catalog.json"]
-"researchguard.trace" = ["template_pack_catalog.json", "guard_model/*.json"]
+"researchguard.trace" = ["template_pack_catalog.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

@@ -326,3 +326,17 @@ Source契约可选：缺省直接运行模型并正常观察更新，嵌入/显�
 - `python scripts/check_prompt_bundles.py` — exit 0, 0.043s; `pass`
 - `python -m pytest --collect-only` — exit 0, 3.324s; `567 tests collected in 2.89s`
 - `python -m flowguard map check` — exit 0, 0.719s; `check: 0 error(s), 11 warning(s), 0 info`
+
+## RG-30 — completed
+
+删Trace目的契约及封存包/专测/两个CLI选项；保schema_version、旧guard_purpose元数据忽略、求解器、深度、案例写回。Trace105pass/LW44pass，真实创建与案例构建0、旧选项2且不写文件；精确移除预告author→trace无用依赖后map0error。完整检查点560pass（tkinter可用无skip）/双模型通过，收集560。
+
+- `python -m flowguard map check` — exit 1, 0.628s; `check: 1 error(s), 11 warning(s), 0 info`
+- `python -m pytest tests/trace` — exit 0, 45.809s; `105 passed in 45.42s`
+- `python <external>/probe_rg30.py` — exit 0, 0.997s; `retired contract source/options/pack residues absent; native create/library build remain`
+- `python -m pytest -p no:cacheprovider tests/contract/test_researchguard_handoff.py tests/e2e/test_production_reader_pipeline.py tests/contract/test_production_reader_native_lifecycle.py` — exit 0, 2.008s; `============================== 44 passed in 1.75s ==============================`
+- `python -m pytest --collect-only` — exit 0, 2.337s; `560 tests collected in 1.96s`
+- `python -m flowguard map check` — exit 0, 0.289s; `check: 0 error(s), 11 warning(s), 0 info`
+- `python -m pytest` — exit 0, 160.769s; `560 passed in 160.32s (0:02:40)`
+- `python -m flowguard map models` — exit 0, 1.532s; `models: 2 passed, 0 failed`
+- `python -m flowguard map check` — exit 0, 0.306s; `check: 0 error(s), 11 warning(s), 0 info`

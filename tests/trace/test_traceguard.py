@@ -290,8 +290,6 @@ def test_cli_create_and_simulate(tmp_path: Path) -> None:
             "create",
             "--output",
             str(starter),
-            "--purpose-contract",
-            str(EXAMPLES / "project_radar_task_purpose.json"),
         ],
         cwd=ROOT,
         text=True,
@@ -390,11 +388,9 @@ def test_case_library_example_validates_and_builds_model(tmp_path: Path) -> None
         root,
         "metadata-api-incident",
         model_path,
-        purpose_contract=EXAMPLES / "project_radar_task_purpose.json",
     )
     assert built["metadata"]["case_id"] == "metadata-api-incident"
     assert built["metadata"]["directions"] == ["root-cause"]
-    assert built["metadata"]["guard_purpose_contract"]["contract_fingerprint"]
 
     result = evaluate_model(load_model(model_path))
     assert result.traces[0].trace_id == "trace_metadata_incident"
@@ -569,8 +565,6 @@ def test_cli_library_smoke_commands(tmp_path: Path) -> None:
             "metadata-api-incident",
                 "--output",
                 str(model_path),
-                "--purpose-contract",
-                str(EXAMPLES / "project_radar_task_purpose.json"),
                 "--pretty",
         ],
         cwd=ROOT,
