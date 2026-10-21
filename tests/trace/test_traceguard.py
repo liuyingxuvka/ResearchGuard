@@ -615,3 +615,11 @@ def test_cli_library_smoke_commands(tmp_path: Path) -> None:
         check=True,
     )
     assert json.loads(direction_payload.stdout)["evidence"][0]["evidence_id"] == "ev-a"
+
+
+def test_hand_written_model_needs_only_schema_version(tmp_path):
+    data = yaml.safe_load((EXAMPLES / "source_registry_only.yaml").read_text(encoding="utf-8"))
+    data["metadata"] = {"schema_version": "researchguard.trace.model.v2"}
+    path = tmp_path / "bare.yaml"
+    path.write_text(yaml.safe_dump(data), encoding="utf-8")
+    assert load_model(path).traces

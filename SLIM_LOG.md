@@ -76,3 +76,12 @@ Absent external depth now invokes the same native analysis in-process; supplied 
 - `python -m pytest` — exit 0, 509.924s; `874 passed, 13 skipped in 509.23s (0:08:29)`
 - `python -m flowguard map models` — exit 0, 0.91s; `models: 2 passed, 0 failed`
 - `python -m flowguard map check` — exit 0, 1.319s; `check: 0 error(s), 9 warning(s), 0 info`
+
+## RG-06 — completed
+
+Removed only six-key portable-header machinery; schema_version and native reference validation remain. Handwritten incident model loads with metadata.schema_version alone; trace154passed (125.79s),collection888,map0errors; no header machinery references in src/tests.
+
+- `python -m pytest tests/trace` — exit 0, 126.508s; `154 passed in 125.79s (0:02:05)`
+- `python <external>/probe_rg06.py` — exit 0, 0.947s; `bare metadata schema_version only accepted; real trace_count1; no header machinery residual`
+- `python -m pytest --collect-only` — exit 0, 3.692s; `888 tests collected in 3.29s`
+- `python -m flowguard map check` — exit 0, 0.569s; `check: 0 error(s), 10 warning(s), 0 info`

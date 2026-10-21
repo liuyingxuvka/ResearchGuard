@@ -288,7 +288,6 @@
         "src/researchguard/trace/export_logicguard.py",
         "src/researchguard/trace/guard_model/verify.py",
         "src/researchguard/trace/handoff.py",
-        "src/researchguard/trace/headers.py",
         "src/researchguard/trace/inference/__init__.py",
         "src/researchguard/trace/inference/compiler.py",
         "src/researchguard/trace/inference/contradiction_core.py",

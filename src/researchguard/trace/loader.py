@@ -16,7 +16,6 @@ from typing import Any
 
 import yaml
 
-from .headers import check_model_header
 from .schema import SchemaError, TraceGuardModel
 from .validation import validate_references
 
@@ -33,10 +32,8 @@ def read_model_data(path: str | Path) -> dict[str, Any]:
     return data
 
 
-def load_model(path: str | Path, *, require_header: bool = True) -> TraceGuardModel:
+def load_model(path: str | Path) -> TraceGuardModel:
     data = read_model_data(path)
-    if require_header:
-        check_model_header(data, path)
     model = TraceGuardModel.from_dict(data)
     validate_references(model)
     return model

@@ -271,12 +271,10 @@ def _evaluation(path: Path):
 
 
 def _evaluation_model_data(data: Mapping[str, Any], *, label: str):
-    from .headers import check_model_header
     from .schema import TraceGuardModel
     from .validation import validate_references
 
     value = deepcopy(dict(data))
-    check_model_header(value, label)
     model = TraceGuardModel.from_dict(value)
     validate_references(model)
     return _evaluation_model(model)
