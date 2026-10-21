@@ -1,22 +1,17 @@
----
-name: traceguard
-description: Reconstruct and stress-test evidence-backed temporal traces, competing storylines, execution and effect chains, counter-scenarios, and bounded causal narratives. It does not discover sources or license final arguments.
----
-
 # TraceGuard
 
 ## Purpose
 
 TraceGuard owns evidence-trace reconstruction with one general route and one internal case-library route. First declare the trace scope, evidence objects, event/evidence boundary, and live alternatives before inference.
 
-## Entrypoint Scope
+## Route Scope
 
 TraceGuard owns temporal order, event and evidence separation, execution and effect chains, competing storylines, bounded causal review, contradictions, counter-scenarios, and evidence-backed trace reconstruction. Source discovery and final argument licensing remain typed handoffs to SourceGuard and LogicGuard.
 
 ## Route map
 
-- `route:general-trace` → temporal, process, execution, outcome, causal, counter-scenario, or competing-storyline work. Read `references/routes/general-trace.md` and the authoritative `references/unified_inference_protocol.md` only when building or checking the mathematical inference path.
-- `route:case-library` → preserve messy case material and search directions before model construction. Read `references/routes/case-library.md`.
+- `route:general-trace` → temporal, process, execution, outcome, causal, counter-scenario, or competing-storyline work. Read `references/trace/general-trace.md` and the authoritative `references/trace/unified_inference_protocol.md` only when building or checking the mathematical inference path.
+- `route:case-library` → preserve messy case material and search directions before model construction. Read `references/trace/case-library.md`.
 
 The case library is an internal route, not another installed skill.
 
@@ -24,7 +19,7 @@ The case library is an internal route, not another installed skill.
 
 Read only the reference declared by the selected route. Load the unified inference protocol only when building or checking the mathematical inference path, and load depth, iteration, command, or safe-output references only when their triggers fire.
 
-## Entrypoint Acceptance Map
+## Route Acceptance Map
 
 - Accept `route:general-trace` after the trace scope, evidence objects, event/evidence boundary, and live alternatives are declared.
 - Accept `route:case-library` only for preserving messy case material and search directions before model construction.
@@ -33,10 +28,10 @@ Read only the reference declared by the selected route. Load the unified inferen
 
 ## Conditional depth map
 
-- `trigger:task-iteration`: later evidence or a future event will test a prediction, a model miss appears, or a trace revision is needed → read `references/task-iteration.md`.
-- `trigger:depth-closure`: broad, complete, causal, deep, predictive, high-impact, robustness, or competing-storyline wording → read `references/depth-and-closure.md`.
-- `trigger:commands-handoffs`: actual CLI execution or SourceGuard/LogicGuard handoff construction → read `references/commands-and-handoffs.md`.
-- `trigger:safe-output`: event/explanation/outcome separation, scope transfer, weakest-link, or downgrade wording → read `references/safe-output.md`.
+- `trigger:task-iteration`: later evidence or a future event will test a prediction, a model miss appears, or a trace revision is needed → read `references/trace/task-iteration.md`.
+- `trigger:depth-closure`: broad, complete, causal, deep, predictive, high-impact, robustness, or competing-storyline wording → read `references/trace/depth-and-closure.md`.
+- `trigger:commands-handoffs`: actual CLI execution or SourceGuard/LogicGuard handoff construction → read `references/trace/commands-and-handoffs.md`.
+- `trigger:safe-output`: event/explanation/outcome separation, scope transfer, weakest-link, or downgrade wording → read `references/trace/safe-output.md`.
 
 These are loading triggers, not quality modes. Once depth is required, use the same canonical solver, perturbation, lineage, holdout, and native closure gates until closure or a visible non-closure terminal.
 

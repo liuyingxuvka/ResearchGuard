@@ -1,21 +1,15 @@
-"""Check ResearchGuard entry budgets and conditional reference edges."""
+"""Check the researchguard skill's entry and route budgets and its conditional reference edges."""
 
 from __future__ import annotations
 
 import argparse
 import json
-import sys
 from pathlib import Path
 from typing import Any, Mapping
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SRC = ROOT / "src"
-if str(SRC) not in sys.path:
-    sys.path.insert(0, str(SRC))
-
-
-
+SKILL_ROOT = ROOT / "skills" / "researchguard"
 MANIFEST_PATH = ROOT / "scripts" / "prompt_bundle_manifest.json"
 
 
@@ -29,35 +23,33 @@ def _read_manifest(path: Path = MANIFEST_PATH) -> Mapping[str, Any]:
 def check_prompt_bundles(
     manifest: Mapping[str, Any] | None = None,
     *,
-    member: str = "all",
+    bundle: str = "all",
 ) -> dict[str, Any]:
     manifest = _read_manifest() if manifest is None else manifest
     failures: list[dict[str, str]] = []
     bundles: list[dict[str, Any]] = []
-    bundle_entries: dict[str, str] = {}
+    selected_files: set[str] = set()
     for row in manifest.get("bundles", []):
-        skill_id = str(row.get("skill_id", ""))
-        if member != "all" and skill_id != member:
+        bundle_id = str(row.get("bundle_id", ""))
+        if bundle != "all" and bundle_id != bundle:
             continue
         paths = [ROOT / str(path) for path in row.get("entry_files", [])]
+        selected_files.update(path.relative_to(ROOT).as_posix() for path in paths)
         missing = [path.relative_to(ROOT).as_posix() for path in paths if not path.is_file()]
         if missing:
-            failures.append({"code": "entry-file-missing", "skill_id": skill_id, "detail": ", ".join(missing)})
+            failures.append({"code": "entry-file-missing", "bundle_id": bundle_id, "detail": ", ".join(missing)})
             continue
         total = sum(path.stat().st_size for path in paths)
         limit = int(row.get("max_entry_bytes", 0))
         headroom = limit - total
         minimum = int(row.get("minimum_headroom_bytes", 0))
         if total > limit:
-            failures.append({"code": "entry-budget-exceeded", "skill_id": skill_id, "detail": f"{total}>{limit}"})
+            failures.append({"code": "entry-budget-exceeded", "bundle_id": bundle_id, "detail": f"{total}>{limit}"})
         if headroom < minimum:
-            failures.append({"code": "entry-headroom-insufficient", "skill_id": skill_id, "detail": f"{headroom}<{minimum}"})
-        bundle_entries[skill_id] = "\n".join(
-            path.read_text(encoding="utf-8") for path in paths
-        )
+            failures.append({"code": "entry-headroom-insufficient", "bundle_id": bundle_id, "detail": f"{headroom}<{minimum}"})
         bundles.append(
             {
-                "skill_id": skill_id,
+                "bundle_id": bundle_id,
                 "entry_bytes": total,
                 "limit_bytes": limit,
                 "headroom_bytes": headroom,
@@ -66,25 +58,20 @@ def check_prompt_bundles(
         )
 
     for edge in manifest.get("reference_edges", []):
-        if member != "all" and str(edge.get("skill_id", "")) != member:
+        declared = str(edge.get("declared_in", ""))
+        if bundle != "all" and declared not in selected_files:
             continue
-        declared_in = ROOT / str(edge.get("declared_in", ""))
         reference = str(edge.get("reference", ""))
         trigger = str(edge.get("trigger_id", ""))
+        declared_in = ROOT / declared
         target = ROOT / reference
         if not declared_in.is_file() or not target.is_file():
-            failures.append({"code": "reference-edge-missing", "skill_id": str(edge.get("skill_id", "")), "detail": reference})
+            failures.append({"code": "reference-edge-missing", "bundle_id": declared, "detail": reference})
             continue
-        declaration = declared_in.read_text(encoding="utf-8")
-        relative_reference = Path(reference).relative_to(Path("skills") / str(edge["skill_id"])).as_posix()
-        if relative_reference not in declaration or trigger not in declaration:
-            failures.append({"code": "reference-edge-undeclared", "skill_id": str(edge.get("skill_id", "")), "detail": f"{trigger}:{relative_reference}"})
-
-    if member in {"all", "researchguard"}:
-        umbrella = (ROOT / "skills" / "researchguard" / "SKILL.md").read_text(encoding="utf-8")
-        for prohibited in manifest.get("prohibited_eager_member_paths", []):
-            if str(prohibited) in umbrella:
-                failures.append({"code": "umbrella-eager-member-load", "skill_id": "researchguard", "detail": str(prohibited)})
+        text = declared_in.read_text(encoding="utf-8")
+        relative_reference = target.relative_to(SKILL_ROOT).as_posix()
+        if relative_reference not in text or (trigger and trigger not in text):
+            failures.append({"code": "reference-edge-undeclared", "bundle_id": declared, "detail": f"{trigger}:{relative_reference}"})
 
     return {
         "schema_version": "researchguard.prompt-bundle-check.v1",
@@ -97,10 +84,10 @@ def check_prompt_bundles(
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--member", choices=("all", "researchguard", "logicguard", "sourceguard", "traceguard", "experimentguard"), default="all")
+    parser.add_argument("--bundle", default="all", help="all, researchguard, route:logic, route:source, route:trace or route:experiment")
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args(argv)
-    result = check_prompt_bundles(member=args.member)
+    result = check_prompt_bundles(bundle=args.bundle)
     print(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True) if args.json else result["status"])
     return 0 if result["status"] == "pass" else 1
 

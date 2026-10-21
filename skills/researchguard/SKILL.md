@@ -1,20 +1,22 @@
 ---
 name: researchguard
-description: Pick the right ResearchGuard member (logicguard, sourceguard, traceguard, experimentguard) for an ambiguous or multi-domain research request, then use that member directly. When the owner is already clear, use the member skill directly.
+description: "Use for research-quality checks: argument structure and claim support, evidence and source discovery, timelines and causal storylines, and the fewest experiments that tell hypotheses apart. Not for writing the finished report, paper, story or guide; use logic-writing."
 ---
 
 # ResearchGuard
 
-## Routing table
+Pick one route, then load only its file. Each route runs its own `researchguard <route>` commands.
 
-- LogicGuard owns argument structure, source-library work, structured artifacts, model deepening, synthesis, and its project-library viewer.
-- SourceGuard owns evidence discovery, retrieval, provenance, source-role gaps, and claim-use qualification.
-- TraceGuard owns temporal reconstruction, competing storylines, execution/effect chains, counter-scenarios, and bounded causal narratives.
-- ExperimentGuard owns recommendation-only minimum finite experiment sets over declared hypotheses and outcomes.
+| The request | Route file |
+|---|---|
+| Argument structure, claim support and safe wording; a source library; structured artifacts (papers, reports, decks); deepening a model; synthesis plans; the project library viewer | `references/routes/logic.md` |
+| Plan or run evidence and source discovery: source roles, retrieval, provenance, lineage, open gaps, when to stop searching | `references/routes/source.md` |
+| Reconstruct and stress-test a timeline, an execution or effect chain, or competing causal storylines from evidence | `references/routes/trace.md` |
+| Recommend the fewest declared experiments that tell declared hypotheses apart (never runs them) | `references/routes/experiment.md` |
 
-Several domains: run the members one after another (usual order SourceGuard → TraceGuard → LogicGuard; ExperimentGuard when hypotheses and candidate experiments are declared). Pass results with `researchguard source export-traceguard`, `researchguard trace export-logicguard` and `researchguard logic import-handoff`. Each member's result is only that member's claim; a failed member result stays visible and is not retried through another member.
+## Rules for every route
 
-## Output Requirements
-
-Return the native result, evidence and claim boundary, blockers and next action.
-Include full JSON only when it is needed or requested.
+- If `researchguard --help` fails, install the engine once with `python -m pip install -e <ResearchGuard checkout>`.
+- Several domains: run the routes one after another (usually source, then trace, then logic; experiment when hypotheses and candidate experiments are declared). Pass results with `researchguard source export-traceguard`, `researchguard trace export-logicguard` and `researchguard logic import-handoff`.
+- A route's result is only that route's claim; a failed result stays visible and is not retried through another route.
+- Return the native result, evidence and claim boundary, blockers and next action; include full JSON only when it is needed or requested.

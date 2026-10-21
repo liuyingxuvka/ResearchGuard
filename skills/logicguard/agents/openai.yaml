@@ -1,4 +1,0 @@
-interface:
-  display_name: "LogicGuard"
-  short_description: "Audit and deepen argument structure"
-  default_prompt: "Use $logicguard to model an argument, run its checks and report supported, qualified or withheld wording."

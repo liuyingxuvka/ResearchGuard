@@ -649,3 +649,21 @@ Prediction freezes now reject unknown coverage IDs in each native model namespac
 - `python -m flowguard map confirm logicguard sourceguard traceguard` — exit 0, 0.44s; `confirmed 3 component(s)`
 - `python -m flowguard map check` — exit 0, 0.285s; `check: 0 error(s), 4 warning(s), 0 info`
 - `python -m flowguard release` — exit 0, 1.893s; `verify: PASS (map, lint and models only; tests not run; run python -m pytest -q separately)`
+
+## RG-54 — completed
+
+Consolidated one researchguard skill and four routes, moving 29 domain files with their complete bodies verified against the predecessor apart from declared path/route edits. Installer removes retired members (symlink removal leaves its external target intact), copies one skill and detects main/nested byte drift even at identical size+mtime; cf077 byte-exact/common_funny comparison AST and existing same-stat/type-mismatch negative retained rather than the shallow reference block. Five prompt bytes exactly 2150/5603/5260/5029/3999; 31 skill files. 18 focused tests and complete checkpoint 344 passed; collection 344; fixed LW43 native bridge actual ready/PASSED 10 passed zero skips; active residue, exports/map/release passed. STOP at the authorized RG54 cross-repo boundary pending FG98/new-FG grant; no RG55 source edit yet.
+
+- `python -c import pathlib,subprocess;r=pathlib.Path("<external-root>/results/ResearchGuard");p=subprocess.run(["rg","-n","-g","*.md","-g","*.py","-g","*.yaml","-g","*.json",r"\$(logicguard|sourceguard|traceguard|experimentguard)\b|skills/(logicguard|sourceguard|traceguard|experimentguard)","<LW43-snapshot>"],capture_output=True,text=True);(r/"RG-54-consumer-skill-raw.log").write_text(p.stdout);active=[x for x in p.stdout.splitlines() if not any(part in x for part in ["/CHANGELOG.md:","/openspec/","/docs/history/","/SLIM_LOG.md:"])];(r/"RG-54-consumer-skill-active.log").write_text("\n".join(active));print("raw hits",len(p.stdout.splitlines()),"active skill-loading hits",len(active));print("\n".join(active));assert p.returncode in [0,1]` — exit 0, 0.07s; `raw hits 0 active skill-loading hits 0`
+- `python scripts/check_prompt_bundles.py` — exit 0, 0.142s; `pass`
+- `python scripts/check_prompt_bundles.py --json` — exit 0, 0.076s; `}`
+- `python -m pytest tests/test_skill_suite.py tests/test_prompt_bundles.py tests/test_install_skill.py tests/test_root_cli.py tests/contract` — exit 0, 3.033s; `18 passed in 2.52s`
+- `python <external>/probe_rg54.py` — exit 0, 1.198s; `active old-skill residue absent; truthful root SLIM_LOG history excluded by root journal rule: 2 hits; raw/journal/active logs retained`
+- `python <external>/check_exports.py` — exit 0, 0.974s; `exports ok`
+- `python -m pytest -p no:cacheprovider tests/contract/test_researchguard_handoff.py --junitxml <external>/RG-54-lw43-junit.xml --basetemp <external>/RG-54-lw43-temp` — exit 0, 1.042s; `============================== 10 passed in 0.53s ==============================`
+- `python <external>/verify_lw_junit.py <external>/RG-54-lw43-junit.xml` — exit 0, 0.148s; `10 actual PASSED, 0 skipped; real native provider-to-reader bridge PASSED/ready, not version-skipped`
+- `python -m pytest --collect-only` — exit 0, 3.577s; `344 tests collected in 2.91s`
+- `python -m flowguard map confirm author-tools` — exit 0, 0.169s; `confirmed 1 component(s)`
+- `python -m flowguard map check` — exit 0, 0.293s; `check: 0 error(s), 4 warning(s), 0 info`
+- `python -m flowguard release` — exit 0, 2.892s; `verify: PASS (map, lint and models only; tests not run; run python -m pytest -q separately)`
+- `python -m pytest` — exit 0, 71.114s; `344 passed in 70.49s (0:01:10)`

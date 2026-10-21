@@ -1,38 +1,33 @@
----
-name: sourceguard
-description: Plan and execute evidence/source discovery for a claim with explicit source roles, retrieval evidence, provenance, gaps, and bounded claim-use decisions. It does not license arguments or reconstruct storylines.
----
-
 # SourceGuard
 
 ## Purpose
 
 SourceGuard owns one current evidence-discovery and source-qualification route. First declare the target claim, desired strength, source roles, and current gaps; then build or inspect the current source model before choosing a search action.
 
-Read `references/source-model-protocol.md` under `route:source-model` for every admitted SourceGuard task.
+Read `references/source/source-model-protocol.md` under `route:source-model` for every admitted SourceGuard task.
 
-## Entrypoint Scope
+## Route Scope
 
 SourceGuard owns source-role planning, evidence discovery, retrieval, provenance, lineage, semantic fit, counter or limiting search, and bounded claim-use qualification. It decides whether a source observation can support the declared claim use; argument licensing and temporal or causal reconstruction remain typed handoffs.
 
 ## Local Material Routing
 
-Read `references/source-model-protocol.md` before every admitted task, then read only the reference declared by each active route or trigger. Keep provider observations, source candidates, and immutable evidence references separate inside the SourceGuard material boundary.
+Read `references/source/source-model-protocol.md` before every admitted task, then read only the reference declared by each active route or trigger. Keep provider observations, source candidates, and immutable evidence references separate inside the SourceGuard material boundary.
 
-## Entrypoint Acceptance Map
+## Route Acceptance Map
 
-- Accept the entrypoint only after the target claim, desired strength, source roles, and current gaps are frozen.
+- Accept the route only after the target claim, desired strength, source roles, and current gaps are frozen.
 - Accept a retrieval or qualification action only after its route reference and source or provider boundary are declared.
 - Accept iteration, depth, command, or safe-output work only after its conditional reference is loaded.
 - If a source anchor, source role, or critical gap is missing, keep the result visibly unresolved rather than promoting a candidate.
 
 ## Conditional depth map
 
-- `trigger:retrieval-workflow`: plan or execute retrieval, qualify provider observations, update semantic state, or export a handoff → read `references/retrieval-workflow.md`.
-- `trigger:task-iteration`: a real observation will test a predicted search action, a model miss appears, or an addressable gap remains → read `references/task-iteration.md`.
-- `trigger:broad-depth-closure`: broad, complete, deep, final, high-impact, or gap-closure wording → read `references/broad-depth-and-closure.md`.
-- `trigger:commands`: actual CLI construction or execution → read `references/commands.md`.
-- `trigger:safe-output`: reader-facing qualification, downgrade, access-gap, or handoff wording → read `references/safe-output.md`.
+- `trigger:retrieval-workflow`: plan or execute retrieval, qualify provider observations, update semantic state, or export a handoff → read `references/source/retrieval-workflow.md`.
+- `trigger:task-iteration`: a real observation will test a predicted search action, a model miss appears, or an addressable gap remains → read `references/source/task-iteration.md`.
+- `trigger:broad-depth-closure`: broad, complete, deep, final, high-impact, or gap-closure wording → read `references/source/broad-depth-and-closure.md`.
+- `trigger:commands`: actual CLI construction or execution → read `references/source/commands.md`.
+- `trigger:safe-output`: reader-facing qualification, downgrade, access-gap, or handoff wording → read `references/source/safe-output.md`.
 
 The small first read is not a weak mode. When a deep trigger fires, continue the existing native search-model loop until all covered native gaps close or a visible terminal stops it.
 

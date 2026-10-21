@@ -290,7 +290,7 @@
     },
     {
       "id": "author-tools",
-      "summary": "Own skill installation by copy, privacy checks and prompt budgets.",
+      "summary": "Own skill installation by copy, privacy checks and the route-file prompt budgets.",
       "responsibilities": [
         "Own ordinary package/skill installation, privacy checks, prompt budgets and source validation."
       ],
@@ -302,10 +302,10 @@
         "scripts/install_skill.py:main"
       ],
       "state": [
-        "five skill directories"
+        "one skill directory"
       ],
       "side_effects": [
-        "copy the five skill folders into the given skills directory"
+        "copy the researchguard skill folder into the given skills directory and remove retired member skill folders"
       ],
       "depends_on": [
         "researchguard-suite"
@@ -317,7 +317,7 @@
       ],
       "models": [],
       "status": "confirmed",
-      "fingerprint": "sha256:7cce2f2d2f15368ffe45e62ae57f20fe824324c413d697985babd1c11fdab33c"
+      "fingerprint": "sha256:7feaea02daff65fd7b9a298e36648910ba31bc35d24725c6faf8fb858cad0158"
     }
   ],
   "flows": [

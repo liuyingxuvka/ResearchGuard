@@ -1,4 +1,0 @@
-interface:
-  display_name: "SourceGuard"
-  short_description: "Plan evidence discovery and qualify source use"
-  default_prompt: "Use $sourceguard to plan evidence discovery for a claim, record what each source can and cannot support, and report the remaining gaps."

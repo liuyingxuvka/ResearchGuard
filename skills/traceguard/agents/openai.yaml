@@ -1,4 +1,0 @@
-interface:
-  display_name: "TraceGuard"
-  short_description: "Stress-test timelines and competing storylines"
-  default_prompt: "Use $traceguard to reconstruct a timeline or competing storylines from evidence, keep events, explanations and outcomes separate, and report bounded wording."

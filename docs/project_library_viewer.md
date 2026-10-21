@@ -9,5 +9,5 @@ Opening a source renders the single recommended top-level logic graph. The
 viewer does not offer competing graph-mode tabs and does not alter the
 canonical source model merely to change presentation.
 
-Use the internal `project-library-viewer` route from `$logicguard`; it is not a
+Use the internal `project-library-viewer` sub-route of the `researchguard` skill's `logic` route; it is not a
 separately installed Codex Skill.

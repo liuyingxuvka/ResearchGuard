@@ -1,21 +1,19 @@
 # ResearchGuard
 
-ResearchGuard is one versioned research-quality guard suite with five direct
-Codex entrypoints:
+ResearchGuard is one versioned research-quality guard suite with one agent
+skill, `researchguard`, and four routes:
 
-- `researchguard` routes cross-Guard or ambiguous research work.
-- `logicguard` audits argument structure and claim support.
-- `sourceguard` plans evidence and source discovery.
-- `traceguard` reconstructs and stress-tests evidence-backed timelines and
-  qualitative causal storylines.
-- `experimentguard` recommends minimum finite experiment sets that distinguish
-  caller-declared hypotheses.
+- `logic` (LogicGuard) audits argument structure and claim support.
+- `source` (SourceGuard) plans evidence and source discovery.
+- `trace` (TraceGuard) reconstructs and stress-tests evidence-backed timelines
+  and qualitative causal storylines.
+- `experiment` (ExperimentGuard) recommends minimum finite experiment sets that
+  distinguish caller-declared hypotheses.
 
-All five entrypoints use one `researchguard` Python distribution and one suite
-version. A selected member failure is terminal.
-ResearchGuard does not retry through another member, silently downgrade, or
-load legacy package formats.
-
+All four routes use one `researchguard` Python distribution, one suite version
+and one console: `researchguard logic|source|trace|experiment ...`. A selected
+route's failure is terminal. ResearchGuard does not retry through another
+route, silently downgrade, or load legacy package formats.
 
 The first release was `v0.1.0`.
 
@@ -27,9 +25,10 @@ python scripts/install_skill.py --target "$CODEX_HOME/skills"   # or ~/.claude/s
 python scripts/install_skill.py --target "$CODEX_HOME/skills" --check
 ```
 
-The first line installs the `researchguard` console; the second copies the five
-skill folders (`researchguard`, `logicguard`, `sourceguard`, `traceguard`,
-`experimentguard`) into the agent's skills directory.
+The first line installs the `researchguard` console; the second copies the
+`researchguard` skill folder into the agent's skills directory and removes the
+`logicguard`, `sourceguard`, `traceguard` and `experimentguard` folders that
+older versions installed.
 
 ## Codex-facing source intake contract
 
@@ -39,36 +38,24 @@ and verifies the model with `view-graph` or `view-snapshot`. If reading
 or modeling is blocked, the source is reported as preserved with modeling
 incomplete; generated prose is never promoted to evidence.
 
-## Public Skill topology
+## Skill layout
 
-- `$researchguard` is the family router.
-- `$logicguard`, `$sourceguard`, `$traceguard`, and `$experimentguard` remain complete direct
-  entrypoints.
+- `skills/researchguard/SKILL.md` is a route table; the agent loads only the
+  chosen `references/routes/<route>.md`.
 - LogicGuard's source library, structured-artifact audit, model deepening,
-  artifact synthesis, and project library viewer are internal routes.
-- TraceGuard's case library is an internal route.
+  artifact synthesis and project library viewer are sub-routes of the `logic`
+  route; TraceGuard's case library is a sub-route of the `trace` route.
 
-SourceGuard now returns typed search-stop decisions; TraceGuard can expose a
-deletion-minimal contradiction core; LogicGuard can expose deletion-minimal
-support and attack sets with a conservative wording license. ExperimentGuard
-is recommendation-only: it never executes an experiment or invents
-probabilities.
+`researchguard source stop-decision` returns typed search-stop decisions;
+TraceGuard can expose a deletion-minimal contradiction core;
+`researchguard logic minimal-sets` exposes deletion-minimal support and attack
+sets with a conservative wording license. ExperimentGuard is
+recommendation-only: it never executes an experiment or invents probabilities.
 
-All direct entries bind to the same native member owners used by the umbrella.
-There are no legacy Skill IDs, command wrappers, aliases, dual readers, or
-failure-triggered alternate routes.
-
-In v0.4.2 the umbrella accepts source-bound task facts instead of caller-set
-applicability. Current member contracts derive coverage, forbidden-condition
-dispositions, first actions, and first references. Direct requests skip the
-umbrella; ambiguous requests read one compact admission index and choose the
-unique smallest set covering every primary responsibility. One sufficient member
-stays single. A necessary multi-member set must declare exact order, dependencies,
-responsibilities, handoffs, field owners, and claim boundary before the umbrella
-can emit composition-planning evidence. Each member's task-local loop
-(predict, observe, revise) works on plain model files and keeps purpose,
-coverage, assumptions, unknowns, predictions, computed gap transitions,
-addressable next actions, and exact stop reasons. A holdout claim or
+Each route's task-local loop (predict, observe, revise) works on plain model
+files and keeps purpose, coverage, assumptions, unknowns, predictions, computed
+gap transitions, addressable next actions, and exact stop reasons. Every id a
+prediction names must exist in the model when it is frozen. A holdout claim or
 observation is optional; when given, it must be independent of the evidence
 used to build the model. The loop never writes the model file, so rolling back
 means restoring the previous file. SourceGuard preserves provider and

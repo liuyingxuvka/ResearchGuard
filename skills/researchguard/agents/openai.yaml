@@ -1,4 +1,4 @@
 interface:
   display_name: "ResearchGuard"
-  short_description: "Pick the right research Guard for the task"
-  default_prompt: "Use $researchguard only to choose the right member skill (logicguard, sourceguard, traceguard, experimentguard) for an ambiguous research request, then use that member directly."
+  short_description: "Check arguments, sources, timelines and experiments"
+  default_prompt: "Use $researchguard to check a research task: pick the route (logic, source, trace or experiment), run the researchguard command it names, and claim only what the output supports."

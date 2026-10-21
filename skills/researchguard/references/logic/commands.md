@@ -20,4 +20,4 @@ researchguard logic depth <model> [--budget <n>] [--output <depth.json>]
 researchguard logic import-handoff <traceguard-bundle.yaml> --output <model.yaml>
 ```
 
-Source-library and viewer commands live in `routes/source-library.md` and `routes/project-library-viewer.md`. Load `h-wadf-quick-reference.md` before creating new node/edge/acceptance structures.
+Source-library and viewer commands live in `source-library.md` and `project-library-viewer.md`. Load `h-wadf-quick-reference.md` before creating new node/edge/acceptance structures.

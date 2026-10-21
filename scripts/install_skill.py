@@ -1,10 +1,11 @@
-"""Install the five ResearchGuard skills into an agent's skills directory.
+"""Install the researchguard skill into an agent's skills directory.
 
     python scripts/install_skill.py --target "$CODEX_HOME/skills"            # or ~/.claude/skills
     python scripts/install_skill.py --target "$CODEX_HOME/skills" --dry-run
     python scripts/install_skill.py --target "$CODEX_HOME/skills" --check    # exit 1 if the copy differs
 
-Copies skills/<name>/ to <target>/<name>/ for each of the five skills (replacing older copies).
+Copies skills/researchguard/ to <target>/researchguard/ (replacing an older copy) and removes the
+retired member skill folders (logicguard, sourceguard, traceguard, experimentguard) left by older versions.
 The Python engine is installed separately: pip install -e <this repository>.
 """
 
@@ -19,7 +20,8 @@ import sys
 from pathlib import Path
 
 SOURCE = Path(__file__).resolve().parents[1] / "skills"
-MEMBERS = ("researchguard", "logicguard", "sourceguard", "traceguard", "experimentguard")
+SKILLS = ("researchguard",)
+RETIRED_SKILLS = ("logicguard", "sourceguard", "traceguard", "experimentguard")
 
 
 def differences(src: Path, dst: Path) -> list[str]:
@@ -58,24 +60,31 @@ def main() -> int:
         parser.error("target environment variable is unset: " + ", ".join(missing))
     target = re.sub(r"%([A-Za-z_][A-Za-z0-9_]*)%", lambda m: os.environ[m[1]], args.target)
     root = Path(os.path.expandvars(target)).expanduser()
-    for name in MEMBERS:
+    for name in SKILLS:
         if not (SOURCE / name / "SKILL.md").is_file():
             print(f"skill source not found: {SOURCE / name}", file=sys.stderr)
             return 2
-    diff = [f"{name}: {line}" for name in MEMBERS
-            for line in differences(SOURCE / name, root / name)]
+    retired = [root / name for name in RETIRED_SKILLS if (root / name).is_dir()]
+    diff = [f"{name}: {line}" for name in SKILLS for line in differences(SOURCE / name, root / name)]
+    diff += [f"retired skill still installed: {path}" for path in retired]
     if args.check:
         print("\n".join(diff) or "installed skills are current")
         return 1 if diff else 0
     if args.dry_run:
-        print(f"would copy 5 skills from {SOURCE} -> {root}")
+        print(f"would copy {len(SKILLS)} skill from {SOURCE} -> {root} and remove {len(retired)} retired skill folder(s)")
         return 0
-    for name in MEMBERS:
+    for name in SKILLS:
         dst = root / name
         if dst.exists():
             shutil.rmtree(dst)
         shutil.copytree(SOURCE / name, dst, ignore=shutil.ignore_patterns("__pycache__"))
         print(f"installed {dst}")
+    for path in retired:
+        if path.is_symlink():
+            path.unlink()
+        else:
+            shutil.rmtree(path)
+        print(f"removed retired {path}")
     return 0
 
 

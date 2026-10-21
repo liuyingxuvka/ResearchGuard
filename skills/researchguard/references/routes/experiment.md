@@ -1,16 +1,11 @@
----
-name: experimentguard
-description: Recommend a minimum finite set of experiments that can distinguish caller-declared hypotheses. Use for experiment selection and discriminating-test design, not experiment execution, causal truth, probability invention, or source/trace/argument work.
----
-
-# ExperimentGuard Skill
+# ExperimentGuard
 
 ## Purpose
 
 ExperimentGuard turns explicit hypotheses, candidate experiments, and predicted
 outcomes into a recommendation-only discriminating set.
 
-## Entrypoint Scope
+## Route Scope
 
 Own deterministic minimum-set recommendation for caller-declared hypotheses. Do
 not execute experiments, decide causal truth, or replace another member.
@@ -19,7 +14,7 @@ not execute experiments, decide causal truth, or replace another member.
 
 Native recommendations use the experiment spec only.
 
-## Entrypoint Acceptance Map
+## Route Acceptance Map
 
 - Require unique hypothesis IDs, a finite experiment inventory, and explicit
   comparable predictions.
@@ -31,14 +26,14 @@ Native recommendations use the experiment spec only.
 
 ## Use When
 
-Use this skill when at least two concrete hypotheses need one or more declared
+Use this route when at least two concrete hypotheses need one or more declared
 experiments that distinguish them.
 
 ## Do Not Use When
 
 Do not execute an experiment, invent outcomes or probabilities, infer causal
 truth, search for sources, reconstruct a timeline, or license an argument.
-Route those requests to the responsible ResearchGuard member.
+Use the matching ResearchGuard route for those requests.
 
 ## Required Inputs
 
