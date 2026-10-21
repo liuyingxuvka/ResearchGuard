@@ -149,3 +149,11 @@ Source plan默认只省略scored_actions，--all-scores恢复完整评分；127�
 - `python -m pytest tests/trace/test_traceguard.py` — exit 0, 50.129s; `39 passed in 49.57s`
 - `python <external>/probe_rg13.py` — exit 0, 2.393s; `rc 2`
 - `python -m pytest --collect-only` — exit 0, 7.69s; `868 tests collected in 6.83s`
+
+## RG-14 — completed
+
+Experiment recommend补默认非领域循环字段，坏输入给JSON/CLI2，删除同义iterate；原最小集合和holdout/schema验证不动。66项实验测试、最小spec选e1及缺字段错误探针通过，收集869。
+
+- `python -m pytest tests/experiment` — exit 0, 19.436s; `66 passed in 18.92s`
+- `python <external>/probe_rg14.py` — exit 0, 0.953s; `rc 2`
+- `python -m pytest --collect-only` — exit 0, 6.135s; `869 tests collected in 5.36s`

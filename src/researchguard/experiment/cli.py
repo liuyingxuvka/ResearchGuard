@@ -13,6 +13,7 @@ from ..target_authority import TargetPurposeAuthority
 from .blueprint import check_blueprint, export_blueprint, impact_blueprint, reverse_trace_experiment
 from .engine import observe_experiments, recommend_experiments
 from .schema import (
+    EXPERIMENT_SPEC_SCHEMA,
     ExperimentConstraint,
     ExperimentChildOutputBinding,
     ExperimentDesignBlock,
@@ -135,14 +136,14 @@ def _load_spec_payload(payload: object) -> ExperimentSpec:
                 raise ValueError("target_universe.native_receipt_refs must be a list of objects")
     universe = payload.get("target_universe")
     return ExperimentSpec(
-        schema_version=str(payload.get("schema_version", "")),
-        task_id=str(payload["task_id"]),
-        purpose=str(payload["purpose"]),
-        coverage_ids=tuple(str(item) for item in payload["coverage_ids"]),
-        assumptions=tuple(str(item) for item in payload["assumptions"]),
-        unknowns=tuple(str(item) for item in payload["unknowns"]),
-        iteration=int(payload["iteration"]),
-        max_iterations=int(payload["max_iterations"]),
+        schema_version=str(payload.get("schema_version") or EXPERIMENT_SPEC_SCHEMA),
+        task_id=str(payload.get("task_id") or "recommendation"),
+        purpose=str(payload.get("purpose") or "Recommend the smallest experiment set that separates the declared hypotheses."),
+        coverage_ids=tuple(str(item) for item in (payload.get("coverage_ids") or ["all-hypothesis-pairs"])),
+        assumptions=tuple(str(item) for item in payload.get("assumptions", [])),
+        unknowns=tuple(str(item) for item in payload.get("unknowns", [])),
+        iteration=int(payload.get("iteration", 0)),
+        max_iterations=int(payload.get("max_iterations", 1)),
         prior_receipt_fingerprint=str(payload.get("prior_receipt_fingerprint", "")),
         prior_open_gap_ids=tuple(str(item) for item in payload.get("prior_open_gap_ids", [])),
         hypothesis_predictions=tuple(
@@ -319,6 +320,14 @@ def _load_observations(path: Path) -> tuple[ExperimentObservation, ...]:
 
 
 def main(argv: list[str] | None = None) -> int:
+    try:
+        return _main(argv)
+    except (KeyError, ValueError, TypeError) as exc:
+        print(json.dumps({"ok": False, "error": f"{type(exc).__name__}: {exc}"}, ensure_ascii=False, sort_keys=True))
+        return 2
+
+
+def _main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="researchguard experiment")
     subparsers = parser.add_subparsers(dest="command", required=True)
     recommend = subparsers.add_parser("recommend")
@@ -326,9 +335,6 @@ def main(argv: list[str] | None = None) -> int:
     observe = subparsers.add_parser("observe")
     observe.add_argument("spec", type=Path)
     observe.add_argument("observations", type=Path)
-    iterate = subparsers.add_parser("iterate")
-    iterate.add_argument("spec", type=Path)
-    iterate.add_argument("observations", type=Path)
     blueprint = subparsers.add_parser("blueprint")
     blueprint_subparsers = blueprint.add_subparsers(dest="blueprint_operation", required=True)
     blueprint_check = blueprint_subparsers.add_parser("check")

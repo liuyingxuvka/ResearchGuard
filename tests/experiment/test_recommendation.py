@@ -271,3 +271,26 @@ def test_prediction_rows_must_cover_each_candidate_identity() -> None:
                 HypothesisPrediction("h2", {"e1": "down"}),
             )
         )
+
+
+def test_minimal_spec_recommends_without_loop_fields(tmp_path, capsys):
+    from researchguard.experiment.cli import main
+    payload = {"hypothesis_predictions": [
+        {"hypothesis_id": "h1", "outcomes_by_experiment": {"e1": "up", "e2": "up", "e3": "up"}},
+        {"hypothesis_id": "h2", "outcomes_by_experiment": {"e1": "down", "e2": "up", "e3": "up"}},
+        {"hypothesis_id": "h3", "outcomes_by_experiment": {"e1": "up", "e2": "down", "e3": "up"}}],
+        "candidate_experiment_ids": ["e1", "e2", "e3"]}
+    path = tmp_path / "spec.json"
+    path.write_text(json.dumps(payload))
+    assert main(["recommend", str(path)]) == 0
+    assert json.loads(capsys.readouterr().out)["status"] == "recommended"
+
+
+def test_malformed_spec_returns_a_json_error(tmp_path, capsys):
+    from researchguard.experiment.cli import main
+    path = tmp_path / "spec.json"
+    path.write_text(json.dumps({"hypothesis_predictions": [{"hypothesis_id": "h1"}], "candidate_experiment_ids": ["e1"]}))
+    assert main(["recommend", str(path)]) == 2
+    result = json.loads(capsys.readouterr().out)
+    assert result["ok"] is False
+    assert "outcomes_by_experiment" in result["error"]

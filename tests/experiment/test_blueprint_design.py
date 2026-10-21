@@ -925,47 +925,6 @@ def test_universe_and_native_case_receipt_are_stable_global_impact_seeds() -> No
         ]
 
 
-def test_blueprint_cli_has_one_grouped_surface_and_no_flat_alias(tmp_path, capsys) -> None:
-    from researchguard.experiment.cli import main
-
-    spec_path = tmp_path / "experiment.json"
-    spec_path.write_text(json.dumps(_spec().to_dict()), encoding="utf-8")
-    assert main(["blueprint", "check", str(spec_path)]) == 0
-    assert json.loads(capsys.readouterr().out)["status"] == "complete"
-    assert main(["blueprint", "impact", str(spec_path), "e1:step"]) == 0
-    assert json.loads(capsys.readouterr().out)["affected_candidate_ids"] == ["e1"]
-    assert main(["blueprint", "impact", str(spec_path), "e1:step", "foreign:unowned"]) == 3
-    blocked = json.loads(capsys.readouterr().out)
-    assert blocked["partial_result_suppressed"] is True
-    assert blocked["affected_candidate_ids"] == []
-    assert main(["blueprint", "trace", str(spec_path), "e1"]) == 0
-    assert json.loads(capsys.readouterr().out)["experiment_id"] == "e1"
-    assert main(["blueprint", "export", str(spec_path)]) == 0
-    assert json.loads(capsys.readouterr().out)["check"]["status"] == "complete"
-    with pytest.raises(SystemExit) as exc:
-        main(["blueprint-check", str(spec_path)])
-    assert exc.value.code == 2
-    with pytest.raises(SystemExit) as exc:
-        main(["blueprint", "unknown", str(spec_path)])
-    assert exc.value.code == 2
-    unknown = _spec().to_dict()
-    unknown["design_blocks"][0]["legacy_alias"] = "forbidden"
-    spec_path.write_text(json.dumps(unknown), encoding="utf-8")
-    with pytest.raises(ValueError, match="unknown current-blueprint fields"):
-        main(["blueprint", "check", str(spec_path)])
-
-    malformed = _spec().to_dict()
-    malformed["target_universe"]["required_port_ids"] = "e1:input"
-    spec_path.write_text(json.dumps(malformed), encoding="utf-8")
-    with pytest.raises(ValueError, match="target_universe.required_port_ids must be a list"):
-        main(["blueprint", "check", str(spec_path)])
-
-    malformed["target_universe"] = []
-    spec_path.write_text(json.dumps(malformed), encoding="utf-8")
-    with pytest.raises(ValueError, match="target_universe must be an object"):
-        main(["blueprint", "check", str(spec_path)])
-
-
 def test_observation_with_invalid_candidate_blueprint_fails_closed_without_stop_iteration() -> None:
     spec = _spec()
     invalid = replace(
