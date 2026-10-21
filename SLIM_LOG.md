@@ -734,3 +734,19 @@ Recorded the maintainer-selected three-part version and patch-only increment pol
 - `python -m pytest --collect-only` — exit 0, 4.669s; `344 tests collected in 3.85s`
 - `python -m flowguard map check` — exit 0, 0.4s; `check: 0 error(s), 3 warning(s), 0 info`
 - `python -m flowguard release` — exit 0, 4.023s; `verify: PASS (map, lint and models only; tests not run; run python -m pytest -q separately)`
+
+## RG-59 — completed
+
+Real CLI stop-decision now starts from paper citation search and from an actual add-observation grown starter model. Continued search, budget blocking and sufficient stopping all verified. Source65 passed; stop5 passed; collection344; fixed LW43 native10 actually passed zero skips; exports/map/release and portable prompt checks passed. Installed command documentation describes native inputs and states without unavailable example paths.
+
+- `python -m pytest tests/source/test_stop_decision.py` — exit 0, 1.568s; `5 passed in 1.09s`
+- `python -m pytest tests/source` — exit 0, 7.289s; `65 passed in 6.94s`
+- `python <external>/probe_rg59.py` — exit 0, 1.563s; `real native growing-model stop confirmed, no observation-as-model surrogate`
+- `python -m flowguard change` — exit 0, 0.348s; `run: python -m pytest -q tests/source/test_stop_decision.py`
+- `python scripts/check_prompt_bundles.py` — exit 0, 0.05s; `pass`
+- `python <external>/check_exports.py` — exit 0, 5.85s; `exports ok`
+- `python -m pytest -p no:cacheprovider tests/contract/test_researchguard_handoff.py --junitxml <external>/RG-59-lw43-junit.xml --basetemp <external>/RG-59-lw43-temp` — exit 0, 4.459s; `============================== 10 passed in 2.08s ==============================`
+- `python <external>/verify_lw_junit.py <external>/RG-59-lw43-junit.xml` — exit 0, 0.1s; `10 actual PASSED, 0 skipped; real native provider-to-reader bridge PASSED/ready, not version-skipped`
+- `python -m pytest --collect-only` — exit 0, 2.203s; `344 tests collected in 1.69s`
+- `python -m flowguard map check` — exit 0, 0.397s; `check: 0 error(s), 3 warning(s), 0 info`
+- `python -m flowguard release` — exit 0, 4.062s; `verify: PASS (map, lint and models only; tests not run; run python -m pytest -q separately)`

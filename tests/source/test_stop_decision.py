@@ -62,14 +62,29 @@ def test_model_stop_decision_reads_the_plan_and_the_blocking_gaps() -> None:
     assert starved.status == "blocked_unresolved_critical"
 
 
-def test_stop_decision_cli_prints_its_inputs_and_the_decision() -> None:
-    result = subprocess.run(
-        [sys.executable, "-m", "researchguard", "source", "stop-decision",
-         "examples/source/qualified_observation.yaml", "--budget", "1"],
-        cwd=ROOT, capture_output=True, text=True,
-    )
+def _source_cli(*args: str) -> subprocess.CompletedProcess:
+    return subprocess.run([sys.executable, "-m", "researchguard", "source", *args],
+                          cwd=ROOT, capture_output=True, text=True)
+
+
+def test_stop_decision_cli_prints_its_inputs_and_the_decision(tmp_path) -> None:
+    result = _source_cli("stop-decision", "examples/source/paper_citation_discovery.yaml", "--budget", "1")
     assert result.returncode == 0, result.stderr
-    payload = json.loads(result.stdout)
-    assert payload["status"] == "stop_sufficient"
-    assert payload["inputs"]["remaining_budget"] == 1.0
-    assert payload["inputs"]["unresolved_critical_gap_ids"] == []
+    searching = json.loads(result.stdout)
+    assert searching["status"] == "continue_search"
+    assert searching["inputs"]["remaining_budget"] == 1.0
+    assert searching["inputs"]["unresolved_critical_gap_ids"] == ["gap-baseline", "gap-counter"]
+    assert searching["selected_search_id"] == searching["inputs"]["candidate_search_ids"][0]
+
+    # The example observation closes the starter model's only blocking gap, so the grown model may stop.
+    grown = tmp_path / "grown.yaml"
+    added = _source_cli("add-observation", "examples/source/starter_researchguard.source.yaml",
+                        "--observation", "examples/source/qualified_observation.yaml", "--output", str(grown))
+    assert added.returncode == 0, added.stdout + added.stderr
+    assert [(gap.gap_id, gap.semantic_state) for gap in load_model(grown).gaps] == [("gap-independent-1", "closed")]
+    result = _source_cli("stop-decision", str(grown), "--budget", "1")
+    assert result.returncode == 0, result.stderr
+    stopped = json.loads(result.stdout)
+    assert stopped["status"] == "stop_sufficient"
+    assert stopped["inputs"]["evidence_sufficient_for_scope"] is True
+    assert stopped["inputs"]["unresolved_critical_gap_ids"] == []
