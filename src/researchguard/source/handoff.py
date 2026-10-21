@@ -27,22 +27,59 @@ LOGICGUARD_BOUNDARY = (
 
 
 
+TRACEGUARD_SOURCE_STATUS = {
+    "saved": "stable_keep",
+    "promoted_traceguard": "stable_keep",
+    "promoted_logicguard": "stable_keep",
+    "permission_gated": "need_auth_or_permission",
+    "inaccessible": "need_auth_or_permission",
+    "rejected": "invalid_or_empty",
+    "duplicate": "invalid_or_empty",
+}
+
+
 def export_traceguard_seed(belief_state: BeliefState) -> dict:
     return {
         "metadata": {
+            "schema_version": "researchguard.trace.model.v2",
             "generated_by": "SourceGuard",
             "boundary": TRACEGUARD_BOUNDARY,
             "source_model_version": str(belief_state.metadata.get("version", "")),
+            "notes": [
+                f"SourceGuard gap {gap.gap_id} ({gap.gap_type}): {gap.description}"
+                for gap in belief_state.gaps
+            ] + [
+                "SourceGuard does not generate validated events or traces.",
+                "Permission-gated and unavailable material remains an access gap.",
+            ],
         },
-        "sources": [to_plain(source) for source in belief_state.sources],
-        "evidence_anchors": [to_plain(anchor) for anchor in belief_state.anchors],
-        "source_gaps": [to_plain(gap) for gap in belief_state.gaps],
+        "sources": [{
+            "source_id": source.source_id,
+            "title": source.title,
+            "url": source.url or None,
+            "source_type": source.source_type,
+            "lineage_id": source.lineage_id or source.source_id,
+            "independence_group": source.lineage_id or source.source_id,
+            "source_reliability": source.source_reliability,
+            "source_status": TRACEGUARD_SOURCE_STATUS.get(source.source_status, "unknown"),
+            "source_date": source.source_date or None,
+            "coverage_period": source.coverage_period or None,
+        } for source in belief_state.sources],
+        "evidence": [{
+            "evidence_id": anchor.anchor_id,
+            "source_id": anchor.source_id,
+            "raw_text": anchor.text or anchor.normalized_summary,
+            "normalized_summary": anchor.normalized_summary or None,
+            "evidence_type": anchor.anchor_type,
+            "extraction_confidence": anchor.extraction_confidence,
+            "evidence_specificity": anchor.specificity,
+            "locator": anchor.locator or None,
+            "limits": list(anchor.limits),
+            "warnings": list(anchor.warnings),
+            "usable_as_trace_evidence": anchor.usable_for_trace,
+        } for anchor in belief_state.anchors],
         "events": [],
         "traces": [],
-        "warnings": [
-            "SourceGuard does not generate validated events or traces.",
-            "Permission-gated and unavailable material remains an access gap.",
-        ],
     }
 
 

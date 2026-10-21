@@ -94,3 +94,12 @@ Removed the export-time exact suite-version gate and five example metadata versi
 - `python <external>/probe_rg07.py` — exit 0, 0.501s; `old release export accepted; example metadata version pins removed; native schema identifiers unchanged`
 - `python -m pytest --collect-only` — exit 0, 4.175s; `888 tests collected in 3.64s`
 - `python -m flowguard map check` — exit 0, 1.455s; `check: 0 error(s), 10 warning(s), 0 info`
+
+## RG-08 — completed
+
+SourceGuard exports actual TraceGuard v2 sources/evidence and moves source gaps/warnings into metadata notes; no invented events or traces. New cross-engine test failed against old schema, then source126passed and all5 exported examples loaded (schema_ok true,trace_count0,okfalse as honest starter state); collection889.
+
+- `python -m pytest tests/source/test_handoff.py::test_traceguard_seed_loads_as_a_traceguard_model` — exit 1, 0.934s; `1 failed in 0.48s`
+- `python -m pytest tests/source` — exit 0, 11.984s; `126 passed in 11.68s`
+- `python <external>/probe_rg08.py` — exit 0, 4.159s; `structural_source_gap: validTraceGuardV2; schema_ok=true;trace_count0;ok=false;rc0`
+- `python -m pytest --collect-only` — exit 0, 3.544s; `889 tests collected in 3.00s`

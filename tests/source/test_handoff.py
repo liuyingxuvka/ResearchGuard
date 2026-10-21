@@ -38,3 +38,13 @@ def test_exports_accept_a_model_written_by_an_older_release():
     state.metadata["version"] = "0.5.8"
     assert export_traceguard_seed(state)["metadata"]["source_model_version"] == "0.5.8"
     assert export_logicguard_source_candidates(state)["metadata"]["source_model_version"] == "0.5.8"
+
+
+def test_traceguard_seed_loads_as_a_traceguard_model():
+    from researchguard.trace.schema import TraceGuardModel
+    from researchguard.trace.validation import validate_references
+
+    state = load_model("examples/source/paper_citation_discovery.yaml", "examples/source/paper_citation_discovery.contract.json")
+    model = TraceGuardModel.from_dict(export_traceguard_seed(state))
+    validate_references(model)
+    assert model.sources and model.evidence and not model.traces
