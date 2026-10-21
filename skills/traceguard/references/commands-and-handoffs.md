@@ -13,9 +13,9 @@ researchguard trace export-logicguard <model.yaml> --output <bundle.yaml>
 researchguard trace create --output <model.yaml>
 researchguard trace simulate --mode storyline-depth --model <model.yaml> --pretty
 researchguard trace compare <before.yaml> <after.yaml> --pretty
-researchguard trace iterate freeze --model <model.yaml> --prediction-id <id> --frozen-at <time> --target-kind <kind> --target-id <id> --expected-evidence <id> --weakens-when <condition> --task-id <task> --purpose <purpose> --coverage-id <id> --iteration 0 --max-iterations 4 --output <prediction.json>
+researchguard trace iterate freeze --model <model.yaml> --prediction-id <id> --frozen-at <time> --target-kind <kind> --target-id <id> --expected-evidence <id> --weakens-when <condition> [--iteration <n> --prior-open-gap-id <gap>] --output <prediction.json>
 researchguard trace iterate compare --prediction <prediction.json> --observation <observation.json> --output <comparison.json>
-researchguard trace iterate decide --comparison <comparison.json> --observation <observation.json> --holdout-observation <holdout.json> --candidate <candidate.yaml> --required-holdout-evidence <id> --output <revision.json>
+researchguard trace iterate decide --comparison <comparison.json> --observation <observation.json> --candidate <candidate.yaml> [--holdout-observation <holdout.json> --required-holdout-evidence <id>] --output <revision.json>
 researchguard trace library validate <case-library> --pretty
 researchguard trace library build-model <case-library> <case-id> --output <model.yaml> --pretty
 ```

@@ -482,3 +482,17 @@ Source search iteration now returns a result without receipt bindings, accepts o
 - `python -m flowguard map confirm sourceguard suite-orchestration` — exit 0, 0.269s; `confirmed 2 component(s)`
 - `python -m flowguard map check` — exit 0, 0.279s; `check: 0 error(s), 4 warning(s), 0 info`
 - `python -m flowguard release` — exit 0, 2.067s; `verify: PASS (map, lint and models only; tests not run; run python -m pytest -q separately)`
+
+## RG-43 — completed
+
+Trace iteration drops detached snapshot/observation/result fingerprints and handwritten bindings. Known target and observed evidence/event/source IDs are checked natively; construction data in a candidate must match the baseline directly. Holdout is optional, with independence enforced when supplied. Timestamp/event-order validation, native gaps and exact baseline-byte stale checks remain. 101 focused tests passed; collection 364; fixed LW43 native ready/PASSED 10 passed 0 skipped; exports/map/release passed.
+
+- `python <external>/probe_rg43.py` — exit 0, 1.678s; `only 2 omitted-key assertions remain`
+- `python <external>/check_exports.py` — exit 0, 0.766s; `exports ok`
+- `python -m pytest -p no:cacheprovider tests/contract/test_researchguard_handoff.py --junitxml <external>/RG-43-lw43-junit.xml --basetemp <external>/RG-43-lw43-temp` — exit 0, 0.905s; `============================== 10 passed in 0.38s ==============================`
+- `python <external>/verify_lw_junit.py <external>/RG-43-lw43-junit.xml` — exit 0, 0.043s; `10 actual PASSED, 0 skipped; real native provider-to-reader bridge PASSED/ready, not version-skipped`
+- `python -m pytest --collect-only` — exit 0, 2.661s; `364 tests collected in 2.12s`
+- `python -m flowguard map confirm suite-orchestration traceguard` — exit 0, 0.284s; `confirmed 2 component(s)`
+- `python -m flowguard map check` — exit 0, 0.429s; `check: 0 error(s), 4 warning(s), 0 info`
+- `python -m pytest tests/trace tests/test_prompt_bundles.py tests/test_skill_suite.py` — exit 0, 43.674s; `101 passed in 43.26s`
+- `python -m flowguard release` — exit 0, 2.021s; `verify: PASS (map, lint and models only; tests not run; run python -m pytest -q separately)`

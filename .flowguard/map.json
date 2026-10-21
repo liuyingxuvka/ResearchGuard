@@ -86,7 +86,7 @@
         ".flowguard/models/sourceguard_content_anchor_oracle_model.py"
       ],
       "status": "confirmed",
-      "fingerprint": "sha256:84374974bb901825d2b00184bbb10151d5d4a460366f3ef417b6341fd5a98024"
+      "fingerprint": "sha256:c0c7c7ee763804bb6ed8c35cb1f406fb255e159e33e8973778ee3d1f07c0245d"
     },
     {
       "id": "logicguard",
@@ -256,7 +256,7 @@
       ],
       "models": [],
       "status": "confirmed",
-      "fingerprint": "sha256:19236fd20f6ddfa0834e6e5d57b37939795a6be51c938825de3a41870f20f0d1"
+      "fingerprint": "sha256:317e40af8921c67f19918a5a578a8ea722c0b1f464b42fabd309891b5a96a2b5"
     },
     {
       "id": "experimentguard",

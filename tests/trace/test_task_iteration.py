@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from dataclasses import asdict
 import json
 from pathlib import Path
 
@@ -9,8 +8,6 @@ import yaml
 
 import researchguard.trace.task_iteration as task_iteration_module
 from researchguard.trace.cli import main
-from researchguard.trace.inference.types import fingerprint
-from researchguard.trace.loader import load_model
 from researchguard.trace.task_iteration import (
     EvidenceBatchObservation,
     TaskIterationError,
@@ -79,7 +76,6 @@ def _prediction(**overrides):
 
 
 def _observation(*, holdout: bool = False, observed_at: str | None = None):
-    model = load_model(EXAMPLE)
     if holdout:
         evidence_ids = ("ev_meeting_boundary",)
         event_ids = ("event_boundary",)
@@ -101,20 +97,7 @@ def _observation(*, holdout: bool = False, observed_at: str | None = None):
             "event_order": list(event_ids),
             "contradiction_ids": [],
             "source_refs": list(source_ids),
-            "evidence_bindings": {
-                item: f"sha256:{fingerprint(asdict(model.evidence_by_id()[item]))}"
-                for item in evidence_ids
-            },
-            "event_bindings": {
-                item: f"sha256:{fingerprint(asdict(model.event_by_id()[item]))}"
-                for item in event_ids
-            },
-            "source_bindings": {
-                item: f"sha256:{fingerprint(asdict(model.source_by_id()[item]))}"
-                for item in source_ids
-            },
             "future_holdout_status": "not_run",
-            "future_holdout_validator_receipt": "",
         }
     )
 
@@ -126,32 +109,29 @@ def _comparison_file(tmp_path: Path, observation, **prediction_overrides) -> Pat
     return path
 
 
-def test_current_prediction_requires_explicit_task_scope() -> None:
-    with pytest.raises(TypeError):
-        freeze_prediction(
-            model_path=EXAMPLE,
-            prediction_id="old-shape",
-            frozen_at="2026-07-17T10:00:00+00:00",
-            target_kind="storyline",
-            target_id="trace_metadata_incident",
-            prediction_kind="evidence_footprint",
-            expected_evidence_ids=["ev_pr_fix"],
-            weakens_when="missing",
-        )
-    assert _prediction().coverage_fingerprint
+def test_prediction_needs_only_a_known_target_and_an_expectation() -> None:
+    prediction = freeze_prediction(
+        model_path=EXAMPLE,
+        prediction_id="minimal",
+        frozen_at="2026-07-17T10:00:00+00:00",
+        target_kind="storyline",
+        target_id="trace_metadata_incident",
+        prediction_kind="evidence_footprint",
+        expected_evidence_ids=["ev_pr_fix"],
+        weakens_when="missing",
+    )
+    assert prediction.iteration == 0
+    assert "snapshot_fingerprint" not in prediction.to_dict()
+    with pytest.raises(TaskIterationError, match="target is missing from the model"):
+        _prediction(target_id="trace_unknown")
 
 
-def test_loaded_prediction_rejects_implicit_or_rebound_task_scope() -> None:
+def test_loaded_prediction_accepts_missing_optional_task_fields() -> None:
     raw = _prediction().to_dict()
-    raw.pop("unknowns")
-    raw["snapshot_fingerprint"] = ""
-    with pytest.raises(TaskIterationError, match="missing task fields"):
-        task_iteration_module.PredictionSnapshot.from_dict(raw)
-    raw = _prediction().to_dict()
-    raw["coverage_ids"] = ["trace_metadata_incident"]
-    raw["snapshot_fingerprint"] = ""
-    with pytest.raises(TaskIterationError, match="coverage_fingerprint mismatch"):
-        task_iteration_module.PredictionSnapshot.from_dict(raw)
+    for key in ("task_id", "purpose", "coverage_ids", "assumptions", "unknowns"):
+        raw.pop(key)
+    loaded = task_iteration_module.PredictionSnapshot.from_dict(raw)
+    assert loaded.coverage_ids == ()
 
 
 def test_observation_must_follow_prediction() -> None:
@@ -162,22 +142,19 @@ def test_observation_must_follow_prediction() -> None:
         )
 
 
-def test_stale_semantic_evidence_binding_is_rejected() -> None:
+def test_observed_ids_must_exist_in_the_model() -> None:
     raw = _observation().to_dict()
-    raw["observation_fingerprint"] = ""
-    raw["evidence_bindings"]["ev_pr_fix"] = "sha256:" + "0" * 64
+    raw["evidence_ids"] = ["ev_unknown"]
     observation = EvidenceBatchObservation.from_dict(raw)
-    with pytest.raises(TaskIterationError, match="evidence binding"):
+    with pytest.raises(TaskIterationError, match="observed evidence is missing from the model"):
         compare_prediction_observation(_prediction(), observation)
 
 
-def test_current_native_depth_receipt_controls_local_match_terminal() -> None:
+def test_native_depth_gaps_control_local_match_terminal() -> None:
     comparison = compare_prediction_observation(_prediction(), _observation())
-    assert comparison["native_depth_receipt_id"]
-    assert comparison["native_depth_receipt"]["closure_status"] in {"PASS", "GAP"}
+    assert "native_depth_receipt" not in comparison
     assert (comparison["terminal_reason"] == "model_closed_for_task") is (
-        comparison["native_depth_receipt"]["closure_status"] == "PASS"
-        and not comparison["open_gap_ids"]
+        not comparison["open_gap_ids"]
     )
 
 
@@ -194,7 +171,20 @@ def test_candidate_accepts_only_with_separate_holdout(tmp_path: Path, monkeypatc
     )
     assert revision["disposition"] == "accepted"
     assert revision["terminal_reason"] == "model_closed_for_task"
-    assert revision["native_depth_receipt_id"] == "traceguard-depth:passing"
+    assert "revision_fingerprint" not in revision
+
+
+def test_candidate_can_be_accepted_without_a_holdout(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setattr(task_iteration_module, "evaluate_storyline_depth", lambda *args, **kwargs: _PassingDepth())
+    construction = _observation()
+    comparison = load_comparison(_comparison_file(tmp_path, construction))
+    revision = decide_candidate_revision(
+        comparison=comparison,
+        candidate_model_path=_candidate_model(tmp_path),
+        observation=construction,
+    )
+    assert revision["disposition"] == "accepted"
+    assert revision["holdout_observation_id"] == ""
 
 
 def test_same_evidence_cannot_be_reused_as_holdout(tmp_path: Path, monkeypatch) -> None:
@@ -223,7 +213,7 @@ def test_candidate_cannot_rewrite_construction_evidence_binding(
     )["raw_text"] = "Candidate rewrote the construction evidence."
     candidate = tmp_path / "candidate-rebound.yaml"
     candidate.write_text(yaml.safe_dump(data, sort_keys=False), encoding="utf-8")
-    with pytest.raises(TaskIterationError, match="construction evidence binding"):
+    with pytest.raises(TaskIterationError, match="construction evidence changed in candidate"):
         decide_candidate_revision(
             comparison=comparison,
             candidate_model_path=candidate,
@@ -249,7 +239,7 @@ def test_explicit_rollback_retains_baseline(tmp_path: Path, monkeypatch) -> None
     assert revision["effective_model_sha256"] == revision["baseline_model_sha256"]
 
 
-def test_cli_requires_strict_task_and_holdout_artifacts(tmp_path: Path) -> None:
+def test_cli_runs_the_loop_with_optional_task_fields(tmp_path: Path) -> None:
     prediction_path = tmp_path / "prediction.json"
     construction_path = tmp_path / "construction.json"
     holdout_path = tmp_path / "holdout.json"
@@ -263,8 +253,6 @@ def test_cli_requires_strict_task_and_holdout_artifacts(tmp_path: Path) -> None:
         "--frozen-at", "2026-07-17T10:00:00+00:00", "--target-kind", "storyline",
         "--target-id", "trace_metadata_incident", "--expected-evidence", "ev_pr_fix",
         "--expected-event", "event_mitigation", "--weakens-when", "missing",
-        "--task-id", "trace-cli", "--purpose", "strict trace CLI", "--coverage-id",
-        "trace_metadata_incident", "--iteration", "0", "--max-iterations", "4",
         "--output", str(prediction_path),
     ]) == 0
     assert main([
