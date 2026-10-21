@@ -138,7 +138,7 @@ def validate_selection_request(
     model_fp = _text("model_fingerprint")
     if model_id and model_id != expected_model_id:
         errors.append("model_identity_mismatch")
-    if model_fp and model_fp != expected_model_fingerprint:
+    if model_fp and model_fp.removeprefix("sha256:") != expected_model_fingerprint:
         errors.append("model_fingerprint_mismatch")
 
     raw_order = request.get("body_unit_order", ())

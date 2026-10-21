@@ -54,7 +54,7 @@ def _unit(unit_id, claim_ids, placement, *, required=False, predecessors=(), rel
     }
 
 
-def _ready_plan():
+def _ready_plan(with_receipt=True):
     model = _model()
     request = {
         "schema": "researchguard.logic.synthesis-request.v1",
@@ -76,7 +76,7 @@ def _ready_plan():
         ],
         "source_branch_bindings": [],
     }
-    receipt = _build_native_depth_analysis(model, budget=20)
+    receipt = _build_native_depth_analysis(model, budget=20) if with_receipt else None
     plan = synthesize_artifact_plan(model, selection_request=request, native_depth_receipt=receipt)
     assert plan.status == "research_handoff_ready", plan.open_gaps
     return plan
@@ -131,3 +131,7 @@ def test_delivery_rejects_unknown_or_duplicate_body_order():
     guidance = adapt_delivery(bad)
     assert guidance.status == "blocked_delivery_contract"
     assert any("unknown_body_unit:ghost" in gap for gap in guidance.open_gaps)
+
+
+def test_ready_plan_needs_no_external_depth_receipt():
+    assert _ready_plan(with_receipt=False).status == "research_handoff_ready"

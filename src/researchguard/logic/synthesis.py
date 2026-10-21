@@ -15,7 +15,7 @@ import re
 from typing import Any, Iterable, Mapping
 
 from .citation_matrix import ClaimSourceParagraphMatrix, build_claim_source_paragraph_matrix
-from .execution_depth import build_argument_coverage_universe, model_fingerprint
+from .execution_depth import _build_native_depth_analysis, build_argument_coverage_universe, model_fingerprint
 from .evaluator import evaluate_model
 from .importance import ImportanceRecord, summarize_importance
 from .model import LogicDepthReceipt, LogicModel
@@ -699,8 +699,13 @@ def _native_scope_gaps(
     if required_assertion:
         reference = native_depth_receipt if native_depth_receipt is not None else request.native_depth_receipt_ref
         if reference in (None, ""):
-            gaps.append("native_depth_receipt_missing")
-        else:
+            reference = _build_native_depth_analysis(
+                model,
+                budget=max(6, len(model.nodes)),
+                requested_claim_scope_ids=selected_claims,
+                result=evaluation,
+            )
+        if reference is not None:
             payload = _load_artifact(reference)
             if payload is None:
                 gaps.append("native_depth_receipt_unresolved")

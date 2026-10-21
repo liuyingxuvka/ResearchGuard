@@ -62,3 +62,17 @@ logic depth now computes native depth without a contract and prints the real six
 - `python <external>/probe_rg04.py` — exit 0, 1.119s; `native gap summary rc3: 516 bytes;partial options rc1; warrant gap retained`
 - `python -m pytest -p no:cacheprovider tests/contract/test_researchguard_handoff.py tests/e2e/test_production_reader_pipeline.py tests/contract/test_production_reader_native_lifecycle.py` — exit 0, 2.087s; `============================== 44 passed in 1.82s ==============================`
 - `python -m pytest --collect-only` — exit 0, 3.786s; `886 tests collected in 3.40s`
+
+Coordinator update: independent cross-repository review confirmed that RG-11–RG-38 also use only the immutable audit dependency copies. The earlier pause after RG-10 is replaced by continuation through RG-38 under the user’s parallel-work authorization. Stop after RG-38 until current LogicWriting completes LW-59; RG-47/RG-48 still require LW-43. No dependency version or per-action verification rule changes.
+
+## RG-05 — completed
+
+Absent external depth now invokes the same native analysis in-process; supplied receipts retain their existing validation. sha256-prefixed selection identities accepted. The real warrant gap remains blocked_support_gap, while a complete model is ready. Focused32/LW44passed; collection887; checkpoint874passed13skipped in509.23s,2models pass,map0errors.
+
+- `python -m pytest tests/logic/test_artifact_synthesis.py tests/logic/test_synthesis_contract.py tests/logic/test_synthesis_native_closure.py tests/logic/test_delivery_contract.py tests/logic/test_cli.py` — exit 0, 21.115s; `32 passed in 20.81s`
+- `python <external>/probe_rg05.py` — exit 0, 0.313s; `blocked_support_gap False True`
+- `python -m pytest -p no:cacheprovider tests/contract/test_researchguard_handoff.py tests/e2e/test_production_reader_pipeline.py tests/contract/test_production_reader_native_lifecycle.py` — exit 0, 2.35s; `============================== 44 passed in 1.99s ==============================`
+- `python -m pytest --collect-only` — exit 0, 3.59s; `887 tests collected in 3.01s`
+- `python -m pytest` — exit 0, 509.924s; `874 passed, 13 skipped in 509.23s (0:08:29)`
+- `python -m flowguard map models` — exit 0, 0.91s; `models: 2 passed, 0 failed`
+- `python -m flowguard map check` — exit 0, 1.319s; `check: 0 error(s), 9 warning(s), 0 info`
