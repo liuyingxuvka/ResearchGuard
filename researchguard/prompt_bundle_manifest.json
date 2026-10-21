@@ -5,10 +5,9 @@
       "skill_id": "researchguard",
       "entry_files": [
         "skills/researchguard/SKILL.md",
-        "skills/researchguard/agents/openai.yaml",
-        "skills/researchguard/references/member-admission-index.md"
+        "skills/researchguard/agents/openai.yaml"
       ],
-      "max_entry_bytes": 12000,
+      "max_entry_bytes": 3000,
       "minimum_headroom_bytes": 1200
     },
     {
@@ -49,24 +48,6 @@
     }
   ],
   "reference_edges": [
-    {
-      "skill_id": "researchguard",
-      "trigger_id": "route:member-admission",
-      "declared_in": "skills/researchguard/SKILL.md",
-      "reference": "skills/researchguard/references/member-admission-index.md"
-    },
-    {
-      "skill_id": "researchguard",
-      "trigger_id": "route:member-model-envelope",
-      "declared_in": "skills/researchguard/SKILL.md",
-      "reference": "skills/researchguard/references/member-model-envelope.md"
-    },
-    {
-      "skill_id": "researchguard",
-      "trigger_id": "route:external-domain-dna",
-      "declared_in": "skills/researchguard/SKILL.md",
-      "reference": "skills/researchguard/references/external-domain-dna.md"
-    },
     {
       "skill_id": "logicguard",
       "trigger_id": "route:general-argument",

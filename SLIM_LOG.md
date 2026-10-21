@@ -193,3 +193,11 @@ Experiment recommend补默认非领域循环字段，坏输入给JSON/CLI2，删
 - `python -m pytest tests/test_prompt_bundles.py tests/test_skill_suite.py` — exit 0, 2.53s; `10 passed in 2.05s`
 - `python -m pytest --collect-only` — exit 0, 4.242s; `861 tests collected in 3.76s`
 - `python -c from pathlib import Path; s=Path("scripts/check_prompt_bundles.py").read_text(); assert not any(x in s for x in ("routing","render_member_admission_index","conditional_blueprint_boundaries","self_dna")); print("checker only retains budget, declared references and eager-member-load limits")` — exit 0, 0.046s; `checker only retains budget, declared references and eager-member-load limits`
+
+## RG-19 — completed
+
+伞形技能按清单改为成员路由和顺序交接，删三参考；失败结果可见且不可换成员重试。入口1738字节，预算/引用检查和10项技能测试通过，伞形references为0。
+
+- `python scripts/check_prompt_bundles.py --json` — exit 0, 0.044s; `}`
+- `python -m pytest tests/test_prompt_bundles.py tests/test_skill_suite.py` — exit 0, 2.079s; `10 passed in 1.77s`
+- `python -c from pathlib import Path; p=Path("skills/researchguard/references"); assert not p.exists() or not list(p.iterdir()); print("0 umbrella references")` — exit 0, 0.031s; `0 umbrella references`
