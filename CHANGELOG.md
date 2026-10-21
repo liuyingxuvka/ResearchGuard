@@ -1,5 +1,22 @@
 # Changelog
 
+## v0.5.10 - 2026-10-21
+
+- Done: RG-01, RG-02, RG-03, RG-04, RG-05, RG-06, RG-07, RG-08, RG-09, RG-10, RG-11, RG-12, RG-13, RG-14, RG-15, RG-16, RG-17, RG-18, RG-19, RG-20, RG-21, RG-22, RG-23, RG-24, RG-25, RG-26, RG-27, RG-28, RG-29, RG-30, RG-31, RG-32, RG-33, RG-34, RG-35, RG-36, RG-37, RG-38, RG-39, RG-40, RG-41, RG-42, RG-43, RG-44, RG-45, RG-46, RG-47, RG-48, RG-49, RG-50, RG-51, RG-52, RG-53, RG-54, RG-55, RG-56, RG-57.
+- Skipped: none.
+- One `researchguard` skill with a route table (logic, source, trace, experiment) replaces the five skill entries;
+  the installer copies it into `--target`, removes the retired member skill folders and offers `--check`/`--dry-run`.
+  The console `researchguard logic|source|trace|experiment` is unchanged.
+- Removed SkillGuard-era proof machinery: admission and routing envelopes, native receipts and owner proofs, domain
+  and self DNA, blueprints and template packs, ModelMesh, the ModelStore stack, SourceGuard model contracts, the
+  LogicGuard depth receipt chain and guard contracts, and the suite fingerprint.
+- New: `researchguard source stop-decision` and `researchguard logic minimal-sets`; `trace evaluate` no longer runs
+  storyline depth (use `trace depth`); `logic validate --library-root` checks Evidence provenance anchors against the
+  source library; the predict-observe-revise loops reject coverage ids (and TraceGuard expected evidence and
+  event ids) that are not in the model.
+- The two self-models replay the real console, installer and SourceGuard depth code; `flowguard release` passes with
+  FlowGuard 0.70.6 and the new FlowGuard.
+
 ## v0.5.9 - 2026-10-18
 
 - Keep every validated independent holdout counterexample visible and block closure even when another holdout matches.

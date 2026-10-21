@@ -701,3 +701,23 @@ OpenSpec1.14.1 installed only in an external private prefix, then performed actu
 - `python -m pytest --collect-only` — exit 0, 2.085s; `344 tests collected in 1.65s`
 - `python -m flowguard map check` — exit 0, 4.214s; `check: 0 error(s), 3 warning(s), 0 info`
 - `python -m flowguard release` — exit 0, 2.791s; `verify: PASS (map, lint and models only; tests not run; run python -m pytest -q separately)`
+
+## RG-57 — completed
+
+User override applied: release version is0.5.10, with native package/pyproject/CLI and both private-env distribution metadata equal. CHANGELOG lists RG01–57; FlowGuard minimum v0.70.6 and historical TraceGuard0.6.0 documentation retained. Raw/active/journal version scans verify only two active version authorities. Full checkpoint344 passed; two oldFG models and both old/newFG release passed; fixed LW43 native bridge10 passed zero skips, collection344, exports/map passed.
+
+- `uv pip install --python python --no-deps -e .` — exit 0, 3.055s; ` + researchguard==0.5.10 (from file://<workspace>/repos/ResearchGuard)`
+- `uv pip install --python python-newfg --no-deps -e .` — exit 0, 1.577s; ` + researchguard==0.5.10 (from file://<workspace>/repos/ResearchGuard)`
+- `python -c import importlib.metadata as m,subprocess,researchguard,pathlib;assert researchguard.__version__==m.version("researchguard")=="0.5.10";assert subprocess.check_output(["researchguard","--version"],text=True).strip()=="researchguard 0.5.10";print(researchguard.__version__,m.version("researchguard"));p=pathlib.Path("CHANGELOG.md");assert p.read_text().splitlines()[2].startswith("## v0.5.10 - ");print("\n".join(p.read_text().splitlines()[:7]));assert "flowguard @ git+https://github.com/liuyingxuvka/FlowGuard.git@v0.70.6" in pathlib.Path("pyproject.toml").read_text()` — exit 0, 0.15s; `- One `researchguard` skill with a route table (logic, source, trace, experiment) replaces the five skill entries;`
+- `python <external>/check_exports.py` — exit 0, 1.259s; `exports ok`
+- `python -m pytest -p no:cacheprovider tests/contract/test_researchguard_handoff.py --junitxml <external>/RG-57-lw43-junit.xml --basetemp <external>/RG-57-lw43-temp` — exit 0, 1.031s; `============================== 10 passed in 0.53s ==============================`
+- `python <external>/verify_lw_junit.py <external>/RG-57-lw43-junit.xml` — exit 0, 0.062s; `10 actual PASSED, 0 skipped; real native provider-to-reader bridge PASSED/ready, not version-skipped`
+- `python -m pytest --collect-only` — exit 0, 4.507s; `344 tests collected in 3.46s`
+- `python -m flowguard map confirm researchguard-suite` — exit 0, 0.175s; `confirmed 1 component(s)`
+- `python -m flowguard map check` — exit 0, 0.294s; `check: 0 error(s), 3 warning(s), 0 info`
+- `python -m flowguard release` — exit 0, 3.496s; `verify: PASS (map, lint and models only; tests not run; run python -m pytest -q separately)`
+- `python <external>/probe_versions.py RG-57` — exit 0, 0.106s; `user0.5.10 authority only; retained historical TraceGuard0.6.0; journal exclusion limited to root SLIM_LOG`
+- `python-newfg -m flowguard release` — exit 0, 12.597s; `verify: PASS (map, lint and models only; tests not run; run python -m pytest -q separately)`
+- `python -m flowguard read --component researchguard-suite` — exit 0, 7.911s; `  used by: logicguard, suite-orchestration`
+- `python -m pytest` — exit 0, 88.277s; `344 passed in 87.69s (0:01:27)`
+- `python -m flowguard map models` — exit 0, 3.554s; `models: 2 passed, 0 failed`

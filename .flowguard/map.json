@@ -33,7 +33,7 @@
         ".flowguard/models/researchguard_suite_model.py"
       ],
       "status": "confirmed",
-      "fingerprint": "sha256:2406227c0251358fad4f46de190b46eafcf16a1308edbc430cb03f5ce854196a"
+      "fingerprint": "sha256:f819ce849757141070d8cd12cd274ff1571d36ef0523eba0bf196aa10e2880ac"
     },
     {
       "id": "suite-orchestration",
