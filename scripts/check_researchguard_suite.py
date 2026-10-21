@@ -35,7 +35,6 @@ from researchguard.routing import (  # noqa: E402
     select_member_request,
 )
 from researchguard.source.schema import Gap, SchemaError  # noqa: E402
-from researchguard.software_dna import check_software_dna_contract  # noqa: E402
 
 
 MEMBERS = (
@@ -175,13 +174,7 @@ def _check_common(checks: list[dict[str, str]]) -> None:
         "consumer projection contains no retired command or wrapper",
         checks,
     )
-    software_dna = check_software_dna_contract(ROOT)
-    _assert(
-        bool(software_dna.get("ready"))
-        and software_dna.get("readiness", {}).get("first_gap", "") == "",
-        "native software-DNA root, provider-neutral denominator, indexes, and seven readiness layers are current",
-        checks,
-    )
+
 
 
 def _task_facts(member: str, argv: tuple[str, ...], intent: str) -> dict:
@@ -368,7 +361,7 @@ def _check_researchguard(checks: list[dict[str, str]]) -> None:
         result.returncode == 0
         and (
             "usage: researchguard "
-            "{run|self-dna|logic|source|trace|experiment} ..."
+            "{run|logic|source|trace|experiment} ..."
         )
         in result.stdout,
         (

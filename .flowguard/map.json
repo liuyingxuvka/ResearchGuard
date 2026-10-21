@@ -23,13 +23,10 @@
         "src/researchguard/native_receipts.py",
         "src/researchguard/portable_material.py",
         "src/researchguard/resources/__init__.py",
-        "src/researchguard/self_dna.py",
-        "src/researchguard/software_dna.py",
         "src/researchguard/suite.py",
         "src/researchguard/target_authority.py"
       ],
       "entrypoints": [
-        "src/researchguard/self_dna.py:check",
         "src/researchguard/suite.py:suite_identity"
       ],
       "state": [

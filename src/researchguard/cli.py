@@ -212,10 +212,9 @@ def _print_help() -> None:
     print(
         "\n".join(
             (
-                "usage: researchguard {run|self-dna|logic|source|trace|experiment} ...",
+                "usage: researchguard {run|logic|source|trace|experiment} ...",
                 "",
                 "run     route to one member or emit one minimum-sufficient composition",
-                "self-dna  explicitly audit ResearchGuard's FlowGuard-owned software DNA",
                 "logic   execute the LogicGuard native owner",
                 "source  execute the SourceGuard native owner",
                 "trace   execute the TraceGuard native owner",
@@ -223,8 +222,6 @@ def _print_help() -> None:
                 "",
                 "umbrella form:",
                 "  researchguard run --business-intent-id ID --task-facts FILE [--native-owner-attestations FILE] [--changed-id ID | --reverse-trace-output ID] -- ARGS",
-                "self-DNA forms:",
-                "  researchguard self-dna check [--root ROOT] [--compact]",
             )
         )
     )
@@ -242,10 +239,6 @@ def main(argv: list[str] | None = None) -> int:
     command_argv = args[1:]
     if command == "run":
         return _run_umbrella(command_argv)
-    if command == "self-dna":
-        from .self_dna import main as self_dna_main
-
-        return self_dna_main(command_argv)
     if command in {"logic", "source", "trace", "experiment"}:
         return _execute(f"{command}guard", command_argv)
     from .routing import TypedGap

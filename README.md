@@ -19,16 +19,6 @@ version, and one suite fingerprint. A selected member failure is terminal.
 ResearchGuard does not retry through another member, silently downgrade, or
 load legacy package formats.
 
-The explicit `researchguard self-dna check` operation reads one native
-repository software-DNA root with four recursively decomposed member
-subtrees. It independently enumerates Python, declarative, workflow, text,
-and resource surfaces, binds every admitted item to one owner, and reports
-seven readiness layers plus deterministic forward, reverse, and affected-only
-indexes. Generated receipts and canonical projections stay outside the
-denominator. Current FlowGuard 0.70.6 owns the living `.flowguard/map.json`.
-The check reports static currentness and explicitly leaves model execution as
-`not_run`; the two executable models and native pytest suite run separately.
-CI installs the published FlowGuard v0.70.6 dependency.
 
 The first release was `v0.1.0`.
 

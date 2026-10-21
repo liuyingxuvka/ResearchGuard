@@ -35,3 +35,12 @@ Made the GUI-only import conditional, fixed direct pytest imports, and removed o
 - `python -m pytest tests/logic/test_library_viewer.py` — exit 0, 0.896s; `9 passed in 0.55s`
 - `pytest --collect-only` — exit 0, 3.497s; `906 tests collected in 3.06s`
 - `python -m pytest --collect-only` — exit 0, 3.769s; `906 tests collected in 3.28s`
+
+## RG-02 — completed
+
+Removed the explicit self-DNA command, duplicate DNA files and its test/runner-only machinery; the FlowGuard map, its component fingerprints and both registered native models remain. Focused51passed; collection884; map0errors (7warnings include expected interim STALE); retired self-dna exits2.
+
+- `python -m pytest tests/test_root_cli.py tests/test_suite_checker_bounds.py tests/test_install_researchguard.py tests/test_suite_model_currentness.py tests/test_skill_suite.py tests/test_prompt_bundles.py` — exit 0, 15.395s; `51 passed in 15.03s`
+- `python <external>/probe_rg02.py` — exit 0, 0.267s; `help current; self-dna unknown-command rc2; remaining literal-only references: ['scripts/check_prompt_bundles.py', 'tests/test_prompt_bundles.py', 'tests/test_skill_suite.py', 'tests/test_suite_model_currentness.py']`
+- `python -m pytest --collect-only` — exit 0, 3.29s; `884 tests collected in 2.84s`
+- `python -m flowguard map check` — exit 0, 0.521s; `check: 0 error(s), 7 warning(s), 0 info`

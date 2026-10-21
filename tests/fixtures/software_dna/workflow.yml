@@ -1,9 +1,0 @@
-schema_version: researchguard.software-dna-fixture.v1
-kind: workflow
-steps:
-  - id: enumerate
-    owner: provider-neutral-inventory
-    terminal: read-only
-  - id: bind
-    owner: repository-software-dna
-    terminal: exact-current
