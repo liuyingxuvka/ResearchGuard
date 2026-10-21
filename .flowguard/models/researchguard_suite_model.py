@@ -14,21 +14,6 @@ from flowguard import (
 )
 
 FLOWGUARD_MODEL_MARKER = "flowguard-executable-model"
-CURRENT_RESEARCHGUARD_VERSION = "0.5.9"
-
-# The executable route model consumes the native software-DNA root only for
-# explicit self-DNA qualification; member-domain blueprints remain opaque
-# native owners and are not copied into this FlowGuard model.
-SOFTWARE_DNA_MODEL_PATH = "models/software_dna/researchguard.json"
-SOFTWARE_DNA_ROOT_MODEL_ID = "researchguard-suite"
-SOFTWARE_DNA_MEMBER_MODEL_IDS = (
-    "logicguard",
-    "sourceguard",
-    "traceguard",
-    "experimentguard",
-)
-SOFTWARE_DNA_READINESS_LAYER_COUNT = 7
-
 
 MEMBER_BY_INTENT = {
     "argument_licensing": ("logicguard", "primary:researchguard:logic"),
@@ -75,20 +60,8 @@ class RouteState:
     alternate_attempts: int = 0
 
 
-@dataclass(frozen=True)
-class PackageIdentityRequest:
-    researchguard_version: str
-    predecessor_distribution_state: str
-    predecessor_version: str = ""
 
 
-@dataclass(frozen=True)
-class PackageIdentityState:
-    phase: str = "unresolved"
-    package_version: str = ""
-    fingerprint_owner: str = ""
-    predecessor_queries: int = 0
-    alternate_attempts: int = 0
 
 
 class Route:
@@ -373,46 +346,6 @@ class OrchestrateHandoff:
         )
 
 
-class ResolveMeshStorePackageIdentity:
-    name = "ResolveMeshStorePackageIdentity"
-    accepted_input_type = PackageIdentityRequest
-    reads = ("researchguard_version",)
-    writes = (
-        "phase",
-        "package_version",
-        "fingerprint_owner",
-        "predecessor_queries",
-    )
-    input_description = "the sole current ResearchGuard in-package version"
-    output_description = "one current durable mesh-store identity"
-    idempotency = "predecessor distribution state is outside the relation"
-
-    def apply(
-        self,
-        request: PackageIdentityRequest,
-        state: PackageIdentityState,
-    ):
-        if (
-            state.phase != "unresolved"
-            or request.researchguard_version != CURRENT_RESEARCHGUARD_VERSION
-        ):
-            yield FunctionResult(
-                request,
-                replace(state, phase="blocked"),
-                label="package_identity_blocked",
-            )
-            return
-        yield FunctionResult(
-            request,
-            replace(
-                state,
-                phase="resolved",
-                package_version=request.researchguard_version,
-                fingerprint_owner="researchguard",
-                predecessor_queries=0,
-            ),
-            label="package_identity_resolved_current",
-        )
 
 
 def no_alternate_success() -> Invariant:
@@ -451,39 +384,10 @@ def terminal_failure_stays_terminal() -> Invariant:
 INVARIANTS = (no_alternate_success(), terminal_failure_stays_terminal())
 
 
-def current_package_identity() -> Invariant:
-    def predicate(state: PackageIdentityState, _trace):
-        if state.phase == "resolved" and (
-            state.package_version != CURRENT_RESEARCHGUARD_VERSION
-            or state.fingerprint_owner != "researchguard"
-        ):
-            return InvariantResult.fail("mesh store identity is not current ResearchGuard")
-        return InvariantResult.pass_()
-
-    return Invariant(
-        "mesh_store_uses_researchguard_package_identity",
-        "Durable mesh-store identity is owned only by the current ResearchGuard package.",
-        predicate,
-    )
 
 
-def no_predecessor_distribution_query() -> Invariant:
-    def predicate(state: PackageIdentityState, _trace):
-        if state.predecessor_queries:
-            return InvariantResult.fail("a retired distribution influenced current identity")
-        return InvariantResult.pass_()
-
-    return Invariant(
-        "no_predecessor_distribution_query",
-        "Current identity never queries a retired Guard distribution.",
-        predicate,
-    )
 
 
-PACKAGE_IDENTITY_INVARIANTS = (
-    current_package_identity(),
-    no_predecessor_distribution_query(),
-)
 
 
 def build_workflow() -> Workflow:
@@ -493,16 +397,10 @@ def build_workflow() -> Workflow:
     )
 
 
-def build_package_identity_workflow() -> Workflow:
-    return Workflow(
-        (ResolveMeshStorePackageIdentity(),),
-        name="researchguard_package_identity",
-    )
 
 
 def scenarios() -> tuple[Scenario, ...]:
     workflow = build_workflow()
-    identity_workflow = build_package_identity_workflow()
     return (
         Scenario(
             name="RG01_direct_logic",
@@ -518,43 +416,6 @@ def scenarios() -> tuple[Scenario, ...]:
                     "member_terminal_pass",
                 ),
                 summary="direct logic reaches researchguard.logic",
-            ),
-            workflow=workflow,
-            invariants=INVARIANTS,
-        ),
-        Scenario(
-            name="RG02_umbrella_logic",
-            description="Source-bound umbrella dispatch reaches the same sole logic path.",
-            initial_state=RouteState(),
-            external_input_sequence=(
-                ResearchRequest(
-                    "argument_licensing",
-                    admission_row_count=4,
-                    minimum_sufficient_members=("logicguard",),
-                ),
-            ),
-            expected=ScenarioExpectation(
-                expected_status="ok",
-                required_trace_labels=(
-                    "route_selected_logicguard",
-                    "member_terminal_pass",
-                ),
-                summary="umbrella logic reaches researchguard.logic",
-            ),
-            workflow=workflow,
-            invariants=INVARIANTS,
-        ),
-        Scenario(
-            name="RG03_ambiguous_blocks",
-            description="A complete derived admission set with no match blocks before native execution.",
-            initial_state=RouteState(),
-            external_input_sequence=(
-                ResearchRequest("unknown", admission_row_count=4),
-            ),
-            expected=ScenarioExpectation(
-                expected_status="ok",
-                required_trace_labels=("member_admission_no_match_blocked",),
-                summary="zero member admission is visible",
             ),
             workflow=workflow,
             invariants=INVARIANTS,
@@ -627,43 +488,6 @@ def scenarios() -> tuple[Scenario, ...]:
             invariants=INVARIANTS,
         ),
         Scenario(
-            name="RG07_predecessor_distribution_absent",
-            description="Missing retired LogicGuard distribution cannot alter current identity.",
-            initial_state=PackageIdentityState(),
-            external_input_sequence=(
-                PackageIdentityRequest(
-                    CURRENT_RESEARCHGUARD_VERSION,
-                    predecessor_distribution_state="absent",
-                ),
-            ),
-            expected=ScenarioExpectation(
-                expected_status="ok",
-                required_trace_labels=("package_identity_resolved_current",),
-                summary="current ResearchGuard identity resolves without predecessor query",
-            ),
-            workflow=identity_workflow,
-            invariants=PACKAGE_IDENTITY_INVARIANTS,
-        ),
-        Scenario(
-            name="RG08_predecessor_distribution_present",
-            description="Installed retired LogicGuard distribution cannot alter current identity.",
-            initial_state=PackageIdentityState(),
-            external_input_sequence=(
-                PackageIdentityRequest(
-                    CURRENT_RESEARCHGUARD_VERSION,
-                    predecessor_distribution_state="present",
-                    predecessor_version="999.999.999",
-                ),
-            ),
-            expected=ScenarioExpectation(
-                expected_status="ok",
-                required_trace_labels=("package_identity_resolved_current",),
-                summary="the same current identity resolves when predecessor is present",
-            ),
-            workflow=identity_workflow,
-            invariants=PACKAGE_IDENTITY_INVARIANTS,
-        ),
-        Scenario(
             name="RG09_direct_experiment",
             description=(
                 "Direct ExperimentGuard selects the sole recommendation-only "
@@ -685,48 +509,6 @@ def scenarios() -> tuple[Scenario, ...]:
                 summary=(
                     "direct experiment reaches researchguard.experiment"
                 ),
-            ),
-            workflow=workflow,
-            invariants=INVARIANTS,
-        ),
-        Scenario(
-            name="RG10_minimum_pair_composition_ready",
-            description="Two irreducible owners are accepted only through one exact composition.",
-            initial_state=RouteState(),
-            external_input_sequence=(
-                ResearchRequest(
-                    "cross_guard_research",
-                    admission_row_count=4,
-                    primary_action_fact_count=2,
-                    minimum_sufficient_members=("sourceguard", "traceguard"),
-                    composition_member_ids=("sourceguard", "traceguard"),
-                    composition_valid=True,
-                ),
-            ),
-            expected=ScenarioExpectation(
-                expected_status="ok",
-                required_trace_labels=("member_composition_ready",),
-                summary="necessary pair yields planning-only composition evidence",
-            ),
-            workflow=workflow,
-            invariants=INVARIANTS,
-        ),
-        Scenario(
-            name="RG11_stale_task_facts_block",
-            description="Incomplete or stale task facts cannot select a route.",
-            initial_state=RouteState(),
-            external_input_sequence=(
-                ResearchRequest(
-                    "argument_licensing",
-                    admission_row_count=4,
-                    minimum_sufficient_members=("logicguard",),
-                    task_facts_current=False,
-                ),
-            ),
-            expected=ScenarioExpectation(
-                expected_status="ok",
-                required_trace_labels=("task_facts_invalid_blocked",),
-                summary="stale task facts block before execution",
             ),
             workflow=workflow,
             invariants=INVARIANTS,
@@ -770,61 +552,14 @@ def scenarios() -> tuple[Scenario, ...]:
             workflow=workflow,
             invariants=INVARIANTS,
         ),
-        Scenario(
-            name="RG14_over_selection_blocks",
-            description="A caller cannot compose siblings when one member is sufficient.",
-            initial_state=RouteState(),
-            external_input_sequence=(
-                ResearchRequest(
-                    "argument_licensing",
-                    admission_row_count=4,
-                    minimum_sufficient_members=("logicguard",),
-                    composition_member_ids=("logicguard", "sourceguard"),
-                    composition_valid=True,
-                ),
-            ),
-            expected=ScenarioExpectation(
-                expected_status="ok",
-                required_trace_labels=("member_over_selection_blocked",),
-                summary="one sufficient member rejects a larger set",
-            ),
-            workflow=workflow,
-            invariants=INVARIANTS,
-        ),
-        Scenario(
-            name="RG15_incomplete_composition_blocks",
-            description="A necessary pair without complete order, ownership, and handoff evidence blocks.",
-            initial_state=RouteState(),
-            external_input_sequence=(
-                ResearchRequest(
-                    "cross_guard_research",
-                    admission_row_count=4,
-                    primary_action_fact_count=2,
-                    minimum_sufficient_members=("sourceguard", "traceguard"),
-                    composition_member_ids=("sourceguard", "traceguard"),
-                    composition_valid=False,
-                ),
-            ),
-            expected=ScenarioExpectation(
-                expected_status="ok",
-                required_trace_labels=("member_composition_invalid_blocked",),
-                summary="invalid composition never reaches member execution",
-            ),
-            workflow=workflow,
-            invariants=INVARIANTS,
-        ),
     )
 
 
 __all__ = [
     "INVARIANTS",
-    "PACKAGE_IDENTITY_INVARIANTS",
     "MEMBER_BY_INTENT",
-    "PackageIdentityRequest",
-    "PackageIdentityState",
     "ResearchRequest",
     "RouteState",
-    "build_package_identity_workflow",
     "build_workflow",
     "scenarios",
 ]

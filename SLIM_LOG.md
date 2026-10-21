@@ -358,3 +358,14 @@ Source契约可选：缺省直接运行模型并正常观察更新，嵌入/显�
 - `python -c import subprocess;p=subprocess.run(["rg","-n","-i","skillguard","scripts","tests","src/researchguard","skills"],capture_output=True,text=True);print(p.stdout,end="");assert p.returncode==1;print("SkillGuard active residuals absent; historical CHANGELOG retained")` — exit 0, 0.054s; `SkillGuard active residuals absent; historical CHANGELOG retained`
 - `python -m pytest --collect-only` — exit 0, 2.757s; `548 tests collected in 2.32s`
 - `python -m flowguard map check` — exit 0, 0.581s; `check: 0 error(s), 11 warning(s), 0 info`
+
+## RG-33 — completed
+
+套件模型删版本自证/包身份工作流/8退役组合场景及无人读model-definition，保7现行场景、4原生类与坏变体/conformance。2模型pass，7场景实数，活跃旧版本仅pyproject/init；548收集/map0error。一次外部-c扫描因__file__缺失启动失败，原expected0/exit1完整保留，改直接脚本后扫描0；不属于产品失败。
+
+- `python -m flowguard map models` — exit 0, 1.63s; `models: 2 passed, 0 failed`
+- `python -c import ast;from pathlib import Path;p=Path(".flowguard/models/researchguard_suite_model.py");m=ast.parse(p.read_text());rows=[n for n in ast.walk(m) if isinstance(n,ast.Call) and isinstance(n.func,ast.Name) and n.func.id=="Scenario"];assert len(rows)==7;print("7 retained direct/failure/handoff/reentry/loading scenarios");exec(compile(Path("<external>/probe_rg33.py").read_text(),"external/probe_rg33.py","exec"))` — exit 1, 0.087s; `7 retained direct/failure/handoff/reentry/loading scenarios`
+- `python -c import ast;from pathlib import Path;m=ast.parse(Path(".flowguard/models/researchguard_suite_model.py").read_text());rows=[n for n in ast.walk(m) if isinstance(n,ast.Call) and isinstance(n.func,ast.Name) and n.func.id=="Scenario"];assert len(rows)==7;print("7 retained direct/failure/handoff/reentry/loading scenarios")` — exit 0, 0.042s; `7 retained direct/failure/handoff/reentry/loading scenarios`
+- `python <external>/probe_rg33.py` — exit 0, 0.154s; `version authority scans passed; truthful journal preserved`
+- `python -m pytest --collect-only` — exit 0, 5.003s; `548 tests collected in 3.17s`
+- `python -m flowguard map check` — exit 0, 0.291s; `check: 0 error(s), 11 warning(s), 0 info`
