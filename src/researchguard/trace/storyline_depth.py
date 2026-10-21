@@ -130,7 +130,6 @@ class StorylineDepthReceipt:
     object_coverage_counts: dict[str, int]
     object_depth_rows: tuple[dict[str, Any], ...]
     temporal_coverage: tuple[dict[str, Any], ...]
-    native_obligation_evidence: tuple[dict[str, Any], ...]
     perturbation_plan: tuple[PerturbationPlanItem, ...]
     effects: tuple[PerturbationEffect, ...]
     unresolved_gaps: tuple[dict[str, Any], ...]
@@ -171,7 +170,6 @@ class StorylineDepthReceipt:
             "object_coverage_counts": self.object_coverage_counts,
             "object_depth_rows": list(self.object_depth_rows),
             "temporal_coverage": list(self.temporal_coverage),
-            "native_obligation_evidence": list(self.native_obligation_evidence),
             "perturbation_plan": [item.to_dict() for item in self.perturbation_plan],
             "effects": [item.to_dict() for item in self.effects],
             "unresolved_gaps": list(self.unresolved_gaps),
@@ -215,109 +213,6 @@ def _canonical_sha256(value: object) -> str:
     return hashlib.sha256(payload).hexdigest()
 
 
-def _native_obligation_observations(
-    model: TraceGuardModel,
-    hypotheses: tuple[StorylineHypothesis, ...],
-    object_depth_rows: tuple[dict[str, Any], ...],
-    plan: tuple[PerturbationPlanItem, ...],
-    effects: tuple[PerturbationEffect, ...],
-) -> tuple[dict[str, Any], ...]:
-    """Bind every native depth obligation to exact target-owned artifacts.
-
-    Counts and object names remain useful summaries, but they cannot prove
-    which current event/evidence/perturbation discharged an obligation.  These
-    observations preserve the exact semantic content and its hash so a
-    supervisor can verify the native judgment without recomputing it.
-    """
-
-    object_maps: dict[str, dict[str, object]] = {
-        "hypothesis": {item.hypothesis_id: item for item in hypotheses},
-        "trace": {item.trace_id: item for item in model.traces},
-        "event": {item.event_id: item for item in model.events},
-        "evidence": {item.evidence_id: item for item in model.evidence},
-        "mechanism": {item.mechanism_id: item for item in model.causal_mechanisms},
-        "confounder": {item.confounder_id: item for item in model.confounder_reviews},
-        "ablation": {item.ablation_id: item for item in model.evidence_ablations},
-        "expected_sensitivity": {
-            item.sensitivity_id: item for item in model.expected_sensitivities
-        },
-        "source": {item.source_id: item for item in model.sources},
-    }
-
-    def artifact_row(kind: str, object_id: str) -> dict[str, Any] | None:
-        value = object_maps.get(kind, {}).get(object_id)
-        if value is None:
-            return None
-        content = asdict(value)
-        return {
-            "artifact_ref": f"traceguard:{kind}:{object_id}",
-            "artifact_sha256": _canonical_sha256(content),
-            "artifact_kind": kind,
-            "artifact_id": object_id,
-        }
-
-    observations: list[dict[str, Any]] = []
-    for row in object_depth_rows:
-        object_type = str(row.get("object_type", ""))
-        object_id = str(row.get("object_id", ""))
-        artifact_rows: dict[str, dict[str, Any]] = {}
-
-        def include(kind: str, item_id: str) -> None:
-            artifact = artifact_row(kind, item_id)
-            if artifact:
-                artifact_rows[str(artifact["artifact_ref"])] = artifact
-
-        include(object_type, object_id)
-        for trace_id in row.get("trace_ids", []):
-            include("trace", str(trace_id))
-        for event_id in row.get("event_ids", []):
-            include("event", str(event_id))
-        for evidence_id in row.get("evidence_ids", []):
-            evidence_id = str(evidence_id)
-            include("evidence", evidence_id)
-            evidence = object_maps["evidence"].get(evidence_id)
-            if evidence is not None:
-                include("source", str(getattr(evidence, "source_id", "")))
-        if object_type == "evidence":
-            include("source", str(row.get("source_id", "")))
-
-        content = {
-            "object_depth_row": row,
-            "artifact_evidence": [artifact_rows[key] for key in sorted(artifact_rows)],
-        }
-        obligation_ids = ["obligation:traceguard-object-depth"]
-        if object_type == "trace":
-            obligation_ids.append("obligation:traceguard-temporal-depth")
-        observations.append(
-            {
-                "native_object_id": f"{object_type}:{object_id}",
-                "target_obligation_ids": obligation_ids,
-                "evidence_ref": f"traceguard:depth-object:{object_type}:{object_id}",
-                "evidence_sha256": _canonical_sha256(content),
-                "content": content,
-            }
-        )
-
-    effect_by_id = {
-        effect.perturbation.perturbation_id: effect
-        for effect in effects
-    }
-    for planned in plan:
-        effect = effect_by_id.get(planned.perturbation_id)
-        content = {
-            "plan": planned.to_dict(),
-            "effect": effect.to_dict() if effect is not None else None,
-        }
-        observations.append(
-            {
-                "native_object_id": f"perturbation:{planned.perturbation_id}",
-                "target_obligation_ids": ["obligation:traceguard-perturbation-depth"],
-                "evidence_ref": f"traceguard:perturbation:{planned.perturbation_id}",
-                "evidence_sha256": _canonical_sha256(content),
-                "content": content,
-            }
-        )
-    return tuple(observations)
 
 
 def _event_time_token(event: EventCandidate) -> str:
@@ -2087,13 +1982,6 @@ def evaluate_storyline_depth(
         object_coverage_counts=object_coverage_counts,
         object_depth_rows=object_depth_rows,
         temporal_coverage=temporal_coverage,
-        native_obligation_evidence=_native_obligation_observations(
-            model,
-            hypotheses,
-            object_depth_rows,
-            plan,
-            tuple(effects),
-        ),
         perturbation_plan=plan,
         effects=tuple(effects),
         unresolved_gaps=tuple(unresolved),

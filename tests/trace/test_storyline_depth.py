@@ -257,15 +257,6 @@ def test_native_receipt_binds_baseline_alternatives_plan_effects_and_gaps():
     assert receipt.object_depth_rows
     assert all(row["status"] == "pass" for row in receipt.object_depth_rows if row["critical"])
     assert all(row["start_middle_end_covered"] for row in receipt.temporal_coverage)
-    assert len(receipt.native_obligation_evidence) >= (
-        len(receipt.object_depth_rows) + len(receipt.perturbation_plan)
-    )
-    for observation in receipt.native_obligation_evidence:
-        assert observation["target_obligation_ids"]
-        assert str(observation["evidence_ref"]).startswith("traceguard:")
-        assert len(str(observation["evidence_sha256"])) == 64
-        assert str(observation["evidence_sha256"]) == str(observation["evidence_sha256"]).lower()
-        assert observation["content"]
     assert receipt.predictive_holdout_status == "not_requested"
     assert receipt.predictive_claim_licensed is False
     assert receipt.covered_claim_scope == "broad"
@@ -285,23 +276,6 @@ def test_native_receipt_binds_baseline_alternatives_plan_effects_and_gaps():
     assert "does not prove factual truth" in receipt.claim_boundary
 
 
-def test_native_obligation_evidence_hash_tracks_exact_evidence_content() -> None:
-    baseline = evaluate_model(_model(_data())).storyline_depth
-    changed_data = _data()
-    changed_data["evidence"][0]["raw_text"] += " Exact evidence content changed."
-    changed = evaluate_model(_model(changed_data)).storyline_depth
-
-    object_id = f"evidence:{changed_data['evidence'][0]['evidence_id']}"
-    baseline_row = next(
-        item for item in baseline.native_obligation_evidence
-        if item["native_object_id"] == object_id
-    )
-    changed_row = next(
-        item for item in changed.native_obligation_evidence
-        if item["native_object_id"] == object_id
-    )
-    assert baseline_row["evidence_ref"] == changed_row["evidence_ref"]
-    assert baseline_row["evidence_sha256"] != changed_row["evidence_sha256"]
 
 
 def test_cli_depth_and_model_backed_simulation_expose_native_receipt():

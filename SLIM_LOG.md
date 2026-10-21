@@ -340,3 +340,12 @@ Source契约可选：缺省直接运行模型并正常观察更新，嵌入/显�
 - `python -m pytest` — exit 0, 160.769s; `560 passed in 160.32s (0:02:40)`
 - `python -m flowguard map models` — exit 0, 1.532s; `models: 2 passed, 0 failed`
 - `python -m flowguard map check` — exit 0, 0.306s; `check: 0 error(s), 11 warning(s), 0 info`
+
+## RG-31 — completed
+
+仅删Trace义务内容/哈希重复字段及生成器和专测，effects/object_depth_rows/扰动计划/原生缺口保留。104pass，两个真实evaluate输出31543/66634字节且oktrue/closurePASS；指定残留为空、收集559/map0error。
+
+- `python -m pytest tests/trace` — exit 0, 43.853s; `104 passed in 43.45s`
+- `python <external>/probe_rg31.py` — exit 0, 2.154s; `Trace obligation-content copies absent; native effects/coverage/gaps remain`
+- `python -m pytest --collect-only` — exit 0, 6.221s; `559 tests collected in 5.20s`
+- `python -m flowguard map check` — exit 0, 0.517s; `check: 0 error(s), 11 warning(s), 0 info`
