@@ -334,19 +334,15 @@ def _changed_gaps(before: BeliefState, after: BeliefState) -> list[dict[str, Any
     for gap_id in sorted(set(before_gaps) & set(after_gaps)):
         old = before_gaps[gap_id]
         new = after_gaps[gap_id]
-        fields = (
-            "gap_type",
-            "status",
-            "semantic_state",
-            "review_required",
-            "blocking",
-            "importance",
-            "description",
-        )
+        fields = {
+            field: (lambda gap, field=field: getattr(gap, field))
+            for field in ("gap_type", "semantic_state", "review_required", "blocking", "importance", "description")
+        }
+        fields["qualification_decision"] = lambda gap: gap.qualification.decision
         delta = {
-            field: {"before": getattr(old, field), "after": getattr(new, field)}
-            for field in fields
-            if getattr(old, field) != getattr(new, field)
+            field: {"before": read(old), "after": read(new)}
+            for field, read in fields.items()
+            if read(old) != read(new)
         }
         if delta:
             changed.append({"gap_id": gap_id, "changes": delta})

@@ -97,3 +97,7 @@ Source plans keep executable declared actions without generating duplicates for
 the same gap. Generated gap queries use its description and at most two domain
 hints, capped at 120 characters. `score-actions` and `plan --all-scores` share
 the complete native candidate/scoring path; scoring weights are unchanged.
+
+`source compare` compares versions of the same model using native semantic gap
+state and qualification decisions, without restoring the retired gap status.
+A self-comparison reports no changes.

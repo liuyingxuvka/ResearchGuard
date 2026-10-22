@@ -14,6 +14,7 @@ researchguard source depth <model.yaml> --observation <observation.yaml> --outpu
 researchguard source add-observation <model.yaml> --observation <observation.yaml> --output <updated.yaml> --pretty
 researchguard source search-iteration freeze <model.yaml> --action-id <id> --expected-gap-reduction <none|partial|closed> --expected-independent-lineage <true|false> --expected-counterevidence <true|false> --expected-cost <0..1> [--protect-gap <gap>] [--iteration <n> --prior-open-gap-id <gap>] --output <prediction.json>
 researchguard source search-iteration run <model.yaml> --prediction <prediction.json> --observation <observation.yaml> --actual-cost <0..1> --decision <accept|reject> --candidate-output <candidate.yaml> --output <result.json>
+researchguard source compare <before.yaml> <after.yaml> --pretty
 researchguard source report <model.yaml> --format markdown
 researchguard source export-traceguard <model.yaml> --output <seed.yaml>
 researchguard source export-logicguard <model.yaml> --output <candidates.yaml>
@@ -52,3 +53,7 @@ actions for that gap. Generated gap queries omit the lead question, use at most
 two domain hints, and end at a word boundary within 120 characters.
 `score-actions` uses the complete `plan --all-scores` scoring path, without a
 candidate cap; declared queries and native scoring weights are preserved.
+
+`source compare` reports shared-gap changes in type, semantic state, review,
+blocking, importance, description and `qualification_decision`; comparing a
+model to itself returns no changes. Comparison does not license evidence.

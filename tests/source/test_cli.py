@@ -140,3 +140,27 @@ def test_plan_and_score_actions_agree() -> None:
     q = {item["action_id"]: item for item in json.loads(scored.stdout)["scored_actions"]}
     assert p == q
     assert p["act-pretrend"]["total_score"] == q["act-pretrend"]["total_score"]
+
+
+def test_compare_a_model_with_its_grown_version(tmp_path: Path) -> None:
+    fixtures = Path(__file__).parent / "fixtures/evergiven"
+    baseline, observation = fixtures / "src_v1.yaml", fixtures / "obs1.yaml"
+    original_bytes = baseline.read_bytes()
+    grown = tmp_path / "grown.yaml"
+    added = _run("add-observation", str(baseline), "--observation", str(observation), "--output", str(grown))
+    assert added.returncode == 0, added.stdout + added.stderr
+    result = _run("compare", str(baseline), str(grown))
+    assert result.returncode == 0, result.stdout + result.stderr
+    compared = json.loads(result.stdout)
+    assert compared["ok"] is True
+    changes = next(item["changes"] for item in compared["gap_delta"]["changed"] if item["gap_id"] == "gap-event-dates")
+    assert changes["semantic_state"] == {"before": "discovered", "after": "closed"}
+    assert changes["qualification_decision"] == {"before": "not_evaluated", "after": "claim_usable"}
+    assert "status" not in changes
+    self_result = _run("compare", str(baseline), str(baseline))
+    assert self_result.returncode == 0, self_result.stdout + self_result.stderr
+    self_comparison = json.loads(self_result.stdout)
+    assert self_comparison["ok"] is True
+    for key in ("source_delta", "anchor_delta", "gap_delta", "action_delta"):
+        assert not any(self_comparison[key].values())
+    assert baseline.read_bytes() == original_bytes

@@ -49,7 +49,8 @@
         "Dispatch researchguard logic|source|trace|experiment straight to the member main; unknown commands return one typed JSON error.",
         "Own the member command-line surfaces, including the source stop rule inputs, optional followups and stable four status names.",
         "Pass the already-loaded trace model into logic handoff export so the native CLI carries actual evidence content and polarity.",
-        "Expose score-actions from the same complete native plan scoring path as plan --all-scores, without a candidate limit."
+        "Expose score-actions from the same complete native plan scoring path as plan --all-scores, without a candidate limit.",
+        "Compare versions of one source model using actual gap semantic fields and nested qualification decision; self-comparison reports no change and retired gap.status stays rejected."
       ],
       "files": [
         "src/researchguard/__main__.py",
@@ -90,7 +91,7 @@
         ".flowguard/models/researchguard_suite_model.py"
       ],
       "status": "confirmed",
-      "fingerprint": "sha256:bfdef47047764f7f2d5859535606096729a0539471ad43a947653f209f9870bf",
+      "fingerprint": "sha256:ef62d51e25fba5c0db2afce272830a403b5525bfe50eb4332460ab8404f31cf7",
       "layer": "interface"
     },
     {
