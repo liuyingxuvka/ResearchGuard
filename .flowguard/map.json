@@ -48,7 +48,8 @@
       "responsibilities": [
         "Dispatch researchguard logic|source|trace|experiment straight to the member main; unknown commands return one typed JSON error.",
         "Own the member command-line surfaces, including the source stop rule inputs, optional followups and stable four status names.",
-        "Pass the already-loaded trace model into logic handoff export so the native CLI carries actual evidence content and polarity."
+        "Pass the already-loaded trace model into logic handoff export so the native CLI carries actual evidence content and polarity.",
+        "Expose score-actions from the same complete native plan scoring path as plan --all-scores, without a candidate limit."
       ],
       "files": [
         "src/researchguard/__main__.py",
@@ -89,7 +90,7 @@
         ".flowguard/models/researchguard_suite_model.py"
       ],
       "status": "confirmed",
-      "fingerprint": "sha256:80c79a6258bc53aa5693bd3a2b824d6cf84c1089e4fd1891a3fa7d89999e2d5d",
+      "fingerprint": "sha256:bfdef47047764f7f2d5859535606096729a0539471ad43a947653f209f9870bf",
       "layer": "interface"
     },
     {
@@ -175,7 +176,8 @@
         "Load, plan, update and iterate on a model file alone; models carry no contract; the action and every protected or coverage gap a prediction names must exist in the model when it is frozen.",
         "Decide whether to keep searching from the model itself: all executable declared and generated actions, selecting an affordable target by native utility, the open blocking gaps and the caller-declared budget.",
         "Combine source semantic-state, depth and coverage gaps from each actual model and delegate transition sets to the shared suite helper; resolved obligations alone count as progress.",
-        "Read all recorded observations for native depth and preview a new observation only on a clone; current-call provider status remains explicit."
+        "Read all recorded observations for native depth and preview a new observation only on a clone; current-call provider status remains explicit.",
+        "Generate gap queries from the gap description and at most two domain hints, bounded to 120 characters; preserve executable declared actions and suppress their generated duplicates."
       ],
       "files": [
         "src/researchguard/source/__init__.py",
@@ -210,7 +212,7 @@
         ".flowguard/models/sourceguard_stop_decision_model.py"
       ],
       "status": "confirmed",
-      "fingerprint": "sha256:8d66846ac44a06258d631f64e3bf0468fa4105e173692dc68a4790ce5f9cd4a6",
+      "fingerprint": "sha256:53e4cb5317708069bc46cdff5b7a46cb5f16ca3fa7f0ce343cad3e507d9262f6",
       "layer": "routes"
     },
     {

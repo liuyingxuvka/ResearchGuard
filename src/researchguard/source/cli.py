@@ -30,7 +30,6 @@ from .schema import (
     Observation,
     to_plain,
 )
-from .scoring import score_actions
 from .stop_decision import decide_model_search_stop
 from .update import apply_observation
 from .task_iteration import (
@@ -503,7 +502,7 @@ def run(args: argparse.Namespace) -> int:
         _json_out(
             {
                 "ok": True,
-                "scored_actions": score_actions(load_model(args.model)),
+                "scored_actions": plan_next_actions(load_model(args.model), limit=None).scored_actions,
             },
             args.pretty,
         )

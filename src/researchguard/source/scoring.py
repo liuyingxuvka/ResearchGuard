@@ -278,8 +278,3 @@ def score_action(action: SearchAction, belief_state: BeliefState) -> ScoredActio
         permission_risk=permission_risk,
         reasons=reasons,
     )
-
-
-def score_actions(belief_state: BeliefState) -> list[ScoredAction]:
-    scored = [score_action(action, belief_state) for action in belief_state.actions if action.status not in {"blocked", "rejected", "completed"}]
-    return sorted(scored, key=lambda item: item.total_score, reverse=True)

@@ -20,21 +20,9 @@ def _slug(value: str) -> str:
     return "-".join("".join(ch.lower() if ch.isalnum() else "-" for ch in value).split("-"))[:48] or "action"
 
 
-def _query_for_gap(gap: Gap, lead_question: str = "", domain_hints: Iterable[str] = ()) -> str:
-    parts = [lead_question, gap.description, " ".join(str(item) for item in domain_hints if str(item).strip())]
-    base = " ".join(dict.fromkeys(part.strip() for part in parts if part and part.strip())) or gap.gap_type
-    if gap.structure_unit_id or gap.structural_role_needed:
-        structural_bits = " ".join(
-            item
-            for item in [
-                gap.structure_unit_id,
-                gap.contribution_type,
-                gap.structural_role_needed,
-                gap.downstream_consumer,
-            ]
-            if item
-        )
-        base = f"{base} {structural_bits}".strip()
+def _query_for_gap(gap: Gap, domain_hints: Iterable[str] = ()) -> str:
+    hints = [str(item).strip() for item in domain_hints if str(item).strip()][:2]
+    base = " ".join([gap.description.strip() or gap.gap_type, *hints])
     if gap.gap_type == "missing_execution_evidence":
         return f"{base} implementation operation outcome official record independent report direct observation"
     if gap.gap_type == "one_sided_support":
@@ -58,6 +46,16 @@ def _query_for_gap(gap: Gap, lead_question: str = "", domain_hints: Iterable[str
     return base
 
 
+def _short_query(query: str) -> str:
+    text = " ".join(query.split())
+    if len(text) <= 120:
+        return text
+    prefix = text[:120]
+    if " " not in prefix or text[120].isspace():
+        return prefix.rstrip()
+    return prefix.rsplit(" ", 1)[0]
+
+
 def _action(
     gap: Gap,
     action_type: str,
@@ -70,7 +68,7 @@ def _action(
     notes: str = "",
     parameters: dict | None = None,
 ) -> SearchAction:
-    query_text = query or _query_for_gap(gap)
+    query_text = _short_query(query or _query_for_gap(gap))
     return SearchAction(
         action_id=f"generated-{gap.gap_id}-{_slug(action_type)}",
         action_type=action_type,
@@ -103,8 +101,7 @@ def _domain_hints(belief_state: BeliefState) -> list[str]:
 
 
 def _actions_for_gap(gap: Gap, belief_state: BeliefState) -> list[SearchAction]:
-    lead = belief_state.lead_by_id().get(gap.lead_id)
-    query = _query_for_gap(gap, lead.question if lead else "", _domain_hints(belief_state))
+    query = _query_for_gap(gap, _domain_hints(belief_state))
     if gap.semantic_state == "closed":
         return []
     if gap.gap_type == "missing_primary_source":
@@ -219,8 +216,11 @@ def _dedupe(actions: Iterable[SearchAction], existing: Iterable[SearchAction]) -
 
 def generate_actions_from_gaps(belief_state: BeliefState) -> list[SearchAction]:
     generated: list[SearchAction] = []
+    declared_targets = {action.target_gap_id for action in belief_state.actions
+                        if action.status in {"proposed", "selected"}}
     for gap in belief_state.gaps:
-        generated.extend(_actions_for_gap(gap, belief_state))
+        if gap.gap_id not in declared_targets:
+            generated.extend(_actions_for_gap(gap, belief_state))
     deduped = _dedupe(generated, belief_state.actions)
     existing_ids = {action.action_id for action in belief_state.actions}
     return [action for action in deduped if action.action_id not in existing_ids]

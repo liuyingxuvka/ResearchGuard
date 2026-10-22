@@ -130,3 +130,13 @@ def test_create_plan_and_add_observation_need_no_model_contract(tmp_path):
     assert result.returncode == 0, result.stderr
     result = _run("validate", str(grown))
     assert result.returncode == 0, result.stderr
+
+
+def test_plan_and_score_actions_agree() -> None:
+    fixture = str(Path(__file__).parent / "fixtures/evergiven/src_v1.yaml")
+    planned, scored = _run("plan", fixture, "--all-scores"), _run("score-actions", fixture)
+    assert planned.returncode == scored.returncode == 0
+    p = {item["action_id"]: item for item in json.loads(planned.stdout)["scored_actions"]}
+    q = {item["action_id"]: item for item in json.loads(scored.stdout)["scored_actions"]}
+    assert p == q
+    assert p["act-pretrend"]["total_score"] == q["act-pretrend"]["total_score"]

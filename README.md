@@ -92,3 +92,8 @@ and the result-only export API remain supported.
 `source depth` includes observations already recorded in the model. A supplied
 observation previews an additional cloned update; without any observations it
 remains planning-only. Recorded depth never implies a provider ran in this call.
+
+Source plans keep executable declared actions without generating duplicates for
+the same gap. Generated gap queries use its description and at most two domain
+hints, capped at 120 characters. `score-actions` and `plan --all-scores` share
+the complete native candidate/scoring path; scoring weights are unchanged.

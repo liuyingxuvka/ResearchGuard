@@ -49,7 +49,9 @@ def test_structural_source_gap_generates_structural_roles():
     actions = generate_actions_from_gaps(state)
     assert actions
     assert {action.expected_source_role for action in actions} & {"bridge_evidence", "method_source"}
-    assert any("chapter_3" in action.query for action in actions)
+    assert state.gaps[0].structure_unit_id == "chapter_3.technology_summary"
+    assert all(action.target_gap_id == state.gaps[0].gap_id for action in actions)
+    assert not any("chapter_3" in action.query for action in actions)
 
 
 def test_permission_gap_blocked_when_policy_disallows():
@@ -69,3 +71,50 @@ def test_plan_next_actions_returns_reasons():
     assert result.ok
     assert result.selected_actions
     assert result.scored_actions[0].reasons
+
+
+def test_declared_action_suppresses_generated_duplicate() -> None:
+    from pathlib import Path
+    from dataclasses import replace
+    state = load_model(Path(__file__).parent / "fixtures/evergiven/src_v1.yaml")
+    before_actions = tuple(state.actions)
+    plan = plan_next_actions(state, limit=5)
+    assert tuple(state.actions) == before_actions
+    assert not generate_actions_from_gaps(state)
+    assert len({item.target_gap_id for item in plan.selected_actions}) == len(plan.selected_actions)
+    for status in ("proposed", "selected"):
+        changed = replace(state, actions=[replace(action, status=status) for action in state.actions])
+        assert not generate_actions_from_gaps(changed)
+    for status in ("blocked", "rejected", "completed", "executed"):
+        changed = replace(state, actions=[replace(action, status=status) for action in state.actions])
+        assert generate_actions_from_gaps(changed)
+
+
+def test_generated_queries_are_short_and_use_only_gap_and_two_hints() -> None:
+    from researchguard.source.schema import Lead
+    description = "Required observed dates and independently reported outcome data"
+    lead_question = "This long unrelated lead question must never enter a gap query"
+    state = BeliefState(metadata={"domain_hints": ["hint-one", "hint-two", "forbidden-hint"]},
+                        leads=[Lead("lead", question=lead_question)],
+                        gaps=[Gap("gap", lead_id="lead", gap_type="missing_execution_evidence", description=description)])
+    actions = generate_actions_from_gaps(state)
+    assert actions
+    for action in actions:
+        assert 0 < len(action.query) <= 120
+        assert action.query.startswith(description)
+        assert "hint-one" in action.query and "hint-two" in action.query
+        assert lead_question not in action.query and "forbidden-hint" not in action.query
+        assert action.query.split()[-1] in (description + " hint-one hint-two implementation operation outcome official record independent report direct observation source deployment image visual recorded report evidence").split()
+    empty = BeliefState(gaps=[Gap("empty", gap_type="missing_primary_source")])
+    assert all(action.query.startswith("missing_primary_source") for action in generate_actions_from_gaps(empty))
+
+
+def test_lead_only_generated_query_keeps_real_question_with_nonempty_character_bound() -> None:
+    from researchguard.source.planner import generate_actions_from_leads
+    from researchguard.source.schema import Lead
+    for question in ("无空格的真实中文研究问题" * 20, "A real lead question " * 20):
+        state = BeliefState(leads=[Lead("lead-only", question=question)])
+        action = generate_actions_from_leads(state)[0]
+        assert 0 < len(action.query) <= 120
+        assert question.startswith(action.query)
+        assert action.query != "unclear_scope"
