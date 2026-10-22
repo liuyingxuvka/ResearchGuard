@@ -17,3 +17,4 @@ tmp/
 *.log
 *.bak
 *.tmp
+SLIM_LOG.md
