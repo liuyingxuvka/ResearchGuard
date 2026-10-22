@@ -159,8 +159,8 @@ INVARIANTS = (
 )
 
 
-def build_workflow(run_route=None) -> Workflow:
-    return Workflow((PickRoute(), LoadRouteFile(), run_route or RunRoute(), FollowHandoff()), name="researchguard_one_skill_four_routes")
+def build_workflow(run_route=None, pick_route=None) -> Workflow:
+    return Workflow((pick_route or PickRoute(), LoadRouteFile(), run_route or RunRoute(), FollowHandoff()), name="researchguard_one_skill_four_routes")
 
 
 def _scenario(name: str, request: ResearchRequest, labels: tuple[str, ...], summary: str) -> Scenario:
@@ -229,7 +229,18 @@ def broken_variants():
                 else:
                     yield result
 
+    class WrongMember(PickRoute):
+        def apply(self, request, state):
+            for result in super().apply(request, state):
+                if result.new_state.route == "logic":
+                    yield replace(result, new_state=replace(result.new_state, member="sourceguard"))
+                else:
+                    yield result
+
     return {
+        "wrong_member": Explorer(
+            build_workflow(pick_route=WrongMember()), (RouteState(),), (ResearchRequest("argument_licensing"),), INVARIANTS
+        ),
         "alternate_route": Explorer(build_workflow(AlternateRoute()), (RouteState(),), (ResearchRequest("argument_licensing"),), INVARIANTS),
         "reroute_on_failure": Explorer(
             build_workflow(RerouteOnFailure()), (RouteState(),), (ResearchRequest("evidence_discovery", native_status="failed"),), INVARIANTS
