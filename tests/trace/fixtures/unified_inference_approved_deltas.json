@@ -27,7 +27,7 @@
       "previous_status": "insufficient",
       "current_status": "insufficient",
       "support_min": 0.0,
-      "support_max": 0.000001,
+      "support_max": 1e-06,
       "delta_disposition": "hard invalid-source constraint preserved with no soft compensation"
     },
     {
@@ -53,9 +53,9 @@
       "trace_id": "trace_rhine_h2",
       "previous_status": "candidate",
       "current_status": "candidate",
-      "support_min": 0.726675,
-      "support_max": 0.726678,
-      "delta_disposition": "retained bounded candidate status while depth coverage remains independently complete"
+      "support_min": 0.719474,
+      "support_max": 0.719477,
+      "delta_disposition": "Retain bounded candidate status after signed opposition contributes negative evidence and evidence-first competition separation removes support released by opposing another hypothesis."
     },
     {
       "model": "examples/trace/source_registry_only.yaml",

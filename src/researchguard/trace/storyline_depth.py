@@ -1649,6 +1649,36 @@ def run_single_perturbation(
     return effect, perturbed_model, perturbed_result
 
 
+def _inference_self_check_gaps(model: TraceGuardModel, baseline_result: Any) -> list[dict[str, Any]]:
+    """Replay native counterexamples to causal and opposition self-boosting."""
+
+    from .inference.engine import infer_model
+
+    variants = []
+    if model.causal_candidates:
+        variants.append(("causal_declaration_raises_support", replace(model, causal_candidates=())))
+    if any(link.polarity == "oppose" for link in model.hypothesis_evidence_links):
+        variants.append(("opposition_raises_support", replace(
+            model,
+            hypothesis_evidence_links=tuple(link for link in model.hypothesis_evidence_links if link.polarity != "oppose"),
+        )))
+    baseline = {row.hypothesis_id: row.support for row in baseline_result.inference_receipt.hypothesis_projections}
+    gaps = []
+    for code, variant in variants:
+        alternate = {row.hypothesis_id: row.support for row in infer_model(variant).inference_receipt.hypothesis_projections}
+        for hypothesis_id, support in sorted(baseline.items()):
+            if support > alternate[hypothesis_id] + 0.001:
+                gaps.append({
+                    "gap_id": f"{code}:{hypothesis_id}",
+                    "severity": "blocking",
+                    "hypothesis_id": hypothesis_id,
+                    "support": support,
+                    "support_without_declaration": alternate[hypothesis_id],
+                    "message": f"Native inference violates {code} for {hypothesis_id}; this storyline cannot close.",
+                })
+    return gaps
+
+
 def evaluate_storyline_depth(
     model: TraceGuardModel,
     baseline_result: Any,
@@ -1698,7 +1728,7 @@ def evaluate_storyline_depth(
             hypotheses,
         )
         effects.append(effect)
-    unresolved = [*alternative_gaps, *causal_gaps, *object_gaps]
+    unresolved = [*alternative_gaps, *causal_gaps, *object_gaps, *_inference_self_check_gaps(model, baseline_result)]
     raw_policy = model.metadata.get("storyline_depth_policy") or {}
     if not isinstance(raw_policy, dict):
         raw_policy = {}
@@ -1861,7 +1891,11 @@ def evaluate_storyline_depth(
         gap.get("gap_id") in {"critical_object_depth_incomplete", "predictive_holdout_not_supported"}
         for gap in unresolved
     )
-    if blocking_causal or blocking_baseline or blocking_object_or_prediction:
+    blocking_self_check = any(
+        str(gap.get("gap_id", "")).startswith(("causal_declaration_raises_support:", "opposition_raises_support:"))
+        for gap in unresolved
+    )
+    if blocking_causal or blocking_baseline or blocking_object_or_prediction or blocking_self_check:
         closure_status = "BLOCKED"
     elif (
         unresolved
@@ -1896,7 +1930,7 @@ def evaluate_storyline_depth(
         sorted(
             item.hypothesis_id
             for item in inference_receipt.hypothesis_projections
-            if item.live
+            if item.live and item.rank != 1
         )
     )
     hypothesis_by_id = {item.hypothesis_id: item for item in hypotheses}

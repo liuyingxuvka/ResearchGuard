@@ -101,6 +101,12 @@ def build_storyline_causal_factors(
                 )
                 direction = "support"
                 weight = policy.hypothesis_support_weight
+            elif link.polarity == "oppose":
+                expression = LinearExpression(
+                    ((hypothesis_atom, value),),
+                )
+                direction = "oppose"
+                weight = policy.hypothesis_opposition_weight
             else:
                 expression = LinearExpression(
                     ((hypothesis_atom, 1.0), (atom_id, 1.0)),
@@ -275,7 +281,7 @@ def build_storyline_causal_factors(
         confounder_score = (
             1.0
             if candidate.confounder_ids and not unresolved
-            else (0.45 if candidate.confounder_ids else 0.0)
+            else 0.0
         )
         confounder_atom = f"confounder_disposition:{candidate.causal_id}"
         observed.append(

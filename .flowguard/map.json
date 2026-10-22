@@ -211,7 +211,7 @@
       "responsibilities": [
         "Own temporal and causal trace inference, storyline stress and case library updates.",
         "Keep command output to analysis results; full JSON is written only with --output.",
-        "Run storyline depth only in trace depth; evaluate solves the model once without it.",
+        "Solve storyline support from evidence first; bound causal support below it. Depth checks that neither causal declarations nor oppose links raise support; evaluate does not run depth.",
         "Freeze a prediction only when its target, its expected evidence and event ids, and every coverage id exist in the model."
       ],
       "files": [
@@ -262,7 +262,7 @@
       ],
       "models": [],
       "status": "confirmed",
-      "fingerprint": "sha256:665c439b3cd8d10a2267c9b4e1939f74d2a6c0a4be133d40bc8c7eef94161661",
+      "fingerprint": "sha256:f67b7c8b04b511f03ea1f5fe48b19a47ffa40682a6f823274e7dcbbf28427d02",
       "layer": "routes"
     },
     {

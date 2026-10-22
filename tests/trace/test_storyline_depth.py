@@ -667,3 +667,55 @@ def test_evaluate_leaves_storyline_depth_to_trace_depth() -> None:
 
     assert cli("evaluate")["storyline_depth"] is None
     assert cli("depth")["schema_version"] == "researchguard.trace.storyline_depth.v2"
+
+
+def test_live_alternatives_exclude_the_leader() -> None:
+    from researchguard.trace.loader import load_model
+
+    model = load_model(Path(__file__).parent / "fixtures" / "evergiven" / "tr_v2b.yaml")
+    baseline = evaluate_model(model)
+    receipt = evaluate_storyline_depth(model, baseline, max_perturbations=0)
+    projections = baseline.inference_receipt.hypothesis_projections
+    assert {row.hypothesis_id for row in projections if row.rank == 1}.isdisjoint(receipt.live_alternative_ids)
+    assert set(receipt.live_alternative_ids) == {row.hypothesis_id for row in projections if row.live and row.rank != 1}
+
+
+def test_depth_self_checks_flag_a_causal_pull(monkeypatch) -> None:
+    from researchguard.trace.inference import engine
+    from researchguard.trace.loader import load_model
+
+    # Removing the evidence-first equalities restores the real old causal pull;
+    # the depth oracle must reject that native solver behavior.
+    monkeypatch.setattr(engine, "_fix_storyline_support", lambda model, problem, policy: problem, raising=False)
+    model = load_model(Path(__file__).parent / "fixtures" / "evergiven" / "tr_v1.yaml")
+    baseline = evaluate_model(model)
+    receipt = evaluate_storyline_depth(model, baseline, max_perturbations=0)
+    assert any(row["gap_id"].startswith("causal_declaration_raises_support:") for row in receipt.unresolved_gaps)
+    assert receipt.closure_status == "BLOCKED"
+
+
+def test_depth_self_checks_flag_opposition_raising_support(monkeypatch) -> None:
+    from dataclasses import replace
+    from researchguard.trace.inference import compiler
+    from researchguard.trace.loader import load_model
+
+    original = compiler.build_storyline_causal_factors
+
+    def reverse_opposition(model, policy):
+        links = tuple(replace(link, polarity="support") if link.polarity == "oppose" else link for link in model.hypothesis_evidence_links)
+        return original(replace(model, hypothesis_evidence_links=links), policy)
+
+    monkeypatch.setattr(compiler, "build_storyline_causal_factors", reverse_opposition)
+    model = load_model(Path(__file__).parent / "fixtures" / "evergiven" / "tr_v2b.yaml")
+    receipt = evaluate_storyline_depth(model, evaluate_model(model), max_perturbations=0)
+    assert any(row["gap_id"].startswith("opposition_raises_support:") for row in receipt.unresolved_gaps)
+    assert receipt.closure_status == "BLOCKED"
+
+
+def test_depth_self_checks_accept_the_evergiven_models() -> None:
+    from researchguard.trace.loader import load_model
+
+    for path in sorted((Path(__file__).parent / "fixtures" / "evergiven").glob("*.yaml")):
+        model = load_model(path)
+        receipt = evaluate_storyline_depth(model, evaluate_model(model), max_perturbations=0)
+        assert not any("raises_support:" in row["gap_id"] for row in receipt.unresolved_gaps)

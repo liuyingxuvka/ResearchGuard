@@ -416,11 +416,15 @@ def test_causal_license_requires_all_typed_boundaries() -> None:
         }
     ]
     supported_model = TraceGuardModel.from_dict(payload)
-    supported = evaluate_model(
-        supported_model,
-        include_storyline_depth=False,
-    ).inference_receipt.hypothesis_projections[0]
+    supported_rows = {
+        row.hypothesis_id: row for row in evaluate_model(
+            supported_model,
+            include_storyline_depth=False,
+        ).inference_receipt.hypothesis_projections
+    }
+    supported = supported_rows["h-causal"]
     assert supported.causal_status == "supported"
+    assert supported_rows["h-alternative"].causal_status == "not_requested"
 
     unresolved_payload = _base_payload()
     unresolved_payload.update(payload)
@@ -430,10 +434,13 @@ def test_causal_license_requires_all_typed_boundaries() -> None:
             "status": "unresolved",
         }
     ]
-    unresolved = evaluate_model(
-        TraceGuardModel.from_dict(unresolved_payload),
-        include_storyline_depth=False,
-    ).inference_receipt.hypothesis_projections[0]
+    unresolved = next(
+        row for row in evaluate_model(
+            TraceGuardModel.from_dict(unresolved_payload),
+            include_storyline_depth=False,
+        ).inference_receipt.hypothesis_projections
+        if row.hypothesis_id == "h-causal"
+    )
     assert unresolved.causal_status != "supported"
     assert unresolved.causal_support < supported.causal_support
 
@@ -601,3 +608,45 @@ def test_maintained_example_differential_inventory_has_no_unexplained_delta() ->
         assert projection.validation_status == row["current_status"]
         assert row["delta_disposition"]
         assert row["support_min"] <= projection.support <= row["support_max"]
+
+
+EVERGIVEN = Path(__file__).parent / "fixtures" / "evergiven"
+
+
+def _storyline_projections(model):
+    return {row.hypothesis_id: row for row in evaluate_model(model).inference_receipt.hypothesis_projections}
+
+
+def test_causal_declaration_never_raises_storyline_support() -> None:
+    for name in ("tr_v1", "tr_varB"):
+        model = load_model(EVERGIVEN / f"{name}.yaml")
+        plain = load_model(EVERGIVEN / "tr_varA.yaml") if name == "tr_v1" else replace(model, causal_candidates=())
+        actual = _storyline_projections(model)
+        expected = _storyline_projections(plain)
+        assert actual.keys() == expected.keys()
+        for hypothesis_id, row in actual.items():
+            assert abs(row.support - expected[hypothesis_id].support) <= 0.001
+            if row.causal_support is not None:
+                assert row.causal_support <= row.support + 0.000001
+
+
+def test_opposition_lowers_support() -> None:
+    opposed = _storyline_projections(load_model(EVERGIVEN / "tr_v2b.yaml"))
+    unopposed = _storyline_projections(load_model(EVERGIVEN / "tr_v2c_nooppose.yaml"))
+    assert opposed["h_suez"].support <= unopposed["h_suez"].support - 0.01
+
+
+def test_better_supported_alternative_ranks_first() -> None:
+    rows = _storyline_projections(load_model(EVERGIVEN / "tr_v2b.yaml"))
+    assert rows["h_demand"].rank == 1
+
+
+def test_unresolved_confounder_scores_zero() -> None:
+    from researchguard.trace.inference.compiler import compile_model
+
+    model = load_model(EVERGIVEN / "tr_v1.yaml")
+    for status in ("unresolved", "partially_addressed"):
+        candidate = replace(model, confounder_reviews=tuple(replace(row, status=status) for row in model.confounder_reviews))
+        problem = compile_model(candidate, DEFAULT_POLICY)
+        values = [row.value for row in problem.observed_atoms if row.kind == "confounder_disposition"]
+        assert values and values == [0.0] * len(values)

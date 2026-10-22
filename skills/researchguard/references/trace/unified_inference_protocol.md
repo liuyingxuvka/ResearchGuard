@@ -36,6 +36,14 @@ sparse QP and calls OSQP directly. There is no fallback evaluator.
 The values are structural MAP support inside the declared model. They are not
 calibrated probabilities and do not prove that the underlying facts are true.
 
+When causal candidates or competition factors are present, the same compiler
+and solver run in two stages: first solve the evidence model without causal
+candidates or pairwise competition penalties, then solve the complete model
+with each storyline support fixed to its evidence-only value. Causal support
+remains below it. Competition remains in the final objective and explanation,
+but opposing a competitor cannot release extra absolute support for a storyline.
+Without either kind of factor, only one solve is needed.
+
 ## 2. Input and output separation
 
 Caller-authored model input may declare source lineage and independence,
@@ -73,15 +81,23 @@ cause-before-effect chronology, an evidence-backed mechanism, explicit
 alternative comparison, reviewed confounders, and declared scope. Missing or
 reversed chronology, missing mechanism evidence, unresolved confounders,
 missing alternatives, or missing scope caps causal support.
+Unresolved or partially addressed confounder reviews contribute zero positive
+confounder support; the unresolved-confounder cap still applies.
 
 Causal text alone creates no causal atom. A supported projection does not
 identify interventions or treatment effects.
 
 ## 6. Competing storylines
 
-Each hypothesis has its own latent support atom. Typed evidence polarity and
-competition relations shape that atom. Rank and live status are projected from
-the same solution; no separate ranking formula may overwrite solved values.
+Each hypothesis has its own latent support atom. Typed evidence shapes its
+absolute support. Oppose evidence contributes a negative squared hinge on
+quality times hypothesis support, using the unchanged policy weight; it has
+no inactive permissive threshold. Limit evidence keeps its existing boundary.
+Competition relations remain comparison context in the full problem rather
+than a source of support. Rank and live status come from the fixed evidence
+solution; no separate ranking formula may overwrite solved values.
+The storyline values are fixed before causal factors are solved. Live
+alternatives in depth output exclude the first-ranked hypothesis.
 
 ## 7. Perturbation and sensitivity
 

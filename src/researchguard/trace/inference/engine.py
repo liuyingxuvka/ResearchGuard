@@ -9,7 +9,7 @@ from .compiler import compile_model
 from .explain import explain_solution
 from .policy import DEFAULT_POLICY, InferencePolicy
 from .projection import project_hypotheses, project_traces
-from .types import InferenceReceipt, fingerprint
+from .types import CompiledProblem, HardConstraint, InferenceReceipt, LinearExpression, fingerprint
 from ..entity_resolution import EntityScore
 from ..results import EvaluationResult, RuleResult, TraceEvaluation
 from ..schema import TraceGuardModel
@@ -498,6 +498,41 @@ def _rule_results_for_trace(
     return tuple(sorted(rows, key=lambda item: item.rule_id))
 
 
+def _fix_storyline_support(
+    model: TraceGuardModel, problem: CompiledProblem, policy: InferencePolicy,
+) -> CompiledProblem:
+    """Freeze absolute evidence support before causal or competition factors."""
+
+    competition_ids = {
+        factor.factor_id for factor in problem.factors
+        if factor.family == "storyline_alternative" and factor.factor_id.startswith("alternative-competition:")
+    }
+    if not model.causal_candidates and not competition_ids:
+        return problem
+    from .osqp_backend import solve_problem
+
+    evidence_problem = compile_model(replace(model, causal_candidates=()), policy)
+    # Competition describes the relative explanation, not extra absolute
+    # support released when a different hypothesis receives opposition.
+    evidence_problem = replace(
+        evidence_problem,
+        factors=tuple(factor for factor in evidence_problem.factors if factor.factor_id not in competition_ids),
+    )
+    evidence_solution = solve_problem(evidence_problem, policy)
+    fixed = tuple(
+        HardConstraint(
+            constraint_id=f"storyline-fixed:{hypothesis_id}",
+            description="Evidence determines storyline support before causal support.",
+            expression=LinearExpression(((atom_id, 1.0),)),
+            lower=float(evidence_solution.atom_values[atom_id]),
+            upper=float(evidence_solution.atom_values[atom_id]),
+            affected_object_ids=(hypothesis_id,),
+        )
+        for hypothesis_id, atom_id in sorted(evidence_problem.metadata["hypothesis_atoms"].items())
+    )
+    return replace(problem, hard_constraints=problem.hard_constraints + fixed)
+
+
 def infer_model(
     model: TraceGuardModel,
     *,
@@ -528,10 +563,11 @@ def infer_model(
     # Loading NumPy/SciPy/OSQP is expensive on the supported Windows runtime.
     # Keep the solver dependency on the actual inference path so importing the
     # public console for routing, schema checks, or ``--help`` remains bounded.
-    # The mathematical execution path is unchanged: solve only after the
-    # canonical problem has been compiled.
+    # Both phases use this same compiler and solver; no alternate evaluator
+    # can raise evidence-derived storyline support.
     from .osqp_backend import solve_problem
 
+    problem = _fix_storyline_support(inference_model, problem, policy)
     solution = solve_problem(problem, policy)
     contributions = explain_solution(problem, solution, policy)
     trace_projections = project_traces(

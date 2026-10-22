@@ -52,6 +52,15 @@ TraceGuard can expose a deletion-minimal contradiction core;
 sets with a conservative wording license. ExperimentGuard is
 recommendation-only: it never executes an experiment or invents probabilities.
 
+TraceGuard solves storyline support from evidence first, then bounds causal
+support beneath it. Declaring a causal candidate cannot improve a storyline's
+support; unresolved or partly addressed confounders provide no positive support.
+`trace depth` always checks applicable causal-declaration and opposing-evidence
+removals for self-boosting support, and blocks closure if either check fails.
+Its live alternatives exclude the leading hypothesis.
+Competition remains comparison context, without turning opposition to one
+hypothesis into extra absolute support for another.
+
 Each route's task-local loop (predict, observe, revise) works on plain model
 files and keeps purpose, coverage, assumptions, unknowns, predictions, computed
 gap transitions, addressable next actions, and exact stop reasons. Every id a
