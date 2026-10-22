@@ -1,15 +1,25 @@
 """Turn a TraceGuard export-logicguard bundle into a starter LogicGuard model."""
 from __future__ import annotations
 
+import logging
 from typing import Any, Mapping
+
+from .provenance import content_hash_for
 
 
 TRACE_HANDOFF_SCHEMA = "researchguard.trace.logic-handoff.v1"
 
 
 def model_dict_from_trace_bundle(bundle: Mapping[str, Any]) -> dict[str, Any]:
-    if not isinstance(bundle, Mapping) or bundle.get("schema") != TRACE_HANDOFF_SCHEMA or not bundle.get("claims"):
-        raise ValueError(f"expected a TraceGuard export-logicguard bundle ({TRACE_HANDOFF_SCHEMA}) with at least one claim")
+    if not isinstance(bundle, Mapping) or bundle.get("schema") != TRACE_HANDOFF_SCHEMA:
+        raise ValueError(f"expected a TraceGuard export-logicguard bundle ({TRACE_HANDOFF_SCHEMA})")
+    if "hypotheses" in bundle:
+        if not isinstance(bundle["hypotheses"], list) or not isinstance(bundle.get("evidence"), list):
+            raise ValueError("handoff hypotheses and evidence must both be lists")
+        if bundle["hypotheses"]:
+            return _model_dict_from_hypotheses(bundle)
+    if not bundle.get("claims"):
+        raise ValueError("expected at least one handoff claim or hypothesis")
     nodes = {}
     edges = []
     for claim in bundle["claims"]:
@@ -29,4 +39,67 @@ def model_dict_from_trace_bundle(bundle: Mapping[str, Any]) -> dict[str, Any]:
             edges.append({"source": node_id, "target": claim_id, "type": "qualifies"})
     root = str(bundle["claims"][0]["claim_id"])
     return {"model": {"id": f"trace_import_{root}", "title": "Imported from a TraceGuard bundle", "root_claim": root},
+            "nodes": nodes, "edges": edges}
+
+
+def _model_dict_from_hypotheses(bundle: Mapping[str, Any]) -> dict[str, Any]:
+    """Import signed data records only; never load or invoke a sibling route."""
+
+    hypotheses, evidence = bundle["hypotheses"], bundle["evidence"]
+    nodes: dict[str, Any] = {}
+    edges = []
+    evidence_by_id = {}
+    for item in evidence:
+        if not isinstance(item, Mapping) or any(type(item.get(key)) is not str for key in ("evidence_id", "source_id", "text", "locator")):
+            raise ValueError("handoff evidence requires string evidence_id, source_id, text and locator")
+        if not all(item[key].strip() for key in ("evidence_id", "source_id")):
+            raise ValueError("handoff evidence id and source id must have content")
+        evidence_id = item["evidence_id"]
+        if evidence_id in evidence_by_id:
+            raise ValueError(f"duplicate handoff evidence id: {evidence_id}")
+        evidence_by_id[evidence_id] = item
+    for hypothesis in hypotheses:
+        if not isinstance(hypothesis, Mapping) or any(type(hypothesis.get(key)) is not str or not hypothesis[key].strip()
+                                                     for key in ("hypothesis_id", "claim", "role")):
+            raise ValueError("handoff hypothesis requires nonempty hypothesis_id, claim and role")
+        hypothesis_id = hypothesis["hypothesis_id"]
+        if hypothesis_id in nodes or hypothesis_id in evidence_by_id:
+            raise ValueError(f"duplicate or conflicting handoff hypothesis id: {hypothesis_id}")
+        nodes[hypothesis_id] = {"type": "Claim", "text": hypothesis["claim"]}
+
+    def new_id(base: str) -> str:
+        node_id, index = base, 1
+        while node_id in nodes or node_id in evidence_by_id:
+            node_id = f"{base}_{index}"
+            index += 1
+        return node_id
+
+    for hypothesis in hypotheses:
+        hypothesis_id = hypothesis["hypothesis_id"]
+        sides = {}
+        for key in ("supporting_evidence_ids", "opposing_evidence_ids", "limiting_evidence_ids"):
+            ids = hypothesis.get(key)
+            if not isinstance(ids, list) or any(type(item) is not str for item in ids):
+                raise ValueError(f"handoff {key} must be a list of evidence ids")
+            if set(ids) - evidence_by_id.keys():
+                raise ValueError(f"handoff {key} references missing evidence")
+            sides[key] = sorted(set(ids))
+        for evidence_id in sorted(set(sides["supporting_evidence_ids"]) & set(sides["opposing_evidence_ids"])):
+            logging.getLogger(__name__).warning("Handoff evidence %s both supports and opposes hypothesis %s; retaining both paths.", evidence_id, hypothesis_id)
+        for key, kind in (("supporting_evidence_ids", "support"), ("opposing_evidence_ids", "oppose"), ("limiting_evidence_ids", "limit")):
+            for evidence_id in sides[key]:
+                item = evidence_by_id[evidence_id]
+                nodes.setdefault(evidence_id, {"type": "Evidence", "text": item["text"], "provenance": [{
+                    "origin_kind": "external_source", "source_id": item["source_id"], "locator": evidence_id,
+                    "content_hash": content_hash_for(item["text"]), "metadata": {"locator_text": item["locator"]},
+                }]})
+                target = hypothesis_id
+                if kind != "support":
+                    target = new_id(f"{'R' if kind == 'oppose' else 'L'}_{hypothesis_id}_{evidence_id}")
+                    nodes[target] = {"type": "Rebuttal" if kind == "oppose" else "Limitation",
+                                     "text": f"{'Opposing' if kind == 'oppose' else 'Limiting'} evidence for {hypothesis_id}: {item['text']}"}
+                    edges.append({"source": target, "target": hypothesis_id, "type": "attacks" if kind == "oppose" else "qualifies"})
+                edges.append({"source": evidence_id, "target": target, "type": "supports"})
+    root = next((item["hypothesis_id"] for item in hypotheses if item["role"] == "primary"), hypotheses[0]["hypothesis_id"])
+    return {"model": {"id": f"trace_import_{root}", "title": "Imported from TraceGuard hypotheses", "root_claim": root},
             "nodes": nodes, "edges": edges}

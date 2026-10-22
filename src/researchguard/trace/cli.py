@@ -237,11 +237,11 @@ def cmd_report(args: argparse.Namespace) -> int:
 
 def cmd_export_logicguard(args: argparse.Namespace) -> int:
     try:
-        _, result = _load_and_evaluate(args.model)
+        model, result = _load_and_evaluate(args.model)
     except (OSError, SchemaError, ValueError, InferenceError) as exc:
         _print_json({"ok": False, "error": str(exc)}, pretty=False)
         return 2
-    text = render_logicguard_yaml(result)
+    text = render_logicguard_yaml(result, model=model)
     if args.output:
         Path(args.output).write_text(text, encoding="utf-8")
     else:

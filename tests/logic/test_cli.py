@@ -384,3 +384,44 @@ def test_cli_import_handoff_reads_a_traceguard_bundle(tmp_path: Path) -> None:
     assert json.loads(imported.stdout)["root_claim"] == "claim_trace_metadata_incident"
     assert "validation: OK" in _run("validate", str(model)).stdout
     assert "missing_warrant" in _run("diagnose", str(model)).stdout
+
+
+def test_import_handoff_builds_one_claim_per_hypothesis(tmp_path: Path) -> None:
+    import yaml
+    from researchguard.logic.provenance import content_hash_for
+    fixture = ROOT / "tests/trace/fixtures/evergiven/tr_v2b.yaml"
+    bundle_path, model_path = tmp_path / "signed-bundle.yaml", tmp_path / "signed-model.yaml"
+    exported = subprocess.run([sys.executable, "-m", "researchguard", "trace", "export-logicguard",
+                               str(fixture), "--output", str(bundle_path)], cwd=ROOT, capture_output=True, text=True)
+    assert exported.returncode == 0, exported.stdout + exported.stderr
+    bundle = yaml.safe_load(bundle_path.read_text())
+    imported = _run("import-handoff", str(bundle_path), "--output", str(model_path))
+    assert imported.returncode == 0, imported.stdout + imported.stderr
+    assert json.loads(imported.stdout)["root_claim"] == "h_suez"
+    data = yaml.safe_load(model_path.read_text())
+    assert data["nodes"]["h_suez"]["type"] == data["nodes"]["h_demand"]["type"] == "Claim"
+    assert not any(edge["source"] == "anc-transpacific" and edge["target"] == "h_suez" and edge["type"] == "supports"
+                   for edge in data["edges"])
+    attackers = {edge["source"] for edge in data["edges"] if edge["target"] == "h_suez" and edge["type"] == "attacks"}
+    assert attackers and all(data["nodes"][item]["type"] == "Rebuttal" for item in attackers)
+    assert any(edge["source"] == "anc-transpacific" and edge["target"] in attackers and edge["type"] == "supports"
+               for edge in data["edges"])
+    assert not any(edge["source"] in {"h_suez", "h_demand"} and edge["target"] in {"h_suez", "h_demand"}
+                   for edge in data["edges"])
+    evidence = {item["evidence_id"]: item for item in bundle["evidence"]}
+    for node_id, node in data["nodes"].items():
+        if node["type"] != "Evidence":
+            continue
+        original = evidence[node_id]
+        assert node["text"] == original["text"]
+        provenance = node["provenance"][0]
+        assert provenance["origin_kind"] == "external_source"
+        assert provenance["source_id"] == original["source_id"]
+        assert provenance["locator"] == node_id
+        assert provenance["metadata"]["locator_text"] == original["locator"]
+        assert provenance["content_hash"] == content_hash_for(node["text"])
+    validated = _run("validate", str(model_path))
+    assert validated.returncode == 0, validated.stdout + validated.stderr
+    assert "validation: OK" in validated.stdout
+    assert "no provenance" not in validated.stdout + validated.stderr
+    assert "missing_warrant" in _run("diagnose", str(model_path)).stdout

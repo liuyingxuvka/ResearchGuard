@@ -81,3 +81,10 @@ gaps mean `progressed`; newly discovered gaps stay visible without claiming a
 quality gain. `--prior-open-gap-id` controls stagnation, not the baseline.
 Trace prediction mismatches remain rejection reasons, separate from native gap
 transitions.
+
+Trace-to-logic handoffs preserve each hypothesis id, signed evidence links,
+evidence text and source provenance. Opposing evidence supports a rebuttal,
+limiting evidence supports a limitation, and neither becomes direct support for
+the target claim. Import preserves the primary hypothesis as root without
+inventing a warrant or relationships between hypotheses. Old trace-only bundles
+and the result-only export API remain supported.

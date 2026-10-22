@@ -47,7 +47,8 @@
       "summary": "Own the researchguard console and the four member command lines; dispatch each member command directly to its owner.",
       "responsibilities": [
         "Dispatch researchguard logic|source|trace|experiment straight to the member main; unknown commands return one typed JSON error.",
-        "Own the member command-line surfaces, including the source stop rule inputs, optional followups and stable four status names."
+        "Own the member command-line surfaces, including the source stop rule inputs, optional followups and stable four status names.",
+        "Pass the already-loaded trace model into logic handoff export so the native CLI carries actual evidence content and polarity."
       ],
       "files": [
         "src/researchguard/__main__.py",
@@ -88,7 +89,7 @@
         ".flowguard/models/researchguard_suite_model.py"
       ],
       "status": "confirmed",
-      "fingerprint": "sha256:b4148f9a3d1e62d94b9a170a432bb8d818cc60666b751fa66d0fbb24320e348c",
+      "fingerprint": "sha256:80c79a6258bc53aa5693bd3a2b824d6cf84c1089e4fd1891a3fa7d89999e2d5d",
       "layer": "interface"
     },
     {
@@ -100,7 +101,8 @@
         "Run the predict-observe-revise loop on plain model files; the loop never writes model files, so rollback is restoring the previous file; every claim, node and coverage id a prediction names must exist in the model when it is frozen.",
         "Derive minimal support and attack sets split by the edge that enters the claim; a blocked claim reports its native blockers as the attack set and preserves the wording license.",
         "Bind Evidence to sources: provenance records are checked on load, and validate --library-root resolves their source_id and locator in the source library.",
-        "Collect argument evaluation and native depth gaps from baseline and candidate; delegate gap transitions to the suite helper, with prior ids used only for argument stagnation."
+        "Collect argument evaluation and native depth gaps from baseline and candidate; delegate gap transitions to the suite helper, with prior ids used only for argument stagnation.",
+        "Import a data-only trace bundle as signed per-hypothesis claims and content-bound evidence provenance, with legacy trace-only claim compatibility and no invented warrants."
       ],
       "files": [
         "src/researchguard/logic/__init__.py",
@@ -162,7 +164,7 @@
       ],
       "models": [],
       "status": "confirmed",
-      "fingerprint": "sha256:fa2351682a052efdfa1ee4e86fa29a6925c9486ca012fb28557776839174c7ab",
+      "fingerprint": "sha256:82e5ebdc22337d03737697a1310b3b9c8bd50467a1f9c4bc13c100e5dc81ac9d",
       "layer": "routes"
     },
     {
@@ -218,7 +220,8 @@
         "Keep command output to analysis results; full JSON is written only with --output.",
         "Solve storyline support from evidence first; bound causal support below it. Depth checks that neither causal declarations nor oppose links raise support; evaluate does not run depth.",
         "Freeze a prediction only when its target, its expected evidence and event ids, and every coverage id exist in the model.",
-        "Keep prediction mismatch rejection independent of storyline native depth and coverage transitions; use the suite helper for model gap changes and count only resolved storyline gaps as progress."
+        "Keep prediction mismatch rejection independent of storyline native depth and coverage transitions; use the suite helper for model gap changes and count only resolved storyline gaps as progress.",
+        "Export hypothesis ids, native rank/support and signed evidence with original text/source/locator alongside the preserved v1 trace claims."
       ],
       "files": [
         "src/researchguard/trace/__init__.py",
@@ -268,7 +271,7 @@
       ],
       "models": [],
       "status": "confirmed",
-      "fingerprint": "sha256:ea6cd7282c486546f34745e48ff36dfc2fc311aec108e78a7520ff94f5507f72",
+      "fingerprint": "sha256:289c675a3f8bdd566a3c3a6a01817cbad2a2baf0d49b07f2e204f69c28745330",
       "layer": "routes"
     },
     {

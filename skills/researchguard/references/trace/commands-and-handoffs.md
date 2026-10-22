@@ -33,3 +33,14 @@ broad, causal, robust, predictive or closed; it runs every critical perturbation
 Reuse each result for summary, weaknesses and gap reporting. The command list above
 is a menu, not a sequence to rerun for one unchanged model. Full JSON remains
 available on demand.
+
+`export-logicguard` retains the v1 `claims` fields and adds per-hypothesis
+`hypotheses` and evidence text/source/locator records. `logic import-handoff`
+uses hypothesis ids as Claim ids and the first primary hypothesis as root.
+Support links stay direct; opposing evidence supports a Rebuttal that attacks
+the hypothesis; limiting evidence supports a Limitation that qualifies it.
+Evidence provenance retains the source id, anchor id as locator, content hash,
+and human locator text. No hypothesis-to-hypothesis edge or warrant is invented.
+A dual-sign evidence link keeps both paths and logs the conflict. An old bundle,
+or a trace-only bundle with no hypotheses, keeps the existing trace-claim path.
+Import reads the bundle only; it never invokes SourceGuard or opens its files.

@@ -8,7 +8,11 @@ envelope and are never presented as object-level limitations.
 from __future__ import annotations
 
 import copy
-from typing import Any, Mapping
+from math import isfinite
+from typing import Any, Mapping, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .schema import TraceGuardModel
 
 from .evaluator import EvaluationResult
 from .loader import dump_yaml
@@ -77,7 +81,30 @@ def _domain_gap_list(trace: Any, audit_context: Mapping[str, Any]) -> list[str]:
     return _stable_unique(gaps)
 
 
-def logicguard_bundle(result: EvaluationResult) -> dict[str, object]:
+def _hypothesis_handoff(model: "TraceGuardModel", receipt: Mapping[str, Any], claims: list[dict[str, Any]]) -> dict[str, Any]:
+    projections = {item["hypothesis_id"]: item for item in receipt.get("hypothesis_projections", ())}
+    hypotheses = []
+    involved = {item for claim in claims for item in claim["evidence"]}
+    for hypothesis in model.storyline_hypotheses:
+        projection = projections[hypothesis.hypothesis_id]
+        sides = {"support": set(), "oppose": set(hypothesis.contradicting_evidence_ids), "limit": set()}
+        for link in model.hypothesis_evidence_links:
+            if link.hypothesis_id == hypothesis.hypothesis_id:
+                sides[link.polarity].add(link.evidence_id)
+        hypotheses.append({
+            "hypothesis_id": hypothesis.hypothesis_id, "claim": hypothesis.claim, "role": hypothesis.role,
+            "support": projection["support"], "rank": projection["rank"], "causal_status": projection["causal_status"],
+            "supporting_evidence_ids": sorted(sides["support"]), "opposing_evidence_ids": sorted(sides["oppose"]),
+            "limiting_evidence_ids": sorted(sides["limit"]),
+        })
+        involved.update(set().union(*sides.values()))
+    evidence = [{"evidence_id": item.evidence_id, "source_id": item.source_id,
+                 "text": item.raw_text or item.normalized_summary or "", "locator": item.locator or ""}
+                for item in model.evidence if item.evidence_id in involved]
+    return {"hypotheses": hypotheses, "evidence": evidence}
+
+
+def logicguard_bundle(result: EvaluationResult, *, model: "TraceGuardModel | None" = None) -> dict[str, object]:
     receipt_payload = _as_dict(getattr(result, "inference_receipt", None))
     receipt_identity = _receipt_identity(result)
     claims: list[dict[str, Any]] = []
@@ -132,7 +159,7 @@ def logicguard_bundle(result: EvaluationResult) -> dict[str, object]:
                 "rebuttal": [item.message for item in trace.contradictions],
             }
         )
-    return {
+    bundle = {
         "schema": LOGICGUARD_HANDOFF_SCHEMA,
         "schema_id": LOGICGUARD_HANDOFF_SCHEMA,
         "export_version": LOGICGUARD_HANDOFF_EXPORT_VERSION,
@@ -152,6 +179,10 @@ def logicguard_bundle(result: EvaluationResult) -> dict[str, object]:
         "handoffs": [_as_dict(item) for item in getattr(result, "handoffs", ()) if hasattr(item, "to_dict")],
         "consolidation_findings": [_as_dict(item) for item in getattr(result, "consolidation_findings", ()) if hasattr(item, "to_dict")],
     }
+
+    if model is not None:
+        bundle.update(_hypothesis_handoff(model, receipt_payload, claims))
+    return bundle
 
 
 def validate_logicguard_bundle(bundle: Mapping[str, Any]) -> dict[str, Any]:
@@ -222,6 +253,44 @@ def validate_logicguard_bundle(bundle: Mapping[str, Any]) -> dict[str, Any]:
         limitation = str(claim.get("limitation", "") or "")
         if any(token in limitation for token in ("HL-MRF", "MAP solution", "calibrated probability", "TraceGuard solver")):
             raise ValueError(f"claim[{index}].limitation contains generic solver language")
+    if "hypotheses" in bundle or "evidence" in bundle:
+        hypotheses, evidence = bundle.get("hypotheses"), bundle.get("evidence")
+        if not isinstance(hypotheses, list) or not isinstance(evidence, list):
+            raise ValueError("LogicGuard handoff hypotheses and evidence must both be lists")
+        evidence_ids: set[str] = set()
+        for index, item in enumerate(evidence):
+            if not isinstance(item, Mapping):
+                raise ValueError(f"evidence[{index}] must be a mapping")
+            for key in ("evidence_id", "source_id", "text", "locator"):
+                if type(item.get(key)) is not str or (key in {"evidence_id", "source_id"} and not item[key].strip()):
+                    raise ValueError(f"evidence[{index}].{key} must be a string" + (" with content" if key in {"evidence_id", "source_id"} else ""))
+            if item["evidence_id"] in evidence_ids:
+                raise ValueError(f"duplicate evidence id in LogicGuard handoff: {item['evidence_id']}")
+            evidence_ids.add(item["evidence_id"])
+        hypothesis_ids: set[str] = set()
+        for index, item in enumerate(hypotheses):
+            if not isinstance(item, Mapping):
+                raise ValueError(f"hypotheses[{index}] must be a mapping")
+            for key in ("hypothesis_id", "claim", "role", "causal_status"):
+                if type(item.get(key)) is not str or not item[key].strip():
+                    raise ValueError(f"hypotheses[{index}].{key} must be a nonempty string")
+            hypothesis_id = item["hypothesis_id"]
+            if hypothesis_id in hypothesis_ids or hypothesis_id in evidence_ids:
+                raise ValueError(f"duplicate or conflicting hypothesis id: {hypothesis_id}")
+            hypothesis_ids.add(hypothesis_id)
+            if type(item.get("support")) not in (int, float) or not isfinite(item["support"]) or not 0 <= item["support"] <= 1:
+                raise ValueError(f"hypotheses[{index}].support must be finite in [0,1]")
+            if type(item.get("rank")) is not int or item["rank"] < 1:
+                raise ValueError(f"hypotheses[{index}].rank must be a positive integer")
+            for key in ("supporting_evidence_ids", "opposing_evidence_ids", "limiting_evidence_ids"):
+                ids = item.get(key)
+                if not isinstance(ids, list) or any(type(value) is not str or not value.strip() for value in ids):
+                    raise ValueError(f"hypotheses[{index}].{key} must be a list of nonempty strings")
+                if len(ids) != len(set(ids)):
+                    raise ValueError(f"hypotheses[{index}].{key} must be deduplicated")
+                missing = sorted(set(ids) - evidence_ids)
+                if missing:
+                    raise ValueError(f"hypotheses[{index}].{key} references missing evidence: {', '.join(missing)}")
     handoffs = bundle.get("handoffs", [])
     if not isinstance(handoffs, list):
         raise ValueError("LogicGuard handoff handoffs must be a list")
@@ -231,8 +300,8 @@ def validate_logicguard_bundle(bundle: Mapping[str, Any]) -> dict[str, Any]:
     return copy.deepcopy(dict(bundle))
 
 
-def render_logicguard_yaml(result: EvaluationResult) -> str:
-    return dump_yaml(logicguard_bundle(result))
+def render_logicguard_yaml(result: EvaluationResult, *, model: "TraceGuardModel | None" = None) -> str:
+    return dump_yaml(logicguard_bundle(result, model=model))
 
 
 __all__ = [
