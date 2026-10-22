@@ -15,7 +15,7 @@ from flowguard import FunctionResult, Invariant, InvariantResult, Scenario, Scen
 
 
 MODEL_ID = "researchguard.source.content_anchor_oracle.current"
-PARENT_MODEL_ID = "researchguard.source.evidence_discovery.current"
+PARENT = "sourceguard"
 DECLARED_FINDING = "sourceguard_blocked:contentless-anchor"
 RETIRED_FINDING = "no_content_qualified_anchor"
 

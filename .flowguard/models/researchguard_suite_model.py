@@ -190,6 +190,7 @@ def scenarios() -> tuple[Scenario, ...]:
 
 # Current FlowGuard model contract.
 MODEL_ID = "researchguard_suite"
+PARENT = "system"
 COMPONENTS = ["researchguard-suite"]
 IMPLEMENTED_BY = {
     "PickRoute": "skills/researchguard/SKILL.md:routes",

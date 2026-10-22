@@ -1,7 +1,11 @@
 {
   "schema": "flowguard.map.v1",
   "project": "researchguard",
-  "layers": [],
+  "layers": [
+    "interface",
+    "routes",
+    "foundation"
+  ],
   "ignore": [
     "openspec/**",
     "docs/**"
@@ -33,7 +37,8 @@
         ".flowguard/models/researchguard_suite_model.py"
       ],
       "status": "confirmed",
-      "fingerprint": "sha256:f819ce849757141070d8cd12cd274ff1571d36ef0523eba0bf196aa10e2880ac"
+      "fingerprint": "sha256:f819ce849757141070d8cd12cd274ff1571d36ef0523eba0bf196aa10e2880ac",
+      "layer": "foundation"
     },
     {
       "id": "suite-orchestration",
@@ -78,11 +83,11 @@
         "tests/experiment/test_recommendation.py"
       ],
       "models": [
-        ".flowguard/models/researchguard_suite_model.py",
-        ".flowguard/models/sourceguard_content_anchor_oracle_model.py"
+        ".flowguard/models/researchguard_suite_model.py"
       ],
       "status": "confirmed",
-      "fingerprint": "sha256:9a427da0fb8aafbc9c99e0c8f8393b6c4cf2b4b48f211d17152a9be60284ce32"
+      "fingerprint": "sha256:9a427da0fb8aafbc9c99e0c8f8393b6c4cf2b4b48f211d17152a9be60284ce32",
+      "layer": "interface"
     },
     {
       "id": "logicguard",
@@ -154,7 +159,8 @@
       ],
       "models": [],
       "status": "confirmed",
-      "fingerprint": "sha256:6144fd78cf8312711ee6d5f297c0012853a99c35e390ffa3e7facdb5ff0b7966"
+      "fingerprint": "sha256:6144fd78cf8312711ee6d5f297c0012853a99c35e390ffa3e7facdb5ff0b7966",
+      "layer": "routes"
     },
     {
       "id": "sourceguard",
@@ -196,7 +202,8 @@
         ".flowguard/models/sourceguard_content_anchor_oracle_model.py"
       ],
       "status": "confirmed",
-      "fingerprint": "sha256:dc587c97f5e001dc8a8b71f56a42f9b71b1c2098c25a25cfd763dbcb09d47768"
+      "fingerprint": "sha256:dc587c97f5e001dc8a8b71f56a42f9b71b1c2098c25a25cfd763dbcb09d47768",
+      "layer": "routes"
     },
     {
       "id": "traceguard",
@@ -255,7 +262,8 @@
       ],
       "models": [],
       "status": "confirmed",
-      "fingerprint": "sha256:1acef159af804f136142037b1022da08f997ba4058c30c2eebe03bd5b0009e47"
+      "fingerprint": "sha256:1acef159af804f136142037b1022da08f997ba4058c30c2eebe03bd5b0009e47",
+      "layer": "routes"
     },
     {
       "id": "experimentguard",
@@ -286,7 +294,8 @@
       ],
       "models": [],
       "status": "confirmed",
-      "fingerprint": "sha256:4c1208b6e346f046c50898c49a61484cf7a201bcba233e1313f2476f2d26e04b"
+      "fingerprint": "sha256:4c1208b6e346f046c50898c49a61484cf7a201bcba233e1313f2476f2d26e04b",
+      "layer": "routes"
     },
     {
       "id": "author-tools",
@@ -307,9 +316,7 @@
       "side_effects": [
         "copy the researchguard skill folder into the given skills directory and remove retired member skill folders"
       ],
-      "depends_on": [
-        "researchguard-suite"
-      ],
+      "depends_on": [],
       "tests": [
         "tests/test_prompt_bundles.py",
         "tests/contract/test_privacy_scan.py",
@@ -319,7 +326,8 @@
         ".flowguard/models/researchguard_suite_model.py"
       ],
       "status": "confirmed",
-      "fingerprint": "sha256:7feaea02daff65fd7b9a298e36648910ba31bc35d24725c6faf8fb858cad0158"
+      "fingerprint": "sha256:7feaea02daff65fd7b9a298e36648910ba31bc35d24725c6faf8fb858cad0158",
+      "layer": "interface"
     }
   ],
   "flows": [
