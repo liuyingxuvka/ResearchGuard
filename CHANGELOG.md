@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Stop source search when its scope is declared sufficient and no blocking gap is open; keep optional followups visible and choose affordable critical searches from all native candidates.
+
 ## v0.5.10 - 2026-10-21
 
 - Done: RG-01, RG-02, RG-03, RG-04, RG-05, RG-06, RG-07, RG-08, RG-09, RG-10, RG-11, RG-12, RG-13, RG-14, RG-15, RG-16, RG-17, RG-18, RG-19, RG-20, RG-21, RG-22, RG-23, RG-24, RG-25, RG-26, RG-27, RG-28, RG-29, RG-30, RG-31, RG-32, RG-33, RG-34, RG-35, RG-36, RG-37, RG-38, RG-39, RG-40, RG-41, RG-42, RG-43, RG-44, RG-45, RG-46, RG-47, RG-48, RG-49, RG-50, RG-51, RG-52, RG-53, RG-54, RG-55, RG-56, RG-57, RG-58, RG-59, RG-60, RG-61.

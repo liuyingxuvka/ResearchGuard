@@ -46,7 +46,10 @@ incomplete; generated prose is never promoted to evidence.
   artifact synthesis and project library viewer are sub-routes of the `logic`
   route; TraceGuard's case library is a sub-route of the `trace` route.
 
-`researchguard source stop-decision` returns typed search-stop decisions;
+`researchguard source stop-decision` checks every executable search targeting an
+open gap. An affordable critical search continues; a critical gap without one
+stays blocked. Without blocking gaps, `--sufficient` stops even when optional
+followups remain; those followups stay visible. Only cost is compared with budget.
 TraceGuard can expose a deletion-minimal contradiction core;
 `researchguard logic minimal-sets` exposes deletion-minimal support and attack
 sets with a conservative wording license. ExperimentGuard is

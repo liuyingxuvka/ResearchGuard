@@ -1,0 +1,25 @@
+observation_id: obs-unctad-pretrend
+action_id: act-pretrend
+observed_sources:
+  - source_id: src-unctad-rmt2021
+    title: "UNCTAD Review of Maritime Transport 2021, ch. 3 (trial transcription)"
+    source_type: pdf_report
+    source_status: saved
+    source_reliability: 0.85
+    source_role: counter_evidence
+    lineage_id: lin-unctad
+    source_date: "2021-11-18"
+    access_status: public
+    url: https://unctad.org/webflyer/review-maritime-transport-2021
+observed_anchors:
+  - anchor_id: anc-unctad-surge
+    source_id: src-unctad-rmt2021
+    anchor_type: page
+    locator: "RMT 2021, chapter 3, freight rates section"
+    text: "Container spot rates began surging in the second half of 2020 as demand rebounded and empty containers were scarce; the Suez Canal blockage in March 2021 added further pressure."
+    normalized_summary: Rates were already surging from H2 2020; the blockage added pressure on top.
+    modality: text
+    extraction_confidence: 0.8
+    specificity: 0.7
+    supports: [gap-pre-trend]
+    usable_for_claim: true

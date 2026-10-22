@@ -244,7 +244,7 @@ def generate_actions_from_leads(belief_state: BeliefState) -> list[SearchAction]
     return _dedupe(generated, belief_state.actions)
 
 
-def plan_next_actions(belief_state: BeliefState, limit: int = 5) -> PlanResult:
+def plan_next_actions(belief_state: BeliefState, limit: int | None = 5) -> PlanResult:
     generated = generate_actions_from_gaps(belief_state) + generate_actions_from_leads(belief_state)
     state_for_scoring = replace(belief_state, actions=_dedupe(generated, belief_state.actions))
     gap_by_id = belief_state.gap_by_id()

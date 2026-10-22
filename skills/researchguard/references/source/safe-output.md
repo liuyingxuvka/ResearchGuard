@@ -15,4 +15,4 @@ State what SourceGuard actually established:
 
 Never say a search result proves the claim, a bibliography supports the paragraph, a locator closes a semantic gap, many mentions are independent, a regional/planning/wholesale/forecast source supports national/retail/outcome/fact wording, or SourceGuard decided the final argument.
 
-Run `researchguard source stop-decision <model.yaml> --budget <remaining budget>` (add `--sufficient` when the evidence already covers the claim scope) and return its `status` (`continue_search`, `stop_sufficient`, `blocked_unresolved_critical`, or `not_run`) with the marginal value, cost, budget, critical gaps, and selected next search it prints. This is a planning decision, not a truth claim.
+Run `researchguard source stop-decision <model.yaml> --budget <remaining budget>` (add `--sufficient` when the evidence already covers the claim scope) and return its `status` (`continue_search`, `stop_sufficient`, `blocked_unresolved_critical`, or `not_run`) with the budget, actual open critical and optional gaps, affordable search ids, selected next search, and `optional_followups` it prints. This is a planning decision, not a truth claim.

@@ -1,0 +1,710 @@
+metadata:
+  purpose: 'Target claim: the Ever Given grounding (23-29 Mar 2021) caused the 2021
+    rise in Asia-Europe container freight rates. Desired strength: bounded.'
+  skill: SourceGuard
+  source_policy: public_only
+  domain_hints:
+  - Ever Given
+  - Suez Canal
+  - Drewry WCI
+  - Shanghai-Rotterdam
+  - Yantian
+  warnings: []
+  updated_at: '2026-10-21T18:50:56+00:00'
+  frontier_boundary: Updated frontier preserves candidates and anchors; it does not
+    validate final claims.
+leads:
+- lead_id: lead-cause
+  question: Did the Ever Given grounding cause the 2021 Asia-Europe freight rate rise?
+  hypothesis: The blockage removed capacity and caused the rise.
+  importance: 0.9
+  status: open
+  related_entities:
+  - Ever Given
+  - Suez Canal
+  related_sources: []
+  related_anchors: []
+  gaps:
+  - gap-event-dates
+  - gap-rate-series
+  - gap-pre-trend
+  - gap-alt-yantian
+  notes: ''
+sources:
+- source_id: src-sca-2021
+  title: Suez Canal Authority statements on the Ever Given grounding and refloating
+    (trial transcription)
+  source_type: government_record
+  url: https://www.suezcanal.gov.eg/
+  source_status: saved
+  source_reliability: 0.9
+  source_role: primary_source
+  lineage_id: lin-sca
+  source_date: '2021-03-29'
+  coverage_period: ''
+  language: ''
+  country: ''
+  access_status: public
+  can_support_structural_use: ''
+  cannot_support_structural_use: ''
+  notes: ''
+  content_fingerprint: ''
+  retrieval_request_fingerprint: ''
+  provider_id: ''
+  provider_revision: ''
+  retrieved_at: ''
+  unconsumed_output_disposition: ''
+- source_id: src-drewry-wci
+  title: Drewry World Container Index, Shanghai-Rotterdam lane, weekly (trial transcription,
+    approximate values)
+  source_type: dataset
+  url: https://www.drewry.co.uk/supply-chain-advisors/supply-chain-expertise/world-container-index-assessed-by-drewry
+  source_status: saved
+  source_reliability: 0.85
+  source_role: primary_source
+  lineage_id: lin-drewry
+  source_date: ''
+  coverage_period: 2020-10 to 2021-12
+  language: ''
+  country: ''
+  access_status: public
+  can_support_structural_use: ''
+  cannot_support_structural_use: ''
+  notes: ''
+  content_fingerprint: ''
+  retrieval_request_fingerprint: ''
+  provider_id: ''
+  provider_revision: ''
+  retrieved_at: ''
+  unconsumed_output_disposition: ''
+- source_id: src-unctad-rmt2021
+  title: UNCTAD Review of Maritime Transport 2021, ch. 3 (trial transcription)
+  source_type: pdf_report
+  url: https://unctad.org/webflyer/review-maritime-transport-2021
+  source_status: saved
+  source_reliability: 0.85
+  source_role: counter_evidence
+  lineage_id: lin-unctad
+  source_date: '2021-11-18'
+  coverage_period: ''
+  language: ''
+  country: ''
+  access_status: public
+  can_support_structural_use: ''
+  cannot_support_structural_use: ''
+  notes: ''
+  content_fingerprint: ''
+  retrieval_request_fingerprint: ''
+  provider_id: ''
+  provider_revision: ''
+  retrieved_at: ''
+  unconsumed_output_disposition: ''
+anchors:
+- anchor_id: anc-sca-dates
+  source_id: src-sca-2021
+  anchor_type: paragraph
+  locator: SCA statement 29 Mar 2021, para 1
+  text: The Ever Given ran aground on 23 March 2021 and was refloated on 29 March
+    2021; navigation resumed the same day.
+  normalized_summary: Grounding 23 Mar 2021, refloated 29 Mar 2021.
+  modality: text
+  observed_at: ''
+  extraction_confidence: 0.9
+  specificity: 0.9
+  supports:
+  - gap-event-dates
+  limits: []
+  claim_use_ids: []
+  handoff_ids: []
+  warnings: []
+  usable_for_trace: false
+  usable_for_claim: true
+  notes: ''
+  anchor_content_fingerprint: ''
+  source_content_fingerprint: ''
+  extractor_id: ''
+  extractor_revision: ''
+  observation_fingerprint: ''
+  unconsumed_output_disposition: ''
+- anchor_id: anc-wci-series
+  source_id: src-drewry-wci
+  anchor_type: table
+  locator: WCI Shanghai-Rotterdam weekly table, rows 2020-10-01..2021-12-30
+  text: 'Approx. USD/FEU: Oct 2020 ~2,000; early Jan 2021 ~8,000; mid Mar 2021 ~7,000;
+    early Apr 2021 ~8,000; Jun 2021 ~10,500; Sep 2021 ~14,000 (peak).'
+  normalized_summary: Rate quadrupled Oct 2020 - Jan 2021, dipped before 23 Mar, rose
+    after, and kept rising to a Sep 2021 peak.
+  modality: table
+  observed_at: ''
+  extraction_confidence: 0.7
+  specificity: 0.8
+  supports:
+  - gap-rate-series
+  limits: []
+  claim_use_ids: []
+  handoff_ids: []
+  warnings: []
+  usable_for_trace: false
+  usable_for_claim: true
+  notes: ''
+  anchor_content_fingerprint: ''
+  source_content_fingerprint: ''
+  extractor_id: ''
+  extractor_revision: ''
+  observation_fingerprint: ''
+  unconsumed_output_disposition: ''
+- anchor_id: anc-unctad-surge
+  source_id: src-unctad-rmt2021
+  anchor_type: page
+  locator: RMT 2021, chapter 3, freight rates section
+  text: Container spot rates began surging in the second half of 2020 as demand rebounded
+    and empty containers were scarce; the Suez Canal blockage in March 2021 added
+    further pressure.
+  normalized_summary: Rates were already surging from H2 2020; the blockage added
+    pressure on top.
+  modality: text
+  observed_at: ''
+  extraction_confidence: 0.8
+  specificity: 0.7
+  supports:
+  - gap-pre-trend
+  limits: []
+  claim_use_ids: []
+  handoff_ids: []
+  warnings: []
+  usable_for_trace: false
+  usable_for_claim: true
+  notes: ''
+  anchor_content_fingerprint: ''
+  source_content_fingerprint: ''
+  extractor_id: ''
+  extractor_revision: ''
+  observation_fingerprint: ''
+  unconsumed_output_disposition: ''
+gaps:
+- gap_id: gap-event-dates
+  lead_id: lead-cause
+  gap_type: missing_primary_source
+  description: Official dates of grounding and refloating.
+  importance: 0.7
+  blocking: true
+  suggested_source_roles:
+  - primary_source
+  suggested_modalities:
+  - text
+  structure_unit_id: ''
+  parent_goal: ''
+  unit_job: ''
+  contribution_type: ''
+  downstream_consumer: ''
+  structural_role_needed: ''
+  can_support_structural_use: ''
+  cannot_support_structural_use: ''
+  allowed_wording: ''
+  unsafe_wording: ''
+  semantic_state: closed
+  qualification:
+    anchor_id: anc-sca-dates
+    source_id: src-sca-2021
+    observation_id: obs-sca-dates
+    locator_present: true
+    source_accessible: true
+    source_reliability: 0.9
+    extraction_confidence: 0.9
+    specificity: 0.9
+    supports_gap: true
+    role_match: true
+    modality_match: true
+    target_match: true
+    usable_for_claim: true
+    decision: claim_usable
+    reasons: []
+  closure_basis:
+    anchor_ids:
+    - anc-sca-dates
+    source_ids:
+    - src-sca-2021
+    observation_ids:
+    - obs-sca-dates
+    thresholds:
+      source_reliability: 0.5
+      extraction_confidence: 0.5
+      specificity: 0.5
+    target_match: source role, anchor modality, and explicit gap support matched
+    claim_use_decision: claim_usable
+    qualified: true
+  review_required: false
+  requires_claim_usability: true
+  notes: Semantically qualified and closed.
+- gap_id: gap-rate-series
+  lead_id: lead-cause
+  gap_type: missing_numeric_provenance
+  description: A weekly Shanghai-Rotterdam spot-rate series covering Oct 2020 - Dec
+    2021.
+  importance: 0.9
+  blocking: true
+  suggested_source_roles:
+  - primary_source
+  suggested_modalities:
+  - table
+  structure_unit_id: ''
+  parent_goal: ''
+  unit_job: ''
+  contribution_type: ''
+  downstream_consumer: ''
+  structural_role_needed: ''
+  can_support_structural_use: ''
+  cannot_support_structural_use: ''
+  allowed_wording: ''
+  unsafe_wording: ''
+  semantic_state: closed
+  qualification:
+    anchor_id: anc-wci-series
+    source_id: src-drewry-wci
+    observation_id: obs-drewry-wci
+    locator_present: true
+    source_accessible: true
+    source_reliability: 0.85
+    extraction_confidence: 0.7
+    specificity: 0.8
+    supports_gap: true
+    role_match: true
+    modality_match: true
+    target_match: true
+    usable_for_claim: true
+    decision: claim_usable
+    reasons: []
+  closure_basis:
+    anchor_ids:
+    - anc-wci-series
+    source_ids:
+    - src-drewry-wci
+    observation_ids:
+    - obs-drewry-wci
+    thresholds:
+      source_reliability: 0.5
+      extraction_confidence: 0.5
+      specificity: 0.5
+    target_match: source role, anchor modality, and explicit gap support matched
+    claim_use_decision: claim_usable
+    qualified: true
+  review_required: false
+  requires_claim_usability: true
+  notes: Semantically qualified and closed.
+- gap_id: gap-pre-trend
+  lead_id: lead-cause
+  gap_type: missing_counterevidence
+  description: Evidence on whether rates were already rising before 23 Mar 2021.
+  importance: 0.9
+  blocking: true
+  suggested_source_roles:
+  - counter_evidence
+  suggested_modalities:
+  - text
+  - table
+  structure_unit_id: ''
+  parent_goal: ''
+  unit_job: ''
+  contribution_type: ''
+  downstream_consumer: ''
+  structural_role_needed: ''
+  can_support_structural_use: ''
+  cannot_support_structural_use: ''
+  allowed_wording: ''
+  unsafe_wording: ''
+  semantic_state: closed
+  qualification:
+    anchor_id: anc-unctad-surge
+    source_id: src-unctad-rmt2021
+    observation_id: obs-unctad-pretrend
+    locator_present: true
+    source_accessible: true
+    source_reliability: 0.85
+    extraction_confidence: 0.8
+    specificity: 0.7
+    supports_gap: true
+    role_match: true
+    modality_match: true
+    target_match: true
+    usable_for_claim: true
+    decision: claim_usable
+    reasons: []
+  closure_basis:
+    anchor_ids:
+    - anc-unctad-surge
+    source_ids:
+    - src-unctad-rmt2021
+    observation_ids:
+    - obs-unctad-pretrend
+    thresholds:
+      source_reliability: 0.5
+      extraction_confidence: 0.5
+      specificity: 0.5
+    target_match: source role, anchor modality, and explicit gap support matched
+    claim_use_decision: claim_usable
+    qualified: true
+  review_required: false
+  requires_claim_usability: true
+  notes: Semantically qualified and closed.
+- gap_id: gap-alt-yantian
+  lead_id: lead-cause
+  gap_type: missing_counterevidence
+  description: Dates and scale of the Yantian port disruption (alternative cause).
+  importance: 0.6
+  blocking: false
+  suggested_source_roles:
+  - counter_evidence
+  suggested_modalities:
+  - text
+  structure_unit_id: ''
+  parent_goal: ''
+  unit_job: ''
+  contribution_type: ''
+  downstream_consumer: ''
+  structural_role_needed: ''
+  can_support_structural_use: ''
+  cannot_support_structural_use: ''
+  allowed_wording: ''
+  unsafe_wording: ''
+  semantic_state: discovered
+  qualification:
+    anchor_id: ''
+    source_id: ''
+    observation_id: ''
+    locator_present: false
+    source_accessible: false
+    source_reliability: 0.0
+    extraction_confidence: 0.0
+    specificity: 0.0
+    supports_gap: false
+    role_match: false
+    modality_match: false
+    target_match: false
+    usable_for_claim: false
+    decision: not_evaluated
+    reasons: []
+  closure_basis:
+    anchor_ids: []
+    source_ids: []
+    observation_ids: []
+    thresholds: {}
+    target_match: ''
+    claim_use_decision: ''
+    qualified: false
+  review_required: false
+  requires_claim_usability: true
+  notes: ''
+- gap_id: counter-source-src-unctad-rmt2021
+  lead_id: ''
+  gap_type: contradiction
+  description: 'Counterevidence candidate observed: UNCTAD Review of Maritime Transport
+    2021, ch. 3 (trial transcription)'
+  importance: 0.7
+  blocking: false
+  suggested_source_roles:
+  - counter_evidence
+  - limiting_evidence
+  suggested_modalities: []
+  structure_unit_id: ''
+  parent_goal: ''
+  unit_job: ''
+  contribution_type: ''
+  downstream_consumer: ''
+  structural_role_needed: ''
+  can_support_structural_use: ''
+  cannot_support_structural_use: ''
+  allowed_wording: ''
+  unsafe_wording: ''
+  semantic_state: contradicted
+  qualification:
+    anchor_id: ''
+    source_id: ''
+    observation_id: ''
+    locator_present: false
+    source_accessible: false
+    source_reliability: 0.0
+    extraction_confidence: 0.0
+    specificity: 0.0
+    supports_gap: false
+    role_match: false
+    modality_match: false
+    target_match: false
+    usable_for_claim: false
+    decision: not_evaluated
+    reasons: []
+  closure_basis:
+    anchor_ids: []
+    source_ids: []
+    observation_ids: []
+    thresholds: {}
+    target_match: ''
+    claim_use_decision: ''
+    qualified: false
+  review_required: false
+  requires_claim_usability: true
+  notes: Counterevidence should be modeled downstream rather than overwriting prior
+    support.
+actions:
+- action_id: act-sca-statement
+  action_type: primary_source_search
+  query: Suez Canal Authority statement Ever Given refloated 29 March 2021
+  target_lead_id: lead-cause
+  target_gap_id: gap-event-dates
+  expected_source_role: primary_source
+  expected_modality: text
+  source_policy: public_only
+  cost: 0.2
+  permission_risk: 0.0
+  status: executed
+  parameters: {}
+  notes: ''
+  unconsumed_output_disposition: ''
+- action_id: act-drewry-wci
+  action_type: source_domain_search
+  query: Drewry World Container Index Shanghai Rotterdam weekly 2021
+  target_lead_id: lead-cause
+  target_gap_id: gap-rate-series
+  expected_source_role: primary_source
+  expected_modality: table
+  source_policy: public_only
+  cost: 0.3
+  permission_risk: 0.0
+  status: executed
+  parameters: {}
+  notes: ''
+  unconsumed_output_disposition: ''
+- action_id: act-pretrend
+  action_type: counterevidence_search
+  query: container freight rates surge late 2020 before Suez blockage
+  target_lead_id: lead-cause
+  target_gap_id: gap-pre-trend
+  expected_source_role: counter_evidence
+  expected_modality: text
+  source_policy: public_only
+  cost: 0.3
+  permission_risk: 0.0
+  status: executed
+  parameters: {}
+  notes: ''
+  unconsumed_output_disposition: ''
+- action_id: act-yantian
+  action_type: counterevidence_search
+  query: Yantian port congestion May June 2021 freight rates
+  target_lead_id: lead-cause
+  target_gap_id: gap-alt-yantian
+  expected_source_role: counter_evidence
+  expected_modality: text
+  source_policy: public_only
+  cost: 0.3
+  permission_risk: 0.0
+  status: proposed
+  parameters: {}
+  notes: ''
+  unconsumed_output_disposition: ''
+observations:
+- observation_id: obs-sca-dates
+  action_id: act-sca-statement
+  observed_sources:
+  - source_id: src-sca-2021
+    title: Suez Canal Authority statements on the Ever Given grounding and refloating
+      (trial transcription)
+    source_type: government_record
+    url: https://www.suezcanal.gov.eg/
+    source_status: saved
+    source_reliability: 0.9
+    source_role: primary_source
+    lineage_id: lin-sca
+    source_date: '2021-03-29'
+    coverage_period: ''
+    language: ''
+    country: ''
+    access_status: public
+    can_support_structural_use: ''
+    cannot_support_structural_use: ''
+    notes: ''
+    content_fingerprint: ''
+    retrieval_request_fingerprint: ''
+    provider_id: ''
+    provider_revision: ''
+    retrieved_at: ''
+    unconsumed_output_disposition: ''
+  observed_anchors:
+  - anchor_id: anc-sca-dates
+    source_id: src-sca-2021
+    anchor_type: paragraph
+    locator: SCA statement 29 Mar 2021, para 1
+    text: The Ever Given ran aground on 23 March 2021 and was refloated on 29 March
+      2021; navigation resumed the same day.
+    normalized_summary: Grounding 23 Mar 2021, refloated 29 Mar 2021.
+    modality: text
+    observed_at: ''
+    extraction_confidence: 0.9
+    specificity: 0.9
+    supports:
+    - gap-event-dates
+    limits: []
+    claim_use_ids: []
+    handoff_ids: []
+    warnings: []
+    usable_for_trace: false
+    usable_for_claim: true
+    notes: ''
+    anchor_content_fingerprint: ''
+    source_content_fingerprint: ''
+    extractor_id: ''
+    extractor_revision: ''
+    observation_fingerprint: ''
+    unconsumed_output_disposition: ''
+  new_entities: []
+  new_leads: []
+  new_gaps: []
+  contradictions: []
+  notes: ''
+  observation_fingerprint: ''
+  unconsumed_output_disposition: ''
+- observation_id: obs-drewry-wci
+  action_id: act-drewry-wci
+  observed_sources:
+  - source_id: src-drewry-wci
+    title: Drewry World Container Index, Shanghai-Rotterdam lane, weekly (trial transcription,
+      approximate values)
+    source_type: dataset
+    url: https://www.drewry.co.uk/supply-chain-advisors/supply-chain-expertise/world-container-index-assessed-by-drewry
+    source_status: saved
+    source_reliability: 0.85
+    source_role: primary_source
+    lineage_id: lin-drewry
+    source_date: ''
+    coverage_period: 2020-10 to 2021-12
+    language: ''
+    country: ''
+    access_status: public
+    can_support_structural_use: ''
+    cannot_support_structural_use: ''
+    notes: ''
+    content_fingerprint: ''
+    retrieval_request_fingerprint: ''
+    provider_id: ''
+    provider_revision: ''
+    retrieved_at: ''
+    unconsumed_output_disposition: ''
+  observed_anchors:
+  - anchor_id: anc-wci-series
+    source_id: src-drewry-wci
+    anchor_type: table
+    locator: WCI Shanghai-Rotterdam weekly table, rows 2020-10-01..2021-12-30
+    text: 'Approx. USD/FEU: Oct 2020 ~2,000; early Jan 2021 ~8,000; mid Mar 2021 ~7,000;
+      early Apr 2021 ~8,000; Jun 2021 ~10,500; Sep 2021 ~14,000 (peak).'
+    normalized_summary: Rate quadrupled Oct 2020 - Jan 2021, dipped before 23 Mar,
+      rose after, and kept rising to a Sep 2021 peak.
+    modality: table
+    observed_at: ''
+    extraction_confidence: 0.7
+    specificity: 0.8
+    supports:
+    - gap-rate-series
+    limits: []
+    claim_use_ids: []
+    handoff_ids: []
+    warnings: []
+    usable_for_trace: false
+    usable_for_claim: true
+    notes: ''
+    anchor_content_fingerprint: ''
+    source_content_fingerprint: ''
+    extractor_id: ''
+    extractor_revision: ''
+    observation_fingerprint: ''
+    unconsumed_output_disposition: ''
+  new_entities: []
+  new_leads: []
+  new_gaps: []
+  contradictions: []
+  notes: ''
+  observation_fingerprint: ''
+  unconsumed_output_disposition: ''
+- observation_id: obs-unctad-pretrend
+  action_id: act-pretrend
+  observed_sources:
+  - source_id: src-unctad-rmt2021
+    title: UNCTAD Review of Maritime Transport 2021, ch. 3 (trial transcription)
+    source_type: pdf_report
+    url: https://unctad.org/webflyer/review-maritime-transport-2021
+    source_status: saved
+    source_reliability: 0.85
+    source_role: counter_evidence
+    lineage_id: lin-unctad
+    source_date: '2021-11-18'
+    coverage_period: ''
+    language: ''
+    country: ''
+    access_status: public
+    can_support_structural_use: ''
+    cannot_support_structural_use: ''
+    notes: ''
+    content_fingerprint: ''
+    retrieval_request_fingerprint: ''
+    provider_id: ''
+    provider_revision: ''
+    retrieved_at: ''
+    unconsumed_output_disposition: ''
+  observed_anchors:
+  - anchor_id: anc-unctad-surge
+    source_id: src-unctad-rmt2021
+    anchor_type: page
+    locator: RMT 2021, chapter 3, freight rates section
+    text: Container spot rates began surging in the second half of 2020 as demand
+      rebounded and empty containers were scarce; the Suez Canal blockage in March
+      2021 added further pressure.
+    normalized_summary: Rates were already surging from H2 2020; the blockage added
+      pressure on top.
+    modality: text
+    observed_at: ''
+    extraction_confidence: 0.8
+    specificity: 0.7
+    supports:
+    - gap-pre-trend
+    limits: []
+    claim_use_ids: []
+    handoff_ids: []
+    warnings: []
+    usable_for_trace: false
+    usable_for_claim: true
+    notes: ''
+    anchor_content_fingerprint: ''
+    source_content_fingerprint: ''
+    extractor_id: ''
+    extractor_revision: ''
+    observation_fingerprint: ''
+    unconsumed_output_disposition: ''
+  new_entities: []
+  new_leads: []
+  new_gaps: []
+  contradictions: []
+  notes: ''
+  observation_fingerprint: ''
+  unconsumed_output_disposition: ''
+graph_edges: []
+weights: {}
+depth_policy:
+  requested_claim_scope: bounded
+  important_threshold: 0.6
+  required_portfolio_classes: []
+  required_source_roles: []
+  minimum_independent_lineages: 2
+  target_unit_inventory_ids: []
+  required_target_unit_ids: []
+  excluded_target_unit_ids: []
+  target_unit_exclusion_reasons: {}
+  require_explicit_lineage: true
+  require_anchor_content: true
+  per_gap_portfolio_required: true
+  required_gap_ids: []
+  required_lineage_slot_ids: []
+  required_anchor_requirement_ids: []
+  required_handoff_ids: []
+  known_good_case_ids: []
+  known_bad_case_ids: []
+  coverage_floors: {}
+  policy_origin: sourceguard-native-depth-v2
+generated_at: '2026-10-21T18:50:16+00:00'

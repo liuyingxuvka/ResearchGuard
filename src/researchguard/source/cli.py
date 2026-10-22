@@ -520,7 +520,7 @@ def run(args: argparse.Namespace) -> int:
             remaining_budget=args.budget,
             evidence_sufficient_for_scope=args.sufficient,
         )
-        _json_out({"ok": True, "inputs": asdict(inputs), **decision.to_dict()}, args.pretty)
+        _json_out({"ok": decision.status != "not_run", "inputs": inputs.to_dict(), **decision.to_dict()}, args.pretty)
         return 0
     if args.command == "depth":
         model = load_model(args.model)

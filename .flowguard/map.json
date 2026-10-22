@@ -45,7 +45,7 @@
       "summary": "Own the researchguard console and the four member command lines; dispatch each member command directly to its owner.",
       "responsibilities": [
         "Dispatch researchguard logic|source|trace|experiment straight to the member main; unknown commands return one typed JSON error.",
-        "Own the member command-line surfaces."
+        "Own the member command-line surfaces, including the source stop rule inputs, optional followups and stable four status names."
       ],
       "files": [
         "src/researchguard/__main__.py",
@@ -86,7 +86,7 @@
         ".flowguard/models/researchguard_suite_model.py"
       ],
       "status": "confirmed",
-      "fingerprint": "sha256:7d9d65ecee46b9a6b15ceb82342b41c2ecf81034366562fd129f72b0016b46f6",
+      "fingerprint": "sha256:b4148f9a3d1e62d94b9a170a432bb8d818cc60666b751fa66d0fbb24320e348c",
       "layer": "interface"
     },
     {
@@ -168,7 +168,7 @@
       "responsibilities": [
         "Own evidence discovery, expected-utility search plans, stop decisions and source/anchor qualification.",
         "Load, plan, update and iterate on a model file alone; models carry no contract; the action and every protected or coverage gap a prediction names must exist in the model when it is frozen.",
-        "Decide whether to keep searching from the model itself: the top planned action, the open blocking gaps and the caller-declared budget."
+        "Decide whether to keep searching from the model itself: all executable declared and generated actions, selecting an affordable target by native utility, the open blocking gaps and the caller-declared budget."
       ],
       "files": [
         "src/researchguard/source/__init__.py",
@@ -199,10 +199,11 @@
         "tests/source/*.py"
       ],
       "models": [
-        ".flowguard/models/sourceguard_content_anchor_oracle_model.py"
+        ".flowguard/models/sourceguard_content_anchor_oracle_model.py",
+        ".flowguard/models/sourceguard_stop_decision_model.py"
       ],
       "status": "confirmed",
-      "fingerprint": "sha256:0f56353988e73b0ac97986a340fe90cba4f5fb83796092c62adeaf82576127b0",
+      "fingerprint": "sha256:96890c3681013a40184f5e66ef599f6fdf6a6d3461c2ee39a7588b500c8fef68",
       "layer": "routes"
     },
     {

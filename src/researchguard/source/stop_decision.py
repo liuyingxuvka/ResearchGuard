@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
+from math import isfinite
 from typing import TYPE_CHECKING, Literal
 
 if TYPE_CHECKING:
@@ -10,27 +11,41 @@ if TYPE_CHECKING:
 
 
 SearchStopStatus = Literal[
-    "continue_search",
-    "stop_sufficient",
-    "blocked_unresolved_critical",
-    "not_run",
+    "continue_search", "stop_sufficient", "blocked_unresolved_critical", "not_run",
 ]
 
 
 @dataclass(frozen=True)
-class SearchStopInput:
-    """Declared inputs for one search-stop decision.
+class SearchCandidate:
+    action_id: str
+    target_gap_id: str
+    cost: float
+    utility: float
+    declared: bool = False
 
-    Values are comparative planning quantities supplied by the caller. They are
-    not probabilities and SourceGuard does not calibrate them as probabilities.
+
+@dataclass(frozen=True)
+class SearchStopInput:
+    """All eligible native candidates and the actual open-gap frontier.
+
+    Utility orders searches; only cost is compared with the remaining budget.
+    Neither quantity is a factual probability.
     """
 
-    marginal_information_value: float
-    next_search_cost: float
     remaining_budget: float
     evidence_sufficient_for_scope: bool
     unresolved_critical_gap_ids: tuple[str, ...] = ()
-    candidate_search_ids: tuple[str, ...] = ()
+    optional_gap_ids: tuple[str, ...] = ()
+    candidates: tuple[SearchCandidate, ...] = ()
+
+    def to_dict(self) -> dict[str, object]:
+        return {
+            **asdict(self),
+            "affordable_search_ids": sorted(
+                item.action_id for item in self.candidates
+                if item.cost <= self.remaining_budget
+            ),
+        }
 
 
 @dataclass(frozen=True)
@@ -40,10 +55,10 @@ class SearchStopDecision:
     reason: str
     selected_search_id: str = ""
     unresolved_critical_gap_ids: tuple[str, ...] = ()
+    optional_followups: tuple[dict[str, str], ...] = ()
     claim_boundary: str = (
         "This decision governs whether the declared source search should "
-        "continue. It does not establish factual truth or calibrated "
-        "probability."
+        "continue. It does not establish factual truth or calibrated probability."
     )
 
     def to_dict(self) -> dict[str, object]:
@@ -51,117 +66,71 @@ class SearchStopDecision:
 
 
 def decide_search_stop(inputs: SearchStopInput) -> SearchStopDecision:
-    """Return one deterministic, typed stop/continue decision."""
-
-    numeric = (
-        inputs.marginal_information_value,
-        inputs.next_search_cost,
-        inputs.remaining_budget,
-    )
-    if any(value < 0 for value in numeric):
-        raise ValueError("search-stop quantities must be non-negative")
+    """Own the one deterministic rule for stopping or choosing a search."""
 
     critical = tuple(sorted(set(inputs.unresolved_critical_gap_ids)))
-    candidates = tuple(sorted(set(inputs.candidate_search_ids)))
-    affordable = (
-        bool(candidates)
-        and inputs.remaining_budget >= inputs.next_search_cost
-    )
-    worthwhile = (
-        inputs.marginal_information_value > inputs.next_search_cost
-    )
+    optional = tuple(sorted(set(inputs.optional_gap_ids) - set(critical)))
+    ordered = sorted(inputs.candidates, key=lambda item: (-item.utility, not item.declared, item.action_id))
+    followups = tuple({"gap_id": gap_id, "action_id": next(
+        (item.action_id for item in ordered if item.target_gap_id == gap_id), ""
+    )} for gap_id in optional)
 
+    def result(status, code, reason, selected=""):
+        return SearchStopDecision(status, code, reason, selected, critical, followups)
+
+    if (not isfinite(inputs.remaining_budget) or inputs.remaining_budget < 0
+            or any(not isfinite(item.cost) or item.cost < 0 or not isfinite(item.utility) for item in ordered)):
+        return result("not_run", "invalid_decision_inputs", "Budget and action costs must be finite and non-negative; utility must be finite.")
     if critical:
-        if affordable and worthwhile:
-            return SearchStopDecision(
-                status="continue_search",
-                reason_code="critical_gap_search_worthwhile",
-                reason=(
-                    "At least one declared critical gap remains and the next "
-                    "declared search has positive comparative value within "
-                    "budget."
-                ),
-                selected_search_id=candidates[0],
-                unresolved_critical_gap_ids=critical,
-            )
-        return SearchStopDecision(
-            status="blocked_unresolved_critical",
-            reason_code="critical_gap_without_justified_search",
-            reason=(
-                "A critical gap remains, but no affordable search with "
-                "positive declared comparative value is available."
-            ),
-            unresolved_critical_gap_ids=critical,
-        )
-
-    if inputs.evidence_sufficient_for_scope and not worthwhile:
-        return SearchStopDecision(
-            status="stop_sufficient",
-            reason_code="scope_sufficient_marginal_value_exhausted",
-            reason=(
-                "The declared scope is sufficiently supported and the next "
-                "search does not exceed its declared cost."
-            ),
-        )
-
-    if affordable and worthwhile:
-        return SearchStopDecision(
-            status="continue_search",
-            reason_code="additional_search_worthwhile",
-            reason=(
-                "The next declared search has positive comparative value and "
-                "fits the remaining budget."
-            ),
-            selected_search_id=candidates[0],
-        )
-
-    return SearchStopDecision(
-        status="not_run",
-        reason_code="decision_inputs_incomplete",
-        reason=(
-            "The evidence is not declared sufficient, and no justified "
-            "candidate search is currently available."
-        ),
-    )
+        targets = [item for item in ordered if item.target_gap_id in critical]
+        affordable = [item for item in targets if item.cost <= inputs.remaining_budget]
+        if affordable:
+            return result("continue_search", "critical_gap_search_affordable",
+                          "An executable search targeting an open blocking gap fits the budget.", affordable[0].action_id)
+        if not targets:
+            return result("blocked_unresolved_critical", "critical_gap_without_search",
+                          f"No executable action targets the open blocking gaps: {', '.join(critical)}.")
+        return result("blocked_unresolved_critical", "critical_gap_search_over_budget",
+                      f"All executable actions targeting blocking gaps {', '.join(critical)} exceed budget {inputs.remaining_budget:g}.")
+    if inputs.evidence_sufficient_for_scope or not optional:
+        return result("stop_sufficient", "scope_sufficient_no_blocking_gap",
+                      "No blocking gap is open; the scope is declared sufficient or no gap remains.")
+    affordable = [item for item in ordered if item.target_gap_id in optional and item.cost <= inputs.remaining_budget]
+    if affordable:
+        return result("continue_search", "optional_gap_search_affordable",
+                      "No blocking gap is open; pass --sufficient to stop now.", affordable[0].action_id)
+    return result("stop_sufficient", "no_affordable_optional_search",
+                  "No blocking gap is open and no executable optional search fits the budget.")
 
 
 def decide_model_search_stop(
-    belief_state: "BeliefState",
-    *,
-    remaining_budget: float,
+    belief_state: "BeliefState", *, remaining_budget: float,
     evidence_sufficient_for_scope: bool = False,
 ) -> tuple[SearchStopInput, SearchStopDecision]:
-    """Read the stop-decision inputs from a SourceGuard model, then decide.
+    """Collect every eligible native planned action, then apply the stop rule.
 
-    The next search is the top action of ``plan_next_actions``: its utility
-    score is the marginal value and its declared ``cost`` is the cost.  Open
-    blocking gaps are the critical gaps; a model without open gaps is
-    sufficient.  The budget and any sufficiency declaration come from the caller.
+    Open means semantic_state != closed, including blocked and permission gaps.
+    The planner's complete scored catalog supplies utility without a top-N cap.
     """
 
     from .planner import plan_next_actions
 
-    plan = plan_next_actions(belief_state, limit=1)
-    top = plan.selected_actions[0] if plan.selected_actions else None
-    score = next(
-        (item.total_score for item in plan.scored_actions if top is not None and item.action_id == top.action_id),
-        0.0,
-    )
+    plan = plan_next_actions(belief_state, limit=None)
+    scores = {item.action_id: item.total_score for item in plan.scored_actions}
+    open_gaps = [gap for gap in belief_state.gaps if gap.semantic_state != "closed"]
+    open_ids = {gap.gap_id for gap in open_gaps}
+    declared_ids = {action.action_id for action in belief_state.actions}
     inputs = SearchStopInput(
-        marginal_information_value=float(score),
-        next_search_cost=float(top.cost) if top is not None else 0.0,
         remaining_budget=float(remaining_budget),
-        evidence_sufficient_for_scope=bool(evidence_sufficient_for_scope) or not plan.open_gaps,
-        unresolved_critical_gap_ids=tuple(gap.gap_id for gap in plan.open_gaps if gap.blocking),
-        candidate_search_ids=(top.action_id,) if top is not None else (),
+        evidence_sufficient_for_scope=bool(evidence_sufficient_for_scope) or not open_gaps,
+        unresolved_critical_gap_ids=tuple(sorted(gap.gap_id for gap in open_gaps if gap.blocking)),
+        optional_gap_ids=tuple(sorted(gap.gap_id for gap in open_gaps if not gap.blocking)),
+        candidates=tuple(SearchCandidate(action.action_id, action.target_gap_id, action.cost,
+                                         scores[action.action_id], action.action_id in declared_ids)
+                         for action in plan.selected_actions if action.target_gap_id in open_ids),
     )
     return inputs, decide_search_stop(inputs)
 
 
-__all__ = [
-    "SearchStopDecision",
-    "SearchStopInput",
-    "SearchStopStatus",
-    "decide_model_search_stop",
-    "decide_search_stop",
-]
+__all__ = ["SearchCandidate", "SearchStopDecision", "SearchStopInput", "SearchStopStatus",
+           "decide_model_search_stop", "decide_search_stop"]

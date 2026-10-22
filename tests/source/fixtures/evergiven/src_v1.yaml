@@ -1,0 +1,85 @@
+metadata:
+  purpose: "Target claim: the Ever Given grounding (23-29 Mar 2021) caused the 2021 rise in Asia-Europe container freight rates. Desired strength: bounded."
+  skill: SourceGuard
+  source_policy: public_only
+  domain_hints: [Ever Given, Suez Canal, Drewry WCI, Shanghai-Rotterdam, Yantian]
+leads:
+- lead_id: lead-cause
+  question: Did the Ever Given grounding cause the 2021 Asia-Europe freight rate rise?
+  hypothesis: The blockage removed capacity and caused the rise.
+  importance: 0.9
+  status: open
+  related_entities: [Ever Given, Suez Canal]
+  gaps: [gap-event-dates, gap-rate-series, gap-pre-trend, gap-alt-yantian]
+gaps:
+- gap_id: gap-event-dates
+  lead_id: lead-cause
+  gap_type: missing_primary_source
+  description: Official dates of grounding and refloating.
+  importance: 0.7
+  blocking: true
+  suggested_source_roles: [primary_source]
+  suggested_modalities: [text]
+  semantic_state: discovered
+- gap_id: gap-rate-series
+  lead_id: lead-cause
+  gap_type: missing_numeric_provenance
+  description: A weekly Shanghai-Rotterdam spot-rate series covering Oct 2020 - Dec 2021.
+  importance: 0.9
+  blocking: true
+  suggested_source_roles: [primary_source]
+  suggested_modalities: [table]
+  semantic_state: discovered
+- gap_id: gap-pre-trend
+  lead_id: lead-cause
+  gap_type: missing_counterevidence
+  description: Evidence on whether rates were already rising before 23 Mar 2021.
+  importance: 0.9
+  blocking: true
+  suggested_source_roles: [counter_evidence]
+  suggested_modalities: [text, table]
+  semantic_state: discovered
+- gap_id: gap-alt-yantian
+  lead_id: lead-cause
+  gap_type: missing_counterevidence
+  description: Dates and scale of the Yantian port disruption (alternative cause).
+  importance: 0.6
+  blocking: false
+  suggested_source_roles: [counter_evidence]
+  suggested_modalities: [text]
+  semantic_state: discovered
+actions:
+- action_id: act-sca-statement
+  action_type: primary_source_search
+  query: Suez Canal Authority statement Ever Given refloated 29 March 2021
+  target_lead_id: lead-cause
+  target_gap_id: gap-event-dates
+  expected_source_role: primary_source
+  expected_modality: text
+  cost: 0.2
+- action_id: act-drewry-wci
+  action_type: source_domain_search
+  query: Drewry World Container Index Shanghai Rotterdam weekly 2021
+  target_lead_id: lead-cause
+  target_gap_id: gap-rate-series
+  expected_source_role: primary_source
+  expected_modality: table
+  cost: 0.3
+- action_id: act-pretrend
+  action_type: counterevidence_search
+  query: container freight rates surge late 2020 before Suez blockage
+  target_lead_id: lead-cause
+  target_gap_id: gap-pre-trend
+  expected_source_role: counter_evidence
+  expected_modality: text
+  cost: 0.3
+- action_id: act-yantian
+  action_type: counterevidence_search
+  query: Yantian port congestion May June 2021 freight rates
+  target_lead_id: lead-cause
+  target_gap_id: gap-alt-yantian
+  expected_source_role: counter_evidence
+  expected_modality: text
+  cost: 0.3
+depth_policy:
+  requested_claim_scope: bounded

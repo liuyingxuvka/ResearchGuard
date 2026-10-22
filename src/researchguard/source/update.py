@@ -226,6 +226,16 @@ def detect_basic_contradiction(belief_state: BeliefState, observation: Observati
         )
     for source in observation.observed_sources:
         if source.source_role == "counter_evidence":
+            answered_gap_ids = {
+                gap_id for anchor in observation.observed_anchors
+                if anchor.source_id == source.source_id for gap_id in anchor.supports
+            }
+            if any(
+                gap.gap_id in answered_gap_ids
+                and (gap.gap_type == "missing_counterevidence" or "counter_evidence" in gap.suggested_source_roles)
+                for gap in belief_state.gaps
+            ):
+                continue
             gaps.append(
                 Gap(
                     gap_id=f"counter-source-{source.source_id}",

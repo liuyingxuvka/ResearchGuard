@@ -19,11 +19,15 @@ researchguard source export-traceguard <model.yaml> --output <seed.yaml>
 researchguard source export-logicguard <model.yaml> --output <candidates.yaml>
 ```
 
-`stop-decision` reads the model's own plan: the top planned action (its utility
-and declared `cost`) and the open blocking gaps; only the remaining budget comes
-from you. While a blocking gap is open it returns `continue_search`, or
-`blocked_unresolved_critical` when the budget cannot pay for the next search;
-after `add-observation` closes the last blocking gap it returns `stop_sufficient`.
+`stop-decision` considers every executable declared or generated action targeting
+an open gap (including blocked and permission gaps). An affordable critical
+search continues, chosen by native utility, then declared action and id on ties;
+otherwise a critical gap stays blocked, with a missing-action or over-budget
+reason. With no critical gap, `--sufficient` or no open gap returns
+`stop_sufficient`; without that declaration it continues only for an affordable
+optional search. `optional_followups` lists each optional gap and its best
+candidate, even when search stops. Cost is compared only with budget, never
+with utility. Invalid inputs return `not_run`.
 
 ## Read one result cheaply
 
