@@ -107,18 +107,6 @@ class ReceiptId(_StringIdentity):
     kind: ClassVar[str] = "receipt_id"
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 @dataclass(frozen=True, order=True)
 class QualifiedModelRef:
     """One exact immutable physical model version."""

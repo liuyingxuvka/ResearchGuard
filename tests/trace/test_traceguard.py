@@ -55,8 +55,6 @@ def test_generic_predicate_bypass_is_rejected() -> None:
         TraceGuardModel.from_dict(data)
 
 
-
-
 def test_project_radar_candidate_report_boundaries() -> None:
     result = evaluate_model(load_model(example("project_radar_hydrogen_trace.yaml")))
     trace = result.traces[0]

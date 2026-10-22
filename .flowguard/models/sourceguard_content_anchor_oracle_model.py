@@ -13,7 +13,6 @@ import json
 from flowguard import FunctionResult, Invariant, InvariantResult, Scenario, ScenarioExpectation, Workflow
 
 
-
 MODEL_ID = "researchguard.source.content_anchor_oracle.current"
 PARENT = "sourceguard"
 DECLARED_FINDING = "sourceguard_blocked:contentless-anchor"
@@ -172,7 +171,6 @@ def scenarios() -> tuple[Scenario, ...]:
             **common,
         ),
     )
-
 
 
 COMPONENTS = ["sourceguard"]

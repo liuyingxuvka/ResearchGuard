@@ -9,7 +9,6 @@ from collections.abc import Callable, Sequence
 from . import __version__
 
 
-
 MemberMain = Callable[[list[str] | None], int]
 
 

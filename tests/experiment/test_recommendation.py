@@ -181,7 +181,6 @@ def test_ordinary_spec_roundtrips_through_native_cli(tmp_path, capsys) -> None:
     assert json.loads(capsys.readouterr().out)["terminal_reason"] == "model_closed_for_task"
 
 
-
 def test_finite_experiment_count_limit_is_not_all_candidates_indistinguishable() -> None:
     values = {
         "hypothesis_predictions": (

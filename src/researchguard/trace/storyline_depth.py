@@ -213,8 +213,6 @@ def _canonical_sha256(value: object) -> str:
     return hashlib.sha256(payload).hexdigest()
 
 
-
-
 def _event_time_token(event: EventCandidate) -> str:
     if event.time_interval is None or event.time_interval.precision == "unknown":
         return ""

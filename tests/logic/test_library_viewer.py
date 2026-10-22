@@ -181,8 +181,6 @@ def test_source_graph_payload_localizes_model_content_and_view_modes(tmp_path: P
     assert detail_zh["graph"]["nodes"][0]["text"] != graph_en["nodes"][0]["text"]
 
 
-
-
 def test_detail_header_meta_hides_internal_source_noise() -> None:
     pytest.importorskip("tkinter")
     from researchguard.logic_viewer.desktop_app import _detail_header_meta_line

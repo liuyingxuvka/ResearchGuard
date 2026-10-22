@@ -527,10 +527,6 @@ def cmd_library(args: argparse.Namespace) -> int:
     return 2 if isinstance(payload, dict) and payload.get("ok") is False else 0
 
 
-
-
-
-
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="researchguard trace", description="TraceGuard evidence-to-trace evaluator")
     sub = parser.add_subparsers(dest="command", required=True)

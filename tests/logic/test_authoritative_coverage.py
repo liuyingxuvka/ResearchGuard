@@ -276,8 +276,6 @@ def test_universe_fingerprint_changes_with_authoritative_inventory() -> None:
     assert second.broad_claim_licensed is False
 
 
-
-
 def test_low_declared_importance_cannot_remove_an_explicit_shallow_card() -> None:
     data = _role_complete_data()
     data["nodes"].update(

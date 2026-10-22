@@ -478,8 +478,6 @@ def _dedupe_items(items: Iterable[SynthesisItem]) -> list[SynthesisItem]:
     return result
 
 
-
-
 def _native_scope_gaps(
     model: LogicModel,
     request: SelectionRequest,
@@ -565,10 +563,6 @@ def _native_scope_gaps(
     if claim_scope is not None:
         gaps.extend(f"native_claim_scope_missing:{value}" for value in getattr(claim_scope, "missing_node_ids", ()))
     return list(dict.fromkeys(str(value) for value in gaps if str(value)))
-
-
-
-
 
 
 def _branch_data(branch: Any) -> dict[str, Any]:

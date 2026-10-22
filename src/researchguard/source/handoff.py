@@ -25,8 +25,6 @@ LOGICGUARD_BOUNDARY = (
 )
 
 
-
-
 TRACEGUARD_SOURCE_STATUS = {
     "saved": "stable_keep",
     "promoted_traceguard": "stable_keep",

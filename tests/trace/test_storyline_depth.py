@@ -276,8 +276,6 @@ def test_native_receipt_binds_baseline_alternatives_plan_effects_and_gaps():
     assert "does not prove factual truth" in receipt.claim_boundary
 
 
-
-
 def test_cli_depth_and_model_backed_simulation_expose_native_receipt():
     depth = subprocess.run(
         [sys.executable, "-m", "researchguard", "trace", "depth", str(EXAMPLE), "--pretty"],
