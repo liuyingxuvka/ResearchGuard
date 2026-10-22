@@ -1,13 +1,22 @@
 # Changelog
 
-## Unreleased
+## v0.5.11 - 2026-10-22
 
-- Stop source search when its scope is declared sufficient and no blocking gap is open; keep optional followups visible and choose affordable critical searches from all native candidates.
+- Compute absolute storyline support from evidence before causal projection. Competition remains available for comparison and explanation without feeding support back into competing hypotheses; declaring a causal candidate cannot raise storyline support.
+- Make opposing evidence contribute negative support directly, give unresolved or partly addressed confounders no positive contribution, and always check causal-declaration and opposition removal during `trace depth`.
+- Stop source search when its scope is declared sufficient and no blocking gap is open. Keep `optional_followups` visible and choose affordable critical searches from all executable candidates, with a native stop-rule model covering the decision.
+- Compute source, logic and trace loop gap transitions from the actual baseline model. Count only resolved gaps as progress and keep prediction mismatches separate from native gap changes.
+- Classify minimal argument-set candidates by the edge entering the claim. When support is unavailable, report the native blockers and their types while preserving the conservative wording license.
+- Preserve hypothesis ids, supporting, opposing and limiting evidence, original text and source provenance across trace-to-logic handoffs; retain existing trace-only bundles and the result-only export API.
+- Let source depth read observations already applied to the model and preview another observation on a clone without claiming a provider ran during the current call.
+- Suppress generated searches for gaps with executable declared actions, keep generated queries short, and use one complete native scoring path for `plan` and `score-actions` without changing scoring weights.
+- Compare versions of one source model using actual semantic gap state and qualification decisions; self-comparison reports no changes.
+- Run FlowGuard map and release checks in push CI, align the route model and component map, and keep execution journals outside the repository.
 
 ## v0.5.10 - 2026-10-21
 
-- Done: RG-01, RG-02, RG-03, RG-04, RG-05, RG-06, RG-07, RG-08, RG-09, RG-10, RG-11, RG-12, RG-13, RG-14, RG-15, RG-16, RG-17, RG-18, RG-19, RG-20, RG-21, RG-22, RG-23, RG-24, RG-25, RG-26, RG-27, RG-28, RG-29, RG-30, RG-31, RG-32, RG-33, RG-34, RG-35, RG-36, RG-37, RG-38, RG-39, RG-40, RG-41, RG-42, RG-43, RG-44, RG-45, RG-46, RG-47, RG-48, RG-49, RG-50, RG-51, RG-52, RG-53, RG-54, RG-55, RG-56, RG-57, RG-58, RG-59, RG-60, RG-61.
-- Skipped: none.
+- `scripts/install_skill.py --check` compares installed files byte by byte.
+
 - One `researchguard` skill with a route table (logic, source, trace, experiment) replaces the five skill entries;
   the installer copies it into `--target`, removes the retired member skill folders and offers `--check`/`--dry-run`.
   The console `researchguard logic|source|trace|experiment` is unchanged.
@@ -23,7 +32,6 @@
 - `AGENTS.md`: a release records the exact tested commit and follows the maintainer's three-part,
   patch-only version policy. The `stop-decision` CLI test runs on real SourceGuard example models and checks that a model with open
   gaps is not reported as sufficient.
-- Cross-repo pass: XR-04; skipped none. Details in the cross-repo action list.
 
 ## v0.5.9 - 2026-10-18
 
