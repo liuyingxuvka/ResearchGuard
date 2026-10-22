@@ -31,6 +31,11 @@ jobs:
       - name: Complete native suite
         if: runner.os == 'Linux'
         run: python -m pytest
+      - name: FlowGuard map check and release
+        if: runner.os == 'Linux'
+        run: |
+          python -m flowguard map check
+          python -m flowguard release
       - name: Focused Windows boundaries
         if: runner.os == 'Windows'
         run: >-
