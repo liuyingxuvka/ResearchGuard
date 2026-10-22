@@ -522,3 +522,35 @@ def test_coverage_universe_fingerprint_changes_when_authoritative_gap_changes() 
     assert first.coverage_universe.universe_fingerprint != second.coverage_universe.universe_fingerprint
     assert second.broad_claim_licensed is False
     assert "gaps:g-bridge" in second.critical_uncovered_ids
+
+
+def test_depth_reads_observations_already_in_the_model() -> None:
+    from researchguard.source.loader import load_model
+    from researchguard.source.depth import model_fingerprint
+    state = load_model(Path(__file__).parent / "fixtures/evergiven/src_v4.yaml")
+    before = model_fingerprint(state)
+    for provider_status in ("NOT_RUN", "PROVIDER_UNAVAILABLE"):
+        updated, depth = apply_observation_and_replan(state, provider_status=provider_status)
+        assert depth.status in {"bounded", "pass"}
+        assert depth.observation_depth_completed is True
+        assert depth.observations_used == [item.observation_id for item in state.observations]
+        assert len(depth.observations_used) == 3
+        assert "gap-event-dates" in depth.closure_bases
+        assert depth.provider_status == provider_status
+        assert depth.observation_status == provider_status
+        assert model_fingerprint(state) == model_fingerprint(updated) == before
+
+
+def test_depth_preview_adds_to_recorded_observations_without_mutating_baseline() -> None:
+    from researchguard.source.loader import load_model
+    from researchguard.source.depth import model_fingerprint
+    state = load_model(Path(__file__).parent / "fixtures/evergiven/src_v4.yaml")
+    before = model_fingerprint(state)
+    preview = Observation(observation_id="obs-preview-empty")
+    updated, depth = apply_observation_and_replan(state, preview)
+    assert depth.observations_used == [item.observation_id for item in state.observations] + [preview.observation_id]
+    assert depth.provider_status == "OBSERVATION_SUPPLIED"
+    assert depth.observation_status == "APPLIED"
+    assert depth.observation_depth_completed
+    assert model_fingerprint(state) == before
+    assert len(updated.observations) == len(state.observations) + 1

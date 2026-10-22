@@ -645,8 +645,10 @@ def apply_observation_and_replan(
 ) -> tuple[BeliefState, SourceDepthReceipt]:
     """Clone a baseline, optionally apply one supplied observation, and replan.
 
-    This function never invokes a provider. An absent observation remains
-    explicitly NOT_RUN or PROVIDER_UNAVAILABLE and cannot create closure depth.
+    This function never invokes a provider. Without a new observation, the
+    current call remains NOT_RUN or PROVIDER_UNAVAILABLE; already recorded
+    observations still contribute native depth. A supplied observation previews
+    one additional update on the cloned model.
     """
 
     baseline = deepcopy(belief_state)
@@ -658,12 +660,10 @@ def apply_observation_and_replan(
     if observation is None:
         updated = deepcopy(baseline)
         observation_status = "PROVIDER_UNAVAILABLE" if normalized_provider == "PROVIDER_UNAVAILABLE" else "NOT_RUN"
-        observations_used: list[str] = []
     else:
         normalized_provider = "OBSERVATION_SUPPLIED"
         updated = apply_observation(deepcopy(baseline), observation)
         observation_status = "APPLIED"
-        observations_used = [observation.observation_id]
 
     after_plan = plan_next_actions(updated, limit=limit)
     comparison = compare_replans(before_plan, after_plan)
@@ -693,7 +693,8 @@ def apply_observation_and_replan(
         for gap in updated.gaps
         if gap.semantic_state != "closed"
     )
-    observation_depth = observation is not None
+    observations_used = list(dict.fromkeys(item.observation_id for item in updated.observations))
+    observation_depth = bool(observations_used)
     coverage_universe = build_source_coverage_universe(
         baseline,
         updated,

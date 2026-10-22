@@ -42,3 +42,7 @@ researchguard source report <model.yaml> --format txt
 ```
 
 A short view does not remove a critical gap or license stronger claim use.
+
+`source depth` reads recorded observations without changing the input file;
+`--observation` previews one more on a clone. `observations_used` lists both;
+provider and observation statuses still describe this call, not a new retrieval.

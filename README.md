@@ -88,3 +88,7 @@ limiting evidence supports a limitation, and neither becomes direct support for
 the target claim. Import preserves the primary hypothesis as root without
 inventing a warrant or relationships between hypotheses. Old trace-only bundles
 and the result-only export API remain supported.
+
+`source depth` includes observations already recorded in the model. A supplied
+observation previews an additional cloned update; without any observations it
+remains planning-only. Recorded depth never implies a provider ran in this call.
