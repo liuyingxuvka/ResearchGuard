@@ -27,7 +27,7 @@
       "previous_status": "insufficient",
       "current_status": "insufficient",
       "support_min": 0.0,
-      "support_max": 1e-06,
+      "support_max": 0.000001,
       "delta_disposition": "hard invalid-source constraint preserved with no soft compensation"
     },
     {
