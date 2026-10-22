@@ -98,7 +98,7 @@
         "Own argument support, source library, structured artifacts, model deepening, synthesis and project library inspection.",
         "Run depth analysis on the model alone; synthesis always computes depth in process.",
         "Run the predict-observe-revise loop on plain model files; the loop never writes model files, so rollback is restoring the previous file; every claim, node and coverage id a prediction names must exist in the model when it is frozen.",
-        "Derive a claim's minimal support and attack sets and its wording license with the model's own evaluator.",
+        "Derive minimal support and attack sets split by the edge that enters the claim; a blocked claim reports its native blockers as the attack set and preserves the wording license.",
         "Bind Evidence to sources: provenance records are checked on load, and validate --library-root resolves their source_id and locator in the source library.",
         "Collect argument evaluation and native depth gaps from baseline and candidate; delegate gap transitions to the suite helper, with prior ids used only for argument stagnation."
       ],
@@ -162,7 +162,7 @@
       ],
       "models": [],
       "status": "confirmed",
-      "fingerprint": "sha256:770032d8c18da36421f1206fabc70ef595586c17b1ed1eee72b8bba5c7a17ffa",
+      "fingerprint": "sha256:fa2351682a052efdfa1ee4e86fa29a6925c9486ca012fb28557776839174c7ab",
       "layer": "routes"
     },
     {

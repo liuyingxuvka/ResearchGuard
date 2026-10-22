@@ -52,7 +52,9 @@ stays blocked. Without blocking gaps, `--sufficient` stops even when optional
 followups remain; those followups stay visible. Only cost is compared with budget.
 TraceGuard can expose a deletion-minimal contradiction core;
 `researchguard logic minimal-sets` exposes deletion-minimal support and attack
-sets with a conservative wording license. ExperimentGuard is
+sets with a conservative wording license. Candidates are split by the edge
+entering the claim; when support is unavailable, the result names the native
+blockers and their types instead of claiming an empty minimal attack core. ExperimentGuard is
 recommendation-only: it never executes an experiment or invents probabilities.
 
 TraceGuard solves storyline support from evidence first, then bounds causal

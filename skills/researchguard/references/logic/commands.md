@@ -21,3 +21,11 @@ researchguard logic import-handoff <traceguard-bundle.yaml> --output <model.yaml
 ```
 
 Source-library and viewer commands live in `source-library.md` and `project-library-viewer.md`. Load `h-wadf-quick-reference.md` before creating new node/edge/acceptance structures.
+
+`minimal-sets` classifies dependencies by the edge entering the target claim,
+including evidence behind an attacker. A node with support and attack paths is
+on the support side. When no support set licenses the claim, `attack.node_ids`
+reports the native evaluator's blockers, `reason_code` is `blocked_by_attack`
+when blockers exist, and `reason` names their ids and types. This blocker list
+is not claimed deletion-minimal. `wording_license` remains `assert`, `qualify`
+or `withhold`.

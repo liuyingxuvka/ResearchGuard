@@ -73,3 +73,45 @@ def test_minimal_sets_cli_prints_the_license() -> None:
     assert payload["wording_license"] == "assert"
     assert payload["support"]["node_ids"] == ["E1", "L1", "W1"]
     assert payload["support"]["deletion_minimal"] is True
+
+
+EVERGIVEN = Path(__file__).parent / "fixtures/evergiven/lg_v1.yaml"
+
+
+def test_blocked_claim_names_its_attackers() -> None:
+    model = load_model(EVERGIVEN)
+    result = license_model_claim(model, "C0")
+    assert result.wording_license == "withhold"
+    assert result.support is None
+    assert result.attack is not None
+    assert {"R_pretrend", "C_alt"} <= set(result.attack.node_ids)
+    assert result.reason_code == "blocked_by_attack"
+    assert all(item in result.to_dict()["reason"] for item in ("C0", "R_pretrend", "Rebuttal", "C_alt", "Claim"))
+    assert result.attack.deletion_minimal is False  # Native blockers, not a claimed minimal oracle core.
+    assert license_model_claim(model, "C_alt").wording_license == "assert"
+
+
+def test_contradicting_claim_and_its_support_are_attack_side() -> None:
+    from researchguard.logic.minimal_sets import _candidate_sides
+    support, attack = _candidate_sides(load_model(EVERGIVEN), "C0")
+    assert "E_series" in support
+    assert {"C_alt", "R_pretrend", "E_pretrend"} <= set(attack)
+    assert not {"C_alt", "R_pretrend", "E_pretrend"} & set(support)
+
+
+def test_support_precedence_and_cycles_keep_target_out_of_its_candidates() -> None:
+    from researchguard.logic.minimal_sets import _candidate_sides
+    model = load_model_from_dict({
+        "model": {"id": "two-paths", "root_claim": "C"},
+        "nodes": {"C": {"type": "Claim", "text": "claim"},
+                  "E": {"type": "Evidence", "text": "dual path"},
+                  "R": {"type": "Rebuttal", "text": "attack"}},
+        "edges": [{"source": "E", "target": "C", "type": "supports"},
+                  {"source": "E", "target": "R", "type": "supports"},
+                  {"source": "R", "target": "C", "type": "attacks"},
+                  {"source": "C", "target": "R", "type": "supports"}],
+    })
+    support, attack = _candidate_sides(model, "C")
+    assert "E" in support and "E" not in attack
+    assert "R" in attack
+    assert "C" not in support + attack
