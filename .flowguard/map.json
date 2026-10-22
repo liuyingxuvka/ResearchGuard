@@ -14,12 +14,13 @@
   "components": [
     {
       "id": "researchguard-suite",
-      "summary": "Own the package version and the suite constants SUITE_ID and MEMBER_IDS.",
+      "summary": "Own the package constants and the one gap-lineage helper shared by three native loops.",
       "responsibilities": [
-        "Own __version__, SUITE_ID and MEMBER_IDS; hold no member logic and no routing."
+        "Own __version__, SUITE_ID, MEMBER_IDS and the one gap-lineage helper the three loops share; hold no member logic and no routing."
       ],
       "files": [
-        "src/researchguard/__init__.py"
+        "src/researchguard/__init__.py",
+        "src/researchguard/gap_lineage.py"
       ],
       "entrypoints": [],
       "state": [
@@ -31,13 +32,14 @@
       "depends_on": [],
       "tests": [
         "tests/test_root_cli.py",
-        "tests/test_skill_suite.py"
+        "tests/test_skill_suite.py",
+        "tests/test_gap_lineage.py"
       ],
       "models": [
         ".flowguard/models/researchguard_suite_model.py"
       ],
       "status": "confirmed",
-      "fingerprint": "sha256:f819ce849757141070d8cd12cd274ff1571d36ef0523eba0bf196aa10e2880ac",
+      "fingerprint": "sha256:1106b59fdde4cd17a49047ba4505c0901bacf3eb445e1782bf9ab8d23b45c88d",
       "layer": "foundation"
     },
     {
@@ -97,7 +99,8 @@
         "Run depth analysis on the model alone; synthesis always computes depth in process.",
         "Run the predict-observe-revise loop on plain model files; the loop never writes model files, so rollback is restoring the previous file; every claim, node and coverage id a prediction names must exist in the model when it is frozen.",
         "Derive a claim's minimal support and attack sets and its wording license with the model's own evaluator.",
-        "Bind Evidence to sources: provenance records are checked on load, and validate --library-root resolves their source_id and locator in the source library."
+        "Bind Evidence to sources: provenance records are checked on load, and validate --library-root resolves their source_id and locator in the source library.",
+        "Collect argument evaluation and native depth gaps from baseline and candidate; delegate gap transitions to the suite helper, with prior ids used only for argument stagnation."
       ],
       "files": [
         "src/researchguard/logic/__init__.py",
@@ -159,7 +162,7 @@
       ],
       "models": [],
       "status": "confirmed",
-      "fingerprint": "sha256:8e69defeee2eb1c2e225887745334cffd6360be0938f44f49c64e760f13cc708",
+      "fingerprint": "sha256:770032d8c18da36421f1206fabc70ef595586c17b1ed1eee72b8bba5c7a17ffa",
       "layer": "routes"
     },
     {
@@ -168,7 +171,8 @@
       "responsibilities": [
         "Own evidence discovery, expected-utility search plans, stop decisions and source/anchor qualification.",
         "Load, plan, update and iterate on a model file alone; models carry no contract; the action and every protected or coverage gap a prediction names must exist in the model when it is frozen.",
-        "Decide whether to keep searching from the model itself: all executable declared and generated actions, selecting an affordable target by native utility, the open blocking gaps and the caller-declared budget."
+        "Decide whether to keep searching from the model itself: all executable declared and generated actions, selecting an affordable target by native utility, the open blocking gaps and the caller-declared budget.",
+        "Combine source semantic-state, depth and coverage gaps from each actual model and delegate transition sets to the shared suite helper; resolved obligations alone count as progress."
       ],
       "files": [
         "src/researchguard/source/__init__.py",
@@ -203,7 +207,7 @@
         ".flowguard/models/sourceguard_stop_decision_model.py"
       ],
       "status": "confirmed",
-      "fingerprint": "sha256:96890c3681013a40184f5e66ef599f6fdf6a6d3461c2ee39a7588b500c8fef68",
+      "fingerprint": "sha256:30894f2cff9d59bd008df759fb320038fe9a9d2c7e75bfaa0a2deb805924cbd8",
       "layer": "routes"
     },
     {
@@ -213,7 +217,8 @@
         "Own temporal and causal trace inference, storyline stress and case library updates.",
         "Keep command output to analysis results; full JSON is written only with --output.",
         "Solve storyline support from evidence first; bound causal support below it. Depth checks that neither causal declarations nor oppose links raise support; evaluate does not run depth.",
-        "Freeze a prediction only when its target, its expected evidence and event ids, and every coverage id exist in the model."
+        "Freeze a prediction only when its target, its expected evidence and event ids, and every coverage id exist in the model.",
+        "Keep prediction mismatch rejection independent of storyline native depth and coverage transitions; use the suite helper for model gap changes and count only resolved storyline gaps as progress."
       ],
       "files": [
         "src/researchguard/trace/__init__.py",
@@ -263,7 +268,7 @@
       ],
       "models": [],
       "status": "confirmed",
-      "fingerprint": "sha256:f67b7c8b04b511f03ea1f5fe48b19a47ffa40682a6f823274e7dcbbf28427d02",
+      "fingerprint": "sha256:ea6cd7282c486546f34745e48ff36dfc2fc311aec108e78a7520ff94f5507f72",
       "layer": "routes"
     },
     {

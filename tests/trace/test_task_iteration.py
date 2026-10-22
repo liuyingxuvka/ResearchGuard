@@ -166,6 +166,7 @@ def test_candidate_accepts_only_with_separate_holdout(tmp_path: Path, monkeypatc
     monkeypatch.setattr(task_iteration_module, "evaluate_storyline_depth", lambda *args, **kwargs: _PassingDepth())
     construction = _observation()
     comparison = load_comparison(_comparison_file(tmp_path, construction))
+    comparison.pop("baseline_gap_ids")  # Older comparison artifacts recompute native baseline gaps.
     revision = decide_candidate_revision(
         comparison=comparison,
         candidate_model_path=_candidate_model(tmp_path),
@@ -271,3 +272,24 @@ def test_cli_runs_the_loop_with_optional_task_fields(tmp_path: Path) -> None:
     ]) == 0
     payload = json.loads(revision_path.read_text(encoding="utf-8"))
     assert payload["schema_version"] == "researchguard.trace.candidate_storyline_revision.v2"
+
+
+def test_mismatch_ids_never_enter_gap_transitions(tmp_path: Path) -> None:
+    prediction = _prediction(expected_evidence_ids=["ev_meeting_boundary"])
+    observation = _observation()
+    comparison = compare_prediction_observation(prediction, observation)
+    assert any(item["mismatch_type"] == "expected_evidence_missing" for item in comparison["mismatches"])
+    assert comparison["progressed"] is False
+    assert not comparison["introduced_gap_ids"]
+    revision = decide_candidate_revision(comparison=comparison, candidate_model_path=_candidate_model(tmp_path),
+                                         observation=observation)
+    assert revision["unaddressed_mismatch_ids"]
+    assert any("unaddressed mismatch" in reason for reason in revision["rejection_reasons"])
+    assert revision["disposition"] != "accepted"
+    assert revision["input_gap_ids"] == comparison["baseline_gap_ids"]
+    assert revision["persisted_gap_ids"] == comparison["baseline_gap_ids"]
+    assert not revision["introduced_gap_ids"]
+    assert revision["progressed"] is False
+    for payload in (comparison, revision):
+        assert not any(item.startswith("mismatch-") for item in payload["gap_transitions"])
+        assert not set(payload["persisted_gap_ids"]) & set(payload["introduced_gap_ids"])

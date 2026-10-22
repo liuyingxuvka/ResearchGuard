@@ -12,6 +12,8 @@ import uuid
 from dataclasses import dataclass
 from typing import Any, Mapping, Sequence
 
+from ..gap_lineage import gap_lineage
+
 from .depth import apply_observation_and_replan, model_fingerprint
 from .planner import plan_next_actions
 from .schema import (
@@ -651,22 +653,18 @@ def run_search_iteration(
     native_review = revalidate_native_depth_receipt(
         baseline, candidate, observation, depth_receipt
     )
-    candidate_gap_map = candidate.gap_by_id()
-    coverage_gaps = {
-        gap_id
-        for gap_id in prediction.coverage_ids
-        if gap_id not in candidate_gap_map
-        or candidate_gap_map[gap_id].semantic_state != "closed"
-    }
-    open_gap_ids = sorted(
-        {
-            gap.gap_id
-            for gap in candidate.gaps
-            if gap.semantic_state != "closed"
-        }
-        | set(depth_receipt.unresolved_gap_ids)
-        | coverage_gaps
-    )
+    def open_gaps(state: BeliefState, depth: SourceDepthReceipt) -> tuple[str, ...]:
+        gaps = state.gap_by_id()
+        return tuple(sorted(
+            {gap.gap_id for gap in state.gaps if gap.semantic_state != "closed"}
+            | set(depth.unresolved_gap_ids)
+            | {gap_id for gap_id in prediction.coverage_ids
+               if gap_id not in gaps or gaps[gap_id].semantic_state != "closed"}
+        ))
+
+    _, baseline_depth = apply_observation_and_replan(baseline, None, limit=limit)
+    baseline_gap_ids = open_gaps(baseline, baseline_depth)
+    open_gap_ids = open_gaps(candidate, depth_receipt)
     can_close = decision == "accept" and review.passed and native_review.passed and not open_gap_ids
     if can_close:
         effective = "accepted"
@@ -710,15 +708,9 @@ def run_search_iteration(
         terminal_reason = "external_input_required"
     else:
         terminal_reason = "continue_iteration"
-    before, after = set(prediction.prior_open_gap_ids), set(open_gap_ids)
-    resolved_gap_ids = tuple(sorted(before - after))
-    persisted_gap_ids = tuple(sorted(before & after))
-    introduced_gap_ids = tuple(sorted(after - before))
-    gap_transitions = {
-        **{gap: "resolved" for gap in resolved_gap_ids},
-        **{gap: "persisted" for gap in persisted_gap_ids},
-        **{gap: "introduced" for gap in introduced_gap_ids},
-    }
+    resolved_gap_ids, persisted_gap_ids, introduced_gap_ids, gap_transitions = gap_lineage(
+        baseline_gap_ids, open_gap_ids
+    )
     result = SearchIterationResult(
         prediction=prediction,
         realized_outcome=realized,
@@ -729,7 +721,7 @@ def run_search_iteration(
         effective_disposition=effective,
         disposition_reason=reason,
         completed_at=utc_now(),
-        input_gap_ids=prediction.prior_open_gap_ids,
+        input_gap_ids=baseline_gap_ids,
         resolved_gap_ids=resolved_gap_ids,
         persisted_gap_ids=persisted_gap_ids,
         introduced_gap_ids=introduced_gap_ids,
@@ -745,7 +737,7 @@ def run_search_iteration(
             )
         ),
         terminal_reason=terminal_reason,
-        progressed=bool(resolved_gap_ids or introduced_gap_ids or (prediction.iteration == 0 and observation is not None)),
+        progressed=bool(resolved_gap_ids),
     )
     return candidate, result
 

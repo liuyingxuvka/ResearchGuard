@@ -9,3 +9,7 @@ This is the existing LogicGuard task loop, not a separate route or understanding
 The loop never writes model files. `accepted` means the candidate file becomes your current model; `rejected` or `continue_iteration` means you keep the baseline. Roll back by keeping or restoring the previous model file (for example from git).
 
 The loop may change only the current task model. It must not tune LogicGuard evaluators, thresholds, defaults, or another Guard. Close only when the prediction, native depth, protected claims and any holdout claims all pass; otherwise stop with `progress_stalled`, `iteration_limit`, or `external_input_required` and keep the open gaps visible. Evidence nodes may carry `provenance` (see `h-wadf-quick-reference.md`).
+
+Gap transitions compare the actual baseline model's native open gaps with the
+candidate's. Only resolved gaps set `progressed`; introduced gaps do not. The
+prior-open ids are used only to detect stagnation, never as the baseline.

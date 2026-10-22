@@ -11,3 +11,9 @@ Compare prediction and observation, create a distinct candidate v2 file, run the
 A holdout observation is optional. When given, it must be a different observation with disjoint evidence ids, and its evidence must exist in the candidate. Internal perturbation is not factual future prediction; a future-event prediction needs an observation whose `future_holdout_status` is `pass`.
 
 Native comparison and perturbation—not caller prose—produce input, resolved, persisted, and introduced gaps. Continue while predictive or coverage gaps remain; on the next round pass `--iteration <n>` and the previous `open_gap_ids` as `--prior-open-gap-id`. Close only as `model_closed_for_task`; otherwise keep the exact non-closure terminal and next action visible.
+
+Gap transitions compare the actual baseline model's native open gaps with the
+candidate's. Only resolved gaps set `progressed`; introduced gaps do not. The
+prior-open ids are used only to detect stagnation, never as the baseline.
+Prediction mismatch ids remain in `unaddressed_mismatch_ids` and rejection
+reasons; they are not native gap ids and never enter `gap_transitions`.

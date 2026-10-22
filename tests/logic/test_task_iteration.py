@@ -209,3 +209,20 @@ def test_cli_freeze_and_run_leave_the_model_files_untouched(tmp_path: Path) -> N
     assert outcome["schema_version"] == "researchguard.logic.argument-iteration-result.v1"
     assert outcome["effective_disposition"] in {"accepted", "continue_iteration"}
     assert (baseline_path.read_bytes(), candidate_path.read_bytes()) == before
+
+
+def test_baseline_gaps_are_not_reported_as_introduced() -> None:
+    from researchguard.logic.loader import load_model
+    fixtures = Path(__file__).parent / "fixtures/evergiven"
+    baseline, candidate = (load_model(fixtures / name) for name in ("lg_v1.yaml", "lg_v2.yaml"))
+    prediction = freeze_argument_prediction(baseline, expected_state="UNDECIDED", mode="premise-removal",
+                                            root_claim="C0", node_id="E_dates")
+    baseline_result = run_argument_iteration(baseline, prediction)
+    result = run_argument_iteration(baseline, prediction, candidate=candidate, decision="accept")
+    assert baseline_result.input_gap_ids
+    assert set(result.input_gap_ids) == set(baseline_result.input_gap_ids)
+    assert not set(result.input_gap_ids) & set(result.introduced_gap_ids)
+    assert set(baseline_result.input_gap_ids) <= set(baseline_result.persisted_gap_ids)
+    assert not set(baseline_result.input_gap_ids) & set(baseline_result.introduced_gap_ids)
+    assert baseline_result.progressed is False
+    assert result.progressed == bool(result.resolved_gap_ids)

@@ -16,6 +16,8 @@ from typing import Any, Iterable, Mapping
 
 import yaml
 
+from ..gap_lineage import gap_lineage
+
 from .evaluator import evaluate_model
 from .storyline_depth import evaluate_storyline_depth
 from .inference.types import fingerprint
@@ -342,6 +344,19 @@ def load_observation(path: str | Path) -> EvidenceBatchObservation:
     return EvidenceBatchObservation.from_dict(_load_mapping(path))
 
 
+def _native_gap_ids(model: Any, depth: Any, coverage_ids: Iterable[str]) -> tuple[str, ...]:
+    known = (set(model.evidence_by_id()) | set(model.event_by_id()) | set(model.source_by_id())
+             | {item.trace_id for item in model.traces}
+             | {item.hypothesis_id for item in model.storyline_hypotheses})
+    return tuple(sorted(
+        {"native-depth:" + str(item.get("gap_id") or item.get("finding_id") or fingerprint(item)[:20])
+         for item in depth.unresolved_gaps}
+        | {f"native-critical-uncovered:{item}" for item in depth.critical_uncovered_ids}
+        | {f"native-critical-ineffective:{item}" for item in depth.critical_ineffective_ids}
+        | {f"coverage-missing:{item}" for item in coverage_ids if item not in known}
+    ))
+
+
 def compare_prediction_observation(
     prediction: PredictionSnapshot,
     observation: EvidenceBatchObservation,
@@ -362,32 +377,7 @@ def compare_prediction_observation(
 
     baseline_result = evaluate_model(model)
     native_depth = evaluate_storyline_depth(model, baseline_result)
-    native_gap_ids = tuple(
-        sorted(
-            {
-                "native-depth:" + str(
-                    item.get("gap_id")
-                    or item.get("finding_id")
-                    or fingerprint(item)[:20]
-                )
-                for item in native_depth.unresolved_gaps
-            }
-            | {f"native-critical-uncovered:{item}" for item in native_depth.critical_uncovered_ids}
-            | {f"native-critical-ineffective:{item}" for item in native_depth.critical_ineffective_ids}
-        )
-    )
-    known_coverage = (
-        set(evidence_by_id)
-        | set(event_by_id)
-        | set(source_by_id)
-        | {item.trace_id for item in model.traces}
-        | {item.hypothesis_id for item in model.storyline_hypotheses}
-    )
-    coverage_gaps = tuple(
-        f"coverage-missing:{item}"
-        for item in prediction.coverage_ids
-        if item not in known_coverage
-    )
+    baseline_gap_ids = _native_gap_ids(model, native_depth, prediction.coverage_ids)
     mismatches: list[StorylineMismatch] = []
 
     def add(kind: str, detail: str) -> None:
@@ -445,7 +435,7 @@ def compare_prediction_observation(
             "future_holdout_validator_missing",
             "future-event expectation requires a passing future holdout check",
         )
-    for native_gap in (*native_gap_ids, *coverage_gaps):
+    for native_gap in baseline_gap_ids:
         add("native_depth_gap", native_gap)
     open_gap_ids = tuple(
         item.detail if item.mismatch_type == "native_depth_gap" else item.mismatch_id
@@ -472,15 +462,10 @@ def compare_prediction_observation(
         "purpose": prediction.purpose,
         "coverage_ids": list(prediction.coverage_ids),
         "open_gap_ids": list(open_gap_ids),
-        "input_gap_ids": list(prediction.prior_open_gap_ids),
-        "resolved_gap_ids": sorted(set(prediction.prior_open_gap_ids) - set(open_gap_ids)),
-        "persisted_gap_ids": sorted(set(prediction.prior_open_gap_ids) & set(open_gap_ids)),
-        "introduced_gap_ids": sorted(set(open_gap_ids) - set(prediction.prior_open_gap_ids)),
-        "gap_transitions": {
-            **{gap: "resolved" for gap in set(prediction.prior_open_gap_ids) - set(open_gap_ids)},
-            **{gap: "persisted" for gap in set(prediction.prior_open_gap_ids) & set(open_gap_ids)},
-            **{gap: "introduced" for gap in set(open_gap_ids) - set(prediction.prior_open_gap_ids)},
-        },
+        "baseline_gap_ids": list(baseline_gap_ids),
+        "input_gap_ids": list(baseline_gap_ids),
+        **{key: list(value) if isinstance(value, tuple) else value
+           for key, value in gap_lineage(baseline_gap_ids, baseline_gap_ids)._asdict().items()},
         "live_alternative_ids": list(native_depth.live_alternative_ids),
         "causal_boundaries": list(native_depth.causal_boundaries),
         "deepest_proven_layer": native_depth.deepest_proven_layer,
@@ -488,11 +473,8 @@ def compare_prediction_observation(
         "next_actions": ["deepen_trace_evidence"] if open_gap_ids else ["no_model_change_needed"],
         "terminal_reason": terminal_reason,
         "iteration": prediction.iteration,
-        "progressed": bool(
-            set(prediction.prior_open_gap_ids) - set(open_gap_ids)
-            or set(open_gap_ids) - set(prediction.prior_open_gap_ids)
-            or (prediction.iteration == 0 and open_gap_ids)
-        ),
+        "prior_open_gap_ids": list(prediction.prior_open_gap_ids),
+        "progressed": False,
         "external_input_ids": list(observation.external_input_ids),
         "original_prediction_status": "weakened" if mismatches else "matched",
         "factual_future_prediction_licensed": False,
@@ -602,24 +584,8 @@ def decide_candidate_revision(
     ):
         reasons.append("construction and holdout observations must both be valid")
 
-    candidate_gap_ids = sorted(
-        set(unaddressed)
-        | {
-            f"candidate-evaluation:{item}"
-            for item in result_payload.get("errors", [])
-        }
-        | {
-            "native-depth:" + str(
-                item.get("gap_id")
-                or item.get("finding_id")
-                or fingerprint(item)[:20]
-            )
-            for item in candidate_depth.unresolved_gaps
-        }
-        | {f"native-critical-uncovered:{item}" for item in candidate_depth.critical_uncovered_ids}
-        | {f"native-critical-ineffective:{item}" for item in candidate_depth.critical_ineffective_ids}
-        | ({"holdout-evidence-missing"} if missing_holdout else set())
-    )
+    coverage_ids = tuple(str(item) for item in comparison.get("coverage_ids", ()))
+    candidate_gap_ids = list(_native_gap_ids(candidate_model, candidate_depth, coverage_ids))
     if candidate_gap_ids and not reasons:
         reasons.append("candidate storyline evidence gaps remain open")
     if force_rollback:
@@ -632,16 +598,19 @@ def decide_candidate_revision(
         disposition = "accepted"
     if candidate_gap_ids and not force_rollback:
         disposition = "continue_iteration"
-    input_gaps = set(str(item) for item in comparison.get("open_gap_ids", []))
+    # Recompute the baseline for old comparison artifacts lacking the new field.
+    if "baseline_gap_ids" in comparison:
+        input_gaps = set(comparison["baseline_gap_ids"])
+    else:
+        baseline_depth = evaluate_storyline_depth(baseline_model, evaluate_model(baseline_model))
+        input_gaps = set(_native_gap_ids(baseline_model, baseline_depth, coverage_ids))
     current_gaps = set(candidate_gap_ids)
-    resolved_gaps = sorted(input_gaps - current_gaps)
-    persisted_gaps = sorted(input_gaps & current_gaps)
-    introduced_gaps = sorted(current_gaps - input_gaps)
+    resolved_gaps, persisted_gaps, introduced_gaps, transitions = gap_lineage(input_gaps, current_gaps)
     if not candidate_gap_ids and disposition == "accepted":
         terminal_reason = "model_closed_for_task"
     elif comparison.get("terminal_reason") == "iteration_limit":
         terminal_reason = "iteration_limit"
-    elif current_gaps == input_gaps and int(comparison.get("iteration", 0)) > 0:
+    elif current_gaps == set(comparison.get("prior_open_gap_ids", comparison.get("input_gap_ids", ()))) and int(comparison.get("iteration", 0)) > 0:
         terminal_reason = "progress_stalled"
     elif missing_holdout or disposition in {"rejected", "rolled_back"}:
         terminal_reason = "external_input_required"
@@ -674,18 +643,14 @@ def decide_candidate_revision(
         "task_id": comparison.get("task_id", ""),
         "iteration": comparison.get("iteration", 0),
         "input_gap_ids": sorted(input_gaps),
-        "resolved_gap_ids": resolved_gaps,
-        "persisted_gap_ids": persisted_gaps,
-        "introduced_gap_ids": introduced_gaps,
+        "resolved_gap_ids": list(resolved_gaps),
+        "persisted_gap_ids": list(persisted_gaps),
+        "introduced_gap_ids": list(introduced_gaps),
         "open_gap_ids": candidate_gap_ids,
-        "gap_transitions": {
-            **{gap: "resolved" for gap in resolved_gaps},
-            **{gap: "persisted" for gap in persisted_gaps},
-            **{gap: "introduced" for gap in introduced_gaps},
-        },
+        "gap_transitions": transitions,
         "next_actions": ["deepen_trace_evidence"] if candidate_gap_ids else ["no_model_change_needed"],
         "terminal_reason": terminal_reason,
-        "progressed": bool(resolved_gaps or introduced_gaps),
+        "progressed": bool(resolved_gaps),
         "effective_model_sha256": effective_hash,
         "factual_future_prediction_licensed": False,
         "claim_boundary": (

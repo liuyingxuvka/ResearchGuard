@@ -15,6 +15,8 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Any, Mapping, Sequence
 
+from ..gap_lineage import gap_lineage
+
 from .evaluator import evaluate_model
 from .model import LogicModel
 from .schema import STATES
@@ -60,17 +62,6 @@ def _native_depth(model: LogicModel, prediction: "ArgumentPrediction") -> tuple[
         requested_claim_scope_ids=prediction.coverage_ids or None,
     )
     return tuple(sorted(str(item) for item in analysis.unresolved_gaps))
-
-
-def _gap_lineage(
-    prior: Sequence[str], current: Sequence[str]
-) -> tuple[tuple[str, ...], tuple[str, ...], tuple[str, ...]]:
-    before, after = set(prior), set(current)
-    return (
-        tuple(sorted(before - after)),
-        tuple(sorted(before & after)),
-        tuple(sorted(after - before)),
-    )
 
 
 @dataclass(frozen=True)
@@ -551,14 +542,7 @@ def run_argument_iteration(
         gaps: Sequence[str],
         terminal: str,
     ) -> ArgumentIterationResult:
-        resolved, persisted, introduced = _gap_lineage(
-            prediction.prior_open_gap_ids, gaps
-        )
-        transitions = {
-            **{gap: "resolved" for gap in resolved},
-            **{gap: "persisted" for gap in persisted},
-            **{gap: "introduced" for gap in introduced},
-        }
+        resolved, persisted, introduced, transitions = gap_lineage(baseline_gaps, gaps)
         return ArgumentIterationResult(
             prediction=prediction,
             baseline_observation=baseline_observation,
@@ -571,7 +555,7 @@ def run_argument_iteration(
             effective_disposition=effective,
             disposition_reason=reason,
             completed_at=utc_now(),
-            input_gap_ids=prediction.prior_open_gap_ids,
+            input_gap_ids=baseline_gaps,
             resolved_gap_ids=resolved,
             persisted_gap_ids=persisted,
             introduced_gap_ids=introduced,
@@ -579,7 +563,7 @@ def run_argument_iteration(
             gap_transitions=transitions,
             next_actions=("deepen_logic_model",) if gaps else ("no_model_change_needed",),
             terminal_reason=terminal,
-            progressed=bool(resolved or introduced or (prediction.iteration == 0 and gaps)),
+            progressed=bool(resolved),
         )
 
     if baseline_comparison.matches and not baseline_gaps:

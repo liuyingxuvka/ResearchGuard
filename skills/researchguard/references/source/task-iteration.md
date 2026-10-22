@@ -9,3 +9,7 @@ After a real observation, `search-iteration run` creates candidate v2 through th
 A new gap records information discovered by the observation; it is not by itself a quality gain. If a provider or external source is missing, preserve that status and the named gap instead of fabricating a source or observation. On the next round pass `--iteration <n>` and the previous `open_gap_ids` as `--prior-open-gap-id`.
 
 The loop may change only this task's belief state, observations, gaps, leads, and action ordering. It cannot tune global weights, thresholds, defaults, templates, or another Guard. Caller-supplied gap transitions and self-reported understanding are not closure evidence.
+
+Gap transitions compare the actual baseline model's native open gaps with the
+candidate's. Only resolved gaps set `progressed`; introduced gaps do not. The
+prior-open ids are used only to detect stagnation, never as the baseline.

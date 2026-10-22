@@ -1,0 +1,25 @@
+observation_id: obs-sca-dates
+action_id: act-sca-statement
+observed_sources:
+  - source_id: src-sca-2021
+    title: "Suez Canal Authority statements on the Ever Given grounding and refloating (trial transcription)"
+    source_type: government_record
+    source_status: saved
+    source_reliability: 0.9
+    source_role: primary_source
+    lineage_id: lin-sca
+    source_date: "2021-03-29"
+    access_status: public
+    url: https://www.suezcanal.gov.eg/
+observed_anchors:
+  - anchor_id: anc-sca-dates
+    source_id: src-sca-2021
+    anchor_type: paragraph
+    locator: "SCA statement 29 Mar 2021, para 1"
+    text: "The Ever Given ran aground on 23 March 2021 and was refloated on 29 March 2021; navigation resumed the same day."
+    normalized_summary: Grounding 23 Mar 2021, refloated 29 Mar 2021.
+    modality: text
+    extraction_confidence: 0.9
+    specificity: 0.9
+    supports: [gap-event-dates]
+    usable_for_claim: true

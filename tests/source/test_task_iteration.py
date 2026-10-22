@@ -233,3 +233,32 @@ def test_cli_freeze_rejects_old_shape_and_emits_v2(tmp_path: Path) -> None:
     payload = json.loads(output.read_text(encoding="utf-8"))
     assert payload["schema_version"] == "researchguard.source.search-outcome-prediction.v2"
     assert "coverage_fingerprint" not in payload
+
+
+def test_first_iteration_transitions_follow_the_baseline_model() -> None:
+    import yaml
+    from researchguard.source.loader import load_model
+    fixtures = Path(__file__).parent / "fixtures/evergiven"
+    state = load_model(fixtures / "src_v1.yaml")
+    observation = Observation.from_dict(yaml.safe_load((fixtures / "obs1.yaml").read_text()))
+    prediction = freeze_search_outcome_prediction(
+        state, action_id="act-sca-statement", expected_gap_reduction="closed",
+        expected_independent_lineage=True, expected_counterevidence=False, expected_cost=.2,
+    )
+    before = model_fingerprint(state)
+    _, result = run_search_iteration(state, prediction, observation, actual_cost=.2, decision="accept")
+    assert model_fingerprint(state) == before
+    assert "gap-event-dates" in result.resolved_gap_ids
+    original_remaining = {"gap-pre-trend", "gap-rate-series", "gap-alt-yantian"}
+    assert original_remaining <= set(result.persisted_gap_ids)
+    assert not original_remaining & set(result.introduced_gap_ids)
+    assert result.progressed is True
+    assert "gap-event-dates" in result.input_gap_ids
+
+
+def test_new_or_unchanged_gaps_alone_are_not_progress() -> None:
+    state = _state()
+    _, result = run_search_iteration(state, _prediction(state), None, actual_cost=0,
+                                    provider_status="NOT_RUN", decision="reject")
+    assert not result.resolved_gap_ids
+    assert result.progressed is False

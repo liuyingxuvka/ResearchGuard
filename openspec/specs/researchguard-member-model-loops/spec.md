@@ -26,11 +26,15 @@ A loop SHALL leave the baseline model file unchanged and write a candidate only 
 - **THEN** the baseline file SHALL remain the current model
 
 ### Requirement: Results carry gap transitions, not receipts
-Each iteration result SHALL record input, resolved and introduced gap ids, the native depth gaps, next actions and the terminal reason, and SHALL NOT carry receipt fingerprints.
+Each iteration result SHALL record input, resolved, persisted and introduced gap ids, the native depth gaps, next actions and the terminal reason, and SHALL NOT carry receipt fingerprints. Transitions SHALL compare the actual baseline and candidate model native gaps using one shared set operation. Only resolved gaps SHALL count as progress; prior-open ids SHALL control stagnation only. Trace prediction mismatch ids SHALL remain rejection reasons and SHALL NOT enter native gap transitions.
 
 #### Scenario: Matching prediction with an open depth gap
 - **WHEN** the prediction matches but an important native depth gap remains
 - **THEN** the result SHALL be non-terminal and SHALL list that gap
+
+#### Scenario: A first iteration discovers a gap
+- **WHEN** a candidate retains baseline gaps and introduces a new gap without resolving any
+- **THEN** the baseline gaps SHALL be persisted, only the new gap SHALL be introduced, and `progressed` SHALL be false
 
 ### Requirement: Holdouts are optional but independent
 A holdout claim or observation SHALL be optional; when one is given it SHALL be independent of the evidence used to build the model.

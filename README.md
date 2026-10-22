@@ -72,3 +72,10 @@ observation is optional; when given, it must be independent of the evidence
 used to build the model. The loop never writes the model file, so rolling back
 means restoring the previous file. SourceGuard preserves provider and
 finite-action stop boundaries.
+
+The source, logic and trace loops compute gap transitions from the actual
+baseline and candidate models through one shared set operation. Only resolved
+gaps mean `progressed`; newly discovered gaps stay visible without claiming a
+quality gain. `--prior-open-gap-id` controls stagnation, not the baseline.
+Trace prediction mismatches remain rejection reasons, separate from native gap
+transitions.
