@@ -212,7 +212,7 @@
         ".flowguard/models/sourceguard_stop_decision_model.py"
       ],
       "status": "confirmed",
-      "fingerprint": "sha256:53e4cb5317708069bc46cdff5b7a46cb5f16ca3fa7f0ce343cad3e507d9262f6",
+      "fingerprint": "sha256:1e628eff54d7f6d2162f999fa51ff642b70ee0c4676731ee316b5d8766f62e41",
       "layer": "routes"
     },
     {
