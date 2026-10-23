@@ -16,7 +16,6 @@ def _run(*args):
 def test_create_validate_plan_report_and_export_smoke(tmp_path):
     created = tmp_path / "starter.yaml"
     trace = tmp_path / "trace.yaml"
-    logic = tmp_path / "logic.yaml"
 
     result = _run("create", "--output", str(created))
     assert result.returncode == 0, result.stderr
@@ -56,9 +55,6 @@ def test_create_validate_plan_report_and_export_smoke(tmp_path):
     assert result.returncode == 0, result.stderr
     assert trace.exists()
 
-    result = _run("export-logicguard", "examples/source/fuel_cell_project_discovery.yaml", "--output", str(logic))
-    assert result.returncode == 0, result.stderr
-    assert logic.exists()
 
 
 def test_model_backed_simulate_and_compare(tmp_path):
@@ -190,3 +186,9 @@ def test_reports_keep_anchors_whose_source_row_is_absent() -> None:
         assert "source row absent" in report
         assert "Page 4" in report
     assert not model.sources
+
+
+def test_retired_logic_export_is_an_unknown_command():
+    result = _run("export-logicguard", "unused.yaml", "--output", "unused-output.yaml")
+    assert result.returncode == 2
+    assert "invalid choice" in result.stderr

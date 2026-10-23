@@ -52,7 +52,8 @@
         "Pass the already-loaded trace model into logic handoff export so the native CLI carries actual evidence content and polarity.",
         "Expose score-actions from the same complete native plan scoring path as plan --all-scores, without a candidate limit.",
         "Compare versions of one source model using actual gap semantic fields and nested qualification decision; self-comparison reports no change and retired gap.status stays rejected.",
-        "Create complete synthetic source and trace starter models whose sample data and evidence boundaries stay explicit."
+        "Create complete synthetic source and trace starter models whose sample data and evidence boundaries stay explicit.",
+        "Expose canonical --source-id intake/import and --source-model provenance checking; retire the unconsumed SourceGuard LogicGuard export."
       ],
       "files": [
         "src/researchguard/__main__.py",
@@ -93,7 +94,7 @@
         ".flowguard/models/researchguard_suite_model.py"
       ],
       "status": "confirmed",
-      "fingerprint": "sha256:e83b0794afbfd3e950bcc6ca033974844abe3d8c473224f723c57af4fd2033d3",
+      "fingerprint": "sha256:88919cacd08276f6104315a3c6782c9f6a26aa5f380cfe126b5f3224b33f140f",
       "layer": "interface"
     },
     {
@@ -106,7 +107,8 @@
         "Derive minimal support and attack sets split by the edge that enters the claim; a blocked claim reports its native blockers as the attack set and preserves the wording license.",
         "Bind Evidence to sources and exact UTF-8 quotes or matching content hashes, report invalid provenance with node ids, and resolve library source_id/locator on validate --library-root.",
         "Collect argument evaluation and native depth gaps from baseline and candidate; delegate gap transitions to the suite helper, with prior ids used only for argument stagnation.",
-        "Import a data-only trace bundle as signed per-hypothesis claims and content-bound evidence provenance, with legacy trace-only claim compatibility and no invented warrants."
+        "Import a data-only trace bundle as signed per-hypothesis claims and content-bound evidence provenance, with legacy trace-only claim compatibility and no invented warrants.",
+        "Resolve provenance from plain SourceGuard source/anchor data, accepting same-source library nodes when supplied; preserve explicit canonical source ids on intake and reject conflicting content. Route evidence search gaps to SourceGuard planning."
       ],
       "files": [
         "src/researchguard/logic/__init__.py",
@@ -168,7 +170,7 @@
       ],
       "models": [],
       "status": "confirmed",
-      "fingerprint": "sha256:d4c5cc1eb713ef1159046e43bcac7c1fcfef763d66a241fbf63c1461fb7844fd",
+      "fingerprint": "sha256:e58b30dac5aa6707f637a64a052fcd67d610525443bcddee1ae16dfe0e6dc108",
       "layer": "routes"
     },
     {
@@ -181,7 +183,8 @@
         "Combine source semantic-state, depth and coverage gaps from each actual model and delegate transition sets to the shared suite helper; resolved obligations alone count as progress.",
         "Read all recorded observations for native depth and preview a new observation only on a clone; current-call provider status remains explicit.",
         "Generate gap queries from the gap description and at most two domain hints, bounded to 120 characters; preserve executable declared actions and suppress their generated duplicates.",
-        "Default only absent gap semantic_state to discovered, keep retired status invalid, and warn on synthetic starter ids during validation."
+        "Default only absent gap semantic_state to discovered, keep retired status invalid, and warn on synthetic starter ids during validation.",
+        "Be the sole owner of source ids, roles, lineage and anchors; export a TraceGuard seed, with no unconsumed LogicGuard candidate export."
       ],
       "files": [
         "src/researchguard/source/__init__.py",
@@ -216,7 +219,7 @@
         ".flowguard/models/sourceguard_stop_decision_model.py"
       ],
       "status": "confirmed",
-      "fingerprint": "sha256:a6444d334d3a559b5521164874a30a268318ffe88410990ad661c6e12c2d8419",
+      "fingerprint": "sha256:31aceb290a6b1f47cc6129d48513079c828a90bab89aad699ca4e41b36e605d1",
       "layer": "routes"
     },
     {

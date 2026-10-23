@@ -13,7 +13,7 @@ from .schema import STATE_IN
 from .simulator import simulate_fragility
 
 
-SOURCE_LIBRARY_SEARCH = "researchguard.logic.source-library:search"
+SOURCEGUARD_PLAN = "researchguard.source:plan"
 SOURCE_LIBRARY_INTAKE = "researchguard.logic.source-library:intake"
 ARGUMENT_REPAIR = "logicguard:argument-repair"
 SIMULATION_ROUTE = "logicguard:simulation"
@@ -131,7 +131,7 @@ def _confidence_gaps(model: LogicModel, result: EvaluationResult, *, start_index
         if evaluation.state == STATE_IN and evaluation.confidence >= 0.55:
             continue
         node = model.nodes[node_id]
-        route = SOURCE_LIBRARY_SEARCH if node.type == "Claim" else ARGUMENT_REPAIR
+        route = SOURCEGUARD_PLAN if node.type == "Claim" else ARGUMENT_REPAIR
         items.append(
             GapItem(
                 id=f"confidence-{start_index + offset}-{node_id}",
@@ -141,7 +141,7 @@ def _confidence_gaps(model: LogicModel, result: EvaluationResult, *, start_index
                 explanation=f"Important node is {evaluation.state} with confidence {evaluation.confidence:.2f}.",
                 suggested_action=_route_action(route, "Add support, narrow the claim, or make the uncertainty explicit."),
                 recommended_route=route,
-                source_query=_source_query(model, (node_id,), "confidence_gap") if route == SOURCE_LIBRARY_SEARCH else "",
+                source_query=_source_query(model, (node_id,), "confidence_gap") if route == SOURCEGUARD_PLAN else "",
                 importance=record.importance,
                 salience=record.salience,
                 provenance={"kind": "evaluation", "state": evaluation.state, "confidence": evaluation.confidence},
@@ -162,7 +162,7 @@ def _fragility_gaps(model: LogicModel, *, start_index: int, limit: int) -> list[
             continue
         record = importance_for_node(model, node_id)
         node = model.nodes[node_id]
-        route = SOURCE_LIBRARY_SEARCH if node.type in {"Claim", "Evidence", "Result"} else SIMULATION_ROUTE
+        route = SOURCEGUARD_PLAN if node.type in {"Claim", "Evidence", "Result"} else SIMULATION_ROUTE
         items.append(
             GapItem(
                 id=f"fragility-{start_index + offset}-{node_id}",
@@ -172,7 +172,7 @@ def _fragility_gaps(model: LogicModel, *, start_index: int, limit: int) -> list[
                 explanation=f"Perturbing {node_id} moves the root to {impact.get('result_state')}.",
                 suggested_action=_route_action(route, "Add independent support or report the fragility explicitly."),
                 recommended_route=route,
-                source_query=_source_query(model, (node_id,), "fragility_gap") if route == SOURCE_LIBRARY_SEARCH else "",
+                source_query=_source_query(model, (node_id,), "fragility_gap") if route == SOURCEGUARD_PLAN else "",
                 importance=record.importance,
                 salience=record.salience,
                 provenance={"kind": "simulation", "mode": "fragility", "impact": dict(impact)},
@@ -185,11 +185,11 @@ def _classify_finding(code: str) -> tuple[str, str]:
     if code in {"missing_warrant", "method_result_conclusion_mismatch"}:
         return "warrant_gap", ARGUMENT_REPAIR
     if code in {"unsupported_claim", "missing_baseline", "context_as_evidence_error"}:
-        return "evidence_gap", SOURCE_LIBRARY_SEARCH
+        return "evidence_gap", SOURCEGUARD_PLAN
     if code in {"scope_mismatch", "missing_boundary_condition", "premature_generalization", "overclaiming"}:
-        return "scope_gap", SOURCE_LIBRARY_SEARCH
+        return "scope_gap", SOURCEGUARD_PLAN
     if code in {"unanswered_rebuttal", "undercut_warrant"}:
-        return "rebuttal_gap", SOURCE_LIBRARY_SEARCH
+        return "rebuttal_gap", SOURCEGUARD_PLAN
     if code in {"hidden_assumption"}:
         return "assumption_gap", ARGUMENT_REPAIR
     if code in {"fragile_conclusion"}:
@@ -220,10 +220,10 @@ def _source_query(model: LogicModel, node_ids: list[str] | tuple[str, ...], code
 
 
 def _route_action(route: str, argument_repair_action: str) -> str:
-    if route == SOURCE_LIBRARY_SEARCH:
+    if route == SOURCEGUARD_PLAN:
         return (
-            "Search existing source-library nodes first; if no suitable source exists, find candidate material, "
-            "intake and model it, link it to the project claim, then re-evaluate."
+            "Run `researchguard source plan <source model>` to find missing evidence; "
+            "then intake found material into the source library for deeper modeling and re-evaluate."
         )
     if route == ARGUMENT_REPAIR:
         return argument_repair_action

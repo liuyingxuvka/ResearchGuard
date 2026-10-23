@@ -1,5 +1,5 @@
 """
-Purpose: Export SourceGuard candidate material to TraceGuard or LogicGuard without claiming downstream validation.
+Purpose: Export SourceGuard candidate material to TraceGuard without claiming downstream validation.
 Repository: https://github.com/liuyingxuvka/ResearchGuard
 Skill: SourceGuard
 Math boundary: Expected utility ranks search value, not factual truth or calibrated probability.
@@ -11,19 +11,13 @@ from __future__ import annotations
 
 
 from .loader import dump_yaml
-from .schema import BeliefState, to_plain
+from .schema import BeliefState
 
 
 TRACEGUARD_BOUNDARY = (
     "Generated from SourceGuard source discovery state; candidate sources are not validated "
     "evidence-to-trace conclusions."
 )
-
-LOGICGUARD_BOUNDARY = (
-    "Candidate material must still be preserved and modeled in LogicGuard source library "
-    "before final claim support."
-)
-
 
 TRACEGUARD_SOURCE_STATUS = {
     "saved": "stable_keep",
@@ -81,40 +75,6 @@ def export_traceguard_seed(belief_state: BeliefState) -> dict:
     }
 
 
-def export_logicguard_source_candidates(belief_state: BeliefState) -> dict:
-    anchors_by_source: dict[str, list[dict]] = {}
-    for anchor in belief_state.anchors:
-        anchors_by_source.setdefault(anchor.source_id, []).append(to_plain(anchor))
-    candidates = []
-    for source in belief_state.sources:
-        candidates.append(
-            {
-                "source_id": source.source_id,
-                "title": source.title,
-                "source_role": source.source_role,
-                "source_date": source.source_date,
-                "coverage_period": source.coverage_period,
-                "access_status": source.access_status,
-                "can_support_structural_use": source.can_support_structural_use,
-                "cannot_support_structural_use": source.cannot_support_structural_use,
-                "anchors": anchors_by_source.get(source.source_id, []),
-                "candidate_claim_support_role": source.source_role,
-                "limitations": [anchor.limits for anchor in belief_state.anchors if anchor.source_id == source.source_id],
-                "counterevidence_notes": source.notes if source.source_role == "counter_evidence" else "",
-                "boundary": "Candidate source only; LogicGuard has not modeled or validated final claim support.",
-            }
-        )
-    return {
-        "metadata": {
-            "generated_by": "SourceGuard",
-            "boundary": LOGICGUARD_BOUNDARY,
-            "source_model_version": str(belief_state.metadata.get("version", "")),
-        },
-        "source_candidates": candidates,
-        "source_gap_rows": [to_plain(gap) for gap in belief_state.gaps],
-    }
-
-
 def affected_member_handoffs(
     belief_state: BeliefState,
     *,
@@ -156,16 +116,9 @@ def render_traceguard_yaml(belief_state: BeliefState) -> str:
     return dump_yaml(export_traceguard_seed(belief_state))
 
 
-def render_logicguard_yaml(belief_state: BeliefState) -> str:
-    return dump_yaml(export_logicguard_source_candidates(belief_state))
-
-
 __all__ = [
-    "LOGICGUARD_BOUNDARY",
     "TRACEGUARD_BOUNDARY",
     "affected_member_handoffs",
-    "export_logicguard_source_candidates",
     "export_traceguard_seed",
-    "render_logicguard_yaml",
     "render_traceguard_yaml",
 ]

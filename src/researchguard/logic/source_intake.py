@@ -54,6 +54,7 @@ class IntakeOptions:
     project_id: str = ""
     project_topic: str = ""
     snapshot_dir: str = INTAKE_SNAPSHOT_DIR
+    source_id: str | None = None
 
 
 @dataclass(frozen=True)
@@ -130,6 +131,9 @@ def intake_materials(
     extractor: Extractor | None = None,
 ) -> IntakeResult:
     opts = options or IntakeOptions()
+    materials = tuple(materials)
+    if opts.source_id is not None and len(materials) != 1:
+        raise SourceLibraryError("--source-id requires exactly one material")
     library = SourceLibrary(opts.library_root)
     results = tuple(_intake_one(library, material, opts, extractor or _extract_logic_fields) for material in materials)
     return IntakeResult(library_root=str(library.root), materials=results)
@@ -143,6 +147,7 @@ def _intake_one(library: SourceLibrary, material: IntakeMaterial, options: Intak
 
     import_result = library.import_source(
         source_file,
+        source_id=options.source_id,
         title=title,
         authors=material.authors,
         year=material.year,

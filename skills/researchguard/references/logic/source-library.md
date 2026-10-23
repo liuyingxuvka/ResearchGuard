@@ -15,6 +15,12 @@ Use the LogicGuard CLI entrypoint:
 researchguard logic <args>
 ```
 
+Source-library source ids use SourceGuard source ids. Pass `--source-id <id>` to
+`logic intake`, `logic library intake` or `logic library import`. An existing id
+with different content is an error. Validate provenance with
+`researchguard logic validate <model> --source-model <source.yaml>`; with
+`--library-root`, a locator may also name a node of that same source.
+
 ## Workflow
 
 1. Identify concrete materials: local files, long pasted text, text files, URLs, papers, books, reports, or web snapshots. Do not treat a short command-only prompt as a source.

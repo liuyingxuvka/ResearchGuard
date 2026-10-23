@@ -14,7 +14,7 @@ Ambiguous internal work stays in `route:general-argument` until its first action
 Load the selected route's reference, construct or inspect its model, then run:
 
 ```text
-researchguard logic validate <model>
+researchguard logic validate <model> --source-model <source.yaml>
 researchguard logic evaluate <model>
 researchguard logic depth <model>
 researchguard logic minimal-sets <model> --claim <id>

@@ -368,6 +368,7 @@ class SourceLibrary:
         self,
         source_path: str | Path,
         *,
+        source_id: str | None = None,
         title: str = "",
         authors: Iterable[str] = (),
         year: str = "",
@@ -382,8 +383,12 @@ class SourceLibrary:
             raise SourceLibraryError(f"Source file not found: {path}")
         content_hash = _file_sha256(path)
         sources = self._load_sources()
+        if source_id is not None and not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._:-]*", source_id):
+            raise SourceLibraryError("source_id must be a nonempty safe identifier")
         for existing in sources:
-            if existing.content_hash == content_hash:
+            if source_id is not None and existing.source_id == source_id and existing.content_hash != content_hash:
+                raise SourceLibraryError(f"source_id {source_id!r} already exists with different content")
+            if existing.content_hash == content_hash and (source_id is None or existing.source_id == source_id):
                 return SourceImportResult(
                     source=existing,
                     created=False,
@@ -396,7 +401,7 @@ class SourceLibrary:
             for source in sources
             if _metadata_may_match(source, title=title, year=year, source_date=source_date, doi=doi, url=url)
         )
-        source_id = _unique_source_id(
+        source_id = source_id or _unique_source_id(
             base=_source_id_base(path, title=title, year=year, source_date=source_date, doi=doi, url=url, content_hash=content_hash),
             existing={source.source_id for source in sources},
         )

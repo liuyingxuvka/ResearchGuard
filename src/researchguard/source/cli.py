@@ -21,7 +21,7 @@ import yaml
 from researchguard import __version__
 
 from .depth import apply_observation_and_replan
-from .handoff import export_logicguard_source_candidates, export_traceguard_seed
+from .handoff import export_traceguard_seed
 from .loader import load_model, validate_model, write_yaml
 from .planner import frontier_summary, plan_next_actions
 from .report import render_json, render_markdown, render_text
@@ -243,10 +243,6 @@ def build_parser() -> argparse.ArgumentParser:
     trace = sub.add_parser("export-traceguard")
     trace.add_argument("model")
     trace.add_argument("--output", required=True)
-
-    logic = sub.add_parser("export-logicguard")
-    logic.add_argument("model")
-    logic.add_argument("--output", required=True)
 
     simulate = sub.add_parser("simulate")
     simulate.add_argument(
@@ -571,13 +567,6 @@ def run(args: argparse.Namespace) -> int:
         write_yaml(
             args.output,
             export_traceguard_seed(load_model(args.model)),
-        )
-        _json_out({"ok": True, "output": args.output}, True)
-        return 0
-    if args.command == "export-logicguard":
-        write_yaml(
-            args.output,
-            export_logicguard_source_candidates(load_model(args.model)),
         )
         _json_out({"ok": True, "output": args.output}, True)
         return 0

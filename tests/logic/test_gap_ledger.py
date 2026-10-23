@@ -15,10 +15,12 @@ def test_gap_ledger_routes_evidence_and_warrant_gaps() -> None:
     items = payload["items"]
 
     assert payload["model_id"] == "engineering_efficiency_argument"
-    assert routes["researchguard.logic.source-library:search"] >= 1
+    assert routes["researchguard.source:plan"] >= 1
+    assert all("researchguard source plan <source model>" in item["suggested_action"]
+               for item in items if item["recommended_route"] == "researchguard.source:plan")
     assert routes["logicguard:argument-repair"] >= 1
     assert any(item["gap_type"] == "warrant_gap" for item in items)
-    assert any(item["source_query"] for item in items if item["recommended_route"] == "researchguard.logic.source-library:search")
+    assert any(item["source_query"] for item in items if item["recommended_route"] == "researchguard.source:plan")
 
 
 def test_gap_ledger_preserves_importance_context() -> None:

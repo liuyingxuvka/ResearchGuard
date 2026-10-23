@@ -379,3 +379,20 @@ def test_evidence_without_provenance_is_a_visible_warning_and_ai_text_is_not_evi
     assert result.warnings == ["Evidence not bound to a source (no provenance): E1"]
     with pytest.raises(ModelLoadError, match="non-ai_generated"):
         load_model_from_dict(_evidence_model(origin_kind="ai_generated", source_id="any"))
+
+
+def test_source_model_accepts_its_anchor_or_the_same_library_source_node(tmp_path: Path) -> None:
+    from researchguard.logic.validator import source_model_provenance_problems
+    material = tmp_path / "source.txt"
+    material.write_text("content")
+    library = SourceLibrary(tmp_path / "library")
+    library.import_source(material, source_id="src-canonical")
+    library.create_source_model("src-canonical", evidence="content")
+    locator = next(iter(library.source_node_ids("src-canonical")))
+    data = {"sources": [{"source_id": "src-canonical"}], "anchors": [{"source_id": "src-canonical", "anchor_id": "anc-source"}]}
+    for anchor in [locator, "anc-source"]:
+        model = load_model_from_dict({"model": {"id": "anchor"}, "nodes": {
+            "E": {"type": "Evidence", "text": "content", "provenance": [
+                {"origin_kind": "external_source", "source_id": "src-canonical", "locator": anchor, "quote": "content"}]}}, "edges": []})
+        assert source_model_provenance_problems(model, data, source_library=library) == []
+        assert validate_model(model, source_model=data, source_library=library).ok

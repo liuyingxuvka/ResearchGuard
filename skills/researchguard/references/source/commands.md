@@ -17,7 +17,6 @@ researchguard source search-iteration run <model.yaml> --prediction <prediction.
 researchguard source compare <before.yaml> <after.yaml> --pretty
 researchguard source report <model.yaml> --format markdown
 researchguard source export-traceguard <model.yaml> --output <seed.yaml>
-researchguard source export-logicguard <model.yaml> --output <candidates.yaml>
 ```
 
 `stop-decision` considers every executable declared or generated action targeting

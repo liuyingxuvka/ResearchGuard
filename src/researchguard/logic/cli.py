@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import argparse
 import json
+
+import yaml
 from pathlib import Path
 from typing import Any
 
@@ -70,6 +72,7 @@ def build_parser() -> argparse.ArgumentParser:
     validate.add_argument("model")
     validate.add_argument("--output")
     validate.add_argument("--library-root", default="", help="Check Evidence provenance anchors against this source library.")
+    validate.add_argument("--source-model", help="Resolve provenance against canonical SourceGuard sources and anchors.")
     validate.set_defaults(func=_cmd_validate)
 
     evaluate = sub.add_parser("evaluate", help="Evaluate model states and confidence.")
@@ -290,6 +293,7 @@ def build_parser() -> argparse.ArgumentParser:
     library_import = library_sub.add_parser("import", help="Import a source file into the global library.")
     library_import.add_argument("root")
     library_import.add_argument("source")
+    library_import.add_argument("--source-id", help="Canonical SourceGuard source id.")
     library_import.add_argument("--title", default="")
     library_import.add_argument("--author", action="append", default=[])
     library_import.add_argument("--year", default="")
@@ -433,7 +437,12 @@ def _cmd_validate(args: argparse.Namespace) -> int:
         library = SourceLibrary(args.library_root)
         if not library.source_index_path.is_file():
             raise ValueError(f"source library not found: {args.library_root}")
-    validation = validate_model(model, source_library=library)
+    source_data = None
+    if args.source_model:
+        source_data = yaml.safe_load(Path(args.source_model).read_text(encoding="utf-8"))
+        if not isinstance(source_data, dict):
+            raise ValueError("source model must be a mapping")
+    validation = validate_model(model, source_library=library, source_model=source_data)
     payload = validation.to_dict()
     if args.output:
         _write(args.output, payload)
@@ -765,6 +774,7 @@ def _cmd_intake(args: argparse.Namespace) -> int:
             library_root=args.root,
             project_id=args.project,
             project_topic=args.project_topic,
+            source_id=args.source_id,
         ),
     )
     payload: Any = result.to_dict() if args.json or (args.output and args.output.endswith(".json")) else result.format_text()
@@ -785,6 +795,7 @@ def _cmd_library_init(args: argparse.Namespace) -> int:
 def _cmd_library_import(args: argparse.Namespace) -> int:
     result = SourceLibrary(args.root).import_source(
         args.source,
+        source_id=args.source_id,
         title=args.title,
         authors=args.author,
         year=args.year,
@@ -1020,6 +1031,7 @@ def _load_json_object(path: str | Path) -> dict[str, Any]:
 
 def _add_intake_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("root", nargs="?", default=".logicguard-library")
+    parser.add_argument("--source-id", help="Canonical SourceGuard source id; requires one material.")
     parser.add_argument("--file", action="append", default=[], help="File to preserve as source material. Can be repeated.")
     parser.add_argument("--text", action="append", default=[], help="Long-form text to snapshot and preserve. Can be repeated.")
     parser.add_argument("--text-file", action="append", default=[], help="Read a text file and preserve it as a snapshot. Can be repeated.")

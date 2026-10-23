@@ -425,3 +425,37 @@ def test_import_handoff_builds_one_claim_per_hypothesis(tmp_path: Path) -> None:
     assert "validation: OK" in validated.stdout
     assert "no provenance" not in validated.stdout + validated.stderr
     assert "missing_warrant" in _run("diagnose", str(model_path)).stdout
+
+
+def test_validate_checks_provenance_against_the_source_model(tmp_path: Path) -> None:
+    import yaml
+    raw = {"model": {"id": "anchors", "root_claim": "C"}, "nodes": {
+        "C": {"type": "Claim", "text": "Bounded claim"},
+        "E": {"type": "Evidence", "text": "Dates", "provenance": [
+            {"origin_kind": "external_source", "source_id": "src-sca-2021", "locator": "anc-sca-dates", "quote": "Dates"}]},
+    }, "edges": []}
+    path = tmp_path / "logic.yaml"
+    source = "tests/source/fixtures/evergiven/src_v4.yaml"
+    for source_id, locator, expected in [("src-sca-2021", "anc-sca-dates", 0),
+                                           ("src-sca-2021", "anc-nope", 2),
+                                           ("src-nope", "anc-sca-dates", 2)]:
+        raw["nodes"]["E"]["provenance"][0].update(source_id=source_id, locator=locator)
+        path.write_text(yaml.safe_dump(raw))
+        result = _run("validate", str(path), "--source-model", source)
+        assert result.returncode == expected, result.stdout
+        if expected:
+            assert "E" in result.stdout and source_id in result.stdout and locator in result.stdout
+
+
+def test_intake_uses_the_given_source_id(tmp_path: Path) -> None:
+    from researchguard.logic import SourceLibrary
+    library = tmp_path / "library"
+    for route in [("intake",), ("library", "intake")]:
+        result = _run(*route, str(library), "--text", "A short preserved source.", "--source-id", "src-canonical", "--json")
+        assert result.returncode == 0, result.stdout
+        assert "src-canonical" in result.stdout
+    text = tmp_path / "source.txt"
+    text.write_text("Different content.")
+    result = _run("library", "import", str(library), str(text), "--source-id", "src-canonical")
+    assert result.returncode != 0 and "different content" in result.stdout
+    assert len(SourceLibrary(library).list_sources()) == 1

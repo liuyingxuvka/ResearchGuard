@@ -43,7 +43,7 @@ class ValidationResult:
         return "\n".join(lines)
 
 
-def validate_model(model: LogicModel, *, source_library: Any = None) -> ValidationResult:
+def validate_model(model: LogicModel, *, source_library: Any = None, source_model: dict[str, Any] | None = None) -> ValidationResult:
     """Validate model structure; with ``source_library`` also resolve Evidence provenance anchors."""
 
     errors: list[str] = []
@@ -52,6 +52,9 @@ def validate_model(model: LogicModel, *, source_library: Any = None) -> Validati
         errors.append("model must define at least one node")
     if model.root_claim and model.root_claim not in model.nodes:
         errors.append(f"root_claim {model.root_claim!r} is not a defined node")
+
+    if source_model is not None:
+        errors.extend(source_model_provenance_problems(model, source_model, source_library=source_library))
 
     unbound_evidence: list[str] = []
     unanchored_evidence: list[str] = []
@@ -66,7 +69,7 @@ def validate_model(model: LogicModel, *, source_library: Any = None) -> Validati
         except ProvenanceError as exc:
             errors.append(str(exc))
             continue
-        if source_library is not None:
+        if source_library is not None and source_model is None:
             errors.extend(_library_anchor_problems(node_id, records, source_library))
             if not any(record.source_id and record.locator for record in records):
                 unanchored_evidence.append(node_id)
@@ -303,6 +306,37 @@ def validate_model(model: LogicModel, *, source_library: Any = None) -> Validati
                         errors.append(f"material child output {block.id!r}/{output_id!r} is unconsumed")
 
     return ValidationResult(ok=not errors, errors=errors, warnings=warnings)
+
+
+def source_model_provenance_problems(
+    model: LogicModel, source_data: dict[str, Any], *, source_library: Any = None,
+) -> list[str]:
+    """Resolve canonical source identities and anchors from plain SourceGuard data."""
+    sources = source_data.get("sources", [])
+    anchors = source_data.get("anchors", [])
+    if not isinstance(sources, list) or not isinstance(anchors, list):
+        raise ValueError("source model sources and anchors must be lists")
+    known = {item.get("source_id") for item in sources if isinstance(item, dict)}
+    anchored = {(item.get("source_id"), item.get("anchor_id")) for item in anchors if isinstance(item, dict)}
+    library_sources = {item.source_id for item in source_library.list_sources()} if source_library else set()
+    problems: list[str] = []
+    for node_id, node in model.nodes.items():
+        if node.type != "Evidence" or not node.provenance:
+            continue
+        try:
+            records = validate_evidence_provenance(node_id, node.provenance)
+        except ProvenanceError:
+            continue  # Structural validation reports malformed provenance.
+        for record in records:
+            if not record.source_id:
+                continue
+            if record.source_id not in known:
+                problems.append(f"dangling_source:logic:{node_id}:{record.source_id} (anchor {record.locator or '<none>'})")
+            elif record.locator and (record.source_id, record.locator) not in anchored:
+                if record.source_id in library_sources and record.locator in source_library.source_node_ids(record.source_id):
+                    continue
+                problems.append(f"dangling_anchor:logic:{node_id}:{record.locator} (source {record.source_id})")
+    return problems
 
 
 def _library_anchor_problems(node_id: str, records: tuple[ProvenanceRecord, ...], library: Any) -> list[str]:
