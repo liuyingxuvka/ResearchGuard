@@ -56,7 +56,6 @@ def test_create_validate_plan_report_and_export_smoke(tmp_path):
     assert trace.exists()
 
 
-
 def test_model_backed_simulate_and_compare(tmp_path):
     result = _run("simulate", "--mode", "gap-closure", "--model", "examples/source/fuel_cell_project_discovery.yaml", "--pretty")
     assert result.returncode == 0, result.stderr

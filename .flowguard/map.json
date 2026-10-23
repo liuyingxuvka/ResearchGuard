@@ -173,7 +173,7 @@
       ],
       "models": [],
       "status": "confirmed",
-      "fingerprint": "sha256:08036609afa08ec4f61ceab7190a870b3ae94dca597f6c29e581d271628b0460",
+      "fingerprint": "sha256:ea0d5594f66cd176677a4af933f87a754a09919b90ff3179c303e3bffcfce5f7",
       "layer": "routes"
     },
     {
@@ -284,7 +284,7 @@
       ],
       "models": [],
       "status": "confirmed",
-      "fingerprint": "sha256:ca27837e9967aaa9a2ba28aeefc83af7e887b3ccbf543eab2c8fa1ca3f30fc4c",
+      "fingerprint": "sha256:7a81faf4458caacfd8490d2b8b68485dc12b53d9ed912f007a7b6d0731cd351c",
       "layer": "routes"
     },
     {

@@ -361,7 +361,6 @@ def _explicit_card_inventory_present(model: LogicModel) -> bool:
     )
 
 
-
 def _uses_implicit_inventory(model: LogicModel) -> bool:
     """Only absent declarations opt into the ordinary-argument coverage view."""
     model_keys = (

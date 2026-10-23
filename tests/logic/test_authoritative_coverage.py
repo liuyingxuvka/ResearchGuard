@@ -13,8 +13,6 @@ from researchguard.logic import (
 from researchguard.logic.execution_depth import _build_native_depth_analysis, model_fingerprint
 
 
-
-
 def _role_complete_data() -> dict:
     return {
         "model": {

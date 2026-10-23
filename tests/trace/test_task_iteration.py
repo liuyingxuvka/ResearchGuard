@@ -110,7 +110,6 @@ def _comparison_file(tmp_path: Path, observation, **prediction_overrides) -> Pat
     return path
 
 
-
 # Supplied Ever Given trial/approximate transcription, not retrieved factual evidence.
 TRIAL_FIXTURES = Path(__file__).parent / "fixtures"
 
@@ -322,7 +321,6 @@ def test_mismatch_ids_never_enter_gap_transitions(tmp_path: Path) -> None:
     for payload in (comparison, revision):
         assert not any(item.startswith("mismatch-") for item in payload["gap_transitions"])
         assert not set(payload["persisted_gap_ids"]) & set(payload["introduced_gap_ids"])
-
 
 
 def test_freeze_accepts_evidence_not_yet_in_the_model(tmp_path) -> None:

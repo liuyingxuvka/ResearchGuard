@@ -269,7 +269,6 @@ def _require_observed_ids(model: Any, observation: "EvidenceBatchObservation", l
             )
 
 
-
 def _observed_model(model: TraceGuardModel, observation: EvidenceBatchObservation) -> TraceGuardModel:
     """Append typed records in memory and reuse the native cross-reference binding."""
     updates: dict[str, tuple[Any, ...]] = {}

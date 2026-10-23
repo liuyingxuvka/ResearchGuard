@@ -15,8 +15,6 @@ from researchguard.logic import (
 from researchguard.logic.execution_depth import _build_native_depth_analysis
 
 
-
-
 def _model(*, with_objection: bool = False, with_competitor: bool = False):
     nodes = {
         "C0": {"type": "Claim", "text": "Root", "importance": 1.0},
