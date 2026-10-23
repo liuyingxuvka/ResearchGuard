@@ -359,7 +359,8 @@
       "responsibilities": [
         "Load research.yaml and native route models without rewriting them.",
         "Check shared hypothesis ids, root claims and canonical source/anchor references in memory.",
-        "Project native logic, trace depth, source planning and experiment observation/recommendation results into a Markdown or JSON status page."
+        "Project native logic, trace depth, source planning and experiment observation/recommendation results into a Markdown or JSON status page.",
+        "Ship the bounded Ever Given research tree with common ids and replay cross-reference checks on native in-memory models."
       ],
       "files": [
         "src/researchguard/research.py"
@@ -383,7 +384,9 @@
       "tests": [
         "tests/test_research_tree.py"
       ],
-      "models": [],
+      "models": [
+        ".flowguard/models/research_tree_model.py"
+      ],
       "layer": "tree",
       "status": "confirmed",
       "fingerprint": "sha256:bff7906e9ed27535dc5e97f97b667e32c92d1a52bd2d40f96781128967b585b7"

@@ -93,3 +93,51 @@ def test_checker_is_in_memory_and_source_is_optional(folder, capsys):
     assert main(['status', str(folder), '--json', '--output', str(output)]) == 0
     assert capsys.readouterr().out == ''
     assert json.loads(output.read_text())['question'] == index['question']
+
+
+def test_shipped_evergiven_tree_has_consistent_shared_ids(capsys):
+    folder = Path(__file__).resolve().parents[1] / 'examples/research/evergiven'
+    assert main(['status', str(folder), '--json']) == 0
+    status = json.loads(capsys.readouterr().out)
+    assert status['errors'] == []
+    assert {row['id'] for row in status['hypotheses']} == {'h_suez', 'h_demand', 'h_yantian'}
+    assert any(row['anchor'] == 'anc-transpacific' for row in status['evidence'])
+    assert status['warnings'] == ['hypothesis_not_in_logic:h_yantian']
+
+
+def test_one_observation_reaches_trace_and_logic_by_sync(tmp_path, capsys):
+    import shutil
+    from researchguard.source.loader import load_model, write_yaml
+    from researchguard.source.schema import Observation, EvidenceAnchor
+    from researchguard.source.update import apply_observation
+    original = Path(__file__).resolve().parents[1] / 'examples/research/evergiven'
+    folder = tmp_path / 'research'
+    shutil.copytree(original, folder)
+    source_path = folder / 'source.yaml'
+    source = apply_observation(load_model(source_path), Observation(
+        observation_id='obs-extra', observed_anchors=[EvidenceAnchor(
+            anchor_id='anc-extra', source_id='src-wci-transpacific',
+            text='An additional recorded observation for the same public-data example.',
+            locator='Extra illustrative row', usable_for_claim=True)]))
+    write_yaml(source_path, source)
+    trace_path = folder / 'trace-next.yaml'
+    assert main(['source', 'export-traceguard', str(source_path), '--into', str(folder / 'trace.yaml'), '--output', str(trace_path)]) == 0
+    trace = yaml.safe_load(trace_path.read_text())
+    trace['hypothesis_evidence_links'].append({'link_id': 'l-extra', 'hypothesis_id': 'h_demand',
+        'evidence_id': 'anc-extra', 'polarity': 'support', 'declared_relevance': .5,
+        'rationale': 'Illustrates an explicit human/AI linking judgment after sync.'})
+    trace_path.write_text(yaml.safe_dump(trace))
+    bundle, logic = folder / 'bundle.yaml', folder / 'logic-next.yaml'
+    assert main(['trace', 'export-logicguard', str(trace_path), '--output', str(bundle)]) == 0
+    assert main(['logic', 'import-handoff', str(bundle), '--into', str(folder / 'logic.yaml'), '--output', str(logic)]) == 0
+    raw_logic = yaml.safe_load(logic.read_text())
+    assert raw_logic['nodes']['anc-extra']['provenance'][0]['source_id'] == 'src-wci-transpacific'
+    index_path = folder / 'research.yaml'
+    index = yaml.safe_load(index_path.read_text())
+    index['models'].update(trace=trace_path.name, logic=logic.name)
+    index_path.write_text(yaml.safe_dump(index))
+    capsys.readouterr()
+    assert main(['status', str(folder), '--json']) == 0
+    status = json.loads(capsys.readouterr().out)
+    extra = next(row for row in status['evidence'] if row['anchor'] == 'anc-extra')
+    assert 'trace:h_demand:support' in extra['used_by'] and 'logic:anc-extra' in extra['used_by']

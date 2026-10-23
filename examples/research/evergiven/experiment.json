@@ -1,0 +1,8 @@
+{
+  "hypothesis_predictions": [
+    {"hypothesis_id": "h_suez", "outcomes_by_experiment": {"e_transpacific": "ae_rise_much_larger", "e_reversion": "reverts_by_may", "e_yantian_timing": "no_jump"}},
+    {"hypothesis_id": "h_demand", "outcomes_by_experiment": {"e_transpacific": "similar_rise", "e_reversion": "keeps_rising", "e_yantian_timing": "no_jump"}},
+    {"hypothesis_id": "h_yantian", "outcomes_by_experiment": {"e_transpacific": "similar_rise", "e_reversion": "keeps_rising", "e_yantian_timing": "jump_in_june"}}
+  ],
+  "candidate_experiment_ids": ["e_transpacific", "e_reversion", "e_yantian_timing"]
+}

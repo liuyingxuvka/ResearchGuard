@@ -14,6 +14,13 @@ Pick one route, then load only its file. Each route runs its own `researchguard 
 | Reconstruct and stress-test a timeline, an execution or effect chain, or competing causal storylines from evidence | `references/routes/trace.md` |
 | Recommend the least costly or fewest declared experiments that tell hypotheses apart (never runs them) | `references/routes/experiment.md` |
 
+One research question forms one model tree: question → competing hypotheses (shared ids
+in logic, trace and experiment) → storylines/events → evidence anchors → sources.
+Its five abilities are structure, counterexamples (argument, perturbation, elimination),
+known-bad variants that must fail (depth checks and dangling ids), real-source binding
+through anchors, and observation binding through predict–observe–revise loops.
+Read the whole tree with `researchguard status <folder>`.
+
 ## Rules for every route
 
 - If `researchguard --help` fails, install the engine once with `python -m pip install -e <ResearchGuard checkout>`.

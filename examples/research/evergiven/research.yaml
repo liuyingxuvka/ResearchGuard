@@ -1,0 +1,18 @@
+schema: researchguard.research.v1
+question: Did the Ever Given grounding (23–29 March 2021) cause the 2021 Asia–Europe
+  container freight rate rise?
+root_claim: h_suez
+hypotheses:
+- id: h_suez
+  text: The Suez blockage caused the rise.
+- id: h_demand
+  text: Demand rebound and container scarcity drove the rise.
+- id: h_yantian
+  text: The Yantian disruption drove the rise.
+models:
+  source: source.yaml
+  trace: trace.yaml
+  logic: logic.yaml
+  experiment: experiment.json
+  experiment_observations:
+  - exp-obs1.json

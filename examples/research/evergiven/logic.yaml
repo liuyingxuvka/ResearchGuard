@@ -1,0 +1,144 @@
+model:
+  id: evergiven_freight
+  title: Did the Ever Given grounding cause the 2021 Asia-Europe freight rate rise?
+  root_claim: h_suez
+nodes:
+  h_suez:
+    type: Claim
+    text: The Ever Given grounding (23-29 Mar 2021) caused the 2021 rise in Asia-Europe
+      container spot rates.
+    scope: Asia-Europe spot rates, 2021
+    importance: 0.9
+  h_demand:
+    type: Claim
+    text: Pandemic demand and container shortage caused the 2021 rise; the blockage
+      added a short bump.
+    scope: Asia-Europe spot rates, 2021
+    importance: 0.9
+  E_dates:
+    type: Evidence
+    text: Grounding 23 Mar 2021, refloated 29 Mar 2021 (SCA).
+    confidence: 0.9
+    scope: Asia-Europe spot rates, 2021
+    provenance:
+    - origin_kind: external_source
+      source_reference: https://www.suezcanal.gov.eg/
+      locator: anc-sca-dates
+      source_date: '2021-03-29'
+      source_id: src-sca-2021
+      quote: The Ever Given ran aground on 23 March 2021 and was refloated on 29 March
+        2021; navigation resumed the same day.
+  E_series:
+    type: Evidence
+    text: 'WCI Shanghai-Rotterdam: ~2,000 (Oct 2020), ~8,000 (Jan 2021), ~7,000 (mid
+      Mar), ~10,500 (Jun), ~14,000 (Sep 2021).'
+    confidence: 0.7
+    scope: Asia-Europe spot rates, 2021
+    provenance:
+    - origin_kind: external_source
+      source_reference: https://www.drewry.co.uk/
+      locator: anc-wci-series
+      source_id: src-drewry-wci
+      quote: 'Approx. USD/FEU: Oct 2020 ~2,000; early Jan 2021 ~8,000; mid Mar 2021
+        ~7,000; early Apr 2021 ~8,000; Jun 2021 ~10,500; Sep 2021 ~14,000 (peak).'
+  E_pretrend:
+    type: Evidence
+    text: 'UNCTAD RMT 2021: rates surged from H2 2020 on demand rebound and container
+      scarcity.'
+    confidence: 0.8
+    scope: Asia-Europe spot rates, 2021
+    provenance:
+    - origin_kind: external_source
+      source_reference: https://unctad.org/webflyer/review-maritime-transport-2021
+      locator: anc-unctad-surge
+      source_id: src-unctad-rmt2021
+      quote: Container spot rates began surging in the second half of 2020 as demand
+        rebounded and empty containers were scarce; the Suez Canal blockage in March
+        2021 added further pressure.
+  W_capacity:
+    type: Warrant
+    text: Removing transit capacity for ~1-2 weeks raises spot rates on the affected
+      lane.
+    confidence: 0.6
+  A_timing:
+    type: Assumption
+    text: The Q2-Q3 rise is attributable to the March blockage rather than continuing
+      pre-existing pressure.
+    confidence: 0.4
+  R_pretrend:
+    type: Rebuttal
+    text: Rates had already quadrupled before the blockage; the rise continued long
+      after the queue cleared.
+    confidence: 0.8
+  E_transpacific:
+    type: Evidence
+    text: 'WCI Shanghai-Los Angeles (no Suez exposure): ~4,000 (Jan 2021) -> ~12,000
+      (Sep 2021).'
+    confidence: 0.7
+    scope: Asia-Europe spot rates, 2021
+    provenance:
+    - origin_kind: external_source
+      source_reference: https://www.drewry.co.uk/
+      locator: anc-transpacific
+      source_id: src-wci-transpacific
+      quote: 'Approx. USD/FEU Shanghai-Los Angeles: Jan 2021 ~4,000; Sep 2021 ~12,000.'
+edges:
+- source: E_dates
+  target: h_suez
+  type: supports
+  weight: 0.5
+- source: E_series
+  target: h_suez
+  type: supports
+  weight: 0.5
+- source: W_capacity
+  target: h_suez
+  type: supports
+  weight: 1.0
+- source: A_timing
+  target: h_suez
+  type: depends_on
+  weight: 1.0
+- source: E_pretrend
+  target: R_pretrend
+  type: supports
+  weight: 0.9
+- source: E_series
+  target: R_pretrend
+  type: supports
+  weight: 0.6
+- source: R_pretrend
+  target: h_suez
+  type: attacks
+  weight: 0.8
+- source: E_pretrend
+  target: h_demand
+  type: supports
+  weight: 0.9
+- source: E_series
+  target: h_demand
+  type: supports
+  weight: 0.6
+- source: h_demand
+  target: h_suez
+  type: contradicts
+  weight: 0.7
+- source: E_transpacific
+  target: R_pretrend
+  type: supports
+  weight: 0.8
+- source: E_transpacific
+  target: h_demand
+  type: supports
+  weight: 0.8
+acceptance:
+  h_suez:
+    all_of:
+    - E_dates
+    - E_series
+    - W_capacity
+    requires:
+    - A_timing
+    no_undefeated_rebuttal: true
+    threshold: 0.65
+    warrant_required: true
