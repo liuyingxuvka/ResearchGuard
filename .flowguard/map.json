@@ -101,7 +101,7 @@
       "summary": "Own argument support, source library, structured artifacts, model deepening, synthesis and project library inspection.",
       "responsibilities": [
         "Own argument support, source library, structured artifacts, model deepening, synthesis and project library inspection.",
-        "Run depth analysis on the model alone; synthesis always computes depth in process.",
+        "Run depth analysis on the model alone; synthesis computes depth in process. Use an internal implicit unit/card only when inventory and role declarations are absent, preserving explicit empty declarations and model identity. Shared Evidence is informational; other shared role nodes retain consumer checks.",
         "Run the predict-observe-revise loop on plain model files; the loop never writes model files, so rollback is restoring the previous file; every claim, node and coverage id a prediction names must exist in the model when it is frozen.",
         "Derive minimal support and attack sets split by the edge that enters the claim; a blocked claim reports its native blockers as the attack set and preserves the wording license.",
         "Bind Evidence to sources and exact UTF-8 quotes or matching content hashes, report invalid provenance with node ids, and resolve library source_id/locator on validate --library-root.",
@@ -168,7 +168,7 @@
       ],
       "models": [],
       "status": "confirmed",
-      "fingerprint": "sha256:70ed2ef85538f1bb22654622c0983c45cf9ec8b60d44adda37734729b285c0ff",
+      "fingerprint": "sha256:d4c5cc1eb713ef1159046e43bcac7c1fcfef763d66a241fbf63c1461fb7844fd",
       "layer": "routes"
     },
     {

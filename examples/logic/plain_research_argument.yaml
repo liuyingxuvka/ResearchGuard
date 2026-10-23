@@ -1,0 +1,100 @@
+# Synthetic teaching argument. Structural support and heuristic confidence are not factual verification.
+# The restart-only inference has a declared quality discount; confidence is not probability.
+model:
+  id: plain-maintenance-argument
+  root_claim: C0
+  description: A bounded comparison inside one synthetic device-maintenance record.
+nodes:
+  C0:
+    type: Claim
+    text: Within this record, the documented filter replacement better explains the
+      recovery than the restart-only account.
+    importance: 1.0
+  C_ALT:
+    type: Claim
+    text: The restart-only account is a weaker, speculative explanation of the same
+      recorded recovery.
+    role: alternative
+    alternative_to: C0
+    importance: 0.8
+  E_series:
+    type: Evidence
+    text: Synthetic notebook records low output before maintenance and recovered output
+      after both filter replacement and restart.
+    provided: true
+    confidence: 0.9
+    importance: 0.8
+  W_compare:
+    type: Warrant
+    text: Compare both explanations against the same recorded series; the unpaired
+      restart-only inference has weaker declared fit.
+    confidence: 0.8
+    importance: 0.8
+    shared_claim_ids:
+    - C0
+    - C_ALT
+  A_measurement:
+    type: Assumption
+    text: The same instrument and sampling method were used throughout this notebook.
+    confidence: 0.8
+    importance: 0.7
+    shared_claim_ids:
+    - C0
+    - C_ALT
+  L_scope:
+    type: Limitation
+    text: This comparison is limited to one synthetic record and does not identify
+      a general causal effect.
+    confidence: 0.8
+    importance: 0.7
+    shared_claim_ids:
+    - C0
+    - C_ALT
+  R_measurement:
+    type: Rebuttal
+    text: A changed measurement scale would undermine either explanation; the notebook
+      records no such change.
+    active: false
+    confidence: 0.8
+    importance: 0.7
+    shared_claim_ids:
+    - C0
+    - C_ALT
+edges:
+- source: E_series
+  target: C0
+  type: supports
+- source: W_compare
+  target: C0
+  type: supports
+- source: A_measurement
+  target: C0
+  type: depends_on
+- source: L_scope
+  target: C0
+  type: qualifies
+- source: R_measurement
+  target: C0
+  type: attacks
+- source: E_series
+  target: C_ALT
+  type: supports
+- source: W_compare
+  target: C_ALT
+  type: supports
+- source: A_measurement
+  target: C_ALT
+  type: depends_on
+- source: L_scope
+  target: C_ALT
+  type: qualifies
+- source: R_measurement
+  target: C_ALT
+  type: attacks
+acceptance:
+  C_ALT:
+    all_of:
+    - E_series
+    - W_compare
+    - A_measurement
+    local_quality_factor: 0.5

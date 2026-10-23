@@ -152,3 +152,41 @@ def test_inert_mutation_is_recorded_but_not_counted_as_depth() -> None:
     assert effects[0].effective is False
     assert effects[0].state_changed is False
     assert effects[0].support_path_changed is False
+
+
+def test_plain_shallow_inventory_still_has_real_role_gaps() -> None:
+    model = load_model_from_dict({
+        "model": {"id": "plain-shallow", "root_claim": "C0"},
+        "nodes": {
+            "C0": {"type": "Claim", "importance": 1.0},
+            "E1": {"type": "Evidence", "importance": 0.9, "provided": True},
+        },
+        "edges": [{"source": "E1", "target": "C0", "type": "supports"}],
+    })
+    receipt = build_logic_depth_receipt(model, budget=8)
+
+    assert receipt.coverage_universe.implicit_inventory is True
+    assert receipt.status == "blocked" and receipt.broad_claim_licensed is False
+    assert "target_unit_inventory_empty" not in receipt.unresolved_gaps
+    assert "model_card_inventory_empty" not in receipt.unresolved_gaps
+    assert {"warrant", "assumption", "boundary", "opposition"} <= set(
+        receipt.coverage_universe.role_coverage[0].missing_roles
+    )
+
+
+def test_plain_example_reaches_native_depth_pass() -> None:
+    from researchguard.logic import load_model
+    from researchguard.logic.execution_depth import model_fingerprint
+
+    path = Path(__file__).resolve().parents[2] / "examples/logic/plain_research_argument.yaml"
+    model = load_model(path)
+    original = json.loads(json.dumps(model.to_dict()))
+    fingerprint = model_fingerprint(model)
+    receipt = build_logic_depth_receipt(model, budget=24)
+
+    assert receipt.coverage_universe.implicit_inventory is True
+    assert receipt.status == "pass"
+    assert receipt.broad_claim_licensed is True
+    assert receipt.unresolved_gaps == ()
+    assert model.to_dict() == original
+    assert model_fingerprint(model) == fingerprint

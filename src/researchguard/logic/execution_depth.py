@@ -361,6 +361,22 @@ def _explicit_card_inventory_present(model: LogicModel) -> bool:
     )
 
 
+
+def _uses_implicit_inventory(model: LogicModel) -> bool:
+    """Only absent declarations opt into the ordinary-argument coverage view."""
+    model_keys = (
+        "target_unit_ids", "artifact_unit_ids", "structure_unit_ids", "task_unit_ids",
+        "target_units", "artifact_units", "structure_units", "task_units",
+        "model_card_ids", "model_cards", "excluded_model_cards",
+        "role_dispositions", "claim_role_dispositions",
+    )
+    node_keys = (*UNIT_METADATA_KEYS, "model_card_id", "card_id", "role_dispositions")
+    return not (
+        model.blocks
+        or any(key in model.metadata for key in model_keys)
+        or any(key in node.metadata for node in model.nodes.values() for key in node_keys)
+    )
+
 def _node_covers_role(
     model: LogicModel,
     node_id: str,
@@ -639,7 +655,8 @@ def _claim_role_coverage(
                 for node_id in {
                     item for values in connected.values() for item in values
                 }
-                if len(consumers_by_role_node.get(node_id, ())) > 1
+                if model.nodes[node_id].type != "Evidence"
+                and len(consumers_by_role_node.get(node_id, ())) > 1
                 and not _sharing_is_explicit(
                     model,
                     node_id,
@@ -760,11 +777,21 @@ def build_argument_coverage_universe(
     if model.root_claim and model.root_claim in model.nodes:
         important_ids.add(model.root_claim)
 
+    implicit_inventory = _uses_implicit_inventory(model)
+
+    def current_card_inventory() -> dict[str, dict[str, Any]]:
+        cards = _card_inventory(model, important_ids)
+        if implicit_inventory:
+            # This is an internal view: do not change model identity or inputs.
+            # Keep important disconnected nodes as well as all reachable nodes.
+            cards["root_argument"]["node_ids"].update(reachable)
+        return cards
+
     # Card reconciliation happens before role or perturbation credit.  Every
     # explicit card remains visible in broad mode.  A closed exclusion can
     # remove only nodes that belong exclusively to excluded cards; if those
     # nodes still participate in the active argument, the exclusion is a gap.
-    card_inventory = _card_inventory(model, important_ids)
+    card_inventory = current_card_inventory()
     excluded_card_ids = {
         card_id
         for card_id, raw in card_inventory.items()
@@ -808,7 +835,7 @@ def build_argument_coverage_universe(
     # importance is low.  Iterate to a fixed point in case a declared
     # applicable node introduces another important claim.
     for _ in range(max(1, len(model.nodes))):
-        card_inventory = _card_inventory(model, important_ids)
+        card_inventory = current_card_inventory()
         card_inventory["root_argument"]["node_ids"].difference_update(
             excluded_node_ids
         )
@@ -829,7 +856,7 @@ def build_argument_coverage_universe(
             break
         important_ids.update(new_ids)
 
-    card_inventory = _card_inventory(model, important_ids)
+    card_inventory = current_card_inventory()
     card_inventory["root_argument"]["node_ids"].difference_update(
         excluded_node_ids
     )
@@ -855,6 +882,8 @@ def build_argument_coverage_universe(
         else:
             unresolved_disconnected.add(node_id)
     target_unit_ids, modeled_target_unit_ids = _target_unit_inventory(model)
+    if implicit_inventory:
+        target_unit_ids = modeled_target_unit_ids = ("root_argument",)
     unmodeled_target_unit_ids = set(target_unit_ids).difference(modeled_target_unit_ids)
     covered_scope = tuple(
         node_id
@@ -877,7 +906,7 @@ def build_argument_coverage_universe(
         findings.append("authoritative_node_universe_empty")
     if not target_unit_ids:
         findings.append("target_unit_inventory_empty")
-    if not _explicit_card_inventory_present(model):
+    if not implicit_inventory and not _explicit_card_inventory_present(model):
         findings.append("model_card_inventory_empty")
     findings.extend(
         f"model_card_exclusion_unresolved:{card_id}"
@@ -912,6 +941,17 @@ def build_argument_coverage_universe(
             for node_id in row.implicit_shared_role_node_ids
         )
     findings.extend(f"claim_scope_missing:{node_id}" for node_id in missing_scope)
+    evidence_consumers = Counter(
+        node_id
+        for row in claim_roles
+        for node_id in {
+            item for values in row.connected_role_node_ids.values() for item in values
+        }
+        if model.nodes[node_id].type == "Evidence"
+    )
+    shared_evidence_node_ids = tuple(sorted(
+        node_id for node_id, count in evidence_consumers.items() if count > 1
+    ))
     fingerprint_payload = {
         "owner_id": "researchguard.logic.authoritative-argument-coverage",
         "model_fingerprint": model_fingerprint(model),
@@ -937,6 +977,11 @@ def build_argument_coverage_universe(
         "importance_policy": policy.to_dict(),
         "claim_scope": scope.to_dict(),
     }
+    # Preserve old explicit-inventory identities when their semantic view is unchanged.
+    if implicit_inventory:
+        fingerprint_payload["implicit_inventory"] = True
+    if shared_evidence_node_ids:
+        fingerprint_payload["shared_evidence_node_ids"] = list(shared_evidence_node_ids)
     fingerprint = hashlib.sha256(
         json.dumps(fingerprint_payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
     ).hexdigest()
@@ -973,6 +1018,8 @@ def build_argument_coverage_universe(
             unresolved_excluded_card_ids or active_excluded_node_ids
         ),
         findings=tuple(dict.fromkeys(findings)),
+        implicit_inventory=implicit_inventory,
+        shared_evidence_node_ids=shared_evidence_node_ids,
     )
 
 

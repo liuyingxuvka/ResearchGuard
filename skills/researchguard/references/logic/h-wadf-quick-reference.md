@@ -72,6 +72,41 @@ Useful fields:
 - `scope_match: true`
 - `warrant_required: true`
 
+## Coverage inventories for depth checks
+
+For an ordinary research argument, the inventory can be implicit: when **all recognized unit, card and role declarations are absent**, depth checking creates one internal unit and one internal card covering the nodes reachable from the root claim. This view is not written back into the model and does not change its fingerprint. The result identifies it with `coverage_universe.implicit_inventory: true`.
+
+Write explicit inventories when modeling a structured document, declaring separate cards or assigning role dispositions:
+
+| Field under `model` | Purpose |
+| --- | --- |
+| `target_units` | Declare the units that need coverage and the real `node_ids` modeling each unit. Listing an ID alone does not establish modeled membership. |
+| `model_cards` | Declare separately checked cards with their `node_ids` and optional `importance`; a rich root aggregate does not excuse a shallow important card. |
+| `role_dispositions` | Explicitly state how roles are treated, either for the root argument (for example `competition: not_applicable`) or by card ID. Use a disposition only when it accurately describes the argument. |
+
+For example, this fragment declares coverage for the nodes of the minimal model below; it is not a complete model or a depth-pass assertion:
+
+```yaml
+model:
+  id: argument_audit
+  root_claim: C0
+  target_units:
+    - unit_id: unit:central-argument
+      node_ids: [C0, E1, W1]
+  model_cards:
+    - card_id: card:central-argument
+      node_ids: [C0, E1, W1]
+      importance: 1.0
+  role_dispositions:
+    competition: not_applicable
+```
+
+Explicit `[]`, `{}` or `null` is **not absence**, and declaring only one of these fields does not opt into implicit coverage. Other recognized declarations also keep the explicit checks: unit ID/record aliases (`artifact`, `structure`, or `task` units), node unit bindings, `model_card_ids`, `excluded_model_cards`, node `model_card_id`/`card_id` bindings, per-claim role dispositions and nonempty native argument blocks. An ordinary model must omit those declarations, rather than submit empty placeholders, to use the implicit inventory. Explicit inventories keep their membership, exclusion, importance and role checks.
+
+When several important claims use the same `Evidence`, its ID appears informationally in `coverage_universe.shared_evidence_node_ids`; this sharing alone is not an `implicit_shared_role_node` gap. Shared non-Evidence nodes, such as a `Warrant`, still need explicit consumer declarations: node `shared_claim_ids` (or `shared_for_claim_ids`), or the corresponding edge sharing annotations. This Evidence exception does not establish provenance, truth or sufficient support.
+
+Implicit coverage removes only the absent-inventory obstacle. It does not waive real role, perturbation, claim-scope, importance or competing-conclusion checks, or remove important disconnected nodes from the denominator. A root claim plus one Evidence node remains shallow. The minimal syntax example below is therefore not a promise of `logic depth` passing; inspect the actual depth result and unresolved gaps before declaring task closure.
+
 ## Minimal Model Shape
 
 ```yaml

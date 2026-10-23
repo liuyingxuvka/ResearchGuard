@@ -56,3 +56,10 @@ A candidate SHALL preserve all newly observed records with the same ids and cont
 #### Scenario: Accepted revision retains a live alternative
 - **WHEN** a valid candidate preserves new observed records and satisfies mismatch/holdout guards but has unresolved native depth gaps
 - **THEN** its disposition SHALL be `accepted`, its effective fingerprint SHALL identify that candidate and its terminal reason SHALL remain `continue_iteration` unless an existing external-input, iteration or stagnation bound applies
+
+### Requirement: Ordinary argument coverage uses an internal inventory
+When all recognized model/node target-unit, card and role declarations are absent and there are no nonempty native blocks, LogicGuard SHALL derive one internal unit/card covering root-reachable nodes while retaining important disconnected nodes. It SHALL expose `coverage_universe.implicit_inventory` without changing model metadata, nodes, blocks or its fingerprint. Explicit declarations, including empty or null ones, SHALL retain existing checks. Real role, scope, competition and perturbation gaps SHALL still block closure.
+
+#### Scenario: Evidence is shared by competing claims
+- **WHEN** two important claims use the same Evidence node
+- **THEN** it SHALL appear in `shared_evidence_node_ids` without a shared-role gap or blocked row from that sharing; shared non-Evidence roles SHALL still require explicit consumer declarations

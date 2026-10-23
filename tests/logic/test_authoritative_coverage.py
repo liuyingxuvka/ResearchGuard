@@ -10,7 +10,7 @@ from researchguard.logic import (
     build_argument_coverage_universe,
     load_model_from_dict,
 )
-from researchguard.logic.execution_depth import _build_native_depth_analysis
+from researchguard.logic.execution_depth import _build_native_depth_analysis, model_fingerprint
 
 
 build_logic_depth_receipt = _build_native_depth_analysis
@@ -464,8 +464,11 @@ def test_shared_role_node_requires_explicit_consumer_declaration() -> None:
         for item in implicit.coverage_universe.claim_role_coverage
         if item.claim_id == "C_CHILD"
     )
-    assert "E1" in child.implicit_shared_role_node_ids
-    assert any(
+    assert "E1" not in child.implicit_shared_role_node_ids
+    assert child.status == "pass"
+    assert "E1" in implicit.coverage_universe.shared_evidence_node_ids
+    assert "E1" in implicit.coverage_universe.to_dict()["shared_evidence_node_ids"]
+    assert not any(
         gap.startswith("implicit_shared_role_node:E1:")
         for gap in implicit.unresolved_gaps
     )
@@ -476,6 +479,16 @@ def test_shared_role_node_requires_explicit_consumer_declaration() -> None:
         gap.startswith("implicit_shared_role_node:E1:")
         for gap in explicit.unresolved_gaps
     )
+
+    # Evidence sharing is informational; the same topology must still guard Warrants.
+    data["edges"].append({"source": "W1", "target": "C_CHILD", "type": "supports"})
+    data["model"]["model_cards"][-1]["node_ids"].append("W1")
+    shared_warrant = build_argument_coverage_universe(_model(data))
+    child = next(row for row in shared_warrant.claim_role_coverage if row.claim_id == "C_CHILD")
+    assert child.status == "blocked"
+    assert "W1" in child.implicit_shared_role_node_ids
+    assert "E1" not in child.implicit_shared_role_node_ids
+    assert any(gap.startswith("implicit_shared_role_node:W1:") for gap in shared_warrant.findings)
 
 
 def test_each_important_claim_has_claim_local_perturbation_coverage() -> None:
@@ -490,3 +503,125 @@ def test_each_important_claim_has_claim_local_perturbation_coverage() -> None:
         for gap in receipt.unresolved_gaps
     )
     assert receipt.broad_claim_licensed is False
+
+
+def _plain_data() -> dict:
+    data = _role_complete_data()
+    for key in ("target_units", "model_cards", "role_dispositions"):
+        data["model"].pop(key)
+    return data
+
+
+def test_plain_argument_uses_an_implicit_inventory_without_mutating_the_model() -> None:
+    data = _plain_data()
+    data["nodes"]["D1"] = {"type": "Warrant", "importance": 0.95}
+    model = _model(data)
+    original = deepcopy(model.to_dict())
+    fingerprint = model_fingerprint(model)
+    universe = build_argument_coverage_universe(model)
+
+    assert universe.implicit_inventory is True
+    assert universe.to_dict()["implicit_inventory"] is True
+    assert len(universe.target_unit_ids) == len(universe.model_card_ids) == 1
+    assert set(universe.reachable_node_ids) <= set(universe.important_node_ids)
+    assert set(data["nodes"]) <= set(universe.important_node_ids)
+    assert "D1" in universe.unresolved_disconnected_node_ids
+    assert "disconnected_important:D1" in universe.findings
+    assert "target_unit_inventory_empty" not in universe.findings
+    assert "model_card_inventory_empty" not in universe.findings
+    assert model.to_dict() == original
+    assert model_fingerprint(model) == fingerprint
+    assert universe.importance_policy.effective_threshold == 0.6
+
+
+# Each real alias is present even when its value is empty; absence is a different contract.
+@pytest.mark.parametrize("location,key,empty", [
+    ("model", "target_unit_ids", None),
+    ("model", "artifact_unit_ids", []),
+    ("model", "structure_unit_ids", {}),
+    ("model", "task_unit_ids", None),
+    ("model", "target_units", []),
+    ("model", "artifact_units", {}),
+    ("model", "structure_units", None),
+    ("model", "task_units", []),
+    ("model", "model_card_ids", {}),
+    ("model", "model_cards", None),
+    ("model", "excluded_model_cards", []),
+    ("model", "role_dispositions", {}),
+    ("model", "claim_role_dispositions", None),
+    ("node", "target_unit_id", []),
+    ("node", "artifact_unit_id", {}),
+    ("node", "structure_unit_id", None),
+    ("node", "task_unit_id", []),
+    ("node", "model_card_id", {}),
+    ("node", "card_id", None),
+    ("node", "role_dispositions", []),
+    ("model", "target_units", None),
+    ("model", "target_units", {}),
+    ("model", "model_cards", []),
+    ("model", "model_cards", {}),
+    ("model", "role_dispositions", None),
+    ("model", "role_dispositions", []),
+])
+def test_explicit_empty_inventory_alias_never_gains_implicit_credit(location, key, empty) -> None:
+    data = _plain_data()
+    target = data["model"] if location == "model" else data["nodes"]["C0"]
+    target[key] = deepcopy(empty)
+    universe = build_argument_coverage_universe(_model(data))
+
+    assert universe.implicit_inventory is False
+    assert universe.to_dict()["implicit_inventory"] is False
+
+
+def test_nonempty_native_blocks_stay_on_the_explicit_inventory_path() -> None:
+    data = _plain_data()
+    data["blocks"] = {"block:argument": {"root_claim": "C0", "member_nodes": list(data["nodes"])}}
+    universe = build_argument_coverage_universe(_model(data))
+
+    assert universe.implicit_inventory is False
+    assert "block:argument" in universe.model_card_ids
+
+
+def test_explicit_inventory_semantics_match_the_real_prechange_baseline() -> None:
+    model = _model()
+    original = deepcopy(model.to_dict())
+    receipt = build_logic_depth_receipt(model, budget=8)
+    payload = receipt.to_dict()
+    universe = payload["coverage_universe"]
+    actual = {
+        "status": receipt.status,
+        "broad_claim_licensed": receipt.broad_claim_licensed,
+        "model_fingerprint": payload["model_fingerprint"],
+        "unresolved_gaps": payload["unresolved_gaps"],
+        "target_unit_ids": universe["target_unit_ids"],
+        "modeled_target_unit_ids": universe["modeled_target_unit_ids"],
+        "model_card_ids": universe["model_card_ids"],
+        "important_node_ids": universe["important_node_ids"],
+        "role_statuses": {row["card_id"]: row["status"] for row in universe["role_coverage"]},
+        "claim_role_members": universe["claim_role_coverage"][0]["connected_role_node_ids"],
+        "importance_threshold": universe["importance_policy"]["effective_threshold"],
+        "perturbation_nodes": [row["node_id"] for row in payload["perturbation_plan"]],
+        "effective_perturbation_count": payload["effective_perturbation_count"],
+    }
+    # Captured once from actual _role_complete_data at immutable6884ede, before RG119 core edits.
+    expected = {'status': 'pass',
+     'broad_claim_licensed': True,
+     'model_fingerprint': 'c52592af7432e32c2748db0a65ae95cd85dc8039fee1f23bbe34f5823b8070ab',
+     'unresolved_gaps': [],
+     'target_unit_ids': ['unit:central-argument'],
+     'modeled_target_unit_ids': ['unit:central-argument'],
+     'model_card_ids': ['card:central-argument', 'root_argument'],
+     'important_node_ids': ['A1', 'C0', 'E1', 'L1', 'R1', 'W1'],
+     'role_statuses': {'card:central-argument': 'pass', 'root_argument': 'pass'},
+     'claim_role_members': {'support': ['E1'],
+                            'warrant': ['W1'],
+                            'assumption': ['A1'],
+                            'boundary': ['L1'],
+                            'opposition': ['R1']},
+     'importance_threshold': 0.6,
+     'perturbation_nodes': ['W1', 'A1', 'L1', 'E1', 'R1'],
+     'effective_perturbation_count': 5}
+    assert actual == expected
+    assert universe["implicit_inventory"] is False
+    assert universe["shared_evidence_node_ids"] == []
+    assert model.to_dict() == original

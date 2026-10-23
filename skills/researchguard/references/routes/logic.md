@@ -26,8 +26,8 @@ Fields and node/edge meanings: `references/logic/h-wadf-quick-reference.md`.
 ## Hard rules and stops
 
 Exactly one route owns the current action; never retry a failed member elsewhere.
-Missing support, warrant, assumption, boundary, opposition, perturbation or required
-target-unit/card coverage blocks closure. Broad wording requires its depth checks.
+Missing support, warrant, assumption, boundary, opposition, perturbation or declared
+inventory coverage blocks closure. Broad wording requires its depth checks.
 No self-report replaces current target-native evidence or upgrades another member's claim.
 `assert`, `qualify`, `withhold` are wording licenses, not factual-truth judgments.
 

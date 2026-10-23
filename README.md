@@ -65,6 +65,12 @@ depth blockers; `trace gaps` includes those unresolved depth gaps. `trace compar
 also reports hypothesis and source/evidence/event/link inventory changes. Source reports
 show source roles and lineage, anchor locators and each closed gap's declared closure basis.
 
+Ordinary logic arguments use an internal unit/card inventory when no inventory or role
+declarations are present. Explicit declarations, including empty ones, keep their checks.
+Depth exposes `coverage_universe.implicit_inventory` and informational shared Evidence IDs;
+real role, scope, competition and perturbation gaps still block closure.
+See `examples/logic/plain_research_argument.yaml` for a complete synthetic example.
+
 TraceGuard can expose a deletion-minimal contradiction core;
 `researchguard logic minimal-sets` exposes deletion-minimal support and attack
 sets with a conservative wording license. Candidates are split by the edge

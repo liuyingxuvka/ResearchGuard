@@ -944,11 +944,15 @@ class ArgumentCoverageUniverse:
     unresolved_excluded_model_card_ids: tuple[str, ...] = ()
     card_reconciliation_passed: bool = False
     findings: tuple[str, ...] = ()
+    implicit_inventory: bool = False
+    shared_evidence_node_ids: tuple[str, ...] = ()
 
     def to_dict(self) -> dict[str, Any]:
         return {
             "owner_id": self.owner_id,
             "universe_fingerprint": self.universe_fingerprint,
+            "implicit_inventory": self.implicit_inventory,
+            "shared_evidence_node_ids": list(self.shared_evidence_node_ids),
             "target_unit_ids": list(self.target_unit_ids),
             "modeled_target_unit_ids": list(self.modeled_target_unit_ids),
             "unmodeled_target_unit_ids": list(self.unmodeled_target_unit_ids),
