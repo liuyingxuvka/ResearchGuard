@@ -45,6 +45,7 @@ def _print_help() -> None:
                 "logic   execute the LogicGuard native owner",
                 "source  execute the SourceGuard native owner",
                 "trace   execute the TraceGuard native owner",
+                "status  inspect a research folder and check shared ids",
                 "experiment  execute the ExperimentGuard recommendation owner",
             )
         )
@@ -61,6 +62,10 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     command = args[0]
     command_argv = args[1:]
+    if command == "status":
+        from .research import status_main
+
+        return status_main(command_argv)
     if command in {"logic", "source", "trace", "experiment"}:
         return _execute(f"{command}guard", command_argv)
     print(

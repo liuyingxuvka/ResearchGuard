@@ -133,3 +133,11 @@ the complete native candidate/scoring path; scoring weights are unchanged.
 `source compare` compares versions of the same model using native semantic gap
 state and qualification decisions, without restoring the retired gap status.
 A self-comparison reports no changes.
+
+## 一个研究文件夹
+
+同一个问题跨多条路线时，把各路线的原生模型放在同一文件夹，写一个
+`research.yaml` 索引并共用假设、来源和锚点 id。运行
+`researchguard status <folder>` 查看假设、证据、未关缺口和下一步；
+`--json` 输出数据，`--output <path>` 保存结果。格式见
+[research-tree.md](skills/researchguard/references/research-tree.md)。

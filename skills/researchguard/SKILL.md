@@ -17,6 +17,6 @@ Pick one route, then load only its file. Each route runs its own `researchguard 
 ## Rules for every route
 
 - If `researchguard --help` fails, install the engine once with `python -m pip install -e <ResearchGuard checkout>`.
-- Several domains: run the routes one after another (usually source, then trace, then logic; experiment when hypotheses and candidate experiments are declared). Pass results with `researchguard source export-traceguard`, `researchguard trace export-logicguard` and `researchguard logic import-handoff`.
+- Several domains (`trigger:research-tree`): for one question spanning routes, put the models in one research folder with `research.yaml` (see `references/research-tree.md`) and run `researchguard status <folder>` to check and view it; route files describe handoff commands.
 - A route's result is only that route's claim; a failed result stays visible and is not retried through another route.
 - Return the native result, evidence and claim boundary, blockers and next action; include full JSON only when it is needed or requested.

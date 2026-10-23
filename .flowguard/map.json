@@ -3,6 +3,7 @@
   "project": "researchguard",
   "layers": [
     "interface",
+    "tree",
     "routes",
     "foundation"
   ],
@@ -53,7 +54,8 @@
         "Expose score-actions from the same complete native plan scoring path as plan --all-scores, without a candidate limit.",
         "Compare versions of one source model using actual gap semantic fields and nested qualification decision; self-comparison reports no change and retired gap.status stays rejected.",
         "Create complete synthetic source and trace starter models whose sample data and evidence boundaries stay explicit.",
-        "Expose canonical --source-id intake/import and --source-model provenance checking; retire the unconsumed SourceGuard LogicGuard export."
+        "Expose canonical --source-id intake/import and --source-model provenance checking; retire the unconsumed SourceGuard LogicGuard export.",
+        "Dispatch status to the read-only research tree view while retaining member help and version formats."
       ],
       "files": [
         "src/researchguard/__main__.py",
@@ -79,6 +81,7 @@
       "depends_on": [
         "experimentguard",
         "logicguard",
+        "research-tree",
         "researchguard-suite",
         "sourceguard",
         "traceguard"
@@ -94,7 +97,7 @@
         ".flowguard/models/researchguard_suite_model.py"
       ],
       "status": "confirmed",
-      "fingerprint": "sha256:88919cacd08276f6104315a3c6782c9f6a26aa5f380cfe126b5f3224b33f140f",
+      "fingerprint": "sha256:0cdcb3b7e54a65fa3d98e42a9d9db52ba2772453dd7d7b2a1b2b2a6fe4a23697",
       "layer": "interface"
     },
     {
@@ -290,12 +293,14 @@
       "responsibilities": [
         "Distinguish hypotheses within the declared finite count limit; minimize optional declared costs before count and IDs, retain cost mode in remaining recommendations, and exclude the selected set from alternatives. Report limit failures separately from truly indistinguishable pairs.",
         "License native closure only for a unique consistent hypothesis with no holdout counterexample and no gaps, while preserving the finite iteration limit first; holdout observations are optional.",
-        "Continue a bounded multi-survivor iteration only with a concrete distinguishing next candidate; preserve valid construction eliminations across matrix misses and never close zero survivors. Do not infer historical progress from unchanged gaps; malformed specs return one JSON error."
+        "Continue a bounded multi-survivor iteration only with a concrete distinguishing next candidate; preserve valid construction eliminations across matrix misses and never close zero survivors. Do not infer historical progress from unchanged gaps; malformed specs return one JSON error.",
+        "Load native experiment specifications and observations for both the CLI and research folder view."
       ],
       "files": [
         "src/researchguard/experiment/__init__.py",
         "src/researchguard/experiment/engine.py",
-        "src/researchguard/experiment/schema.py"
+        "src/researchguard/experiment/schema.py",
+        "src/researchguard/experiment/loader.py"
       ],
       "entrypoints": [
         "src/researchguard/experiment/engine.py:recommend_experiments"
@@ -313,7 +318,7 @@
       ],
       "models": [],
       "status": "confirmed",
-      "fingerprint": "sha256:362c1f5b5b685b84df059d7beee1c14c6abfa00b32384fdfff815f5d4b54ad1d",
+      "fingerprint": "sha256:6fa6c00dc5c9ecf2f9c98b75fd183024b24c4d64ea5c386056c9ca84e2cea68e",
       "layer": "routes"
     },
     {
@@ -347,6 +352,41 @@
       "status": "confirmed",
       "fingerprint": "sha256:7feaea02daff65fd7b9a298e36648910ba31bc35d24725c6faf8fb858cad0158",
       "layer": "interface"
+    },
+    {
+      "id": "research-tree",
+      "summary": "Read one research folder, check shared ids and project native route results.",
+      "responsibilities": [
+        "Load research.yaml and native route models without rewriting them.",
+        "Check shared hypothesis ids, root claims and canonical source/anchor references in memory.",
+        "Project native logic, trace depth, source planning and experiment observation/recommendation results into a Markdown or JSON status page."
+      ],
+      "files": [
+        "src/researchguard/research.py"
+      ],
+      "entrypoints": [
+        "src/researchguard/research.py:status_main"
+      ],
+      "state": [
+        "loaded native models and index"
+      ],
+      "side_effects": [
+        "read models; write only explicit --output"
+      ],
+      "depends_on": [
+        "experimentguard",
+        "logicguard",
+        "researchguard-suite",
+        "sourceguard",
+        "traceguard"
+      ],
+      "tests": [
+        "tests/test_research_tree.py"
+      ],
+      "models": [],
+      "layer": "tree",
+      "status": "confirmed",
+      "fingerprint": "sha256:bff7906e9ed27535dc5e97f97b667e32c92d1a52bd2d40f96781128967b585b7"
     }
   ],
   "flows": [

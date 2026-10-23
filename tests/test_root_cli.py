@@ -9,6 +9,7 @@ def test_root_cli_has_only_current_public_commands(capsys) -> None:
     assert main(["--help"]) == 0
     output = capsys.readouterr().out
     assert "{logic|source|trace|experiment}" in output
+    assert "status  inspect a research folder" in output
     assert "portable" not in output
     assert "domain-dna" not in output
     assert "self-dna export" not in output
