@@ -30,6 +30,16 @@ The first line installs the `researchguard` console; the second copies the
 `logicguard`, `sourceguard`, `traceguard` and `experimentguard` folders that
 older versions installed.
 
+## Starting a model
+
+`researchguard source create --output source.yaml` and `researchguard trace create --output trace.yaml`
+write complete synthetic teaching examples that validate directly. Source validation warns while
+`example-` rows remain; replace them with retrieved material before using the model for a real claim.
+Source gaps default to `discovered` only when `semantic_state` is omitted; retired `status` remains invalid.
+The source and trace field sheets list current fields, defaults, allowed values and observation formats.
+Logic Evidence provenance may use an exact-text `quote` to calculate its content hash; a supplied hash
+must match, and validation errors name the affected node.
+
 ## Codex-facing source intake contract
 
 The CLI preservation step is not enough by itself. When concrete source

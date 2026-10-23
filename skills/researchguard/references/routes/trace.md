@@ -66,3 +66,5 @@ Solver failure, unacceptable residuals, missing lineage, unresolved critical obj
 
 Return the native result, evidence and claim boundary, blockers and next action.
 Include full JSON only when it is needed or requested.
+
+- `trigger:fields`: before writing a model or observation, read `references/trace/fields.md`.

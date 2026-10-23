@@ -302,7 +302,18 @@ def test_cli_create_and_simulate(tmp_path: Path) -> None:
     )
     validation_payload = json.loads(validated.stdout)
     assert validation_payload["schema_ok"] is True
-    assert validation_payload["inference_status"] == "NOT_RUN_EMPTY_MODEL"
+    assert validation_payload["ok"] is True
+    assert validation_payload["trace_count"] == 1
+    assert validation_payload["traces"][0]["trace_id"] == "example-recovery-trace"
+    empty = tmp_path / "empty.yaml"
+    empty.write_text("metadata: {skill: TraceGuard, schema_version: researchguard.trace.model.v2}\n", encoding="utf-8")
+    empty_validated = subprocess.run(
+        [sys.executable, "-m", "researchguard", "trace", "validate", str(empty)],
+        cwd=ROOT, text=True, capture_output=True, check=True,
+    )
+    empty_payload = json.loads(empty_validated.stdout)
+    assert empty_payload["schema_ok"] is True
+    assert empty_payload["inference_status"] == "NOT_RUN_EMPTY_MODEL"
     completed = subprocess.run([sys.executable, "-m", "researchguard", "trace", "simulate", "--mode", "storyline", "--pretty"], cwd=ROOT, text=True, capture_output=True, check=True)
     payload = json.loads(completed.stdout)
     assert payload["pipeline"][0] == "source"

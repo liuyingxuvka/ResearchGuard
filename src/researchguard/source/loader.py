@@ -36,9 +36,20 @@ def model_to_dict(belief_state: BeliefState) -> dict[str, Any]:
 
 def validate_model(path: str | Path) -> dict[str, Any]:
     belief_state = load_model(path)
+    example_ids = sorted({
+        getattr(row, id_field)
+        for collection, id_field in (
+            (belief_state.leads, "lead_id"), (belief_state.sources, "source_id"),
+            (belief_state.anchors, "anchor_id"), (belief_state.gaps, "gap_id"),
+            (belief_state.actions, "action_id"), (belief_state.observations, "observation_id"),
+        )
+        for row in collection
+        if getattr(row, id_field).startswith("example-")
+    })
     return {
         "ok": True,
         "path": str(path),
+        "warnings": ["starter example rows still present: " + ", ".join(example_ids)] if example_ids else [],
         "lead_count": len(belief_state.leads),
         "source_count": len(belief_state.sources),
         "anchor_count": len(belief_state.anchors),

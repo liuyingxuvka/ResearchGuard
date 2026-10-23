@@ -24,6 +24,11 @@ Confidence is not probability.
 
 `Evidence` nodes may carry `provenance`, a list of records saying where the material came from:
 `provenance: [{origin_kind: external_source, source_id: <library source id>, locator: <node id in that source's model>, content_hash: "sha256:<hash of the cited text>", source_date: 2024-05-01}]`.
+A record may supply `quote` instead of `content_hash`; the loader hashes the exact UTF-8 text,
+including spaces and newlines. When both are supplied they must agree. A hash accepts the
+existing optional `sha256:` prefix; missing both is an error. `quote` must be a non-empty
+string and remains cited material, not a claim of factual truth. Provenance errors identify
+the Evidence node, for example `Evidence node 'E_dates': content_hash must be a sha256 digest`.
 `origin_kind` is one of `external_source`, `observed_event`, `user_attestation`, `test_result`, `human_observation`, `instrument_measurement`, `imported_record` (`ai_generated` and `derived` are not evidence). `source_reference` (for example a URL or DOI) may replace `source_id`.
 `logic validate` warns about Evidence without provenance; `researchguard logic validate <model> --library-root <library>` also fails when a `source_id` is not in the library or a `locator` is not a node of that source's model, and warns when an Evidence node has no `source_id` + `locator` pair.
 

@@ -90,7 +90,7 @@ class ProvenanceRecord:
     """One content-addressed declaration of where modeled material came from."""
 
     origin_kind: OriginKind | str
-    content_hash: str
+    content_hash: str = ""
     source_id: str | None = None
     source_reference: str | None = None
     locator: str | None = None
@@ -99,6 +99,7 @@ class ProvenanceRecord:
     actor: str = ""
     independence_group: str | None = None
     metadata: Mapping[str, Any] = field(default_factory=dict)
+    quote: str | None = None
 
     def __post_init__(self) -> None:
         try:
@@ -106,7 +107,14 @@ class ProvenanceRecord:
         except ValueError as exc:
             raise ProvenanceError(f"unsupported origin_kind: {self.origin_kind!r}") from exc
         object.__setattr__(self, "origin_kind", origin)
-        object.__setattr__(self, "content_hash", normalize_content_hash(self.content_hash))
+        if self.quote is not None and (not isinstance(self.quote, str) or not self.quote):
+            raise ProvenanceError("quote must be a non-empty string")
+        if self.content_hash == "" and self.quote is None:
+            raise ProvenanceError("content_hash or quote is required")
+        digest = normalize_content_hash(self.content_hash) if self.content_hash != "" else content_hash_for(self.quote)
+        if self.quote is not None and digest != content_hash_for(self.quote):
+            raise ProvenanceError("content_hash does not match quote")
+        object.__setattr__(self, "content_hash", digest)
         source_id = str(self.source_id).strip() if self.source_id not in (None, "") else None
         source_reference = (
             str(self.source_reference).strip()
@@ -164,6 +172,7 @@ class ProvenanceRecord:
                 "source_reference": self.source_reference,
                 "locator": self.locator,
                 "content_hash": self.content_hash,
+                "quote": self.quote,
                 "observed_at": self.observed_at,
                 "source_date": self.source_date,
                 "actor": self.actor,
@@ -180,7 +189,8 @@ class ProvenanceRecord:
             source_id=raw.get("source_id"),
             source_reference=raw.get("source_reference"),
             locator=raw.get("locator"),
-            content_hash=str(raw.get("content_hash", "")),
+            content_hash=raw.get("content_hash", ""),
+            quote=raw.get("quote"),
             observed_at=raw.get("observed_at"),
             source_date=raw.get("source_date"),
             actor=str(raw.get("actor", "")),
@@ -217,7 +227,10 @@ def validate_evidence_provenance(
     node_id: str,
     records: Iterable[ProvenanceRecord | Mapping[str, Any]],
 ) -> tuple[ProvenanceRecord, ...]:
-    normalized = coerce_provenance(records)
+    try:
+        normalized = coerce_provenance(records)
+    except ProvenanceError as exc:
+        raise ProvenanceError(f"Evidence node {node_id!r}: {exc}") from exc
     if not any(record.is_evidentiary for record in normalized):
         raise ProvenanceError(
             f"Evidence node {node_id!r} requires at least one non-ai_generated evidentiary provenance record"

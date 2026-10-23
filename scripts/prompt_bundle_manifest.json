@@ -36,7 +36,9 @@
     {"trigger_id": "trigger:task-iteration", "declared_in": "skills/researchguard/references/routes/trace.md", "reference": "skills/researchguard/references/trace/task-iteration.md"},
     {"trigger_id": "trigger:depth-closure", "declared_in": "skills/researchguard/references/routes/trace.md", "reference": "skills/researchguard/references/trace/depth-and-closure.md"},
     {"trigger_id": "trigger:commands-handoffs", "declared_in": "skills/researchguard/references/routes/trace.md", "reference": "skills/researchguard/references/trace/commands-and-handoffs.md"},
-    {"trigger_id": "trigger:safe-output", "declared_in": "skills/researchguard/references/routes/trace.md", "reference": "skills/researchguard/references/trace/safe-output.md"}
+    {"trigger_id": "trigger:safe-output", "declared_in": "skills/researchguard/references/routes/trace.md", "reference": "skills/researchguard/references/trace/safe-output.md"},
+    {"trigger_id": "trigger:fields", "declared_in": "skills/researchguard/references/routes/source.md", "reference": "skills/researchguard/references/source/fields.md"},
+    {"trigger_id": "trigger:fields", "declared_in": "skills/researchguard/references/routes/trace.md", "reference": "skills/researchguard/references/trace/fields.md"}
   ],
   "claim_boundary": "This manifest checks prompt entry byte budgets and conditional reference edges only. Byte totals are deterministic prompt-regression proxies, not provider token counts."
 }

@@ -65,3 +65,5 @@ Task-local closure is only `model_closed_for_task`. Other current terminals incl
 
 Return the native result, evidence and claim boundary, blockers and next action.
 Include full JSON only when it is needed or requested.
+
+- `trigger:fields`: before writing a model or observation, read `references/source/fields.md`.

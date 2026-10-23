@@ -2,7 +2,9 @@
 
 SourceGuard is one POMDP-style approximate evidence-discovery planner. It maintains a source/gap belief graph, proposes search actions, ranks expected utility, accepts real observations, updates semantic state, and exports candidate handoffs. Utility is not truth, calibrated probability, or final confidence.
 
-State the target claim, desired strength, gaps, and source roles in the model before planning.
+Write the target conclusion in `leads[].question` and the requested strength in `depth_policy.requested_claim_scope` (`bounded` or `broad`); declare the gaps and source roles before planning.
+
+When constructing or correcting a source model or observation, read [the complete fields and examples](fields.md). `researchguard source create --output starter.yaml` writes a complete synthetic teaching model; replace its `example-` rows with retrieved material, and keep the starter warning distinct from evidence qualification.
 
 For native proof and development regression, reuse the same frozen input and prefer a small task-bound structure object; do not rebuild a long prose example for each check. A newly observed gap is a discovery, not automatic quality improvement. When external material is unavailable, keep the existing `external` or `provider` status and its gap visible; never invent a source, observation, or citation to complete the graph.
 

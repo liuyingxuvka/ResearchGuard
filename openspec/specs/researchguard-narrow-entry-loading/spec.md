@@ -38,3 +38,7 @@ The console SHALL keep `researchguard logic|source|trace|experiment ...`, and a 
 #### Scenario: A route fails
 - **WHEN** `researchguard source ...` returns a non-pass result
 - **THEN** the result SHALL be reported as is and no other route SHALL run automatically
+
+#### Scenario: A source or trace model needs field names
+- **WHEN** the selected route reaches `trigger:fields` before writing a model or observation
+- **THEN** the agent SHALL load that route's field sheet with current fields, defaults and allowed values

@@ -33,7 +33,8 @@
       "tests": [
         "tests/test_root_cli.py",
         "tests/test_skill_suite.py",
-        "tests/test_gap_lineage.py"
+        "tests/test_gap_lineage.py",
+        "tests/test_field_sheets.py"
       ],
       "models": [
         ".flowguard/models/researchguard_suite_model.py"
@@ -50,7 +51,8 @@
         "Own the member command-line surfaces, including the source stop rule inputs, optional followups and stable four status names.",
         "Pass the already-loaded trace model into logic handoff export so the native CLI carries actual evidence content and polarity.",
         "Expose score-actions from the same complete native plan scoring path as plan --all-scores, without a candidate limit.",
-        "Compare versions of one source model using actual gap semantic fields and nested qualification decision; self-comparison reports no change and retired gap.status stays rejected."
+        "Compare versions of one source model using actual gap semantic fields and nested qualification decision; self-comparison reports no change and retired gap.status stays rejected.",
+        "Create complete synthetic source and trace starter models whose sample data and evidence boundaries stay explicit."
       ],
       "files": [
         "src/researchguard/__main__.py",
@@ -91,7 +93,7 @@
         ".flowguard/models/researchguard_suite_model.py"
       ],
       "status": "confirmed",
-      "fingerprint": "sha256:ef62d51e25fba5c0db2afce272830a403b5525bfe50eb4332460ab8404f31cf7",
+      "fingerprint": "sha256:466551a5a9f24f92cb215456c4d56102dfaeb3fb2c845c80ade310923fce1884",
       "layer": "interface"
     },
     {
@@ -102,7 +104,7 @@
         "Run depth analysis on the model alone; synthesis always computes depth in process.",
         "Run the predict-observe-revise loop on plain model files; the loop never writes model files, so rollback is restoring the previous file; every claim, node and coverage id a prediction names must exist in the model when it is frozen.",
         "Derive minimal support and attack sets split by the edge that enters the claim; a blocked claim reports its native blockers as the attack set and preserves the wording license.",
-        "Bind Evidence to sources: provenance records are checked on load, and validate --library-root resolves their source_id and locator in the source library.",
+        "Bind Evidence to sources and exact UTF-8 quotes or matching content hashes, report invalid provenance with node ids, and resolve library source_id/locator on validate --library-root.",
         "Collect argument evaluation and native depth gaps from baseline and candidate; delegate gap transitions to the suite helper, with prior ids used only for argument stagnation.",
         "Import a data-only trace bundle as signed per-hypothesis claims and content-bound evidence provenance, with legacy trace-only claim compatibility and no invented warrants."
       ],
@@ -166,7 +168,7 @@
       ],
       "models": [],
       "status": "confirmed",
-      "fingerprint": "sha256:82e5ebdc22337d03737697a1310b3b9c8bd50467a1f9c4bc13c100e5dc81ac9d",
+      "fingerprint": "sha256:1210c5e6cde7f247289b315a4f13f7abacfa7edf1cfcb6c7ddf4ba3404013014",
       "layer": "routes"
     },
     {
@@ -178,7 +180,8 @@
         "Decide whether to keep searching from the model itself: all executable declared and generated actions, selecting an affordable target by native utility, the open blocking gaps and the caller-declared budget.",
         "Combine source semantic-state, depth and coverage gaps from each actual model and delegate transition sets to the shared suite helper; resolved obligations alone count as progress.",
         "Read all recorded observations for native depth and preview a new observation only on a clone; current-call provider status remains explicit.",
-        "Generate gap queries from the gap description and at most two domain hints, bounded to 120 characters; preserve executable declared actions and suppress their generated duplicates."
+        "Generate gap queries from the gap description and at most two domain hints, bounded to 120 characters; preserve executable declared actions and suppress their generated duplicates.",
+        "Default only absent gap semantic_state to discovered, keep retired status invalid, and warn on synthetic starter ids during validation."
       ],
       "files": [
         "src/researchguard/source/__init__.py",
@@ -213,7 +216,7 @@
         ".flowguard/models/sourceguard_stop_decision_model.py"
       ],
       "status": "confirmed",
-      "fingerprint": "sha256:1e628eff54d7f6d2162f999fa51ff642b70ee0c4676731ee316b5d8766f62e41",
+      "fingerprint": "sha256:ad0a8076fab433728e822aa2e737de6a117679eca9dfc4edd53cb9864d45f01e",
       "layer": "routes"
     },
     {

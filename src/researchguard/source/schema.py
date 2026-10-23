@@ -312,7 +312,7 @@ def require_choice(value: Any, allowed: set[str], field_name: str, default: str 
     if not isinstance(value, str):
         raise SchemaError(f"{field_name} must be a string")
     if value not in allowed:
-        raise SchemaError(f"{field_name} has invalid value {value!r}")
+        raise SchemaError(f"{field_name} has invalid value {value!r}; allowed: {', '.join(sorted(allowed))}")
     return value
 
 
@@ -646,19 +646,17 @@ class Gap:
         roles = list_of_strings(data.get("suggested_source_roles"))
         invalid_roles = [role for role in roles if role not in SOURCE_ROLES]
         if invalid_roles:
-            raise SchemaError(f"gap.suggested_source_roles has invalid values {invalid_roles!r}")
+            raise SchemaError(f"gap.suggested_source_roles has invalid values {invalid_roles!r}; allowed: {', '.join(sorted(SOURCE_ROLES))}")
         modalities = list_of_strings(data.get("suggested_modalities"))
         invalid_modalities = [modality for modality in modalities if modality not in MODALITIES]
         if invalid_modalities:
-            raise SchemaError(f"gap.suggested_modalities has invalid values {invalid_modalities!r}")
+            raise SchemaError(f"gap.suggested_modalities has invalid values {invalid_modalities!r}; allowed: {', '.join(sorted(MODALITIES))}")
         if "status" in data:
             raise SchemaError(
                 "gap.status is retired; migrate the record directly to semantic_state"
             )
-        if "semantic_state" not in data:
-            raise SchemaError("gap.semantic_state is required")
         semantic_state = require_choice(
-            data.get("semantic_state"),
+            data.get("semantic_state", "discovered"),
             SEMANTIC_GAP_STATES,
             "gap.semantic_state",
         )
@@ -818,11 +816,11 @@ class SourceDepthPolicy:
         classes = list_of_strings(data.get("required_portfolio_classes"))
         invalid_classes = sorted(set(classes) - SOURCE_PORTFOLIO_CLASSES)
         if invalid_classes:
-            raise SchemaError(f"depth_policy.required_portfolio_classes has invalid values {invalid_classes!r}")
+            raise SchemaError(f"depth_policy.required_portfolio_classes has invalid values {invalid_classes!r}; allowed: {', '.join(sorted(SOURCE_PORTFOLIO_CLASSES))}")
         roles = list_of_strings(data.get("required_source_roles"))
         invalid_roles = sorted(set(roles) - SOURCE_ROLES)
         if invalid_roles:
-            raise SchemaError(f"depth_policy.required_source_roles has invalid values {invalid_roles!r}")
+            raise SchemaError(f"depth_policy.required_source_roles has invalid values {invalid_roles!r}; allowed: {', '.join(sorted(SOURCE_ROLES))}")
         raw_floors = data.get("coverage_floors") or {}
         if not isinstance(raw_floors, Mapping):
             raise SchemaError("depth_policy.coverage_floors must be a mapping")

@@ -98,3 +98,18 @@ a sibling after failure.
 
 Return the native result, evidence and claim boundary, blockers and next action.
 Include full JSON only when it is needed or requested.
+
+## Observation JSON
+
+Pass a list, or an object with `observations`. Each row requires `experiment_id`,
+`observed_outcome` (non-empty when valid), `evidence_id`, `source_ref`, `observed_at`
+and `role` (`construction` or `holdout`). `status` defaults to `valid`; allowed values
+are `valid`, `invalid`, `not_run`. Optional `observation_port_id` and `outcome_port_id`
+default to empty strings. An observation records caller-supplied results; this route
+never performs the experiment.
+
+```json
+{"observations": [{"experiment_id": "e1", "observed_outcome": "up",
+  "evidence_id": "measurement-1", "source_ref": "lab-notebook:page-1",
+  "observed_at": "2026-10-21T12:00:00Z", "role": "construction", "status": "valid"}]}
+```
