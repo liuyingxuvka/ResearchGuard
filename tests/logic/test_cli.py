@@ -459,3 +459,37 @@ def test_intake_uses_the_given_source_id(tmp_path: Path) -> None:
     result = _run("library", "import", str(library), str(text), "--source-id", "src-canonical")
     assert result.returncode != 0 and "different content" in result.stdout
     assert len(SourceLibrary(library).list_sources()) == 1
+
+
+def test_import_handoff_into_keeps_hand_built_nodes(tmp_path: Path) -> None:
+    import yaml
+    bundle = {'schema': 'researchguard.trace.logic-handoff.v1', 'hypotheses': [
+        {'hypothesis_id': 'h', 'claim': 'Hypothesis', 'role': 'primary', 'supporting_evidence_ids': ['a'],
+         'opposing_evidence_ids': [], 'limiting_evidence_ids': []}],
+        'evidence': [{'evidence_id': 'a', 'source_id': 's', 'text': 'Observation', 'locator': 'p1'}]}
+    bundle_path, into, out = (tmp_path / name for name in ('bundle.yaml', 'logic.yaml', 'new.yaml'))
+    bundle_path.write_text(yaml.safe_dump(bundle))
+    assert _run('import-handoff', str(bundle_path), '--output', str(into)).returncode == 0
+    existing = yaml.safe_load(into.read_text())
+    existing['nodes']['hand-built'] = {'type': 'Warrant', 'text': 'Hand-written reasoning'}
+    existing['nodes']['h']['text'] = 'Authored claim'
+    existing['edges'][0]['weight'] = .7
+    into.write_text(yaml.safe_dump(existing))
+    before = into.read_bytes()
+    bundle['evidence'].append({'evidence_id': 'b', 'source_id': 's', 'text': 'New evidence', 'locator': 'p2'})
+    bundle['hypotheses'][0]['supporting_evidence_ids'].append('b')
+    bundle_path.write_text(yaml.safe_dump(bundle))
+    rejected = _run('import-handoff', str(bundle_path), '--into', str(into), '--output', str(into))
+    assert rejected.returncode != 0 and into.read_bytes() == before
+    result = _run('import-handoff', str(bundle_path), '--into', str(into), '--output', str(out))
+    assert result.returncode == 0, result.stdout
+    summary = json.loads(result.stdout)
+    assert summary['added']['nodes'] == ['b']
+    assert {'kind': 'nodes', 'id': 'h'} in summary['conflicts']
+    assert any(row['kind'] == 'edges' for row in summary['conflicts'])
+    merged = yaml.safe_load(out.read_text())
+    assert into.read_bytes() == before
+    for node_id, row in existing['nodes'].items():
+        assert merged['nodes'][node_id] == row
+    assert merged['edges'][:len(existing['edges'])] == existing['edges']
+    assert _run('validate', str(out)).returncode == 0

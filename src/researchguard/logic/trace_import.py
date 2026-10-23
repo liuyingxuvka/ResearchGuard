@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import logging
+from copy import deepcopy
 from typing import Any, Mapping
 
 from .provenance import content_hash_for
@@ -103,3 +104,35 @@ def _model_dict_from_hypotheses(bundle: Mapping[str, Any]) -> dict[str, Any]:
     root = next((item["hypothesis_id"] for item in hypotheses if item["role"] == "primary"), hypotheses[0]["hypothesis_id"])
     return {"model": {"id": f"trace_import_{root}", "title": "Imported from TraceGuard hypotheses", "root_claim": root},
             "nodes": nodes, "edges": edges}
+
+
+def sync_trace_bundle(bundle: Mapping[str, Any], existing: dict[str, Any]) -> tuple[dict, dict, list]:
+    """Add nodes and edge identities from a handoff without editing existing work."""
+    if not isinstance(existing, dict) or not isinstance(existing.get("nodes"), dict):
+        raise ValueError("--into logic model must contain a nodes mapping")
+    merged = deepcopy(existing)
+    incoming = model_dict_from_trace_bundle(bundle)
+    added: dict[str, list] = {"nodes": [], "edges": []}
+    conflicts = []
+    nodes = merged["nodes"]
+    for node_id, row in incoming["nodes"].items():
+        if node_id not in nodes:
+            nodes[node_id] = row
+            added["nodes"].append(node_id)
+        elif nodes[node_id] != row:
+            conflicts.append({"kind": "nodes", "id": node_id})
+    edges = merged.setdefault("edges", [])
+    if not isinstance(edges, list):
+        raise ValueError("--into edges must be a list")
+    def key(row):
+        return (row["source"], row["target"], row["type"])
+    by_key = {key(row): row for row in edges}
+    for row in incoming["edges"]:
+        identity = key(row)
+        if identity not in by_key:
+            edges.append(row)
+            by_key[identity] = row
+            added["edges"].append(list(identity))
+        elif by_key[identity] != row:
+            conflicts.append({"kind": "edges", "id": list(identity)})
+    return merged, added, conflicts

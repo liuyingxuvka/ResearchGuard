@@ -255,6 +255,7 @@ def build_parser() -> argparse.ArgumentParser:
     import_handoff = sub.add_parser("import-handoff", help="Turn a TraceGuard export-logicguard bundle into a starter model.")
     import_handoff.add_argument("bundle")
     import_handoff.add_argument("--output", required=True)
+    import_handoff.add_argument("--into", help="Append missing nodes and edges to an existing logic model.")
     import_handoff.set_defaults(func=_cmd_import_handoff)
 
     synthesize = sub.add_parser("synthesize", help="Validate an explicit target artifact unit request.")
@@ -572,12 +573,21 @@ def _cmd_minimal_sets(args: argparse.Namespace) -> int:
 
 def _cmd_import_handoff(args: argparse.Namespace) -> int:
     import yaml
-    from .trace_import import model_dict_from_trace_bundle
+    from .trace_import import model_dict_from_trace_bundle, sync_trace_bundle
 
     bundle = yaml.safe_load(Path(args.bundle).read_text(encoding="utf-8"))
-    model = model_dict_from_trace_bundle(bundle)
+    payload = {"ok": True, "output": args.output}
+    if args.into:
+        if Path(args.into).resolve() == Path(args.output).resolve():
+            raise ValueError("--output must be different from --into")
+        existing = yaml.safe_load(Path(args.into).read_text(encoding="utf-8"))
+        model, added, conflicts = sync_trace_bundle(bundle, existing)
+        payload.update(added=added, conflicts=conflicts)
+    else:
+        model = model_dict_from_trace_bundle(bundle)
     Path(args.output).write_text(yaml.safe_dump(model, sort_keys=False, allow_unicode=True), encoding="utf-8")
-    print(json.dumps({"ok": True, "output": args.output, "root_claim": model["model"]["root_claim"], "node_count": len(model["nodes"])}, indent=2))
+    payload.update(root_claim=model["model"]["root_claim"], node_count=len(model["nodes"]))
+    print(json.dumps(payload, indent=2))
     return 0
 
 

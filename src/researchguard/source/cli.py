@@ -21,7 +21,7 @@ import yaml
 from researchguard import __version__
 
 from .depth import apply_observation_and_replan
-from .handoff import export_traceguard_seed
+from .handoff import export_traceguard_seed, sync_traceguard_seed
 from .loader import load_model, validate_model, write_yaml
 from .planner import frontier_summary, plan_next_actions
 from .report import render_json, render_markdown, render_text
@@ -243,6 +243,7 @@ def build_parser() -> argparse.ArgumentParser:
     trace = sub.add_parser("export-traceguard")
     trace.add_argument("model")
     trace.add_argument("--output", required=True)
+    trace.add_argument("--into", help="Append missing source and anchor ids to an existing trace model.")
 
     simulate = sub.add_parser("simulate")
     simulate.add_argument(
@@ -564,11 +565,18 @@ def run(args: argparse.Namespace) -> int:
             print(render_json(model))
         return 0
     if args.command == "export-traceguard":
-        write_yaml(
-            args.output,
-            export_traceguard_seed(load_model(args.model)),
-        )
-        _json_out({"ok": True, "output": args.output}, True)
+        source = load_model(args.model)
+        payload = {"ok": True, "output": args.output}
+        if args.into:
+            if Path(args.into).resolve() == Path(args.output).resolve():
+                raise ValueError("--output must be different from --into")
+            existing = yaml.safe_load(Path(args.into).read_text(encoding="utf-8"))
+            merged, added, conflicts = sync_traceguard_seed(source, existing)
+            payload.update(added=added, conflicts=conflicts)
+        else:
+            merged = export_traceguard_seed(source)
+        write_yaml(args.output, merged)
+        _json_out(payload, True)
         return 0
     if args.command == "simulate":
         _json_out(_simulate(args.mode, args.model), args.pretty)

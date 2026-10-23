@@ -67,3 +67,13 @@ model to itself returns no changes. Comparison does not license evidence.
 Markdown and text reports list source ids, titles, roles and lineage with anchor ids
 and locators. Each closed gap names the anchors and sources in its current
 `closure_basis`; these are declared qualification records, not new retrieval or truth.
+
+
+To bring new observations downstream, use
+`researchguard source export-traceguard <source.yaml> --into <trace.yaml> --output <new-trace.yaml>`,
+then `researchguard trace export-logicguard <new-trace.yaml> --output <bundle.yaml>` and
+`researchguard logic import-handoff <bundle.yaml> --into <logic.yaml> --output <new-logic.yaml>`.
+Sync only appends missing ids and edges. Existing records and hand-built content
+stay unchanged; differing records with the same identity are listed in `conflicts`.
+`--output` must differ from `--into`; no input is overwritten. Source anchors usable
+for claims or traces are exported as usable trace evidence; AI still owns links.

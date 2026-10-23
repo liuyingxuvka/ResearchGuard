@@ -9,6 +9,8 @@ Boundary: Source candidates and evidence anchors require downstream TraceGuard/L
 
 from __future__ import annotations
 
+from copy import deepcopy
+
 
 from .loader import dump_yaml
 from .schema import BeliefState
@@ -68,11 +70,37 @@ def export_traceguard_seed(belief_state: BeliefState) -> dict:
             "locator": anchor.locator or None,
             "limits": list(anchor.limits),
             "warnings": list(anchor.warnings),
-            "usable_as_trace_evidence": anchor.usable_for_trace,
+            "usable_as_trace_evidence": anchor.usable_for_trace or anchor.usable_for_claim,
         } for anchor in belief_state.anchors],
         "events": [],
         "traces": [],
     }
+
+
+def sync_traceguard_seed(belief_state: BeliefState, existing: dict) -> tuple[dict, dict, list]:
+    """Append missing source/anchor ids; preserve every existing downstream field."""
+    if not isinstance(existing, dict):
+        raise ValueError("--into trace model must be a mapping")
+    merged = deepcopy(existing)
+    incoming = export_traceguard_seed(belief_state)
+    added = {"sources": [], "evidence": []}
+    conflicts = []
+    for kind, id_key in (("sources", "source_id"), ("evidence", "evidence_id")):
+        rows = merged.setdefault(kind, [])
+        if not isinstance(rows, list) or any(not isinstance(row, dict) or not row.get(id_key) for row in rows):
+            raise ValueError(f"--into {kind} must be id-bearing records")
+        by_id = {row[id_key]: row for row in rows}
+        if len(by_id) != len(rows):
+            raise ValueError(f"--into {kind} ids must be unique")
+        for row in incoming[kind]:
+            item_id = row[id_key]
+            if item_id not in by_id:
+                rows.append(row)
+                by_id[item_id] = row
+                added[kind].append(item_id)
+            elif by_id[item_id] != row:
+                conflicts.append({"kind": kind, "id": item_id})
+    return merged, added, conflicts
 
 
 def affected_member_handoffs(
@@ -121,4 +149,5 @@ __all__ = [
     "affected_member_handoffs",
     "export_traceguard_seed",
     "render_traceguard_yaml",
+    "sync_traceguard_seed",
 ]

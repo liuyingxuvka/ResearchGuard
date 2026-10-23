@@ -50,3 +50,13 @@ and human locator text. No hypothesis-to-hypothesis edge or warrant is invented.
 A dual-sign evidence link keeps both paths and logs the conflict. An old bundle,
 or a trace-only bundle with no hypotheses, keeps the existing trace-claim path.
 Import reads the bundle only; it never invokes SourceGuard or opens its files.
+
+
+To bring new observations downstream, use
+`researchguard source export-traceguard <source.yaml> --into <trace.yaml> --output <new-trace.yaml>`,
+then `researchguard trace export-logicguard <new-trace.yaml> --output <bundle.yaml>` and
+`researchguard logic import-handoff <bundle.yaml> --into <logic.yaml> --output <new-logic.yaml>`.
+Sync only appends missing ids and edges. Existing records and hand-built content
+stay unchanged; differing records with the same identity are listed in `conflicts`.
+`--output` must differ from `--into`; no input is overwritten. Source anchors usable
+for claims or traces are exported as usable trace evidence; AI still owns links.

@@ -36,3 +36,13 @@ experiment recommendations or observations. It does not strengthen their claims.
 Without a source model, source/anchor checking is skipped with
 `source_model_not_listed`; unused hypotheses and hypotheses missing from logic are
 warnings. Handoff commands remain in the individual route references.
+
+
+To bring new observations downstream, use
+`researchguard source export-traceguard <source.yaml> --into <trace.yaml> --output <new-trace.yaml>`,
+then `researchguard trace export-logicguard <new-trace.yaml> --output <bundle.yaml>` and
+`researchguard logic import-handoff <bundle.yaml> --into <logic.yaml> --output <new-logic.yaml>`.
+Sync only appends missing ids and edges. Existing records and hand-built content
+stay unchanged; differing records with the same identity are listed in `conflicts`.
+`--output` must differ from `--into`; no input is overwritten. Source anchors usable
+for claims or traces are exported as usable trace evidence; AI still owns links.
