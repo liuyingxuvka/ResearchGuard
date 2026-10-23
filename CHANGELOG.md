@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.5.12 - 2026-10-23
+
+- Add field sheets and filled starter models for the four research routes. Validation names the offending node and lists allowed values; quoted evidence can derive its content hash automatically.
+- Shorten route instructions to their purpose, command sequence and stopping rules, and show timelines, hypotheses, blocking gaps and source decisions in readable research reports.
+- Accept new evidence in trace prediction and revision loops, check the predicted direction, and let ordinary research arguments reach logic depth closure.
+- Support optional experiment costs, preserve eliminated hypotheses across observations, remove unused port fields, and allow OSQP versions at or above 1.0.
+- Maintain the component map and bind model invariants to tests that exercise their implementation.
+
 ## v0.5.11 - 2026-10-22
 
 - Compute absolute storyline support from evidence before causal projection. Competition remains available for comparison and explanation without feeding support back into competing hypotheses; declaring a causal candidate cannot raise storyline support.
