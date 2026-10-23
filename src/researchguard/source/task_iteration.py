@@ -21,7 +21,7 @@ from .schema import (
     Gap,
     Observation,
     SearchAction,
-    SourceDepthReceipt,
+    SourceDepthResult,
     to_plain,
     utc_now,
 )
@@ -492,11 +492,11 @@ def review_search_candidate(
     )
 
 
-def revalidate_native_depth_receipt(
+def revalidate_native_depth(
     baseline: BeliefState,
     candidate: BeliefState,
     observation: Observation | None,
-    receipt: SourceDepthReceipt,
+    receipt: SourceDepthResult,
 ) -> NativeDepthRevalidation:
     """Check that native depth completed and passes the requested claim scope."""
 
@@ -650,10 +650,10 @@ def run_search_iteration(
     review = review_search_candidate(
         baseline, candidate, prediction.protected_gap_ids
     )
-    native_review = revalidate_native_depth_receipt(
+    native_review = revalidate_native_depth(
         baseline, candidate, observation, depth_receipt
     )
-    def open_gaps(state: BeliefState, depth: SourceDepthReceipt) -> tuple[str, ...]:
+    def open_gaps(state: BeliefState, depth: SourceDepthResult) -> tuple[str, ...]:
         gaps = state.gap_by_id()
         return tuple(sorted(
             {gap.gap_id for gap in state.gaps if gap.semantic_state != "closed"}
@@ -778,7 +778,7 @@ __all__ = [
     "derive_realized_search_outcome",
     "freeze_search_outcome_prediction",
     "affected_source_obligations",
-    "revalidate_native_depth_receipt",
+    "revalidate_native_depth",
     "review_search_candidate",
     "run_search_iteration",
     "validate_search_prediction_binding",

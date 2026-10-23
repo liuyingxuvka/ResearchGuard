@@ -1,8 +1,8 @@
 # Trace Depth and Closure
 
-Broad, complete, causal, deep, robust, or predictive wording requires the canonical inference receipt plus current target-owned storyline-depth execution evidence: run `researchguard trace depth <model.yaml> --output <depth.json>` (`trace evaluate` does not run depth).
+Broad, complete, causal, deep, robust, or predictive wording requires the canonical inference result plus current target-owned storyline-depth execution evidence: run `researchguard trace depth <model.yaml> --output <depth.json>` (`trace evaluate` does not run depth).
 
-Preserve primary and alternative hypotheses; traces/events/evidence; causal mechanisms, confounders, alternatives, scope; perturbation plan; baseline and perturbed receipts; object and candidate-universe fingerprints; eligible/critical/selected/executed/effective counts; per-kind coverage; critical-uncovered ids; requested/covered scope; and predictive holdout status.
+Preserve primary and alternative hypotheses; traces/events/evidence; causal mechanisms, confounders, alternatives, scope; perturbation plan; baseline and perturbed results; object and candidate inventories; eligible/critical/selected/executed/effective counts; per-kind coverage; critical-uncovered ids; requested/covered scope; and predictive holdout status.
 
 Every perturbation changes typed declarations and recompiles/resolves through the same approved solver. Editing a reported score or rank is invalid. Every critical perturbation must be effective or predeclared as an informative null. One effective probe cannot hide an untested/ineffective critical probe. Solver failure, infeasibility, bad residuals, or unapproved backend is terminal; there is no heuristic fallback.
 

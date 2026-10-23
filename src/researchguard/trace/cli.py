@@ -452,8 +452,8 @@ def cmd_compare(args: argparse.Namespace) -> int:
             changes["current_stage"] = {"before": old.current_stage, "after": new.current_stage}
         if changes:
             changed_traces.append({"trace_id": trace_id, "changes": changes})
-    old_hypotheses = {row.hypothesis_id: row for row in before.inference_receipt.hypothesis_projections}
-    new_hypotheses = {row.hypothesis_id: row for row in after.inference_receipt.hypothesis_projections}
+    old_hypotheses = {row.hypothesis_id: row for row in before.inference.hypothesis_projections}
+    new_hypotheses = {row.hypothesis_id: row for row in after.inference.hypothesis_projections}
     changed_hypotheses = []
     for hypothesis_id in sorted(old_hypotheses.keys() & new_hypotheses.keys()):
         changes = {}

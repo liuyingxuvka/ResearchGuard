@@ -904,7 +904,6 @@ class SourceCoverageUniverse:
     policy_origin: str = SOURCE_DEPTH_NATIVE_POLICY_ORIGIN
     requested_claim_scope: str = "bounded"
     covered_claim_scope: str = "planning_only"
-    universe_fingerprint: str = ""
     declared_target_unit_ids: list[str] = field(default_factory=list)
     discovered_target_unit_ids: list[str] = field(default_factory=list)
     required_target_unit_ids: list[str] = field(default_factory=list)
@@ -1088,10 +1087,8 @@ class ReplanComparison:
 
 
 @dataclass
-class SourceDepthReceipt:
-    receipt_version: str
+class SourceDepthResult:
     model_fingerprint: str
-    result_model_fingerprint: str
     provider_status: str
     observation_status: str
     planning_depth_completed: bool
@@ -1110,7 +1107,7 @@ class SourceDepthReceipt:
     broad_claim_licensed: bool = False
     status: str = "planning_only"
     claim_boundary: str = (
-        "This receipt proves only native SourceGuard planning and supplied-observation processing. "
+        "This result describes only native SourceGuard planning and supplied-observation processing. "
         "It does not prove source truth, extraction authenticity, validated events, or final argument support."
     )
     deepest_proven_layer: str = "planning"

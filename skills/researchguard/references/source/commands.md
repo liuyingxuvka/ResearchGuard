@@ -10,7 +10,7 @@ researchguard source score-actions <model.yaml> --pretty
 researchguard source frontier <model.yaml> --pretty
 researchguard source stop-decision <model.yaml> --budget <remaining budget> [--sufficient] --pretty
 researchguard source depth <model.yaml> --pretty
-researchguard source depth <model.yaml> --observation <observation.yaml> --output <receipt.json> --updated-model-output <updated.yaml> --pretty
+researchguard source depth <model.yaml> --observation <observation.yaml> --output <depth.json> --updated-model-output <updated.yaml> --pretty
 researchguard source add-observation <model.yaml> --observation <observation.yaml> --output <updated.yaml> --pretty
 researchguard source search-iteration freeze <model.yaml> --action-id <id> --expected-gap-reduction <none|partial|closed> --expected-independent-lineage <true|false> --expected-counterevidence <true|false> --expected-cost <0..1> [--protect-gap <gap>] [--iteration <n> --prior-open-gap-id <gap>] --output <prediction.json>
 researchguard source search-iteration run <model.yaml> --prediction <prediction.json> --observation <observation.yaml> --actual-cost <0..1> --decision <accept|reject> --candidate-output <candidate.yaml> --output <result.json>

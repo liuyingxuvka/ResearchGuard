@@ -14,7 +14,7 @@ Use it for:
   item B, technology case to method gap, method choice to validation setup,
   result to conclusion, and figure/table takeaway to later claim;
 - writing TraceGuard evaluation gaps back into the investigation memory;
-- preserving canonical inference-receipt history, object-universe fingerprints,
+- preserving native gap and contradiction follow-ups,
   critical object rows, temporal strata, ineffective critical perturbations,
   and expected-sensitivity gaps for later repair;
 - building a TraceGuard model from saved case material.
@@ -33,9 +33,9 @@ Do not use it as a replacement for LogicGuard source library. LogicGuard source 
 8. Write gaps, contradictions, limiting evidence needs, execution-chain needs, handoff follow-ups, and same-class review findings back into the case.
 9. When native storyline-depth evaluation runs, write unresolved alternatives,
     causal-mechanism/confounder gaps, the complete candidate-universe
-    fingerprint, every untested high-impact perturbation,
+    identity, every untested high-impact perturbation,
     critical-uncovered ids, expected-sensitivity mismatches, and the canonical
-    inference receipt id back into the case as an immutable observation; do
+    inference result id back into the case as an immutable observation; do
     not copy inferred status, rank, support, or causal license into input
     ledgers and do not reproduce the evaluator inside the library route.
 10. For non-trivial investigations, preserve trace-card coverage: leads detected, trace cards created, layer coverage, missing roles, access gaps, live alternatives, and downstream handoff ids.
@@ -49,14 +49,14 @@ Do not use it as a replacement for LogicGuard source library. LogicGuard source 
 ## Boundary
 
 The current TraceGuard case library has one storage boundary: ledgers preserve typed
-declarations and provenance; canonical inference receipts are append-only
-observations. A later model build never merges receipt outputs back into
-caller input.
+declarations and provenance. Writeback appends gaps and contradictions only; it
+does not store inference histories. A later model build never merges result
+outputs back into caller input.
 
 Keep this chain explicit:
 
 ```text
-lead/direction -> source lineage and independence group -> evidence role and polarity -> event or explanation declaration -> typed trace/hypothesis/causal candidate -> canonical inference receipt observation -> bounded final claim
+lead/direction -> source lineage and independence group -> evidence role and polarity -> event or explanation declaration -> typed trace/hypothesis/causal candidate -> canonical inference result observation -> bounded final claim
 ```
 
 A source is not evidence by itself. Evidence is not an event by itself. A confirmed event is not a confirmed motive or outcome by itself. A trace is not a final claim by itself.
@@ -91,7 +91,7 @@ confounders or scope limits
 causal-chain weakest link
 counter-scenario question
 declared importance and scope
-latest canonical receipt id
+latest canonical result id
 next evidence task
 ```
 
@@ -115,7 +115,7 @@ causal-chain weakest link
 counter-scenario question
 confounder or scope limit
 missing evidence
-latest canonical receipt id and projection locator
+latest canonical result id and projection locator
 safe wording draft, clearly marked non-authoritative until projection
 unsafe wording risk when overclaim risk is material
 target artifact locator such as paragraph, section, page, slide, or report slot when known

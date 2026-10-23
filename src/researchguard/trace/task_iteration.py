@@ -307,7 +307,7 @@ def _target_support(result: Any, prediction: PredictionSnapshot) -> float:
         rows = result.traces
         field = "trace_id"
     else:
-        rows = result.inference_receipt.hypothesis_projections
+        rows = result.inference.hypothesis_projections
         field = "hypothesis_id"
     row = next((row for row in rows if getattr(row, field) == prediction.target_id), None)
     if row is None:

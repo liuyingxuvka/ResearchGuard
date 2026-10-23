@@ -87,6 +87,6 @@ def test_fixed_sparse_performance_budget() -> None:
     result = evaluate_model(model, include_storyline_depth=False)
     elapsed = perf_counter() - started
     assert len(result.traces) == PERFORMANCE_CASE_SIZE
-    assert len(result.inference_receipt.contributions) == PERFORMANCE_CASE_SIZE * 6
-    assert result.inference_receipt.solver_status in {"solved", "solved inaccurate"}
+    assert len(result.inference.contributions) == PERFORMANCE_CASE_SIZE * 6
+    assert result.inference.solver_status in {"solved", "solved inaccurate"}
     assert elapsed <= PERFORMANCE_BUDGET_SECONDS

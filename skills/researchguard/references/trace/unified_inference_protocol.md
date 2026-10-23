@@ -54,7 +54,7 @@ expected sensitivities.
 Caller-authored input must not declare final trace status, final hypothesis
 rank, final causal support, final safe wording, generic predicate values that
 bypass typed compilation, or old intervention/counterfactual outcome records.
-Those are projections of one current inference receipt.
+Those are projections of one current inference result.
 
 ## 3. Provenance and independence
 
@@ -104,21 +104,21 @@ alternatives in depth output exclude the first-ranked hypothesis.
 A perturbation is a pure transformation of the typed model. TraceGuard
 fingerprints and solves the baseline, constructs the transformation without
 mutation, recompiles with the same policy/factors/solver, solves again, and
-binds both receipts into the perturbation effect.
+binds both results into the perturbation effect.
 
 An expected sensitivity is a regression expectation about the model, not a
 factual counterfactual outcome.
 
-## 8. Solver and receipt hard gates
+## 8. Solver and result hard gates
 
 OSQP output is accepted only when status, finite values, residual limits, hard
 constraints, and recomputed objective all pass. Failure is visible and closed;
 TraceGuard never switches solver, reuses stale output, or manufactures a
 projection.
 
-Every inference receipt binds schema, policy, factor set, solver, problem,
+Every inference result binds schema, policy, factor set, solver, problem,
 solution, contributions, projections, diagnostics, gaps, contradictions, and
-claim boundary. Every reported factor id resolves inside that same receipt.
+claim boundary. Every reported factor id resolves inside that same result.
 
 ## 9. Prompt protocol
 

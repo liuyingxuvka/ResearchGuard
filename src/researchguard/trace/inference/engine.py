@@ -9,7 +9,7 @@ from .compiler import compile_model
 from .explain import explain_solution
 from .policy import DEFAULT_POLICY, InferencePolicy
 from .projection import project_hypotheses, project_traces
-from .types import CompiledProblem, HardConstraint, InferenceReceipt, LinearExpression, fingerprint
+from .types import CompiledProblem, HardConstraint, InferenceResult, LinearExpression
 from ..entity_resolution import EntityScore
 from ..results import EvaluationResult, RuleResult, TraceEvaluation
 from ..schema import TraceGuardModel
@@ -327,123 +327,6 @@ def _domain_fields(model: TraceGuardModel, trace) -> _DomainFields:
     )
 
 
-def _receipt_payload(
-    *,
-    problem,
-    solution,
-    contributions,
-    trace_projections,
-    hypothesis_projections,
-    policy: InferencePolicy,
-) -> dict[str, object]:
-    return {
-        "model_fingerprint": str(problem.metadata.get("model_fingerprint", "")),
-        "problem_fingerprint": problem.problem_fingerprint,
-        "solution_fingerprint": solution.solution_fingerprint,
-        "atom_values_fingerprint": fingerprint(solution.atom_values),
-        "factor_catalog_fingerprint": fingerprint(
-            [item.to_dict() for item in problem.factors]
-        ),
-        "hard_constraint_catalog_fingerprint": fingerprint(
-            [item.to_dict() for item in problem.hard_constraints]
-        ),
-        "provenance_fingerprint": fingerprint(
-            [
-                {
-                    "atom_id": item.atom_id,
-                    "evidence_ids": item.evidence_ids,
-                    "lineage_ids": item.lineage_ids,
-                    "metadata": item.metadata,
-                }
-                for item in problem.observed_atoms
-            ]
-        ),
-        "schema_id": problem.schema_id,
-        "policy_id": problem.policy_id,
-        "factor_set_id": problem.factor_set_id,
-        "solver_id": problem.solver_id,
-        "solver_configuration_fingerprint": policy.solver_configuration_fingerprint,
-        "solver_backend": solution.backend,
-        "solver_backend_version": solution.backend_version,
-        "solver_status": solution.status,
-        "primal_residual": solution.primal_residual,
-        "dual_residual": solution.dual_residual,
-        "maximum_constraint_violation": solution.maximum_constraint_violation,
-        "iterations": solution.iterations,
-        "objective": solution.objective,
-        "hard_constraint_ids": [
-            item.constraint_id for item in problem.hard_constraints
-        ],
-        "contribution_fingerprint": fingerprint(
-            [item.to_dict() for item in contributions]
-        ),
-        "trace_projections": [item.to_dict() for item in trace_projections],
-        "hypothesis_projections": [
-            item.to_dict() for item in hypothesis_projections
-        ],
-    }
-
-
-def verify_inference_receipt(receipt: InferenceReceipt) -> None:
-    """Fail when a projection or receipt identity is detached from its evidence."""
-
-    contribution_ids = [item.factor_id for item in receipt.contributions]
-    if len(contribution_ids) != len(set(contribution_ids)):
-        raise ValueError("inference receipt has duplicate factor contributions")
-    contribution_set = set(contribution_ids)
-    constraint_set = set(receipt.hard_constraint_ids)
-    for projection in (
-        *receipt.trace_projections,
-        *receipt.hypothesis_projections,
-    ):
-        if not set(projection.top_support_factor_ids) <= contribution_set:
-            raise ValueError("projection references detached supporting factors")
-        if not set(projection.top_opposition_factor_ids) <= contribution_set:
-            raise ValueError("projection references detached opposing factors")
-        binding_ids = getattr(projection, "binding_constraint_ids", ())
-        if not set(binding_ids) <= constraint_set:
-            raise ValueError("projection references detached hard constraints")
-    identity_payload = {
-        "model_fingerprint": receipt.model_fingerprint,
-        "problem_fingerprint": receipt.problem_fingerprint,
-        "solution_fingerprint": receipt.solution_fingerprint,
-        "atom_values_fingerprint": receipt.atom_values_fingerprint,
-        "factor_catalog_fingerprint": receipt.factor_catalog_fingerprint,
-        "hard_constraint_catalog_fingerprint": (
-            receipt.hard_constraint_catalog_fingerprint
-        ),
-        "provenance_fingerprint": receipt.provenance_fingerprint,
-        "schema_id": receipt.schema_id,
-        "policy_id": receipt.policy_id,
-        "factor_set_id": receipt.factor_set_id,
-        "solver_id": receipt.solver_id,
-        "solver_configuration_fingerprint": (
-            receipt.solver_configuration_fingerprint
-        ),
-        "solver_backend": receipt.solver_backend,
-        "solver_backend_version": receipt.solver_backend_version,
-        "solver_status": receipt.solver_status,
-        "primal_residual": receipt.primal_residual,
-        "dual_residual": receipt.dual_residual,
-        "maximum_constraint_violation": receipt.maximum_constraint_violation,
-        "iterations": receipt.iterations,
-        "objective": receipt.objective,
-        "hard_constraint_ids": list(receipt.hard_constraint_ids),
-        "contribution_fingerprint": fingerprint(
-            [item.to_dict() for item in receipt.contributions]
-        ),
-        "trace_projections": [
-            item.to_dict() for item in receipt.trace_projections
-        ],
-        "hypothesis_projections": [
-            item.to_dict() for item in receipt.hypothesis_projections
-        ],
-    }
-    expected_id = f"traceguard-inference-{fingerprint(identity_payload)[:24]}"
-    if receipt.receipt_id != expected_id:
-        raise ValueError("inference receipt content fingerprint mismatch")
-
-
 def _entity_scores(model: TraceGuardModel, problem, solution) -> tuple[EntityScore, ...]:
     rows: list[EntityScore] = []
     for item in problem.metadata.get("entity_pairs", []):
@@ -588,32 +471,12 @@ def infer_model(
     diagnostics = tuple(problem.metadata.get("diagnostics", ()))
     gaps = tuple(problem.metadata.get("gaps", ()))
     contradictions = tuple(problem.metadata.get("contradictions", ()))
-    receipt_payload = _receipt_payload(
-        problem=problem,
-        solution=solution,
-        contributions=contributions,
-        trace_projections=trace_projections,
-        hypothesis_projections=hypothesis_projections,
-        policy=policy,
-    )
-    receipt = InferenceReceipt(
-        receipt_id=f"traceguard-inference-{fingerprint(receipt_payload)[:24]}",
-        model_fingerprint=str(receipt_payload["model_fingerprint"]),
-        problem_fingerprint=problem.problem_fingerprint,
-        solution_fingerprint=solution.solution_fingerprint,
-        atom_values_fingerprint=str(receipt_payload["atom_values_fingerprint"]),
-        factor_catalog_fingerprint=str(
-            receipt_payload["factor_catalog_fingerprint"]
-        ),
-        hard_constraint_catalog_fingerprint=str(
-            receipt_payload["hard_constraint_catalog_fingerprint"]
-        ),
-        provenance_fingerprint=str(receipt_payload["provenance_fingerprint"]),
+    receipt = InferenceResult(
+        model_fingerprint=str(problem.metadata.get("model_fingerprint", "")),
         schema_id=problem.schema_id,
         policy_id=problem.policy_id,
         factor_set_id=problem.factor_set_id,
         solver_id=problem.solver_id,
-        solver_configuration_fingerprint=policy.solver_configuration_fingerprint,
         solver_backend=solution.backend,
         solver_backend_version=solution.backend_version,
         solver_status=solution.status,
@@ -633,7 +496,6 @@ def infer_model(
         contradictions=contradictions,
         claim_boundary=CLAIM_BOUNDARY,
     )
-    verify_inference_receipt(receipt)
     trace_by_id = {item.trace_id: item for item in model.traces}
     # Domain projection is deliberately computed once per trace.  Reusing the
     # same validated object prevents field-by-field recomputation from
@@ -722,5 +584,5 @@ def infer_model(
         diagnostics=diagnostics,
         gaps=gaps,
         contradictions=contradictions,
-        inference_receipt=receipt,
+        inference=receipt,
     )

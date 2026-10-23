@@ -440,7 +440,6 @@ def test_case_library_create_persist_search_and_gap_writeback(tmp_path: Path) ->
         "ok": True,
         "gaps_written": 2,
         "contradictions_written": 1,
-        "inference_receipt_written": False,
     }
 
     paths = case_library.LibraryPaths(root)
@@ -482,7 +481,6 @@ def test_case_library_writeback_preserves_handoff_followups(tmp_path: Path) -> N
         "ok": True,
         "gaps_written": 2,
         "contradictions_written": 0,
-        "inference_receipt_written": False,
     }
     paths = case_library.LibraryPaths(root)
     gaps = case_library.read_yaml(paths.case_ledger("incident-a", "gaps.yaml"), [])
@@ -492,7 +490,7 @@ def test_case_library_writeback_preserves_handoff_followups(tmp_path: Path) -> N
     }
 
 
-def test_case_library_records_inference_receipts_as_observations_only(
+def test_case_library_does_not_store_inference_receipts(
     tmp_path: Path,
 ) -> None:
     root = tmp_path / "library"
@@ -506,15 +504,9 @@ def test_case_library_records_inference_receipts_as_observations_only(
     result_path.write_text(json.dumps(result.to_dict()), encoding="utf-8")
 
     payload = case_library.write_back_gaps(root, "incident-a", result_path)
-    assert payload["inference_receipt_written"] is True
+    assert payload["ok"] is True
     paths = case_library.require_library(root)
-    saved = case_library.read_yaml(
-        paths.case_ledger("incident-a", "inference_receipts.yaml"),
-        [],
-    )
-    assert saved[0]["record_kind"] == "inference_observation"
-    assert saved[0]["solver_id"] == "osqp.direct.v1"
-    assert saved[0]["trace_projections"]
+    assert not paths.case_ledger("incident-a", "inference_receipts.yaml").exists()
 
 
 def test_case_library_rejects_missing_direction_source_write(tmp_path: Path) -> None:
@@ -684,7 +676,7 @@ def test_report_shows_timeline_hypotheses_and_blockers(monkeypatch, capsys) -> N
             assert event.time_interval.start in report
             assert event.action in report
             assert all(evidence_id in report for evidence_id in event.evidence_ids)
-        for projection in baseline.inference_receipt.hypothesis_projections:
+        for projection in baseline.inference.hypothesis_projections:
             assert projection.hypothesis_id in report
             assert f"{projection.support:.3f}" in report
             assert projection.causal_status in report
@@ -709,8 +701,8 @@ def test_report_shows_timeline_hypotheses_and_blockers(monkeypatch, capsys) -> N
     assert cli.cmd_report(Namespace(model=str(path), format="json")) == 0
     payload = json.loads(capsys.readouterr().out)
     assert calls == [{"include_storyline_depth": False}]
-    assert payload["inference_receipt"]["hypothesis_projections"]
-    assert payload["inference_receipt"]["contributions"]
+    assert payload["inference"]["hypothesis_projections"]
+    assert payload["inference"]["contributions"]
     assert payload["handoffs"] and payload["storyline_depth"] is None
 
 

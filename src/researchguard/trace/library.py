@@ -194,7 +194,6 @@ def create_case(root: str | Path, case_id: str, *, title: str, topic: str = "", 
         "gaps.yaml",
         "contradictions.yaml",
         "search_tasks.yaml",
-        "inference_receipts.yaml",
     ):
         if not (case_dir / name).exists():
             write_yaml(case_dir / name, [])
@@ -500,7 +499,7 @@ def validate_library(root: str | Path) -> dict[str, Any]:
                             "direction_id": did,
                             "trace_id": item.get("trace_id"),
                             "fields": sorted(retired),
-                            "message": "Trace inference outputs belong in receipt history, not model input.",
+                            "message": "Trace inference outputs belong in evaluation outputs, not model input.",
                         }
                     )
             links = _extend_from_direction(
@@ -563,27 +562,13 @@ def write_back_gaps(root: str | Path, case_id: str, result_path: str | Path) -> 
                   "case_id": slug(case_id), "followup_status": "open", "written_at": now_iso()}
         append_unique_by_id(paths.case_ledger(case_id, "gaps.yaml"), record, "gap_id")
         return {"ok": False, "error": message, "gaps_written": 1,
-                "contradictions_written": 0, "inference_receipt_written": False}
+                "contradictions_written": 0}
     gaps: list[dict[str, Any]] = []
     contradictions: list[dict[str, Any]] = []
     handoff_followups: list[dict[str, Any]] = []
     gaps.extend(result.get("gaps", []))
     contradictions.extend(result.get("contradictions", []))
     handoff_followups.extend(result.get("consolidation_findings", []))
-    inference_receipt = result.get("inference_receipt")
-    receipt_written = False
-    if isinstance(inference_receipt, dict) and inference_receipt.get("receipt_id"):
-        append_unique_by_id(
-            paths.case_ledger(case_id, "inference_receipts.yaml"),
-            {
-                **inference_receipt,
-                "case_id": slug(case_id),
-                "observed_at": now_iso(),
-                "record_kind": "inference_observation",
-            },
-            "receipt_id",
-        )
-        receipt_written = True
     for trace in result.get("traces", []):
         gaps.extend(trace.get("gaps", []))
         contradictions.extend(trace.get("contradictions", []))
@@ -622,7 +607,6 @@ def write_back_gaps(root: str | Path, case_id: str, result_path: str | Path) -> 
         "ok": True,
         "gaps_written": written_gaps,
         "contradictions_written": written_contradictions,
-        "inference_receipt_written": receipt_written,
     }
 
 

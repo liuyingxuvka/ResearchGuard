@@ -13,7 +13,7 @@ from researchguard.source import (
     SourceDepthPolicy,
     SourceRecord,
     apply_observation_and_replan,
-    build_source_depth_receipt,
+    build_source_depth,
 )
 from researchguard.source.planner import generate_actions_from_gaps
 from researchguard.source.update import apply_observation
@@ -182,7 +182,7 @@ def test_medical_execution_gap_does_not_inject_industrial_vocabulary() -> None:
 
 
 def test_no_observation_receipt_is_honestly_planning_only() -> None:
-    receipt = build_source_depth_receipt(
+    receipt = build_source_depth(
         _guard(BeliefState(gaps=[_gap()]), "test-planning-only")
     )
 
@@ -297,14 +297,14 @@ def _broad_observation(*, shared_lineage: bool = False) -> Observation:
 
 
 def test_contentless_anchor_is_blocked_by_source_depth() -> None:
-    passing = build_source_depth_receipt(_broad_state(), _broad_observation())
+    passing = build_source_depth(_broad_state(), _broad_observation())
     assert all(row.status == "pass" for row in passing.coverage_universe.object_depth_rows)
 
     contentless = _broad_observation()
     for anchor in contentless.observed_anchors:
         anchor.text = ""
         anchor.normalized_summary = ""
-    blocked = build_source_depth_receipt(_broad_state(), contentless)
+    blocked = build_source_depth(_broad_state(), contentless)
     assert blocked.broad_claim_licensed is False
     assert any(
         "sourceguard_blocked:contentless-anchor" in row.findings
@@ -321,7 +321,7 @@ def test_one_gap_one_source_cannot_license_broad_source_depth() -> None:
         ),
         "test-one-gap-broad",
     )
-    receipt = build_source_depth_receipt(state, _qualified_observation())
+    receipt = build_source_depth(state, _qualified_observation())
 
     assert receipt.status == "bounded"
     assert receipt.requested_claim_scope == "broad"
@@ -332,14 +332,14 @@ def test_one_gap_one_source_cannot_license_broad_source_depth() -> None:
 
 
 def test_complete_native_source_portfolio_can_license_broad_depth() -> None:
-    receipt = build_source_depth_receipt(_broad_state(), _broad_observation())
+    receipt = build_source_depth(_broad_state(), _broad_observation())
 
     assert receipt.status == "pass"
     assert receipt.adequacy_status == "pass"
     assert receipt.covered_claim_scope == "broad"
     assert receipt.broad_claim_licensed is True
     assert receipt.critical_uncovered_ids == []
-    assert receipt.coverage_universe.universe_fingerprint
+    assert receipt.coverage_universe.dimensions
     dimensions = {item.dimension_id: item for item in receipt.coverage_universe.dimensions}
     assert dimensions["portfolio_classes"].coverage_ratio == 1.0
     assert dimensions["independent_lineages"].closed_count == 2
@@ -350,7 +350,7 @@ def test_complete_native_source_portfolio_can_license_broad_depth() -> None:
 
 
 def test_dependent_sources_do_not_satisfy_independent_lineage_floor() -> None:
-    receipt = build_source_depth_receipt(
+    receipt = build_source_depth(
         _broad_state(),
         _broad_observation(shared_lineage=True),
     )
@@ -365,7 +365,7 @@ def test_broad_scope_requires_a_nonempty_target_unit_inventory() -> None:
     state.depth_policy.target_unit_inventory_ids = []
     state.depth_policy.required_target_unit_ids = []
 
-    receipt = build_source_depth_receipt(state, _broad_observation())
+    receipt = build_source_depth(state, _broad_observation())
 
     assert receipt.broad_claim_licensed is False
     assert "target_units_required_universe_empty" in receipt.coverage_universe.findings
@@ -385,7 +385,7 @@ def test_discovered_target_unit_cannot_be_omitted_from_declared_inventory() -> N
     )
     state = _guard(state, "test-omitted-unit")
 
-    receipt = build_source_depth_receipt(state, _broad_observation())
+    receipt = build_source_depth(state, _broad_observation())
 
     assert receipt.broad_claim_licensed is False
     assert "unit:omitted-section" in receipt.coverage_universe.discovered_target_unit_ids
@@ -399,7 +399,7 @@ def test_declared_target_unit_must_be_required_or_explicitly_excluded() -> None:
     state = _broad_state()
     state.depth_policy.target_unit_inventory_ids.append("unit:appendix")
 
-    receipt = build_source_depth_receipt(state, _broad_observation())
+    receipt = build_source_depth(state, _broad_observation())
 
     assert receipt.broad_claim_licensed is False
     assert "target_unit_inventory_unclassified:unit:appendix" in receipt.coverage_universe.findings
@@ -420,7 +420,7 @@ def test_excluded_target_unit_needs_reason_and_cannot_hide_an_active_gap() -> No
     )
     state = _guard(state, "test-excluded-active-gap")
 
-    receipt = build_source_depth_receipt(state, _broad_observation())
+    receipt = build_source_depth(state, _broad_observation())
 
     assert receipt.broad_claim_licensed is False
     assert "target_unit_exclusion_reason_missing:unit:excluded" in receipt.coverage_universe.findings
@@ -433,7 +433,7 @@ def test_null_exclusion_reason_is_not_coerced_into_apparent_text() -> None:
     state.depth_policy.excluded_target_unit_ids.append("unit:appendix")
     state.depth_policy.target_unit_exclusion_reasons["unit:appendix"] = None  # type: ignore[assignment]
 
-    receipt = build_source_depth_receipt(state, _broad_observation())
+    receipt = build_source_depth(state, _broad_observation())
 
     assert receipt.broad_claim_licensed is False
     assert "target_unit_exclusion_reason_missing:unit:appendix" in receipt.coverage_universe.findings
@@ -447,7 +447,7 @@ def test_global_portfolio_does_not_replace_per_gap_portfolio_depth() -> None:
         if anchor.source_id == "s-limiting":
             anchor.limits = [item for item in anchor.limits if item != "g-direct"]
 
-    receipt = build_source_depth_receipt(_broad_state(), observation)
+    receipt = build_source_depth(_broad_state(), observation)
 
     assert receipt.broad_claim_licensed is False
     assert "per_gap_portfolio:g-direct:portfolio:independent" in receipt.critical_uncovered_ids
@@ -461,7 +461,7 @@ def test_locator_without_anchor_content_cannot_satisfy_broad_object_depth() -> N
         anchor.normalized_summary = ""
         anchor.text = ""
 
-    receipt = build_source_depth_receipt(_broad_state(), observation)
+    receipt = build_source_depth(_broad_state(), observation)
 
     assert receipt.broad_claim_licensed is False
     assert all(item.status == "fail" for item in receipt.coverage_universe.object_depth_rows)
@@ -481,7 +481,7 @@ def test_missing_lineage_is_not_treated_as_independent_source_identity() -> None
     for source in observation.observed_sources:
         source.lineage_id = ""
 
-    receipt = build_source_depth_receipt(_broad_state(), observation)
+    receipt = build_source_depth(_broad_state(), observation)
 
     assert receipt.broad_claim_licensed is False
     dimensions = {item.dimension_id: item for item in receipt.coverage_universe.dimensions}
@@ -490,7 +490,7 @@ def test_missing_lineage_is_not_treated_as_independent_source_identity() -> None
 
 
 def test_broad_empty_universe_fails_closed() -> None:
-    receipt = build_source_depth_receipt(
+    receipt = build_source_depth(
         _guard(
             BeliefState(depth_policy=SourceDepthPolicy(requested_claim_scope="broad")),
             "test-empty-broad",
@@ -504,8 +504,8 @@ def test_broad_empty_universe_fails_closed() -> None:
     assert "branches_required_universe_empty" in receipt.coverage_universe.findings
 
 
-def test_coverage_universe_fingerprint_changes_when_authoritative_gap_changes() -> None:
-    first = build_source_depth_receipt(_broad_state(), _broad_observation())
+def test_model_freshness_changes_when_authoritative_gap_changes() -> None:
+    first = build_source_depth(_broad_state(), _broad_observation())
     changed = _broad_state()
     changed.gaps.append(
         Gap(
@@ -517,9 +517,9 @@ def test_coverage_universe_fingerprint_changes_when_authoritative_gap_changes() 
         )
     )
     changed = _guard(changed, "test-coverage-fingerprint-change")
-    second = build_source_depth_receipt(changed, _broad_observation())
+    second = build_source_depth(changed, _broad_observation())
 
-    assert first.coverage_universe.universe_fingerprint != second.coverage_universe.universe_fingerprint
+    assert first.model_fingerprint != second.model_fingerprint
     assert second.broad_claim_licensed is False
     assert "gaps:g-bridge" in second.critical_uncovered_ids
 

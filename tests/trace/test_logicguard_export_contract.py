@@ -32,8 +32,8 @@ def test_export_is_versioned_complete_and_pure():
     assert first["schema"] == LOGICGUARD_HANDOFF_SCHEMA
     assert first["schema_id"] == LOGICGUARD_HANDOFF_SCHEMA
     assert first["metadata"]["source_model_fingerprint"]
-    assert first["metadata"]["native_inference_receipt_id"]
-    assert first["metadata"]["native_inference_receipt"]["receipt_id"]
+    assert "native_inference_receipt_id" not in first["metadata"]
+    assert "native_inference_receipt" not in first["metadata"]
     claim = first["claims"][0]
     assert claim["limitation"] == "Patent evidence is technology background unless linked to explicit deployment evidence."
     assert "HL-MRF" not in claim["limitation"]
@@ -142,7 +142,7 @@ def test_export_keeps_polarity_per_hypothesis() -> None:
     opposing = {"anc-unctad-surge", "anc-transpacific"}
     assert opposing <= set(suez["opposing_evidence_ids"])
     assert not opposing & set(suez["supporting_evidence_ids"])
-    native = {item.hypothesis_id: item for item in result.inference_receipt.hypothesis_projections}
+    native = {item.hypothesis_id: item for item in result.inference.hypothesis_projections}
     assert suez["rank"] == native["h_suez"].rank
     assert suez["support"] == pytest.approx(native["h_suez"].support)
     assert suez["causal_status"] == native["h_suez"].causal_status

@@ -923,7 +923,6 @@ class ClaimScopeCoverage:
 @dataclass(frozen=True)
 class ArgumentCoverageUniverse:
     owner_id: str
-    universe_fingerprint: str
     target_unit_ids: tuple[str, ...]
     modeled_target_unit_ids: tuple[str, ...]
     unmodeled_target_unit_ids: tuple[str, ...]
@@ -950,7 +949,6 @@ class ArgumentCoverageUniverse:
     def to_dict(self) -> dict[str, Any]:
         return {
             "owner_id": self.owner_id,
-            "universe_fingerprint": self.universe_fingerprint,
             "implicit_inventory": self.implicit_inventory,
             "shared_evidence_node_ids": list(self.shared_evidence_node_ids),
             "target_unit_ids": list(self.target_unit_ids),
@@ -1000,8 +998,7 @@ class ArgumentCoverageUniverse:
 
 
 @dataclass(frozen=True)
-class LogicDepthReceipt:
-    receipt_version: str
+class LogicDepthResult:
     model_id: str
     model_fingerprint: str
     generated_at: str
@@ -1027,7 +1024,6 @@ class LogicDepthReceipt:
 
     def to_dict(self) -> dict[str, Any]:
         return {
-            "receipt_version": self.receipt_version,
             "model_id": self.model_id,
             "model_fingerprint": self.model_fingerprint,
             "generated_at": self.generated_at,

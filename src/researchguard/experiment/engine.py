@@ -23,24 +23,6 @@ def _digest(value: object) -> str:
     return f"sha256:{hashlib.sha256(body.encode('utf-8')).hexdigest()}"
 
 
-def matrix_fingerprint(spec: ExperimentSpec, *, hypothesis_ids: tuple[str, ...] | None = None) -> str:
-    selected = set(hypothesis_ids) if hypothesis_ids is not None else None
-    return _digest(
-        {
-            "hypotheses": [
-                {
-                    "hypothesis_id": item.hypothesis_id,
-                    "outcomes_by_experiment": dict(sorted(item.outcomes_by_experiment.items())),
-                }
-                for item in sorted(spec.hypothesis_predictions, key=lambda row: row.hypothesis_id)
-                if selected is None or item.hypothesis_id in selected
-            ],
-            "candidate_experiment_ids": sorted(spec.candidate_experiment_ids),
-            "coverage_ids": sorted(spec.coverage_ids),
-        }
-    )
-
-
 def _pairs(spec: ExperimentSpec) -> tuple[tuple[str, str], ...]:
     return tuple(combinations(sorted(item.hypothesis_id for item in spec.hypothesis_predictions), 2))
 
@@ -141,20 +123,17 @@ def observe_experiments(spec: ExperimentSpec, observations: tuple[ExperimentObse
             active_ids.append(hypothesis_id)
         dispositions.append(HypothesisDisposition(hypothesis_id, status, matched, contradicted))
 
-    base_fingerprint = matrix_fingerprint(spec)
     revision_candidate = None
     if unexpected or not active_ids:
         ids = tuple(row.evidence_id for row in unexpected) or tuple(row.evidence_id for row in valid_construction)
         gaps.add("prediction-matrix-revision-required")
         revision_candidate = PredictionMatrixRevisionCandidate(
             candidate_id=f"matrix-revision:{_digest(ids)[7:27]}",
-            base_matrix_fingerprint=base_fingerprint,
             unexpected_observation_ids=ids,
             required_actions=("revise_hypothesis_or_prediction_matrix", "freeze_new_matrix_before_replay"),
         )
         active_ids = []
 
-    candidate_fingerprint = matrix_fingerprint(spec, hypothesis_ids=tuple(active_ids))
     observed_ids = {row.experiment_id for row in valid_construction}
     if len(active_ids) > 1:
         remaining_candidates = tuple(sorted(candidates - observed_ids))
@@ -229,8 +208,6 @@ def observe_experiments(spec: ExperimentSpec, observations: tuple[ExperimentObse
     return ExperimentIterationResult(
         task_id=spec.task_id,
         iteration=spec.iteration,
-        base_matrix_fingerprint=base_fingerprint,
-        candidate_matrix_fingerprint=candidate_fingerprint,
         recommendation=recommendation,
         observations=observations,
         hypothesis_dispositions=tuple(dispositions),
@@ -249,4 +226,4 @@ def observe_experiments(spec: ExperimentSpec, observations: tuple[ExperimentObse
     )
 
 
-__all__ = ["matrix_fingerprint", "observe_experiments", "recommend_experiments"]
+__all__ = ["observe_experiments", "recommend_experiments"]

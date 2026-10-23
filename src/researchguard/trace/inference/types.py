@@ -309,20 +309,12 @@ class HypothesisProjection:
 
 
 @dataclass(frozen=True)
-class InferenceReceipt:
-    receipt_id: str
+class InferenceResult:
     model_fingerprint: str
-    problem_fingerprint: str
-    solution_fingerprint: str
-    atom_values_fingerprint: str
-    factor_catalog_fingerprint: str
-    hard_constraint_catalog_fingerprint: str
-    provenance_fingerprint: str
     schema_id: str
     policy_id: str
     factor_set_id: str
     solver_id: str
-    solver_configuration_fingerprint: str
     solver_backend: str
     solver_backend_version: str
     solver_status: str
@@ -342,19 +334,11 @@ class InferenceReceipt:
 
     def to_dict(self) -> dict[str, Any]:
         return {
-            "receipt_id": self.receipt_id,
             "model_fingerprint": self.model_fingerprint,
-            "problem_fingerprint": self.problem_fingerprint,
-            "solution_fingerprint": self.solution_fingerprint,
-            "atom_values_fingerprint": self.atom_values_fingerprint,
-            "factor_catalog_fingerprint": self.factor_catalog_fingerprint,
-            "hard_constraint_catalog_fingerprint": self.hard_constraint_catalog_fingerprint,
-            "provenance_fingerprint": self.provenance_fingerprint,
             "schema_id": self.schema_id,
             "policy_id": self.policy_id,
             "factor_set_id": self.factor_set_id,
             "solver_id": self.solver_id,
-            "solver_configuration_fingerprint": self.solver_configuration_fingerprint,
             "solver_backend": self.solver_backend,
             "solver_backend_version": self.solver_backend_version,
             "solver_status": self.solver_status,

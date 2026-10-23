@@ -13,7 +13,6 @@ from researchguard.logic import (
 from researchguard.logic.execution_depth import _build_native_depth_analysis, model_fingerprint
 
 
-build_logic_depth_receipt = _build_native_depth_analysis
 
 
 def _role_complete_data() -> dict:
@@ -59,14 +58,14 @@ def _model(data: dict | None = None):
 
 
 def test_role_complete_current_universe_can_license_declared_broad_scope() -> None:
-    receipt = build_logic_depth_receipt(_model(), budget=8)
+    receipt = _build_native_depth_analysis(_model(), budget=8)
 
-    assert receipt.receipt_version == "researchguard.logic.depth.v2"
+    assert "receipt_version" not in receipt.to_dict()
     assert receipt.status == "pass"
     assert receipt.broad_claim_licensed is True
     assert receipt.coverage_universe is not None
     assert receipt.coverage_universe.owner_id == "researchguard.logic.authoritative-argument-coverage"
-    assert len(receipt.coverage_universe.universe_fingerprint) == 64
+    assert receipt.coverage_universe.role_coverage
     assert receipt.coverage_universe.role_coverage[0].status == "pass"
     assert receipt.coverage_universe.claim_scope.passed is True
 
@@ -83,7 +82,7 @@ def test_root_plus_one_evidence_is_shallow_and_cannot_license_broad_scope() -> N
         }
     )
 
-    receipt = build_logic_depth_receipt(model, budget=8)
+    receipt = _build_native_depth_analysis(model, budget=8)
 
     assert receipt.broad_claim_licensed is False
     assert receipt.status == "blocked"
@@ -97,7 +96,7 @@ def test_broad_scope_requires_explicit_target_unit_and_card_denominators() -> No
     data["model"].pop("target_units")
     data["model"].pop("model_cards")
 
-    receipt = build_logic_depth_receipt(_model(data), budget=8)
+    receipt = _build_native_depth_analysis(_model(data), budget=8)
 
     assert "target_unit_inventory_empty" in receipt.unresolved_gaps
     assert "model_card_inventory_empty" in receipt.unresolved_gaps
@@ -108,7 +107,7 @@ def test_competing_conclusion_role_must_be_explicitly_covered_or_disposed() -> N
     data = _role_complete_data()
     data["model"].pop("role_dispositions")
 
-    receipt = build_logic_depth_receipt(_model(data), budget=8)
+    receipt = _build_native_depth_analysis(_model(data), budget=8)
 
     root = next(
         row
@@ -123,7 +122,7 @@ def test_competing_conclusion_role_must_be_explicitly_covered_or_disposed() -> N
 def test_disconnected_important_node_remains_in_authoritative_denominator() -> None:
     data = _role_complete_data()
     data["nodes"]["D1"] = {"type": "Warrant", "importance": 0.95}
-    receipt = build_logic_depth_receipt(_model(data), budget=10)
+    receipt = _build_native_depth_analysis(_model(data), budget=10)
 
     assert "D1" in receipt.coverage_universe.important_node_ids
     assert "D1" in receipt.coverage_universe.unresolved_disconnected_node_ids
@@ -138,13 +137,13 @@ def test_closed_disposition_is_visible_but_unresolved_disposition_still_blocks()
     assert "D1" in closed.terminally_disposed_disconnected_node_ids
 
     data["nodes"]["D1"]["disposition"] = "human_review"
-    unresolved = build_logic_depth_receipt(_model(data), budget=10)
+    unresolved = _build_native_depth_analysis(_model(data), budget=10)
     assert "D1" in unresolved.coverage_universe.unresolved_disconnected_node_ids
     assert unresolved.broad_claim_licensed is False
 
 
 def test_importance_policy_is_target_owned_and_has_no_caller_override() -> None:
-    receipt = build_logic_depth_receipt(_model(), budget=8)
+    receipt = _build_native_depth_analysis(_model(), budget=8)
 
     policy = receipt.coverage_universe.importance_policy
     assert policy.profile == "enforced"
@@ -159,7 +158,7 @@ def test_nominal_budget_never_drops_a_critical_candidate() -> None:
     data = _role_complete_data()
     data["nodes"]["E1"]["importance"] = 0.95
     data["nodes"]["W1"]["importance"] = 0.95
-    receipt = build_logic_depth_receipt(_model(data), budget=1)
+    receipt = _build_native_depth_analysis(_model(data), budget=1)
     selected = {item.node_id for item in receipt.perturbation_plan}
 
     assert {"E1", "W1"} <= selected
@@ -170,7 +169,7 @@ def test_nominal_budget_never_drops_a_critical_candidate() -> None:
 def test_every_critical_perturbation_must_be_effective() -> None:
     data = _role_complete_data()
     data["nodes"]["R1"].update({"active": True, "importance": 0.95})
-    receipt = build_logic_depth_receipt(_model(data), budget=8)
+    receipt = _build_native_depth_analysis(_model(data), budget=8)
 
     assert "R1" in receipt.critical_perturbation_coverage["ineffective_ids"]
     assert "ineffective_critical_perturbation:R1" in receipt.unresolved_gaps
@@ -178,7 +177,7 @@ def test_every_critical_perturbation_must_be_effective() -> None:
 
 
 def test_missing_requested_claim_node_blocks_scope_license() -> None:
-    receipt = build_logic_depth_receipt(
+    receipt = _build_native_depth_analysis(
         _model(),
         budget=8,
         requested_claim_scope_ids=["C0", "C_MISSING"],
@@ -194,7 +193,7 @@ def test_each_declared_important_card_needs_roles_or_closed_dispositions() -> No
     data["model"]["model_cards"] = [
         {"card_id": "card-shallow", "node_ids": ["C0", "E1"], "importance": 0.9}
     ]
-    receipt = build_logic_depth_receipt(_model(data), budget=8)
+    receipt = _build_native_depth_analysis(_model(data), budget=8)
     card = next(row for row in receipt.coverage_universe.role_coverage if row.card_id == "card-shallow")
 
     assert card.status == "blocked"
@@ -240,7 +239,7 @@ def test_rich_aggregate_cannot_hide_one_shallow_critical_card() -> None:
         }
     )
 
-    receipt = build_logic_depth_receipt(_model(data), budget=12)
+    receipt = _build_native_depth_analysis(_model(data), budget=12)
     root = next(
         row
         for row in receipt.coverage_universe.role_coverage
@@ -260,18 +259,18 @@ def test_rich_aggregate_cannot_hide_one_shallow_critical_card() -> None:
 
 def test_depth_api_has_no_caller_selectable_profile_or_threshold() -> None:
     with pytest.raises(TypeError):
-        build_logic_depth_receipt(_model(), budget=8, profile="bounded")
+        _build_native_depth_analysis(_model(), budget=8, profile="bounded")
     with pytest.raises(TypeError):
-        build_logic_depth_receipt(_model(), budget=8, important_threshold=0.7)
+        _build_native_depth_analysis(_model(), budget=8, important_threshold=0.7)
 
 
-def test_universe_fingerprint_changes_with_authoritative_inventory() -> None:
-    first = build_logic_depth_receipt(_model(), budget=8)
+def test_model_freshness_changes_with_authoritative_inventory() -> None:
+    first = _build_native_depth_analysis(_model(), budget=8)
     changed = deepcopy(_role_complete_data())
     changed["model"]["target_unit_ids"] = ["section-1"]
-    second = build_logic_depth_receipt(_model(changed), budget=8)
+    second = _build_native_depth_analysis(_model(changed), budget=8)
 
-    assert first.coverage_universe.universe_fingerprint != second.coverage_universe.universe_fingerprint
+    assert first.model_fingerprint != second.model_fingerprint
     assert "section-1" in second.coverage_universe.unmodeled_target_unit_ids
     assert second.broad_claim_licensed is False
 
@@ -307,7 +306,7 @@ def test_low_declared_importance_cannot_remove_an_explicit_shallow_card() -> Non
         }
     )
 
-    receipt = build_logic_depth_receipt(_model(data), budget=20)
+    receipt = _build_native_depth_analysis(_model(data), budget=20)
     row = next(
         item
         for item in receipt.coverage_universe.role_coverage
@@ -330,7 +329,7 @@ def test_card_exclusion_requires_closed_reason_and_cannot_hide_active_nodes() ->
             "excluded": True,
         }
     )
-    unresolved_receipt = build_logic_depth_receipt(_model(unresolved), budget=8)
+    unresolved_receipt = _build_native_depth_analysis(_model(unresolved), budget=8)
     assert (
         "model_card_exclusion_unresolved:card:excluded-unresolved"
         in unresolved_receipt.unresolved_gaps
@@ -352,7 +351,7 @@ def test_card_exclusion_requires_closed_reason_and_cannot_hide_active_nodes() ->
             "importance": 1.0,
         },
     ]
-    active_receipt = build_logic_depth_receipt(_model(active), budget=8)
+    active_receipt = _build_native_depth_analysis(_model(active), budget=8)
     assert (
         "excluded_model_card_still_structurally_active:E1"
         in active_receipt.unresolved_gaps
@@ -378,7 +377,7 @@ def test_closed_disconnected_card_exclusion_is_visible_and_noncontributing() -> 
         }
     )
 
-    receipt = build_logic_depth_receipt(_model(data), budget=8)
+    receipt = _build_native_depth_analysis(_model(data), budget=8)
     row = next(
         item
         for item in receipt.coverage_universe.role_coverage
@@ -415,7 +414,7 @@ def test_each_important_claim_needs_its_own_connected_role_universe() -> None:
         }
     )
 
-    receipt = build_logic_depth_receipt(_model(data), budget=20)
+    receipt = _build_native_depth_analysis(_model(data), budget=20)
     child = next(
         item
         for item in receipt.coverage_universe.claim_role_coverage
@@ -458,7 +457,7 @@ def test_shared_role_node_requires_explicit_consumer_declaration() -> None:
         }
     )
 
-    implicit = build_logic_depth_receipt(_model(data), budget=20)
+    implicit = _build_native_depth_analysis(_model(data), budget=20)
     child = next(
         item
         for item in implicit.coverage_universe.claim_role_coverage
@@ -474,7 +473,7 @@ def test_shared_role_node_requires_explicit_consumer_declaration() -> None:
     )
 
     data["nodes"]["E1"]["shared_claim_ids"] = ["C0", "C_CHILD"]
-    explicit = build_logic_depth_receipt(_model(data), budget=20)
+    explicit = _build_native_depth_analysis(_model(data), budget=20)
     assert not any(
         gap.startswith("implicit_shared_role_node:E1:")
         for gap in explicit.unresolved_gaps
@@ -492,7 +491,7 @@ def test_shared_role_node_requires_explicit_consumer_declaration() -> None:
 
 
 def test_each_important_claim_has_claim_local_perturbation_coverage() -> None:
-    receipt = build_logic_depth_receipt(_model(), budget=1)
+    receipt = _build_native_depth_analysis(_model(), budget=1)
     root = next(
         item for item in receipt.claim_perturbation_coverage if item.claim_id == "C0"
     )
@@ -585,7 +584,7 @@ def test_nonempty_native_blocks_stay_on_the_explicit_inventory_path() -> None:
 def test_explicit_inventory_semantics_match_the_real_prechange_baseline() -> None:
     model = _model()
     original = deepcopy(model.to_dict())
-    receipt = build_logic_depth_receipt(model, budget=8)
+    receipt = _build_native_depth_analysis(model, budget=8)
     payload = receipt.to_dict()
     universe = payload["coverage_universe"]
     actual = {

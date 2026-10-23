@@ -93,13 +93,10 @@ def render_markdown(
         depth = result.storyline_depth
         lines.extend(
             [
-                "## Storyline Depth Receipt",
+                "## Storyline Depth",
                 "",
-                f"- Receipt id: `{depth.receipt_id}`",
                 f"- Closure status: `{depth.closure_status}`",
                 f"- Model fingerprint: `{depth.model_fingerprint}`",
-                f"- Candidate universe fingerprint: `{depth.candidate_universe_fingerprint}`",
-                f"- Object universe fingerprint: `{depth.object_universe_fingerprint}`",
                 f"- Requested / covered scope: `{depth.requested_claim_scope}` / `{depth.covered_claim_scope}`",
                 f"- Broad claim licensed: `{str(depth.broad_claim_licensed).lower()}`",
                 f"- Eligible / critical / executed: `{depth.coverage_counts['eligible_count']}` / "
@@ -178,7 +175,7 @@ def render_text(
         )
     if result.storyline_depth is not None:
         blocks.append(
-            "Storyline depth receipt:\n"
+            "Storyline depth:\n"
             f"- Closure status: {result.storyline_depth.closure_status}\n"
             f"- Requested / covered scope: {result.storyline_depth.requested_claim_scope} / "
             f"{result.storyline_depth.covered_claim_scope}\n"
@@ -225,7 +222,7 @@ def _render_research_state(
                   "| Hypothesis id | Claim | Support | Rank | Live | Causal status | Top opposition factor |",
                   "| --- | --- | --- | --- | --- | --- | --- |"])
     hypotheses = model.hypothesis_by_id()
-    for row in result.inference_receipt.hypothesis_projections:
+    for row in result.inference.hypothesis_projections:
         hypothesis = hypotheses.get(row.hypothesis_id)
         claim = hypothesis.claim if hypothesis is not None else ""
         if hypothesis is None and row.hypothesis_id.startswith("implicit:"):

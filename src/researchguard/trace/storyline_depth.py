@@ -92,10 +92,6 @@ class PerturbationEffect:
     effective: bool
     informative_null: bool
     counts_toward_depth: bool
-    baseline_inference_receipt_id: str = ""
-    perturbed_inference_receipt_id: str = ""
-    baseline_problem_fingerprint: str = ""
-    perturbed_problem_fingerprint: str = ""
     baseline_solver_id: str = ""
     perturbed_solver_id: str = ""
 
@@ -108,25 +104,19 @@ class PerturbationEffect:
             "effective": self.effective,
             "informative_null": self.informative_null,
             "counts_toward_depth": self.counts_toward_depth,
-            "baseline_inference_receipt_id": self.baseline_inference_receipt_id,
-            "perturbed_inference_receipt_id": self.perturbed_inference_receipt_id,
-            "baseline_problem_fingerprint": self.baseline_problem_fingerprint,
-            "perturbed_problem_fingerprint": self.perturbed_problem_fingerprint,
             "baseline_solver_id": self.baseline_solver_id,
             "perturbed_solver_id": self.perturbed_solver_id,
         }
 
 
 @dataclass(frozen=True)
-class StorylineDepthReceipt:
+class StorylineDepthResult:
     schema_version: str
-    receipt_id: str
     model_fingerprint: str
     baseline: dict[str, Any]
     hypotheses: tuple[dict[str, Any], ...]
     alternatives: tuple[StorylineAlternative, ...]
     causal_coverage: tuple[dict[str, Any], ...]
-    object_universe_fingerprint: str
     object_coverage_counts: dict[str, int]
     object_depth_rows: tuple[dict[str, Any], ...]
     temporal_coverage: tuple[dict[str, Any], ...]
@@ -134,7 +124,6 @@ class StorylineDepthReceipt:
     effects: tuple[PerturbationEffect, ...]
     unresolved_gaps: tuple[dict[str, Any], ...]
     untested_high_impact: tuple[dict[str, Any], ...]
-    candidate_universe_fingerprint: str
     critical_threshold: float
     coverage_counts: dict[str, int]
     coverage_by_kind: tuple[dict[str, Any], ...]
@@ -149,8 +138,6 @@ class StorylineDepthReceipt:
     predictive_claim_licensed: bool
     closure_status: str
     claim_boundary: str
-    hierarchy_fingerprint: str = ""
-    interface_fingerprint: str = ""
     affected_object_ids: tuple[str, ...] = ()
     live_alternative_ids: tuple[str, ...] = ()
     causal_boundaries: tuple[dict[str, Any], ...] = ()
@@ -160,13 +147,11 @@ class StorylineDepthReceipt:
     def to_dict(self) -> dict[str, Any]:
         return {
             "schema_version": self.schema_version,
-            "receipt_id": self.receipt_id,
             "model_fingerprint": self.model_fingerprint,
             "baseline": self.baseline,
             "hypotheses": list(self.hypotheses),
             "alternatives": [item.to_dict() for item in self.alternatives],
             "causal_coverage": list(self.causal_coverage),
-            "object_universe_fingerprint": self.object_universe_fingerprint,
             "object_coverage_counts": self.object_coverage_counts,
             "object_depth_rows": list(self.object_depth_rows),
             "temporal_coverage": list(self.temporal_coverage),
@@ -174,7 +159,6 @@ class StorylineDepthReceipt:
             "effects": [item.to_dict() for item in self.effects],
             "unresolved_gaps": list(self.unresolved_gaps),
             "untested_high_impact": list(self.untested_high_impact),
-            "candidate_universe_fingerprint": self.candidate_universe_fingerprint,
             "critical_threshold": self.critical_threshold,
             "coverage_counts": self.coverage_counts,
             "coverage_by_kind": list(self.coverage_by_kind),
@@ -189,8 +173,6 @@ class StorylineDepthReceipt:
             "predictive_claim_licensed": self.predictive_claim_licensed,
             "closure_status": self.closure_status,
             "claim_boundary": self.claim_boundary,
-            "hierarchy_fingerprint": self.hierarchy_fingerprint,
-            "interface_fingerprint": self.interface_fingerprint,
             "affected_object_ids": list(self.affected_object_ids),
             "live_alternative_ids": list(self.live_alternative_ids),
             "causal_boundaries": list(self.causal_boundaries),
@@ -270,8 +252,8 @@ def _object_depth_coverage(
     hypotheses: tuple[StorylineHypothesis, ...],
     *,
     requested_claim_scope: str = "broad",
-) -> tuple[str, dict[str, int], tuple[dict[str, Any], ...], tuple[dict[str, Any], ...], list[dict[str, Any]]]:
-    """Build a fingerprinted, target-owned object and temporal denominator."""
+) -> tuple[dict[str, int], tuple[dict[str, Any], ...], tuple[dict[str, Any], ...], list[dict[str, Any]]]:
+    """Build a target-owned object and temporal denominator."""
 
     hypothesis_by_id = {item.hypothesis_id: item for item in hypotheses}
     trace_by_id = {item.trace_id: item for item in model.traces}
@@ -603,30 +585,6 @@ def _object_depth_coverage(
             },
         )
 
-    fingerprint_payload = {
-        "owner": "researchguard.trace.storyline-object-depth",
-        "critical_importance_threshold": CRITICAL_OBJECT_IMPORTANCE_THRESHOLD,
-        "requested_claim_scope": requested_claim_scope,
-        "temporal_policy": {
-            "minimum_per_trace_qualified_event_count": declared_minimum_count,
-            "minimum_per_trace_qualified_event_ratio": declared_minimum_ratio,
-            "maximum_per_trace_unqualified_run": declared_maximum_run,
-            "native_floor_algorithm": "max(3,ceil(sqrt(eligible_event_count)))",
-            "temporal_distribution_algorithm": "declared_trace_sequence_thirds_with_sqrt_gap_ceiling",
-        },
-        "temporal_rows": temporal_rows,
-        "rows": [
-            {
-                "object_type": row["object_type"],
-                "object_id": row["object_id"],
-                "critical": row["critical"],
-            }
-            for row in rows
-        ],
-    }
-    fingerprint = hashlib.sha256(
-        json.dumps(fingerprint_payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
-    ).hexdigest()
     critical_rows = [row for row in rows if row["critical"]]
     counts = {
         "eligible_count": len(rows),
@@ -635,7 +593,7 @@ def _object_depth_coverage(
         "critical_covered_count": sum(row["status"] == "pass" for row in critical_rows),
         "critical_uncovered_count": sum(row["status"] != "pass" for row in critical_rows),
     }
-    return fingerprint, counts, tuple(rows), tuple(temporal_rows), gaps
+    return counts, tuple(rows), tuple(temporal_rows), gaps
 
 
 def hypotheses_for_model(model: TraceGuardModel) -> tuple[StorylineHypothesis, ...]:
@@ -693,7 +651,7 @@ def hypothesis_snapshots(
     inference_projections = {
         item.hypothesis_id: item
         for item in getattr(
-            getattr(result, "inference_receipt", None),
+            getattr(result, "inference", None),
             "hypothesis_projections",
             (),
         )
@@ -800,7 +758,7 @@ def _causal_rows(
     projections = {
         item.hypothesis_id: item
         for item in getattr(
-            getattr(baseline_result, "inference_receipt", None),
+            getattr(baseline_result, "inference", None),
             "hypothesis_projections",
             (),
         )
@@ -1179,20 +1137,6 @@ def select_perturbation_plan(
         if item.priority_score >= critical_threshold and item.perturbation_id not in executed_ids
     ]
     return tuple(selected), tuple(untested)
-
-
-def _candidate_universe_fingerprint(
-    candidates: tuple[PerturbationPlanItem, ...],
-    critical_threshold: float,
-) -> str:
-    payload = {
-        "owner": "researchguard.trace.storyline-depth",
-        "critical_threshold": critical_threshold,
-        "candidates": [item.to_dict() for item in candidates],
-    }
-    return hashlib.sha256(
-        json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
-    ).hexdigest()
 
 
 def _unique(existing: set[str], base: str) -> str:
@@ -1635,14 +1579,10 @@ def run_single_perturbation(
         hypotheses_for_model(perturbed_model),
     )
     effect = compare_perturbation(plan, before, after)
-    baseline_receipt = baseline_result.inference_receipt
-    perturbed_receipt = perturbed_result.inference_receipt
+    baseline_receipt = baseline_result.inference
+    perturbed_receipt = perturbed_result.inference
     effect = replace(
         effect,
-        baseline_inference_receipt_id=baseline_receipt.receipt_id,
-        perturbed_inference_receipt_id=perturbed_receipt.receipt_id,
-        baseline_problem_fingerprint=baseline_receipt.problem_fingerprint,
-        perturbed_problem_fingerprint=perturbed_receipt.problem_fingerprint,
         baseline_solver_id=baseline_receipt.solver_id,
         perturbed_solver_id=perturbed_receipt.solver_id,
     )
@@ -1662,10 +1602,10 @@ def _inference_self_check_gaps(model: TraceGuardModel, baseline_result: Any) -> 
             model,
             hypothesis_evidence_links=tuple(link for link in model.hypothesis_evidence_links if link.polarity != "oppose"),
         )))
-    baseline = {row.hypothesis_id: row.support for row in baseline_result.inference_receipt.hypothesis_projections}
+    baseline = {row.hypothesis_id: row.support for row in baseline_result.inference.hypothesis_projections}
     gaps = []
     for code, variant in variants:
-        alternate = {row.hypothesis_id: row.support for row in infer_model(variant).inference_receipt.hypothesis_projections}
+        alternate = {row.hypothesis_id: row.support for row in infer_model(variant).inference.hypothesis_projections}
         for hypothesis_id, support in sorted(baseline.items()):
             if support > alternate[hypothesis_id] + 0.001:
                 gaps.append({
@@ -1685,7 +1625,7 @@ def evaluate_storyline_depth(
     *,
     max_perturbations: int | None = None,
     requested_claim_scope: str = "broad",
-) -> StorylineDepthReceipt:
+) -> StorylineDepthResult:
     if requested_claim_scope not in {"bounded", "broad"}:
         raise ValueError("requested_claim_scope must be 'bounded' or 'broad'")
     fingerprint = _model_fingerprint(model)
@@ -1698,7 +1638,6 @@ def evaluate_storyline_depth(
         baseline_result,
     )
     (
-        object_universe_fingerprint,
         object_coverage_counts,
         object_depth_rows,
         temporal_coverage,
@@ -1709,10 +1648,6 @@ def evaluate_storyline_depth(
         requested_claim_scope=requested_claim_scope,
     )
     candidates = perturbation_candidates(model, hypotheses)
-    candidate_universe_fingerprint = _candidate_universe_fingerprint(
-        candidates,
-        CRITICAL_PERTURBATION_THRESHOLD,
-    )
     plan, untested = select_perturbation_plan(
         model,
         hypotheses,
@@ -1925,11 +1860,11 @@ def evaluate_storyline_depth(
         "critical_uncovered_count": len(critical_uncovered),
     }
 
-    inference_receipt = baseline_result.inference_receipt
+    inference = baseline_result.inference
     live_alternative_ids = tuple(
         sorted(
             item.hypothesis_id
-            for item in inference_receipt.hypothesis_projections
+            for item in inference.hypothesis_projections
             if item.live and item.rank != 1
         )
     )
@@ -1951,7 +1886,7 @@ def evaluate_storyline_depth(
             "claim_boundary": item.claim_boundary,
             "formal_causal_identification_licensed": False,
         }
-        for item in inference_receipt.hypothesis_projections
+        for item in inference.hypothesis_projections
     )
     affected_object_ids = {
         str(row.get("object_id", ""))
@@ -1978,10 +1913,8 @@ def evaluate_storyline_depth(
         if unresolved
         else ""
     )
-    receipt_id = f"traceguard-depth:{fingerprint[:16]}"
-    return StorylineDepthReceipt(
+    return StorylineDepthResult(
         schema_version="researchguard.trace.storyline_depth.v2",
-        receipt_id=receipt_id,
         model_fingerprint=fingerprint,
         baseline={
             "ok": baseline_result.ok,
@@ -2010,7 +1943,6 @@ def evaluate_storyline_depth(
         ),
         alternatives=alternatives,
         causal_coverage=causal_coverage,
-        object_universe_fingerprint=object_universe_fingerprint,
         object_coverage_counts=object_coverage_counts,
         object_depth_rows=object_depth_rows,
         temporal_coverage=temporal_coverage,
@@ -2018,7 +1950,6 @@ def evaluate_storyline_depth(
         effects=tuple(effects),
         unresolved_gaps=tuple(unresolved),
         untested_high_impact=untested,
-        candidate_universe_fingerprint=candidate_universe_fingerprint,
         critical_threshold=CRITICAL_PERTURBATION_THRESHOLD,
         coverage_counts=coverage_counts,
         coverage_by_kind=tuple(coverage_by_kind),
@@ -2033,7 +1964,7 @@ def evaluate_storyline_depth(
         predictive_claim_licensed=False,
         closure_status=closure_status,
         claim_boundary=(
-            "This receipt reports TraceGuard model behavior only for its exact fingerprinted candidate universe, "
+            "This result reports TraceGuard model behavior only for its declared candidate universe, "
             "executed perturbations, and covered claim scope. "
             "It does not prove factual truth, causal identification, calibrated probability, or future real-world outcomes."
         ),

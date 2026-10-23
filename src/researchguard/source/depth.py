@@ -1,4 +1,4 @@
-"""Native SourceGuard semantic-depth receipts and observation replanning."""
+"""Native SourceGuard semantic-depth results and observation replanning."""
 
 from __future__ import annotations
 
@@ -17,7 +17,7 @@ from .schema import (
     SOURCE_PORTFOLIO_CLASSES,
     SourceCoverageDimension,
     SourceCoverageUniverse,
-    SourceDepthReceipt,
+    SourceDepthResult,
     SourceObjectDepthRow,
     to_plain,
 )
@@ -559,40 +559,6 @@ def build_source_coverage_universe(
             )
         )
 
-    fingerprint_payload = {
-        "owner_id": "researchguard.source.semantic-gap-depth",
-        "policy_origin": SOURCE_DEPTH_NATIVE_POLICY_ORIGIN,
-        "requested_claim_scope": policy.requested_claim_scope,
-        "important_threshold": threshold,
-        "minimum_independent_lineages": policy.minimum_independent_lineages,
-        "target_unit_inventory_ids": declared_target_units,
-        "required_target_unit_ids": required_target_units,
-        "excluded_target_unit_ids": excluded_target_units,
-        "target_unit_exclusion_reasons": exclusion_reasons,
-        "discovered_target_unit_ids": discovered_target_units,
-        "require_explicit_lineage": policy.require_explicit_lineage,
-        "require_anchor_content": policy.require_anchor_content,
-        "required_gap_ids": sorted(policy.required_gap_ids),
-        "required_lineage_slot_ids": sorted(policy.required_lineage_slot_ids),
-        "required_anchor_requirement_ids": sorted(policy.required_anchor_requirement_ids),
-        "required_handoff_ids": sorted(policy.required_handoff_ids),
-        "known_good_case_ids": sorted(policy.known_good_case_ids),
-        "known_bad_case_ids": sorted(policy.known_bad_case_ids),
-        "per_gap_portfolio_required": policy.per_gap_portfolio_required,
-        "dimensions": [
-            {
-                "dimension_id": item.dimension_id,
-                "universe_ids": item.universe_ids,
-                "critical_ids": item.critical_ids,
-                "coverage_floor": item.coverage_floor,
-                "floor_origin": item.floor_origin,
-            }
-            for item in dimensions
-        ],
-    }
-    universe_fingerprint = hashlib.sha256(
-        json.dumps(fingerprint_payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
-    ).hexdigest()
     critical_uncovered = sorted(
         f"{item.dimension_id}:{item_id}"
         for item in dimensions
@@ -619,7 +585,6 @@ def build_source_coverage_universe(
         policy_origin=SOURCE_DEPTH_NATIVE_POLICY_ORIGIN,
         requested_claim_scope=policy.requested_claim_scope,
         covered_claim_scope=covered_scope,
-        universe_fingerprint=universe_fingerprint,
         declared_target_unit_ids=declared_target_units,
         discovered_target_unit_ids=discovered_target_units,
         required_target_unit_ids=required_target_units,
@@ -642,7 +607,7 @@ def apply_observation_and_replan(
     *,
     provider_status: str = "NOT_RUN",
     limit: int = 5,
-) -> tuple[BeliefState, SourceDepthReceipt]:
+) -> tuple[BeliefState, SourceDepthResult]:
     """Clone a baseline, optionally apply one supplied observation, and replan.
 
     This function never invokes a provider. Without a new observation, the
@@ -710,10 +675,8 @@ def apply_observation_and_replan(
         and coverage_universe.covered_claim_scope == "broad"
     )
     status = "pass" if broad_claim_licensed else ("bounded" if observation_depth else "planning_only")
-    receipt = SourceDepthReceipt(
-        receipt_version="researchguard.source.depth.v2",
+    receipt = SourceDepthResult(
         model_fingerprint=model_fingerprint(baseline),
-        result_model_fingerprint=model_fingerprint(updated),
         provider_status=normalized_provider,
         observation_status=observation_status,
         planning_depth_completed=True,
@@ -752,13 +715,13 @@ def apply_observation_and_replan(
     return updated, receipt
 
 
-def build_source_depth_receipt(
+def build_source_depth(
     belief_state: BeliefState,
     observation: Observation | None = None,
     *,
     provider_status: str = "NOT_RUN",
     limit: int = 5,
-) -> SourceDepthReceipt:
+) -> SourceDepthResult:
     return apply_observation_and_replan(
         belief_state,
         observation,
@@ -769,7 +732,7 @@ def build_source_depth_receipt(
 
 __all__ = [
     "apply_observation_and_replan",
-    "build_source_depth_receipt",
+    "build_source_depth",
     "build_source_coverage_universe",
     "compare_replans",
     "model_fingerprint",

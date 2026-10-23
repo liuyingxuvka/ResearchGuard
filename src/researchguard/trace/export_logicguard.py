@@ -44,32 +44,6 @@ def _stable_unique(values: Any) -> list[str]:
     return output
 
 
-def _receipt_identity(result: EvaluationResult) -> dict[str, Any]:
-    receipt = getattr(result, "inference_receipt", None)
-    payload = _as_dict(receipt)
-    if not payload:
-        return {
-            "receipt_id": "",
-            "model_fingerprint": "",
-            "problem_fingerprint": "",
-            "solution_fingerprint": "",
-            "schema_id": "",
-        }
-    keys = (
-        "receipt_id",
-        "model_fingerprint",
-        "problem_fingerprint",
-        "solution_fingerprint",
-        "schema_id",
-        "policy_id",
-        "factor_set_id",
-        "solver_id",
-        "solver_backend",
-        "solver_backend_version",
-    )
-    return {key: copy.deepcopy(payload.get(key, "")) for key in keys}
-
-
 def _domain_gap_list(trace: Any, audit_context: Mapping[str, Any]) -> list[str]:
     gaps: list[str] = []
     gaps.extend(_stable_unique(getattr(trace, "domain_gaps", ())))
@@ -81,8 +55,8 @@ def _domain_gap_list(trace: Any, audit_context: Mapping[str, Any]) -> list[str]:
     return _stable_unique(gaps)
 
 
-def _hypothesis_handoff(model: "TraceGuardModel", receipt: Mapping[str, Any], claims: list[dict[str, Any]]) -> dict[str, Any]:
-    projections = {item["hypothesis_id"]: item for item in receipt.get("hypothesis_projections", ())}
+def _hypothesis_handoff(model: "TraceGuardModel", inference: Mapping[str, Any], claims: list[dict[str, Any]]) -> dict[str, Any]:
+    projections = {item["hypothesis_id"]: item for item in inference.get("hypothesis_projections", ())}
     hypotheses = []
     involved = {item for claim in claims for item in claim["evidence"]}
     for hypothesis in model.storyline_hypotheses:
@@ -105,8 +79,7 @@ def _hypothesis_handoff(model: "TraceGuardModel", receipt: Mapping[str, Any], cl
 
 
 def logicguard_bundle(result: EvaluationResult, *, model: "TraceGuardModel | None" = None) -> dict[str, object]:
-    receipt_payload = _as_dict(getattr(result, "inference_receipt", None))
-    receipt_identity = _receipt_identity(result)
+    inference_payload = _as_dict(getattr(result, "inference", None))
     claims: list[dict[str, Any]] = []
     for trace in getattr(result, "traces", ()):
         original_context = _as_dict(getattr(trace, "audit_context", {}))
@@ -121,8 +94,7 @@ def logicguard_bundle(result: EvaluationResult, *, model: "TraceGuardModel | Non
                 # Generic solver language belongs to this audit envelope.
                 "claim_boundary": getattr(trace, "claim_boundary", ""),
                 "tool_template": "TraceGuard links source-backed evidence to events and a trace candidate through soft rules and hard gates.",
-                "native_inference_receipt_id": receipt_identity.get("receipt_id", ""),
-                "source_model_fingerprint": receipt_identity.get("model_fingerprint", ""),
+                "source_model_fingerprint": inference_payload.get("model_fingerprint", ""),
                 "domain_gaps": domain_gaps,
             }
         )
@@ -145,8 +117,7 @@ def logicguard_bundle(result: EvaluationResult, *, model: "TraceGuardModel | Non
                 "limitation": "; ".join(domain_boundaries),
                 "native_causal_license": getattr(trace, "native_causal_license", "not_licensed"),
                 "domain_gaps": domain_gaps,
-                "source_model_fingerprint": receipt_identity.get("model_fingerprint", ""),
-                "native_inference_receipt_id": receipt_identity.get("receipt_id", ""),
+                "source_model_fingerprint": inference_payload.get("model_fingerprint", ""),
                 "audit_context": audit_context,
                 "handoff_id": f"lead_{trace.trace_id}",
                 "structure_unit_id": trace.structure_unit_id,
@@ -170,9 +141,7 @@ def logicguard_bundle(result: EvaluationResult, *, model: "TraceGuardModel | Non
             "purpose": "LogicGuard-ready claim bundle generated from TraceGuard.",
             "repository": "https://github.com/liuyingxuvka/ResearchGuard",
             "skill": "TraceGuard",
-            "source_model_fingerprint": receipt_identity.get("model_fingerprint", ""),
-            "native_inference_receipt_id": receipt_identity.get("receipt_id", ""),
-            "native_inference_receipt": receipt_payload,
+            "source_model_fingerprint": inference_payload.get("model_fingerprint", ""),
             "boundary": "TraceGuard reconstructs traces; LogicGuard audits claims about those traces.",
         },
         "claims": claims,
@@ -181,7 +150,7 @@ def logicguard_bundle(result: EvaluationResult, *, model: "TraceGuardModel | Non
     }
 
     if model is not None:
-        bundle.update(_hypothesis_handoff(model, receipt_payload, claims))
+        bundle.update(_hypothesis_handoff(model, inference_payload, claims))
     return bundle
 
 
@@ -208,10 +177,6 @@ def validate_logicguard_bundle(bundle: Mapping[str, Any]) -> dict[str, Any]:
         raise ValueError("LogicGuard handoff metadata export_version is not current")
     if not str(metadata.get("source_model_fingerprint", "") or "").strip():
         raise ValueError("LogicGuard handoff source model fingerprint is required")
-    if not str(metadata.get("native_inference_receipt_id", "") or "").strip():
-        raise ValueError("LogicGuard handoff native inference receipt identity is required")
-    if not isinstance(metadata.get("native_inference_receipt"), Mapping):
-        raise ValueError("LogicGuard handoff native inference receipt is required")
     claims = bundle.get("claims")
     if not isinstance(claims, list):
         raise ValueError("LogicGuard handoff claims must be a list")

@@ -144,7 +144,6 @@ class HypothesisDisposition:
 @dataclass(frozen=True)
 class PredictionMatrixRevisionCandidate:
     candidate_id: str
-    base_matrix_fingerprint: str
     unexpected_observation_ids: tuple[str, ...]
     required_actions: tuple[str, ...]
     disposition: Literal["not_applied"] = "not_applied"
@@ -174,8 +173,6 @@ class ExperimentRecommendation:
 class ExperimentIterationResult:
     task_id: str
     iteration: int
-    base_matrix_fingerprint: str
-    candidate_matrix_fingerprint: str
     recommendation: ExperimentRecommendation
     observations: tuple[ExperimentObservation, ...]
     hypothesis_dispositions: tuple[HypothesisDisposition, ...]
@@ -204,8 +201,6 @@ class ExperimentIterationResult:
             "schema_version": self.schema_version,
             "task_id": self.task_id,
             "iteration": self.iteration,
-            "base_matrix_fingerprint": self.base_matrix_fingerprint,
-            "candidate_matrix_fingerprint": self.candidate_matrix_fingerprint,
             "recommendation": self.recommendation.to_dict(),
             "observations": [item.to_dict() for item in self.observations],
             "hypothesis_dispositions": [item.to_dict() for item in self.hypothesis_dispositions],

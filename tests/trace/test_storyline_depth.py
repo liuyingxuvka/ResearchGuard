@@ -234,17 +234,15 @@ def test_unlinked_fixed_event_is_ineffective_and_does_not_count_toward_depth():
     assert not effect.counts_toward_depth
 
 
-def test_native_receipt_binds_baseline_alternatives_plan_effects_and_gaps():
+def test_native_result_reports_baseline_alternatives_plan_effects_and_gaps():
     receipt = evaluate_model(_model(_data()), include_storyline_depth=True).storyline_depth
 
     assert receipt.schema_version == "researchguard.trace.storyline_depth.v2"
     assert len(receipt.model_fingerprint) == 64
-    assert receipt.receipt_id.endswith(receipt.model_fingerprint[:16])
     assert receipt.baseline["hypothesis_snapshots"]
     assert any(row.alternative_ids for row in receipt.alternatives)
     assert receipt.perturbation_plan
     assert receipt.effects
-    assert receipt.candidate_universe_fingerprint
     assert receipt.critical_threshold == CRITICAL_PERTURBATION_THRESHOLD
     assert receipt.coverage_counts["critical_uncovered_count"] == 0
     assert receipt.critical_uncovered_ids == ()
@@ -252,7 +250,6 @@ def test_native_receipt_binds_baseline_alternatives_plan_effects_and_gaps():
     assert receipt.sensitivity_mismatch_ids == ()
     assert receipt.untested_high_impact == ()
     assert receipt.broad_claim_licensed is True
-    assert receipt.object_universe_fingerprint
     assert receipt.object_coverage_counts["critical_uncovered_count"] == 0
     assert receipt.object_depth_rows
     assert all(row["status"] == "pass" for row in receipt.object_depth_rows if row["critical"])
@@ -264,11 +261,6 @@ def test_native_receipt_binds_baseline_alternatives_plan_effects_and_gaps():
         effect.counts_toward_depth for effect in receipt.effects
     )
     for effect in receipt.effects:
-        assert effect.baseline_inference_receipt_id
-        assert effect.perturbed_inference_receipt_id
-        assert effect.baseline_problem_fingerprint
-        assert effect.perturbed_problem_fingerprint
-        assert effect.baseline_problem_fingerprint != effect.perturbed_problem_fingerprint
         assert effect.baseline_solver_id == "osqp.direct.v1"
         assert effect.perturbed_solver_id == effect.baseline_solver_id
         for row in effect.deltas.values():
@@ -385,13 +377,13 @@ def test_bounded_request_never_becomes_broad_license() -> None:
     assert receipt.broad_claim_licensed is False
 
 
-def test_candidate_universe_fingerprint_changes_with_authoritative_model() -> None:
+def test_model_freshness_changes_with_authoritative_model() -> None:
     first = evaluate_model(_model(_data()), include_storyline_depth=True).storyline_depth
     changed_data = _data()
     changed_data["events"][0]["importance"] = 0.01
     second = evaluate_model(_model(changed_data), include_storyline_depth=True).storyline_depth
 
-    assert first.candidate_universe_fingerprint != second.candidate_universe_fingerprint
+    assert first.model_fingerprint != second.model_fingerprint
 
 
 def test_single_event_noncausal_trace_cannot_license_broad_depth() -> None:
@@ -505,7 +497,7 @@ def test_traceguard_never_promotes_internal_perturbation_to_future_prediction() 
     }
 
 
-def test_object_universe_fingerprint_changes_with_trace_inventory() -> None:
+def test_object_inventory_changes_with_trace_inventory() -> None:
     first = evaluate_model(_model(_data()), include_storyline_depth=True).storyline_depth
     changed = _data()
     changed["sources"].append(
@@ -531,7 +523,7 @@ def test_object_universe_fingerprint_changes_with_trace_inventory() -> None:
     )
     second = evaluate_model(_model(changed), include_storyline_depth=True).storyline_depth
 
-    assert first.object_universe_fingerprint != second.object_universe_fingerprint
+    assert first.object_depth_rows != second.object_depth_rows
 
 
 def test_low_importance_explicit_trace_cannot_escape_broad_object_denominator() -> None:
@@ -602,7 +594,7 @@ def _long_trace_depth_row(
     )[-3:]
     data["metadata"]["storyline_depth_policy"] = policy or {}
     model = TraceGuardModel.from_dict(data)
-    _, _, rows, _, _ = _object_depth_coverage(
+    _, rows, _, _ = _object_depth_coverage(
         model,
         hypotheses_for_model(model),
         requested_claim_scope="broad",
@@ -675,7 +667,7 @@ def test_live_alternatives_exclude_the_leader() -> None:
     model = load_model(Path(__file__).parent / "fixtures" / "evergiven" / "tr_v2b.yaml")
     baseline = evaluate_model(model)
     receipt = evaluate_storyline_depth(model, baseline, max_perturbations=0)
-    projections = baseline.inference_receipt.hypothesis_projections
+    projections = baseline.inference.hypothesis_projections
     assert {row.hypothesis_id for row in projections if row.rank == 1}.isdisjoint(receipt.live_alternative_ids)
     assert set(receipt.live_alternative_ids) == {row.hypothesis_id for row in projections if row.live and row.rank != 1}
 

@@ -21,7 +21,7 @@ def generate_markdown_report(
     diagnostics = diagnostics or diagnose_model(model, result)
     fragility = fragility or simulate_fragility(model, root_claim=model.root_claim)
     counterexample = counterexample or search_counterexamples(model, root_claim=model.root_claim)
-    depth_receipt = _build_native_depth_analysis(model)
+    depth_result = _build_native_depth_analysis(model)
     root = result.root()
 
     lines = [
@@ -58,11 +58,16 @@ def generate_markdown_report(
         lines.append("- No root claim.")
 
     lines.extend(["", "## Support Structure"])
-    support_rows = [row for row in dependency_trace(model, root_claim=model.root_claim) if row.get("edge_type") in {"supports", "depends_on", "refines", "derives", "aggregates"}]
+    paths = dependency_trace(model, root_claim=model.root_claim)
+    attack_pairs = {(edge.source, edge.target) for edge in model.edges if edge.type in {"attacks", "undercuts", "contradicts"}}
+    def is_attack(row):
+        path = row.get("path", [])
+        return any(pair in attack_pairs for pair in zip(path, path[1:]))
+    support_rows = [row for row in paths if not is_attack(row)]
     lines.extend(_path_lines(support_rows) or ["- No declared support paths."])
 
-    lines.extend(["", "## Attack / Rebuttal Structure"])
-    attack_rows = [row for row in dependency_trace(model, root_claim=model.root_claim) if row.get("edge_type") in {"attacks", "undercuts", "contradicts"}]
+    lines.extend(["", "## Attack Structure"])
+    attack_rows = [row for row in paths if is_attack(row)]
     lines.extend(_path_lines(attack_rows) or ["- No declared attack or rebuttal paths."])
 
     lines.extend(["", "## Missing Warrants"])
@@ -100,24 +105,24 @@ def generate_markdown_report(
     else:
         lines.append("- Keep claims tied to declared evidence, warrants, assumptions, and scope.")
 
-    lines.extend(["", "## Native Execution Depth"])
-    universe = depth_receipt.coverage_universe
+    lines.extend(["", "## Depth"])
+    universe = depth_result.coverage_universe
+    unresolved = set(depth_result.tournament.unresolved_competitor_ids)
+    unresolved.update(item for row in depth_result.tournament.candidates for item in row.unresolved_objection_ids)
     lines.extend(
         [
-            f"- Receipt status: `{depth_receipt.status}`",
-            f"- Depth profile: `{depth_receipt.profile}`",
-            f"- Model fingerprint: `{depth_receipt.model_fingerprint}`",
-            f"- Coverage-universe fingerprint: `{universe.universe_fingerprint if universe else 'NOT_RUN'}`",
-            f"- Important coverage: {depth_receipt.coverage.covered_count}/{depth_receipt.coverage.required_count}",
+            f"- Status: `{depth_result.status}`",
+            f"- Depth profile: `{depth_result.profile}`",
+            f"- Important coverage: {depth_result.coverage.covered_count}/{depth_result.coverage.required_count}",
             f"- Role-complete important cards: {sum(row.status == 'pass' for row in universe.role_coverage) if universe else 0}/{len(universe.role_coverage) if universe else 0}",
             f"- Disconnected important nodes: {', '.join(universe.unresolved_disconnected_node_ids) if universe and universe.unresolved_disconnected_node_ids else 'None'}",
             f"- Claim scope coverage: {len(universe.claim_scope.covered_node_ids) if universe else 0}/{len(universe.claim_scope.requested_node_ids) if universe else 0}",
-            f"- Unresolved competitors: {', '.join(depth_receipt.tournament.unresolved_competitor_ids) or 'None'}",
-            f"- Effective perturbations: {sum(item.effective for item in depth_receipt.perturbation_effectiveness)}",
-            f"- Effective critical perturbations: {depth_receipt.critical_perturbation_coverage.get('effective_count', 0)}/{depth_receipt.critical_perturbation_coverage.get('eligible_count', 0)}",
-            f"- Untested high-impact nodes: {', '.join(depth_receipt.untested_high_impact_node_ids) or 'None'}",
-            f"- Broad structural claim licensed: {depth_receipt.broad_claim_licensed}",
-            f"- Boundary: {depth_receipt.claim_boundary}",
+            f"- Unresolved competitors: {', '.join(sorted(unresolved)) or 'None'}",
+            f"- Effective perturbations: {sum(item.effective for item in depth_result.perturbation_effectiveness)}",
+            f"- Effective critical perturbations: {depth_result.critical_perturbation_coverage.get('effective_count', 0)}/{depth_result.critical_perturbation_coverage.get('eligible_count', 0)}",
+            f"- Untested high-impact nodes: {', '.join(depth_result.untested_high_impact_node_ids) or 'None'}",
+            f"- Broad structural claim licensed: {depth_result.broad_claim_licensed}",
+            f"- Boundary: {depth_result.claim_boundary}",
         ]
     )
 

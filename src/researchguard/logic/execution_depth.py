@@ -1,4 +1,4 @@
-"""Native execution-depth receipts built from LogicGuard-owned evaluation results."""
+"""Native execution-depth results built from LogicGuard-owned evaluation results."""
 
 from __future__ import annotations
 
@@ -23,7 +23,7 @@ from .model import (
     DepthCoverageSummary,
     EvaluationResult,
     ImportancePolicy,
-    LogicDepthReceipt,
+    LogicDepthResult,
     LogicModel,
     PerturbationEffectiveness,
     PerturbationPlanItem,
@@ -952,42 +952,8 @@ def build_argument_coverage_universe(
     shared_evidence_node_ids = tuple(sorted(
         node_id for node_id, count in evidence_consumers.items() if count > 1
     ))
-    fingerprint_payload = {
-        "owner_id": "researchguard.logic.authoritative-argument-coverage",
-        "model_fingerprint": model_fingerprint(model),
-        "target_unit_ids": target_unit_ids,
-        "modeled_target_unit_ids": modeled_target_unit_ids,
-        "model_card_ids": [row.card_id for row in roles],
-        "important_node_ids": sorted(important_ids),
-        "reachable_node_ids": sorted(reachable),
-        "critical_perturbable_node_ids": sorted(critical),
-        "role_coverage": [row.to_dict() for row in roles],
-        "claim_role_coverage": [row.to_dict() for row in claim_roles],
-        "discovered_model_card_ids": sorted(card_inventory),
-        "declared_model_card_ids": sorted(
-            card_id
-            for card_id, raw in card_inventory.items()
-            if bool(raw.get("explicit"))
-        ),
-        "excluded_model_card_ids": sorted(excluded_card_ids),
-        "unresolved_excluded_model_card_ids": sorted(
-            unresolved_excluded_card_ids
-        ),
-        "active_excluded_node_ids": sorted(active_excluded_node_ids),
-        "importance_policy": policy.to_dict(),
-        "claim_scope": scope.to_dict(),
-    }
-    # Preserve old explicit-inventory identities when their semantic view is unchanged.
-    if implicit_inventory:
-        fingerprint_payload["implicit_inventory"] = True
-    if shared_evidence_node_ids:
-        fingerprint_payload["shared_evidence_node_ids"] = list(shared_evidence_node_ids)
-    fingerprint = hashlib.sha256(
-        json.dumps(fingerprint_payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
-    ).hexdigest()
     return ArgumentCoverageUniverse(
         owner_id="researchguard.logic.authoritative-argument-coverage",
-        universe_fingerprint=fingerprint,
         target_unit_ids=target_unit_ids,
         modeled_target_unit_ids=modeled_target_unit_ids,
         unmodeled_target_unit_ids=tuple(sorted(unmodeled_target_unit_ids)),
@@ -1390,7 +1356,7 @@ def _build_native_depth_analysis(
     requested_claim_scope_ids: Iterable[str] | None = None,
     result: EvaluationResult | None = None,
     interface_receipt_refs: Iterable[str] = (),
-) -> LogicDepthReceipt:
+) -> LogicDepthResult:
     # Synthesis already evaluated this model.  Reuse that result when supplied
     # instead of evaluating the same model a second time before depth analysis.
     result = result or evaluate_model(model)
@@ -1496,8 +1462,7 @@ def _build_native_depth_analysis(
         if broad_claim_licensed
         else ("bounded" if universe.claim_scope.covered_node_ids else "not_run")
     )
-    return LogicDepthReceipt(
-        receipt_version="researchguard.logic.depth.v2",
+    return LogicDepthResult(
         model_id=model.id,
         model_fingerprint=model_fingerprint(model),
         generated_at=datetime.now(timezone.utc).isoformat(),
@@ -1511,7 +1476,7 @@ def _build_native_depth_analysis(
         status=status,
         broad_claim_licensed=broad_claim_licensed,
         claim_boundary=(
-            "LogicGuard depth receipts license only the current target-owned task/artifact/card universe, "
+            "LogicGuard depth results license only the current target-owned task/artifact/card universe, "
             "its covered claim scope, role-complete important cards, and effective critical perturbations. "
             "They do not establish factual truth or alternatives absent from the supplied artifact inventory."
         ),

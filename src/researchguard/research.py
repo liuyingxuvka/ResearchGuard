@@ -158,7 +158,7 @@ def research_status(tree: ResearchTree) -> dict[str, Any]:
             problems["errors"].append(f"model_invalid:{route}: {exc}")
     logic = results.get("logic")
     trace = results.get("trace")
-    trace_rows = {row.hypothesis_id: row.to_dict() for row in trace.inference_receipt.hypothesis_projections} if trace else {}
+    trace_rows = {row.hypothesis_id: row.to_dict() for row in trace.inference.hypothesis_projections} if trace else {}
     exp_payload = results["experiment"].to_dict() if "experiment" in results else {}
     exp_rows = {row["hypothesis_id"]: row for row in exp_payload.get("hypothesis_dispositions", [])}
     hypotheses = [{**row,

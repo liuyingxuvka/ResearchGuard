@@ -15,7 +15,6 @@ from researchguard.logic import (
 from researchguard.logic.execution_depth import _build_native_depth_analysis
 
 
-build_logic_depth_receipt = _build_native_depth_analysis
 
 
 def _model(*, with_objection: bool = False, with_competitor: bool = False):
@@ -71,7 +70,7 @@ def _model(*, with_objection: bool = False, with_competitor: bool = False):
 
 
 def test_native_depth_receipt_is_model_bound_and_serializable() -> None:
-    receipt = build_logic_depth_receipt(_model(), budget=8)
+    receipt = _build_native_depth_analysis(_model(), budget=8)
     payload = receipt.to_dict()
 
     assert receipt.broad_claim_licensed
@@ -98,7 +97,7 @@ def test_comparable_competing_conclusion_remains_visible() -> None:
 
     assert "C_ALT" in tournament.unresolved_competitor_ids
     assert tournament.status == "bounded"
-    assert build_logic_depth_receipt(model, budget=8).broad_claim_licensed is False
+    assert _build_native_depth_analysis(model, budget=8).broad_claim_licensed is False
 
 
 def test_explicitly_unresolved_objection_stays_in_tournament_boundary() -> None:
@@ -163,7 +162,7 @@ def test_plain_shallow_inventory_still_has_real_role_gaps() -> None:
         },
         "edges": [{"source": "E1", "target": "C0", "type": "supports"}],
     })
-    receipt = build_logic_depth_receipt(model, budget=8)
+    receipt = _build_native_depth_analysis(model, budget=8)
 
     assert receipt.coverage_universe.implicit_inventory is True
     assert receipt.status == "blocked" and receipt.broad_claim_licensed is False
@@ -182,7 +181,7 @@ def test_plain_example_reaches_native_depth_pass() -> None:
     model = load_model(path)
     original = json.loads(json.dumps(model.to_dict()))
     fingerprint = model_fingerprint(model)
-    receipt = build_logic_depth_receipt(model, budget=24)
+    receipt = _build_native_depth_analysis(model, budget=24)
 
     assert receipt.coverage_universe.implicit_inventory is True
     assert receipt.status == "pass"

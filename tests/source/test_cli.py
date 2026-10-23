@@ -44,7 +44,7 @@ def test_create_validate_plan_report_and_export_smoke(tmp_path):
     assert observed_depth["covered_claim_scope"] == "bounded"
     assert observed_depth["adequacy_status"] == "bounded"
     assert observed_depth["broad_claim_licensed"] is False
-    assert observed_depth["coverage_universe"]["universe_fingerprint"]
+    assert observed_depth["coverage_universe"]["dimensions"]
     assert observed_depth["replan_comparison"]["removed_action_ids"]
 
     result = _run("report", "examples/source/fuel_cell_project_discovery.yaml", "--format", "markdown")

@@ -1,6 +1,6 @@
 """Stable public result types for TraceGuard evaluation.
 
-These types contain projections from one inference receipt. They do not score,
+These types contain projections from one native inference result. They do not score,
 solve, or import facade modules.
 """
 
@@ -124,7 +124,7 @@ class EvaluationResult:
     diagnostics: tuple[Diagnostic, ...]
     gaps: tuple[Gap, ...]
     contradictions: tuple[Contradiction, ...]
-    inference_receipt: object
+    inference: object
     handoffs: tuple[object, ...] = ()
     consolidation_findings: tuple[object, ...] = ()
     storyline_depth: object | None = None
@@ -138,9 +138,9 @@ class EvaluationResult:
             "diagnostics": [item.to_dict() for item in self.diagnostics],
             "gaps": [item.to_dict() for item in self.gaps],
             "contradictions": [item.to_dict() for item in self.contradictions],
-            "inference_receipt": (
-                self.inference_receipt.to_dict()
-                if hasattr(self.inference_receipt, "to_dict")
+            "inference": (
+                self.inference.to_dict()
+                if hasattr(self.inference, "to_dict")
                 else None
             ),
             "handoffs": [

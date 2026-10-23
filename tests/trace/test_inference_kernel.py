@@ -420,7 +420,7 @@ def test_causal_license_requires_all_typed_boundaries() -> None:
         row.hypothesis_id: row for row in evaluate_model(
             supported_model,
             include_storyline_depth=False,
-        ).inference_receipt.hypothesis_projections
+        ).inference.hypothesis_projections
     }
     supported = supported_rows["h-causal"]
     assert supported.causal_status == "supported"
@@ -438,7 +438,7 @@ def test_causal_license_requires_all_typed_boundaries() -> None:
         row for row in evaluate_model(
             TraceGuardModel.from_dict(unresolved_payload),
             include_storyline_depth=False,
-        ).inference_receipt.hypothesis_projections
+        ).inference.hypothesis_projections
         if row.hypothesis_id == "h-causal"
     )
     assert unresolved.causal_status != "supported"
@@ -457,20 +457,19 @@ def test_permutation_and_replay_are_deterministic() -> None:
     first = evaluate_model(
         TraceGuardModel.from_dict(payload),
         include_storyline_depth=False,
-    ).inference_receipt
+    ).inference
     permuted = deepcopy(payload)
     permuted["sources"] = list(reversed(permuted["sources"]))
     permuted["evidence"] = list(reversed(permuted["evidence"]))
     second = evaluate_model(
         TraceGuardModel.from_dict(permuted),
         include_storyline_depth=False,
-    ).inference_receipt
+    ).inference
     replay = evaluate_model(
         TraceGuardModel.from_dict(payload),
         include_storyline_depth=False,
-    ).inference_receipt
-    assert first.problem_fingerprint == second.problem_fingerprint
-    assert first.solution_fingerprint == second.solution_fingerprint
+    ).inference
+    assert first.to_dict() == second.to_dict()
     assert first.to_dict() == replay.to_dict()
 
 
@@ -532,7 +531,7 @@ def test_typed_opposition_reduces_hypothesis_support() -> None:
     supported = evaluate_model(
         TraceGuardModel.from_dict(payload),
         include_storyline_depth=False,
-    ).inference_receipt.hypothesis_projections[0].support
+    ).inference.hypothesis_projections[0].support
     opposed = deepcopy(payload)
     opposed["hypothesis_evidence_links"].append(
         {
@@ -545,26 +544,17 @@ def test_typed_opposition_reduces_hypothesis_support() -> None:
     opposed_support = evaluate_model(
         TraceGuardModel.from_dict(opposed),
         include_storyline_depth=False,
-    ).inference_receipt.hypothesis_projections[0].support
+    ).inference.hypothesis_projections[0].support
     assert opposed_support < supported
 
 
-def test_projection_explanations_are_bound_to_receipt_contributions() -> None:
-    from researchguard.trace.inference.engine import verify_inference_receipt
+def test_projection_explanations_are_bound_to_native_contributions() -> None:
 
     receipt = evaluate_model(
         TraceGuardModel.from_dict(_base_payload()),
         include_storyline_depth=False,
-    ).inference_receipt
-    verify_inference_receipt(receipt)
+    ).inference
     contribution_ids = {item.factor_id for item in receipt.contributions}
-    assert receipt.problem_fingerprint
-    assert receipt.solution_fingerprint
-    assert receipt.atom_values_fingerprint
-    assert receipt.factor_catalog_fingerprint
-    assert receipt.hard_constraint_catalog_fingerprint
-    assert receipt.provenance_fingerprint
-    assert receipt.solver_configuration_fingerprint
     assert receipt.solver_backend == "osqp"
     assert receipt.solver_backend_version
     assert receipt.solver_status in {"solved", "solved inaccurate"}
@@ -614,7 +604,7 @@ EVERGIVEN = Path(__file__).parent / "fixtures" / "evergiven"
 
 
 def _storyline_projections(model):
-    return {row.hypothesis_id: row for row in evaluate_model(model).inference_receipt.hypothesis_projections}
+    return {row.hypothesis_id: row for row in evaluate_model(model).inference.hypothesis_projections}
 
 
 def test_causal_declaration_never_raises_storyline_support() -> None:
@@ -650,3 +640,14 @@ def test_unresolved_confounder_scores_zero() -> None:
         problem = compile_model(candidate, DEFAULT_POLICY)
         values = [row.value for row in problem.observed_atoms if row.kind == "confounder_disposition"]
         assert values and values == [0.0] * len(values)
+
+
+def test_evaluation_outputs_native_results_and_only_model_freshness() -> None:
+    result = evaluate_model(TraceGuardModel.from_dict(_base_payload()))
+    payload = result.to_dict()
+    assert 'inference' in payload and 'inference_receipt' not in payload
+    keys = set(payload['inference'])
+    assert 'receipt_id' not in keys
+    assert {key for key in keys if key.endswith('fingerprint')} == {'model_fingerprint'}
+    assert {'solver_status', 'primal_residual', 'dual_residual', 'iterations', 'objective',
+            'hard_constraint_ids', 'contributions', 'trace_projections', 'hypothesis_projections'} <= keys

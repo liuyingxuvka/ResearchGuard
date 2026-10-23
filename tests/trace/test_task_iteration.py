@@ -376,7 +376,7 @@ def test_revision_can_be_accepted_while_alternatives_stay_live(tmp_path, monkeyp
         result = native_evaluate(model, *args, **kwargs)
         actual_evaluations.append({"phase": phase[0], "hypotheses": [
             {"id": row.hypothesis_id, "support": row.support, "rank": row.rank, "live": row.live}
-            for row in result.inference_receipt.hypothesis_projections]})
+            for row in result.inference.hypothesis_projections]})
         return result
 
     monkeypatch.setattr(task_iteration_module, "evaluate_model", record_native_evaluation)
