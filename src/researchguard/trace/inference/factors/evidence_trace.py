@@ -56,7 +56,7 @@ def evidence_quality(
     ) / 3.0
     type_strength = policy.evidence_type_strength.get(
         evidence.evidence_type,
-        policy.evidence_type_strength["unknown"],
+        0.25,
     )
     return clamp01(extraction * (0.55 + 0.45 * type_strength))
 

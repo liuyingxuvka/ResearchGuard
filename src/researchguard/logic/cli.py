@@ -464,6 +464,12 @@ def _cmd_evaluate(args: argparse.Namespace) -> int:
 
 
 def _cmd_library_viewer(args: argparse.Namespace) -> int:
+    try:
+        import PIL  # noqa: F401 - optional viewer dependency gate
+        import tkinter  # noqa: F401 - supplied by the Python distribution
+    except ImportError:
+        print(json.dumps({"ok": False, "error": "The viewer extra and a Python with tkinter are required; install with python -m pip install -e \".[viewer]\"."}))
+        return 2
     from researchguard.logic_viewer.launcher import main as viewer_main
 
     argv = ["--library-root", str(args.library_root)]

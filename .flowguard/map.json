@@ -49,7 +49,7 @@
       "summary": "Own the researchguard console and the four member command lines; dispatch each member command directly to its owner.",
       "responsibilities": [
         "Dispatch researchguard logic|source|trace|experiment straight to the member main; unknown commands return one typed JSON error.",
-        "Own member command lines, including stable source stop rules, trace iteration direction and report/gaps/compare research-state views while retaining complete JSON output. Expose plain results with model freshness and no receipt identities.",
+        "Own member command lines, including stable source stop rules, trace iteration direction and report/gaps/compare research-state views while retaining complete JSON output. Expose plain results with model freshness and no receipt identities. Require the viewer extra and tkinter only for the desktop viewer; reject the retired projectradar simulation mode.",
         "Pass the already-loaded trace model into logic handoff export so the native CLI carries actual evidence content and polarity.",
         "Expose score-actions from the same complete native plan scoring path as plan --all-scores, without a candidate limit.",
         "Compare versions of one source model using actual gap semantic fields and nested qualification decision; self-comparison reports no change and retired gap.status stays rejected.",
@@ -97,7 +97,7 @@
         ".flowguard/models/researchguard_suite_model.py"
       ],
       "status": "confirmed",
-      "fingerprint": "sha256:ca6effe5b1fd94ae97edf34874a85082e1fc3fe1ba70dadc4bfee7f2981dbe4a",
+      "fingerprint": "sha256:3f5c182edb6bd4a60afe623c5b438f41eed6d666238c908642603b9631d93155",
       "layer": "interface"
     },
     {
@@ -229,7 +229,7 @@
       "id": "traceguard",
       "summary": "Own temporal and causal trace inference, storyline stress and case library updates.",
       "responsibilities": [
-        "Own temporal and causal trace inference, storyline stress, case library updates and readable timeline/hypothesis/depth reporting. Expose native inference/depth results with model freshness only; handoffs carry source-model freshness and case writeback stores gaps and contradictions without solver histories.",
+        "Own temporal and causal trace inference, storyline stress, case library updates and readable timeline/hypothesis/depth reporting. Expose native inference/depth results with model freshness only; handoffs carry source-model freshness and case writeback stores gaps and contradictions without solver histories. Use neutral undeclared evidence types and model-authored finite strength tables consistently across every factor; preserve case model declarations.",
         "Keep command output to analysis results; full JSON is written only with --output.",
         "Solve storyline support from evidence first; bound causal support below it. Depth checks that neither causal declarations nor oppose links raise support; evaluate does not run depth.",
         "Freeze with an existing target and coverage; permit future expected evidence/event ids. Append typed observation rows in memory and compare canonical target support direction.",
@@ -284,7 +284,7 @@
       ],
       "models": [],
       "status": "confirmed",
-      "fingerprint": "sha256:4f4f6b76a582f58d1da2a3ab8457d0068504658c6abea80cc270cd7531c6d7e0",
+      "fingerprint": "sha256:ca27837e9967aaa9a2ba28aeefc83af7e887b3ccbf543eab2c8fa1ca3f30fc4c",
       "layer": "routes"
     },
     {

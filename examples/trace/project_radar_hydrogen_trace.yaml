@@ -1,4 +1,5 @@
 metadata:
+  evidence_type_strength: {"company_announcement": 0.82, "funding_award": 0.95, "hiring": 0.28, "patent": 0.32, "tender_notice": 0.72}
   schema_version: researchguard.trace.model.v2
   purpose: ProjectRadar-style hydrogen project trace candidate with mixed source lanes.
   model_instance_id: researchguard.trace.example.project-radar.hydrogen-trace

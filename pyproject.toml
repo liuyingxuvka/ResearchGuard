@@ -32,12 +32,12 @@ classifiers = [
 dependencies = [
   "numpy>=1.26",
   "osqp>=1.0",
-  "Pillow>=10.0",
   "PyYAML>=6.0",
   "scipy>=1.11",
 ]
 
 [project.optional-dependencies]
+viewer = ["Pillow>=10.0"]
 test = [
   "pytest>=8.0",
   "flowguard @ git+https://github.com/liuyingxuvka/FlowGuard.git@v0.70.6",

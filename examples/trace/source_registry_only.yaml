@@ -1,4 +1,5 @@
 metadata:
+  evidence_type_strength: {"source_only": 0.08}
   schema_version: researchguard.trace.model.v2
   purpose: Demonstrate source registry row is not project database.
   repository: https://github.com/liuyingxuvka/ResearchGuard

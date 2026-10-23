@@ -1,4 +1,5 @@
 metadata:
+  evidence_type_strength: {"issue": 0.72, "log_entry": 0.78, "meeting_note": 0.7, "pr": 0.82}
   schema_version: researchguard.trace.model.v2
   purpose: Generic incident-response storyline from logs, issue, pull request, and
     meeting note.

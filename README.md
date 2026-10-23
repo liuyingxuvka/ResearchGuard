@@ -141,3 +141,8 @@ A self-comparison reports no changes.
 `researchguard status <folder>` 查看假设、证据、未关缺口和下一步；
 `--json` 输出数据，`--output <path>` 保存结果。格式见
 [research-tree.md](skills/researchguard/references/research-tree.md)。
+
+
+The optional desktop viewer requires the `viewer` extra
+(`python -m pip install -e ".[viewer]"`) and Python with tkinter.
+Core argument, source, trace and experiment commands do not require Pillow.

@@ -501,3 +501,11 @@ evidence_ablations: []
 scenario_perturbations: []
 expected_sensitivities: []
 ```
+
+
+`metadata.evidence_type_strength` optionally maps evidence type names to finite
+strengths in 0..1. Types absent from the declaration use neutral 0.25.
+For example: `evidence_type_strength: {paragraph: 0.6, table: 0.8}`.
+These are the model author's explicit assumptions, not universal evidence rankings.
+Case libraries can declare the same table in `case.yaml` metadata; build-model
+preserves it in the generated model.

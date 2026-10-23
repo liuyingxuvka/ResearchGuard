@@ -1,4 +1,5 @@
 metadata:
+  evidence_type_strength: {"hiring": 0.28}
   schema_version: researchguard.trace.model.v2
   purpose: Demonstrate that hiring-only evidence remains a weak signal and not operation
     evidence.

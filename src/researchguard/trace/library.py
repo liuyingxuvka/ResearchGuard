@@ -417,6 +417,11 @@ def build_model(
         },
         **merged,
     }
+    case_metadata = case.get("metadata", {})
+    if not isinstance(case_metadata, dict):
+        raise LibraryError("case.metadata must be a mapping")
+    if "evidence_type_strength" in case_metadata:
+        model["metadata"]["evidence_type_strength"] = case_metadata["evidence_type_strength"]
     return model
 
 

@@ -12,7 +12,7 @@ PERFORMANCE_BUDGET_SECONDS = 8.0
 
 def _large_sparse_payload(size: int = PERFORMANCE_CASE_SIZE) -> dict:
     payload: dict[str, object] = {
-        "metadata": {"schema_version": "researchguard.trace.model.v2"},
+        "metadata": {"schema_version": "researchguard.trace.model.v2", "evidence_type_strength": {'official_project_page': 0.9}},
         "sources": [],
         "evidence": [],
         "events": [],

@@ -44,3 +44,8 @@ researchguard logic library import-package .logicguard-library project.zip --dry
 3. Report the visible project/graph and actual operation status. Inspection ends here.
 
 Stop when the selected view is available or report the actual I/O or identity error.
+
+
+The optional desktop viewer requires the `viewer` extra
+(`python -m pip install -e ".[viewer]"`) and Python with tkinter.
+Core argument, source, trace and experiment commands do not require Pillow.

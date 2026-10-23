@@ -14,6 +14,7 @@ from dataclasses import asdict, dataclass, field
 import hashlib
 import json
 from typing import Any, Mapping
+from math import isfinite
 
 
 SCHEMA_ID = "researchguard.trace.model.v2"
@@ -125,6 +126,17 @@ def trace_interface_model_fingerprint(model: "TraceGuardModel") -> str:
     payload["metadata"] = metadata
     body = json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
     return "sha256:" + hashlib.sha256(body.encode("utf-8")).hexdigest()
+
+
+def declared_evidence_type_strength(metadata: Mapping[str, Any]) -> dict[str, float]:
+    """Read the caller's finite type strengths; undeclared types keep neutral strength."""
+    table = metadata.get("evidence_type_strength", {})
+    if not isinstance(table, Mapping):
+        raise SchemaError("metadata.evidence_type_strength must be a type-to-strength mapping")
+    for key, value in table.items():
+        if not isinstance(key, str) or not key.strip() or isinstance(value, bool) or not isinstance(value, (int, float)) or not 0 <= value <= 1 or not isfinite(value):
+            raise SchemaError("metadata.evidence_type_strength requires named types and finite values in 0..1")
+    return dict(table)
 
 
 @dataclass(frozen=True)
@@ -1021,6 +1033,7 @@ class TraceGuardModel:
         if not isinstance(data, dict):
             raise SchemaError("model root must be a mapping")
         metadata = dict(data.get("metadata", {}))
+        declared_evidence_type_strength(metadata)
         if metadata.get("schema_version") != SCHEMA_ID:
             raise SchemaError(
                 f"metadata.schema_version must equal {SCHEMA_ID}; "

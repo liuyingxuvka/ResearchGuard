@@ -409,12 +409,6 @@ def cmd_simulate(args: argparse.Namespace) -> int:
             "expected_status": "weak_signal",
             "reason": "a single weak lane is not enough for a validated storyline claim",
         }
-    elif args.mode == "projectradar":
-        payload = {
-            "mode": args.mode,
-            "pipeline": ["source_registry", "evidence", "event", "trace_candidate", "storyline", "ProjectRadar status lane", "LogicGuard handoff"],
-            "boundary": "ProjectRadar is one application; source registry row is not a project database row.",
-        }
     else:
         payload = {
             "mode": args.mode,
@@ -681,7 +675,7 @@ def build_parser() -> argparse.ArgumentParser:
     simulate = sub.add_parser("simulate")
     simulate.add_argument(
         "--mode",
-        choices=["storyline", "storyline-depth", "projectradar", "weak-signal", "evidence-removal", "contradiction-injection"],
+        choices=["storyline", "storyline-depth", "weak-signal", "evidence-removal", "contradiction-injection"],
         default="storyline",
     )
     simulate.add_argument("--model", default="")

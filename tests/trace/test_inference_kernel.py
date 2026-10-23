@@ -145,7 +145,7 @@ def test_infeasible_problem_fails_closed_without_fallback() -> None:
 def _base_payload() -> dict[str, object]:
     return {
         "metadata": {
-            "schema_version": "researchguard.trace.model.v2",
+            "schema_version": "researchguard.trace.model.v2", "evidence_type_strength": {'funding_award': 0.95, 'funding_awarded': 0.95, 'contract_award': 0.95, 'official_project_page': 0.9, 'company_announcement': 0.82, 'tender_notice': 0.72, 'procurement': 0.72, 'design_note': 0.68, 'log_entry': 0.78, 'issue': 0.72, 'pr': 0.82, 'meeting_note': 0.7, 'news': 0.42, 'patent': 0.32, 'hiring': 0.28, 'keyword_hit': 0.2, 'source_only': 0.08, 'unknown': 0.25},
             "model_instance_id": "kernel-test",
         },
         "sources": [
@@ -651,3 +651,28 @@ def test_evaluation_outputs_native_results_and_only_model_freshness() -> None:
     assert {key for key in keys if key.endswith('fingerprint')} == {'model_fingerprint'}
     assert {'solver_status', 'primal_residual', 'dual_residual', 'iterations', 'objective',
             'hard_constraint_ids', 'contributions', 'trace_projections', 'hypothesis_projections'} <= keys
+
+
+def test_evidence_strength_is_neutral_unless_the_model_declares_it():
+    from researchguard.trace.inference.compiler import compile_model
+    payload = _base_payload()
+    payload['metadata'].pop('evidence_type_strength')
+    first = compile_model(TraceGuardModel.from_dict(payload), DEFAULT_POLICY)
+    baseline = next(row.value for row in first.observed_atoms if row.atom_id == 'evidence_quality:e1')
+    evidence_id = payload['evidence'][0]['evidence_id']
+    payload['evidence'][0]['evidence_type'] = 'paragraph'
+    second = compile_model(TraceGuardModel.from_dict(payload), DEFAULT_POLICY)
+    same = next(row.value for row in second.observed_atoms if row.atom_id == f'evidence_quality:{evidence_id}')
+    assert same == baseline
+    payload['metadata']['evidence_type_strength'] = {'paragraph': .9}
+    stronger = compile_model(TraceGuardModel.from_dict(payload), DEFAULT_POLICY)
+    assert next(row.value for row in stronger.observed_atoms if row.atom_id == f'evidence_quality:{evidence_id}') > same
+    assert dict(DEFAULT_POLICY.evidence_type_strength) == {'unknown': .25}
+
+
+@pytest.mark.parametrize('table', [[], {'paragraph': -1}, {'paragraph': 1.1}, {'paragraph': float('nan')}, {'paragraph': True}])
+def test_invalid_declared_evidence_strength_is_rejected(table):
+    payload = _base_payload()
+    payload['metadata']['evidence_type_strength'] = table
+    with pytest.raises(SchemaError, match='evidence_type_strength'):
+        TraceGuardModel.from_dict(payload)

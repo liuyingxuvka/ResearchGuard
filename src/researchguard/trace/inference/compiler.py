@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 from typing import Any
+from dataclasses import replace
 
-from ..schema import SCHEMA_ID, TraceGuardModel, trace_model_fingerprint
+from ..schema import SCHEMA_ID, TraceGuardModel, trace_model_fingerprint, declared_evidence_type_strength
 from ..validation import validate_references
 from .factors import (
     build_entity_factors,
@@ -35,6 +36,7 @@ def compile_model(
     if model.metadata.get("schema_version") != SCHEMA_ID:
         raise CompilationError(f"only {SCHEMA_ID} can enter the inference compiler")
     validate_references(model)
+    policy = replace(policy, evidence_type_strength={**policy.evidence_type_strength, **declared_evidence_type_strength(model.metadata)})
     builders = (
         build_evidence_trace_factors,
         build_entity_factors,

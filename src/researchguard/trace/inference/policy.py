@@ -42,26 +42,7 @@ class InferencePolicy:
     maximum_constraint_violation: float = 1e-5
     accepted_statuses: tuple[str, ...] = ("solved", "solved inaccurate")
     evidence_type_strength: Mapping[str, float] = field(
-        default_factory=lambda: {
-            "funding_award": 0.95,
-            "funding_awarded": 0.95,
-            "contract_award": 0.95,
-            "official_project_page": 0.90,
-            "company_announcement": 0.82,
-            "tender_notice": 0.72,
-            "procurement": 0.72,
-            "design_note": 0.68,
-            "log_entry": 0.78,
-            "issue": 0.72,
-            "pr": 0.82,
-            "meeting_note": 0.70,
-            "news": 0.42,
-            "patent": 0.32,
-            "hiring": 0.28,
-            "keyword_hit": 0.20,
-            "source_only": 0.08,
-            "unknown": 0.25,
-        }
+        default_factory=lambda: {"unknown": 0.25}
     )
 
     @property
