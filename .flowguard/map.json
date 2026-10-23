@@ -40,7 +40,7 @@
         ".flowguard/models/researchguard_suite_model.py"
       ],
       "status": "confirmed",
-      "fingerprint": "sha256:3faa28d8bfe086408bd1edc78c7276e23791f8c1605a575b5792d25c1d940045",
+      "fingerprint": "sha256:80d0a7372863d06f5c0dfa9129d47b4065c54893025e465da756f59a9cb3ea8a",
       "layer": "foundation"
     },
     {
