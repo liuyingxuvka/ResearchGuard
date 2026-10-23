@@ -63,3 +63,14 @@ When all recognized model/node target-unit, card and role declarations are absen
 #### Scenario: Evidence is shared by competing claims
 - **WHEN** two important claims use the same Evidence node
 - **THEN** it SHALL appear in `shared_evidence_node_ids` without a shared-role gap or blocked row from that sharing; shared non-Evidence roles SHALL still require explicit consumer declarations
+
+### Requirement: Experiment recommendations preserve their finite objective
+Absent experiment costs SHALL retain count-first recommendation. A supplied cost mapping (including empty) SHALL use non-negative finite numeric costs, default omitted candidate costs to 1, and permit at most 16 candidates. Within the declared count limit, recommendation SHALL minimize total cost, then count, then experiment ids; alternatives SHALL exclude the selected set. Remaining recommendations SHALL retain the projected cost mode after observations.
+
+#### Scenario: A matrix miss follows valid counterevidence
+- **WHEN** a hypothesis has already been contradicted by a valid construction observation and a later outcome matches no declared hypothesis
+- **THEN** it SHALL remain `eliminated`, other uncontradicted hypotheses SHALL be `model_miss`, and zero survivors SHALL require matrix revision rather than closure
+
+#### Scenario: Retired experiment port keys occur in old JSON
+- **WHEN** an old prediction or observation contains one of the four retired port fields
+- **THEN** the loader SHALL ignore that field, retain the current native task and observation semantics, and omit it from serialized output

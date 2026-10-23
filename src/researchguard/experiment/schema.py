@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import asdict, dataclass
+from math import isfinite
 from typing import Literal
 
 
@@ -21,8 +23,6 @@ def _unique(values: tuple[str, ...], field: str, *, allow_empty: bool = True) ->
 class HypothesisPrediction:
     hypothesis_id: str
     outcomes_by_experiment: dict[str, str]
-    observation_port_by_experiment: dict[str, str] | None = None
-    outcome_port_by_experiment: dict[str, str] | None = None
 
     def __post_init__(self) -> None:
         if not self.hypothesis_id.strip():
@@ -48,6 +48,7 @@ class ExperimentSpec:
     maximum_experiment_count: int | None = None
     prior_open_gap_ids: tuple[str, ...] = ()
     schema_version: str = EXPERIMENT_SPEC_SCHEMA
+    cost_by_experiment: dict[str, float] | None = None
 
     def __post_init__(self) -> None:
         if self.schema_version != EXPERIMENT_SPEC_SCHEMA:
@@ -69,6 +70,18 @@ class ExperimentSpec:
         for row in self.hypothesis_predictions:
             if not candidates.issubset(row.outcomes_by_experiment):
                 raise ValueError("every hypothesis prediction must cover the candidate universe")
+        if self.cost_by_experiment is not None:
+            if not isinstance(self.cost_by_experiment, Mapping):
+                raise ValueError("cost_by_experiment must be an experiment-id to cost mapping")
+            if len(self.candidate_experiment_ids) > 16:
+                raise ValueError("cost mode supports at most 16 candidate experiments")
+            unknown = set(self.cost_by_experiment) - candidates
+            if unknown:
+                raise ValueError("cost_by_experiment contains unknown experiment ids: " + ", ".join(sorted(map(str, unknown))))
+            for experiment_id, cost in self.cost_by_experiment.items():
+                if (isinstance(cost, bool) or not isinstance(cost, (int, float))
+                        or cost < 0 or (isinstance(cost, float) and not isfinite(cost))):
+                    raise ValueError(f"cost for {experiment_id} must be a finite non-negative number")
 
 
     def to_dict(self) -> dict[str, object]:
@@ -86,6 +99,8 @@ class ExperimentSpec:
             "maximum_experiment_count": self.maximum_experiment_count,
             "prior_open_gap_ids": list(self.prior_open_gap_ids),
         }
+        if self.cost_by_experiment is not None:
+            result["cost_by_experiment"] = dict(self.cost_by_experiment)
         return result
 
 
@@ -98,8 +113,6 @@ class ExperimentObservation:
     observed_at: str
     role: Literal["construction", "holdout"]
     status: Literal["valid", "invalid", "not_run"] = "valid"
-    observation_port_id: str = ""
-    outcome_port_id: str = ""
 
     def __post_init__(self) -> None:
         required = (
@@ -148,7 +161,7 @@ class ExperimentRecommendation:
     unresolved_hypothesis_pairs: tuple[tuple[str, str], ...]
     reason_code: str
     claim_boundary: str = (
-        "ExperimentGuard recommends a minimum-cardinality distinguishing set "
+        "ExperimentGuard recommends a distinguishing set with minimum declared cost when supplied, then minimum experiment count, "
         "for the caller-declared predictions. It does not execute experiments, "
         "invent probabilities, or decide which hypothesis is true."
     )

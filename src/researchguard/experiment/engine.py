@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+from fractions import Fraction
 from itertools import combinations
 
 from .schema import (
@@ -68,10 +69,23 @@ def recommend_experiments(spec: ExperimentSpec) -> ExperimentRecommendation:
         return ExperimentRecommendation("blocked_invalid_input", (), (), (), "invalid_finite_experiment_spec")
     pairs = _pairs(spec)
     limit = min(len(candidates), spec.maximum_experiment_count or len(candidates))
+    costs = (None if spec.cost_by_experiment is None else
+             {item: Fraction(spec.cost_by_experiment.get(item, 1)) for item in candidates})
+    cost_solutions = []
     for size in range(1, limit + 1):
         solutions = tuple(selected for selected in combinations(candidates, size) if not _unresolved(selected, pairs, predictions))
         if solutions:
-            return ExperimentRecommendation("recommended", solutions[0], solutions, (), "minimum_distinguishing_set_found")
+            if spec.cost_by_experiment is None:
+                return ExperimentRecommendation("recommended", solutions[0], solutions[1:], (), "minimum_distinguishing_set_found")
+            cost_solutions.extend(
+                (sum(costs[item] for item in selected), size, selected)
+                for selected in solutions
+            )
+    if cost_solutions:
+        cost_solutions.sort()
+        cost, count, selected = cost_solutions[0]
+        alternatives = tuple(row[2] for row in cost_solutions[1:] if row[:2] == (cost, count))
+        return ExperimentRecommendation("recommended", selected, alternatives, (), "minimum_cost_distinguishing_set_found")
     unresolved = _unresolved(candidates, pairs, predictions)
     return ExperimentRecommendation(
         "indistinguishable",
@@ -115,10 +129,10 @@ def observe_experiments(spec: ExperimentSpec, observations: tuple[ExperimentObse
     for hypothesis_id in sorted(predictions):
         matched = tuple(row.experiment_id for row in valid_construction if predictions[hypothesis_id].get(row.experiment_id) == row.observed_outcome)
         contradicted = tuple(row.experiment_id for row in valid_construction if predictions[hypothesis_id].get(row.experiment_id) is not None and predictions[hypothesis_id].get(row.experiment_id) != row.observed_outcome)
-        if unexpected:
-            status = "model_miss"
-        elif contradicted:
+        if contradicted:
             status = "eliminated"
+        elif unexpected:
+            status = "model_miss"
         elif valid_construction and len(matched) == len(valid_construction):
             status = "consistent"
             active_ids.append(hypothesis_id)
@@ -157,6 +171,10 @@ def observe_experiments(spec: ExperimentSpec, observations: tuple[ExperimentObse
                 hypothesis_predictions=tuple(row for row in spec.hypothesis_predictions if row.hypothesis_id in active_ids),
                 candidate_experiment_ids=remaining_candidates,
                 maximum_experiment_count=spec.maximum_experiment_count,
+                cost_by_experiment=(
+                    None if spec.cost_by_experiment is None else
+                    {key: value for key, value in spec.cost_by_experiment.items() if key in remaining_candidates}
+                ),
             )
             recommendation = recommend_experiments(remaining)
         else:
@@ -174,7 +192,7 @@ def observe_experiments(spec: ExperimentSpec, observations: tuple[ExperimentObse
                 else "declared-candidates-indistinguishable"
             )
     elif len(active_ids) == 1:
-        recommendation = ExperimentRecommendation("recommended", (), ((),), (), "one_hypothesis_consistent")
+        recommendation = ExperimentRecommendation("recommended", (), (), (), "one_hypothesis_consistent")
         for row in valid_holdouts:
             if predictions[active_ids[0]][row.experiment_id] != row.observed_outcome:
                 gaps.add(f"holdout-conflict:{row.evidence_id}")

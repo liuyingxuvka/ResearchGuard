@@ -7,8 +7,8 @@ skill, `researchguard`, and four routes:
 - `source` (SourceGuard) plans evidence and source discovery.
 - `trace` (TraceGuard) reconstructs and stress-tests evidence-backed timelines
   and qualitative causal storylines.
-- `experiment` (ExperimentGuard) recommends minimum finite experiment sets that
-  distinguish caller-declared hypotheses.
+- `experiment` (ExperimentGuard) recommends finite experiment sets that distinguish
+  caller-declared hypotheses, minimizing declared cost or experiment count.
 
 All four routes use one `researchguard` Python distribution, one suite version
 and one console: `researchguard logic|source|trace|experiment ...`. A selected
@@ -77,6 +77,13 @@ sets with a conservative wording license. Candidates are split by the edge
 entering the claim; when support is unavailable, the result names the native
 blockers and their types instead of claiming an empty minimal attack core. ExperimentGuard is
 recommendation-only: it never executes an experiment or invents probabilities.
+
+Experiment specs may declare non-negative finite `cost_by_experiment` values.
+With costs, select by total cost, then count and IDs (at most 16 candidates);
+without them, keep count first. Unlisted costs default to 1. Alternatives omit
+the selected set, and valid prior counterevidence keeps a hypothesis eliminated
+even when a later observation misses the prediction matrix. Retired port fields
+are ignored in old JSON inputs and omitted from current output.
 
 TraceGuard solves storyline support from evidence first, then bounds causal
 support beneath it. Declaring a causal candidate cannot improve a storyline's

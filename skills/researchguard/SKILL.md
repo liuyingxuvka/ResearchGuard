@@ -1,6 +1,6 @@
 ---
 name: researchguard
-description: "Use for research-quality checks: argument structure and claim support, evidence and source discovery, timelines and causal storylines, and the fewest experiments that tell hypotheses apart. Not for writing the finished report, paper, story or guide; use logic-writing."
+description: "Use for research-quality checks: argument structure and claim support, evidence and source discovery, timelines and causal storylines, and the least costly or fewest declared experiments that tell hypotheses apart. Not for writing the finished report, paper, story or guide; use logic-writing."
 ---
 
 # ResearchGuard
@@ -12,7 +12,7 @@ Pick one route, then load only its file. Each route runs its own `researchguard 
 | Argument structure, claim support and safe wording; a source library; structured artifacts (papers, reports, decks); deepening a model; synthesis plans; the project library viewer | `references/routes/logic.md` |
 | Plan or run evidence and source discovery: source roles, retrieval, provenance, lineage, open gaps, when to stop searching | `references/routes/source.md` |
 | Reconstruct and stress-test a timeline, an execution or effect chain, or competing causal storylines from evidence | `references/routes/trace.md` |
-| Recommend the fewest declared experiments that tell declared hypotheses apart (never runs them) | `references/routes/experiment.md` |
+| Recommend the least costly or fewest declared experiments that tell hypotheses apart (never runs them) | `references/routes/experiment.md` |
 
 ## Rules for every route
 

@@ -25,6 +25,8 @@ def _load_spec(path: Path) -> ExperimentSpec:
 def _load_spec_payload(payload: object) -> ExperimentSpec:
     if not isinstance(payload, Mapping):
         raise ValueError("experiment spec root must be an object")
+    if "cost_by_experiment" in payload and not isinstance(payload["cost_by_experiment"], Mapping):
+        raise ValueError("cost_by_experiment must be an experiment-id to cost mapping")
     return ExperimentSpec(
         schema_version=str(payload.get("schema_version") or EXPERIMENT_SPEC_SCHEMA),
         task_id=str(payload.get("task_id") or "recommendation"),
@@ -42,14 +44,7 @@ def _load_spec_payload(payload: object) -> ExperimentSpec:
                     str(key): str(value)
                     for key, value in item["outcomes_by_experiment"].items()
                 },
-                observation_port_by_experiment={
-                    str(key): str(value)
-                    for key, value in (item.get("observation_port_by_experiment") or {}).items()
-                },
-                outcome_port_by_experiment={
-                    str(key): str(value)
-                    for key, value in (item.get("outcome_port_by_experiment") or {}).items()
-                },
+
             )
             for item in payload["hypothesis_predictions"]
         ),
@@ -57,6 +52,7 @@ def _load_spec_payload(payload: object) -> ExperimentSpec:
             str(item) for item in payload["candidate_experiment_ids"]
         ),
         maximum_experiment_count=payload.get("maximum_experiment_count"),
+        cost_by_experiment=payload.get("cost_by_experiment"),
     )
 
 
@@ -74,8 +70,6 @@ def _load_observations(path: Path) -> tuple[ExperimentObservation, ...]:
             observed_at=str(item["observed_at"]),
             role=str(item["role"]),
             status=str(item.get("status", "valid")),
-            observation_port_id=str(item.get("observation_port_id", "")),
-            outcome_port_id=str(item.get("outcome_port_id", "")),
         )
         for item in rows
     )

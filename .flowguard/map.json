@@ -93,7 +93,7 @@
         ".flowguard/models/researchguard_suite_model.py"
       ],
       "status": "confirmed",
-      "fingerprint": "sha256:171fd8b7ec1642b5357bff56553d71ade7470554a42b523c9236224c5da7c679",
+      "fingerprint": "sha256:e83b0794afbfd3e950bcc6ca033974844abe3d8c473224f723c57af4fd2033d3",
       "layer": "interface"
     },
     {
@@ -285,9 +285,9 @@
       "id": "experimentguard",
       "summary": "Own finite minimum experiment sets, observation-driven iteration, optional holdout checks and bounded terminal decisions.",
       "responsibilities": [
-        "Distinguish hypotheses only within the caller-declared finite experiment-count limit and report limit failures separately from truly indistinguishable pairs.",
+        "Distinguish hypotheses within the declared finite count limit; minimize optional declared costs before count and IDs, retain cost mode in remaining recommendations, and exclude the selected set from alternatives. Report limit failures separately from truly indistinguishable pairs.",
         "License native closure only for a unique consistent hypothesis with no holdout counterexample and no gaps, while preserving the finite iteration limit first; holdout observations are optional.",
-        "Continue a bounded multi-survivor iteration only with a concrete distinguishing next candidate; do not infer historical evidence progress from unchanged gap identifiers; malformed specs return one JSON error."
+        "Continue a bounded multi-survivor iteration only with a concrete distinguishing next candidate; preserve valid construction eliminations across matrix misses and never close zero survivors. Do not infer historical progress from unchanged gaps; malformed specs return one JSON error."
       ],
       "files": [
         "src/researchguard/experiment/__init__.py",
@@ -310,7 +310,7 @@
       ],
       "models": [],
       "status": "confirmed",
-      "fingerprint": "sha256:4c1208b6e346f046c50898c49a61484cf7a201bcba233e1313f2476f2d26e04b",
+      "fingerprint": "sha256:362c1f5b5b685b84df059d7beee1c14c6abfa00b32384fdfff815f5d4b54ad1d",
       "layer": "routes"
     },
     {
