@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.5.13 - 2026-10-23
+
+- Keep native route models in one research folder with a `research.yaml` index and shared hypothesis, source and anchor ids. Use `researchguard status <folder>` for a readable or JSON view of hypotheses, evidence, open gaps and next actions.
+- Make SourceGuard the owner of source identity. Use `logic validate --source-model <source.yaml>` to check provenance and `--source-id` on intake or library import to reuse canonical ids. Remove `source export-logicguard`; read the SourceGuard model YAML directly instead.
+- Add `--into` to source-to-trace exports and logic handoff imports. Sync appends missing records, reports conflicts, preserves existing work and writes a separate output file.
+- Include an Ever Given research tree with quoted source provenance and an example observation flowing through both handoffs.
+- Return native results without receipt ids or redundant output fingerprints. Rename trace `inference_receipt` to `inference`, depth result types to `*DepthResult`, `build_source_depth_receipt` to `build_source_depth`, and `revalidate_native_depth_receipt` to `revalidate_native_depth`. Preserve actual model/content freshness and existing input interface structures. Case libraries write gaps and contradictions without storing solver histories.
+- Group full attack chains separately in logic reports and show unresolved items from the native conclusion comparison.
+- Install the desktop viewer with the optional `viewer` extra and a Python that includes tkinter. Core commands no longer require Pillow. Remove `trace simulate --mode projectradar`.
+- Declare evidence type strengths in model `metadata.evidence_type_strength`; undeclared types use neutral 0.25. Existing examples carry their previous values explicitly, including generated case models.
+
 ## v0.5.12 - 2026-10-23
 
 - Add field sheets and filled starter models for the four research routes. Validation names the offending node and lists allowed values; quoted evidence can derive its content hash automatically.
