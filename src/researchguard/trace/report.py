@@ -11,9 +11,15 @@ Boundary: Reports must not upgrade candidate or weak-signal traces into confirme
 from __future__ import annotations
 
 from .evaluator import EvaluationResult
+from .schema import TraceGuardModel
+from .temporal import interval_to_range
 
 
-def render_markdown(result: EvaluationResult) -> str:
+def render_markdown(
+    result: EvaluationResult, model: TraceGuardModel | None = None, depth: object | None = None,
+) -> str:
+    if model is not None:
+        return _render_research_state(result, model, depth)
     lines: list[str] = ["# TraceGuard Report", ""]
     lines.append(f"Objective score: `{result.objective_score}`")
     lines.append(f"Overall model ok: `{str(result.ok).lower()}`")
@@ -138,7 +144,15 @@ def render_markdown(result: EvaluationResult) -> str:
     return "\n".join(lines).strip() + "\n"
 
 
-def render_text(result: EvaluationResult) -> str:
+def render_text(
+    result: EvaluationResult, model: TraceGuardModel | None = None, depth: object | None = None,
+) -> str:
+    if model is not None:
+        lines = _render_research_state(result, model, depth).splitlines()
+        return "\n".join(
+            line.lstrip("# ").replace("`", "")
+            for line in lines if not line.startswith("| ---")
+        ) + "\n"
     blocks = []
     for trace in result.traces:
         blocks.append(
@@ -178,3 +192,110 @@ def render_text(result: EvaluationResult) -> str:
             f"- Claim boundary: {result.storyline_depth.claim_boundary}"
         )
     return "\n\n".join(blocks) + "\n"
+
+
+def _cell(value: object) -> str:
+    """Keep caller text inside one Markdown table cell without losing its content."""
+    return str(value).replace("\n", " ").replace("|", "\\|")
+
+
+def _render_research_state(
+    result: EvaluationResult, model: TraceGuardModel, depth: object | None,
+) -> str:
+    """Compact reading view; all native blockers remain intact, with no byte slicing."""
+    depth = depth if depth is not None else result.storyline_depth
+    lines = ["# TraceGuard Report", "", "## Timeline", "",
+             "| Date | Event id | Action | Evidence ids |", "| --- | --- | --- | --- |"]
+
+    def event_order(event):
+        start = interval_to_range(event.time_interval).start
+        return (start is None, start.isoformat() if start else "", event.event_id)
+
+    for event in sorted(model.events, key=event_order):
+        interval = event.time_interval
+        when = "unknown"
+        if interval is not None:
+            when = str(interval.start or interval.end or interval.text or "unknown")
+            if interval.start and interval.end and interval.start != interval.end:
+                when = f"{interval.start}–{interval.end}"
+        lines.append("| " + " | ".join(map(_cell, (
+            when, event.event_id, event.action, ", ".join(event.evidence_ids) or "none",
+        ))) + " |")
+    lines.extend(["", "## Hypotheses", "",
+                  "| Hypothesis id | Claim | Support | Rank | Live | Causal status | Top opposition factor |",
+                  "| --- | --- | --- | --- | --- | --- | --- |"])
+    hypotheses = model.hypothesis_by_id()
+    for row in result.inference_receipt.hypothesis_projections:
+        hypothesis = hypotheses.get(row.hypothesis_id)
+        claim = hypothesis.claim if hypothesis is not None else ""
+        if hypothesis is None and row.hypothesis_id.startswith("implicit:"):
+            trace = model.trace_by_id().get(row.hypothesis_id.removeprefix("implicit:"))
+            claim = (trace.claim or trace.title) if trace is not None else ""
+        claim = claim if len(claim) <= 80 else claim[:79] + "…"
+        lines.append("| " + " | ".join(map(_cell, (
+            row.hypothesis_id, claim, f"{row.support:.3f}", row.rank,
+            str(row.live).lower(), row.causal_status,
+            next(iter(row.top_opposition_factor_ids), "none"),
+        ))) + " |")
+    lines.extend(["", "## Storyline Depth", ""])
+    if depth is None:
+        lines.append("Not run.")
+    else:
+        lines.append(
+            f"{depth.closure_status}; scope {depth.requested_claim_scope}/{depth.covered_claim_scope}; "
+            f"broad claim licensed={str(depth.broad_claim_licensed).lower()}; "
+            f"unresolved={len(depth.unresolved_gaps)}."
+        )
+        for gap in depth.unresolved_gaps:
+            owner = gap.get("hypothesis_id") or gap.get("object_id")
+            context = f" ({owner})" if owner else ""
+            lines.append(f"- `{gap.get('gap_id', 'gap')}`{context}: {gap.get('message', '')}")
+        if not depth.unresolved_gaps:
+            lines.append("- none")
+    lines.extend(["", f"Objective score: {result.objective_score}; Overall model ok: {str(result.ok).lower()}"])
+    for trace in result.traces:
+        lines.extend([
+            "", f"## {trace.title}", "",
+            f"Trace type: {trace.trace_type}; Validation status: {trace.validation_status}; "
+            f"Structural support: {trace.support:.3f}; Current stage: {trace.current_stage}",
+            f"Evidence support: {', '.join(trace.evidence_ids) or 'none'}",
+            f"Claim boundary: {trace.claim_boundary}",
+            f"Safe wording: {trace.safe_wording}",
+            f"Unsafe wording avoided: {trace.unsafe_wording_avoided}",
+            "", "### Report Handoff", "",
+        ])
+        handoff = next((item for item in result.handoffs if item.trace_id == trace.trace_id), None)
+        if handoff is None:
+            lines.append("- none")
+        else:
+            lines.extend([
+                f"Claim id: {handoff.claim_id}; Lead id: {handoff.lead_id}; Target: {handoff.paragraph_target}",
+                f"Supporting: {', '.join(handoff.supporting_evidence_ids) or 'none'}; "
+                f"Limiting: {', '.join(handoff.limiting_evidence_ids) or 'none'}",
+                f"Missing: {'; '.join(handoff.missing_evidence) or 'none'}; "
+                f"Next search: {handoff.next_search_task or 'none'}",
+            ])
+        lines.extend(["", "### Rule Violations", ""])
+        for rule in trace.rule_results[:3]:
+            lines.append(f"- `{rule.rule_id}` loss={rule.loss:.3f} violation={rule.violation:.3f}")
+        if not trace.rule_results:
+            lines.append("- none")
+        for title, items, id_field in (
+            ("Contradictions", trace.contradictions, "contradiction_id"),
+            ("Gaps", trace.gaps, "gap_id"),
+            ("Diagnostics", trace.diagnostics, "diagnostic_id"),
+        ):
+            lines.extend(["", f"### {title}", ""])
+            for item in items:
+                extra = getattr(item, "suggested_next_evidence", "") or getattr(item, "repair_hint", "")
+                lines.append(f"- `{getattr(item, id_field)}` {item.message}" + (f" Next: {extra}" if extra else ""))
+            if not items:
+                lines.append("- none")
+    if result.consolidation_findings:
+        lines.extend(["", "## Consolidation And Same-Class Review", ""])
+        for finding in result.consolidation_findings:
+            lines.append(
+                f"- `{finding.finding_type}` {finding.rationale} "
+                f"Affected: {', '.join(finding.affected_ids)}. Next: {finding.recommendation}"
+            )
+    return "\n".join(lines).strip() + "\n"

@@ -28,6 +28,36 @@ def _plan(value: PlanResult | BeliefState) -> tuple[BeliefState | None, PlanResu
     return None, value
 
 
+def _source_anchor_lines(belief_state: BeliefState | None) -> list[str]:
+    if belief_state is None:
+        return ["- Plan-only report: source, anchor and closure rows require a model."]
+    lines: list[str] = []
+    known_source_ids = {source.source_id for source in belief_state.sources}
+    for source in belief_state.sources:
+        lines.append(
+            f"- {source.source_id} | {source.title} | role={source.source_role} | lineage={source.lineage_id or 'unspecified'}"
+        )
+        for anchor in belief_state.anchors:
+            if anchor.source_id == source.source_id:
+                lines.append(f"  - {anchor.anchor_id} | locator={anchor.locator or 'unspecified'}")
+    if not belief_state.sources:
+        lines.append("- No sources recorded.")
+    for anchor in belief_state.anchors:
+        if anchor.source_id not in known_source_ids:
+            lines.append(
+                f"- Unbound anchor {anchor.anchor_id} | source_id={anchor.source_id} "
+                f"(source row absent) | locator={anchor.locator or 'unspecified'}"
+            )
+    for gap in belief_state.gaps:
+        if gap.semantic_state == "closed":
+            basis = gap.closure_basis
+            lines.append(
+                f"- Closed gap {gap.gap_id}: anchors={', '.join(basis.anchor_ids)}; "
+                f"sources={', '.join(basis.source_ids)}"
+            )
+    return lines
+
+
 def render_markdown(value: PlanResult | BeliefState) -> str:
     belief_state, plan = _plan(value)
     lines = [
@@ -65,6 +95,7 @@ def render_markdown(value: PlanResult | BeliefState) -> str:
             )
     else:
         lines.append("- No model-backed lifecycle rows are available in this plan-only report.")
+    lines.extend(["", "## Sources and Anchors", *_source_anchor_lines(belief_state)])
     lines.extend(["", "## Recommended Search Actions"])
     selected_ids = {action.action_id for action in plan.selected_actions}
     for scored in plan.scored_actions:
@@ -126,6 +157,7 @@ def render_text(value: PlanResult | BeliefState) -> str:
         for gap in belief_state.gaps:
             semantic_counts[gap.semantic_state] = semantic_counts.get(gap.semantic_state, 0) + 1
         parts.append(f"Semantic gap states: {semantic_counts}")
+    parts.extend(["Sources and Anchors:", *_source_anchor_lines(belief_state)])
     parts.append("Boundary: candidate material requires downstream TraceGuard/LogicGuard review.")
     return "\n".join(parts) + "\n"
 

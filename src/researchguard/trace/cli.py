@@ -290,26 +290,30 @@ def cmd_diagnose(args: argparse.Namespace) -> int:
 
 def cmd_gaps(args: argparse.Namespace) -> int:
     try:
-        _, result = _load_and_evaluate(args.model)
+        model = load_model(args.model)
+        result = evaluate_model(model, include_storyline_depth=True)
     except (OSError, SchemaError, ValueError, InferenceError) as exc:
         _print_json({"ok": False, "error": str(exc)}, pretty=args.pretty)
         return 2
-    _print_json({"ok": result.ok, "gaps": [item.to_dict() for item in result.gaps]}, pretty=args.pretty)
+    gaps = [item.to_dict() for item in result.gaps]
+    gaps.extend(result.storyline_depth.unresolved_gaps)
+    _print_json({"ok": result.ok, "gaps": gaps}, pretty=args.pretty)
     return 0
 
 
 def cmd_report(args: argparse.Namespace) -> int:
     try:
-        _, result = _load_and_evaluate(args.model)
+        model = load_model(args.model)
+        result = evaluate_model(model, include_storyline_depth=args.format != "json")
     except (OSError, SchemaError, ValueError, InferenceError) as exc:
         _print_json({"ok": False, "error": str(exc)}, pretty=False)
         return 2
     if args.format == "json":
         _print_json(result.to_dict(), pretty=True)
     elif args.format == "txt":
-        print(render_text(result), end="")
+        print(render_text(result, model=model, depth=result.storyline_depth), end="")
     else:
-        print(render_markdown(result), end="")
+        print(render_markdown(result, model=model, depth=result.storyline_depth), end="")
     return 0
 
 
@@ -423,8 +427,10 @@ def cmd_simulate(args: argparse.Namespace) -> int:
 
 def cmd_compare(args: argparse.Namespace) -> int:
     try:
-        before = evaluate_model(load_model(args.before))
-        after = evaluate_model(load_model(args.after))
+        before_model = load_model(args.before)
+        after_model = load_model(args.after)
+        before = evaluate_model(before_model)
+        after = evaluate_model(after_model)
     except (OSError, SchemaError, ValueError, InferenceError) as exc:
         _print_json({"ok": False, "error": str(exc)}, pretty=args.pretty)
         return 2
@@ -446,6 +452,31 @@ def cmd_compare(args: argparse.Namespace) -> int:
             changes["current_stage"] = {"before": old.current_stage, "after": new.current_stage}
         if changes:
             changed_traces.append({"trace_id": trace_id, "changes": changes})
+    old_hypotheses = {row.hypothesis_id: row for row in before.inference_receipt.hypothesis_projections}
+    new_hypotheses = {row.hypothesis_id: row for row in after.inference_receipt.hypothesis_projections}
+    changed_hypotheses = []
+    for hypothesis_id in sorted(old_hypotheses.keys() & new_hypotheses.keys()):
+        changes = {}
+        for field in ("support", "rank", "live", "causal_status"):
+            old_value = getattr(old_hypotheses[hypothesis_id], field)
+            new_value = getattr(new_hypotheses[hypothesis_id], field)
+            if field == "support":
+                old_value, new_value = round(old_value, 6), round(new_value, 6)
+            if old_value != new_value:
+                changes[field] = {"before": old_value, "after": new_value}
+        if changes:
+            changed_hypotheses.append({"hypothesis_id": hypothesis_id, "changes": changes})
+    object_delta = {}
+    for name, attribute, id_field in (
+        ("sources", "sources", "source_id"),
+        ("evidence", "evidence", "evidence_id"),
+        ("events", "events", "event_id"),
+        ("links", "hypothesis_evidence_links", "link_id"),
+        ("hypotheses", "storyline_hypotheses", "hypothesis_id"),
+    ):
+        old_ids = {getattr(item, id_field) for item in getattr(before_model, attribute)}
+        new_ids = {getattr(item, id_field) for item in getattr(after_model, attribute)}
+        object_delta[name] = {"added": sorted(new_ids - old_ids), "removed": sorted(old_ids - new_ids)}
     _print_json(
         {
             "ok": True,
@@ -456,6 +487,12 @@ def cmd_compare(args: argparse.Namespace) -> int:
                 "removed": sorted(set(before_by_id) - set(after_by_id)),
                 "changed": changed_traces,
             },
+            "hypothesis_delta": {
+                "added": sorted(new_hypotheses.keys() - old_hypotheses.keys()),
+                "removed": sorted(old_hypotheses.keys() - new_hypotheses.keys()),
+                "changed": changed_hypotheses,
+            },
+            "object_delta": object_delta,
             "diagnostic_count_delta": len(after.diagnostics) - len(before.diagnostics),
             "gap_count_delta": len(after.gaps) - len(before.gaps),
             "contradiction_count_delta": len(after.contradictions) - len(before.contradictions),

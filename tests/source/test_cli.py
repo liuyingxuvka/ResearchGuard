@@ -164,3 +164,29 @@ def test_compare_a_model_with_its_grown_version(tmp_path: Path) -> None:
     for key in ("source_delta", "anchor_delta", "gap_delta", "action_delta"):
         assert not any(self_comparison[key].values())
     assert baseline.read_bytes() == original_bytes
+
+
+def test_report_lists_sources_anchors_and_closure() -> None:
+    path = ROOT / "tests/source/fixtures/evergiven/src_v4.yaml"
+    for format_name in ("markdown", "txt"):
+        result = _run("report", str(path), "--format", format_name)
+        assert result.returncode == 0, result.stdout + result.stderr
+        assert "Sources and Anchors" in result.stdout
+        assert "anc-sca-dates" in result.stdout
+        assert any("gap-event-dates" in line and "anc-sca-dates" in line for line in result.stdout.splitlines())
+        assert "sources=" in result.stdout
+        assert "lineage=" in result.stdout
+
+
+def test_reports_keep_anchors_whose_source_row_is_absent() -> None:
+    from researchguard.source.report import render_markdown, render_text
+    from researchguard.source.schema import BeliefState
+
+    model = BeliefState.from_dict({"anchors": [{"anchor_id": "orphan-anchor", "source_id": "absent-source", "locator": "Page 4"}]})
+    for render in (render_markdown, render_text):
+        report = render(model)
+        assert "orphan-anchor" in report
+        assert "source_id=absent-source" in report
+        assert "source row absent" in report
+        assert "Page 4" in report
+    assert not model.sources

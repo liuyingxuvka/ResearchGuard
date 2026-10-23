@@ -20,7 +20,7 @@ researchguard trace library validate <case-library> --pretty
 researchguard trace library build-model <case-library> <case-id> --output <model.yaml> --pretty
 ```
 
-Read results with `trace report --format markdown` (2–4 KB). `evaluate` and `depth` with `--output` print a short summary and write the full JSON to the file.
+Read results with `trace report --format markdown` or `--format txt`: dated events, ranked live hypotheses, causal state, opposing factors and native depth blockers precede the trace details. This readable view computes depth from its existing evaluation; use it instead of rerunning a separate depth command merely for a summary. `trace gaps` includes solver and unresolved depth gaps. `trace compare` preserves trace changes and adds hypothesis state and source/evidence/event/link inventory changes. `evaluate` and `depth` with `--output` retain the complete JSON; `report --format json` retains the complete evaluation view.
 
 TraceGuard → LogicGuard includes trace/model-card/structure ids, validated and missing steps, alternatives, causal weakest link, conclusion-transfer status, downstream consumer, and safe/unsafe wording. TraceGuard → SourceGuard includes exact trace gap, evidence role/class, locator, counter/limiting need, and bridge need. Handoffs remain `awaiting_owner`; they never execute the sibling.
 

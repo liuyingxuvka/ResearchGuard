@@ -64,3 +64,7 @@ candidate cap; declared queries and native scoring weights are preserved.
 `source compare` reports shared-gap changes in type, semantic state, review,
 blocking, importance, description and `qualification_decision`; comparing a
 model to itself returns no changes. Comparison does not license evidence.
+
+Markdown and text reports list source ids, titles, roles and lineage with anchor ids
+and locators. Each closed gap names the anchors and sources in its current
+`closure_basis`; these are declared qualification records, not new retrieval or truth.

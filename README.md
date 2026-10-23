@@ -60,6 +60,11 @@ incomplete; generated prose is never promoted to evidence.
 open gap. An affordable critical search continues; a critical gap without one
 stays blocked. Without blocking gaps, `--sufficient` stops even when optional
 followups remain; those followups stay visible. Only cost is compared with budget.
+`trace report` in Markdown or text shows dated events, ranked hypotheses and native
+depth blockers; `trace gaps` includes those unresolved depth gaps. `trace compare`
+also reports hypothesis and source/evidence/event/link inventory changes. Source reports
+show source roles and lineage, anchor locators and each closed gap's declared closure basis.
+
 TraceGuard can expose a deletion-minimal contradiction core;
 `researchguard logic minimal-sets` exposes deletion-minimal support and attack
 sets with a conservative wording license. Candidates are split by the edge

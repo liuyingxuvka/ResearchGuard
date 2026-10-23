@@ -48,7 +48,7 @@
       "summary": "Own the researchguard console and the four member command lines; dispatch each member command directly to its owner.",
       "responsibilities": [
         "Dispatch researchguard logic|source|trace|experiment straight to the member main; unknown commands return one typed JSON error.",
-        "Own the member command-line surfaces, including the source stop rule inputs, optional followups and stable four status names.",
+        "Own member command lines, including stable source stop rules and trace report/gaps/compare research-state views while retaining complete JSON output.",
         "Pass the already-loaded trace model into logic handoff export so the native CLI carries actual evidence content and polarity.",
         "Expose score-actions from the same complete native plan scoring path as plan --all-scores, without a candidate limit.",
         "Compare versions of one source model using actual gap semantic fields and nested qualification decision; self-comparison reports no change and retired gap.status stays rejected.",
@@ -93,7 +93,7 @@
         ".flowguard/models/researchguard_suite_model.py"
       ],
       "status": "confirmed",
-      "fingerprint": "sha256:466551a5a9f24f92cb215456c4d56102dfaeb3fb2c845c80ade310923fce1884",
+      "fingerprint": "sha256:3ee0db5e230903f459059e2e668fe2e9fc99a13cfe97ba7d388ff56d476a18a0",
       "layer": "interface"
     },
     {
@@ -175,7 +175,7 @@
       "id": "sourceguard",
       "summary": "Own evidence discovery, expected-utility search plans, stop decisions and source/anchor qualification.",
       "responsibilities": [
-        "Own evidence discovery, expected-utility search plans, stop decisions and source/anchor qualification.",
+        "Own evidence discovery, expected-utility search plans, stop decisions, source/anchor qualification and readable source/anchor/closure reporting.",
         "Load, plan, update and iterate on a model file alone; models carry no contract; the action and every protected or coverage gap a prediction names must exist in the model when it is frozen.",
         "Decide whether to keep searching from the model itself: all executable declared and generated actions, selecting an affordable target by native utility, the open blocking gaps and the caller-declared budget.",
         "Combine source semantic-state, depth and coverage gaps from each actual model and delegate transition sets to the shared suite helper; resolved obligations alone count as progress.",
@@ -216,14 +216,14 @@
         ".flowguard/models/sourceguard_stop_decision_model.py"
       ],
       "status": "confirmed",
-      "fingerprint": "sha256:ad0a8076fab433728e822aa2e737de6a117679eca9dfc4edd53cb9864d45f01e",
+      "fingerprint": "sha256:a6444d334d3a559b5521164874a30a268318ffe88410990ad661c6e12c2d8419",
       "layer": "routes"
     },
     {
       "id": "traceguard",
       "summary": "Own temporal and causal trace inference, storyline stress and case library updates.",
       "responsibilities": [
-        "Own temporal and causal trace inference, storyline stress and case library updates.",
+        "Own temporal and causal trace inference, storyline stress, case library updates and readable timeline/hypothesis/depth reporting.",
         "Keep command output to analysis results; full JSON is written only with --output.",
         "Solve storyline support from evidence first; bound causal support below it. Depth checks that neither causal declarations nor oppose links raise support; evaluate does not run depth.",
         "Freeze a prediction only when its target, its expected evidence and event ids, and every coverage id exist in the model.",
@@ -278,7 +278,7 @@
       ],
       "models": [],
       "status": "confirmed",
-      "fingerprint": "sha256:289c675a3f8bdd566a3c3a6a01817cbad2a2baf0d49b07f2e204f69c28745330",
+      "fingerprint": "sha256:ebcddacf53fcc3b8c179005cf6959642d292de3773aa7466045944e452d0fac8",
       "layer": "routes"
     },
     {

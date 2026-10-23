@@ -650,3 +650,119 @@ def test_create_and_build_model_need_no_purpose_contract(tmp_path: Path):
     built = case_library.write_model(copy_case_library(tmp_path), "metadata-api-incident", tmp_path / "built.yaml")
     assert "guard_purpose_contract" not in built["metadata"]
     assert evaluate_model(load_model(tmp_path / "built.yaml")).traces[0].trace_id == "trace_metadata_incident"
+
+
+def test_report_shows_timeline_hypotheses_and_blockers(monkeypatch, capsys) -> None:
+    from argparse import Namespace
+    from dataclasses import replace
+
+    from researchguard.trace import cli
+    from researchguard.trace.report import render_markdown, render_text
+
+    path = ROOT / "tests/trace/fixtures/evergiven/tr_v1.yaml"
+    model = load_model(path)
+    baseline = evaluate_model(model, include_storyline_depth=True)
+    calls = []
+
+    def evaluate_once(model, **options):
+        calls.append(options)
+        return evaluate_model(model, **options)
+
+    monkeypatch.setattr(cli, "evaluate_model", evaluate_once)
+    for format in ("markdown", "txt"):
+        calls.clear()
+        assert cli.cmd_report(Namespace(model=str(path), format=format)) == 0
+        report = capsys.readouterr().out
+        assert calls == [{"include_storyline_depth": True}]
+        assert len(report.encode("utf-8")) <= 4096
+        assert report.index("Timeline") < report.index("Hypotheses") < report.index("Storyline Depth")
+        previous = -1
+        for event in sorted(model.events, key=lambda event: event.time_interval.start):
+            position = report.index(event.event_id)
+            assert position > previous
+            previous = position
+            assert event.time_interval.start in report
+            assert event.action in report
+            assert all(evidence_id in report for evidence_id in event.evidence_ids)
+        for projection in baseline.inference_receipt.hypothesis_projections:
+            assert projection.hypothesis_id in report
+            assert f"{projection.support:.3f}" in report
+            assert projection.causal_status in report
+            assert projection.top_opposition_factor_ids[0] in report
+        assert baseline.storyline_depth.closure_status in report
+        for gap in baseline.storyline_depth.unresolved_gaps:
+            assert gap["gap_id"] in report
+            assert gap["message"] in report
+        for rule in baseline.traces[0].rule_results[:3]:
+            assert rule.rule_id in report
+        for rule in baseline.traces[0].rule_results[3:]:
+            assert rule.rule_id not in report
+        assert "Claim boundary" in report and "Report Handoff" in report
+        if format == "txt":
+            assert "##" not in report and "`" not in report and "| ---" not in report
+    # Caller order does not change the dated timeline, and legacy result-only calls still work.
+    reversed_model = replace(model, events=tuple(reversed(model.events)))
+    assert render_markdown(baseline, model=reversed_model) == render_markdown(baseline, model=model)
+    assert "Validation status" in render_markdown(baseline)
+    assert "Validation status" in render_text(baseline)
+    calls.clear()
+    assert cli.cmd_report(Namespace(model=str(path), format="json")) == 0
+    payload = json.loads(capsys.readouterr().out)
+    assert calls == [{"include_storyline_depth": False}]
+    assert payload["inference_receipt"]["hypothesis_projections"]
+    assert payload["inference_receipt"]["contributions"]
+    assert payload["handoffs"] and payload["storyline_depth"] is None
+
+
+def test_gaps_include_depth_gaps(capsys) -> None:
+    from argparse import Namespace
+
+    from researchguard.trace import cli
+
+    for path in (ROOT / "tests/trace/fixtures/evergiven/tr_v1.yaml", example("project_radar_hydrogen_trace.yaml")):
+        baseline = evaluate_model(load_model(path), include_storyline_depth=True)
+        if path.name == "tr_v1.yaml":
+            assert baseline.storyline_depth.unresolved_gaps
+        else:
+            assert baseline.gaps
+            assert baseline.storyline_depth.unresolved_gaps == ()
+        assert cli.cmd_gaps(Namespace(model=str(path), pretty=False)) == 0
+        payload = json.loads(capsys.readouterr().out)
+        expected = [gap.to_dict() for gap in baseline.gaps] + list(baseline.storyline_depth.unresolved_gaps)
+        assert payload["gaps"] == expected
+        assert all(gap["gap_id"] and gap["message"] for gap in payload["gaps"])
+        assert payload["ok"] == baseline.ok
+
+
+def test_compare_shows_hypothesis_and_object_changes(capsys) -> None:
+    from argparse import Namespace
+
+    from researchguard.trace import cli
+
+    before = ROOT / "tests/trace/fixtures/evergiven/tr_v1.yaml"
+    after = ROOT / "tests/trace/fixtures/evergiven/tr_v2b.yaml"
+    args = Namespace(before=str(before), after=str(after), pretty=False)
+    assert cli.cmd_compare(args) == 0
+    payload = json.loads(capsys.readouterr().out)
+    assert "anc-transpacific" in payload["object_delta"]["evidence"]["added"]
+    assert payload["object_delta"]["sources"]["added"]
+    assert payload["object_delta"]["events"]["added"]
+    assert len(payload["object_delta"]["links"]["added"]) == 2
+    hypotheses = {row["hypothesis_id"]: row["changes"] for row in payload["hypothesis_delta"]["changed"]}
+    assert hypotheses["h_suez"]["support"]["after"] < hypotheses["h_suez"]["support"]["before"]
+    assert {"added", "removed", "changed"} == payload["trace_delta"].keys()
+    assert {"diagnostic_count_delta", "gap_count_delta", "contradiction_count_delta"} <= payload.keys()
+    # The reverse comparison preserves removed ids and each changed native field.
+    assert cli.cmd_compare(Namespace(before=str(after), after=str(before), pretty=False)) == 0
+    reverse = json.loads(capsys.readouterr().out)
+    for kind, delta in payload["object_delta"].items():
+        assert reverse["object_delta"][kind] == {"added": delta["removed"], "removed": delta["added"]}
+    for row in reverse["hypothesis_delta"]["changed"]:
+        for field, change in row["changes"].items():
+            forward = hypotheses[row["hypothesis_id"]][field]
+            assert change == {"before": forward["after"], "after": forward["before"]}
+    assert cli.cmd_compare(Namespace(before=str(before), after=str(before), pretty=False)) == 0
+    unchanged = json.loads(capsys.readouterr().out)
+    assert unchanged["trace_delta"] == {"added": [], "removed": [], "changed": []}
+    assert unchanged["hypothesis_delta"] == {"added": [], "removed": [], "changed": []}
+    assert all(delta == {"added": [], "removed": []} for delta in unchanged["object_delta"].values())
