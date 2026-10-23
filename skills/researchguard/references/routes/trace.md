@@ -1,70 +1,44 @@
 # TraceGuard
 
-## Purpose
+Reconstruct temporal/execution/effect chains and competing stories; review bounded cause. Declare scope, evidence/event boundaries and alternatives first.
 
-TraceGuard owns evidence-trace reconstruction with one general route and one internal case-library route. First declare the trace scope, evidence objects, event/evidence boundary, and live alternatives before inference.
+## Use / not use
 
-## Route Scope
+Use for incidents, lineage, requirements history, contradictions and counter-scenarios. The case library preserves messy material before modeling; it is not another skill.
+Do not infer cause from chronology, upgrade announcements to operations/outcomes, invent predictions, search for missing sources, license final arguments or use heuristic/legacy scoring. Hand source gaps to SourceGuard and final arguments to LogicGuard.
 
-TraceGuard owns temporal order, event and evidence separation, execution and effect chains, competing storylines, bounded causal review, contradictions, counter-scenarios, and evidence-backed trace reconstruction. Source discovery and final argument licensing remain typed handoffs to SourceGuard and LogicGuard.
+## Command order
 
-## Route map
+Read the selected route and active references; build the scoped model:
 
-- `route:general-trace` → temporal, process, execution, outcome, causal, counter-scenario, or competing-storyline work. Read `references/trace/general-trace.md` and the authoritative `references/trace/unified_inference_protocol.md` only when building or checking the mathematical inference path.
-- `route:case-library` → preserve messy case material and search directions before model construction. Read `references/trace/case-library.md`.
+`researchguard trace create --output model.yaml` (new model only; replace synthetic examples)
+`researchguard trace validate model.yaml`
+`researchguard trace evaluate model.yaml --output evaluation.json`
+`researchguard trace depth model.yaml --output depth.json` (when depth is required)
+`researchguard trace export-logicguard model.yaml --output bundle.yaml` (handoff only)
 
-The case library is an internal route, not another installed skill.
+Evaluate omits depth. Reuse results; do not rerun the menu for an unchanged model. Load iteration/library references as needed.
 
-## Local Material Routing
+## Fields
 
-Read only the reference declared by the selected route. Load the unified inference protocol only when building or checking the mathematical inference path, and load depth, iteration, command, or safe-output references only when their triggers fire.
+Fields/examples: `references/trace/fields.md`.
 
-## Route Acceptance Map
+## Hard rules / stop rules
 
-- Accept `route:general-trace` after the trace scope, evidence objects, event/evidence boundary, and live alternatives are declared.
-- Accept `route:case-library` only for preserving messy case material and search directions before model construction.
-- Accept inference, depth, iteration, command, or safe-output work only after its trigger-specific reference is loaded.
-- If lineage, critical objects, perturbations, or alternatives are missing, return a visible non-closure terminal rather than infer from chronology.
+Use the canonical solver; preserve lineage and separate events, explanations and outcomes. Required perturbation, residual, contradiction and holdout checks remain mandatory. Solver failure/bad residuals, missing lineage, unresolved critical objects, untested/ineffective critical probes, scope transfers, live alternatives or unsupported predictive holdout block broad closure. No self-report replaces current evaluation/depth; a member result cannot license another member's claim.
 
-## Conditional depth map
+- `model_closed_for_task`: close only with current evaluation/depth and bounded safe wording.
+- `progress_stalled`: report weakest links; seek changed evidence or narrow scope.
+- `iteration_limit`: stop retries; report unresolved blockers.
+- `external_input_required`: request the missing input or typed owner handoff.
+- `scope_excluded`: state the exclusion; do not transfer conclusions outside scope.
 
-- `trigger:task-iteration`: later evidence or a future event will test a prediction, a model miss appears, or a trace revision is needed → read `references/trace/task-iteration.md`.
-- `trigger:depth-closure`: broad, complete, causal, deep, predictive, high-impact, robustness, or competing-storyline wording → read `references/trace/depth-and-closure.md`.
-- `trigger:commands-handoffs`: actual CLI execution or SourceGuard/LogicGuard handoff construction → read `references/trace/commands-and-handoffs.md`.
-- `trigger:safe-output`: event/explanation/outcome separation, scope transfer, weakest-link, or downgrade wording → read `references/trace/safe-output.md`.
+## Conditional references
 
-These are loading triggers, not quality modes. Once depth is required, use the same canonical solver, perturbation, lineage, holdout, and native closure gates until closure or a visible non-closure terminal.
-
-## Use When
-
-Use TraceGuard for event/evidence separation, temporal order, incidents, requirements history, research lineage, execution/effect chains, competing storylines, bounded causal review, contradictions, and counter-scenarios.
-
-## Do Not Use When
-
-Do not use TraceGuard to infer causality from chronology, upgrade an announcement into operation or outcome, search for missing sources, license a final argument, invent a future prediction, or retry through heuristic or legacy scoring.
-
-## Required Workflow
-
-1. Freeze the trace scope, target, evidence objects, event/evidence boundary, and live alternatives.
-2. Read the selected route reference and every active trigger-specific reference.
-3. Reconstruct the trace with the canonical solver, preserve lineage, and separate events, explanations, and outcomes.
-4. Run required perturbation, residual, holdout, and contradiction checks; keep scope transfers and live alternatives explicit.
-5. Close only at `model_closed_for_task` with current evaluation and depth results, or return the visible terminal and weakest links.
-6. Return safe wording, typed handoffs, and the full claim boundary.
-
-## Hard Gates
-
-- Chronology alone cannot establish causality, and announcements cannot be upgraded into operation or outcome.
-- Solver failure, unacceptable residuals, missing lineage, unresolved critical objects, ineffective critical perturbations, scope transfer, live alternatives, or unsupported predictive holdout block broad closure.
-- A member result cannot silently license a final argument or source claim.
-
-## Native closure
-
-Solver failure, unacceptable residuals, missing lineage, unresolved critical objects, ineffective critical perturbations, scope transfer, live alternatives, or unsupported predictive holdout blocks broad closure. `model_closed_for_task` is the only task-model closure. `progress_stalled`, `iteration_limit`, `external_input_required`, and `scope_excluded` remain visible. A self-report never substitutes for current evaluation and depth results.
-
-## Output Requirements
-
-Return the native result, evidence and claim boundary, blockers and next action.
-Include full JSON only when it is needed or requested.
-
-- `trigger:fields`: before writing a model or observation, read `references/trace/fields.md`.
+- `route:general-trace`: `references/trace/general-trace.md`; mathematical inference work also reads `references/trace/unified_inference_protocol.md`.
+- `route:case-library`: `references/trace/case-library.md`.
+- `trigger:fields`: model/observation writing → `references/trace/fields.md`.
+- `trigger:task-iteration`: later evidence, prediction test, model miss or revision → `references/trace/task-iteration.md`.
+- `trigger:depth-closure`: broad/complete/causal/deep/predictive/high-impact/robust or competing claims → `references/trace/depth-and-closure.md`.
+- `trigger:commands-handoffs`: CLI or typed handoff → `references/trace/commands-and-handoffs.md`.
+- `trigger:safe-output`: separation, scope, weakest link or downgrade → `references/trace/safe-output.md`.

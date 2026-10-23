@@ -1,69 +1,48 @@
 # SourceGuard
 
 ## Purpose
+Find sources; qualify anchors. Utility ranks search value, not truth/probability.
 
-SourceGuard owns one current evidence-discovery and source-qualification route. First declare the target claim, desired strength, source roles, and current gaps; then build or inspect the current source model before choosing a search action.
+## Use when
+Retrieval, provenance/lineage, source roles, semantic fit, counter/limiting, numeric/bridge evidence or claim use.
 
-Read `references/source/source-model-protocol.md` under `route:source-model` for every admitted SourceGuard task.
+## Do not use
+Trace reconstruction/argument licensing: use typed handoffs; no silent Guard calls.
 
-## Route Scope
+## Order
+Freeze claim/strength/roles/artifact/gaps. New model only: replace teaching rows. Validate, plan, retrieve, record real material:
 
-SourceGuard owns source-role planning, evidence discovery, retrieval, provenance, lineage, semantic fit, counter or limiting search, and bounded claim-use qualification. It decides whether a source observation can support the declared claim use; argument licensing and temporal or causal reconstruction remain typed handoffs.
+```text
+researchguard source create --output model.yaml
+researchguard source validate model.yaml
+researchguard source plan model.yaml --limit 3
+researchguard source add-observation model.yaml --observation observation.yaml --output updated.yaml
+researchguard source depth updated.yaml
+researchguard source stop-decision updated.yaml --budget <remaining>
+```
 
-## Local Material Routing
+## Fields
+See `references/source/fields.md`: claim in `leads[].question`, strength in `depth_policy.requested_claim_scope` (bounded/broad). Absent gap state defaults to discovered; retired status fails; closed needs complete current closure_basis.
 
-Read `references/source/source-model-protocol.md` before every admitted task, then read only the reference declared by each active route or trigger. Keep provider observations, source candidates, and immutable evidence references separate inside the SourceGuard material boundary.
+## Stops
+- `continue_iteration` / `continue_search`: take the selected action; repeat with real observations.
+- `model_closed_for_task`: report native task closure within scope; understanding cannot close.
+- `progress_stalled`: stop unchanged work; request new evidence/action.
+- `iteration_limit`: stop; report gaps.
+- `external_input_required` / `provider_access_required`: obtain named input/access; keep gap.
+- `finite_action_exhausted`: report exhausted actions/unresolved scope.
+- `blocked_unresolved_critical`: obtain critical search/budget; no claim promotion.
+- `stop_sufficient`: stop search; `not_run`: correct inputs.
+Compare cost with budget; utility ranks. Keep optional followups.
 
-## Route Acceptance Map
+## Hard rules
+Separate observations, candidates and immutable refs. Candidates, locators, utility and aggregates alone are not evidence. Keep missing/stale/planning-only/bounded/skipped/inaccessible/provider-unavailable work visible. Never invent retrieval/OCR/multimodal work. Recorded observations in depth do not imply fresh retrieval. Broad closure requires current depth, complete target/gap universes, per-gap direct/independent/counter coverage, lineage, content anchors and no critical gap.
 
-- Accept the route only after the target claim, desired strength, source roles, and current gaps are frozen.
-- Accept a retrieval or qualification action only after its route reference and source or provider boundary are declared.
-- Accept iteration, depth, command, or safe-output work only after its conditional reference is loaded.
-- If a source anchor, source role, or critical gap is missing, keep the result visibly unresolved rather than promoting a candidate.
-
-## Conditional depth map
-
-- `trigger:retrieval-workflow`: plan or execute retrieval, qualify provider observations, update semantic state, or export a handoff → read `references/source/retrieval-workflow.md`.
-- `trigger:task-iteration`: a real observation will test a predicted search action, a model miss appears, or an addressable gap remains → read `references/source/task-iteration.md`.
-- `trigger:broad-depth-closure`: broad, complete, deep, final, high-impact, or gap-closure wording → read `references/source/broad-depth-and-closure.md`.
-- `trigger:commands`: actual CLI construction or execution → read `references/source/commands.md`.
-- `trigger:safe-output`: reader-facing qualification, downgrade, access-gap, or handoff wording → read `references/source/safe-output.md`.
-
-The small first read is not a weak mode. When a deep trigger fires, continue the existing native search-model loop until all covered native gaps close or a visible terminal stops it.
-
-## Use When
-
-Use SourceGuard for source-role planning, evidence discovery, retrieval, provenance, lineage, counter/limiting search, semantic fit, key-number provenance, bridge evidence, and claim-use qualification.
-
-## Do Not Use When
-
-Do not use SourceGuard to assert factual truth, promote a search result or candidate into evidence, reconstruct a trace, license a final argument, fake external search/OCR/multimodal analysis, or silently invoke another Guard.
-
-## Required Workflow
-
-1. Freeze the target claim, desired strength, source roles, target artifact, and current gap universe.
-2. Read the source-model protocol and the references selected by active route and triggers.
-3. Plan or execute bounded retrieval, record provider observations, and qualify candidates without treating search results as evidence.
-4. Cite each source by the anchor id and locator the tool reports (`source depth` computes evidence references itself); record direct, independent, counter, lineage, and content-bearing coverage where required.
-5. Iterate through the native search-model loop until `model_closed_for_task` or a visible terminal such as `provider_access_required`, `finite_action_exhausted`, or `progress_stalled`.
-6. Return safe claim use, unresolved gaps, typed handoffs, and the complete claim boundary.
-
-## Hard Gates
-
-- A search result, source candidate, locator, utility score, or aggregate is never individual evidence by itself.
-- Missing, stale, inaccessible, skipped, or provider-unavailable work remains visible.
-- Broad closure requires current depth results, the complete target-unit and gap universe, per-gap direct/independent/counter coverage, lineage, content-bearing anchors, and no unresolved critical native gap.
-- SourceGuard cannot invent external retrieval, OCR, multimodal analysis, or truth probability.
-
-## Native closure
-
-Search result is not evidence; source candidate is not evidence; locator is not semantic support; utility is not truth probability. Broad closure requires the current depth result, the complete target-unit/gap universe, per-gap direct/independent/counter coverage, lineage and content-bearing anchors, and no unresolved critical native gap. Planning-only, provider-unavailable, bounded, stale, skipped, or inaccessible work remains visible.
-
-Task-local closure is only `model_closed_for_task`. Other current terminals include `continue_iteration`, `progress_stalled`, `iteration_limit`, `external_input_required`, `provider_access_required`, and `finite_action_exhausted`. AI cannot close by reporting that it understands the source problem.
-
-## Output Requirements
-
-Return the native result, evidence and claim boundary, blockers and next action.
-Include full JSON only when it is needed or requested.
-
-- `trigger:fields`: before writing a model or observation, read `references/source/fields.md`.
+## References
+- `route:source-model`: always → `references/source/source-model-protocol.md`.
+- `trigger:fields`: model/observation → `references/source/fields.md`.
+- `trigger:retrieval-workflow`: retrieval/qualification/update/export → `references/source/retrieval-workflow.md`.
+- `trigger:task-iteration`: predict before observation; miss/open gap → `references/source/task-iteration.md`.
+- `trigger:broad-depth-closure`: broad/complete/deep/final/high-impact/closure → `references/source/broad-depth-and-closure.md`.
+- `trigger:commands`: CLI construction → `references/source/commands.md`.
+- `trigger:safe-output`: reader use/downgrade/access-gap/handoff → `references/source/safe-output.md`.

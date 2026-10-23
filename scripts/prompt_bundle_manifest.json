@@ -2,10 +2,10 @@
   "schema_version": "researchguard.prompt-bundle-manifest.v1",
   "bundles": [
     {"bundle_id": "researchguard", "entry_files": ["skills/researchguard/SKILL.md", "skills/researchguard/agents/openai.yaml"], "max_entry_bytes": 3000, "minimum_headroom_bytes": 600},
-    {"bundle_id": "route:logic", "entry_files": ["skills/researchguard/references/routes/logic.md"], "max_entry_bytes": 7000, "minimum_headroom_bytes": 1000},
-    {"bundle_id": "route:source", "entry_files": ["skills/researchguard/references/routes/source.md"], "max_entry_bytes": 7000, "minimum_headroom_bytes": 1000},
-    {"bundle_id": "route:trace", "entry_files": ["skills/researchguard/references/routes/trace.md"], "max_entry_bytes": 6500, "minimum_headroom_bytes": 1000},
-    {"bundle_id": "route:experiment", "entry_files": ["skills/researchguard/references/routes/experiment.md"], "max_entry_bytes": 5500, "minimum_headroom_bytes": 600}
+    {"bundle_id": "route:logic", "entry_files": ["skills/researchguard/references/routes/logic.md"], "max_entry_bytes": 4000, "minimum_headroom_bytes": 1000},
+    {"bundle_id": "route:source", "entry_files": ["skills/researchguard/references/routes/source.md"], "max_entry_bytes": 4000, "minimum_headroom_bytes": 1000},
+    {"bundle_id": "route:trace", "entry_files": ["skills/researchguard/references/routes/trace.md"], "max_entry_bytes": 4000, "minimum_headroom_bytes": 1000},
+    {"bundle_id": "route:experiment", "entry_files": ["skills/researchguard/references/routes/experiment.md"], "max_entry_bytes": 4000, "minimum_headroom_bytes": 600}
   ],
   "reference_edges": [
     {"trigger_id": "", "declared_in": "skills/researchguard/SKILL.md", "reference": "skills/researchguard/references/routes/logic.md"},

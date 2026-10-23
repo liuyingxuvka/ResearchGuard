@@ -32,15 +32,22 @@ with utility. Invalid inputs return `not_run`.
 
 ## Read one result cheaply
 
-For routine planning, call `plan_next_actions(model, limit=3)` once and use
-`render_text(plan)` on that same PlanResult. The text retains selected actions,
-open gaps and the mathematical boundary. Keep the full scored candidate JSON as
-an on-demand artifact; do not paste it into every turn or recompute a plan just
-to change its display. The existing CLI text view is:
+Choose one CLI view for a routine read. For native JSON with selected actions,
+open gaps and the mathematical boundary, run:
+
+```text
+researchguard source plan <model.yaml> --limit 3
+```
+
+For a short text view, use this command instead:
 
 ```text
 researchguard source report <model.yaml> --format txt
 ```
+
+Each command computes its own view; do not run both merely to change display.
+Use `plan --all-scores` only when the full scored candidate JSON is needed and
+retain that output as an on-demand artifact instead of pasting it every turn.
 
 A short view does not remove a critical gap or license stronger claim use.
 

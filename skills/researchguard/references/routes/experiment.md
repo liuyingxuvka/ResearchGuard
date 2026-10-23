@@ -1,115 +1,64 @@
 # ExperimentGuard
 
-## Purpose
+Recommend finite experiment sets that distinguish caller-declared hypotheses.
+Discrimination is structural and recommendation-only.
 
-ExperimentGuard turns explicit hypotheses, candidate experiments, and predicted
-outcomes into a recommendation-only discriminating set.
+## Use / do not use
 
-## Route Scope
+Use when at least two explicit hypotheses predict outcomes for a finite inventory.
+Do not execute experiments, invent outcomes/probabilities, decide causal truth,
+discover sources, reconstruct timelines or license arguments. Hand off to that owner.
 
-Own deterministic minimum-set recommendation for caller-declared hypotheses. Do
-not execute experiments, decide causal truth, or replace another member.
+## Command order
 
-## Local Material Routing
+Freeze the spec before observing, then run:
 
-Native recommendations use the experiment spec only.
-
-## Route Acceptance Map
-
-- Require unique hypothesis IDs, a finite experiment inventory, and explicit
-  comparable predictions.
-- Task-local iteration may add a task id, an iteration bound and the previous
-  open gaps; every other loop field is optional.
-- Missing declarations, valid observations, or holdout evidence remain visible
-  as unresolved; never guess them.
-- A sibling member is never a retry.
-
-## Use When
-
-Use this route when at least two concrete hypotheses need one or more declared
-experiments that distinguish them.
-
-## Do Not Use When
-
-Do not execute an experiment, invent outcomes or probabilities, infer causal
-truth, search for sources, reconstruct a timeline, or license an argument.
-Use the matching ResearchGuard route for those requests.
-
-## Required Inputs
-
-Require unique hypothesis IDs, a finite candidate inventory, and a declared
-outcome for each hypothesis/experiment relationship used for discrimination.
-Missing declarations stay visible. Minimal spec (all other fields are optional):
-
-```json
-{
-  "hypothesis_predictions": [
-    {"hypothesis_id": "h1", "outcomes_by_experiment": {"e1": "up", "e2": "up"}},
-    {"hypothesis_id": "h2", "outcomes_by_experiment": {"e1": "down", "e2": "up"}},
-    {"hypothesis_id": "h3", "outcomes_by_experiment": {"e1": "up", "e2": "down"}}
-  ],
-  "candidate_experiment_ids": ["e1", "e2"]
-}
+```text
+researchguard experiment recommend <spec.json>
+researchguard experiment observe <spec.json> <observations.json>
 ```
 
-## Required Workflow
+Apply real observations and update the next spec's iteration/prior gaps explicitly;
+never rewrite the frozen prediction matrix after seeing a result.
 
-1. Freeze hypotheses, candidate experiments, and predictions.
-2. Validate explicit, comparable predictions.
-3. Find every minimum-cardinality set distinguishing each hypothesis pair.
-4. Return the deterministic first recommendation, tied sets, and unresolved
-   pairs.
-5. State the claim boundary and keep the result recommendation-only.
+## Fields and examples
 
-## Hard Gates
+A spec needs unique hypothesis IDs, candidate IDs and each hypothesis's predicted
+outcome for every candidate. Minimal spec:
 
-- Never invent hypotheses, outcomes, probabilities, results, or evidence.
-- Every selected or tied set must distinguish every declared pair within the
-  finite bound; unresolved pairs remain visible.
-- `invalid` and `not_run` observations create gaps. A holdout observation is
-  optional; a holdout that contradicts the one survivor keeps the task open.
-- Zero survivors are a prediction-matrix miss requiring an immutable revision
-  candidate and new iteration, never a silent rewrite or success.
-- Recommendation status proves only finite-prediction discrimination.
+```json
+{"hypothesis_predictions": [
+  {"hypothesis_id": "h1", "outcomes_by_experiment": {"e1": "up"}},
+  {"hypothesis_id": "h2", "outcomes_by_experiment": {"e1": "down"}}],
+ "candidate_experiment_ids": ["e1"]}
+```
 
-## Conditional Task-Local Experiment Iteration
+Optional task fields: `task_id`, `purpose`, `coverage_ids`, `assumptions`, `unknowns`,
+`iteration` (0), `max_iterations` (1), `prior_open_gap_ids` ([]), and
+`maximum_experiment_count` (unset). Require comparable declarations; never guess them.
 
-Trigger the loop for a larger task, a real observation, a matrix miss, an
-addressable gap, or requested predictive closure. Freeze the hypotheses,
-candidate experiments and predicted outcomes in the spec before observing. Each
-observation carries an evidence ID, source, time, construction or holdout role,
-and `valid`, `invalid`, or `not_run` status. Invalid and not-run evidence create
-visible gaps.
-
-With valid observations, compute dispositions and rebuild the minimum set.
-Zero survivors emit an immutable revision candidate and require a new iteration.
-One survivor closes unless a holdout observation contradicts it. Record gap
-lineage, next experiments and terminal reason; on the next round put the open
-gaps into `prior_open_gap_ids`. Continue to `model_closed_for_task`, or stop
-with `iteration_limit`, `progress_stalled`, or `external_input_required`.
-
-## Local Route
-
-Use `researchguard experiment recommend <spec.json>`; apply observations with
-`researchguard experiment observe <spec.json> <observations.json>`. Never invoke
-a sibling after failure.
-
-## Output Requirements
-
-Return the native result, evidence and claim boundary, blockers and next action.
-Include full JSON only when it is needed or requested.
-
-## Observation JSON
-
-Pass a list, or an object with `observations`. Each row requires `experiment_id`,
-`observed_outcome` (non-empty when valid), `evidence_id`, `source_ref`, `observed_at`
-and `role` (`construction` or `holdout`). `status` defaults to `valid`; allowed values
-are `valid`, `invalid`, `not_run`. Optional `observation_port_id` and `outcome_port_id`
-default to empty strings. An observation records caller-supplied results; this route
-never performs the experiment.
+Observations are a list or `{"observations": [...]}`. Required row fields:
+`experiment_id`, `observed_outcome` (nonempty when valid), `evidence_id`, `source_ref`,
+`observed_at`, `role` (`construction` or `holdout`). `status` defaults to `valid`;
+values: `valid`, `invalid`, `not_run`. Optional `observation_port_id` and
+`outcome_port_id` default to empty strings.
 
 ```json
 {"observations": [{"experiment_id": "e1", "observed_outcome": "up",
-  "evidence_id": "measurement-1", "source_ref": "lab-notebook:page-1",
-  "observed_at": "2026-10-21T12:00:00Z", "role": "construction", "status": "valid"}]}
+ "evidence_id": "measurement-1", "source_ref": "lab-notebook:page-1",
+ "observed_at": "2026-10-21T12:00:00Z", "role": "construction"}]}
 ```
+
+## Hard rules and stops
+
+Every selected/tied set must distinguish all declared pairs within the finite bound.
+Return the deterministic minimum-cardinality recommendation and unresolved pairs.
+Invalid/not-run observations create gaps. Holdout evidence is optional; any supplied
+counterexample keeps closure blocked. Zero survivors require a visible matrix-revision
+candidate and a new iteration, never silent success. A sibling is never a retry.
+
+`model_closed_for_task` closes only a uniquely consistent hypothesis without gaps or
+holdout counterexamples. For `iteration_limit`, report the bound; for
+`progress_stalled`, stop with the unchanged gaps; for `external_input_required`,
+obtain the named external observation. Otherwise continue the concrete next experiment
+recommendation and retain gap lineage, dispositions and terminal reason.
