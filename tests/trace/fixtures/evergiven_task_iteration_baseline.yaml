@@ -1,0 +1,352 @@
+metadata:
+  schema_version: researchguard.trace.model.v2
+  generated_by: SourceGuard
+  boundary: Generated from SourceGuard source discovery state; candidate sources are
+    not validated evidence-to-trace conclusions.
+  source_model_version: ''
+  notes:
+  - 'SourceGuard gap gap-event-dates (missing_primary_source): Official dates of grounding
+    and refloating.'
+  - 'SourceGuard gap gap-rate-series (missing_numeric_provenance): A weekly Shanghai-Rotterdam
+    spot-rate series covering Oct 2020 - Dec 2021.'
+  - 'SourceGuard gap gap-pre-trend (missing_counterevidence): Evidence on whether
+    rates were already rising before 23 Mar 2021.'
+  - 'SourceGuard gap gap-alt-yantian (missing_counterevidence): Dates and scale of
+    the Yantian port disruption (alternative cause).'
+  - 'SourceGuard gap counter-source-src-unctad-rmt2021 (contradiction): Counterevidence
+    candidate observed: UNCTAD Review of Maritime Transport 2021, ch. 3 (trial transcription)'
+  - SourceGuard does not generate validated events or traces.
+  - Permission-gated and unavailable material remains an access gap.
+  purpose: Did the Ever Given grounding cause the 2021 Asia-Europe freight rate rise?
+sources:
+- source_id: src-sca-2021
+  title: Suez Canal Authority statements on the Ever Given grounding and refloating
+    (trial transcription)
+  url: https://www.suezcanal.gov.eg/
+  source_type: government_record
+  lineage_id: lin-sca
+  independence_group: lin-sca
+  source_reliability: 0.9
+  source_status: stable_keep
+  source_date: '2021-03-29'
+  coverage_period: null
+- source_id: src-drewry-wci
+  title: Drewry World Container Index, Shanghai-Rotterdam lane, weekly (trial transcription,
+    approximate values)
+  url: https://www.drewry.co.uk/supply-chain-advisors/supply-chain-expertise/world-container-index-assessed-by-drewry
+  source_type: dataset
+  lineage_id: lin-drewry
+  independence_group: lin-drewry
+  source_reliability: 0.85
+  source_status: stable_keep
+  source_date: null
+  coverage_period: 2020-10 to 2021-12
+- source_id: src-unctad-rmt2021
+  title: UNCTAD Review of Maritime Transport 2021, ch. 3 (trial transcription)
+  url: https://unctad.org/webflyer/review-maritime-transport-2021
+  source_type: pdf_report
+  lineage_id: lin-unctad
+  independence_group: lin-unctad
+  source_reliability: 0.85
+  source_status: stable_keep
+  source_date: '2021-11-18'
+  coverage_period: null
+evidence:
+- evidence_id: anc-sca-dates
+  source_id: src-sca-2021
+  raw_text: The Ever Given ran aground on 23 March 2021 and was refloated on 29 March
+    2021; navigation resumed the same day.
+  normalized_summary: Grounding 23 Mar 2021, refloated 29 Mar 2021.
+  evidence_type: paragraph
+  extraction_confidence: 0.9
+  evidence_specificity: 0.9
+  locator: SCA statement 29 Mar 2021, para 1
+  limits: []
+  warnings: []
+  usable_as_trace_evidence: true
+  supports:
+  - event_grounding
+  - event_refloat
+- evidence_id: anc-wci-series
+  source_id: src-drewry-wci
+  raw_text: 'Approx. USD/FEU: Oct 2020 ~2,000; early Jan 2021 ~8,000; mid Mar 2021
+    ~7,000; early Apr 2021 ~8,000; Jun 2021 ~10,500; Sep 2021 ~14,000 (peak).'
+  normalized_summary: Rate quadrupled Oct 2020 - Jan 2021, dipped before 23 Mar, rose
+    after, and kept rising to a Sep 2021 peak.
+  evidence_type: table
+  extraction_confidence: 0.7
+  evidence_specificity: 0.8
+  locator: WCI Shanghai-Rotterdam weekly table, rows 2020-10-01..2021-12-30
+  limits: []
+  warnings: []
+  usable_as_trace_evidence: true
+  supports:
+  - event_rates_surge_2020
+  - event_rates_rise_q2
+  - event_rates_peak
+- evidence_id: anc-unctad-surge
+  source_id: src-unctad-rmt2021
+  raw_text: Container spot rates began surging in the second half of 2020 as demand
+    rebounded and empty containers were scarce; the Suez Canal blockage in March 2021
+    added further pressure.
+  normalized_summary: Rates were already surging from H2 2020; the blockage added
+    pressure on top.
+  evidence_type: page
+  extraction_confidence: 0.8
+  evidence_specificity: 0.7
+  locator: RMT 2021, chapter 3, freight rates section
+  limits: []
+  warnings: []
+  usable_as_trace_evidence: true
+  supports:
+  - event_rates_surge_2020
+events:
+- event_id: event_rates_surge_2020
+  evidence_ids:
+  - anc-wci-series
+  - anc-unctad-surge
+  actor_ids:
+  - ent_lane
+  action: spot rate quadrupled
+  object_ids:
+  - ent_lane
+  event_type: observation
+  time_interval:
+    start: 2020-10
+    precision: month
+    confidence: 0.85
+  location_ids: []
+  trace_hint: freight 2021
+  stage_hint: unknown
+  extraction_confidence: 0.8
+  importance: 0.9
+- event_id: event_grounding
+  evidence_ids:
+  - anc-sca-dates
+  actor_ids:
+  - ent_evergiven
+  action: ran aground in Suez Canal
+  object_ids:
+  - ent_evergiven
+  event_type: observation
+  time_interval:
+    start: '2021-03-23'
+    precision: exact_date
+    confidence: 0.85
+  location_ids: []
+  trace_hint: freight 2021
+  stage_hint: unknown
+  extraction_confidence: 0.8
+  importance: 0.9
+- event_id: event_refloat
+  evidence_ids:
+  - anc-sca-dates
+  actor_ids:
+  - ent_evergiven
+  action: refloated
+  object_ids:
+  - ent_evergiven
+  event_type: observation
+  time_interval:
+    start: '2021-03-29'
+    precision: exact_date
+    confidence: 0.85
+  location_ids: []
+  trace_hint: freight 2021
+  stage_hint: unknown
+  extraction_confidence: 0.8
+  importance: 0.7
+- event_id: event_rates_rise_q2
+  evidence_ids:
+  - anc-wci-series
+  actor_ids:
+  - ent_lane
+  action: spot rate rose to about 10,500
+  object_ids:
+  - ent_lane
+  event_type: observation
+  time_interval:
+    start: 2021-06
+    precision: month
+    confidence: 0.85
+  location_ids: []
+  trace_hint: freight 2021
+  stage_hint: unknown
+  extraction_confidence: 0.8
+  importance: 0.8
+- event_id: event_rates_peak
+  evidence_ids:
+  - anc-wci-series
+  actor_ids:
+  - ent_lane
+  action: spot rate peaked near 14,000
+  object_ids:
+  - ent_lane
+  event_type: observation
+  time_interval:
+    start: 2021-09
+    precision: month
+    confidence: 0.85
+  location_ids: []
+  trace_hint: freight 2021
+  stage_hint: unknown
+  extraction_confidence: 0.8
+  importance: 0.8
+traces:
+- trace_id: trace_freight_2021
+  title: Asia-Europe freight 2020-2021
+  trace_type: market_storyline
+  event_ids:
+  - event_rates_surge_2020
+  - event_grounding
+  - event_refloat
+  - event_rates_rise_q2
+  - event_rates_peak
+  entity_ids:
+  - ent_evergiven
+  - ent_lane
+  location_ids: []
+  current_stage: unknown
+  importance: 0.9
+  claim: Rates rose before, during and after the blockage.
+entities:
+- mention_id: ent_evergiven
+  evidence_id: anc-sca-dates
+  raw_name: Ever Given
+  normalized_name: ever given
+  entity_type: asset
+  role: blocking_vessel
+  confidence: 0.9
+- mention_id: ent_lane
+  evidence_id: anc-wci-series
+  raw_name: Shanghai-Rotterdam lane
+  normalized_name: shanghai-rotterdam
+  entity_type: asset
+  role: affected_market
+  confidence: 0.85
+storyline_hypotheses:
+- hypothesis_id: h_suez
+  claim: The Ever Given blockage caused the 2021 Asia-Europe rate rise.
+  role: primary
+  trace_ids:
+  - trace_freight_2021
+  event_ids:
+  - event_grounding
+  - event_refloat
+  - event_rates_rise_q2
+  - event_rates_peak
+  importance: 0.9
+  uncertainty: 0.5
+  causal: true
+  mechanism_ids:
+  - mech_capacity
+  confounder_ids:
+  - conf_demand
+- hypothesis_id: h_demand
+  claim: Pandemic demand and container shortage drove the rise; the blockage added
+    a short bump.
+  role: alternative
+  trace_ids:
+  - trace_freight_2021
+  event_ids:
+  - event_rates_surge_2020
+  - event_rates_rise_q2
+  - event_rates_peak
+  importance: 0.9
+  uncertainty: 0.4
+  causal: true
+  mechanism_ids:
+  - mech_demand
+hypothesis_evidence_links:
+- link_id: l_suez_sca
+  hypothesis_id: h_suez
+  evidence_id: anc-sca-dates
+  polarity: support
+  declared_relevance: 0.6
+- link_id: l_suez_wci
+  hypothesis_id: h_suez
+  evidence_id: anc-wci-series
+  polarity: support
+  declared_relevance: 0.5
+- link_id: l_suez_unctad
+  hypothesis_id: h_suez
+  evidence_id: anc-unctad-surge
+  polarity: oppose
+  declared_relevance: 0.8
+- link_id: l_dem_unctad
+  hypothesis_id: h_demand
+  evidence_id: anc-unctad-surge
+  polarity: support
+  declared_relevance: 0.9
+- link_id: l_dem_wci
+  hypothesis_id: h_demand
+  evidence_id: anc-wci-series
+  polarity: support
+  declared_relevance: 0.8
+hypothesis_relations:
+- relation_id: rel_suez_vs_demand
+  left_hypothesis_id: h_suez
+  right_hypothesis_id: h_demand
+  relation: alternative
+  evidence_ids:
+  - anc-wci-series
+  - anc-unctad-surge
+causal_mechanisms:
+- mechanism_id: mech_capacity
+  hypothesis_id: h_suez
+  description: Blockage delayed ~400 ships, removing effective vessel and container
+    capacity for weeks.
+  evidence_ids:
+  - anc-sca-dates
+  declared_relevance: 0.6
+- mechanism_id: mech_demand
+  hypothesis_id: h_demand
+  description: Goods demand rebound plus empty-container imbalance tightened capacity
+    from H2 2020.
+  evidence_ids:
+  - anc-unctad-surge
+  declared_relevance: 0.8
+confounder_reviews:
+- confounder_id: conf_demand
+  hypothesis_id: h_suez
+  description: Rates were already rising from demand before the blockage.
+  status: unresolved
+  evidence_ids:
+  - anc-unctad-surge
+  importance: 0.9
+causal_scopes:
+- scope_id: scope_ae_2021
+  description: Asia-Europe spot rates, 2021
+  time_window: 2021-01..2021-12
+causal_candidates:
+- causal_id: cc_suez
+  hypothesis_id: h_suez
+  cause_event_ids:
+  - event_grounding
+  effect_event_ids:
+  - event_rates_rise_q2
+  - event_rates_peak
+  mechanism_ids:
+  - mech_capacity
+  confounder_ids:
+  - conf_demand
+  alternative_hypothesis_ids:
+  - h_demand
+  scope_id: scope_ae_2021
+evidence_ablations:
+- ablation_id: abl_no_unctad
+  hypothesis_id: h_demand
+  trace_id: trace_freight_2021
+  description: Remove the UNCTAD pre-trend evidence.
+  remove_evidence_ids:
+  - anc-unctad-surge
+  importance: 0.9
+expected_sensitivities:
+- sensitivity_id: sens_no_unctad
+  perturbation_id: abl_no_unctad
+  target_kind: hypothesis
+  target_id: h_demand
+  rationale: Without the pre-trend evidence the demand storyline should weaken.
+  expected_direction: decrease
+  minimum_absolute_change: 0.05
+scenario_perturbations: []

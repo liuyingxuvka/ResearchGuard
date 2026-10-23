@@ -1,0 +1,91 @@
+{
+  "schema_version": "researchguard.trace.evidence_batch_observation.v2",
+  "observation_id": "obs-tp",
+  "observed_at": "2026-10-21T19:30:00Z",
+  "quality_status": "valid",
+  "evidence_ids": [
+    "anc-transpacific"
+  ],
+  "source_refs": [
+    "src-wci-transpacific"
+  ],
+  "new_sources": [
+    {
+      "source_id": "src-wci-transpacific",
+      "title": "Drewry WCI Shanghai-Los Angeles lane (trial transcription, approximate)",
+      "url": null,
+      "source_type": "dataset",
+      "lineage_id": "lin-drewry",
+      "independence_group": "lin-drewry",
+      "source_reliability": 0.85,
+      "source_status": "stable_keep",
+      "source_date": null,
+      "coverage_period": "2021"
+    }
+  ],
+  "new_evidence": [
+    {
+      "evidence_id": "anc-transpacific",
+      "source_id": "src-wci-transpacific",
+      "raw_text": "Approx. USD/FEU Shanghai-Los Angeles: Jan 2021 ~4,000; Sep 2021 ~12,000.",
+      "normalized_summary": "Transpacific rates (no Suez exposure) roughly tripled in 2021 as well.",
+      "evidence_type": "table",
+      "extraction_confidence": 0.7,
+      "evidence_specificity": 0.8,
+      "locator": "WCI Shanghai-LA weekly table 2021",
+      "limits": [],
+      "warnings": [],
+      "usable_as_trace_evidence": true,
+      "supports": [
+        "event_tp_rise"
+      ]
+    }
+  ],
+  "new_events": [
+    {
+      "event_id": "event_tp_rise",
+      "evidence_ids": [
+        "anc-transpacific"
+      ],
+      "actor_ids": [
+        "ent_lane"
+      ],
+      "action": "transpacific spot rate tripled",
+      "object_ids": [
+        "ent_lane"
+      ],
+      "event_type": "observation",
+      "time_interval": {
+        "start": "2021-09",
+        "precision": "month",
+        "confidence": 0.8
+      },
+      "location_ids": [],
+      "trace_hint": "freight 2021",
+      "stage_hint": "unknown",
+      "extraction_confidence": 0.8,
+      "importance": 0.8
+    }
+  ],
+  "new_links": [
+    {
+      "link_id": "l_suez_tp",
+      "hypothesis_id": "h_suez",
+      "evidence_id": "anc-transpacific",
+      "polarity": "oppose",
+      "declared_relevance": 0.9
+    },
+    {
+      "link_id": "l_dem_tp",
+      "hypothesis_id": "h_demand",
+      "evidence_id": "anc-transpacific",
+      "polarity": "support",
+      "declared_relevance": 0.8
+    }
+  ],
+  "event_ids": [],
+  "event_order": [
+    "event_tp_rise"
+  ],
+  "future_holdout_status": "not_run"
+}

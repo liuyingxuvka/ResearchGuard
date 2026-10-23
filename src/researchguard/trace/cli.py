@@ -519,6 +519,7 @@ def cmd_iterate(args: argparse.Namespace) -> int:
                 expected_event_ids=args.expected_event or [],
                 expected_event_order=args.expected_event_order or [],
                 weakens_when=args.weakens_when,
+                expected_direction=args.expected_direction,
                 task_id=args.task_id,
                 purpose=args.purpose,
                 coverage_ids=args.coverage_id,
@@ -714,7 +715,8 @@ def build_parser() -> argparse.ArgumentParser:
     freeze.add_argument("--expected-evidence", action="append")
     freeze.add_argument("--expected-event", action="append")
     freeze.add_argument("--expected-event-order", action="append")
-    freeze.add_argument("--weakens-when", required=True)
+    freeze.add_argument("--weakens-when", default="")
+    freeze.add_argument("--expected-direction", choices=("weaken", "strengthen", "unchanged"), default="")
     freeze.add_argument("--task-id", default="")
     freeze.add_argument("--purpose", default="")
     freeze.add_argument("--coverage-id", action="append", default=[])

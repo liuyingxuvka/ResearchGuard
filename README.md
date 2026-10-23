@@ -83,9 +83,13 @@ hypothesis into extra absolute support for another.
 
 Each route's task-local loop (predict, observe, revise) works on plain model
 files and keeps purpose, coverage, assumptions, unknowns, predictions, computed
-gap transitions, addressable next actions, and exact stop reasons. Every id a
-prediction names must exist in the model when it is frozen. A holdout claim or
-observation is optional; when given, it must be independent of the evidence
+gap transitions, addressable next actions, and exact stop reasons. Trace predictions
+require an existing target and coverage, but may expect evidence or events not yet
+in the baseline. An observation can append native source/evidence/event/link rows;
+comparison computes target support and its declared expected direction. Native
+depth gaps remain separate from prediction mismatches. A candidate must preserve
+those new rows; accepting a revision with remaining depth gaps continues iteration.
+A holdout claim or observation is optional; when given, it must be independent of the evidence
 used to build the model. The loop never writes the model file, so rolling back
 means restoring the previous file. SourceGuard preserves provider and
 finite-action stop boundaries.

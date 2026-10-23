@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import replace
 import json
 from pathlib import Path
 
@@ -109,6 +110,36 @@ def _comparison_file(tmp_path: Path, observation, **prediction_overrides) -> Pat
     return path
 
 
+
+# Supplied Ever Given trial/approximate transcription, not retrieved factual evidence.
+TRIAL_FIXTURES = Path(__file__).parent / "fixtures"
+
+
+def _new_record_case(tmp_path, *, opposition_relevance=None):
+    tmp_path.mkdir(parents=True, exist_ok=True)
+    baseline = tmp_path / "baseline.yaml"
+    baseline.write_bytes((TRIAL_FIXTURES / "evergiven_task_iteration_baseline.yaml").read_bytes())
+    raw = json.loads((TRIAL_FIXTURES / "evergiven_task_iteration_observation.json").read_text(encoding="utf-8"))
+    if opposition_relevance is not None:
+        next(row for row in raw["new_links"] if row["link_id"] == "l_suez_tp")["declared_relevance"] = opposition_relevance
+    observation = EvidenceBatchObservation.from_dict(raw)
+    data = yaml.safe_load(baseline.read_text(encoding="utf-8"))
+    for observed_key, model_key in (("new_sources", "sources"), ("new_evidence", "evidence"),
+                                    ("new_events", "events"), ("new_links", "hypothesis_evidence_links")):
+        data[model_key] = data.get(model_key, []) + raw[observed_key]
+    candidate = tmp_path / "candidate.yaml"
+    candidate.write_text(yaml.safe_dump(data, sort_keys=False), encoding="utf-8")
+    return baseline, observation, candidate
+
+
+def _new_record_prediction(baseline, direction="weaken"):
+    return freeze_prediction(model_path=baseline, prediction_id="trial-transpacific",
+        frozen_at="2026-10-21T19:00:00Z", target_kind="hypothesis", target_id="h_suez",
+        prediction_kind="evidence_footprint", expected_evidence_ids=["anc-transpacific"],
+        expected_event_ids=["event_tp_rise"], expected_event_order=["event_tp_rise"],
+        expected_direction=direction, coverage_ids=["h_suez", "trace_freight_2021"])
+
+
 def test_prediction_needs_only_a_known_target_and_an_expectation() -> None:
     prediction = freeze_prediction(
         model_path=EXAMPLE,
@@ -126,16 +157,15 @@ def test_prediction_needs_only_a_known_target_and_an_expectation() -> None:
         _prediction(target_id="trace_unknown")
     with pytest.raises(TaskIterationError, match="coverage ids are missing from the model: ev_unknown"):
         _prediction(coverage_ids=["ev_pr_fix", "ev_unknown"])
-    with pytest.raises(TaskIterationError, match="expected evidence or event ids are missing from the model: ev_typo"):
-        _prediction(expected_evidence_ids=["ev_typo"])
 
 
 def test_loaded_prediction_accepts_missing_optional_task_fields() -> None:
     raw = _prediction().to_dict()
-    for key in ("task_id", "purpose", "coverage_ids", "assumptions", "unknowns"):
+    for key in ("task_id", "purpose", "coverage_ids", "assumptions", "unknowns", "expected_direction"):
         raw.pop(key)
     loaded = task_iteration_module.PredictionSnapshot.from_dict(raw)
     assert loaded.coverage_ids == ()
+    assert loaded.expected_direction == ""
 
 
 def test_observation_must_follow_prediction() -> None:
@@ -206,26 +236,24 @@ def test_same_evidence_cannot_be_reused_as_holdout(tmp_path: Path, monkeypatch) 
         )
 
 
-def test_candidate_cannot_rewrite_construction_evidence_binding(
-    tmp_path: Path, monkeypatch
-) -> None:
-    monkeypatch.setattr(task_iteration_module, "evaluate_storyline_depth", lambda *args, **kwargs: _PassingDepth())
-    construction = _observation()
-    comparison = load_comparison(_comparison_file(tmp_path, construction))
-    data = yaml.safe_load(EXAMPLE.read_text(encoding="utf-8"))
-    next(
-        item for item in data["evidence"] if item["evidence_id"] == "ev_pr_fix"
-    )["raw_text"] = "Candidate rewrote the construction evidence."
-    candidate = tmp_path / "candidate-rebound.yaml"
+@pytest.mark.parametrize("field, identifier, changed_field, value", [
+    ("sources", "src-wci-transpacific", "title", "Rewritten observed source"),
+    ("evidence", "anc-transpacific", "raw_text", "Rewritten observed evidence"),
+    ("events", "event_tp_rise", "action", "Rewritten observed event"),
+    ("hypothesis_evidence_links", "l_suez_tp", "polarity", "support"),
+])
+def test_candidate_cannot_rewrite_construction_evidence_binding(tmp_path, field, identifier, changed_field, value) -> None:
+    baseline, observation, candidate = _new_record_case(tmp_path)
+    comparison = compare_prediction_observation(_new_record_prediction(baseline), observation)
+    data = yaml.safe_load(candidate.read_text(encoding="utf-8"))
+    id_field = {"sources": "source_id", "evidence": "evidence_id", "events": "event_id",
+                "hypothesis_evidence_links": "link_id"}[field]
+    next(row for row in data[field] if row[id_field] == identifier)[changed_field] = value
     candidate.write_text(yaml.safe_dump(data, sort_keys=False), encoding="utf-8")
-    with pytest.raises(TaskIterationError, match="construction evidence changed in candidate"):
-        decide_candidate_revision(
-            comparison=comparison,
-            candidate_model_path=candidate,
-            observation=construction,
-            holdout_observation=_observation(holdout=True),
-            required_holdout_evidence_ids=["ev_meeting_boundary"],
-        )
+    with pytest.raises(TaskIterationError, match=identifier):
+        decide_candidate_revision(comparison=comparison, candidate_model_path=candidate,
+                                  observation=observation,
+                                  addressed_mismatch_ids=[row["mismatch_id"] for row in comparison["mismatches"]])
 
 
 def test_explicit_rollback_retains_baseline(tmp_path: Path, monkeypatch) -> None:
@@ -257,7 +285,7 @@ def test_cli_runs_the_loop_with_optional_task_fields(tmp_path: Path) -> None:
         "iterate", "freeze", "--model", str(EXAMPLE), "--prediction-id", "prediction-cli",
         "--frozen-at", "2026-07-17T10:00:00+00:00", "--target-kind", "storyline",
         "--target-id", "trace_metadata_incident", "--expected-evidence", "ev_pr_fix",
-        "--expected-event", "event_mitigation", "--weakens-when", "missing",
+        "--expected-event", "event_mitigation", "--expected-direction", "unchanged",
         "--output", str(prediction_path),
     ]) == 0
     assert main([
@@ -270,6 +298,7 @@ def test_cli_runs_the_loop_with_optional_task_fields(tmp_path: Path) -> None:
         str(candidate), "--required-holdout-evidence", "ev_meeting_boundary", "--output",
         str(revision_path),
     ]) == 0
+    assert json.loads(comparison_path.read_text(encoding="utf-8"))["observed_direction"] == "unchanged"
     payload = json.loads(revision_path.read_text(encoding="utf-8"))
     assert payload["schema_version"] == "researchguard.trace.candidate_storyline_revision.v2"
 
@@ -293,3 +322,164 @@ def test_mismatch_ids_never_enter_gap_transitions(tmp_path: Path) -> None:
     for payload in (comparison, revision):
         assert not any(item.startswith("mismatch-") for item in payload["gap_transitions"])
         assert not set(payload["persisted_gap_ids"]) & set(payload["introduced_gap_ids"])
+
+
+
+def test_freeze_accepts_evidence_not_yet_in_the_model(tmp_path) -> None:
+    baseline, observation, _ = _new_record_case(tmp_path)
+    data = yaml.safe_load(baseline.read_text(encoding="utf-8"))
+    assert "anc-transpacific" not in {row["evidence_id"] for row in data["evidence"]}
+    assert "event_tp_rise" not in {row["event_id"] for row in data["events"]}
+    prediction = _new_record_prediction(baseline)
+    assert prediction.expected_evidence_ids == ("anc-transpacific",)
+    assert prediction.expected_event_ids == ("event_tp_rise",)
+    assert prediction.expected_direction == "weaken" and prediction.weakens_when == ""
+    assert observation.event_ids == () and observation.event_order == ("event_tp_rise",)
+
+
+def test_compare_computes_the_direction(tmp_path) -> None:
+    baseline, observation, candidate = _new_record_case(tmp_path)
+    before = baseline.read_bytes(), candidate.read_bytes(), observation.to_dict()
+    result = compare_prediction_observation(_new_record_prediction(baseline), observation)
+    assert result["support_after"] < result["support_before"] - .01
+    assert result["observed_direction"] == "weaken"
+    types = {row["mismatch_type"] for row in result["mismatches"]}
+    assert not types & {"direction_mismatch", "expected_evidence_missing", "expected_event_missing", "event_order_mismatch"}
+    assert result["factual_future_prediction_licensed"] is False
+    assert (baseline.read_bytes(), candidate.read_bytes(), observation.to_dict()) == before
+
+
+def test_wrong_direction_is_a_mismatch(tmp_path) -> None:
+    baseline, observation, _ = _new_record_case(tmp_path)
+    result = compare_prediction_observation(_new_record_prediction(baseline, "strengthen"), observation)
+    assert result["observed_direction"] == "weaken"
+    assert result["support_after"] < result["support_before"] - .01
+    assert any(row["mismatch_type"] == "direction_mismatch" for row in result["mismatches"])
+
+
+def test_depth_gaps_are_not_mismatches(tmp_path) -> None:
+    baseline, observation, _ = _new_record_case(tmp_path)
+    result = compare_prediction_observation(_new_record_prediction(baseline), observation)
+    assert result["open_depth_gap_ids"]
+    assert not any(row["mismatch_type"] == "native_depth_gap" for row in result["mismatches"])
+    assert set(result["open_depth_gap_ids"]) <= set(result["open_gap_ids"])
+    assert not any(identifier.startswith("mismatch-") for identifier in result["gap_transitions"])
+    assert result["terminal_reason"] != "model_closed_for_task"
+
+
+def test_revision_can_be_accepted_while_alternatives_stay_live(tmp_path, monkeypatch) -> None:
+    actual_evaluations = []
+    phase = ["exact supplied trial"]
+    native_evaluate = task_iteration_module.evaluate_model
+
+    def record_native_evaluation(model, *args, **kwargs):
+        result = native_evaluate(model, *args, **kwargs)
+        actual_evaluations.append({"phase": phase[0], "hypotheses": [
+            {"id": row.hypothesis_id, "support": row.support, "rank": row.rank, "live": row.live}
+            for row in result.inference_receipt.hypothesis_projections]})
+        return result
+
+    monkeypatch.setattr(task_iteration_module, "evaluate_model", record_native_evaluation)
+    baseline, observation, candidate = _new_record_case(tmp_path / "exact")
+    before = baseline.read_bytes(), candidate.read_bytes(), observation.to_dict()
+    comparison = compare_prediction_observation(_new_record_prediction(baseline), observation)
+    revision = decide_candidate_revision(comparison=comparison, candidate_model_path=candidate,
+        observation=observation, addressed_mismatch_ids=[row["mismatch_id"] for row in comparison["mismatches"]])
+    assert revision["candidate_evaluation_ok"] and revision["disposition"] == "accepted"
+    assert revision["open_gap_ids"] and revision["terminal_reason"] == "continue_iteration"
+    assert revision["effective_model_sha256"] == revision["candidate_model_sha256"]
+    assert revision["effective_model_sha256"] != revision["baseline_model_sha256"]
+    assert revision["factual_future_prediction_licensed"] is False
+    assert (baseline.read_bytes(), candidate.read_bytes(), observation.to_dict()) == before
+
+    # Explicit trial variant: only the new opposition link's relevance is .8
+    # instead of .9, keeping a real nonleader live under the unchanged .12 margin.
+    phase[0] = "trial opposition relevance .8"
+    baseline, observation, candidate = _new_record_case(tmp_path / "live", opposition_relevance=.8)
+    before = baseline.read_bytes(), candidate.read_bytes(), observation.to_dict()
+    comparison = compare_prediction_observation(_new_record_prediction(baseline), observation)
+    live_revision = decide_candidate_revision(comparison=comparison, candidate_model_path=candidate,
+        observation=observation, addressed_mismatch_ids=[row["mismatch_id"] for row in comparison["mismatches"]])
+    assert live_revision["candidate_evaluation_ok"] and live_revision["disposition"] == "accepted"
+    assert "h_suez" in live_revision["live_alternative_ids"]
+    assert live_revision["open_gap_ids"] and live_revision["terminal_reason"] == "continue_iteration"
+    assert live_revision["effective_model_sha256"] == live_revision["candidate_model_sha256"]
+    assert (baseline.read_bytes(), candidate.read_bytes(), observation.to_dict()) == before
+    print(json.dumps({"native_hypothesis_evaluations": actual_evaluations,
+                      "exact_live_alternative_ids": revision["live_alternative_ids"],
+                      "trial_variant_live_alternative_ids": live_revision["live_alternative_ids"]}))
+
+
+@pytest.mark.parametrize("field", ["new_sources", "new_evidence", "new_events", "new_links"])
+def test_observation_rejects_duplicate_new_record_ids(tmp_path, field) -> None:
+    baseline, observation, _ = _new_record_case(tmp_path)
+    raw = observation.to_dict()
+    raw[field] = [*raw[field], raw[field][0]]
+    identifier = raw[field][0][{"new_sources": "source_id", "new_evidence": "evidence_id",
+                               "new_events": "event_id", "new_links": "link_id"}[field]]
+    with pytest.raises(TaskIterationError, match=identifier):
+        duplicated = EvidenceBatchObservation.from_dict(raw)
+        compare_prediction_observation(_new_record_prediction(baseline), duplicated)
+
+
+def test_observed_new_evidence_cannot_reuse_a_baseline_id(tmp_path) -> None:
+    baseline, observation, _ = _new_record_case(tmp_path)
+    identifier = yaml.safe_load(baseline.read_text(encoding="utf-8"))["evidence"][0]["evidence_id"]
+    raw = observation.to_dict()
+    raw["new_evidence"][0]["evidence_id"] = identifier
+    raw["evidence_ids"] = [identifier]
+    for event in raw["new_events"]:
+        event["evidence_ids"] = [identifier]
+    for link in raw["new_links"]:
+        link["evidence_id"] = identifier
+    with pytest.raises(TaskIterationError, match=identifier):
+        colliding = EvidenceBatchObservation.from_dict(raw)
+        compare_prediction_observation(_new_record_prediction(baseline), colliding)
+
+
+@pytest.mark.parametrize("quality", ["invalid", "access_gap"])
+def test_invalid_observation_cannot_be_accepted_even_when_mismatches_are_addressed(tmp_path, quality) -> None:
+    observation = replace(_observation(), quality_status=quality)
+    comparison = compare_prediction_observation(_prediction(), observation)
+    assert any(row["mismatch_type"] == "observation_invalid" for row in comparison["mismatches"])
+    revision = decide_candidate_revision(comparison=comparison, candidate_model_path=_candidate_model(tmp_path),
+        observation=observation, addressed_mismatch_ids=[row["mismatch_id"] for row in comparison["mismatches"]])
+    assert revision["disposition"] != "accepted"
+    assert any("valid" in reason for reason in revision["rejection_reasons"])
+
+
+def test_distinct_holdout_observation_cannot_reuse_new_construction_evidence(tmp_path) -> None:
+    baseline, observation, candidate = _new_record_case(tmp_path)
+    observation = replace(observation, evidence_ids=())
+    assert not observation.evidence_ids and observation.new_evidence
+    comparison = compare_prediction_observation(_new_record_prediction(baseline), observation)
+    holdout = replace(observation, observation_id="distinct-holdout", evidence_ids=("anc-transpacific",),
+                      event_ids=("event_tp_rise",), new_sources=(), new_evidence=(), new_events=(), new_links=())
+    with pytest.raises(TaskIterationError, match="disjoint"):
+        decide_candidate_revision(comparison=comparison, candidate_model_path=candidate, observation=observation,
+                                  holdout_observation=holdout, required_holdout_evidence_ids=["anc-transpacific"])
+
+
+def test_loaded_prediction_refuses_a_changed_baseline(tmp_path) -> None:
+    baseline, observation, _ = _new_record_case(tmp_path)
+    prediction = _new_record_prediction(baseline)
+    baseline.write_bytes(baseline.read_bytes() + b"\n# edited after freeze\n")
+    with pytest.raises(TaskIterationError, match="stale"):
+        task_iteration_module.PredictionSnapshot.from_dict(prediction.to_dict())
+    with pytest.raises(TaskIterationError, match="stale"):
+        compare_prediction_observation(prediction, observation)
+
+
+def test_lifecycle_artifact_write_never_overwrites_an_existing_file(tmp_path) -> None:
+    path = tmp_path / "existing.json"
+    path.write_bytes(b"existing immutable-style artifact\n")
+    with pytest.raises(TaskIterationError, match="refusing to overwrite"):
+        write_artifact(path, {"changed": True})
+    assert path.read_bytes() == b"existing immutable-style artifact\n"
+
+
+def test_new_event_order_still_detects_a_missing_expected_order(tmp_path) -> None:
+    baseline, observation, _ = _new_record_case(tmp_path)
+    observation = replace(observation, event_order=())
+    comparison = compare_prediction_observation(_new_record_prediction(baseline), observation)
+    assert any(row["mismatch_type"] == "event_order_mismatch" for row in comparison["mismatches"])

@@ -13,12 +13,18 @@ researchguard trace export-logicguard <model.yaml> --output <bundle.yaml>
 researchguard trace create --output <model.yaml>
 researchguard trace simulate --mode storyline-depth --model <model.yaml> --pretty
 researchguard trace compare <before.yaml> <after.yaml> --pretty
-researchguard trace iterate freeze --model <model.yaml> --prediction-id <id> --frozen-at <time> --target-kind <kind> --target-id <id> --expected-evidence <id> --weakens-when <condition> [--iteration <n> --prior-open-gap-id <gap>] --output <prediction.json>
+researchguard trace iterate freeze --model <model.yaml> --prediction-id <id> --frozen-at <time> --target-kind <kind> --target-id <id> --expected-evidence <id> [--expected-direction weaken|strengthen|unchanged] [--weakens-when <remark>] [--iteration <n> --prior-open-gap-id <gap>] --output <prediction.json>
 researchguard trace iterate compare --prediction <prediction.json> --observation <observation.json> --output <comparison.json>
 researchguard trace iterate decide --comparison <comparison.json> --observation <observation.json> --candidate <candidate.yaml> [--holdout-observation <holdout.json> --required-holdout-evidence <id>] --output <revision.json>
 researchguard trace library validate <case-library> --pretty
 researchguard trace library build-model <case-library> <case-id> --output <model.yaml> --pretty
 ```
+
+Freeze may name future evidence/event ids; target and coverage must already exist.
+Observations may append native records in memory. Compare reports canonical support
+before/after and direction; depth gaps are not prediction mismatches. Decide preserves
+new observed rows, and an accepted revision can still need iteration. See
+`task-iteration.md` and `fields.md` for the artifact formats and remaining guards.
 
 Read results with `trace report --format markdown` or `--format txt`: dated events, ranked live hypotheses, causal state, opposing factors and native depth blockers precede the trace details. This readable view computes depth from its existing evaluation; use it instead of rerunning a separate depth command merely for a summary. `trace gaps` includes solver and unresolved depth gaps. `trace compare` preserves trace changes and adds hypothesis state and source/evidence/event/link inventory changes. `evaluate` and `depth` with `--output` retain the complete JSON; `report --format json` retains the complete evaluation view.
 

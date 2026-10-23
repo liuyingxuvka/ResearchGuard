@@ -27,7 +27,7 @@ Fields/examples: `references/trace/fields.md`.
 
 Use the canonical solver; preserve lineage and separate events, explanations and outcomes. Required perturbation, residual, contradiction and holdout checks remain mandatory. Solver failure/bad residuals, missing lineage, unresolved critical objects, untested/ineffective critical probes, scope transfers, live alternatives or unsupported predictive holdout block broad closure. No self-report replaces current evaluation/depth; a member result cannot license another member's claim.
 
-- `model_closed_for_task`: close only with current evaluation/depth and bounded safe wording.
+- `model_closed_for_task`: close with current evaluation/depth; acceptance alone never closes.
 - `progress_stalled`: report weakest links; seek changed evidence or narrow scope.
 - `iteration_limit`: stop retries; report unresolved blockers.
 - `external_input_required`: request the missing input or typed owner handoff.

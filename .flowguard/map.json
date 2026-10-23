@@ -48,7 +48,7 @@
       "summary": "Own the researchguard console and the four member command lines; dispatch each member command directly to its owner.",
       "responsibilities": [
         "Dispatch researchguard logic|source|trace|experiment straight to the member main; unknown commands return one typed JSON error.",
-        "Own member command lines, including stable source stop rules and trace report/gaps/compare research-state views while retaining complete JSON output.",
+        "Own member command lines, including stable source stop rules, trace iteration direction and report/gaps/compare research-state views while retaining complete JSON output.",
         "Pass the already-loaded trace model into logic handoff export so the native CLI carries actual evidence content and polarity.",
         "Expose score-actions from the same complete native plan scoring path as plan --all-scores, without a candidate limit.",
         "Compare versions of one source model using actual gap semantic fields and nested qualification decision; self-comparison reports no change and retired gap.status stays rejected.",
@@ -93,7 +93,7 @@
         ".flowguard/models/researchguard_suite_model.py"
       ],
       "status": "confirmed",
-      "fingerprint": "sha256:3ee0db5e230903f459059e2e668fe2e9fc99a13cfe97ba7d388ff56d476a18a0",
+      "fingerprint": "sha256:171fd8b7ec1642b5357bff56553d71ade7470554a42b523c9236224c5da7c679",
       "layer": "interface"
     },
     {
@@ -226,8 +226,8 @@
         "Own temporal and causal trace inference, storyline stress, case library updates and readable timeline/hypothesis/depth reporting.",
         "Keep command output to analysis results; full JSON is written only with --output.",
         "Solve storyline support from evidence first; bound causal support below it. Depth checks that neither causal declarations nor oppose links raise support; evaluate does not run depth.",
-        "Freeze a prediction only when its target, its expected evidence and event ids, and every coverage id exist in the model.",
-        "Keep prediction mismatch rejection independent of storyline native depth and coverage transitions; use the suite helper for model gap changes and count only resolved storyline gaps as progress.",
+        "Freeze with an existing target and coverage; permit future expected evidence/event ids. Append typed observation rows in memory and compare canonical target support direction.",
+        "Preserve newly observed rows in candidates; acceptance is independent of native depth closure. Keep prediction mismatches separate from native gaps, use the suite lineage helper and count only resolved native gaps as progress.",
         "Export hypothesis ids, native rank/support and signed evidence with original text/source/locator alongside the preserved v1 trace claims."
       ],
       "files": [
@@ -278,7 +278,7 @@
       ],
       "models": [],
       "status": "confirmed",
-      "fingerprint": "sha256:ebcddacf53fcc3b8c179005cf6959642d292de3773aa7466045944e452d0fac8",
+      "fingerprint": "sha256:8b850d0e5ae4070074253af2bbc609830e8cd7065d6befb95c84ee8b82286f59",
       "layer": "routes"
     },
     {

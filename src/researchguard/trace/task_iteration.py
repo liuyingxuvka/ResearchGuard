@@ -7,7 +7,7 @@ to the canonical :func:`researchguard.trace.evaluator.evaluate_model` entry poin
 
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, replace
 from datetime import datetime
 import hashlib
 import json
@@ -22,6 +22,8 @@ from .evaluator import evaluate_model
 from .storyline_depth import evaluate_storyline_depth
 from .inference.types import fingerprint
 from .loader import load_model
+from .schema import SourceRecord, EvidenceItem, EventCandidate, HypothesisEvidenceLink, TraceGuardModel
+from .validation import validate_references
 
 
 PREDICTION_SCHEMA = "researchguard.trace.task_prediction.v2"
@@ -31,6 +33,13 @@ REVISION_SCHEMA = "researchguard.trace.candidate_storyline_revision.v2"
 VALID_TARGET_KINDS = {"storyline", "hypothesis"}
 VALID_PREDICTION_KINDS = {"evidence_footprint", "future_event"}
 VALID_QUALITY = {"valid", "invalid", "access_gap"}
+VALID_DIRECTIONS = {"weaken", "strengthen", "unchanged"}
+_OBSERVATION_RECORDS = (
+    ("new_sources", "sources", SourceRecord, "source_id"),
+    ("new_evidence", "evidence", EvidenceItem, "evidence_id"),
+    ("new_events", "events", EventCandidate, "event_id"),
+    ("new_links", "hypothesis_evidence_links", HypothesisEvidenceLink, "link_id"),
+)
 
 
 class TaskIterationError(ValueError):
@@ -116,6 +125,7 @@ class PredictionSnapshot:
     iteration: int = 0
     max_iterations: int = 8
     prior_open_gap_ids: tuple[str, ...] = ()
+    expected_direction: str = ""
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -126,6 +136,9 @@ class PredictionSnapshot:
             raise TaskIterationError(f"schema_version must equal {PREDICTION_SCHEMA}")
         target_kind = str(data.get("target_kind", ""))
         prediction_kind = str(data.get("prediction_kind", ""))
+        expected_direction = str(data.get("expected_direction", ""))
+        if expected_direction and expected_direction not in VALID_DIRECTIONS:
+            raise TaskIterationError(f"invalid expected_direction: {expected_direction}")
         if target_kind not in VALID_TARGET_KINDS:
             raise TaskIterationError(f"invalid target_kind: {target_kind}")
         if prediction_kind not in VALID_PREDICTION_KINDS:
@@ -164,6 +177,7 @@ class PredictionSnapshot:
             "expected_event_ids": expected_events,
             "expected_event_order": expected_order,
             "weakens_when": str(data.get("weakens_when", "")).strip(),
+            "expected_direction": expected_direction,
             "factual_future_prediction_licensed": False,
             "task_id": task_id,
             "purpose": str(data.get("purpose", "")).strip(),
@@ -176,8 +190,6 @@ class PredictionSnapshot:
         }
         if not payload["prediction_id"] or not payload["target_id"]:
             raise TaskIterationError("prediction_id and target_id are required")
-        if not payload["weakens_when"]:
-            raise TaskIterationError("weakens_when is required")
         _parse_timestamp(payload["frozen_at"], "frozen_at")
         observed_model_hash = _sha256_file(payload["baseline_model_path"])
         if observed_model_hash != payload["baseline_model_sha256"]:
@@ -198,6 +210,10 @@ class EvidenceBatchObservation:
     source_refs: tuple[str, ...]
     future_holdout_status: str
     external_input_ids: tuple[str, ...] = ()
+    new_sources: tuple[SourceRecord, ...] = ()
+    new_evidence: tuple[EvidenceItem, ...] = ()
+    new_events: tuple[EventCandidate, ...] = ()
+    new_links: tuple[HypothesisEvidenceLink, ...] = ()
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -224,11 +240,17 @@ class EvidenceBatchObservation:
             ),
             "external_input_ids": _ordered_unique(data.get("external_input_ids", [])),
         }
+        for field, _, record_type, _ in _OBSERVATION_RECORDS:
+            rows = data.get(field, [])
+            if not isinstance(rows, (list, tuple)) or any(not isinstance(row, Mapping) for row in rows):
+                raise TaskIterationError(f"{field} must be a list of native record mappings")
+            payload[field] = tuple(record_type.from_dict(dict(row)) for row in rows)
         if not payload["observation_id"]:
             raise TaskIterationError("observation_id is required")
         _parse_timestamp(payload["observed_at"], "observed_at")
-        if set(payload["event_order"]) - set(payload["event_ids"]):
-            raise TaskIterationError("event_order may only contain event_ids")
+        known_order_ids = set(payload["event_ids"]) | {row.event_id for row in payload["new_events"]}
+        if set(payload["event_order"]) - known_order_ids:
+            raise TaskIterationError("event_order may only contain event_ids or new_events ids")
         return cls(**payload)
 
 
@@ -245,6 +267,52 @@ def _require_observed_ids(model: Any, observation: "EvidenceBatchObservation", l
             raise TaskIterationError(
                 f"{label} {kind} is missing from the model: " + ", ".join(missing)
             )
+
+
+
+def _observed_model(model: TraceGuardModel, observation: EvidenceBatchObservation) -> TraceGuardModel:
+    """Append typed records in memory and reuse the native cross-reference binding."""
+    updates: dict[str, tuple[Any, ...]] = {}
+    for field, attribute, _, id_field in _OBSERVATION_RECORDS:
+        rows = getattr(observation, field)
+        if not rows:
+            continue
+        original = getattr(model, attribute)
+        seen = {getattr(row, id_field) for row in original}
+        for row in rows:
+            record_id = getattr(row, id_field)
+            if record_id in seen:
+                raise TaskIterationError(f"{field} {id_field} conflicts with baseline or observation: {record_id}")
+            seen.add(record_id)
+        updates[attribute] = (*original, *rows)
+    if not updates:
+        return model
+    augmented = replace(model, **updates)
+    merged = TraceGuardModel.from_dict(augmented.to_dict())
+    validate_references(merged)
+    return merged
+
+
+def _require_new_records(candidate: TraceGuardModel, observation: EvidenceBatchObservation) -> None:
+    for field, attribute, _, id_field in _OBSERVATION_RECORDS:
+        candidate_rows = {getattr(row, id_field): row for row in getattr(candidate, attribute)}
+        changed = [getattr(row, id_field) for row in getattr(observation, field)
+                   if candidate_rows.get(getattr(row, id_field)) != row]
+        if changed:
+            raise TaskIterationError(f"construction {field} changed in candidate: " + ", ".join(changed))
+
+
+def _target_support(result: Any, prediction: PredictionSnapshot) -> float:
+    if prediction.target_kind == "storyline":
+        rows = result.traces
+        field = "trace_id"
+    else:
+        rows = result.inference_receipt.hypothesis_projections
+        field = "hypothesis_id"
+    row = next((row for row in rows if getattr(row, field) == prediction.target_id), None)
+    if row is None:
+        raise TaskIterationError(f"prediction target is missing from evaluated model: {prediction.target_id}")
+    return float(row.support)
 
 
 @dataclass(frozen=True)
@@ -269,7 +337,8 @@ def freeze_prediction(
     expected_evidence_ids: Iterable[str] = (),
     expected_event_ids: Iterable[str] = (),
     expected_event_order: Iterable[str] = (),
-    weakens_when: str,
+    weakens_when: str = "",
+    expected_direction: str = "",
     task_id: str = "",
     purpose: str = "",
     coverage_ids: Iterable[str] = (),
@@ -303,13 +372,6 @@ def freeze_prediction(
         raise TaskIterationError("coverage ids are missing from the model: " + ", ".join(missing_coverage))
     expected_evidence_ids = list(expected_evidence_ids)
     expected_event_ids = list(expected_event_ids)
-    missing_expected = [item for item in expected_evidence_ids if item not in model.evidence_by_id()] + [
-        item for item in expected_event_ids if item not in model.event_by_id()
-    ]
-    if missing_expected:
-        raise TaskIterationError(
-            "expected evidence or event ids are missing from the model: " + ", ".join(missing_expected)
-        )
     payload = {
         "schema_version": PREDICTION_SCHEMA,
         "prediction_id": prediction_id,
@@ -323,6 +385,7 @@ def freeze_prediction(
         "expected_event_ids": list(expected_event_ids),
         "expected_event_order": list(expected_event_order),
         "weakens_when": weakens_when,
+        "expected_direction": expected_direction,
         "factual_future_prediction_licensed": False,
         "task_id": task_id,
         "purpose": purpose,
@@ -361,86 +424,48 @@ def compare_prediction_observation(
     prediction: PredictionSnapshot,
     observation: EvidenceBatchObservation,
 ) -> dict[str, Any]:
-    """Compare one frozen expectation with one later evidence batch."""
-
-    if _parse_timestamp(observation.observed_at, "observed_at") <= _parse_timestamp(
-        prediction.frozen_at, "frozen_at"
-    ):
-        raise TaskIterationError(
-            "observation must be later than the frozen prediction"
-        )
+    """Compare a frozen prediction with a later, append-only native observation."""
+    if _parse_timestamp(observation.observed_at, "observed_at") <= _parse_timestamp(prediction.frozen_at, "frozen_at"):
+        raise TaskIterationError("observation must be later than the frozen prediction")
+    if _sha256_file(prediction.baseline_model_path) != prediction.baseline_model_sha256:
+        raise TaskIterationError("baseline model fingerprint is stale")
     model = load_model(prediction.baseline_model_path)
-    evidence_by_id = model.evidence_by_id()
-    event_by_id = model.event_by_id()
-    source_by_id = model.source_by_id()
-    _require_observed_ids(model, observation, "observed")
-
+    observed_model = _observed_model(model, observation)
+    _require_observed_ids(observed_model, observation, "observed")
     baseline_result = evaluate_model(model)
-    native_depth = evaluate_storyline_depth(model, baseline_result)
-    baseline_gap_ids = _native_gap_ids(model, native_depth, prediction.coverage_ids)
+    baseline_depth = evaluate_storyline_depth(model, baseline_result)
+    observed_result = baseline_result if observed_model is model else evaluate_model(observed_model)
+    observed_depth = baseline_depth if observed_model is model else evaluate_storyline_depth(observed_model, observed_result)
+    baseline_gap_ids = _native_gap_ids(model, baseline_depth, prediction.coverage_ids)
+    depth_gap_ids = _native_gap_ids(observed_model, observed_depth, prediction.coverage_ids)
+    support_before = _target_support(baseline_result, prediction)
+    support_after = _target_support(observed_result, prediction)
+    delta = support_after - support_before
+    direction = "weaken" if delta < -0.01 else "strengthen" if delta > 0.01 else "unchanged"
     mismatches: list[StorylineMismatch] = []
 
     def add(kind: str, detail: str) -> None:
-        mismatches.append(
-            StorylineMismatch(
-                mismatch_id=f"mismatch-{len(mismatches) + 1:03d}",
-                mismatch_type=kind,
-                blocking_original_prediction=True,
-                detail=detail,
-            )
-        )
+        mismatches.append(StorylineMismatch(f"mismatch-{len(mismatches) + 1:03d}", kind, True, detail))
 
     if observation.quality_status != "valid":
-        add(
-            "observation_invalid",
-            f"observation quality is {observation.quality_status}",
-        )
-    missing_evidence = sorted(
-        set(prediction.expected_evidence_ids) - set(observation.evidence_ids)
-    )
+        add("observation_invalid", f"observation quality is {observation.quality_status}")
+    observed_evidence_ids = set(observation.evidence_ids) | {row.evidence_id for row in observation.new_evidence}
+    observed_event_ids = set(observation.event_ids) | {row.event_id for row in observation.new_events}
+    missing_evidence = sorted(set(prediction.expected_evidence_ids) - observed_evidence_ids)
+    missing_events = sorted(set(prediction.expected_event_ids) - observed_event_ids)
     if missing_evidence:
-        add(
-            "expected_evidence_missing",
-            "missing expected evidence ids: " + ", ".join(missing_evidence),
-        )
-    missing_events = sorted(
-        set(prediction.expected_event_ids) - set(observation.event_ids)
-    )
+        add("expected_evidence_missing", "missing expected evidence ids: " + ", ".join(missing_evidence))
     if missing_events:
-        add(
-            "expected_event_missing",
-            "missing expected event ids: " + ", ".join(missing_events),
-        )
-    if (
-        prediction.expected_event_order
-        and tuple(
-            item
-            for item in observation.event_order
-            if item in prediction.expected_event_order
-        )
-        != prediction.expected_event_order
-    ):
-        add(
-            "event_order_mismatch",
-            "observed event order does not preserve the frozen expected order",
-        )
+        add("expected_event_missing", "missing expected event ids: " + ", ".join(missing_events))
+    if prediction.expected_event_order and tuple(item for item in observation.event_order if item in prediction.expected_event_order) != prediction.expected_event_order:
+        add("event_order_mismatch", "observed event order does not preserve the frozen expected order")
     if observation.contradiction_ids:
-        add(
-            "unexpected_contradiction",
-            "observation reports contradictions: "
-            + ", ".join(observation.contradiction_ids),
-        )
+        add("unexpected_contradiction", "observation reports contradictions: " + ", ".join(observation.contradiction_ids))
     if prediction.prediction_kind == "future_event" and observation.future_holdout_status != "pass":
-        add(
-            "future_holdout_validator_missing",
-            "future-event expectation requires a passing future holdout check",
-        )
-    for native_gap in baseline_gap_ids:
-        add("native_depth_gap", native_gap)
-    open_gap_ids = tuple(
-        item.detail if item.mismatch_type == "native_depth_gap" else item.mismatch_id
-        for item in mismatches
-    )
+        add("future_holdout_validator_missing", "future-event expectation requires a passing future holdout check")
+    if prediction.expected_direction and direction != prediction.expected_direction:
+        add("direction_mismatch", f"expected {prediction.expected_direction}, observed {direction}")
+    open_gap_ids = tuple(dict.fromkeys((*depth_gap_ids, *(row.mismatch_id for row in mismatches))))
     if observation.external_input_ids:
         terminal_reason = "external_input_required"
     elif not open_gap_ids:
@@ -451,39 +476,40 @@ def compare_prediction_observation(
         terminal_reason = "progress_stalled"
     else:
         terminal_reason = "continue_iteration"
-    payload: dict[str, Any] = {
+    transitions = gap_lineage(baseline_gap_ids, depth_gap_ids)
+    return {
         "schema_version": COMPARISON_SCHEMA,
         "prediction_id": prediction.prediction_id,
         "observation_id": observation.observation_id,
         "baseline_model_path": prediction.baseline_model_path,
         "baseline_model_sha256": prediction.baseline_model_sha256,
         "mismatches": [item.to_dict() for item in mismatches],
+        "expected_direction": prediction.expected_direction,
+        "observed_direction": direction,
+        "support_before": support_before,
+        "support_after": support_after,
         "task_id": prediction.task_id,
         "purpose": prediction.purpose,
         "coverage_ids": list(prediction.coverage_ids),
         "open_gap_ids": list(open_gap_ids),
+        "open_depth_gap_ids": list(depth_gap_ids),
         "baseline_gap_ids": list(baseline_gap_ids),
         "input_gap_ids": list(baseline_gap_ids),
-        **{key: list(value) if isinstance(value, tuple) else value
-           for key, value in gap_lineage(baseline_gap_ids, baseline_gap_ids)._asdict().items()},
-        "live_alternative_ids": list(native_depth.live_alternative_ids),
-        "causal_boundaries": list(native_depth.causal_boundaries),
-        "deepest_proven_layer": native_depth.deepest_proven_layer,
-        "first_unresolved_gap": native_depth.first_unresolved_gap,
-        "next_actions": ["deepen_trace_evidence"] if open_gap_ids else ["no_model_change_needed"],
+        **{key: list(value) if isinstance(value, tuple) else value for key, value in transitions._asdict().items()},
+        "live_alternative_ids": list(observed_depth.live_alternative_ids),
+        "causal_boundaries": list(observed_depth.causal_boundaries),
+        "deepest_proven_layer": observed_depth.deepest_proven_layer,
+        "first_unresolved_gap": observed_depth.first_unresolved_gap,
+        "next_actions": ["address_prediction_mismatches"] if mismatches else ["deepen_trace_evidence"] if depth_gap_ids else ["no_model_change_needed"],
         "terminal_reason": terminal_reason,
         "iteration": prediction.iteration,
         "prior_open_gap_ids": list(prediction.prior_open_gap_ids),
-        "progressed": False,
+        "progressed": bool(transitions.resolved_gap_ids),
         "external_input_ids": list(observation.external_input_ids),
         "original_prediction_status": "weakened" if mismatches else "matched",
         "factual_future_prediction_licensed": False,
-        "claim_boundary": (
-            "This comparison updates only the current TraceGuard task model. "
-            "It does not license factual future prediction."
-        ),
+        "claim_boundary": "This comparison updates only the current TraceGuard task model; it does not license factual future prediction.",
     }
-    return payload
 
 
 def _validate_comparison(data: Mapping[str, Any]) -> dict[str, Any]:
@@ -525,7 +551,9 @@ def decide_candidate_revision(
     if holdout_observation is not None:
         if holdout_observation.observation_id == observation.observation_id:
             raise TaskIterationError("holdout observation must be independent")
-        if set(holdout_observation.evidence_ids) & set(observation.evidence_ids):
+        construction_ids = set(observation.evidence_ids) | {row.evidence_id for row in observation.new_evidence}
+        holdout_ids = set(holdout_observation.evidence_ids) | {row.evidence_id for row in holdout_observation.new_evidence}
+        if holdout_ids & construction_ids:
             raise TaskIterationError("holdout evidence ids must be disjoint from construction evidence")
     baseline_path = Path(str(comparison.get("baseline_model_path", ""))).resolve()
     candidate_path = Path(candidate_model_path).resolve()
@@ -541,16 +569,7 @@ def decide_candidate_revision(
     candidate_result = evaluate_model(candidate_model)
     result_payload = candidate_result.to_dict()
     _require_observed_ids(candidate_model, observation, "construction")
-    for kind, ids, before, after in (
-        ("evidence", observation.evidence_ids, baseline_model.evidence_by_id(), candidate_model.evidence_by_id()),
-        ("event", observation.event_ids, baseline_model.event_by_id(), candidate_model.event_by_id()),
-        ("source", observation.source_refs, baseline_model.source_by_id(), candidate_model.source_by_id()),
-    ):
-        changed = [item for item in ids if before.get(item) != after.get(item)]
-        if changed:
-            raise TaskIterationError(
-                f"construction {kind} changed in candidate: " + ", ".join(changed)
-            )
+    _require_new_records(candidate_model, observation)
     if holdout_observation is not None:
         _require_observed_ids(candidate_model, holdout_observation, "holdout")
     candidate_depth = evaluate_storyline_depth(candidate_model, candidate_result)
@@ -586,8 +605,6 @@ def decide_candidate_revision(
 
     coverage_ids = tuple(str(item) for item in comparison.get("coverage_ids", ()))
     candidate_gap_ids = list(_native_gap_ids(candidate_model, candidate_depth, coverage_ids))
-    if candidate_gap_ids and not reasons:
-        reasons.append("candidate storyline evidence gaps remain open")
     if force_rollback:
         disposition = "rolled_back"
         if "rollback explicitly requested" not in reasons:
@@ -596,8 +613,6 @@ def decide_candidate_revision(
         disposition = "rejected"
     else:
         disposition = "accepted"
-    if candidate_gap_ids and not force_rollback:
-        disposition = "continue_iteration"
     # Recompute the baseline for old comparison artifacts lacking the new field.
     if "baseline_gap_ids" in comparison:
         input_gaps = set(comparison["baseline_gap_ids"])
@@ -606,7 +621,9 @@ def decide_candidate_revision(
         input_gaps = set(_native_gap_ids(baseline_model, baseline_depth, coverage_ids))
     current_gaps = set(candidate_gap_ids)
     resolved_gaps, persisted_gaps, introduced_gaps, transitions = gap_lineage(input_gaps, current_gaps)
-    if not candidate_gap_ids and disposition == "accepted":
+    if observation.external_input_ids:
+        terminal_reason = "external_input_required"
+    elif not candidate_gap_ids and disposition == "accepted":
         terminal_reason = "model_closed_for_task"
     elif comparison.get("terminal_reason") == "iteration_limit":
         terminal_reason = "iteration_limit"
