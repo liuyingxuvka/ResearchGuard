@@ -89,7 +89,7 @@ def load_model_from_dict(raw: Mapping[str, Any], *, validate: bool = True) -> Lo
             parent=_string_or_none(node_data.get("parent")),
             children=[str(item) for item in node_data.get("children", []) or []],
             metadata=metadata,
-            provenance=list(node_data.get("provenance", []) or []),
+            provenance=_provenance_records(node_data.get("provenance"), f"{'Evidence node' if node_type == 'Evidence' else 'Node'} {node_id!r}"),
         )
         nodes[node.id] = node
 
@@ -236,9 +236,16 @@ def _parse_blocks(raw_blocks: Mapping[str, Any]) -> dict[str, ArgumentBlock]:
             input_classifications={str(key): str(value) for key, value in dict(data.get("input_classifications", {}) or {}).items()},
             output_classifications={str(key): str(value) for key, value in dict(data.get("output_classifications", {}) or {}).items()},
             metadata={key: value for key, value in data.items() if key not in known_fields},
-            provenance=list(data.get("provenance", []) or []),
+            provenance=_provenance_records(data.get("provenance"), f"Argument block {block_id!r}"),
         )
     return blocks
+
+
+def _provenance_records(value: Any, owner: str) -> list[Any]:
+    try:
+        return list(value or [])
+    except (TypeError, ValueError) as exc:
+        raise ModelLoadError(f"{owner}: {exc}") from exc
 
 
 def _float_or_default(value: Any, default: float) -> float:

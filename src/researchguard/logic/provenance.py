@@ -229,7 +229,7 @@ def validate_evidence_provenance(
 ) -> tuple[ProvenanceRecord, ...]:
     try:
         normalized = coerce_provenance(records)
-    except ProvenanceError as exc:
+    except (TypeError, ValueError) as exc:
         raise ProvenanceError(f"Evidence node {node_id!r}: {exc}") from exc
     if not any(record.is_evidentiary for record in normalized):
         raise ProvenanceError(
