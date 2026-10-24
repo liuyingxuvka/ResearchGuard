@@ -13,8 +13,6 @@ venv/
 .local/
 work/
 tmp/
-.flowguard/evidence/
 *.log
 *.bak
 *.tmp
-SLIM_LOG.md

@@ -40,7 +40,7 @@ dependencies = [
 viewer = ["Pillow>=10.0"]
 test = [
   "pytest>=8.0",
-  "flowguard @ git+https://github.com/liuyingxuvka/FlowGuard.git@v0.70.11",
+  "flowguard @ git+https://github.com/liuyingxuvka/FlowGuard.git@v0.70.12",
 ]
 
 [project.scripts]

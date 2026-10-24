@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Maintenance checks of ResearchGuard's own model tree run on FlowGuard 0.70.12.
+
 ## v0.5.14 - 2026-10-24
 
 - Research folders now expose one native verdict for writers, readable status pages and current/candidate comparisons. Optional library, search and anchor-ablation declarations join source, trace, logic and experiment results without replacing their native reasoning rules.
