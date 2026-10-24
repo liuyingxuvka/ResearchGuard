@@ -50,7 +50,7 @@
       ],
       "layer": "foundation",
       "status": "confirmed",
-      "fingerprint": "sha256:8ed3d847ad55ac380297c21354871c152aa2168a65982f87912cf2ffb2732887"
+      "fingerprint": "sha256:1241bbe349cc118fc48a6d186b7a677ab7cb32a549a1fece883a16b10b301a36"
     },
     {
       "id": "suite-orchestration",
