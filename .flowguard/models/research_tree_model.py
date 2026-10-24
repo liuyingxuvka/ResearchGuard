@@ -29,6 +29,8 @@ TESTED_BY = {'dangling_reference_is_an_error': ['tests/test_research_tree.py:tes
  'every_ablation_is_caught_or_named': ['tests/test_research_tree.py:test_ablation_nobody_uses_is_named'],
  'verdict_matches_the_routes': ['tests/test_research_tree.py:test_verdict_matches_each_route_and_page_is_readable'],
  'live_hypotheses_follow_route_exclusions': ['tests/test_research_tree.py:test_live_hypotheses_follow_every_route'],
+ 'ablation_agrees_with_trace_depth': ['tests/test_research_tree.py:test_trace_ablation_agrees_with_trace_depth',
+                                      'tests/test_research_tree.py:test_ablation_rows_name_side_effects'],
  'contested_iff_disagreement': ['tests/test_research_tree.py:test_live_hypotheses_follow_every_route',
                                 'tests/test_research_tree.py:test_verdict_matches_each_route_and_page_is_readable']}
 
@@ -44,6 +46,20 @@ class Hypothesis:
 
 
 @dataclass(frozen=True)
+class Ablation:
+    """A declared anchor ablation: whether logic moved, and TraceGuard's own expected-sensitivity answer."""
+    id: str
+    hypothesis: str
+    logic_moved: bool = False
+    trace_check: bool = False          # TraceGuard's expected-sensitivity check (trace's own threshold; 0 for question rows)
+    declared_by_trace: bool = False    # the ablation and its expected sensitivity are declared in trace.yaml
+    projection_moved: bool | None = None   # a second measure (projection support difference); None = same as trace_check
+
+    def second_measure(self):
+        return self.trace_check if self.projection_moved is None else self.projection_moved
+
+
+@dataclass(frozen=True)
 class Question:
     """The inputs status reads: hypothesis rows, references, copies, ablations and the root claim."""
     name: str
@@ -51,7 +67,7 @@ class Question:
     dangling: tuple[str, ...] = ()           # problem codes of references to missing anchors or sources
     drifted: tuple[str, ...] = ()            # problem codes of copied fields that differ from their owner
     library_anchors: tuple[str, ...] = ()    # anchors that resolve only through the source library
-    ablations: tuple[tuple[str, str, tuple[str, ...]], ...] = ()   # (id, hypothesis, routes whose result moved)
+    ablations: tuple[Ablation, ...] = ()
     root_license: str = ''                   # native wording license of the root claim
 
 
@@ -117,8 +133,13 @@ class Status:
                 (errors if wrong == 'warning_as_error' else warnings).append(f'hypothesis_unused:{row.id}')
         disagreements = () if wrong == 'skip_route_comparison' else route_conflicts(question)
         warnings.extend(f'route_disagreement:{h}:{kind}:{detail}' for h, kind, detail in disagreements)
-        ablations = tuple((name, caught) for name, _, caught in question.ablations
-                          if not (wrong == 'drop_uncaught_ablations' and not caught))
+        ablations = []
+        for row in question.ablations:
+            trace = row.second_measure() if wrong == 'ablation_uses_a_second_sensitivity' else row.trace_check
+            caught = tuple(route for route, moved in (('logic', row.logic_moved), ('trace', trace)) if moved)
+            if not (wrong == 'drop_uncaught_ablations' and not caught):
+                ablations.append((row.id, caught))
+        ablations = tuple(ablations)
         warnings.extend(f'ablation_not_caught:{name}' for name, caught in ablations if not caught)
         live = tuple(row.id for row in question.hypotheses
                      if wrong == 'excluded_hypothesis_stays_live' and row.experiment == 'eliminated' or not excluded(row))
@@ -170,11 +191,18 @@ def routes_contradict(state, question):
 
 def every_ablation(state, question):
     rows = dict(state.ablations)
-    for name, _, caught in question.ablations:
-        if name not in rows:
-            return f'ablation {name} has no row'
-        if not rows[name] and f'ablation_not_caught:{name}' not in state.warnings:
-            return f'uncaught ablation {name} is not named'
+    for row in question.ablations:
+        if row.id not in rows:
+            return f'ablation {row.id} has no row'
+        if not rows[row.id] and f'ablation_not_caught:{row.id}' not in state.warnings:
+            return f'uncaught ablation {row.id} is not named'
+
+
+def trace_depth_agrees(state, question):
+    rows = dict(state.ablations)
+    for row in question.ablations:
+        if row.declared_by_trace and row.id in rows and ('trace' in rows[row.id]) != row.trace_check:
+            return f'ablation {row.id}: trace in caught_by is {"trace" in rows[row.id]} but trace depth says {row.trace_check}'
 
 
 def verdict_routes(state, question):
@@ -201,6 +229,7 @@ INVARIANTS = (
     Invariant('library_anchors_are_resolved', 'Anchors resolved through the source library are not dangling.', rule(library_anchors)),
     Invariant('routes_do_not_contradict_silently', 'Direct route disagreements are reported.', rule(routes_contradict)),
     Invariant('every_ablation_is_caught_or_named', 'Every declared ablation has a row and uncaught ones are named.', rule(every_ablation)),
+    Invariant('ablation_agrees_with_trace_depth', 'A trace-declared ablation is caught by trace exactly when trace depth passes its expected sensitivity.', rule(trace_depth_agrees)),
     Invariant('verdict_matches_the_routes', 'The verdict license equals the native root license.', rule(verdict_routes)),
     Invariant('live_hypotheses_follow_route_exclusions', 'Live hypotheses are those no route excludes, in index order.', rule(live_hypotheses)),
     Invariant('contested_iff_disagreement', 'The verdict is contested exactly when routes disagree.', rule(contested_rule)),
@@ -216,7 +245,10 @@ CASES = (
     Question('library', (H('h', 'UNDECIDED'),), library_anchors=('n1',)),
     Question('anchor_disagreement', (H('h', 'UNDECIDED', True, None, (('a', 'trace', 'support'), ('a', 'logic', 'oppose'))),)),
     Question('status_disagreement', (H('h', 'IN', False, 'consistent'),), root_license='assert'),
-    Question('ablation', (H('h', 'UNDECIDED', True),), ablations=(('caught', 'h', ('logic',)), ('unused', 'h', ()))),
+    Question('ablation', (H('h', 'UNDECIDED', True),), ablations=(Ablation('caught', 'h', logic_moved=True), Ablation('unused', 'h'))),
+    Question('trace_ablation', (H('h_demand', 'UNDECIDED', True), H('h_suez', 'UNDECIDED', False)), ablations=(
+        Ablation('abl_no_unctad', 'h_demand', logic_moved=True, trace_check=True, declared_by_trace=True, projection_moved=False),
+        Ablation('question_without_unctad', 'h_demand', logic_moved=True, trace_check=True, projection_moved=True))),
     Question('exclusions', (H('h_out', 'OUT', True), H('h_dead', 'UNDECIDED', False), H('h_gone', 'UNDECIDED', True, 'eliminated'),
                             H('h_live', 'UNDECIDED', True, 'consistent')), root_license='qualify'),
 )
@@ -232,6 +264,7 @@ MUTATIONS = {
     'skip_route_comparison': 'routes_do_not_contradict_silently',
     'drop_uncaught_ablations': 'every_ablation_is_caught_or_named',
     'verdict_upgrades_license': 'verdict_matches_the_routes',
+    'ablation_uses_a_second_sensitivity': 'ablation_agrees_with_trace_depth',
     'excluded_hypothesis_stays_live': 'live_hypotheses_follow_route_exclusions',
     'disagreement_not_contested': 'contested_iff_disagreement',
 }
@@ -278,14 +311,17 @@ def native_case(kind):
     return index, models
 
 
-def project(status, root_license):
+def project(status, root_license, trace_depth=None):
     """Abstract state of a real research_status result, so the same rules run on the real outputs."""
     rows = []
     for row in status['hypotheses']:
         logic, trace, experiment = row.get('logic') or {}, row.get('trace') or {}, row.get('experiment') or {}
         rows.append(Hypothesis(row['id'], logic.get('state'), trace.get('live'),
                                experiment.get('status') if experiment.get('status') not in (None, 'not_listed') else None))
-    ablations = tuple((row['id'], row['hypothesis'], tuple(row['caught_by'])) for row in status['ablations'])
+    trace_depth = trace_depth or {}
+    ablations = tuple(Ablation(row['id'], row['hypothesis'], 'logic' in row['caught_by'],
+                               trace_depth.get(row['id'], 'trace' in row['caught_by']), row['id'] in trace_depth)
+                      for row in status['ablations'])
     question = Question('native', tuple(rows), ablations=ablations, root_license=root_license)
     verdict = status['verdict']
     return State(question, tuple(status['errors']), tuple(status['warnings']),
@@ -377,7 +413,16 @@ def evergiven_state():
         status = json.loads(output.read_text())
     tree = load_research(folder)
     native_license = license_model_claim(tree.models['logic'], tree.index['root_claim']).wording_license
-    return exit_code, status, project(status, native_license)
+    return exit_code, status, project(status, native_license, trace_depth_answers(tree.models['trace']))
+
+
+def trace_depth_answers(trace):
+    """TraceGuard's own depth verdict for each trace-declared ablation's expected sensitivity."""
+    from researchguard.trace.evaluator import evaluate_model
+    depth = evaluate_model(trace, include_storyline_depth=True).storyline_depth
+    mismatched = set(depth.sensitivity_mismatch_ids)
+    return {row.perturbation_id: row.sensitivity_id not in mismatched for row in trace.expected_sensitivities
+            if row.target_kind == 'hypothesis' and row.expected_direction == 'decrease'}
 
 
 def conformance():

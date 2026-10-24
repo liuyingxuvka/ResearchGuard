@@ -1272,7 +1272,7 @@ def _inject_contradiction(
     )
 
 
-def _apply_declared_perturbation(
+def apply_declared_perturbation(
     model: TraceGuardModel,
     perturbation_id: str,
 ) -> TraceGuardModel:
@@ -1442,7 +1442,7 @@ def apply_perturbation(
     if plan.kind == "contradiction_injection":
         return _inject_contradiction(model, plan)
     if plan.kind in {"evidence_ablation", "expected_sensitivity"}:
-        return _apply_declared_perturbation(
+        return apply_declared_perturbation(
             model,
             plan.declared_perturbation_id,
         )
@@ -1497,7 +1497,7 @@ def compare_perturbation(
     )
 
 
-def _expected_sensitivity_matches(
+def expected_sensitivity_matches(
     model: TraceGuardModel,
     effect: PerturbationEffect,
 ) -> bool:
@@ -1747,7 +1747,7 @@ def evaluate_storyline_depth(
             effect.perturbation.expected_sensitivity_id
             for effect in effects
             if effect.perturbation.kind == "expected_sensitivity"
-            and not _expected_sensitivity_matches(model, effect)
+            and not expected_sensitivity_matches(model, effect)
         )
     )
     if sensitivity_mismatches:

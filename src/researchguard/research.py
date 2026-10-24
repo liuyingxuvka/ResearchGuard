@@ -222,7 +222,11 @@ def route_disagreements(models, hypotheses):
 
 
 def apply_ablations(index, models, results):
-    """Use the native evaluators on disposable, anchor-ablated route models."""
+    """Use the native evaluators on disposable, anchor-ablated route models.
+
+    The trace route is judged by TraceGuard's own expected-sensitivity check: a trace-declared
+    ablation uses its declared sensitivity, a question-level row a synthetic one with threshold 0.
+    """
     rows = [dict(row) for row in index.get("ablations", [])]
     trace = models.get("trace")
     if trace:
@@ -233,12 +237,13 @@ def apply_ablations(index, models, results):
                 if expectation.perturbation_id == ablation.ablation_id and expectation.target_kind == "hypothesis" and expectation.expected_direction == "decrease":
                     rows.append({"id": ablation.ablation_id, "hypothesis": expectation.target_id,
                                  "remove_anchors": list(ablation.remove_evidence_ids), "expect": "weaken",
-                                 "minimum_absolute_change": expectation.minimum_absolute_change, "native_ablation": ablation.ablation_id})
+                                 "native_ablation": ablation.ablation_id, "sensitivity": expectation.sensitivity_id})
                     break
     errors, warnings, outcomes, seen = [], [], [], set()
     source = models.get("source")
     anchors = {row.anchor_id for row in source.anchors} if source else set()
     hypothesis_ids = {row["id"] for row in index["hypotheses"]}
+    logic = models.get("logic")
     for row in rows:
         name, hypothesis = row["id"], row["hypothesis"]
         if name in seen:
@@ -251,40 +256,61 @@ def apply_ablations(index, models, results):
             errors.append(f"unknown_hypothesis:ablation:{name}:{hypothesis}")
         if missing or hypothesis not in hypothesis_ids:
             continue
-        removed, caught = set(row["remove_anchors"]), []
-        logic = models.get("logic")
+        removed, caught, effects = set(row["remove_anchors"]), [], []
         if logic and "logic" in results:
             candidate = copy.deepcopy(logic)
             deleted = {node.id for node in candidate.nodes.values() if node.type == "Evidence" and any(p.locator in removed for p in validate_evidence_provenance(node.id, node.provenance))}
             if deleted:
                 candidate.nodes = {key: node for key, node in candidate.nodes.items() if key not in deleted}
                 candidate.edges = [edge for edge in candidate.edges if edge.source not in deleted and edge.target not in deleted]
+                after_results = evaluate_logic(candidate).node_results
                 before = results["logic"].node_results.get(hypothesis)
-                after = evaluate_logic(candidate).node_results.get(hypothesis)
+                after = after_results.get(hypothesis)
                 if before and after and ((row["expect"] == "eliminate" and after.state == "OUT") or (row["expect"] == "weaken" and (after.confidence < before.confidence or before.state == "IN" and after.state != "IN"))):
                     caught.append("logic")
+                for other in sorted(hypothesis_ids - {hypothesis}):
+                    old, new = results["logic"].node_results.get(other), after_results.get(other)
+                    if old and new and old.state != new.state:
+                        effects.append({"hypothesis": other, "route": "logic", "field": "state", "before": old.state, "after": new.state})
         if trace and "trace" in results and any(item.evidence_id in removed for item in trace.evidence):
-            from dataclasses import replace
-            from .trace.schema import EvidenceAblation
-            from .trace.storyline_depth import _apply_declared_perturbation
-            ablation_id = f"research-ablation:{name}"
-            if row.get("native_ablation"):
-                candidate = _apply_declared_perturbation(trace, row["native_ablation"])
-            else:
-                candidate = replace(trace, evidence_ablations=(*trace.evidence_ablations, EvidenceAblation(ablation_id, hypothesis, None, "Research-folder anchor ablation", list(removed))))
-                candidate = _apply_declared_perturbation(candidate, ablation_id)
-            projections = lambda result: {item.hypothesis_id: item for item in result.inference.hypothesis_projections}
-            before = projections(results["trace"]).get(hypothesis)
-            after = projections(evaluate_trace(candidate)).get(hypothesis)
-            if before and after:
-                difference = before.support - after.support
-                minimum = row.get("minimum_absolute_change", 0)
-                if (row["expect"] == "eliminate" and not after.live) or (row["expect"] == "weaken" and difference > 0 and difference >= minimum):
-                    caught.append("trace")
-        outcomes.append({"id": name, "hypothesis": hypothesis, "expect": row["expect"], "caught_by": caught})
+            moved, trace_effects = _trace_ablation(trace, results["trace"], row, hypothesis_ids)
+            if moved:
+                caught.append("trace")
+            effects.extend(trace_effects)
+        outcome = {"id": name, "hypothesis": hypothesis, "expect": row["expect"], "caught_by": caught}
+        if effects:
+            outcome["effects"] = sorted(effects, key=lambda item: (item["hypothesis"], item["route"]))
+        outcomes.append(outcome)
         if not caught:
-            warnings.append(f"ablation_not_caught:{name}")
+            warnings.append(f"ablation_not_caught:{row['id']}")
     return outcomes, errors, warnings
+
+
+def _trace_ablation(trace, baseline, row, hypothesis_ids):
+    """Run one ablation through TraceGuard's perturbation and expected-sensitivity check, in memory only."""
+    from dataclasses import replace
+    from .trace.schema import EvidenceAblation, ExpectedSensitivity
+    from .trace.storyline_depth import PerturbationPlanItem, expected_sensitivity_matches, run_single_perturbation
+    hypothesis = row["hypothesis"]
+    if row.get("native_ablation"):
+        model, ablation_id, sensitivity_id = trace, row["native_ablation"], row["sensitivity"]
+    else:
+        ablation_id, sensitivity_id = f"research-ablation:{row['id']}", f"research-sensitivity:{row['id']}"
+        model = replace(trace,
+            evidence_ablations=(*trace.evidence_ablations, EvidenceAblation(ablation_id, hypothesis, None, "Research-folder anchor ablation", sorted(set(row["remove_anchors"])))),
+            expected_sensitivities=(*trace.expected_sensitivities, ExpectedSensitivity(sensitivity_id, ablation_id, "hypothesis", hypothesis, "decrease", 0.0)))
+    plan = PerturbationPlanItem(perturbation_id=f"expected_sensitivity:{sensitivity_id}", kind="expected_sensitivity",
+                                target_hypothesis_id=hypothesis, declared_perturbation_id=ablation_id, expected_sensitivity_id=sensitivity_id)
+    effect, _, perturbed = run_single_perturbation(model, baseline, plan)
+    before = {item.hypothesis_id: item for item in baseline.inference.hypothesis_projections}
+    after = {item.hypothesis_id: item for item in perturbed.inference.hypothesis_projections}
+    if row["expect"] == "eliminate":
+        moved = hypothesis in after and not after[hypothesis].live
+    else:
+        moved = expected_sensitivity_matches(model, effect)
+    effects = [{"hypothesis": other, "route": "trace", "field": "live", "before": before[other].live, "after": after[other].live}
+               for other in sorted(hypothesis_ids - {hypothesis}) if other in before and other in after and before[other].live != after[other].live]
+    return moved, effects
 
 
 def verdict_for_writers(tree, hypotheses, disagreements, errors):
@@ -426,7 +452,8 @@ def render_status_markdown(status: dict[str, Any]) -> str:
         lines.append("- " + cell(f"search {row['id']}" if row["route"] == "search" else f"experiment: {row.get('status')}; next: {', '.join(row['ids']) or 'none'}"))
     lines.extend(["", "## Ablations", ""])
     for row in status["ablations"]:
-        lines.append(f"- {cell(row['id'])}: {cell(row['hypothesis'])} {row['expect']}; caught by {', '.join(row['caught_by']) or 'none'}")
+        effects = "; effects: " + ", ".join(f"{item['hypothesis']} {item['route']} {item['field']} {str(item['before']).lower()} → {str(item['after']).lower()}" for item in row["effects"]) if row.get("effects") else ""
+        lines.append(f"- {cell(row['id'])}: {cell(row['hypothesis'])} {row['expect']}; caught by {', '.join(row['caught_by']) or 'none'}{cell(effects)}")
     lines.extend(["", "## Disagreements", ""])
     lines.extend(f"- {cell(row['hypothesis'])}: {row['kind']} {cell(row['detail'])}" for row in status["disagreements"])
     lines.extend(["", "## Problems", ""])

@@ -288,3 +288,31 @@ def test_live_hypotheses_follow_every_route(folder):
     accepted_and_excluded = [dict(rows['h'], logic={'state': 'IN'}, trace={'live': False})]
     disagreements = route_disagreements({}, accepted_and_excluded)
     assert disagreements and verdict_for_writers(tree, accepted_and_excluded, disagreements, [])['contested'] is True
+
+
+def test_trace_ablation_agrees_with_trace_depth():
+    from researchguard.trace.evaluator import evaluate_model
+    folder = Path(__file__).resolve().parents[1] / 'examples/research/evergiven'
+    tree = load_research(folder)
+    status = research_status(tree)
+    trace = tree.models['trace']
+    mismatched = set(evaluate_model(trace, include_storyline_depth=True).storyline_depth.sensitivity_mismatch_ids)
+    rows = {row['id']: row for row in status['ablations']}
+    declared = [item for item in trace.expected_sensitivities if item.perturbation_id in rows]
+    assert declared
+    for item in declared:
+        assert ('trace' in rows[item.perturbation_id]['caught_by']) == (item.sensitivity_id not in mismatched)
+    # abl_no_unctad: the h_demand snapshot score falls by 0.0435, below trace's declared 0.05, so neither view counts trace.
+    assert rows['abl_no_unctad']['caught_by'] == ['logic'] and 'sens_no_unctad' in mismatched
+    # The question-level row has threshold 0, so the same check counts any decrease.
+    assert rows['question_without_unctad']['caught_by'] == ['logic', 'trace']
+
+
+def test_ablation_rows_name_side_effects():
+    from researchguard.research import render_status_markdown
+    folder = Path(__file__).resolve().parents[1] / 'examples/research/evergiven'
+    status = research_status(load_research(folder))
+    rows = {row['id']: row for row in status['ablations']}
+    for name in ('abl_no_unctad', 'question_without_unctad'):
+        assert {'hypothesis': 'h_suez', 'route': 'trace', 'field': 'live', 'before': False, 'after': True} in rows[name]['effects']
+    assert '; effects: h_suez trace live false → true' in render_status_markdown(status)

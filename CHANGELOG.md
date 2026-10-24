@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Maintenance checks of ResearchGuard's own model tree run on FlowGuard 0.70.12.
+- Question-level ablations judge the trace route with TraceGuard's own expected-sensitivity check, so status and trace depth agree; each ablation row lists side effects on other hypotheses.
 
 ## v0.5.14 - 2026-10-24
 

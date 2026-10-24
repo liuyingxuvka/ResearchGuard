@@ -192,7 +192,8 @@
         "Solve storyline support from evidence first; bound causal support below it. Depth checks that neither causal declarations nor oppose links raise support; evaluate does not run depth.",
         "Freeze with an existing target and coverage; permit future expected evidence/event ids. Append typed observation rows in memory and compare canonical target support direction.",
         "Preserve newly observed rows in candidates; acceptance is independent of native depth closure. Keep prediction mismatches separate from native gaps, use the suite lineage helper and count only resolved native gaps as progress.",
-        "Export hypothesis ids, native rank/support and signed evidence with original text/source/locator alongside the preserved v1 trace claims."
+        "Export hypothesis ids, native rank/support and signed evidence with original text/source/locator alongside the preserved v1 trace claims.",
+        "One expected-sensitivity check judges trace depth and question ablations."
       ],
       "files": [
         "src/researchguard/trace/__init__.py",
@@ -252,7 +253,7 @@
       "models": [],
       "layer": "routes",
       "status": "confirmed",
-      "fingerprint": "sha256:e370158769726b17914f98d7127143e7eaab5739e98cc5014d8557ba404e9070"
+      "fingerprint": "sha256:3896062679c587297d3ca057fecfad831712f605188f94188c0ce2f91abafe1c"
     },
     {
       "id": "experimentguard",
@@ -329,7 +330,8 @@
         "Detect copied-content drift and direct evidence or conclusion disagreements between native routes.",
         "Apply declared anchor ablations in memory and expose uncaught known-bad cases.",
         "Project the authoritative search stop and root wording license into one five-key verdict; compare current and candidate questions without writing models.",
-        "The question model lists live hypotheses and contested routes from route states."
+        "The question model lists live hypotheses and contested routes from route states.",
+        "Ablation rows name side effects on other hypotheses."
       ],
       "files": [
         "src/researchguard/research.py"
@@ -359,7 +361,7 @@
       ],
       "layer": "tree",
       "status": "confirmed",
-      "fingerprint": "sha256:904a0e0f8a1d23e6f81c7aab39cd550cf69b2290c6008ca600a223c0948c7f42"
+      "fingerprint": "sha256:a1879e06e8a1061d96cc5440a74ebebe78f4ce7d30b4af7a137def4e208ce572"
     },
     {
       "entrypoints": [

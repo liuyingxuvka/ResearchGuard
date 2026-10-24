@@ -70,12 +70,13 @@ retain the disagreement as an explicit writing risk.
 Declare unique `id`, `remove_anchors`, `hypothesis` and `expect: weaken|eliminate`.
 Anchors must exist in the source model and hypotheses in the index. Evidence-only
 trace ablations with a decreasing hypothesis sensitivity join this same list;
-duplicate ids are errors. Native logic and trace evaluators operate on disposable
-in-memory copies: weakened confidence/state or native support loss catches
-`weaken`; OUT or not live catches `eliminate`. Trace's declared minimum decrease
-is respected. `ablations[].caught_by` names the reacting routes. An empty list
-produces `ablation_not_caught:<id>`: a declared known-bad that no route detects.
-No model files are changed; experiment observations are not ablated.
+duplicate ids are errors. Evaluators run on disposable in-memory copies. Logic
+catches `weaken` by lower confidence or state; trace catches it by TraceGuard's own
+expected-sensitivity check (a fall in the snapshot score, at trace's declared
+threshold; 0 for question rows), so `status` and `trace depth` agree. OUT or not
+live catches `eliminate`. `caught_by` names the reacting routes; an empty list gives
+`ablation_not_caught:<id>`. `effects` lists other hypotheses whose trace `live` or
+logic `state` flips. No model files are changed; observations are not ablated.
 
 ## Current and candidate
 
