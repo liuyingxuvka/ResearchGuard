@@ -36,7 +36,7 @@ See `references/source/fields.md`: claim in `leads[].question`, strength in `dep
 Compare cost with budget; utility ranks. Keep optional followups.
 
 ## Hard rules
-Separate observations, candidates and immutable refs. Candidates, locators, utility and aggregates alone are not evidence. Keep missing/stale/planning-only/bounded/skipped/inaccessible/provider-unavailable work visible. Never invent retrieval/OCR/multimodal work. Recorded observations in depth do not imply fresh retrieval. Broad closure requires current depth, complete target/gap universes, per-gap direct/independent/counter coverage, lineage, content anchors and no critical gap.
+Separate observations, candidates and immutable refs. Candidates, locators, utility and aggregates alone are not evidence. Keep missing/stale/planning-only/bounded/skipped/inaccessible/provider-unavailable work visible. Never invent retrieval/OCR/multimodal work. Recorded observations in depth do not imply fresh retrieval. Broad closure requires current depth, complete declared-unit/gap universes, per-gap direct/independent/counter coverage, lineage, content anchors and no critical gap.
 
 ## References
 - `route:source-model`: always → `references/source/source-model-protocol.md`.

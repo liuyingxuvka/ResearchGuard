@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from researchguard.logic import adapt_delivery, load_model_from_dict, model_fingerprint, synthesize_artifact_plan
+from researchguard.logic import load_model_from_dict, model_fingerprint, synthesize_artifact_plan
 
 
 def _request(model, *, goal="Create a report", artifact_kind="report", claims=("C0",), placement="body", max_body_units=2, branches=()):
@@ -93,7 +93,7 @@ def test_synthesis_assigns_treatment_guidance() -> None:
     assert plan.units[0].research_importance["C0"] == 0.95
 
 
-def test_delivery_guidance_avoids_internal_labels() -> None:
+def test_missing_support_stays_blocked_in_the_argument_plan() -> None:
     model = load_model_from_dict(
         {
             "model": {"id": "delivery_test", "root_claim": "C0"},
@@ -104,16 +104,8 @@ def test_delivery_guidance_avoids_internal_labels() -> None:
         }
     )
     plan = synthesize_artifact_plan(model, selection_request=_request(model, artifact_kind="presentation"))
-    guidance = adapt_delivery(plan)
-    text = "\n".join(item.suggested_text for item in guidance.suggestions)
-    traces = "\n".join(item.trace for item in guidance.suggestions)
-
-    assert guidance.status == "blocked_support_gap"
-    assert guidance.suggestions == ()
-    assert "missing_handoff" not in text
-    assert "core_claim" not in text
-    assert "Limited to validated range." not in text
-    assert "prominence=lead" not in traces
+    assert plan.status == "blocked_support_gap"
+    assert plan.open_gaps
 
 
 def test_synthesis_can_preserve_source_branch_candidates() -> None:
@@ -150,7 +142,7 @@ def test_synthesis_can_preserve_source_branch_candidates() -> None:
     assert plan.candidate_dispositions[0].placement == "body"
 
 
-def test_temporal_context_does_not_override_importance_but_guides_delivery() -> None:
+def test_temporal_context_does_not_override_argument_importance() -> None:
     model = load_model_from_dict(
         {
             "model": {"id": "temporal_synthesis", "root_claim": "C0"},
@@ -180,9 +172,89 @@ def test_temporal_context_does_not_override_importance_but_guides_delivery() -> 
             }
         ],
     )
-    guidance = adapt_delivery(plan, profile="report")
 
     assert plan.units[0].claim_ids == ("C0",)
     assert plan.selected_items[0].temporal_role in {"historical", "source_dated"}
-    assert guidance.status == "blocked_support_gap"
-    assert guidance.suggestions == ()
+    assert plan.status == "blocked_support_gap"
+    assert plan.open_gaps
+
+
+def _model():
+    nodes = {}
+    edges = []
+    for claim_id, importance, role_importance in (("C0", 1.0, 0.7), ("C2", 0.8, 0.7), ("O1", 0.2, 0.2)):
+        nodes[claim_id] = {"type": "Claim", "text": f"SENTINEL-{claim_id}", "importance": importance}
+        for prefix, node_type, edge_type in (
+            ("E", "Evidence", "supports"),
+            ("W", "Warrant", "supports"),
+            ("A", "Assumption", "depends_on"),
+            ("L", "Limitation", "qualifies"),
+            ("R", "Rebuttal", "attacks"),
+        ):
+            node_id = f"{prefix}{claim_id}"
+            nodes[node_id] = {"type": node_type, "text": f"{node_type}-{claim_id}", "importance": role_importance}
+            edges.append({"source": node_id, "target": claim_id, "type": edge_type})
+    edges.append({"source": "C2", "target": "C0", "type": "supports"})
+    connected = [node_id for node_id in nodes if node_id != "O1" and not node_id.endswith("O1")]
+    return load_model_from_dict(
+        {
+            "model": {
+                "id": "delivery-contract",
+                "root_claim": "C0",
+                "target_units": [{"unit_id": "unit:delivery", "node_ids": connected}],
+                "model_cards": [{"card_id": "card:delivery", "node_ids": connected}],
+                "role_dispositions": {"competition": "not_applicable"},
+            },
+            "nodes": nodes,
+            "edges": edges,
+        }
+    )
+
+
+def _unit(unit_id, claim_ids, placement, *, required=False, predecessors=(), relation="background"):
+    return {
+        "unit_id": unit_id,
+        "parent_unit_id": None,
+        "reader_question": "What follows?",
+        "unit_job": "Explain the bounded point.",
+        "claim_ids": list(claim_ids),
+        "predecessor_unit_ids": list(predecessors),
+        "progression_relation": relation,
+        "editorial_prominence": "lead",
+        "placement": placement,
+        "placement_reason": "Required by the selected composition.",
+        "required": required,
+    }
+
+
+def _ready_plan():
+    model = _model()
+    request = {
+        "schema": "researchguard.logic.synthesis-request.v1",
+        "request_id": "delivery-request",
+        "target_id": "delivery-artifact",
+        "target_goal": "Preserve delivery structure",
+        "artifact_kind": "report",
+        "reader_id": "reader",
+        "model_id": model.id,
+        "model_fingerprint": model_fingerprint(model),
+        "body_unit_order": ["u0", "u1"],
+        "max_body_units": 2,
+        "units": [
+            _unit("u0", ["C2"], "body", required=True, relation="establishes"),
+            _unit("u1", ["C0"], "body", required=True, predecessors=("u0",), relation="concludes"),
+            _unit("un", ["C2"], "note"),
+            _unit("ua", ["C2"], "appendix"),
+            _unit("uo", ["O1"], "omit"),
+        ],
+        "source_branch_bindings": [],
+    }
+    plan = synthesize_artifact_plan(model, selection_request=request)
+    assert plan.status == "research_handoff_ready", plan.open_gaps
+    return plan
+
+
+def test_ready_argument_plan_uses_native_depth_without_external_state():
+    plan = _ready_plan()
+    assert plan.status == "research_handoff_ready"
+    assert not plan.open_gaps

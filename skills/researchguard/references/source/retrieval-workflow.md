@@ -1,6 +1,6 @@
 # Retrieval Workflow
 
-1. Identify target claim strength, current model-card or trace gaps, source roles, source policies, leads, modalities, and access boundaries.
+1. Identify the required claim strength, current model-card or trace gaps, source roles, source policies, leads, modalities, and access boundaries.
 2. Build a portfolio plan: closest primary records, official/institutional records, execution/outcome evidence, independent evidence, analytical/model sources, affected stakeholders, counter/limiting/non-occurrence evidence, lineage checks, and future falsifiers as relevant.
 3. Generate actions from exact gaps: original source, specific site, lineage, numeric provenance, independent corroboration, counter/limiting, execution/outcome, freshness, stakeholder, absence signal, multimodal locator, branch-distinguishing, expert/model source, or bridge evidence.
 4. Rank expected utility and either execute an available permitted retrieval tool or return a plan. Never claim external search unless the tool ran.

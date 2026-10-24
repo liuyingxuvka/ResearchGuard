@@ -23,7 +23,7 @@ SourceGuard depth MUST NOT emit `no_content_qualified_anchor` as an alternate fi
 - **THEN** its conformance SHALL read `src/researchguard/source/depth.py` and fail if the declared finding is missing or the retired finding is present
 
 ### Requirement: Other depth failures stay visible
-The contentless-anchor finding SHALL coexist with SourceGuard's portfolio, lineage and target-unit findings, and a locator without content SHALL NOT become claim-usable evidence.
+The contentless-anchor finding SHALL coexist with SourceGuard's portfolio, lineage and declared-unit findings, and a locator without content SHALL NOT become claim-usable evidence.
 
 #### Scenario: Locator without content
 - **WHEN** an anchor has a locator but no content

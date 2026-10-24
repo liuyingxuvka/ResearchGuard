@@ -1,6 +1,7 @@
-# One research folder
+# One research folder is the model of one question
 
-For a question that spans routes, keep native models side by side and add:
+A research folder joins the native source, trace, logic and experiment models by
+shared ids. The index is the question model, not a second reasoning engine:
 
 ```yaml
 schema: researchguard.research.v1
@@ -15,34 +16,112 @@ models:
   logic: logic.yaml
   experiment: experiment.json
   experiment_observations: [observations.json]
+library: ../personal-library
+search: {budget: 3, scope_sufficient: false}
+ablations:
+  - {id: without_anchor, remove_anchors: [anchor_main], hypothesis: h_main, expect: weaken}
 ```
 
-All paths are relative to `research.yaml`. Each route and observations are optional;
-observations require an experiment model. A listed logic model requires a root Claim.
-Run `researchguard status <folder>` (or the index path); `--json` gives the same
-information as data, and `--output <path>` explicitly saves it. Otherwise nothing
-is written. Exit 0 means no reference errors, 1 means model/reference errors,
-and 2 means the index could not be read. Warnings can remain at exit 0.
+All paths are relative to `research.yaml`. Routes, `library`, `search` and
+`ablations` are optional. Observations require an experiment model; a listed logic
+model requires its root Claim. Hypothesis ids are shared by logic Claims, trace
+hypotheses and experiment predictions. Source ids and evidence anchor ids keep
+their SourceGuard identities. Every route's native loader still validates it.
 
-Use the same hypothesis id for a logic Claim, trace storyline hypothesis and
-experiment hypothesis. SourceGuard owns source ids, roles, lineage and anchors.
-Trace source ids equal SourceGuard source ids; trace evidence ids equal anchor ids.
-Logic Evidence provenance uses that source id and anchor id as `locator`.
-Experiment observations use the anchor id as `evidence_id` and source id as
-`source_ref`. Each route's native loader still validates its own model.
+`researchguard status <folder> [--json] [--output <path>] [--candidate <folder2>]`
+reads the index (or its explicit path). Default output is a compact verdict-first
+page; JSON retains complete results. It writes only an explicit `--output`.
+Exit 0 means no errors, 1 means model or reference errors, and 2 means an unreadable
+index. Warnings do not change exit 0. A missing library is `library_missing:<path>`.
+The library uses the same provenance resolver as `logic validate --library-root`.
+A library project is a reading list, not a second research-question container.
 
-Status projects each route's own evaluation, source search plan, trace depth and
-experiment recommendations or observations. It does not strengthen their claims.
+## Who owns what
+
+SourceGuard owns anchor `text`, `source_id`, `locator` and source `title`, `url`,
+`source_date`, `lineage_id`. The shared ownership table maps these to trace
+`evidence[].raw_text` (text or normalized summary), source records, and logic
+Evidence provenance: `quote` or its native `content_hash`, `source_reference`,
+`source_date`. `status` compares present, nonempty copies exactly. It reports
+`copy_drift:trace:<id>:<field>` or `copy_drift:logic:<node>:<field>` when a copy
+differs. Missing optional provenance is not invented or treated as a drift.
 Without a source model, source/anchor checking is skipped with
-`source_model_not_listed`; unused hypotheses and hypotheses missing from logic are
-warnings. Handoff commands remain in the individual route references.
+`source_model_not_listed`; dangling ids and invalid native models stay errors.
 
+`--into` synchronization refreshes only these owned fields and lists identities
+under `updated`. It preserves trace links, reliability and other local work,
+logic author summaries, unrelated provenance and all existing edges. `conflicts`
+means a real identity clash (a different source or an incompatible node type),
+not a changed quote. Old handoff bundles without optional source metadata remain
+readable; absence does not erase existing provenance.
 
-To bring new observations downstream, use
-`researchguard source export-traceguard <source.yaml> --into <trace.yaml> --output <new-trace.yaml>`,
-then `researchguard trace export-logicguard <new-trace.yaml> --output <bundle.yaml>` and
-`researchguard logic import-handoff <bundle.yaml> --into <logic.yaml> --output <new-logic.yaml>`.
-Sync only appends missing ids and edges. Existing records and hand-built content
-stay unchanged; differing records with the same identity are listed in `conflicts`.
-`--output` must differ from `--into`; no input is overwritten. Source anchors usable
-for claims or traces are exported as usable trace evidence; AI still owns links.
+## When routes disagree
+
+Direct evidence supporting a hypothesis in one route and opposing it in another
+produces `route_disagreement:<hypothesis>:anchor:<anchor>`. Indirect argument
+chains and `limit` links are not compared. An explicitly rejected hypothesis
+(logic OUT, trace not live or experiment eliminated) conflicting with logic IN or
+trace live produces a status disagreement. UNDECIDED and experiment consistent
+are neutral. `disagreements` lists these warnings; correct the erroneous route or
+retain the disagreement as an explicit writing risk.
+
+## Known-bad: ablations
+
+Declare unique `id`, `remove_anchors`, `hypothesis` and `expect: weaken|eliminate`.
+Anchors must exist in the source model and hypotheses in the index. Evidence-only
+trace ablations with a decreasing hypothesis sensitivity join this same list;
+duplicate ids are errors. Native logic and trace evaluators operate on disposable
+in-memory copies: weakened confidence/state or native support loss catches
+`weaken`; OUT or not live catches `eliminate`. Trace's declared minimum decrease
+is respected. `ablations[].caught_by` names the reacting routes. An empty list
+produces `ablation_not_caught:<id>`: a declared known-bad that no route detects.
+No model files are changed; experiment observations are not ablated.
+
+## Current and candidate
+
+The research folder is current; a candidate folder is the target that replaces it
+when accepted. Run `researchguard status <current> --candidate <candidate>` to
+see changed hypothesis states/confidences, trace rank/support/live, experiment
+status, anchor additions/removals and changed errors/warnings. Equal folders show
+`no changes`. JSON contains `current`, `candidate`, `changes`; exit 1 follows the
+candidate's errors. Acceptance is explicitly replacing current files (or updating
+index paths), with history in git. The kernel never replaces a model for you.
+
+All four native predict-observe-revise loops use `researchguard.iteration`: one
+canonical `baseline_identity`, gap lineage and terminal selection. Source models
+exclude generation/update timestamps from identity; other routes use their loaded
+native model dictionaries. Frozen prediction schemas are v3; older predictions
+fail `stale_prediction: re-freeze`. A changed baseline must be frozen again.
+Candidates need a new path and changed model content. Common terminal reasons
+are `continue_iteration`, `model_closed_for_task`, `progress_stalled`,
+`iteration_limit`, `external_input_required`, `scope_excluded`; SourceGuard also
+uses `provider_access_required`, `finite_action_exhausted`. These do not change
+native domain rules about evidence, protected scope or holdout independence.
+
+## Verdict for writers
+
+Writers, including LogicWriting, read only `verdict` from
+`researchguard status <folder> --json --output research-status.json`:
+
+- `search`: the native stop decision with the index's budget/sufficiency, or
+  `not_run` without source and `search`. Native values are `continue_search`,
+  `stop_sufficient`, `blocked_unresolved_critical`.
+- `root_claim`: null, or exactly `id`, `wording_license`, `reason` from native
+  argument licensing (`assert`, `qualify`, `withhold`). It never upgrades wording.
+- `live_hypotheses`: index-order ids not explicitly excluded by any route.
+- `contested`: whether route disagreements exist; it is a risk, not a new gate.
+- `errors`: the number of errors in this status result.
+
+## Synchronize new evidence
+
+```sh
+researchguard source export-traceguard source.yaml --into trace.yaml --output trace-next.yaml
+researchguard trace export-logicguard trace-next.yaml --output bundle.yaml
+researchguard logic import-handoff bundle.yaml --into logic.yaml --output logic-next.yaml
+```
+
+Every output must differ from the input/`--into` path. Sync reports `added`,
+`updated`, `conflicts`; a second unchanged sync has empty lists. Source anchors
+usable for claims or traces export as usable evidence; AI still owns the links.
+Update index paths to the accepted files, then read `status` again. Route results
+remain scoped to their own declared evidence and do not establish factual truth.

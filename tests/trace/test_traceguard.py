@@ -490,7 +490,7 @@ def test_case_library_writeback_preserves_handoff_followups(tmp_path: Path) -> N
     }
 
 
-def test_case_library_does_not_store_inference_receipts(
+def test_case_library_writeback_preserves_current_gaps(
     tmp_path: Path,
 ) -> None:
     root = tmp_path / "library"
@@ -506,7 +506,7 @@ def test_case_library_does_not_store_inference_receipts(
     payload = case_library.write_back_gaps(root, "incident-a", result_path)
     assert payload["ok"] is True
     paths = case_library.require_library(root)
-    assert not paths.case_ledger("incident-a", "inference_receipts.yaml").exists()
+    assert paths.case_ledger("incident-a", "gaps.yaml").is_file()
 
 
 def test_case_library_rejects_missing_direction_source_write(tmp_path: Path) -> None:
@@ -758,3 +758,12 @@ def test_compare_shows_hypothesis_and_object_changes(capsys) -> None:
     assert unchanged["trace_delta"] == {"added": [], "removed": [], "changed": []}
     assert unchanged["hypothesis_delta"] == {"added": [], "removed": [], "changed": []}
     assert all(delta == {"added": [], "removed": []} for delta in unchanged["object_delta"].values())
+
+
+def test_retired_interface_bindings_are_schema_errors():
+    from researchguard.trace.schema import SCHEMA_ID
+    raw = {"metadata": {"schema_version": SCHEMA_ID}}
+    model = TraceGuardModel.from_dict({**raw, "interface_bindings": []})
+    assert "interface_bindings" not in model.to_dict()
+    with pytest.raises(SchemaError, match="interface_bindings.*retired"):
+        TraceGuardModel.from_dict({**raw, "interface_bindings": [{}]})

@@ -9,13 +9,12 @@ rollback is keeping (or restoring from git) the previous model file.
 from __future__ import annotations
 
 import uuid
-import hashlib
 import json
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Any, Mapping, Sequence
 
-from ..gap_lineage import gap_lineage
+from ..iteration import baseline_identity, source_identity, require_prediction_identity, select_terminal, validate_candidate, gap_lineage
 
 from .evaluator import evaluate_model
 from .model import LogicModel
@@ -24,7 +23,7 @@ from .simulator import simulate_model
 from .execution_depth import _build_native_depth_analysis
 
 
-ARGUMENT_PREDICTION_SCHEMA = "researchguard.logic.argument-prediction.v2"
+ARGUMENT_PREDICTION_SCHEMA = "researchguard.logic.argument-prediction.v3"
 ARGUMENT_ITERATION_RESULT_SCHEMA = "researchguard.logic.argument-iteration-result.v1"
 SUPPORTED_PREDICTION_MODES = frozenset(
     {
@@ -35,25 +34,12 @@ SUPPORTED_PREDICTION_MODES = frozenset(
         "scope-narrowing",
     }
 )
-MODEL_TERMINALS = frozenset(
-    {
-        "continue_iteration",
-        "model_closed_for_task",
-        "external_input_required",
-        "scope_excluded",
-        "progress_stalled",
-        "iteration_limit",
-    }
-)
 
 
 def utc_now() -> str:
     return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
 
 
-def _canonical_sha256(value: Any) -> str:
-    body = json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
-    return f"sha256:{hashlib.sha256(body.encode('utf-8')).hexdigest()}"
 
 
 def _native_depth(model: LogicModel, prediction: "ArgumentPrediction") -> tuple[str, ...]:
@@ -68,7 +54,7 @@ def _native_depth(model: LogicModel, prediction: "ArgumentPrediction") -> tuple[
 class ArgumentPrediction:
     prediction_id: str
     model_id: str
-    baseline_digest: str
+    baseline_identity: str
     root_claim: str
     mode: str
     expected_state: str
@@ -91,14 +77,14 @@ class ArgumentPrediction:
     def __post_init__(self) -> None:
         if self.schema_version != ARGUMENT_PREDICTION_SCHEMA:
             raise ValueError(
-                f"unsupported argument prediction schema {self.schema_version!r}"
+                "stale_prediction: re-freeze"
             )
         if not self.prediction_id:
             raise ValueError("prediction_id must not be empty")
         if not self.model_id:
             raise ValueError("model_id must not be empty")
-        if not self.baseline_digest.startswith("sha256:"):
-            raise ValueError("baseline_digest must be a sha256 digest")
+        if not self.baseline_identity.startswith("sha256:"):
+            raise ValueError("baseline_identity must be a sha256 digest")
         if self.mode not in SUPPORTED_PREDICTION_MODES:
             raise ValueError(f"unsupported prediction mode: {self.mode}")
         if self.expected_state not in STATES:
@@ -129,7 +115,7 @@ class ArgumentPrediction:
             "schema_version": self.schema_version,
             "prediction_id": self.prediction_id,
             "model_id": self.model_id,
-            "baseline_digest": self.baseline_digest,
+            "baseline_identity": self.baseline_identity,
             "root_claim": self.root_claim,
             "mode": self.mode,
             "expected_state": self.expected_state,
@@ -155,7 +141,7 @@ class ArgumentPrediction:
             schema_version=str(raw.get("schema_version", "")),
             prediction_id=str(raw.get("prediction_id", "")),
             model_id=str(raw.get("model_id", "")),
-            baseline_digest=str(raw.get("baseline_digest", "")),
+            baseline_identity=str(raw.get("baseline_identity", "")),
             root_claim=str(raw.get("root_claim", "")),
             mode=str(raw.get("mode", "")),
             expected_state=str(raw.get("expected_state", "")),
@@ -342,7 +328,7 @@ def freeze_argument_prediction(
     return ArgumentPrediction(
         prediction_id=prediction_id or f"prediction-{uuid.uuid4().hex}",
         model_id=model.id,
-        baseline_digest=_model_digest(model),
+        baseline_identity=baseline_identity(model.canonical_dict()),
         root_claim=claim_id,
         mode=mode,
         expected_state=expected_state,
@@ -387,7 +373,7 @@ def observe_argument_prediction(
         max_size=prediction.max_size,
     )
     return ArgumentObservation(
-        model_digest=_model_digest(model),
+        model_digest=baseline_identity(model.canonical_dict()),
         observed_state=result.result_state,
         observed_confidence=result.result_confidence,
         native_result=result.to_dict(),
@@ -413,16 +399,7 @@ def validate_prediction_binding(
             f"prediction model id {prediction.model_id!r} does not match "
             f"baseline {model.id!r}"
         )
-    actual_digest = _model_digest(model)
-    if actual_digest != prediction.baseline_digest:
-        raise ValueError(
-            "stale argument prediction: baseline digest changed "
-            f"from {prediction.baseline_digest} to {actual_digest}"
-        )
-    if prediction.root_claim not in model.nodes:
-        raise ValueError("prediction root claim is missing from baseline")
-    if not prediction.node_id or prediction.node_id not in model.nodes:
-        raise ValueError("prediction perturbation target is missing from baseline")
+    require_prediction_identity(prediction.baseline_identity, baseline_identity(model.canonical_dict()))
 
 
 def revalidate_protected_claims(
@@ -523,13 +500,11 @@ def run_argument_iteration(
     )
 
     def terminal_for(gaps: Sequence[str], *, external: bool = False) -> str:
-        if prediction.iteration >= prediction.max_iterations:
-            return "iteration_limit"
-        if external:
-            return "external_input_required"
-        if set(gaps) == set(prediction.prior_open_gap_ids) and prediction.iteration > 0:
-            return "progress_stalled"
-        return "continue_iteration" if gaps else "model_closed_for_task"
+        return select_terminal(closed=not gaps, iteration=prediction.iteration,
+                               max_iterations=prediction.max_iterations,
+                               stalled=set(gaps) == set(prediction.prior_open_gap_ids) and prediction.iteration > 0,
+                               external=external)
+
 
     def make_result(
         *,
@@ -648,8 +623,6 @@ def run_argument_iteration(
     )
 
 
-def _model_digest(model: LogicModel) -> str:
-    return _canonical_sha256(model.canonical_dict())
 
 
 __all__ = [

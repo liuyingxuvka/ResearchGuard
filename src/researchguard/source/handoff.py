@@ -11,6 +11,8 @@ from __future__ import annotations
 
 from copy import deepcopy
 
+from researchguard.ownership import trace_anchor_owned, trace_source_owned
+
 
 from .loader import dump_yaml
 from .schema import BeliefState
@@ -49,25 +51,20 @@ def export_traceguard_seed(belief_state: BeliefState) -> dict:
         },
         "sources": [{
             "source_id": source.source_id,
-            "title": source.title,
-            "url": source.url or None,
+            **trace_source_owned(source),
             "source_type": source.source_type,
-            "lineage_id": source.lineage_id or source.source_id,
-            "independence_group": source.lineage_id or source.source_id,
+            "independence_group": trace_source_owned(source)["lineage_id"],
             "source_reliability": source.source_reliability,
             "source_status": TRACEGUARD_SOURCE_STATUS.get(source.source_status, "unknown"),
-            "source_date": source.source_date or None,
             "coverage_period": source.coverage_period or None,
         } for source in belief_state.sources],
         "evidence": [{
             "evidence_id": anchor.anchor_id,
-            "source_id": anchor.source_id,
-            "raw_text": anchor.text or anchor.normalized_summary,
+            **trace_anchor_owned(anchor),
             "normalized_summary": anchor.normalized_summary or None,
             "evidence_type": anchor.anchor_type,
             "extraction_confidence": anchor.extraction_confidence,
             "evidence_specificity": anchor.specificity,
-            "locator": anchor.locator or None,
             "limits": list(anchor.limits),
             "warnings": list(anchor.warnings),
             "usable_as_trace_evidence": anchor.usable_for_trace or anchor.usable_for_claim,
@@ -77,14 +74,19 @@ def export_traceguard_seed(belief_state: BeliefState) -> dict:
     }
 
 
-def sync_traceguard_seed(belief_state: BeliefState, existing: dict) -> tuple[dict, dict, list]:
-    """Append missing source/anchor ids; preserve every existing downstream field."""
+def sync_traceguard_seed(belief_state: BeliefState, existing: dict) -> tuple[dict, dict, dict, list]:
+    """Refresh SourceGuard-owned fields; preserve all downstream links and work."""
     if not isinstance(existing, dict):
         raise ValueError("--into trace model must be a mapping")
     merged = deepcopy(existing)
     incoming = export_traceguard_seed(belief_state)
     added = {"sources": [], "evidence": []}
+    updated = {"sources": [], "evidence": []}
     conflicts = []
+    owned_by_kind = {
+        "sources": {row.source_id: trace_source_owned(row) for row in belief_state.sources},
+        "evidence": {row.anchor_id: trace_anchor_owned(row) for row in belief_state.anchors},
+    }
     for kind, id_key in (("sources", "source_id"), ("evidence", "evidence_id")):
         rows = merged.setdefault(kind, [])
         if not isinstance(rows, list) or any(not isinstance(row, dict) or not row.get(id_key) for row in rows):
@@ -98,9 +100,16 @@ def sync_traceguard_seed(belief_state: BeliefState, existing: dict) -> tuple[dic
                 rows.append(row)
                 by_id[item_id] = row
                 added[kind].append(item_id)
-            elif by_id[item_id] != row:
+                continue
+            current = by_id[item_id]
+            if kind == "evidence" and current.get("source_id") not in (None, "", row["source_id"]):
                 conflicts.append({"kind": kind, "id": item_id})
-    return merged, added, conflicts
+                continue
+            owned = owned_by_kind[kind][item_id]
+            if any(current.get(field) != value for field, value in owned.items()):
+                current.update(owned)
+                updated[kind].append(item_id)
+    return merged, added, updated, conflicts
 
 
 def affected_member_handoffs(

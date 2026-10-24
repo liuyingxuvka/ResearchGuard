@@ -64,7 +64,7 @@ def test_unknown_source_branch_is_a_bounded_gap_instead_of_runtime_error():
     request = _request(model, source_branch_bindings=[{
         "branch_id": "branch:missing",
         "source_id": "source:one",
-        "current_native_evidence_ref": "receipt:one",
+        "current_native_evidence_ref": "result:one",
         "destination_unit_id": "u1",
         "anchor_node_id": "C0",
         "claim_ids": ["C0"],
@@ -112,7 +112,7 @@ def test_parent_predecessor_graph_and_budget_fail_closed():
     assert "u1,u2" in "".join(plan.open_gaps)
 
 
-def test_source_branch_identity_anchor_and_receipt_are_independent_gates():
+def test_source_branch_identity_anchor_and_result_are_independent_gates():
     model = _model()
     request = _request(
         model,

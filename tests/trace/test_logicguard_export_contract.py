@@ -32,8 +32,6 @@ def test_export_is_versioned_complete_and_pure():
     assert first["schema"] == LOGICGUARD_HANDOFF_SCHEMA
     assert first["schema_id"] == LOGICGUARD_HANDOFF_SCHEMA
     assert first["metadata"]["source_model_fingerprint"]
-    assert "native_inference_receipt_id" not in first["metadata"]
-    assert "native_inference_receipt" not in first["metadata"]
     claim = first["claims"][0]
     assert claim["limitation"] == "Patent evidence is technology background unless linked to explicit deployment evidence."
     assert "HL-MRF" not in claim["limitation"]

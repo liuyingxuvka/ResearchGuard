@@ -5,7 +5,7 @@
 ## FlowGuard map and model maintenance
 
 1. Start each session with `python -m flowguard read` before opening source.
-2. Before adding behavior, use `python -m flowguard read --find WORDS`; extend its existing owner.
+2. Before changing behaviour or structure: `python -m flowguard target start "<goal>"`, edit the target, `python -m flowguard target check`, then `python -m flowguard target promote`; extend the existing owner (`python -m flowguard read --find WORDS`).
 3. Open only the affected component's files (`python -m flowguard read --component ID`).
 4. After editing, run `python -m flowguard change`, fix errors, and run the affected tests and models it selects.
 5. Re-read each REVIEW component, update its description if behavior changed, then `python -m flowguard map confirm ID`.

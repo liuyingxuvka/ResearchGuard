@@ -19,7 +19,7 @@ researchguard source report <model.yaml> --format markdown
 researchguard source export-traceguard <model.yaml> --output <seed.yaml>
 ```
 
-`stop-decision` considers every executable declared or generated action targeting
+`stop-decision` considers every executable declared or generated action addressing
 an open gap (including blocked and permission gaps). An affordable critical
 search continues, chosen by native utility, then declared action and id on ties;
 otherwise a critical gap stays blocked, with a missing-action or over-budget
@@ -73,7 +73,8 @@ To bring new observations downstream, use
 `researchguard source export-traceguard <source.yaml> --into <trace.yaml> --output <new-trace.yaml>`,
 then `researchguard trace export-logicguard <new-trace.yaml> --output <bundle.yaml>` and
 `researchguard logic import-handoff <bundle.yaml> --into <logic.yaml> --output <new-logic.yaml>`.
-Sync only appends missing ids and edges. Existing records and hand-built content
-stay unchanged; differing records with the same identity are listed in `conflicts`.
+Sync adds missing ids and refreshes owner-controlled copied fields in existing records.
+It reports `added`, `updated` and `conflicts`; typed links and hand-built non-owned content stay unchanged.
+Identity conflicts are reported rather than overwritten. Repeating a successful sync is idempotent.
 `--output` must differ from `--into`; no input is overwritten. Source anchors usable
 for claims or traces are exported as usable trace evidence; AI still owns links.

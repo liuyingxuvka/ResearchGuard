@@ -330,7 +330,7 @@ def validate_selection_request(
             errors.append(f"unit:{unit_id}:body_parent_not_body:{parent}")
 
     # Binding rows are strict identity assertions.  The source library and
-    # native receipt owners perform the content checks later; this layer still
+    # native result owners perform the content checks later; this layer still
     # refuses malformed or ambiguous rows.
     binding_keys: dict[tuple[str, str, str], dict[str, Any]] = {}
     for index, binding in enumerate(bindings):

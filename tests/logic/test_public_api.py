@@ -38,7 +38,6 @@ def test_structured_artifact_api_is_exported() -> None:
     assert "build_artifact_map" in exported
     assert "audit_structure" in exported
     assert "synthesize_artifact_plan" in exported
-    assert "adapt_delivery" in exported
     assert "markdown_to_model" in exported
     assert "markdown_to_model_dict" in exported
     assert "ClaimSourceParagraphMatrix" in exported
@@ -52,13 +51,6 @@ def test_model_identity_provenance_and_depth_api_is_exported() -> None:
     exported = set(researchguard.logic.__all__)
     assert {
         "SCHEMA_VERSION",
-        "ModelId",
-        "ModelRevision",
-        "NodeId",
-        "EdgeId",
-        "BlockId",
-        "QualifiedNodeRef",
         "ProvenanceRecord",
         "LogicDepthResult",
     } <= exported
-    assert "build_logic_depth_receipt" not in exported

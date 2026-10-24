@@ -1,6 +1,6 @@
 # Source model and observation fields
 
-Write the target conclusion in `leads[].question`. Set the requested strength in
+Write the the conclusion to check in `leads[].question`. Set the requested strength in
 `depth_policy.requested_claim_scope`: `bounded` or `broad`. Search utility ranks
 discovery value; it does not establish truth or license a final claim. Keep real
 retrieval material separate from the synthetic teaching rows below.
@@ -33,7 +33,7 @@ default; they are declared heuristics, not calibrated probabilities.
 | Fields | Required / optional, defaults |
 |---|---|
 | `lead_id` | Required nonempty string. |
-| `question`, `hypothesis`, `notes` | Optional strings, `""`. `question` carries the target conclusion to investigate. |
+| `question`, `hypothesis`, `notes` | Optional strings, `""`. `question` carries the the conclusion to check to investigate. |
 | `importance` | Optional score, `0.5`. |
 | `status` | Optional `LEAD_STATUSES`, `open`. |
 | `related_entities`, `related_sources`, `related_anchors`, `gaps` | Optional string lists, `[]`. Reference the relevant current row IDs. |
@@ -73,14 +73,14 @@ not independent evidence.
 `anchor_ids`, `source_ids`, `observation_ids` default to `[]`; `thresholds` defaults
 to `{}`; `target_match` and `claim_use_decision` are strings, default `""`;
 `qualified` defaults to `false`. Unlike qualification's boolean `target_match`,
-the closure-basis `target_match` describes the actual target fit.
+the closure-basis `target_match` describes the actual claim fit.
 
 A `closed` gap requires **all** of: `qualified: true`; nonempty `anchor_ids`,
 `source_ids`, and `observation_ids`; `thresholds` containing `source_reliability`,
 `extraction_confidence`, and `specificity`; and nonempty `target_match` and
 `claim_use_decision`. Threshold values are scores bounded to `[0, 1]`. Actual
 closure still depends on accessible sources, the qualification thresholds,
-content, role/modality/target fit, and claim usability where required. A locator
+content, role/modality/claim fit, and claim usability where required. A locator
 or newly observed anchor alone does not close a gap.
 
 ## Actions
@@ -147,7 +147,7 @@ in the model's `observations`. It is YAML, without an extra schema envelope.
 
 A supplied search-iteration observation requires provider status
 `OBSERVATION_SUPPLIED`; no-observation work remains `NOT_RUN` or
-`PROVIDER_UNAVAILABLE`. Prediction fields such as `baseline_fingerprint` and
+`PROVIDER_UNAVAILABLE`. Prediction fields such as `baseline_identity` and
 `expected_cost` belong to the frozen prediction, not this observation mapping.
 
 ## Depth policy

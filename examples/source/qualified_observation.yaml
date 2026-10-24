@@ -9,7 +9,7 @@ observed_sources:
     source_role: independent_report
     lineage_id: origin-independent-report-1
     access_status: public
-    notes: Example observation for the semantic-depth receipt path.
+    notes: Example observation for the semantic-depth result path.
 observed_anchors:
   - anchor_id: anchor-independent-report-1
     source_id: src-independent-report-1

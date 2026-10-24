@@ -471,7 +471,7 @@ def infer_model(
     diagnostics = tuple(problem.metadata.get("diagnostics", ()))
     gaps = tuple(problem.metadata.get("gaps", ()))
     contradictions = tuple(problem.metadata.get("contradictions", ()))
-    receipt = InferenceResult(
+    inference = InferenceResult(
         model_fingerprint=str(problem.metadata.get("model_fingerprint", "")),
         schema_id=problem.schema_id,
         policy_id=problem.policy_id,
@@ -584,5 +584,5 @@ def infer_model(
         diagnostics=diagnostics,
         gaps=gaps,
         contradictions=contradictions,
-        inference=receipt,
+        inference=inference,
     )

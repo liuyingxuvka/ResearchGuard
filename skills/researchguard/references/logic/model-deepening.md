@@ -15,11 +15,11 @@ researchguard logic <args>
 
 ## Workflow
 
-1. Identify the current model, target artifact, target reader, and expansion goal. If there is no model yet, return to the general LogicGuard route or `route:structured-artifact` to build one first.
+1. Identify the current model, the requested artifact, the intended reader, and expansion goal. If there is no model yet, return to the general LogicGuard route or `route:structured-artifact` to build one first.
 2. Validate or inspect the model when a YAML/JSON model is available. If only prose is available, map the relevant artifact boundaries first: `Document -> Section -> ArgumentBlock -> local nodes`.
-3. Build a model-card coverage view before selecting individual nodes when the artifact is non-trivial. Record target units, existing model cards, deep cards, shallow cards, skeleton cards, skipped units, and skipped reasons.
+3. Build a model-card coverage view before selecting individual nodes when the artifact is non-trivial. Record declared units, existing model cards, deep cards, shallow cards, skeleton cards, skipped units, and skipped reasons.
 4. Build a deepening queue. Rank candidate nodes by:
-   - importance to the root claim or target artifact;
+   - importance to the root claim or the requested artifact;
    - under-modeled state, especially high-importance sections or blocks that are still leaves;
    - structural contribution risk: missing parent goal, missing unit job, missing child obligation, missing downstream consumer, missing same-level progression, orphan block, or unrecovered conclusion obligation;
    - missing evidence, warrant, boundary, or rebuttal handling;
@@ -74,7 +74,7 @@ researchguard logic <args>
 13. Recommend the next route:
    - `route:source-library` for source search, intake, anchored deepening, or source-node linking;
    - `route:structured-artifact` for section, paragraph, slide, page, or block placement;
-   - `route:artifact-synthesis` when the expanded model is ready for a target story plan, outline, section plan, paragraph blueprint, or delivery guidance;
+   - `route:artifact-synthesis` when the expanded model is ready for an argument plan (`route:artifact-synthesis`);
    - `logicguard` for mixed or ambiguous follow-up modeling.
 14. For non-trivial deepening, show a compact AI-selected Mermaid diagram or table of the selected node, proposed children, structural contribution rows, gaps, and next route. A why/proof tree is often clearest for child support, a contribution graph is often clearest for downstream use, and a gap table is often clearest for missing evidence, warrant, boundary, or rebuttal work. Keep it as explanation; it is not validation evidence.
 15. After each deepening round, return the native remaining important leaves,
@@ -87,7 +87,7 @@ researchguard logic <args>
 
 Return a model-first result, not final article copy:
 
-- target and scope;
+- question and scope;
 - model-card coverage before and after the deepening round;
 - structural contribution status before and after the round: parent goal, unit job, downstream consumer, conclusion recovery, and repair action for selected high-importance units;
 - same-level progression status for selected literature, technology-summary,
@@ -123,7 +123,7 @@ integration.
 - Do not create a README-, paper-, report-, or deck-specific route. This skill is generic model deepening.
 - Do not replace `route:source-library`; source-backed gaps need preserved and modeled sources.
 - Do not replace `route:structured-artifact`; structure placement and flow still belong there.
-- Do not replace `route:artifact-synthesis`; final artifact-native story plans and prose belong there.
+- Do not replace `route:artifact-synthesis`; it supplies the argument plan; final paragraphs, genre and prose belong to LogicWriting or the active writing owner.
 - Do not replace an active upper-level writing workflow; final thesis/paper
   expression integration belongs there.
 - Do not treat raw importance as a separate standalone skill. Importance remains a cross-cutting LogicGuard property used inside this route.
@@ -142,12 +142,12 @@ Children:
   W1 warrant: separating role inputs and outputs reduces authority collapse.
   Q1 boundary: process isolation does not prove factual truth.
   R1 rebuttal: system cards are still prompts, so why trust them?
-Next route: source-library for evidence, then artifact-synthesis for final paragraph blueprint.
+Next route: source-library for evidence, then artifact-synthesis for an argument plan (`route:artifact-synthesis`).
 ```
 
 ## Native completion and stopping
 
-1. Use diagnose/importance on the current model to identify a real gap affecting the target conclusion.
+1. Use diagnose/importance on the current model to identify a real gap affecting the the conclusion to check.
 2. Extend only relevant important nodes, opposition, sources or dependencies and run the current native perturbation/depth evaluation once.
 3. For further rounds use the existing argument-iteration freeze/run route (see `task-model-maturation.md`); record actual changes and remaining gaps.
 

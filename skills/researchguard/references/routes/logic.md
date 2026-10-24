@@ -28,7 +28,7 @@ Fields and node/edge meanings: `references/logic/h-wadf-quick-reference.md`.
 Exactly one route owns the current action; never retry a failed member elsewhere.
 Missing support, warrant, assumption, boundary, opposition, perturbation or declared
 inventory coverage blocks closure. Broad wording requires its depth checks.
-No self-report replaces current target-native evidence or upgrades another member's claim.
+No self-report replaces the route's own current result or upgrades another member's claim.
 `assert`, `qualify`, `withhold` are wording licenses, not factual-truth judgments.
 
 Only `model_closed_for_task` closes the task. For `progress_stalled`, stop and obtain

@@ -40,20 +40,17 @@ def test_cli_version_smoke() -> None:
     assert f"logicguard {__version__}" in result.stdout
 
 
-def test_cli_report_outline_and_simulate_smoke(tmp_path: Path) -> None:
+def test_cli_report_and_simulate_smoke(tmp_path: Path) -> None:
     example = "examples/logic/engineering_efficiency_argument.yaml"
     report = tmp_path / "report.md"
-    outline = tmp_path / "outline.md"
     fragility = tmp_path / "fragility.json"
     combo = tmp_path / "combo.json"
     gaps = tmp_path / "gaps.json"
     assert _run("report", example, "--output", str(report)).returncode == 0
-    assert _run("outline", example, "--output", str(outline)).returncode == 0
     assert _run("simulate", example, "--root", "C0", "--mode", "fragility", "--output", str(fragility)).returncode == 0
     assert _run("simulate", example, "--root", "C0", "--mode", "combination-counterexample", "--output", str(combo)).returncode == 0
     assert _run("gaps", example, "--output", str(gaps)).returncode == 0
     assert "Executive Summary" in report.read_text(encoding="utf-8")
-    assert "Root Claim" in outline.read_text(encoding="utf-8")
     assert json.loads(fragility.read_text(encoding="utf-8"))["mode"] == "fragility"
     assert json.loads(combo.read_text(encoding="utf-8"))["mode"] == "combination-counterexample"
     assert json.loads(gaps.read_text(encoding="utf-8"))["route_summary"]
@@ -327,14 +324,12 @@ hierarchy:
         "editorial_prominence": "lead", "placement": "body", "placement_reason": "required", "required": True}],
         "source_branch_bindings": []
     }), encoding="utf-8")
-    synthesis = _run("synthesize", str(model), "--selection-request", str(selection_request), "--delivery", "--json")
+    synthesis = _run("synthesize", str(model), "--selection-request", str(selection_request), "--json")
     assert synthesis.returncode == 3
     payload = json.loads(synthesis.stdout)
-    assert payload["plan"]["units"][0]["claim_ids"] == ["C1"]
-    assert payload["delivery"]["status"] == "blocked_support_gap"
-    assert payload["delivery"]["suggestions"] == []
-    suggestions = "\n".join(item["suggested_text"] for item in payload["delivery"]["suggestions"])
-    assert "missing_handoff" not in suggestions
+    assert payload["units"][0]["claim_ids"] == ["C1"]
+    assert payload["status"] == "blocked_support_gap"
+    assert payload["open_gaps"]
 
 
 def test_cli_structure_from_markdown(tmp_path: Path) -> None:
@@ -485,8 +480,8 @@ def test_import_handoff_into_keeps_hand_built_nodes(tmp_path: Path) -> None:
     assert result.returncode == 0, result.stdout
     summary = json.loads(result.stdout)
     assert summary['added']['nodes'] == ['b']
-    assert {'kind': 'nodes', 'id': 'h'} in summary['conflicts']
-    assert any(row['kind'] == 'edges' for row in summary['conflicts'])
+    # Authored claim text and edge weight are outside the copied-field ownership.
+    assert summary['conflicts'] == []
     merged = yaml.safe_load(out.read_text())
     assert into.read_bytes() == before
     for node_id, row in existing['nodes'].items():

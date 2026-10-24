@@ -36,7 +36,7 @@ nodes:
     scope: Asia-Europe spot rates, 2021
     provenance:
     - origin_kind: external_source
-      source_reference: https://www.drewry.co.uk/
+      source_reference: https://www.drewry.co.uk/supply-chain-advisors/supply-chain-expertise/world-container-index-assessed-by-drewry
       locator: anc-wci-series
       source_id: src-drewry-wci
       quote: 'Approx. USD/FEU: Oct 2020 ~2,000; early Jan 2021 ~8,000; mid Mar 2021
@@ -78,7 +78,6 @@ nodes:
     scope: Asia-Europe spot rates, 2021
     provenance:
     - origin_kind: external_source
-      source_reference: https://www.drewry.co.uk/
       locator: anc-transpacific
       source_id: src-wci-transpacific
       quote: 'Approx. USD/FEU Shanghai-Los Angeles: Jan 2021 ~4,000; Sep 2021 ~12,000.'

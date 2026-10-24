@@ -67,11 +67,11 @@ def _model(*, with_objection: bool = False, with_competitor: bool = False):
     )
 
 
-def test_native_depth_receipt_is_model_bound_and_serializable() -> None:
-    receipt = _build_native_depth_analysis(_model(), budget=8)
-    payload = receipt.to_dict()
+def test_native_depth_result_is_model_bound_and_serializable() -> None:
+    result = _build_native_depth_analysis(_model(), budget=8)
+    payload = result.to_dict()
 
-    assert receipt.broad_claim_licensed
+    assert result.broad_claim_licensed
     assert len(payload["model_fingerprint"]) == 64
     assert payload["coverage"]["semantic_coverage_passed"] is True
     assert payload["perturbation_plan"]
@@ -160,14 +160,14 @@ def test_plain_shallow_inventory_still_has_real_role_gaps() -> None:
         },
         "edges": [{"source": "E1", "target": "C0", "type": "supports"}],
     })
-    receipt = _build_native_depth_analysis(model, budget=8)
+    result = _build_native_depth_analysis(model, budget=8)
 
-    assert receipt.coverage_universe.implicit_inventory is True
-    assert receipt.status == "blocked" and receipt.broad_claim_licensed is False
-    assert "target_unit_inventory_empty" not in receipt.unresolved_gaps
-    assert "model_card_inventory_empty" not in receipt.unresolved_gaps
+    assert result.coverage_universe.implicit_inventory is True
+    assert result.status == "blocked" and result.broad_claim_licensed is False
+    assert "target_unit_inventory_empty" not in result.unresolved_gaps
+    assert "model_card_inventory_empty" not in result.unresolved_gaps
     assert {"warrant", "assumption", "boundary", "opposition"} <= set(
-        receipt.coverage_universe.role_coverage[0].missing_roles
+        result.coverage_universe.role_coverage[0].missing_roles
     )
 
 
@@ -179,11 +179,11 @@ def test_plain_example_reaches_native_depth_pass() -> None:
     model = load_model(path)
     original = json.loads(json.dumps(model.to_dict()))
     fingerprint = model_fingerprint(model)
-    receipt = _build_native_depth_analysis(model, budget=24)
+    result = _build_native_depth_analysis(model, budget=24)
 
-    assert receipt.coverage_universe.implicit_inventory is True
-    assert receipt.status == "pass"
-    assert receipt.broad_claim_licensed is True
-    assert receipt.unresolved_gaps == ()
+    assert result.coverage_universe.implicit_inventory is True
+    assert result.status == "pass"
+    assert result.broad_claim_licensed is True
+    assert result.unresolved_gaps == ()
     assert model.to_dict() == original
     assert model_fingerprint(model) == fingerprint

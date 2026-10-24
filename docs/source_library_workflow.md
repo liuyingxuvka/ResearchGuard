@@ -49,4 +49,4 @@ gap found
 ```
 
 A gap is closed only by current modeled and linked evidence, not by a search
-suggestion or an author-side validation receipt.
+suggestion or an author-side validation result.

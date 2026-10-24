@@ -13,3 +13,5 @@ The loop may change only this task's belief state, observations, gaps, leads, an
 Gap transitions compare the actual baseline model's native open gaps with the
 candidate's. Only resolved gaps set `progressed`; introduced gaps do not. The
 prior-open ids are used only to detect stagnation, never as the baseline.
+
+Lifecycle identity, terminal reasons and acceptance use the single shared kernel; see [Current and candidate](../research-tree.md#current-and-candidate). Frozen prediction schemas are v3; older predictions require `stale_prediction: re-freeze`. Native evidence, protected-scope and holdout rules remain unchanged.

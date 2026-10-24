@@ -13,7 +13,7 @@ import json
 from flowguard import FunctionResult, Invariant, InvariantResult, Scenario, ScenarioExpectation, Workflow
 
 
-MODEL_ID = "researchguard.source.content_anchor_oracle.current"
+MODEL_ID = "sourceguard_content_anchor"
 PARENT = "sourceguard"
 DECLARED_FINDING = "sourceguard_blocked:contentless-anchor"
 RETIRED_FINDING = "no_content_qualified_anchor"
@@ -101,7 +101,7 @@ def content_anchor_identity_is_singular(
     if state.content_qualified:
         if DECLARED_FINDING in findings or state.depth_status != "pass":
             return InvariantResult.fail(
-                "Content-bearing known-good case was blocked by the content-anchor oracle.",
+                "Content-bearing known-good case was blocked by the content-anchor check.",
                 {"case_id": state.case_id},
             )
         return InvariantResult.pass_()
@@ -125,7 +125,7 @@ def content_anchor_identity_is_singular(
 def workflow() -> Workflow:
     return Workflow(
         (EvaluateContentAnchorFinding(),),
-        name="sourceguard_content_anchor_oracle_alignment",
+        name="sourceguard_content_anchor_alignment",
     )
 
 
@@ -144,7 +144,7 @@ def scenarios() -> tuple[Scenario, ...]:
     return (
         Scenario(
             name=CONTENT_GOOD.case_id,
-            description="Content-bearing anchor passes the content-anchor oracle.",
+            description="Content-bearing anchor passes the content-anchor check.",
             initial_state=AnchorDepthState(),
             external_input_sequence=(CONTENT_GOOD,),
             expected=ScenarioExpectation(expected_status="ok", summary="known-good passes"),

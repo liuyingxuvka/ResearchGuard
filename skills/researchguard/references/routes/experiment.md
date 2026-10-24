@@ -61,3 +61,5 @@ a visible, unapplied matrix-revision candidate and never close. A sibling is not
 For `iteration_limit`, report the bound; `progress_stalled`, stop with unchanged
 gaps; `external_input_required`, obtain the named observation. Otherwise continue
 the concrete next experiment, retaining gap lineage, dispositions and terminal reason.
+
+The loop uses the shared identity, terminal and gap-lineage kernel; see [Current and candidate](../research-tree.md#current-and-candidate). Native experiment, evidence and holdout rules remain unchanged.

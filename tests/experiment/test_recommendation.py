@@ -80,21 +80,21 @@ def test_real_observation_closes_only_with_independent_holdout(iteration: int) -
         iteration=iteration,
         prior_open_gap_ids=() if prior is None else prior.introduced_gap_ids,
     )
-    receipt = observe_experiments(
+    result = observe_experiments(
         spec,
         (
             _observation("e1", "up", role="construction", suffix="a"),
             _observation("e2", "hot", role="holdout", suffix="b"),
         ),
     )
-    assert receipt.terminal_reason == "model_closed_for_task"
-    assert receipt.progressed is True
-    assert receipt.resolved_gap_ids == receipt.persisted_gap_ids == receipt.introduced_gap_ids == ()
-    assert receipt.holdout_evidence_ids == ("evidence:b",)
-    assert [item.hypothesis_id for item in receipt.hypothesis_dispositions if item.status == "consistent"] == ["h1"]
+    assert result.terminal_reason == "model_closed_for_task"
+    assert result.progressed is True
+    assert result.resolved_gap_ids == result.persisted_gap_ids == result.introduced_gap_ids == ()
+    assert result.holdout_evidence_ids == ("evidence:b",)
+    assert [item.hypothesis_id for item in result.hypothesis_dispositions if item.status == "consistent"] == ["h1"]
     assert any(
         item.hypothesis_id == "h2" and item.status == "eliminated"
-        for item in receipt.hypothesis_dispositions
+        for item in result.hypothesis_dispositions
     )
 
 
@@ -105,13 +105,13 @@ def test_iteration_terminal_boundaries(iteration: int, observed: bool, terminal:
         _observation("e1", "up", role="construction", suffix="a"),
         _observation("e2", "hot", role="holdout", suffix="b"),
     ) if observed else ()
-    receipt = observe_experiments(
+    result = observe_experiments(
         _spec(iteration=iteration, prior_open_gap_ids=()),
         observations,
     )
-    assert receipt.terminal_reason == terminal
+    assert result.terminal_reason == terminal
     if not observed:
-        assert receipt.progressed is False
+        assert result.progressed is False
 
 
 @pytest.mark.parametrize("outcomes", [("cold",), ("hot", "cold"), ("cold", "hot")])
@@ -127,11 +127,11 @@ def test_every_valid_holdout_counterexample_blocks_closure(outcomes, tmp_path, c
     spec_path.write_text(json.dumps(_spec().to_dict()), encoding="utf-8")
     observations_path.write_text(json.dumps([row.to_dict() for row in observations]), encoding="utf-8")
     assert main(["observe", str(spec_path), str(observations_path)]) == 2
-    receipt = json.loads(capsys.readouterr().out)
-    assert receipt["terminal_reason"] == "external_input_required"
-    assert any(gap.startswith("holdout-conflict:") for gap in receipt["introduced_gap_ids"])
-    assert receipt["holdout_evidence_ids"] == [row.evidence_id for row in observations[1:]]
-    assert [row["hypothesis_id"] for row in receipt["hypothesis_dispositions"] if row["status"] == "consistent"] == ["h1"]
+    result = json.loads(capsys.readouterr().out)
+    assert result["terminal_reason"] == "external_input_required"
+    assert any(gap.startswith("holdout-conflict:") for gap in result["introduced_gap_ids"])
+    assert result["holdout_evidence_ids"] == [row.evidence_id for row in observations[1:]]
+    assert [row["hypothesis_id"] for row in result["hypothesis_dispositions"] if row["status"] == "consistent"] == ["h1"]
 
 
 def test_same_gap_partial_evidence_can_continue_without_claiming_historical_progress() -> None:
@@ -147,16 +147,16 @@ def test_same_gap_partial_evidence_can_continue_without_claiming_historical_prog
     observations = (_observation("e1", "up", role="construction", suffix="a"),)
     # Replaying the same declared evidence has no provable historical newness.
     for iteration in range(1, 5):
-        receipt = observe_experiments(_spec(
+        result = observe_experiments(_spec(
             **values, iteration=iteration, prior_open_gap_ids=(),
         ), observations)
-        assert receipt.terminal_reason == ("iteration_limit" if iteration == 4 else "continue_iteration")
-        assert receipt.progressed is False
-        assert receipt.introduced_gap_ids == receipt.persisted_gap_ids == receipt.resolved_gap_ids == ()
-        assert receipt.recommendation.selected_experiment_ids == ("e2",)
-        assert [(row.hypothesis_id, row.status) for row in receipt.hypothesis_dispositions] == [
+        assert result.terminal_reason == ("iteration_limit" if iteration == 4 else "continue_iteration")
+        assert result.progressed is False
+        assert result.introduced_gap_ids == result.persisted_gap_ids == result.resolved_gap_ids == ()
+        assert result.recommendation.selected_experiment_ids == ("e2",)
+        assert [(row.hypothesis_id, row.status) for row in result.hypothesis_dispositions] == [
             ("h1", "consistent"), ("h2", "consistent"), ("h3", "eliminated")]
-        prior = receipt
+        prior = result
 
 
 def test_ordinary_spec_roundtrips_through_native_cli(tmp_path, capsys) -> None:
@@ -196,10 +196,10 @@ def test_finite_experiment_count_limit_is_not_all_candidates_indistinguishable()
     assert recommendation.reason_code == "no_distinguishing_set_within_declared_limit"
     assert recommendation.selected_experiment_ids == recommendation.alternative_minimal_sets == ()
     assert recommendation.unresolved_hypothesis_pairs == ()
-    receipt = observe_experiments(limited, ())
-    assert receipt.recommendation.reason_code == recommendation.reason_code
-    assert receipt.introduced_gap_ids == ("experiment-count-limit-prevents-distinguishing-set",)
-    assert receipt.terminal_reason == "external_input_required"
+    result = observe_experiments(limited, ())
+    assert result.recommendation.reason_code == recommendation.reason_code
+    assert result.introduced_gap_ids == ("experiment-count-limit-prevents-distinguishing-set",)
+    assert result.terminal_reason == "external_input_required"
     sufficient = recommend_experiments(_spec(**values, maximum_experiment_count=2))
     assert sufficient.status == "recommended"
     assert sufficient.selected_experiment_ids == ("e1", "e2")
@@ -214,29 +214,28 @@ def test_one_survivor_closes_without_a_holdout() -> None:
     assert result.terminal_reason == "model_closed_for_task"
     assert result.holdout_evidence_ids == ()
     assert result.recommendation.alternative_minimal_sets == ()
-    assert "receipt_fingerprint" not in result.to_dict()
 
 
 def test_zero_survivors_is_model_miss_and_never_closes() -> None:
-    receipt = observe_experiments(
+    result = observe_experiments(
         _spec(),
         (_observation("e1", "unknown", role="construction", suffix="a"),),
     )
-    assert receipt.terminal_reason == "external_input_required"
-    assert receipt.revision_candidate is not None
-    assert receipt.revision_candidate.disposition == "not_applied"
-    assert "prediction-matrix-revision-required" in receipt.introduced_gap_ids
-    assert all(item.status == "model_miss" for item in receipt.hypothesis_dispositions)
+    assert result.terminal_reason == "external_input_required"
+    assert result.revision_candidate is not None
+    assert result.revision_candidate.disposition == "not_applied"
+    assert "prediction-matrix-revision-required" in result.introduced_gap_ids
+    assert all(item.status == "model_miss" for item in result.hypothesis_dispositions)
 
 
 @pytest.mark.parametrize("status", ["invalid", "not_run"])
 def test_nonvalid_observation_is_explicit_gap(status: str) -> None:
-    receipt = observe_experiments(
+    result = observe_experiments(
         _spec(),
         (_observation("e1", "", role="construction", suffix="a", status=status),),
     )
-    assert receipt.terminal_reason == "external_input_required"
-    assert f"observation-{status}:e1" in receipt.introduced_gap_ids
+    assert result.terminal_reason == "external_input_required"
+    assert f"observation-{status}:e1" in result.introduced_gap_ids
 
 
 def test_reused_evidence_id_is_rejected() -> None:

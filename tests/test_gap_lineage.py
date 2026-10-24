@@ -1,6 +1,6 @@
 import pytest
 
-from researchguard.gap_lineage import gap_lineage
+from researchguard.iteration import gap_lineage
 
 
 @pytest.mark.parametrize("before,after,expected", [

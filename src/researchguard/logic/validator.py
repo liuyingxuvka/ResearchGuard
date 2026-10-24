@@ -5,12 +5,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
-from .model import (
-    LogicModel,
-    block_interface_payload_fingerprint,
-    block_interface_receipt_fingerprint,
-    interface_model_fingerprint,
-)
+from .model import LogicModel
+from .acceptance import _as_list
 from .provenance import ProvenanceError, ProvenanceRecord, validate_evidence_provenance
 from .schema import ACCEPTANCE_KEYS, EDGE_TYPES, NODE_TYPES, STATES
 
@@ -226,85 +222,6 @@ def validate_model(model: LogicModel, *, source_library: Any = None, source_mode
     if block_cycle:
         errors.append(f"argument-block hierarchy contains a cycle: {' -> '.join(block_cycle)}")
 
-    interface_keys: set[tuple[str, str]] = set()
-    consumed_outputs: set[tuple[str, str]] = set()
-    for binding in model.block_interfaces:
-        key = (binding.parent_block_id, binding.parent_input_node_id)
-        if key in interface_keys:
-            errors.append(
-                f"parent input {binding.parent_block_id!r}/{binding.parent_input_node_id!r} has multiple producers"
-            )
-        interface_keys.add(key)
-        child = model.blocks.get(binding.child_block_id)
-        parent = model.blocks.get(binding.parent_block_id)
-        if child is None:
-            errors.append(f"block interface references unknown child {binding.child_block_id!r}")
-            continue
-        if parent is None:
-            errors.append(f"block interface references unknown parent {binding.parent_block_id!r}")
-            continue
-        if binding.child_output_claim_id not in child.output_claims:
-            errors.append(
-                f"block interface child output {binding.child_output_claim_id!r} is not owned by {child.id!r}"
-            )
-        if binding.parent_input_node_id not in parent.input_nodes:
-            errors.append(
-                f"block interface parent input {binding.parent_input_node_id!r} is not owned by {parent.id!r}"
-            )
-        if child.parent != parent.id and child.id not in parent.child_blocks:
-            errors.append(f"block interface {child.id!r}->{parent.id!r} is outside the canonical block hierarchy")
-        if binding.output_classification != binding.input_classification:
-            errors.append(
-                f"block interface classification mismatch for {binding.child_output_claim_id!r}"
-            )
-        expected_output = child.output_classifications.get(binding.child_output_claim_id)
-        expected_input = parent.input_classifications.get(binding.parent_input_node_id)
-        if expected_output and expected_output != binding.output_classification:
-            errors.append(f"block interface output classification disagrees for {binding.child_output_claim_id!r}")
-        if expected_input and expected_input != binding.input_classification:
-            errors.append(f"block interface input classification disagrees for {binding.parent_input_node_id!r}")
-        expected_payload = block_interface_payload_fingerprint(model, binding)
-        if binding.consumed_fingerprint != expected_payload:
-            errors.append(
-                f"block interface consumed fingerprint is not derived from canonical child output for {binding.child_output_claim_id!r}"
-            )
-        if binding.producer_result_fingerprint != expected_payload:
-            errors.append(
-                f"block interface producer result fingerprint disagrees for {binding.child_output_claim_id!r}"
-            )
-        if binding.producer_model_fingerprint != interface_model_fingerprint(model):
-            errors.append(
-                f"block interface producer model fingerprint is stale for {binding.child_block_id!r}"
-            )
-        if binding.producer_task_id != model.id:
-            errors.append(
-                f"block interface producer task identity disagrees for {binding.child_block_id!r}"
-            )
-        if binding.receipt_status != "current":
-            errors.append(
-                f"block interface parent receipt is not current for {binding.parent_input_node_id!r}"
-            )
-        if binding.parent_receipt_fingerprint != block_interface_receipt_fingerprint(model, binding):
-            errors.append(
-                f"block interface parent receipt fingerprint is stale for {binding.parent_input_node_id!r}"
-            )
-        consumed_outputs.add((binding.child_block_id, binding.child_output_claim_id))
-
-    if model.block_interfaces or model.metadata.get("blueprint_interfaces_required"):
-        for block in model.blocks.values():
-            for input_id in block.input_nodes:
-                if block.input_classifications.get(input_id) == "external":
-                    continue
-                if (block.id, input_id) not in interface_keys:
-                    errors.append(f"required parent input {block.id!r}/{input_id!r} has no permitted producer")
-            for output_id in block.output_claims:
-                node = model.nodes.get(output_id)
-                material = node is None or node.importance is None or node.importance >= 0.5
-                if material and (block.id, output_id) not in consumed_outputs and block.parent:
-                    disposition = str(block.metadata.get("output_dispositions", {}).get(output_id, ""))
-                    if disposition not in {"unresolved", "excluded", "terminal"}:
-                        errors.append(f"material child output {block.id!r}/{output_id!r} is unconsumed")
-
     return ValidationResult(ok=not errors, errors=errors, warnings=warnings)
 
 
@@ -358,14 +275,6 @@ def _library_anchor_problems(node_id: str, records: tuple[ProvenanceRecord, ...]
     return problems
 
 
-def _as_list(value: Any) -> list[str]:
-    if value is None:
-        return []
-    if isinstance(value, str):
-        return [value]
-    if isinstance(value, (list, tuple, set)):
-        return [str(item) for item in value]
-    return [str(value)]
 
 
 def _find_cycle(graph: dict[str, list[str]]) -> list[str]:

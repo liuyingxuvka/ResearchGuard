@@ -46,15 +46,6 @@ VALIDATION_STATUSES = {
     "insufficient",
     "unknown",
 }
-TRACE_INTERFACE_DISPOSITIONS = {"consumed", "unresolved", "excluded"}
-TRACE_INTERFACE_PAIRS = {
-    ("source", "evidence_fact"),
-    ("evidence_fact", "event"),
-    ("event", "trace"),
-    ("trace", "hypothesis"),
-    ("hypothesis", "bounded_claim"),
-    ("hypothesis", "handoff"),
-}
 
 
 class SchemaError(ValueError):
@@ -81,6 +72,8 @@ def list_of_strings(value: Any) -> list[str]:
     if not isinstance(value, list) or not all(isinstance(item, str) for item in value):
         raise SchemaError("expected a list of strings")
     return value
+
+
 
 
 def optional_sha256(value: Any, field_name: str) -> str:
@@ -113,19 +106,6 @@ def trace_model_fingerprint(model: "TraceGuardModel") -> str:
     return hashlib.sha256(body.encode("utf-8")).hexdigest()
 
 
-def trace_interface_model_fingerprint(model: "TraceGuardModel") -> str:
-    """Fingerprint the native producer model without interface receipt recursion."""
-
-    payload = asdict(model)
-    payload["interface_bindings"] = []
-    metadata = dict(payload.get("metadata", {}))
-    metadata.pop("display", None)
-    for key in list(metadata):
-        if str(key).startswith("display_") or str(key).startswith("guard_purpose"):
-            metadata.pop(key)
-    payload["metadata"] = metadata
-    body = json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
-    return "sha256:" + hashlib.sha256(body.encode("utf-8")).hexdigest()
 
 
 def declared_evidence_type_strength(metadata: Mapping[str, Any]) -> dict[str, float]:
@@ -865,145 +845,10 @@ class ExpectedSensitivity:
         )
 
 
-@dataclass(frozen=True)
-class TraceInterfaceReceiptRef:
-    receipt_id: str
-    producer_kind: str
-    producer_id: str
-    result_fingerprint: str
-    model_fingerprint: str
-    task_id: str
-    status: str
-    receipt_fingerprint: str
-
-    def __post_init__(self) -> None:
-        if not all(
-            str(value).strip()
-            for value in (
-                self.receipt_id,
-                self.producer_kind,
-                self.producer_id,
-                self.task_id,
-            )
-        ):
-            raise SchemaError("trace interface receipt requires producer, result, model, and task identities")
-        for name, value in (
-            ("result_fingerprint", self.result_fingerprint),
-            ("model_fingerprint", self.model_fingerprint),
-            ("receipt_fingerprint", self.receipt_fingerprint),
-        ):
-            if not value.startswith("sha256:") or len(value) != 71:
-                raise SchemaError(f"trace interface receipt {name} must be an exact sha256 fingerprint")
-        if self.status not in {"current", "stale", "failed", "not_run"}:
-            raise SchemaError("trace interface receipt status is not current")
-
-    @property
-    def expected_fingerprint(self) -> str:
-        payload = self.to_dict()
-        payload.pop("receipt_fingerprint", None)
-        body = json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
-        return "sha256:" + hashlib.sha256(body.encode("utf-8")).hexdigest()
-
-    @classmethod
-    def from_dict(cls, data: Mapping[str, Any]) -> "TraceInterfaceReceiptRef":
-        allowed = {
-            "receipt_id", "producer_kind", "producer_id", "result_fingerprint",
-            "model_fingerprint", "task_id", "status", "receipt_fingerprint",
-        }
-        if set(data) != allowed:
-            raise SchemaError("trace interface receipt contains unknown or missing current fields")
-        return cls(**{key: str(data.get(key, "")) for key in allowed})
-
-    def to_dict(self) -> dict[str, str]:
-        return asdict(self)
 
 
-@dataclass(frozen=True)
-class TraceInterfaceBinding:
-    binding_id: str
-    producer_kind: str
-    producer_id: str
-    consumer_kind: str
-    consumer_id: str
-    payload_schema_id: str
-    producer_object_fingerprint: str
-    consumer_object_fingerprint: str
-    receipt_refs: tuple[TraceInterfaceReceiptRef, ...] = ()
-    disposition: str = "consumed"
-
-    @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> "TraceInterfaceBinding":
-        allowed = {
-            "binding_id", "producer_kind", "producer_id", "consumer_kind", "consumer_id",
-            "payload_schema_id", "producer_object_fingerprint", "consumer_object_fingerprint",
-            "receipt_refs", "disposition",
-        }
-        unknown = sorted(set(data) - allowed)
-        if unknown:
-            raise SchemaError(f"trace_interface contains unknown current-schema fields {unknown!r}")
-        pair = (str(data.get("producer_kind", "")), str(data.get("consumer_kind", "")))
-        if pair not in TRACE_INTERFACE_PAIRS:
-            raise SchemaError(f"invalid trace interface producer/consumer pair {pair!r}")
-        disposition = str(data.get("disposition", "consumed"))
-        if disposition not in TRACE_INTERFACE_DISPOSITIONS:
-            raise SchemaError(f"invalid trace interface disposition {disposition!r}")
-        binding_id = str(data.get("binding_id", ""))
-        producer_id = str(data.get("producer_id", ""))
-        consumer_id = str(data.get("consumer_id", ""))
-        payload_schema_id = str(data.get("payload_schema_id", ""))
-        if not all((binding_id, producer_id, consumer_id, payload_schema_id)):
-            raise SchemaError("trace interface requires stable binding, endpoint, and payload identities")
-        raw_receipts = data.get("receipt_refs", [])
-        if not isinstance(raw_receipts, (list, tuple)) or any(
-            not isinstance(item, Mapping) for item in raw_receipts
-        ):
-            raise SchemaError("trace_interface.receipt_refs must be a list of current receipt objects")
-        return cls(
-            binding_id=binding_id,
-            producer_kind=pair[0],
-            producer_id=producer_id,
-            consumer_kind=pair[1],
-            consumer_id=consumer_id,
-            payload_schema_id=payload_schema_id,
-            producer_object_fingerprint=optional_sha256(
-                data.get("producer_object_fingerprint"),
-                "trace_interface.producer_object_fingerprint",
-            ),
-            consumer_object_fingerprint=optional_sha256(
-                data.get("consumer_object_fingerprint"),
-                "trace_interface.consumer_object_fingerprint",
-            ),
-            receipt_refs=tuple(
-                TraceInterfaceReceiptRef.from_dict(item)
-                for item in raw_receipts
-            ),
-            disposition=disposition,
-        )
 
 
-def trace_interface_payload_fingerprint(
-    model: "TraceGuardModel", binding: TraceInterfaceBinding
-) -> str:
-    body = json.dumps(
-        {
-            "binding_id": binding.binding_id,
-            "producer_kind": binding.producer_kind,
-            "producer_id": binding.producer_id,
-            "consumer_kind": binding.consumer_kind,
-            "consumer_id": binding.consumer_id,
-            "payload_schema_id": binding.payload_schema_id,
-            "producer_object_fingerprint": trace_interface_endpoint_fingerprint(
-                model, binding.producer_kind, binding.producer_id
-            ),
-            "consumer_object_fingerprint": trace_interface_endpoint_fingerprint(
-                model, binding.consumer_kind, binding.consumer_id
-            ),
-        },
-        sort_keys=True,
-        separators=(",", ":"),
-        ensure_ascii=False,
-    )
-    return "sha256:" + hashlib.sha256(body.encode("utf-8")).hexdigest()
 
 
 @dataclass(frozen=True)
@@ -1026,12 +871,14 @@ class TraceGuardModel:
     evidence_ablations: tuple[EvidenceAblation, ...] = ()
     scenario_perturbations: tuple[ScenarioPerturbation, ...] = ()
     expected_sensitivities: tuple[ExpectedSensitivity, ...] = ()
-    interface_bindings: tuple[TraceInterfaceBinding, ...] = ()
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "TraceGuardModel":
         if not isinstance(data, dict):
             raise SchemaError("model root must be a mapping")
+        if data.get("interface_bindings", []) != []:
+            raise SchemaError("`interface_bindings` is retired; remove it")
+        data = {key: value for key, value in data.items() if key != "interface_bindings"}
         metadata = dict(data.get("metadata", {}))
         declared_evidence_type_strength(metadata)
         if metadata.get("schema_version") != SCHEMA_ID:
@@ -1058,7 +905,6 @@ class TraceGuardModel:
             "evidence_ablations",
             "scenario_perturbations",
             "expected_sensitivities",
-            "interface_bindings",
         }
         retired = {
             "predicates",
@@ -1154,10 +1000,6 @@ class TraceGuardModel:
                 ExpectedSensitivity.from_dict(item)
                 for item in data.get("expected_sensitivities", [])
             ),
-            interface_bindings=tuple(
-                TraceInterfaceBinding.from_dict(item)
-                for item in data.get("interface_bindings", [])
-            ),
         )
 
     @staticmethod
@@ -1197,8 +1039,6 @@ class TraceGuardModel:
     def hypothesis_by_id(self) -> dict[str, StorylineHypothesis]:
         return {item.hypothesis_id: item for item in self.storyline_hypotheses}
 
-    def interface_by_id(self) -> dict[str, TraceInterfaceBinding]:
-        return {item.binding_id: item for item in self.interface_bindings}
 
     def to_dict(self) -> dict[str, Any]:
         payload = asdict(self)
@@ -1207,51 +1047,3 @@ class TraceGuardModel:
             hypothesis.pop("contradicting_evidence_ids", None)
             hypothesis.pop("alternative_to", None)
         return payload
-
-
-def trace_interface_endpoint_fingerprint(
-    model: TraceGuardModel,
-    kind: str,
-    object_id: str,
-) -> str:
-    """Return the current semantic identity consumed at one typed interface endpoint."""
-
-    native_by_kind = {
-        "source": model.source_by_id(),
-        "evidence_fact": model.evidence_by_id(),
-        "event": model.event_by_id(),
-        "trace": model.trace_by_id(),
-        "hypothesis": model.hypothesis_by_id(),
-    }
-    if kind in native_by_kind:
-        row = native_by_kind[kind].get(object_id)
-        return str(getattr(row, "object_fingerprint", "")) if row is not None else ""
-    if kind in {"bounded_claim", "handoff"}:
-        owner = next(
-            (
-                hypothesis
-                for hypothesis in model.storyline_hypotheses
-                if object_id
-                in (
-                    hypothesis.bounded_claim_ids
-                    if kind == "bounded_claim"
-                    else hypothesis.handoff_ids
-                )
-            ),
-            None,
-        )
-        if owner is None or not owner.object_fingerprint:
-            return ""
-        body = json.dumps(
-            {
-                "kind": kind,
-                "object_id": object_id,
-                "hypothesis_id": owner.hypothesis_id,
-                "hypothesis_object_fingerprint": owner.object_fingerprint,
-            },
-            sort_keys=True,
-            separators=(",", ":"),
-            ensure_ascii=False,
-        )
-        return "sha256:" + hashlib.sha256(body.encode("utf-8")).hexdigest()
-    return ""

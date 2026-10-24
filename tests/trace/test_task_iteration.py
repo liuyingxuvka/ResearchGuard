@@ -24,7 +24,6 @@ EXAMPLE = Path("examples/trace/incident_response_storyline.yaml")
 
 
 class _PassingDepth:
-    receipt_id = "traceguard-depth:passing"
     unresolved_gaps = ()
     critical_uncovered_ids = ()
     critical_ineffective_ids = ()
@@ -38,7 +37,6 @@ class _PassingDepth:
     def to_dict(self):
         return {
             "schema_version": "researchguard.trace.storyline_depth.v2",
-            "receipt_id": self.receipt_id,
             "closure_status": "PASS",
             "unresolved_gaps": [],
         }
@@ -166,6 +164,10 @@ def test_loaded_prediction_accepts_missing_optional_task_fields() -> None:
     assert loaded.coverage_ids == ()
     assert loaded.expected_direction == ""
 
+    raw["schema_version"] = "researchguard.trace.task_prediction.v2"
+    with pytest.raises(ValueError, match="stale_prediction: re-freeze"):
+        task_iteration_module.PredictionSnapshot.from_dict(raw)
+
 
 def test_observation_must_follow_prediction() -> None:
     with pytest.raises(TaskIterationError, match="must be later"):
@@ -185,7 +187,7 @@ def test_observed_ids_must_exist_in_the_model() -> None:
 
 def test_native_depth_gaps_control_local_match_terminal() -> None:
     comparison = compare_prediction_observation(_prediction(), _observation())
-    assert "native_depth_receipt" not in comparison
+    assert "native_depth_result" not in comparison
     assert (comparison["terminal_reason"] == "model_closed_for_task") is (
         not comparison["open_gap_ids"]
     )
@@ -268,7 +270,7 @@ def test_explicit_rollback_retains_baseline(tmp_path: Path, monkeypatch) -> None
         force_rollback=True,
     )
     assert revision["disposition"] == "rolled_back"
-    assert revision["effective_model_sha256"] == revision["baseline_model_sha256"]
+    assert revision["effective_model_sha256"] == revision["baseline_identity"]
 
 
 def test_cli_runs_the_loop_with_optional_task_fields(tmp_path: Path) -> None:
@@ -386,7 +388,7 @@ def test_revision_can_be_accepted_while_alternatives_stay_live(tmp_path, monkeyp
     assert revision["candidate_evaluation_ok"] and revision["disposition"] == "accepted"
     assert revision["open_gap_ids"] and revision["terminal_reason"] == "continue_iteration"
     assert revision["effective_model_sha256"] == revision["candidate_model_sha256"]
-    assert revision["effective_model_sha256"] != revision["baseline_model_sha256"]
+    assert revision["effective_model_sha256"] != revision["baseline_identity"]
     assert revision["factual_future_prediction_licensed"] is False
     assert (baseline.read_bytes(), candidate.read_bytes(), observation.to_dict()) == before
 
@@ -461,7 +463,11 @@ def test_distinct_holdout_observation_cannot_reuse_new_construction_evidence(tmp
 def test_loaded_prediction_refuses_a_changed_baseline(tmp_path) -> None:
     baseline, observation, _ = _new_record_case(tmp_path)
     prediction = _new_record_prediction(baseline)
-    baseline.write_bytes(baseline.read_bytes() + b"\n# edited after freeze\n")
+    baseline.write_bytes(baseline.read_bytes() + b"\n# formatting does not change loaded model identity\n")
+    assert task_iteration_module.PredictionSnapshot.from_dict(prediction.to_dict()).baseline_identity == prediction.baseline_identity
+    data = yaml.safe_load(baseline.read_text())
+    data["storyline_hypotheses"][0]["claim"] += " changed after freeze"
+    baseline.write_text(yaml.safe_dump(data))
     with pytest.raises(TaskIterationError, match="stale"):
         task_iteration_module.PredictionSnapshot.from_dict(prediction.to_dict())
     with pytest.raises(TaskIterationError, match="stale"):

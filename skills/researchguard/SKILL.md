@@ -5,25 +5,26 @@ description: "Use for research-quality checks: argument structure and claim supp
 
 # ResearchGuard
 
-Pick one route, then load only its file. Each route runs its own `researchguard <route>` commands.
+Pick one route and load only its file; each keeps its native commands and claim boundary.
 
-| The request | Route file |
+| Work | Route file |
 |---|---|
-| Argument structure, claim support and safe wording; a source library; structured artifacts (papers, reports, decks); deepening a model; synthesis plans; the project library viewer | `references/routes/logic.md` |
-| Plan or run evidence and source discovery: source roles, retrieval, provenance, lineage, open gaps, when to stop searching | `references/routes/source.md` |
-| Reconstruct and stress-test a timeline, an execution or effect chain, or competing causal storylines from evidence | `references/routes/trace.md` |
-| Recommend the least costly or fewest declared experiments that tell hypotheses apart (never runs them) | `references/routes/experiment.md` |
+| Arguments, safe wording, source library, artifact audits and argument plans | `references/routes/logic.md` |
+| Source discovery, provenance, gaps and search stop decisions | `references/routes/source.md` |
+| Timelines, causal storylines and competing explanations | `references/routes/trace.md` |
+| Minimum distinguishing experiments; never executes them | `references/routes/experiment.md` |
 
-One research question forms one model tree: question → competing hypotheses (shared ids
-in logic, trace and experiment) → storylines/events → evidence anchors → sources.
-Its five abilities are structure, counterexamples (argument, perturbation, elimination),
-known-bad variants that must fail (depth checks and dangling ids), real-source binding
-through anchors, and observation binding through predict–observe–revise loops.
-Read the whole tree with `researchguard status <folder>`.
+- Node: a hypothesis in `research.yaml`; a failing hypothesis shows its counterexample: the route result, copied field or anchor that disagrees.
+- Parent: the question in `research.yaml`; the source, trace, logic and experiment models are its parts, joined by shared ids.
+- Known-bad: `ablations:` in `research.yaml` (remove anchors, expect weaken or eliminate); each one must be caught, else `status` reports `ablation_not_caught`.
+- Real binding: anchors owned by the source model; trace and logic copies are checked (`copy_drift`) and refreshed by `--into` syncs.
+- Test binding: predict-observe-revise loops and experiment observations.
+- Readback: `researchguard status <folder>` (verdict first; `--json`).
+- Current vs target: the research folder is the current model; a candidate folder is the target and replaces it when accepted; `status <folder> --candidate <folder2>` shows before and after.
 
 ## Rules for every route
 
-- If `researchguard --help` fails, install the engine once with `python -m pip install -e <ResearchGuard checkout>`.
-- Several domains (`trigger:research-tree`): for one question spanning routes, put the models in one research folder with `research.yaml` (see `references/research-tree.md`) and run `researchguard status <folder>` to check and view it; route files describe handoff commands.
-- A route's result is only that route's claim; a failed result stays visible and is not retried through another route.
-- Return the native result, evidence and claim boundary, blockers and next action; include full JSON only when it is needed or requested.
+- Missing engine: `python -m pip install -e <ResearchGuard checkout>`.
+- Cross-route question (`trigger:research-tree`): load `references/research-tree.md`.
+- A failed route stays failed; another route cannot replace its result.
+- Return native findings, evidence boundary, blockers and next action. Full JSON only as needed.

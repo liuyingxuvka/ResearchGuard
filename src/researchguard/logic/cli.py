@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from researchguard._artifact_io import _load_json_object
+
 import argparse
 import json
 
@@ -11,7 +13,6 @@ from typing import Any
 
 from . import __version__
 from .diagnostics import diagnose_model
-from .delivery import adapt_delivery
 from .evaluator import evaluate_model
 from .execution_depth import _build_native_depth_analysis
 from .argument_modeling import create_argument_model
@@ -43,9 +44,6 @@ from .synthesis import synthesize_artifact_plan
 from .validator import validate_model
 from .writer import (
     claim_strength_adjustment,
-    model_to_outline,
-    model_to_section_plan,
-    paragraph_blueprint,
     review_report_generator,
 )
 
@@ -193,14 +191,7 @@ def build_parser() -> argparse.ArgumentParser:
     report.add_argument("--output")
     report.set_defaults(func=_cmd_report)
 
-    outline = sub.add_parser("outline", help="Generate a model-grounded writing outline.")
-    outline.add_argument("model")
-    outline.add_argument("--output")
-    outline.add_argument("--section-plan", action="store_true")
-    outline.add_argument("--paragraph")
-    outline.add_argument("--with-citations", action="store_true", help="Include claim-source-paragraph handoff details for paragraph output.")
-    outline.add_argument("--paper-structure", action="store_true")
-    outline.set_defaults(func=_cmd_outline)
+
 
     citation = sub.add_parser("citation", help="Build or audit claim-source-paragraph matrices.")
     citation_sub = citation.add_subparsers(required=True)
@@ -265,7 +256,6 @@ def build_parser() -> argparse.ArgumentParser:
     synthesize.add_argument("--source-id", default="", help="Optional source id to load branch candidates from.")
     synthesize.add_argument("--project", default="", help="Optional project id to filter source branch candidates.")
     synthesize.add_argument("--branch", action="append", default=[], help="Specific source branch id to include. Can be repeated.")
-    synthesize.add_argument("--delivery", action="store_true", help="Also produce delivery-profile guidance.")
     synthesize.add_argument("--json", action="store_true")
     synthesize.add_argument("--output")
     synthesize.set_defaults(func=_cmd_synthesize)
@@ -587,8 +577,8 @@ def _cmd_import_handoff(args: argparse.Namespace) -> int:
         if Path(args.into).resolve() == Path(args.output).resolve():
             raise ValueError("--output must be different from --into")
         existing = yaml.safe_load(Path(args.into).read_text(encoding="utf-8"))
-        model, added, conflicts = sync_trace_bundle(bundle, existing)
-        payload.update(added=added, conflicts=conflicts)
+        model, added, updated, conflicts = sync_trace_bundle(bundle, existing)
+        payload.update(added=added, updated=updated, conflicts=conflicts)
     else:
         model = model_dict_from_trace_bundle(bundle)
     Path(args.output).write_text(yaml.safe_dump(model, sort_keys=False, allow_unicode=True), encoding="utf-8")
@@ -630,24 +620,6 @@ def _cmd_report(args: argparse.Namespace) -> int:
     return 0
 
 
-def _cmd_outline(args: argparse.Namespace) -> int:
-    model = load_model(args.model)
-    if args.section_plan:
-        payload = model_to_section_plan(model)
-    elif args.paragraph:
-        citation_matrix = build_claim_source_paragraph_matrix(model) if args.with_citations else None
-        payload = paragraph_blueprint(model, args.paragraph, citation_matrix=citation_matrix)
-    elif args.paper_structure:
-        from .writer import paper_structure_generator
-
-        payload = paper_structure_generator(model)
-    else:
-        payload = model_to_outline(model)
-    if args.output:
-        _write(args.output, payload)
-    else:
-        print(payload)
-    return 0
 
 
 def _cmd_citation_matrix(args: argparse.Namespace) -> int:
@@ -756,14 +728,7 @@ def _cmd_synthesize(args: argparse.Namespace) -> int:
         source_branches=source_branches,
         source_library=library,
     )
-    if args.delivery:
-        guidance = adapt_delivery(plan, profile=plan.profile)
-        payload = {
-            "plan": plan.to_dict(),
-            "delivery": guidance.to_dict(),
-        } if args.json or (args.output and args.output.endswith(".json")) else plan.to_markdown() + "\n" + guidance.to_markdown()
-    else:
-        payload = plan.to_dict() if args.json or (args.output and args.output.endswith(".json")) else plan.to_markdown()
+    payload = plan.to_dict() if args.json or (args.output and args.output.endswith(".json")) else plan.to_markdown()
     if args.output:
         _write(args.output, payload)
     else:
@@ -1038,11 +1003,6 @@ def _load_i18n_payload(value: str) -> dict[str, Any]:
     return payload
 
 
-def _load_json_object(path: str | Path) -> dict[str, Any]:
-    payload = json.loads(Path(path).read_text(encoding="utf-8"))
-    if not isinstance(payload, dict):
-        raise ValueError(f"JSON artifact must contain an object: {path}")
-    return payload
 
 
 def _add_intake_args(parser: argparse.ArgumentParser) -> None:

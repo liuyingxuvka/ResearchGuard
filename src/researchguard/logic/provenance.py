@@ -102,6 +102,8 @@ class ProvenanceRecord:
     quote: str | None = None
 
     def __post_init__(self) -> None:
+        if "separation_receipt_id" in self.metadata:
+            raise ProvenanceError("`separation_receipt_id` is retired; use separation_reason")
         try:
             origin = OriginKind(self.origin_kind)
         except ValueError as exc:
@@ -157,7 +159,7 @@ class ProvenanceRecord:
     @property
     def reviewed_separation(self) -> bool:
         return bool(self.metadata.get("reviewed_separation")) and bool(
-            self.metadata.get("separation_receipt_id")
+            self.metadata.get("separation_reason")
         )
 
     def source_content_key(self) -> tuple[str, str]:
@@ -244,7 +246,7 @@ def normalize_duplicate_independence(
     """Make exact duplicate source/content records share one independence group.
 
     Explicit reviewed separation remains distinct only when it names a review
-    receipt.  No external truth or actual independence is inferred here.
+    result.  No external truth or actual independence is inferred here.
     """
 
     normalized = list(coerce_provenance(records))

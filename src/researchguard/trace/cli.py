@@ -248,7 +248,7 @@ def cmd_depth(args: argparse.Namespace) -> int:
     try:
         model = load_model(args.model)
         baseline = evaluate_model(model, include_storyline_depth=False)
-        receipt = evaluate_storyline_depth(
+        depth_result = evaluate_storyline_depth(
             model,
             baseline,
             max_perturbations=args.max_perturbations,
@@ -257,7 +257,7 @@ def cmd_depth(args: argparse.Namespace) -> int:
     except (OSError, SchemaError, ValueError, InferenceError) as exc:
         _print_json({"ok": False, "error": str(exc)}, pretty=args.pretty)
         return 2
-    payload = receipt.to_dict()
+    payload = depth_result.to_dict()
     if args.output:
         Path(args.output).write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
         summary = {key: payload.get(key) for key in (

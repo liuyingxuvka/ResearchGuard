@@ -195,6 +195,7 @@ COMPONENTS = ["researchguard-suite"]
 IMPLEMENTED_BY = {
     "PickRoute": "skills/researchguard/SKILL.md:routes",
     "RunRoute": "src/researchguard/cli.py:_member_main",
+    "Console": "src/researchguard/cli.py:main",
     "Install": "scripts/install_skill.py:main",
 }
 TESTED_BY = {
@@ -310,3 +311,12 @@ def conformance():
         replayed_steps=tuple(observations),
         summary="Four routes and the installer replayed; route table and skill folders compared as code facts.",
     )
+
+
+NOT_MODELED = {
+    "src/researchguard/logic/cli.py:main": "Argparse dispatch and explicit report IO; native argument, library and synthesis behavior is guarded by tests/logic/test_cli.py and member models.",
+    "src/researchguard/source/cli.py:main": "Argparse dispatch only; source planning, sync and stop behavior is guarded by tests/source/test_cli.py and source models.",
+    "src/researchguard/trace/cli.py:main": "Argparse dispatch only; native inference and explicit handoffs are guarded by tests/trace and research-tree replay.",
+    "src/researchguard/experiment/cli.py:main": "Argparse dispatch only; finite discrimination and observation behavior is guarded by tests/experiment.",
+    "src/researchguard/logic_viewer/launcher.py:main": "Optional desktop viewer startup has no research lifecycle; tests cover its launch and API boundary without requiring GUI display.",
+}

@@ -59,7 +59,7 @@ def test_field_sheet_names_all_requested_lists_and_current_enum_values() -> None
         schema.PERTURBATION_DIRECTIONS, schema.TIME_PRECISIONS,
         schema.ENTITY_RESOLUTION_RELATIONS, schema.LOCATION_ROLES,
         schema.VALIDATION_STATUSES, schema.CAUSAL_STATUSES,
-        schema.TRACE_INTERFACE_DISPOSITIONS, VALID_QUALITY,
+        VALID_QUALITY,
     ):
         for value in choices:
             assert f"`{value}`" in text

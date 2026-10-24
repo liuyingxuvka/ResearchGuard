@@ -16,3 +16,9 @@ models:
   experiment: experiment.json
   experiment_observations:
   - exp-obs1.json
+search: {budget: 3, scope_sufficient: false}
+ablations:
+- id: question_without_unctad
+  remove_anchors: [anc-unctad-surge]
+  hypothesis: h_demand
+  expect: weaken

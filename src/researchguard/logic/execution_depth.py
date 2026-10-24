@@ -346,7 +346,7 @@ def _explicit_card_inventory_present(model: LogicModel) -> bool:
     """Return whether the target supplied a real card/block denominator.
 
     ``root_argument`` is a useful aggregate view, but it is synthetic.  A
-    broad receipt therefore also needs at least one target-authored card or
+    broad result therefore also needs at least one target-authored card or
     native block so a rich aggregate cannot hide a shallow important unit.
     """
 
@@ -1354,7 +1354,6 @@ def _build_native_depth_analysis(
     budget: int = 6,
     requested_claim_scope_ids: Iterable[str] | None = None,
     result: EvaluationResult | None = None,
-    interface_receipt_refs: Iterable[str] = (),
 ) -> LogicDepthResult:
     # Synthesis already evaluated this model.  Reuse that result when supplied
     # instead of evaluating the same model a second time before depth analysis.
@@ -1438,21 +1437,6 @@ def _build_native_depth_analysis(
         )
         if not row.applicable_node_ids and row.status != "pass":
             gaps.append(f"claim_perturbation_set_missing:{row.claim_id}")
-    receipt_refs = tuple(sorted(set(str(item) for item in interface_receipt_refs if str(item))))
-    required_receipt_refs = {
-        item.parent_receipt_id
-        for item in model.block_interfaces
-        if item.consumer_status == "consumed"
-    }
-    supplied_receipt_refs = set(receipt_refs)
-    gaps.extend(
-        f"leaf_interface_receipt_missing:{receipt_id}"
-        for receipt_id in sorted(required_receipt_refs - supplied_receipt_refs)
-    )
-    gaps.extend(
-        f"leaf_interface_receipt_foreign:{receipt_id}"
-        for receipt_id in sorted(supplied_receipt_refs - required_receipt_refs)
-    )
     gaps = list(dict.fromkeys(gaps))
     status = "blocked" if gaps else "pass"
     broad_claim_licensed = status == "pass"
@@ -1485,7 +1469,6 @@ def _build_native_depth_analysis(
         claim_perturbation_coverage=claim_perturbations,
         requested_claim_scope="complete",
         covered_claim_scope=covered_claim_scope,
-        interface_receipt_refs=receipt_refs,
         deepest_proven_layer=("native-semantics" if gaps else "native-semantics-and-blueprint-inputs"),
         first_unresolved_gap=gaps[0] if gaps else "",
     )

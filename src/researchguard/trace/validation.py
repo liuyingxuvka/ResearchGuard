@@ -274,26 +274,3 @@ def validate_references(model: TraceGuardModel) -> None:
                 f"expected sensitivity {sensitivity.sensitivity_id} references "
                 f"missing trace {sensitivity.target_id}"
             )
-
-    interface_ids: set[str] = set()
-    object_ids_by_kind = {
-        "source": source_ids,
-        "evidence_fact": evidence_ids,
-        "event": event_ids,
-        "trace": trace_ids,
-        "hypothesis": hypothesis_ids,
-        "bounded_claim": bounded_claim_ids,
-        "handoff": handoff_ids,
-    }
-    for binding in model.interface_bindings:
-        if binding.binding_id in interface_ids:
-            raise SchemaError(f"duplicate trace interface binding {binding.binding_id}")
-        interface_ids.add(binding.binding_id)
-        if binding.producer_id not in object_ids_by_kind[binding.producer_kind]:
-            raise SchemaError(
-                f"trace interface {binding.binding_id} references missing producer {binding.producer_id}"
-            )
-        if binding.consumer_id not in object_ids_by_kind[binding.consumer_kind]:
-            raise SchemaError(
-                f"trace interface {binding.binding_id} references missing consumer {binding.consumer_id}"
-            )

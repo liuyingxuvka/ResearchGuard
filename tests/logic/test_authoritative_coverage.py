@@ -56,16 +56,14 @@ def _model(data: dict | None = None):
 
 
 def test_role_complete_current_universe_can_license_declared_broad_scope() -> None:
-    receipt = _build_native_depth_analysis(_model(), budget=8)
-
-    assert "receipt_version" not in receipt.to_dict()
-    assert receipt.status == "pass"
-    assert receipt.broad_claim_licensed is True
-    assert receipt.coverage_universe is not None
-    assert receipt.coverage_universe.owner_id == "researchguard.logic.authoritative-argument-coverage"
-    assert receipt.coverage_universe.role_coverage
-    assert receipt.coverage_universe.role_coverage[0].status == "pass"
-    assert receipt.coverage_universe.claim_scope.passed is True
+    result = _build_native_depth_analysis(_model(), budget=8)
+    assert result.status == "pass"
+    assert result.broad_claim_licensed is True
+    assert result.coverage_universe is not None
+    assert result.coverage_universe.owner_id == "researchguard.logic.authoritative-argument-coverage"
+    assert result.coverage_universe.role_coverage
+    assert result.coverage_universe.role_coverage[0].status == "pass"
+    assert result.coverage_universe.claim_scope.passed is True
 
 
 def test_root_plus_one_evidence_is_shallow_and_cannot_license_broad_scope() -> None:
@@ -80,12 +78,12 @@ def test_root_plus_one_evidence_is_shallow_and_cannot_license_broad_scope() -> N
         }
     )
 
-    receipt = _build_native_depth_analysis(model, budget=8)
+    result = _build_native_depth_analysis(model, budget=8)
 
-    assert receipt.broad_claim_licensed is False
-    assert receipt.status == "blocked"
+    assert result.broad_claim_licensed is False
+    assert result.status == "blocked"
     assert {"warrant", "assumption", "boundary", "opposition"} <= set(
-        receipt.coverage_universe.role_coverage[0].missing_roles
+        result.coverage_universe.role_coverage[0].missing_roles
     )
 
 
@@ -94,38 +92,38 @@ def test_broad_scope_requires_explicit_target_unit_and_card_denominators() -> No
     data["model"].pop("target_units")
     data["model"].pop("model_cards")
 
-    receipt = _build_native_depth_analysis(_model(data), budget=8)
+    result = _build_native_depth_analysis(_model(data), budget=8)
 
-    assert "target_unit_inventory_empty" in receipt.unresolved_gaps
-    assert "model_card_inventory_empty" in receipt.unresolved_gaps
-    assert receipt.broad_claim_licensed is False
+    assert "target_unit_inventory_empty" in result.unresolved_gaps
+    assert "model_card_inventory_empty" in result.unresolved_gaps
+    assert result.broad_claim_licensed is False
 
 
 def test_competing_conclusion_role_must_be_explicitly_covered_or_disposed() -> None:
     data = _role_complete_data()
     data["model"].pop("role_dispositions")
 
-    receipt = _build_native_depth_analysis(_model(data), budget=8)
+    result = _build_native_depth_analysis(_model(data), budget=8)
 
     root = next(
         row
-        for row in receipt.coverage_universe.role_coverage
+        for row in result.coverage_universe.role_coverage
         if row.card_id == "root_argument"
     )
     assert "competition" in root.missing_roles
-    assert "missing_role:root_argument:competition" in receipt.unresolved_gaps
-    assert receipt.broad_claim_licensed is False
+    assert "missing_role:root_argument:competition" in result.unresolved_gaps
+    assert result.broad_claim_licensed is False
 
 
 def test_disconnected_important_node_remains_in_authoritative_denominator() -> None:
     data = _role_complete_data()
     data["nodes"]["D1"] = {"type": "Warrant", "importance": 0.95}
-    receipt = _build_native_depth_analysis(_model(data), budget=10)
+    result = _build_native_depth_analysis(_model(data), budget=10)
 
-    assert "D1" in receipt.coverage_universe.important_node_ids
-    assert "D1" in receipt.coverage_universe.unresolved_disconnected_node_ids
-    assert "disconnected_important:D1" in receipt.unresolved_gaps
-    assert receipt.broad_claim_licensed is False
+    assert "D1" in result.coverage_universe.important_node_ids
+    assert "D1" in result.coverage_universe.unresolved_disconnected_node_ids
+    assert "disconnected_important:D1" in result.unresolved_gaps
+    assert result.broad_claim_licensed is False
 
 
 def test_closed_disposition_is_visible_but_unresolved_disposition_still_blocks() -> None:
@@ -141,49 +139,49 @@ def test_closed_disposition_is_visible_but_unresolved_disposition_still_blocks()
 
 
 def test_importance_policy_is_target_owned_and_has_no_caller_override() -> None:
-    receipt = _build_native_depth_analysis(_model(), budget=8)
+    result = _build_native_depth_analysis(_model(), budget=8)
 
-    policy = receipt.coverage_universe.importance_policy
+    policy = result.coverage_universe.importance_policy
     assert policy.profile == "enforced"
     assert policy.effective_threshold == 0.6
     assert policy.requested_threshold is None
     assert policy.threshold_origin == "logicguard_native_enforced"
     assert policy.passed is True
-    assert set(receipt.coverage_universe.important_node_ids) == set(_role_complete_data()["nodes"])
+    assert set(result.coverage_universe.important_node_ids) == set(_role_complete_data()["nodes"])
 
 
 def test_nominal_budget_never_drops_a_critical_candidate() -> None:
     data = _role_complete_data()
     data["nodes"]["E1"]["importance"] = 0.95
     data["nodes"]["W1"]["importance"] = 0.95
-    receipt = _build_native_depth_analysis(_model(data), budget=1)
-    selected = {item.node_id for item in receipt.perturbation_plan}
+    result = _build_native_depth_analysis(_model(data), budget=1)
+    selected = {item.node_id for item in result.perturbation_plan}
 
     assert {"E1", "W1"} <= selected
-    assert receipt.critical_perturbation_coverage["selected_count"] == 2
-    assert receipt.critical_perturbation_coverage["uncovered_ids"] == []
+    assert result.critical_perturbation_coverage["selected_count"] == 2
+    assert result.critical_perturbation_coverage["uncovered_ids"] == []
 
 
 def test_every_critical_perturbation_must_be_effective() -> None:
     data = _role_complete_data()
     data["nodes"]["R1"].update({"active": True, "importance": 0.95})
-    receipt = _build_native_depth_analysis(_model(data), budget=8)
+    result = _build_native_depth_analysis(_model(data), budget=8)
 
-    assert "R1" in receipt.critical_perturbation_coverage["ineffective_ids"]
-    assert "ineffective_critical_perturbation:R1" in receipt.unresolved_gaps
-    assert receipt.broad_claim_licensed is False
+    assert "R1" in result.critical_perturbation_coverage["ineffective_ids"]
+    assert "ineffective_critical_perturbation:R1" in result.unresolved_gaps
+    assert result.broad_claim_licensed is False
 
 
 def test_missing_requested_claim_node_blocks_scope_license() -> None:
-    receipt = _build_native_depth_analysis(
+    result = _build_native_depth_analysis(
         _model(),
         budget=8,
         requested_claim_scope_ids=["C0", "C_MISSING"],
     )
 
-    assert receipt.coverage_universe.claim_scope.missing_node_ids == ("C_MISSING",)
-    assert "claim_scope_missing:C_MISSING" in receipt.unresolved_gaps
-    assert receipt.broad_claim_licensed is False
+    assert result.coverage_universe.claim_scope.missing_node_ids == ("C_MISSING",)
+    assert "claim_scope_missing:C_MISSING" in result.unresolved_gaps
+    assert result.broad_claim_licensed is False
 
 
 def test_each_declared_important_card_needs_roles_or_closed_dispositions() -> None:
@@ -191,12 +189,12 @@ def test_each_declared_important_card_needs_roles_or_closed_dispositions() -> No
     data["model"]["model_cards"] = [
         {"card_id": "card-shallow", "node_ids": ["C0", "E1"], "importance": 0.9}
     ]
-    receipt = _build_native_depth_analysis(_model(data), budget=8)
-    card = next(row for row in receipt.coverage_universe.role_coverage if row.card_id == "card-shallow")
+    result = _build_native_depth_analysis(_model(data), budget=8)
+    card = next(row for row in result.coverage_universe.role_coverage if row.card_id == "card-shallow")
 
     assert card.status == "blocked"
     assert "warrant" in card.missing_roles
-    assert receipt.broad_claim_licensed is False
+    assert result.broad_claim_licensed is False
 
 
 def test_rich_aggregate_cannot_hide_one_shallow_critical_card() -> None:
@@ -237,22 +235,22 @@ def test_rich_aggregate_cannot_hide_one_shallow_critical_card() -> None:
         }
     )
 
-    receipt = _build_native_depth_analysis(_model(data), budget=12)
+    result = _build_native_depth_analysis(_model(data), budget=12)
     root = next(
         row
-        for row in receipt.coverage_universe.role_coverage
+        for row in result.coverage_universe.role_coverage
         if row.card_id == "root_argument"
     )
     shallow = next(
         row
-        for row in receipt.coverage_universe.role_coverage
+        for row in result.coverage_universe.role_coverage
         if row.card_id == "card:critical-subclaim"
     )
 
     assert root.status == "pass"
     assert shallow.status == "blocked"
     assert {"warrant", "boundary", "opposition"} <= set(shallow.missing_roles)
-    assert receipt.broad_claim_licensed is False
+    assert result.broad_claim_licensed is False
 
 
 def test_depth_api_has_no_caller_selectable_profile_or_threshold() -> None:
@@ -304,18 +302,18 @@ def test_low_declared_importance_cannot_remove_an_explicit_shallow_card() -> Non
         }
     )
 
-    receipt = _build_native_depth_analysis(_model(data), budget=20)
+    result = _build_native_depth_analysis(_model(data), budget=20)
     row = next(
         item
-        for item in receipt.coverage_universe.role_coverage
+        for item in result.coverage_universe.role_coverage
         if item.card_id == "card:low-self-report"
     )
 
     assert row.declared_importance == 0.1
     assert row.importance >= 0.95
     assert row.status == "blocked"
-    assert "missing_role:card:low-self-report:warrant" in receipt.unresolved_gaps
-    assert receipt.broad_claim_licensed is False
+    assert "missing_role:card:low-self-report:warrant" in result.unresolved_gaps
+    assert result.broad_claim_licensed is False
 
 
 def test_card_exclusion_requires_closed_reason_and_cannot_hide_active_nodes() -> None:
@@ -327,10 +325,10 @@ def test_card_exclusion_requires_closed_reason_and_cannot_hide_active_nodes() ->
             "excluded": True,
         }
     )
-    unresolved_receipt = _build_native_depth_analysis(_model(unresolved), budget=8)
+    unresolved_result = _build_native_depth_analysis(_model(unresolved), budget=8)
     assert (
         "model_card_exclusion_unresolved:card:excluded-unresolved"
-        in unresolved_receipt.unresolved_gaps
+        in unresolved_result.unresolved_gaps
     )
 
     active = _role_complete_data()
@@ -349,12 +347,12 @@ def test_card_exclusion_requires_closed_reason_and_cannot_hide_active_nodes() ->
             "importance": 1.0,
         },
     ]
-    active_receipt = _build_native_depth_analysis(_model(active), budget=8)
+    active_result = _build_native_depth_analysis(_model(active), budget=8)
     assert (
         "excluded_model_card_still_structurally_active:E1"
-        in active_receipt.unresolved_gaps
+        in active_result.unresolved_gaps
     )
-    assert active_receipt.broad_claim_licensed is False
+    assert active_result.broad_claim_licensed is False
 
 
 def test_closed_disconnected_card_exclusion_is_visible_and_noncontributing() -> None:
@@ -375,19 +373,19 @@ def test_closed_disconnected_card_exclusion_is_visible_and_noncontributing() -> 
         }
     )
 
-    receipt = _build_native_depth_analysis(_model(data), budget=8)
+    result = _build_native_depth_analysis(_model(data), budget=8)
     row = next(
         item
-        for item in receipt.coverage_universe.role_coverage
+        for item in result.coverage_universe.role_coverage
         if item.card_id == "card:closed-background"
     )
     assert row.status == "excluded_closed"
-    assert set(receipt.coverage_universe.excluded_model_card_ids) == {
+    assert set(result.coverage_universe.excluded_model_card_ids) == {
         "card:closed-background"
     }
-    assert receipt.coverage_universe.card_reconciliation_passed is True
-    assert "C_BG" not in receipt.coverage_universe.important_node_ids
-    assert receipt.broad_claim_licensed is True
+    assert result.coverage_universe.card_reconciliation_passed is True
+    assert "C_BG" not in result.coverage_universe.important_node_ids
+    assert result.broad_claim_licensed is True
 
 
 def test_each_important_claim_needs_its_own_connected_role_universe() -> None:
@@ -412,18 +410,18 @@ def test_each_important_claim_needs_its_own_connected_role_universe() -> None:
         }
     )
 
-    receipt = _build_native_depth_analysis(_model(data), budget=20)
+    result = _build_native_depth_analysis(_model(data), budget=20)
     child = next(
         item
-        for item in receipt.coverage_universe.claim_role_coverage
+        for item in result.coverage_universe.claim_role_coverage
         if item.claim_id == "C_CHILD"
     )
     assert child.connected_role_node_ids["support"] == ("E_CHILD",)
     assert {"warrant", "assumption", "boundary", "opposition"} <= set(
         child.missing_roles
     )
-    assert "claim_role_missing:C_CHILD:warrant" in receipt.unresolved_gaps
-    assert receipt.broad_claim_licensed is False
+    assert "claim_role_missing:C_CHILD:warrant" in result.unresolved_gaps
+    assert result.broad_claim_licensed is False
 
 
 def test_shared_role_node_requires_explicit_consumer_declaration() -> None:
@@ -489,17 +487,17 @@ def test_shared_role_node_requires_explicit_consumer_declaration() -> None:
 
 
 def test_each_important_claim_has_claim_local_perturbation_coverage() -> None:
-    receipt = _build_native_depth_analysis(_model(), budget=1)
+    result = _build_native_depth_analysis(_model(), budget=1)
     root = next(
-        item for item in receipt.claim_perturbation_coverage if item.claim_id == "C0"
+        item for item in result.claim_perturbation_coverage if item.claim_id == "C0"
     )
     assert root.applicable_node_ids
     assert root.uncovered_node_ids
     assert any(
         gap.startswith("claim_perturbation_uncovered:C0:")
-        for gap in receipt.unresolved_gaps
+        for gap in result.unresolved_gaps
     )
-    assert receipt.broad_claim_licensed is False
+    assert result.broad_claim_licensed is False
 
 
 def _plain_data() -> dict:
@@ -582,12 +580,12 @@ def test_nonempty_native_blocks_stay_on_the_explicit_inventory_path() -> None:
 def test_explicit_inventory_semantics_match_the_real_prechange_baseline() -> None:
     model = _model()
     original = deepcopy(model.to_dict())
-    receipt = _build_native_depth_analysis(model, budget=8)
-    payload = receipt.to_dict()
+    result = _build_native_depth_analysis(model, budget=8)
+    payload = result.to_dict()
     universe = payload["coverage_universe"]
     actual = {
-        "status": receipt.status,
-        "broad_claim_licensed": receipt.broad_claim_licensed,
+        "status": result.status,
+        "broad_claim_licensed": result.broad_claim_licensed,
         "model_fingerprint": payload["model_fingerprint"],
         "unresolved_gaps": payload["unresolved_gaps"],
         "target_unit_ids": universe["target_unit_ids"],
@@ -600,10 +598,11 @@ def test_explicit_inventory_semantics_match_the_real_prechange_baseline() -> Non
         "perturbation_nodes": [row["node_id"] for row in payload["perturbation_plan"]],
         "effective_perturbation_count": payload["effective_perturbation_count"],
     }
-    # Captured once from actual _role_complete_data at immutable6884ede, before RG119 core edits.
+    # Semantic values retain the pre-RG119 baseline; the fingerprint reflects retirement
+    # of the empty block-interface field from canonical serialization (RG202).
     expected = {'status': 'pass',
      'broad_claim_licensed': True,
-     'model_fingerprint': 'c52592af7432e32c2748db0a65ae95cd85dc8039fee1f23bbe34f5823b8070ab',
+     'model_fingerprint': 'da57fcffc1ef9e7005d05ecea3c4cfff6d420d304c67117946ef6cbb244df703',
      'unresolved_gaps': [],
      'target_unit_ids': ['unit:central-argument'],
      'modeled_target_unit_ids': ['unit:central-argument'],

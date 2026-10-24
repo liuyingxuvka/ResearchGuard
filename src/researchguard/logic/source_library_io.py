@@ -13,7 +13,7 @@ from typing import Any, Iterable, Mapping
 
 import yaml
 
-from .source_library import DEFAULT_MODEL_SUFFIX, LIBRARY_VERSION, ProjectBranch, SourceLibrary, SourceLibraryError, SourceRecord
+from .source_library import _file_sha256, DEFAULT_MODEL_SUFFIX, LIBRARY_VERSION, ProjectBranch, SourceLibrary, SourceLibraryError, SourceRecord
 
 
 PACKAGE_FORMAT = "researchguard.logic.source-library-package.v1"
@@ -493,12 +493,6 @@ def _zip_member_sha256(archive: zipfile.ZipFile, member: str) -> str:
     return hashlib.sha256(archive.read(_safe_member_name(member))).hexdigest()
 
 
-def _file_sha256(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
 
 
 def _json_bytes(payload: Mapping[str, Any]) -> bytes:

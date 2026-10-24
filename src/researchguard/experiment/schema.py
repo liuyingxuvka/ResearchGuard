@@ -194,11 +194,13 @@ class ExperimentIterationResult:
     progressed: bool
     affected_obligation_ids: tuple[str, ...] = ()
     first_unresolved_gap: str = ""
+    baseline_identity: str = ""
     schema_version: str = EXPERIMENT_ITERATION_SCHEMA
 
     def to_dict(self) -> dict[str, object]:
         return {
             "schema_version": self.schema_version,
+            "baseline_identity": self.baseline_identity,
             "task_id": self.task_id,
             "iteration": self.iteration,
             "recommendation": self.recommendation.to_dict(),

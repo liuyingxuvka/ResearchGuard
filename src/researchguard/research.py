@@ -2,8 +2,10 @@
 from __future__ import annotations
 
 import argparse
+import copy
 from dataclasses import dataclass, field
 import json
+import math
 from pathlib import Path
 from typing import Any
 
@@ -14,10 +16,13 @@ from .experiment.loader import _load_observations, _load_spec
 from .experiment.engine import observe_experiments, recommend_experiments
 from .logic.evaluator import evaluate_model as evaluate_logic
 from .logic.loader import load_model as load_logic
-from .logic.provenance import validate_evidence_provenance
+from .logic.provenance import content_hash_for, validate_evidence_provenance
+from .logic.minimal_sets import license_model_claim
+from .logic.source_library import SourceLibrary
 from .logic.validator import source_model_provenance_problems
 from .source.loader import load_model as load_source
 from .source.planner import plan_next_actions
+from .source.stop_decision import decide_model_search_stop
 from .source.schema import to_plain
 from .trace.evaluator import evaluate_model as evaluate_trace
 from .trace.loader import load_model as load_trace
@@ -30,6 +35,7 @@ class ResearchTree:
     models: dict[str, Any] = field(default_factory=dict)
     observations: tuple[Any, ...] = ()
     errors: list[str] = field(default_factory=list)
+    library: Any = None
 
 
 def _validate_index(data: Any) -> dict[str, Any]:
@@ -58,6 +64,27 @@ def _validate_index(data: Any) -> dict[str, Any]:
         raise ValueError("root_claim must be a nonempty id")
     if models.get("experiment_observations") and "experiment" not in models:
         raise ValueError("experiment observations require an experiment model")
+    if "library" in data and (not isinstance(data["library"], str) or not data["library"].strip()):
+        raise ValueError("library must be a nonempty path")
+    if "search" in data:
+        search = data["search"]
+        if not isinstance(search, dict) or set(search) - {"budget", "scope_sufficient"}:
+            raise ValueError("search must contain budget and optional scope_sufficient")
+        budget = search.get("budget")
+        if isinstance(budget, bool) or not isinstance(budget, (int, float)) or not math.isfinite(budget) or budget < 0:
+            raise ValueError("search.budget must be a finite nonnegative number")
+        if not isinstance(search.get("scope_sufficient", False), bool):
+            raise ValueError("search.scope_sufficient must be a boolean")
+    rows = data.get("ablations", [])
+    if not isinstance(rows, list):
+        raise ValueError("ablations must be a list")
+    for row in rows:
+        if not isinstance(row, dict) or any(not isinstance(row.get(key), str) or not row[key].strip() for key in ("id", "hypothesis")):
+            raise ValueError("each ablation needs id and hypothesis")
+        if row.get("expect") not in {"weaken", "eliminate"}:
+            raise ValueError("ablation.expect must be weaken or eliminate")
+        if not isinstance(row.get("remove_anchors"), list) or not row["remove_anchors"] or any(not isinstance(item, str) or not item for item in row["remove_anchors"]):
+            raise ValueError("ablation.remove_anchors must contain nonempty anchor ids")
     return data
 
 
@@ -67,6 +94,13 @@ def load_research(path: str | Path) -> ResearchTree:
         index_path /= "research.yaml"
     data = _validate_index(yaml.safe_load(index_path.read_text(encoding="utf-8")))
     tree = ResearchTree(index_path, data)
+    if "library" in data:
+        library_path = index_path.parent / data["library"]
+        library = SourceLibrary(library_path)
+        if library.source_index_path.is_file():
+            tree.library = library
+        else:
+            tree.errors.append(f"library_missing:{data['library']}")
     loaders = {"source": load_source, "trace": load_trace, "logic": load_logic, "experiment": _load_spec}
     for route, loader in loaders.items():
         if route not in data.get("models", {}):
@@ -93,7 +127,7 @@ def load_research(path: str | Path) -> ResearchTree:
     return tree
 
 
-def check_research_tree(index: dict[str, Any], models: dict[str, Any], observations: tuple[Any, ...] = ()) -> dict[str, list[str]]:
+def check_research_tree(index: dict[str, Any], models: dict[str, Any], observations: tuple[Any, ...] = (), *, source_library=None) -> dict[str, list[str]]:
     """Check already-loaded native models in memory; perform no file I/O or solving."""
     errors: list[str] = []
     warnings: list[str] = []
@@ -131,17 +165,146 @@ def check_research_tree(index: dict[str, Any], models: dict[str, Any], observati
             errors.extend(f"dangling_anchor:trace:{row.evidence_id}" for row in trace.evidence
                           if anchors.get(row.evidence_id) != row.source_id)
         if logic is not None:
-            errors.extend(source_model_provenance_problems(logic, to_plain(source)))
+            errors.extend(source_model_provenance_problems(logic, to_plain(source), source_library=source_library))
         for row in observations:
             if row.evidence_id not in anchors or anchors.get(row.evidence_id) != row.source_ref:
                 errors.append(f"dangling_anchor:experiment:{row.evidence_id}")
             if row.source_ref not in source_ids:
                 errors.append(f"dangling_source:experiment:{row.source_ref}")
+    from .ownership import copied_content_problems
+    errors.extend(copied_content_problems(models, content_hash_for=content_hash_for))
     return {"errors": sorted(set(errors)), "warnings": sorted(set(warnings)), "info": info}
 
 
+def route_disagreements(models, hypotheses):
+    """Compare direct shared-anchor evidence and explicit native conclusions."""
+    trace, logic = models.get("trace"), models.get("logic")
+    directions = {"trace": {}, "logic": {}}
+    def add(route, hypothesis, anchor, direction):
+        if direction in {"support", "oppose"}:
+            directions[route].setdefault((hypothesis, anchor), set()).add(direction)
+    if trace:
+        for link in trace.hypothesis_evidence_links:
+            add("trace", link.hypothesis_id, link.evidence_id, link.polarity)
+        for hypothesis in trace.storyline_hypotheses:
+            for anchor in hypothesis.evidence_ids:
+                add("trace", hypothesis.hypothesis_id, anchor, "support")
+            for anchor in hypothesis.contradicting_evidence_ids:
+                add("trace", hypothesis.hypothesis_id, anchor, "oppose")
+    if logic:
+        for edge in logic.edges:
+            node = logic.nodes.get(edge.source)
+            if node is None or node.type != "Evidence":
+                continue
+            direction = "support" if edge.type == "supports" else "oppose" if edge.type in {"attacks", "contradicts", "undercuts"} else ""
+            for provenance in validate_evidence_provenance(node.id, node.provenance):
+                add("logic", edge.target, provenance.locator, direction)
+    result = []
+    for key in sorted(directions["trace"].keys() & directions["logic"].keys()):
+        left, right = directions["trace"][key], directions["logic"][key]
+        if (left, right) in [({"support"}, {"oppose"}), ({"oppose"}, {"support"})]:
+            result.append({"hypothesis": key[0], "kind": "anchor", "detail": key[1]})
+    for row in hypotheses:
+        values, accepted, rejected = {}, [], []
+        for route, key, accept, reject in (("logic", "state", "IN", "OUT"), ("trace", "live", True, False), ("experiment", "status", None, "eliminated")):
+            payload = row.get(route)
+            if payload is None or key not in payload:
+                continue
+            value = payload[key]
+            values[route] = value
+            if accept is not None and value == accept:
+                accepted.append(route)
+            if value == reject:
+                rejected.append(route)
+        if accepted and rejected:
+            result.append({"hypothesis": row["id"], "kind": "status", "detail": ",".join(f"{key}={values[key]}" for key in sorted(values))})
+    return result
+
+
+def apply_ablations(index, models, results):
+    """Use the native evaluators on disposable, anchor-ablated route models."""
+    rows = [dict(row) for row in index.get("ablations", [])]
+    trace = models.get("trace")
+    if trace:
+        for ablation in trace.evidence_ablations:
+            if not ablation.remove_evidence_ids or ablation.remove_event_ids:
+                continue
+            for expectation in trace.expected_sensitivities:
+                if expectation.perturbation_id == ablation.ablation_id and expectation.target_kind == "hypothesis" and expectation.expected_direction == "decrease":
+                    rows.append({"id": ablation.ablation_id, "hypothesis": expectation.target_id,
+                                 "remove_anchors": list(ablation.remove_evidence_ids), "expect": "weaken",
+                                 "minimum_absolute_change": expectation.minimum_absolute_change, "native_ablation": ablation.ablation_id})
+                    break
+    errors, warnings, outcomes, seen = [], [], [], set()
+    source = models.get("source")
+    anchors = {row.anchor_id for row in source.anchors} if source else set()
+    hypothesis_ids = {row["id"] for row in index["hypotheses"]}
+    for row in rows:
+        name, hypothesis = row["id"], row["hypothesis"]
+        if name in seen:
+            errors.append(f"duplicate_ablation:{name}")
+            continue
+        seen.add(name)
+        missing = set(row["remove_anchors"]) - anchors
+        errors.extend(f"unknown_anchor:ablation:{name}:{anchor}" for anchor in sorted(missing))
+        if hypothesis not in hypothesis_ids:
+            errors.append(f"unknown_hypothesis:ablation:{name}:{hypothesis}")
+        if missing or hypothesis not in hypothesis_ids:
+            continue
+        removed, caught = set(row["remove_anchors"]), []
+        logic = models.get("logic")
+        if logic and "logic" in results:
+            candidate = copy.deepcopy(logic)
+            deleted = {node.id for node in candidate.nodes.values() if node.type == "Evidence" and any(p.locator in removed for p in validate_evidence_provenance(node.id, node.provenance))}
+            if deleted:
+                candidate.nodes = {key: node for key, node in candidate.nodes.items() if key not in deleted}
+                candidate.edges = [edge for edge in candidate.edges if edge.source not in deleted and edge.target not in deleted]
+                before = results["logic"].node_results.get(hypothesis)
+                after = evaluate_logic(candidate).node_results.get(hypothesis)
+                if before and after and ((row["expect"] == "eliminate" and after.state == "OUT") or (row["expect"] == "weaken" and (after.confidence < before.confidence or before.state == "IN" and after.state != "IN"))):
+                    caught.append("logic")
+        if trace and "trace" in results and any(item.evidence_id in removed for item in trace.evidence):
+            from dataclasses import replace
+            from .trace.schema import EvidenceAblation
+            from .trace.storyline_depth import _apply_declared_perturbation
+            ablation_id = f"research-ablation:{name}"
+            if row.get("native_ablation"):
+                candidate = _apply_declared_perturbation(trace, row["native_ablation"])
+            else:
+                candidate = replace(trace, evidence_ablations=(*trace.evidence_ablations, EvidenceAblation(ablation_id, hypothesis, None, "Research-folder anchor ablation", list(removed))))
+                candidate = _apply_declared_perturbation(candidate, ablation_id)
+            projections = lambda result: {item.hypothesis_id: item for item in result.inference.hypothesis_projections}
+            before = projections(results["trace"]).get(hypothesis)
+            after = projections(evaluate_trace(candidate)).get(hypothesis)
+            if before and after:
+                difference = before.support - after.support
+                minimum = row.get("minimum_absolute_change", 0)
+                if (row["expect"] == "eliminate" and not after.live) or (row["expect"] == "weaken" and difference > 0 and difference >= minimum):
+                    caught.append("trace")
+        outcomes.append({"id": name, "hypothesis": hypothesis, "expect": row["expect"], "caught_by": caught})
+        if not caught:
+            warnings.append(f"ablation_not_caught:{name}")
+    return outcomes, errors, warnings
+
+
+def verdict_for_writers(tree, hypotheses, disagreements, errors):
+    search = "not_run"
+    if "source" in tree.models and "search" in tree.index:
+        configuration = tree.index["search"]
+        _, decision = decide_model_search_stop(tree.models["source"], remaining_budget=configuration["budget"], evidence_sufficient_for_scope=configuration.get("scope_sufficient", False))
+        search = decision.status
+    root = None
+    if "logic" in tree.models and tree.index.get("root_claim"):
+        claim = tree.index["root_claim"]
+        if claim in tree.models["logic"].nodes:
+            license = license_model_claim(tree.models["logic"], claim)
+            root = {"id": claim, "wording_license": license.wording_license, "reason": license.reason}
+    live = [row["id"] for row in hypotheses if not ((row.get("logic") or {}).get("state") == "OUT" or (row.get("trace") or {}).get("live") is False or (row.get("experiment") or {}).get("status") == "eliminated")]
+    return {"search": search, "root_claim": root, "live_hypotheses": live, "contested": bool(disagreements), "errors": len(errors)}
+
+
 def research_status(tree: ResearchTree) -> dict[str, Any]:
-    problems = check_research_tree(tree.index, tree.models, tree.observations)
+    problems = check_research_tree(tree.index, tree.models, tree.observations, source_library=tree.library)
     problems["errors"] = sorted(set(tree.errors + problems["errors"]))
     results: dict[str, Any] = {}
     for route, model in tree.models.items():
@@ -207,7 +370,22 @@ def research_status(tree: ResearchTree) -> dict[str, Any]:
     if exp_payload:
         next_actions.append({"route": "experiment", "ids": exp_payload.get("selected_experiment_ids", exp_payload.get("next_experiment_ids", [])),
                              "status": exp_payload.get("status", exp_payload.get("terminal_reason"))})
-    return {"suite": SUITE_ID, "question": tree.index["question"], "models": {
+    disagreements = route_disagreements(tree.models, hypotheses)
+    problems["warnings"].extend(f"route_disagreement:{row['hypothesis']}:{row['kind']}:{row['detail']}" for row in disagreements)
+    try:
+        ablations, errors, warnings = apply_ablations(tree.index, tree.models, results)
+        problems["errors"].extend(errors)
+        problems["warnings"].extend(warnings)
+    except (ValueError, TypeError, KeyError, ArithmeticError) as exc:
+        ablations = []
+        problems["errors"].append(f"model_invalid:ablation: {exc}")
+    try:
+        verdict = verdict_for_writers(tree, hypotheses, disagreements, problems["errors"])
+    except (ValueError, TypeError, KeyError, ArithmeticError) as exc:
+        problems["errors"].append(f"model_invalid:verdict: {exc}")
+        verdict = {"search": "not_run", "root_claim": None, "live_hypotheses": [], "contested": bool(disagreements), "errors": len(problems["errors"])}
+    return {"suite": SUITE_ID, "question": tree.index["question"], "verdict": verdict,
+        "ablations": ablations, "disagreements": disagreements, "models": {
         key: {"path": value, "status": "ok" if key in results else "invalid"}
         for key, value in tree.index.get("models", {}).items() if key != "experiment_observations"},
         "hypotheses": hypotheses, "evidence": evidence, "open_gaps": gaps,
@@ -215,24 +393,81 @@ def research_status(tree: ResearchTree) -> dict[str, Any]:
 
 
 def render_status_markdown(status: dict[str, Any]) -> str:
-    def cell(value: Any) -> str:
-        text = value if isinstance(value, str) else json.dumps(value, ensure_ascii=False, sort_keys=True)
-        return text.replace("|", "\\|").replace("\n", " ")
-    lines = [f"# {status['question']}", "", "Models: " + " | ".join(
-        f"{key} {row['status']} ({row['path']})" for key, row in status["models"].items()),
-        "", "## Hypotheses", "", "| id | text | logic (state, confidence) | trace (support, rank, live, causal) | experiment |",
-        "|---|---|---|---|---|---|"]
+    def cell(value):
+        return str(value).replace("|", "\\|").replace("\n", " ")
+    verdict = status["verdict"]
+    root = verdict["root_claim"]
+    lines = [f"# {status['question']}", "", "## Verdict", "",
+             f"- search: {verdict['search']}",
+             "- root_claim: " + (f"{root['id']}: {root['wording_license']} — {root['reason']}" if root else "not_run"),
+             "- live_hypotheses: " + (", ".join(verdict["live_hypotheses"]) or "none"),
+             f"- contested: {str(verdict['contested']).lower()}", f"- errors: {verdict['errors']}", "",
+             "Models: " + " | ".join(f"{key} {row['status']} ({row['path']})" for key, row in status["models"].items()),
+             "", "## Hypotheses", "", "| id | text | logic | trace | experiment |", "|---|---|---|---|---|"]
     for row in status["hypotheses"]:
-        lines.append("| " + " | ".join(cell(row[key]) for key in ("id", "text", "logic", "trace", "experiment")) + " |")
+        logic, trace, experiment = row["logic"], row["trace"], row["experiment"]
+        logic_text = f"{logic['state']} {logic['confidence']:.2f}" if logic else "not listed"
+        trace_text = (f"rank {trace['rank']}, support {trace['support']:.2f}, " + ("live" if trace["live"] else "not live") + (f", causal {trace['causal_support']:.2f}" if trace.get("causal_support") is not None else "")) if trace else "not listed"
+        lines.append("| " + " | ".join(cell(item) for item in (row["id"], row["text"], logic_text, trace_text, experiment.get("status", "not_run"))) + " |")
     lines.extend(["", "## Evidence", "", "| anchor | source | lineage | used by |", "|---|---|---|---|"])
     for row in status["evidence"]:
-        lines.append("| " + " | ".join(cell(row[key]) for key in ("anchor", "source", "lineage", "used_by")) + " |")
-    for title, key in [("Open gaps", "open_gaps"), ("Next", "next")]:
-        lines.extend(["", f"## {title}", ""])
-        lines.extend("- " + cell(row) for row in status[key])
+        lines.append("| " + " | ".join(cell(item) for item in (row["anchor"], row["source"], row["lineage"], ", ".join(row["used_by"]))) + " |")
+    lines.extend(["", "## Open gaps", ""])
+    for row in status["open_gaps"]:
+        if row["route"] == "source":
+            text = f"source gap {row['id']} ({'blocking' if row['blocking'] else 'optional'}) → next: {', '.join(row['next']) or 'none'}"
+        elif row["route"] == "trace depth":
+            text = f"trace depth: {row['closure_status']}, {len(row['unresolved_gaps'])} unresolved gaps"
+        else:
+            text = f"logic: {row['root_claim']} blocked by {', '.join(row['blocked_by']) or 'none'}"
+        lines.append("- " + cell(text))
+    lines.extend(["", "## Next", ""])
+    for row in status["next"]:
+        lines.append("- " + cell(f"search {row['id']}" if row["route"] == "search" else f"experiment: {row.get('status')}; next: {', '.join(row['ids']) or 'none'}"))
+    lines.extend(["", "## Ablations", ""])
+    for row in status["ablations"]:
+        lines.append(f"- {cell(row['id'])}: {cell(row['hypothesis'])} {row['expect']}; caught by {', '.join(row['caught_by']) or 'none'}")
+    lines.extend(["", "## Disagreements", ""])
+    lines.extend(f"- {cell(row['hypothesis'])}: {row['kind']} {cell(row['detail'])}" for row in status["disagreements"])
     lines.extend(["", "## Problems", ""])
     for kind in ("errors", "warnings", "info"):
         lines.extend(f"- {kind.rstrip('s')} {cell(row)}" for row in status[kind])
+    return "\n".join(lines) + "\n"
+
+
+def compare_research_status(current, candidate):
+    changes = []
+    old = {row["id"]: row for row in current["hypotheses"]}
+    new = {row["id"]: row for row in candidate["hypotheses"]}
+    for identifier in dict.fromkeys((*old, *new)):
+        before, after = old.get(identifier), new.get(identifier)
+        projected = lambda row: {route: {key: value for key, value in (row.get(route) or {}).items() if key in {"state", "confidence", "rank", "support", "live", "status"}} for route in ("logic", "trace", "experiment")} if row else None
+        left, right = projected(before), projected(after)
+        if left != right:
+            changes.append({"kind": "hypothesis", "id": identifier, "before": left, "after": right})
+    for key in ("evidence", "errors", "warnings"):
+        left = {row["anchor"] for row in current[key]} if key == "evidence" else set(current[key])
+        right = {row["anchor"] for row in candidate[key]} if key == "evidence" else set(candidate[key])
+        for value in sorted(left - right):
+            changes.append({"kind": key, "id": value, "change": "removed"})
+        for value in sorted(right - left):
+            changes.append({"kind": key, "id": value, "change": "added"})
+    return {"current": current, "candidate": candidate, "changes": changes}
+
+
+def render_comparison(comparison):
+    def short(value):
+        if value is None:
+            return "not listed"
+        return "; ".join(f"{route}: " + ", ".join(f"{key}={item}" for key, item in data.items()) for route, data in value.items() if data)
+    lines = ["## Current and candidate", ""]
+    for row in comparison["changes"]:
+        if row["kind"] == "hypothesis":
+            lines.append(f"- {row['id']}: {short(row['before'])} → {short(row['after'])}")
+        else:
+            lines.append(f"- {row['kind']} {row['change']}: {row['id']}")
+    if not comparison["changes"]:
+        lines.append("no changes")
     return "\n".join(lines) + "\n"
 
 
@@ -240,16 +475,19 @@ def status_main(argv: list[str]) -> int:
     parser = argparse.ArgumentParser(prog="researchguard status")
     parser.add_argument("path")
     parser.add_argument("--json", action="store_true")
+    parser.add_argument("--candidate", type=Path)
     parser.add_argument("--output", type=Path)
     args = parser.parse_args(argv)
     try:
         status = research_status(load_research(args.path))
+        if args.candidate:
+            status = compare_research_status(status, research_status(load_research(args.candidate)))
     except (OSError, ValueError, TypeError, yaml.YAMLError) as exc:
         print(json.dumps({"errors": [f"research_index_invalid: {exc}"]}, ensure_ascii=False))
         return 2
-    text = json.dumps(status, ensure_ascii=False, indent=2) + "\n" if args.json else render_status_markdown(status)
+    text = json.dumps(status, ensure_ascii=False, indent=2) + "\n" if args.json else render_comparison(status) if args.candidate else render_status_markdown(status)
     if args.output:
         args.output.write_text(text, encoding="utf-8")
     else:
         print(text, end="")
-    return 1 if status["errors"] else 0
+    return 1 if (status["candidate"] if args.candidate else status)["errors"] else 0

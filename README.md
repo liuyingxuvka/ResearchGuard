@@ -56,7 +56,7 @@ incomplete; generated prose is never promoted to evidence.
   artifact synthesis and project library viewer are sub-routes of the `logic`
   route; TraceGuard's case library is a sub-route of the `trace` route.
 
-`researchguard source stop-decision` checks every executable search targeting an
+`researchguard source stop-decision` checks every executable search addressing an
 open gap. An affordable critical search continues; a critical gap without one
 stays blocked. Without blocking gaps, `--sufficient` stops even when optional
 followups remain; those followups stay visible. Only cost is compared with budget.
@@ -97,15 +97,18 @@ hypothesis into extra absolute support for another.
 Each route's task-local loop (predict, observe, revise) works on plain model
 files and keeps purpose, coverage, assumptions, unknowns, predictions, computed
 gap transitions, addressable next actions, and exact stop reasons. Trace predictions
-require an existing target and coverage, but may expect evidence or events not yet
+require an existing hypothesis or trace and coverage, but may expect evidence or events not yet
 in the baseline. An observation can append native source/evidence/event/link rows;
-comparison computes target support and its declared expected direction. Native
+comparison computes the checked hypothesis's support and its declared expected direction. Native
 depth gaps remain separate from prediction mismatches. A candidate must preserve
 those new rows; accepting a revision with remaining depth gaps continues iteration.
 A holdout claim or observation is optional; when given, it must be independent of the evidence
 used to build the model. The loop never writes the model file, so rolling back
 means restoring the previous file. SourceGuard preserves provider and
 finite-action stop boundaries.
+The routes share one current/candidate lifecycle kernel. Frozen predictions use v3
+with `baseline_identity`; older predictions require `stale_prediction: re-freeze`.
+A changed baseline must be frozen again.
 
 The source, logic and trace loops compute gap transitions from the actual
 baseline and candidate models through one shared set operation. Only resolved
@@ -117,7 +120,7 @@ transitions.
 Trace-to-logic handoffs preserve each hypothesis id, signed evidence links,
 evidence text and source provenance. Opposing evidence supports a rebuttal,
 limiting evidence supports a limitation, and neither becomes direct support for
-the target claim. Import preserves the primary hypothesis as root without
+the the claim being checked. Import preserves the primary hypothesis as root without
 inventing a warrant or relationships between hypotheses. Old trace-only bundles
 and the result-only export API remain supported.
 

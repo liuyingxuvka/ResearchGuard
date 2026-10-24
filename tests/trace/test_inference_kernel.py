@@ -550,23 +550,23 @@ def test_typed_opposition_reduces_hypothesis_support() -> None:
 
 def test_projection_explanations_are_bound_to_native_contributions() -> None:
 
-    receipt = evaluate_model(
+    result = evaluate_model(
         TraceGuardModel.from_dict(_base_payload()),
         include_storyline_depth=False,
     ).inference
-    contribution_ids = {item.factor_id for item in receipt.contributions}
-    assert receipt.solver_backend == "osqp"
-    assert receipt.solver_backend_version
-    assert receipt.solver_status in {"solved", "solved inaccurate"}
-    assert receipt.primal_residual <= DEFAULT_POLICY.maximum_primal_residual
-    assert receipt.dual_residual <= DEFAULT_POLICY.maximum_dual_residual
+    contribution_ids = {item.factor_id for item in result.contributions}
+    assert result.solver_backend == "osqp"
+    assert result.solver_backend_version
+    assert result.solver_status in {"solved", "solved inaccurate"}
+    assert result.primal_residual <= DEFAULT_POLICY.maximum_primal_residual
+    assert result.dual_residual <= DEFAULT_POLICY.maximum_dual_residual
     assert (
-        receipt.maximum_constraint_violation
+        result.maximum_constraint_violation
         <= DEFAULT_POLICY.maximum_constraint_violation
     )
     for projection in (
-        *receipt.trace_projections,
-        *receipt.hypothesis_projections,
+        *result.trace_projections,
+        *result.hypothesis_projections,
     ):
         assert set(projection.top_support_factor_ids) <= contribution_ids
         assert set(projection.top_opposition_factor_ids) <= contribution_ids
@@ -645,9 +645,8 @@ def test_unresolved_confounder_scores_zero() -> None:
 def test_evaluation_outputs_native_results_and_only_model_freshness() -> None:
     result = evaluate_model(TraceGuardModel.from_dict(_base_payload()))
     payload = result.to_dict()
-    assert 'inference' in payload and 'inference_receipt' not in payload
+    assert 'inference' in payload
     keys = set(payload['inference'])
-    assert 'receipt_id' not in keys
     assert {key for key in keys if key.endswith('fingerprint')} == {'model_fingerprint'}
     assert {'solver_status', 'primal_residual', 'dual_residual', 'iterations', 'objective',
             'hard_constraint_ids', 'contributions', 'trace_projections', 'hypothesis_projections'} <= keys

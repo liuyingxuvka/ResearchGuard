@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from importlib import import_module
+from researchguard._exports import lazy_exports
 
 _PUBLIC_API = {
     'researchguard.logic.diagnostics': (
@@ -14,11 +14,6 @@ _PUBLIC_API = {
         'SetOracle',
         'WordingLicense',
         'license_conclusion',
-    ),
-    'researchguard.logic.delivery': (
-        'DeliveryGuidance',
-        'DeliverySuggestion',
-        'adapt_delivery',
     ),
     'researchguard.logic.evaluator': (
         'evaluate_model',
@@ -48,21 +43,6 @@ _PUBLIC_API = {
         'GapLedger',
         'build_gap_ledger',
     ),
-    'researchguard.logic.identity': (
-        'BlockId',
-        'EdgeId',
-        'EvaluationId',
-        'IdentityError',
-        'ModelId',
-        'ModelRevision',
-        'NodeId',
-        'QualifiedModelRef',
-        'QualifiedNodeRef',
-        'ReceiptId',
-        'TransactionId',
-        'decode_path_segment',
-        'encode_path_segment',
-    ),
     'researchguard.logic.importance': (
         'ImportanceRecord',
         'ImportanceSummary',
@@ -85,11 +65,6 @@ _PUBLIC_API = {
     ),
     'researchguard.logic.model': (
         'ArgumentBlock',
-        'BlockInterfaceBinding',
-        'block_interface_payload_fingerprint',
-        'block_interface_receipt_payload',
-        'block_interface_receipt_fingerprint',
-        'interface_model_fingerprint',
         'ArgumentCoverageUniverse',
         'ClaimPerturbationCoverage',
         'ClaimRoleCoverage',
@@ -208,9 +183,6 @@ _PUBLIC_API = {
     ),
     'researchguard.logic.writer': (
         'claim_strength_adjustment',
-        'model_to_outline',
-        'model_to_section_plan',
-        'paragraph_blueprint',
         'review_report_generator',
     ),
     'researchguard': (
@@ -218,7 +190,6 @@ _PUBLIC_API = {
     ),
 }
 
-_LAZY_EXPORTS = {name: module for module, names in _PUBLIC_API.items() for name in names}
 
 __all__ = [
     'ArgumentBlock',
@@ -237,8 +208,6 @@ __all__ = [
     'DepthCoverageSummary',
     'DiagnosticFinding',
     'DiagnosticReport',
-    'DeliveryGuidance',
-    'DeliverySuggestion',
     'Edge',
     'EvaluationResult',
     'ImportancePolicy',
@@ -297,7 +266,6 @@ __all__ = [
     'SelectionRequest',
     'SYNTHESIS_REQUEST_SCHEMA',
     'validate_selection_request',
-    'adapt_delivery',
     'apply_default_perturbation',
     'audit_structure',
     'audit_claim_source_paragraph_matrix',
@@ -321,10 +289,7 @@ __all__ = [
     'load_model_from_dict',
     'markdown_to_model',
     'markdown_to_model_dict',
-    'model_to_outline',
     'model_fingerprint',
-    'model_to_section_plan',
-    'paragraph_blueprint',
     'observe_argument_prediction',
     'revalidate_protected_claims',
     'review_report_generator',
@@ -347,42 +312,16 @@ __all__ = [
     'validate_prediction_binding',
     'validate_evidence_provenance',
     '__version__',
-    'BlockId',
     'EVIDENTIARY_ORIGINS',
-    'EdgeId',
-    'EvaluationId',
-    'IdentityError',
-    'ModelId',
-    'ModelRevision',
-    'NodeId',
     'OriginKind',
     'ProvenanceError',
     'ProvenanceRecord',
-    'QualifiedNodeRef',
-    'ReceiptId',
-    'TransactionId',
     'coerce_provenance',
     'content_hash_for',
-    'decode_path_segment',
     'default_independence_group',
-    'encode_path_segment',
     'normalize_content_hash',
     'normalize_duplicate_independence',
-    'BlockInterfaceBinding',
-    'QualifiedModelRef',
 ]
 
 
-def __getattr__(name: str):
-    try:
-        module_name = _LAZY_EXPORTS[name]
-    except KeyError:
-        raise AttributeError(f"module {__name__!r} has no attribute {name!r}") from None
-    attribute = name
-    value = getattr(import_module(module_name), attribute)
-    globals()[name] = value
-    return value
-
-
-def __dir__():
-    return sorted(set(globals()) | set(_LAZY_EXPORTS))
+__getattr__, __dir__ = lazy_exports(_PUBLIC_API, globals())

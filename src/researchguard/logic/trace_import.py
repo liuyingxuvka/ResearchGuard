@@ -6,6 +6,7 @@ from copy import deepcopy
 from typing import Any, Mapping
 
 from .provenance import content_hash_for
+from researchguard.ownership import handoff_logic_owned, refresh_logic_provenance
 
 
 TRACE_HANDOFF_SCHEMA = "researchguard.trace.logic-handoff.v1"
@@ -91,8 +92,9 @@ def _model_dict_from_hypotheses(bundle: Mapping[str, Any]) -> dict[str, Any]:
             for evidence_id in sides[key]:
                 item = evidence_by_id[evidence_id]
                 nodes.setdefault(evidence_id, {"type": "Evidence", "text": item["text"], "provenance": [{
-                    "origin_kind": "external_source", "source_id": item["source_id"], "locator": evidence_id,
-                    "content_hash": content_hash_for(item["text"]), "metadata": {"locator_text": item["locator"]},
+                    "origin_kind": "external_source",
+                    **handoff_logic_owned(item, content_hash_for=content_hash_for),
+                    "metadata": {"locator_text": item["locator"]},
                 }]})
                 target = hypothesis_id
                 if kind != "support":
@@ -106,33 +108,120 @@ def _model_dict_from_hypotheses(bundle: Mapping[str, Any]) -> dict[str, Any]:
             "nodes": nodes, "edges": edges}
 
 
-def sync_trace_bundle(bundle: Mapping[str, Any], existing: dict[str, Any]) -> tuple[dict, dict, list]:
-    """Add nodes and edge identities from a handoff without editing existing work."""
+def sync_trace_bundle(bundle: Mapping[str, Any], existing: dict[str, Any]) -> tuple[dict, dict, dict, list]:
+    """Refresh owned Evidence provenance while retaining authored nodes and links."""
     if not isinstance(existing, dict) or not isinstance(existing.get("nodes"), dict):
         raise ValueError("--into logic model must contain a nodes mapping")
     merged = deepcopy(existing)
     incoming = model_dict_from_trace_bundle(bundle)
     added: dict[str, list] = {"nodes": [], "edges": []}
+    updated: dict[str, list] = {"nodes": [], "edges": []}
     conflicts = []
     nodes = merged["nodes"]
+    remapped, blocked = {}, set()
+
+    def provenance(row):
+        records = row.get("provenance", [])
+        if not isinstance(records, list) or any(not isinstance(record, dict) for record in records):
+            raise ValueError("--into Evidence provenance must be a list of mappings")
+        return records
+
     for node_id, row in incoming["nodes"].items():
-        if node_id not in nodes:
-            nodes[node_id] = row
-            added["nodes"].append(node_id)
-        elif nodes[node_id] != row:
-            conflicts.append({"kind": "nodes", "id": node_id})
+        if node_id in nodes and not isinstance(nodes[node_id], dict):
+            raise ValueError("--into nodes must contain record mappings")
+        if row.get("type") != "Evidence":
+            if node_id not in nodes:
+                nodes[node_id] = row
+                added["nodes"].append(node_id)
+            elif nodes[node_id].get("type") != row.get("type"):
+                conflicts.append({"kind": "nodes", "id": node_id})
+                blocked.add(node_id)
+            continue
+        incoming_provenance = row.get("provenance", [])
+        if not incoming_provenance:
+            # Legacy claim-only bundles carry no owned source payload to refresh.
+            if node_id not in nodes:
+                nodes[node_id] = row
+                added["nodes"].append(node_id)
+            elif nodes[node_id].get("type") != "Evidence":
+                conflicts.append({"kind": "nodes", "id": node_id})
+                blocked.add(node_id)
+            continue
+        owned, = incoming_provenance
+        identity = (owned.get("source_id"), owned.get("locator"))
+        target = node_id
+        if node_id in nodes:
+            if nodes[node_id].get("type") != "Evidence":
+                conflicts.append({"kind": "nodes", "id": node_id})
+                blocked.add(node_id)
+                continue
+            records = provenance(nodes[node_id])
+            source_ids = {record.get("source_id") for record in records if record.get("source_id")}
+            if source_ids and identity[0] not in source_ids:
+                conflicts.append({"kind": "nodes", "id": node_id})
+                blocked.add(node_id)
+                continue
+        else:
+            matches = []
+            wrong_sources = []
+            for candidate, current in nodes.items():
+                if not isinstance(current, dict) or current.get("type") != "Evidence":
+                    continue
+                for record in provenance(current):
+                    pair = (record.get("source_id"), record.get("locator"))
+                    if pair == identity:
+                        if candidate not in matches:
+                            matches.append(candidate)
+                    elif pair[1] == identity[1] and pair[0] not in (None, "", identity[0]):
+                        if candidate not in wrong_sources:
+                            wrong_sources.append(candidate)
+            if len(matches) > 1:
+                raise ValueError(f"ambiguous existing Evidence provenance for {node_id}: {', '.join(matches)}")
+            if matches:
+                target = matches[0]
+            elif wrong_sources:
+                conflicts.extend({"kind": "nodes", "id": candidate} for candidate in wrong_sources)
+                blocked.add(node_id)
+                continue
+            else:
+                nodes[node_id] = row
+                added["nodes"].append(node_id)
+                continue
+        remapped[node_id] = target
+        current = nodes[target]
+        records = provenance(current)
+        matches = [record for record in records if (record.get("source_id"), record.get("locator")) == identity]
+        if not matches:
+            matches = [record for record in records
+                       if record.get("source_id") in (None, "", identity[0])
+                       and record.get("locator") in (None, "", identity[1])]
+            if len(matches) > 1:
+                raise ValueError(f"ambiguous existing Evidence provenance for {node_id}")
+        changed = False
+        if matches:
+            for record in matches:
+                changed = refresh_logic_provenance(record, owned) or changed
+        else:
+            records.append(deepcopy(owned))
+            current["provenance"] = records
+            changed = True
+        if changed and target not in updated["nodes"]:
+            updated["nodes"].append(target)
     edges = merged.setdefault("edges", [])
     if not isinstance(edges, list):
         raise ValueError("--into edges must be a list")
     def key(row):
         return (row["source"], row["target"], row["type"])
     by_key = {key(row): row for row in edges}
-    for row in incoming["edges"]:
+    for original in incoming["edges"]:
+        if original["source"] in blocked or original["target"] in blocked:
+            continue
+        row = {**original, "source": remapped.get(original["source"], original["source"]),
+               "target": remapped.get(original["target"], original["target"])}
         identity = key(row)
         if identity not in by_key:
             edges.append(row)
             by_key[identity] = row
             added["edges"].append(list(identity))
-        elif by_key[identity] != row:
-            conflicts.append({"kind": "edges", "id": list(identity)})
-    return merged, added, conflicts
+        # Existing edge metadata and authored relations are never copy fields.
+    return merged, added, updated, conflicts

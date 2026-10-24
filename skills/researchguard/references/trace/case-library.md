@@ -118,7 +118,7 @@ missing evidence
 latest canonical result id and projection locator
 safe wording draft, clearly marked non-authoritative until projection
 unsafe wording risk when overclaim risk is material
-target artifact locator such as paragraph, section, page, slide, or report slot when known
+artifact locator such as paragraph, section, page, slide, or report slot when known
 source structure unit, destination structure unit, relation to previous, and
 trace layer when the lead is a thesis section handoff
 next search task

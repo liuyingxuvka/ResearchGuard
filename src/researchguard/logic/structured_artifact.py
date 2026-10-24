@@ -55,7 +55,6 @@ class ArtifactMap:
     parse_gap_unit_ids: tuple[str, ...] = ()
     realization_binding_ids: tuple[str, ...] = ()
     unrealized_argument_block_ids: tuple[str, ...] = ()
-    missing_interface_receipt_ids: tuple[str, ...] = ()
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -67,7 +66,6 @@ class ArtifactMap:
             "parse_gap_unit_ids": list(self.parse_gap_unit_ids),
             "realization_binding_ids": list(self.realization_binding_ids),
             "unrealized_argument_block_ids": list(self.unrealized_argument_block_ids),
-            "missing_interface_receipt_ids": list(self.missing_interface_receipt_ids),
         }
 
 
@@ -96,30 +94,6 @@ def build_artifact_map(
         else ()
     )
     parse_gaps = tuple(sorted(item.unit_id for item in inventory.units if item.parse_disposition == "unparsed")) if inventory else ()
-    receipt_resource_ids = (
-        {
-            resource.resource_id
-            for unit in inventory.units
-            for resource in unit.resources
-            if resource.role == "receipt"
-            and resource.required
-            and resource.disposition == "bound"
-        }
-        if inventory
-        else set()
-    )
-    required_receipt_ids = {
-        item.parent_receipt_id
-        for item in model.block_interfaces
-        if item.consumer_status == "consumed"
-    }
-    provided_receipt_ids = {
-        str(resource_id)
-        for item in bindings
-        for resource_id in getattr(item, "resource_ids", ())
-        if str(resource_id) in receipt_resource_ids
-        and str(resource_id) in required_receipt_ids
-    }
     return ArtifactMap(
         model.id,
         artifact_kind,
@@ -134,7 +108,6 @@ def build_artifact_map(
             )
         ),
         tuple(sorted(set(model.blocks) - bound_block_ids)) if inventory else (),
-        tuple(sorted(required_receipt_ids - provided_receipt_ids)),
     )
 
 

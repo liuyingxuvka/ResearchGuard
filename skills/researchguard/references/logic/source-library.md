@@ -79,7 +79,7 @@ to the active writing/document owner. No separate closure ledger is required.
 
 - Return to the general LogicGuard route for mixed or ambiguous LogicGuard requests.
 - Use `route:structured-artifact` when the main task is section, slide, page, or paragraph structure review.
-- Use `route:artifact-synthesis` when the main task is building a new target story plan from existing material.
+- Use `route:artifact-synthesis` when the main task is building a new argument plan from existing material.
 - When an upper-level writing workflow is active, return source-reuse and
   source-role findings to that workflow for final prose integration.
 - Importance is cross-cutting. Use it inside the source-library workflow; do not route to a separate importance skill.

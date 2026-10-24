@@ -675,7 +675,7 @@ def apply_observation_and_replan(
         and coverage_universe.covered_claim_scope == "broad"
     )
     status = "pass" if broad_claim_licensed else ("bounded" if observation_depth else "planning_only")
-    receipt = SourceDepthResult(
+    depth_result = SourceDepthResult(
         model_fingerprint=model_fingerprint(baseline),
         provider_status=normalized_provider,
         observation_status=observation_status,
@@ -712,7 +712,7 @@ def apply_observation_and_replan(
             }
         ),
     )
-    return updated, receipt
+    return updated, depth_result
 
 
 def build_source_depth(

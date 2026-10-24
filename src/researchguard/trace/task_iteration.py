@@ -9,14 +9,13 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass, replace
 from datetime import datetime
-import hashlib
 import json
 from pathlib import Path
 from typing import Any, Iterable, Mapping
 
 import yaml
 
-from ..gap_lineage import gap_lineage
+from ..iteration import baseline_identity, source_identity, require_prediction_identity, select_terminal, validate_candidate, gap_lineage
 
 from .evaluator import evaluate_model
 from .storyline_depth import evaluate_storyline_depth
@@ -26,7 +25,7 @@ from .schema import SourceRecord, EvidenceItem, EventCandidate, HypothesisEviden
 from .validation import validate_references
 
 
-PREDICTION_SCHEMA = "researchguard.trace.task_prediction.v2"
+PREDICTION_SCHEMA = "researchguard.trace.task_prediction.v3"
 OBSERVATION_SCHEMA = "researchguard.trace.evidence_batch_observation.v2"
 COMPARISON_SCHEMA = "researchguard.trace.prediction_observation_comparison.v2"
 REVISION_SCHEMA = "researchguard.trace.candidate_storyline_revision.v2"
@@ -46,11 +45,11 @@ class TaskIterationError(ValueError):
     """Raised when task-local lifecycle evidence is missing or stale."""
 
 
-def _sha256_file(path: str | Path) -> str:
+def _model_identity(path: str | Path) -> str:
     resolved = Path(path).resolve()
     if not resolved.is_file():
         raise TaskIterationError(f"required file does not exist: {resolved}")
-    return hashlib.sha256(resolved.read_bytes()).hexdigest()
+    return baseline_identity(load_model(resolved).to_dict())
 
 
 def _parse_timestamp(value: str, field: str) -> datetime:
@@ -107,7 +106,7 @@ class PredictionSnapshot:
     schema_version: str
     prediction_id: str
     baseline_model_path: str
-    baseline_model_sha256: str
+    baseline_identity: str
     frozen_at: str
     target_kind: str
     target_id: str
@@ -133,7 +132,7 @@ class PredictionSnapshot:
     @classmethod
     def from_dict(cls, data: Mapping[str, Any]) -> "PredictionSnapshot":
         if data.get("schema_version") != PREDICTION_SCHEMA:
-            raise TaskIterationError(f"schema_version must equal {PREDICTION_SCHEMA}")
+            raise TaskIterationError("stale_prediction: re-freeze")
         target_kind = str(data.get("target_kind", ""))
         prediction_kind = str(data.get("prediction_kind", ""))
         expected_direction = str(data.get("expected_direction", ""))
@@ -168,7 +167,7 @@ class PredictionSnapshot:
             "schema_version": PREDICTION_SCHEMA,
             "prediction_id": str(data.get("prediction_id", "")),
             "baseline_model_path": str(data.get("baseline_model_path", "")),
-            "baseline_model_sha256": str(data.get("baseline_model_sha256", "")),
+            "baseline_identity": str(data.get("baseline_identity", "")),
             "frozen_at": str(data.get("frozen_at", "")),
             "target_kind": target_kind,
             "target_id": str(data.get("target_id", "")),
@@ -191,9 +190,9 @@ class PredictionSnapshot:
         if not payload["prediction_id"] or not payload["target_id"]:
             raise TaskIterationError("prediction_id and target_id are required")
         _parse_timestamp(payload["frozen_at"], "frozen_at")
-        observed_model_hash = _sha256_file(payload["baseline_model_path"])
-        if observed_model_hash != payload["baseline_model_sha256"]:
-            raise TaskIterationError("baseline model fingerprint is stale")
+        observed_model_hash = _model_identity(payload["baseline_model_path"])
+        if observed_model_hash != payload["baseline_identity"]:
+            raise TaskIterationError("stale_prediction: re-freeze")
         return cls(**payload)
 
 
@@ -375,7 +374,7 @@ def freeze_prediction(
         "schema_version": PREDICTION_SCHEMA,
         "prediction_id": prediction_id,
         "baseline_model_path": str(resolved),
-        "baseline_model_sha256": _sha256_file(resolved),
+        "baseline_identity": _model_identity(resolved),
         "frozen_at": frozen_at,
         "target_kind": target_kind,
         "target_id": target_id,
@@ -426,8 +425,8 @@ def compare_prediction_observation(
     """Compare a frozen prediction with a later, append-only native observation."""
     if _parse_timestamp(observation.observed_at, "observed_at") <= _parse_timestamp(prediction.frozen_at, "frozen_at"):
         raise TaskIterationError("observation must be later than the frozen prediction")
-    if _sha256_file(prediction.baseline_model_path) != prediction.baseline_model_sha256:
-        raise TaskIterationError("baseline model fingerprint is stale")
+    if _model_identity(prediction.baseline_model_path) != prediction.baseline_identity:
+        raise TaskIterationError("stale_prediction: re-freeze")
     model = load_model(prediction.baseline_model_path)
     observed_model = _observed_model(model, observation)
     _require_observed_ids(observed_model, observation, "observed")
@@ -465,23 +464,17 @@ def compare_prediction_observation(
     if prediction.expected_direction and direction != prediction.expected_direction:
         add("direction_mismatch", f"expected {prediction.expected_direction}, observed {direction}")
     open_gap_ids = tuple(dict.fromkeys((*depth_gap_ids, *(row.mismatch_id for row in mismatches))))
-    if observation.external_input_ids:
-        terminal_reason = "external_input_required"
-    elif not open_gap_ids:
-        terminal_reason = "model_closed_for_task"
-    elif prediction.iteration >= prediction.max_iterations:
-        terminal_reason = "iteration_limit"
-    elif set(open_gap_ids) == set(prediction.prior_open_gap_ids) and prediction.iteration > 0:
-        terminal_reason = "progress_stalled"
-    else:
-        terminal_reason = "continue_iteration"
+    terminal_reason = select_terminal(closed=not open_gap_ids and not observation.external_input_ids,
+        iteration=prediction.iteration, max_iterations=prediction.max_iterations,
+        stalled=set(open_gap_ids) == set(prediction.prior_open_gap_ids) and prediction.iteration > 0,
+        external=bool(observation.external_input_ids))
     transitions = gap_lineage(baseline_gap_ids, depth_gap_ids)
     return {
         "schema_version": COMPARISON_SCHEMA,
         "prediction_id": prediction.prediction_id,
         "observation_id": observation.observation_id,
         "baseline_model_path": prediction.baseline_model_path,
-        "baseline_model_sha256": prediction.baseline_model_sha256,
+        "baseline_identity": prediction.baseline_identity,
         "mismatches": [item.to_dict() for item in mismatches],
         "expected_direction": prediction.expected_direction,
         "observed_direction": direction,
@@ -514,10 +507,10 @@ def compare_prediction_observation(
 def _validate_comparison(data: Mapping[str, Any]) -> dict[str, Any]:
     if data.get("schema_version") != COMPARISON_SCHEMA:
         raise TaskIterationError(f"schema_version must equal {COMPARISON_SCHEMA}")
-    if _sha256_file(str(data.get("baseline_model_path", ""))) != str(
-        data.get("baseline_model_sha256", "")
+    if _model_identity(str(data.get("baseline_model_path", ""))) != str(
+        data.get("baseline_identity", "")
     ):
-        raise TaskIterationError("comparison baseline model is stale")
+        raise TaskIterationError("stale_prediction: re-freeze")
     return dict(data)
 
 
@@ -556,12 +549,12 @@ def decide_candidate_revision(
             raise TaskIterationError("holdout evidence ids must be disjoint from construction evidence")
     baseline_path = Path(str(comparison.get("baseline_model_path", ""))).resolve()
     candidate_path = Path(candidate_model_path).resolve()
-    if baseline_path == candidate_path:
-        raise TaskIterationError("candidate model path must differ from baseline")
-    baseline_hash = _sha256_file(baseline_path)
-    candidate_hash = _sha256_file(candidate_path)
-    if candidate_hash == baseline_hash:
-        raise TaskIterationError("candidate model content must differ from baseline")
+    baseline_hash = _model_identity(baseline_path)
+    candidate_hash = _model_identity(candidate_path)
+    try:
+        validate_candidate(baseline_path, candidate_path, load_model(baseline_path).to_dict(), load_model(candidate_path).to_dict())
+    except ValueError as exc:
+        raise TaskIterationError(str(exc)) from exc
 
     baseline_model = load_model(baseline_path)
     candidate_model = load_model(candidate_path)
@@ -620,18 +613,12 @@ def decide_candidate_revision(
         input_gaps = set(_native_gap_ids(baseline_model, baseline_depth, coverage_ids))
     current_gaps = set(candidate_gap_ids)
     resolved_gaps, persisted_gaps, introduced_gaps, transitions = gap_lineage(input_gaps, current_gaps)
-    if observation.external_input_ids:
-        terminal_reason = "external_input_required"
-    elif not candidate_gap_ids and disposition == "accepted":
-        terminal_reason = "model_closed_for_task"
-    elif comparison.get("terminal_reason") == "iteration_limit":
-        terminal_reason = "iteration_limit"
-    elif current_gaps == set(comparison.get("prior_open_gap_ids", comparison.get("input_gap_ids", ()))) and int(comparison.get("iteration", 0)) > 0:
-        terminal_reason = "progress_stalled"
-    elif missing_holdout or disposition in {"rejected", "rolled_back"}:
-        terminal_reason = "external_input_required"
-    else:
-        terminal_reason = "continue_iteration"
+    terminal_reason = select_terminal(
+        closed=not candidate_gap_ids and disposition == "accepted" and not observation.external_input_ids,
+        iteration=int(comparison.get("iteration", 0)),
+        limit_reached=comparison.get("terminal_reason") == "iteration_limit",
+        stalled=current_gaps == set(comparison.get("prior_open_gap_ids", comparison.get("input_gap_ids", ()))) and int(comparison.get("iteration", 0)) > 0,
+        external=bool(observation.external_input_ids or missing_holdout or disposition in {"rejected", "rolled_back"}))
 
     effective_hash = candidate_hash if disposition == "accepted" else baseline_hash
     return {
@@ -642,7 +629,7 @@ def decide_candidate_revision(
             holdout_observation.observation_id if holdout_observation is not None else ""
         ),
         "baseline_model_path": str(baseline_path),
-        "baseline_model_sha256": baseline_hash,
+        "baseline_identity": baseline_hash,
         "candidate_model_path": str(candidate_path),
         "candidate_model_sha256": candidate_hash,
         "addressed_mismatch_ids": sorted(addressed),

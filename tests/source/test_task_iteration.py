@@ -103,6 +103,10 @@ def test_loaded_prediction_accepts_missing_optional_task_fields() -> None:
     assert loaded.coverage_ids == ()
     assert "coverage_fingerprint" not in loaded.to_dict()
 
+    raw["schema_version"] = "researchguard.source.search-outcome-prediction.v2"
+    with pytest.raises(ValueError, match="stale_prediction: re-freeze"):
+        SearchOutcomePrediction.from_dict(raw)
+
 
 def _observation(*, close_holdout: bool = False) -> Observation:
     source = SourceRecord(
@@ -152,7 +156,7 @@ def test_stale_baseline_is_rejected() -> None:
     state = _state()
     prediction = _prediction(state)
     state.metadata["changed"] = True
-    with pytest.raises(ValueError, match="stale search prediction"):
+    with pytest.raises(ValueError, match="stale_prediction: re-freeze"):
         validate_search_prediction_binding(state, prediction)
 
 
@@ -212,10 +216,9 @@ def test_closing_every_gap_leaves_the_baseline_untouched() -> None:
     assert model_fingerprint(candidate) != before
     assert result.effective_disposition == "accepted"
     assert result.terminal_reason == "model_closed_for_task"
-    assert "receipt_fingerprint" not in result.to_dict()
 
 
-def test_cli_freeze_rejects_old_shape_and_emits_v2(tmp_path: Path) -> None:
+def test_cli_freeze_rejects_old_shape_and_emits_v3(tmp_path: Path) -> None:
     output = tmp_path / "prediction.json"
     result = subprocess.run(
         [
@@ -231,7 +234,7 @@ def test_cli_freeze_rejects_old_shape_and_emits_v2(tmp_path: Path) -> None:
     )
     assert result.returncode == 0, result.stderr
     payload = json.loads(output.read_text(encoding="utf-8"))
-    assert payload["schema_version"] == "researchguard.source.search-outcome-prediction.v2"
+    assert payload["schema_version"] == "researchguard.source.search-outcome-prediction.v3"
     assert "coverage_fingerprint" not in payload
 
 

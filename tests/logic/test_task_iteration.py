@@ -105,14 +105,18 @@ def test_loaded_prediction_accepts_missing_optional_task_fields() -> None:
         raw.pop(key)
     loaded = ArgumentPrediction.from_dict(raw)
     assert loaded.coverage_ids == ()
-    assert loaded.baseline_digest == raw["baseline_digest"]
+    assert loaded.baseline_identity == raw["baseline_identity"]
+
+    raw["schema_version"] = "researchguard.logic.argument-prediction.v2"
+    with pytest.raises(ValueError, match="stale_prediction: re-freeze"):
+        ArgumentPrediction.from_dict(raw)
 
 
 def test_stale_baseline_binding_is_rejected() -> None:
     baseline, _ = _baseline_and_candidate()
     prediction = _prediction(baseline)
     baseline.nodes["C0"].text = "Changed after freeze"
-    with pytest.raises(ValueError, match="stale argument prediction"):
+    with pytest.raises(ValueError, match="stale_prediction: re-freeze"):
         validate_prediction_binding(baseline, prediction)
 
 
@@ -138,7 +142,6 @@ def test_candidate_acceptance_checks_protected_and_holdout_claims(monkeypatch) -
     assert result.effective_disposition == "accepted"
     assert result.terminal_reason == "model_closed_for_task"
     assert all(item.passed for item in result.holdout_claims)
-    assert "receipt_fingerprint" not in result.to_dict()
 
 
 def test_holdout_regression_blocks_candidate_even_when_target_matches(monkeypatch) -> None:
@@ -198,7 +201,7 @@ def test_cli_freeze_and_run_leave_the_model_files_untouched(tmp_path: Path) -> N
     )
     assert frozen.returncode == 0, frozen.stderr
     payload = json.loads(prediction_path.read_text(encoding="utf-8"))
-    assert payload["schema_version"] == "researchguard.logic.argument-prediction.v2"
+    assert payload["schema_version"] == "researchguard.logic.argument-prediction.v3"
     assert "coverage_fingerprint" not in payload
     ran = cli(
         "run", str(baseline_path), "--prediction", str(prediction_path),

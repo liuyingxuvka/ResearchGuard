@@ -9,7 +9,6 @@ from researchguard.logic import (
     audit_claim_source_paragraph_matrix,
     build_claim_source_paragraph_matrix,
     load_model_from_dict,
-    paragraph_blueprint,
     synthesize_artifact_plan,
     model_fingerprint,
 )
@@ -91,15 +90,6 @@ def test_matrix_audit_flags_missing_sources_and_duplicate_claims() -> None:
     assert "generated_citation_marker_needs_review" in codes
 
 
-def test_paragraph_blueprint_can_include_citation_matrix() -> None:
-    model = load_model_from_dict(_model_dict())
-    matrix = build_claim_source_paragraph_matrix(model)
-
-    text = paragraph_blueprint(model, "C1", citation_matrix=matrix)
-
-    assert "Paragraph locator: section 2" in text
-    assert "Source markers: [paper-a]" in text
-    assert "paper-a: measured_result" in text
 
 
 def test_synthesis_items_include_citation_matrix_handoff() -> None:
@@ -148,19 +138,3 @@ def test_cli_citation_matrix_and_audit_smoke(tmp_path: Path) -> None:
     assert audit.returncode == 0, audit.stderr or audit.stdout
     findings = json.loads(audit.stdout)["findings"]
     assert any(finding["code"] == "important_claim_missing_source" for finding in findings)
-
-
-def test_cli_outline_can_attach_citation_handoff(tmp_path: Path) -> None:
-    model_file = tmp_path / "model.json"
-    model_file.write_text(json.dumps(_model_dict()), encoding="utf-8")
-
-    result = subprocess.run(
-        [sys.executable, "-m", "researchguard", "logic", "outline", str(model_file), "--paragraph", "C1", "--with-citations"],
-        cwd=ROOT,
-        check=False,
-        capture_output=True,
-        text=True,
-    )
-
-    assert result.returncode == 0, result.stderr or result.stdout
-    assert "Source markers: [paper-a]" in result.stdout

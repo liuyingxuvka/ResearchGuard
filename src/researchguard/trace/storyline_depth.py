@@ -1579,12 +1579,12 @@ def run_single_perturbation(
         hypotheses_for_model(perturbed_model),
     )
     effect = compare_perturbation(plan, before, after)
-    baseline_receipt = baseline_result.inference
-    perturbed_receipt = perturbed_result.inference
+    baseline_inference = baseline_result.inference
+    perturbed_inference = perturbed_result.inference
     effect = replace(
         effect,
-        baseline_solver_id=baseline_receipt.solver_id,
-        perturbed_solver_id=perturbed_receipt.solver_id,
+        baseline_solver_id=baseline_inference.solver_id,
+        perturbed_solver_id=perturbed_inference.solver_id,
     )
     return effect, perturbed_model, perturbed_result
 
@@ -1972,7 +1972,7 @@ def evaluate_storyline_depth(
         live_alternative_ids=live_alternative_ids,
         causal_boundaries=causal_boundaries,
         deepest_proven_layer=(
-            "native-storyline-depth" if closure_status == "PASS" else "native-inference-receipt"
+            "native-storyline-depth" if closure_status == "PASS" else "native-inference"
         ),
         first_unresolved_gap=first_unresolved_gap,
     )

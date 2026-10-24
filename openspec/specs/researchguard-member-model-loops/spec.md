@@ -1,7 +1,7 @@
 # researchguard-member-model-loops Specification
 
 ## Purpose
-Let each ResearchGuard route grow its model with the research: predict, observe, revise, on plain model files, without receipts.
+Let each ResearchGuard route grow its model with the research: predict, observe, revise, on plain model files, with native gap transitions.
 
 ## Requirements
 ### Requirement: Each route owns its own loop
@@ -12,7 +12,7 @@ LogicGuard (`argument-iteration`), SourceGuard (`search-iteration`), TraceGuard 
 - **THEN** that route SHALL report `continue_iteration` or its exact stop reason and SHALL NOT run a sibling route
 
 ### Requirement: Predictions are bound to the model
-A frozen prediction SHALL bind to its baseline file and become stale when it changes. Targets and coverage ids SHALL exist in that baseline. TraceGuard MAY predict evidence/event ids not yet present; its expected support direction SHALL be optional and, when declared, one of `weaken`, `strengthen` or `unchanged`. Other routes retain their native expected-id requirements.
+The routes SHALL use one shared current/candidate lifecycle kernel. Frozen prediction schemas are v3 and carry `baseline_identity`; retired prediction schemas SHALL fail with `stale_prediction: re-freeze`. A changed baseline SHALL be frozen again. Named hypotheses, claims and coverage ids SHALL exist in that baseline. TraceGuard MAY predict evidence/event ids not yet present; its expected support direction SHALL be optional and, when declared, one of `weaken`, `strengthen` or `unchanged`. Other routes retain their native expected-id requirements.
 
 #### Scenario: A coverage id is misspelled
 - **WHEN** `freeze` is given a coverage id that is not in the model
@@ -25,8 +25,8 @@ A loop SHALL leave baseline and candidate model files unchanged; the caller SHAL
 - **WHEN** the decision is `reject` or the candidate fails a protected or holdout check
 - **THEN** the baseline file SHALL remain the current model
 
-### Requirement: Results carry gap transitions, not receipts
-Each iteration result SHALL record input, resolved, persisted and introduced gap ids, the native depth gaps, next actions and the terminal reason, and SHALL NOT carry receipt fingerprints. Transitions SHALL compare the actual baseline and candidate model native gaps using one shared set operation. Only resolved gaps SHALL count as progress; prior-open ids SHALL control stagnation only. Trace prediction mismatch ids SHALL remain rejection reasons and SHALL NOT enter native gap transitions.
+### Requirement: Results carry native gap transitions
+Each iteration result SHALL record input, resolved, persisted and introduced gap ids, the native depth gaps, next actions and the terminal reason,. Transitions SHALL compare the actual baseline and candidate model native gaps using one shared set operation. Only resolved gaps SHALL count as progress; prior-open ids SHALL control stagnation only. Trace prediction mismatch ids SHALL remain rejection reasons and SHALL NOT enter native gap transitions.
 
 #### Scenario: Matching prediction with an open depth gap
 - **WHEN** the prediction matches but an important native depth gap remains
@@ -44,9 +44,9 @@ A holdout claim or observation SHALL be optional; when one is given it SHALL be 
 - **THEN** the decision SHALL fail with a message about holdout independence
 
 ### Requirement: Trace observations can append native records
-A v2 TraceGuard observation MAY carry `new_sources`, `new_evidence`, `new_events` and `new_links`. Compare SHALL append these only in memory, reject conflicting ids, rebind native references and use canonical evaluation to report target support before/after. A delta below -0.01 SHALL weaken, above 0.01 SHALL strengthen, and otherwise remain unchanged. A declared direction that differs SHALL be a `direction_mismatch`. Native depth gaps SHALL remain in `open_depth_gap_ids`, outside prediction mismatches.
+A v2 TraceGuard observation MAY carry `new_sources`, `new_evidence`, `new_events` and `new_links`. Compare SHALL append these only in memory, reject conflicting ids, rebind native references and use canonical evaluation to report the checked hypothesis's support before/after. A delta below -0.01 SHALL weaken, above 0.01 SHALL strengthen, and otherwise remain unchanged. A declared direction that differs SHALL be a `direction_mismatch`. Native depth gaps SHALL remain in `open_depth_gap_ids`, outside prediction mismatches.
 
-#### Scenario: New opposing evidence weakens the target
+#### Scenario: New opposing evidence weakens the checked hypothesis
 - **WHEN** expected evidence absent from the baseline arrives as a native observation row with an opposing link
 - **THEN** compare SHALL evaluate that appended model without changing the baseline and SHALL check its support direction
 
@@ -58,7 +58,7 @@ A candidate SHALL preserve all newly observed records with the same ids and cont
 - **THEN** its disposition SHALL be `accepted`, its effective fingerprint SHALL identify that candidate and its terminal reason SHALL remain `continue_iteration` unless an existing external-input, iteration or stagnation bound applies
 
 ### Requirement: Ordinary argument coverage uses an internal inventory
-When all recognized model/node target-unit, card and role declarations are absent and there are no nonempty native blocks, LogicGuard SHALL derive one internal unit/card covering root-reachable nodes while retaining important disconnected nodes. It SHALL expose `coverage_universe.implicit_inventory` without changing model metadata, nodes, blocks or its fingerprint. Explicit declarations, including empty or null ones, SHALL retain existing checks. Real role, scope, competition and perturbation gaps SHALL still block closure.
+When all recognized model/node declared-unit, card and role declarations are absent and there are no nonempty native blocks, LogicGuard SHALL derive one internal unit/card covering root-reachable nodes while retaining important disconnected nodes. It SHALL expose `coverage_universe.implicit_inventory` without changing model metadata, nodes, blocks or its fingerprint. Explicit declarations, including empty or null ones, SHALL retain existing checks. Real role, scope, competition and perturbation gaps SHALL still block closure.
 
 #### Scenario: Evidence is shared by competing claims
 - **WHEN** two important claims use the same Evidence node

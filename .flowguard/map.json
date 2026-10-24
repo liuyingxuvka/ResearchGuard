@@ -15,47 +15,54 @@
   "components": [
     {
       "id": "researchguard-suite",
-      "summary": "Own the package constants and the one gap-lineage helper shared by three native loops.",
+      "summary": "Shared package constants, lazy exports, explicit artifact IO and the read-only iteration and source-ownership kernels.",
       "responsibilities": [
-        "Own __version__, SUITE_ID, MEMBER_IDS and the one gap-lineage helper the three loops share; hold no member logic and no routing."
+        "Publish suite constants and lazily load each native member API without importing optional desktop dependencies.",
+        "Bind frozen predictions to canonical model content, select terminal reasons and compare gap lineage without writing model files.",
+        "Project source-owned copied fields consistently for drift checks and explicit handoff refreshes."
       ],
       "files": [
         "src/researchguard/__init__.py",
-        "src/researchguard/gap_lineage.py"
+        "src/researchguard/_exports.py",
+        "src/researchguard/_artifact_io.py",
+        "src/researchguard/iteration.py",
+        "src/researchguard/ownership.py"
       ],
       "entrypoints": [],
       "state": [
-        "package version"
+        "package version and frozen prediction identities"
       ],
       "side_effects": [
-        "none"
+        "Write explicitly requested JSON artifacts through the common CLI helper; iteration and ownership projections do not modify models"
       ],
       "depends_on": [],
       "tests": [
+        "tests/test_field_sheets.py",
+        "tests/test_gap_lineage.py",
+        "tests/test_iteration.py",
         "tests/test_root_cli.py",
         "tests/test_skill_suite.py",
-        "tests/test_gap_lineage.py",
-        "tests/test_field_sheets.py"
+        "tests/test_vocabulary.py"
       ],
       "models": [
-        ".flowguard/models/researchguard_suite_model.py"
+        ".flowguard/models/researchguard_suite_model.py",
+        ".flowguard/models/iteration_kernel_model.py"
       ],
+      "layer": "foundation",
       "status": "confirmed",
-      "fingerprint": "sha256:80c18c4c4b4f4f96f513ef1f3609681a1cecf4a4ce7d48946cabf40fa45caab6",
-      "layer": "foundation"
+      "fingerprint": "sha256:98bffd74efa3a3126289357fbde0d4aed09ce58a078bd4383fdc9b3246fbb8e4"
     },
     {
       "id": "suite-orchestration",
       "summary": "Own the researchguard console and the four member command lines; dispatch each member command directly to its owner.",
       "responsibilities": [
         "Dispatch researchguard logic|source|trace|experiment straight to the member main; unknown commands return one typed JSON error.",
-        "Own member command lines, including stable source stop rules, trace iteration direction and report/gaps/compare research-state views while retaining complete JSON output. Expose plain results with model freshness and no receipt identities. Require the viewer extra and tkinter only for the desktop viewer; reject the retired projectradar simulation mode.",
+        "Own member command lines, including stable source stop rules, trace iteration direction and report/gaps/compare research-state views while retaining complete JSON output. Expose plain results with model freshness and no result identities. Require the viewer extra and tkinter only for the desktop viewer; reject the retired projectradar simulation mode.",
         "Pass the already-loaded trace model into logic handoff export so the native CLI carries actual evidence content and polarity.",
         "Expose score-actions from the same complete native plan scoring path as plan --all-scores, without a candidate limit.",
         "Compare versions of one source model using actual gap semantic fields and nested qualification decision; self-comparison reports no change and retired gap.status stays rejected.",
         "Create complete synthetic source and trace starter models whose sample data and evidence boundaries stay explicit.",
-        "Expose canonical --source-id intake/import and --source-model provenance checking; retire the unconsumed SourceGuard LogicGuard export.",
-        "Dispatch status to the read-only research tree view while retaining member help and version formats. Expose --into on source-to-trace and trace-to-logic handoffs, requiring a distinct output file."
+        "Expose canonical --source-id intake/import and --source-model provenance checking; retire the unconsumed SourceGuard LogicGuard export. Dispatch status to the read-only research tree view while retaining member help and version formats. Expose --into on source-to-trace and trace-to-logic handoffs, requiring a distinct output file."
       ],
       "files": [
         "src/researchguard/__main__.py",
@@ -80,7 +87,9 @@
       ],
       "depends_on": [
         "experimentguard",
-        "logicguard",
+        "logic-argument",
+        "logic-artifact",
+        "logic-library",
         "research-tree",
         "researchguard-suite",
         "sourceguard",
@@ -96,103 +105,44 @@
       "models": [
         ".flowguard/models/researchguard_suite_model.py"
       ],
+      "layer": "interface",
       "status": "confirmed",
-      "fingerprint": "sha256:3f5c182edb6bd4a60afe623c5b438f41eed6d666238c908642603b9631d93155",
-      "layer": "interface"
+      "fingerprint": "sha256:2a10cc8d6412ad683461a48d3069040c7ce996a4126c06cd82065be08e6cd565"
     },
     {
       "id": "logicguard",
-      "summary": "Own argument support, source library, structured artifacts, model deepening, synthesis and project library inspection.",
+      "summary": "LogicGuard: argument licensing, the source library and arguments inside written artifacts.",
       "responsibilities": [
-        "Own argument support, source library, structured artifacts, model deepening, synthesis and project library inspection. Return LogicDepthResult without receipt/universe identities; render complete attack chains separately and use native tournament unresolved items.",
-        "Run depth analysis on the model alone; synthesis computes depth in process. Use an internal implicit unit/card only when inventory and role declarations are absent, preserving explicit empty declarations and model identity. Shared Evidence is informational; other shared role nodes retain consumer checks.",
-        "Run the predict-observe-revise loop on plain model files; the loop never writes model files, so rollback is restoring the previous file; every claim, node and coverage id a prediction names must exist in the model when it is frozen.",
-        "Derive minimal support and attack sets split by the edge that enters the claim; a blocked claim reports its native blockers as the attack set and preserves the wording license.",
-        "Bind Evidence to sources and exact UTF-8 quotes or matching content hashes, report invalid provenance with node ids, and resolve library source_id/locator on validate --library-root.",
-        "Collect argument evaluation and native depth gaps from baseline and candidate; delegate gap transitions to the suite helper, with prior ids used only for argument stagnation.",
-        "Import a data-only trace bundle as signed per-hypothesis claims and content-bound evidence provenance, with legacy trace-only claim compatibility and no invented warrants. Support add-only handoff sync by node and edge identities with conflict reporting and preserved hand-built work.",
-        "Resolve provenance from plain SourceGuard source/anchor data, accepting same-source library nodes when supplied; preserve explicit canonical source ids on intake and reject conflicting content. Route evidence search gaps to SourceGuard planning."
+        "Group native argument licensing, personal source work and artifact argument auditing under one member."
       ],
-      "files": [
-        "src/researchguard/logic/__init__.py",
-        "src/researchguard/logic/acceptance.py",
-        "src/researchguard/logic/argument_modeling.py",
-        "src/researchguard/logic/citation_matrix.py",
-        "src/researchguard/logic/delivery.py",
-        "src/researchguard/logic/diagnostics.py",
-        "src/researchguard/logic/evaluator.py",
-        "src/researchguard/logic/execution_depth.py",
-        "src/researchguard/logic/gap_ledger.py",
-        "src/researchguard/logic/hierarchy.py",
-        "src/researchguard/logic/identity.py",
-        "src/researchguard/logic/importance.py",
-        "src/researchguard/logic/library_viewer.py",
-        "src/researchguard/logic/loader.py",
-        "src/researchguard/logic/localization.py",
-        "src/researchguard/logic/markdown_structure.py",
-        "src/researchguard/logic/minimal_sets.py",
-        "src/researchguard/logic/model.py",
-        "src/researchguard/logic/provenance.py",
-        "src/researchguard/logic/report.py",
-        "src/researchguard/logic/schema.py",
-        "src/researchguard/logic/simulator.py",
-        "src/researchguard/logic/source_intake.py",
-        "src/researchguard/logic/source_library.py",
-        "src/researchguard/logic/source_library_io.py",
-        "src/researchguard/logic/structure_audit.py",
-        "src/researchguard/logic/structured_artifact.py",
-        "src/researchguard/logic/synthesis.py",
-        "src/researchguard/logic/synthesis_contract.py",
-        "src/researchguard/logic/task_iteration.py",
-        "src/researchguard/logic/trace_import.py",
-        "src/researchguard/logic/validator.py",
-        "src/researchguard/logic/writer.py",
-        "src/researchguard/logic_viewer/__init__.py",
-        "src/researchguard/logic_viewer/common.py",
-        "src/researchguard/logic_viewer/desktop_app.py",
-        "src/researchguard/logic_viewer/i18n.py",
-        "src/researchguard/logic_viewer/launcher.py",
-        "src/researchguard/logic_viewer/settings.py",
-        "src/researchguard/logic_viewer/software_update.py",
-        "src/researchguard/logic_viewer/store.py",
-        "src/researchguard/logic_viewer/ui_data.py"
-      ],
+      "files": [],
       "entrypoints": [],
-      "state": [
-        "native member model"
-      ],
-      "side_effects": [
-        "native file writes only through explicit commands"
-      ],
-      "depends_on": [
-        "researchguard-suite"
-      ],
+      "state": [],
+      "side_effects": [],
+      "depends_on": [],
       "tests": [
-        "tests/logic/**/*.py",
-        "tests/logic/*.py"
+        "tests/logic/test_public_api.py"
       ],
       "models": [],
+      "layer": "routes",
       "status": "confirmed",
-      "fingerprint": "sha256:ea0d5594f66cd176677a4af933f87a754a09919b90ff3179c303e3bffcfce5f7",
-      "layer": "routes"
+      "fingerprint": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     {
       "id": "sourceguard",
-      "summary": "Own evidence discovery, expected-utility search plans, stop decisions and source/anchor qualification.",
+      "summary": "Source belief states, anchors, search frontiers and native stop decisions.",
       "responsibilities": [
-        "Own evidence discovery, expected-utility search plans, stop decisions, source/anchor qualification and readable source/anchor/closure reporting. Return SourceDepthResult with actual model freshness and native coverage, without receipt versions, result-model or universe self-hashes.",
+        "Own evidence discovery, expected-utility search plans, stop decisions, source/anchor qualification and readable source/anchor/closure reporting. Return SourceDepthResult with actual model freshness and native coverage, without result versions, result-model or universe self-hashes.",
         "Load, plan, update and iterate on a model file alone; models carry no contract; the action and every protected or coverage gap a prediction names must exist in the model when it is frozen.",
         "Decide whether to keep searching from the model itself: all executable declared and generated actions, selecting an affordable target by native utility, the open blocking gaps and the caller-declared budget.",
         "Combine source semantic-state, depth and coverage gaps from each actual model and delegate transition sets to the shared suite helper; resolved obligations alone count as progress.",
         "Read all recorded observations for native depth and preview a new observation only on a clone; current-call provider status remains explicit.",
         "Generate gap queries from the gap description and at most two domain hints, bounded to 120 characters; preserve executable declared actions and suppress their generated duplicates.",
-        "Default only absent gap semantic_state to discovered, keep retired status invalid, and warn on synthetic starter ids during validation.",
-        "Be the sole owner of source ids, roles, lineage and anchors; export a TraceGuard seed, with no unconsumed LogicGuard candidate export. Support add-only trace seed sync by source/anchor ids, listing content conflicts and retaining all downstream fields; claim-usable anchors are trace-usable."
+        "Default only absent gap semantic_state to discovered, keep retired status invalid, and warn on synthetic starter ids during validation. Be the sole owner of source ids, roles, lineage and anchors; export a TraceGuard seed, with no unconsumed LogicGuard candidate export. Refresh source-owned trace copies by identity while preserving downstream fields; claim-usable anchors are trace-usable."
       ],
       "files": [
         "src/researchguard/source/__init__.py",
         "src/researchguard/source/depth.py",
-        "src/researchguard/source/graph.py",
         "src/researchguard/source/handoff.py",
         "src/researchguard/source/loader.py",
         "src/researchguard/source/planner.py",
@@ -205,29 +155,37 @@
       ],
       "entrypoints": [],
       "state": [
-        "native member model"
+        "source beliefs: sources, anchors, gaps, actions and stop rules"
       ],
       "side_effects": [
-        "native file writes only through explicit commands"
+        "Write explicit source models, TraceGuard seeds and source reports; refresh only source-owned copies"
       ],
       "depends_on": [
         "researchguard-suite"
       ],
       "tests": [
-        "tests/source/**/*.py",
-        "tests/source/*.py"
+        "tests/source/__init__.py",
+        "tests/source/test_cli.py",
+        "tests/source/test_handoff.py",
+        "tests/source/test_planner.py",
+        "tests/source/test_schema.py",
+        "tests/source/test_scoring.py",
+        "tests/source/test_semantic_gap_depth.py",
+        "tests/source/test_stop_decision.py",
+        "tests/source/test_task_iteration.py",
+        "tests/source/test_update.py"
       ],
       "models": [
-        ".flowguard/models/sourceguard_content_anchor_oracle_model.py",
+        ".flowguard/models/sourceguard_content_anchor_model.py",
         ".flowguard/models/sourceguard_stop_decision_model.py"
       ],
+      "layer": "routes",
       "status": "confirmed",
-      "fingerprint": "sha256:6f0eba5ae0e75be90b7622192460b3c0c21f586ca5f1ac0d802f1bc94db05e8f",
-      "layer": "routes"
+      "fingerprint": "sha256:f7951ada971c7659222cf50bd317a882121e6e8f341a2c17d74c6f4989719106"
     },
     {
       "id": "traceguard",
-      "summary": "Own temporal and causal trace inference, storyline stress and case library updates.",
+      "summary": "Temporal and causal trace inference, storyline depth, ablations and trace-to-logic handoff.",
       "responsibilities": [
         "Own temporal and causal trace inference, storyline stress, case library updates and readable timeline/hypothesis/depth reporting. Expose native inference/depth results with model freshness only; handoffs carry source-model freshness and case writeback stores gaps and contradictions without solver histories. Use neutral undeclared evidence types and model-authored finite strength tables consistently across every factor; preserve case model declarations.",
         "Keep command output to analysis results; full JSON is written only with --output.",
@@ -270,26 +228,33 @@
       ],
       "entrypoints": [],
       "state": [
-        "native member model"
+        "trace models, events, storyline hypotheses, ablations and trace case-library data"
       ],
       "side_effects": [
-        "native file writes only through explicit commands"
+        "Write explicitly requested trace models, logic bundles, iteration results and case-library files"
       ],
       "depends_on": [
         "researchguard-suite"
       ],
       "tests": [
-        "tests/trace/**/*.py",
-        "tests/trace/*.py"
+        "tests/trace/__init__.py",
+        "tests/trace/test_contradiction_core.py",
+        "tests/trace/test_inference_kernel.py",
+        "tests/trace/test_inference_performance.py",
+        "tests/trace/test_logicguard_export_contract.py",
+        "tests/trace/test_starter_fields.py",
+        "tests/trace/test_storyline_depth.py",
+        "tests/trace/test_task_iteration.py",
+        "tests/trace/test_traceguard.py"
       ],
       "models": [],
+      "layer": "routes",
       "status": "confirmed",
-      "fingerprint": "sha256:7a81faf4458caacfd8490d2b8b68485dc12b53d9ed912f007a7b6d0731cd351c",
-      "layer": "routes"
+      "fingerprint": "sha256:12690ae6cfc692521e05dbab2345e287dc6f1da0160437e7ae2f0b8f35011594"
     },
     {
       "id": "experimentguard",
-      "summary": "Own finite minimum experiment sets, observation-driven iteration, optional holdout checks and bounded terminal decisions.",
+      "summary": "Finite experiment discrimination, observation updates and bounded terminal decisions.",
       "responsibilities": [
         "Distinguish hypotheses within the declared finite count limit; minimize optional declared costs before count and IDs, retain cost mode in remaining recommendations, and exclude the selected set from alternatives. Report limit failures separately from truly indistinguishable pairs. Return experiment dispositions and revision proposals without matrix self-fingerprints.",
         "License native closure only for a unique consistent hypothesis with no holdout counterexample and no gaps, while preserving the finite iteration limit first; holdout observations are optional.",
@@ -306,20 +271,21 @@
         "src/researchguard/experiment/engine.py:recommend_experiments"
       ],
       "state": [
-        "native member model"
+        "experiment specifications, predictions and explicit observations"
       ],
       "side_effects": [
-        "native file writes only through explicit commands"
+        "Write an explicitly requested experiment recommendation or observation report"
       ],
-      "depends_on": [],
+      "depends_on": [
+        "researchguard-suite"
+      ],
       "tests": [
-        "tests/experiment/**/*.py",
-        "tests/experiment/*.py"
+        "tests/experiment/test_recommendation.py"
       ],
       "models": [],
+      "layer": "routes",
       "status": "confirmed",
-      "fingerprint": "sha256:899a7d5508216efb52733e0d59a2bed5840acd61173c54d7063aed890164877a",
-      "layer": "routes"
+      "fingerprint": "sha256:4afaed83466f1ac289c360e7789774a4a045943230ef9c294e535d5b6bbe725e"
     },
     {
       "id": "author-tools",
@@ -349,18 +315,18 @@
       "models": [
         ".flowguard/models/researchguard_suite_model.py"
       ],
+      "layer": "interface",
       "status": "confirmed",
-      "fingerprint": "sha256:7feaea02daff65fd7b9a298e36648910ba31bc35d24725c6faf8fb858cad0158",
-      "layer": "interface"
+      "fingerprint": "sha256:7feaea02daff65fd7b9a298e36648910ba31bc35d24725c6faf8fb858cad0158"
     },
     {
       "id": "research-tree",
-      "summary": "Read one research folder, check shared ids and project native route results.",
+      "summary": "One research question: cross-route identities, copy drift, ablations, candidate comparison and one verdict for writers.",
       "responsibilities": [
-        "Load research.yaml and native route models without rewriting them.",
-        "Check shared hypothesis ids, root claims and canonical source/anchor references in memory.",
-        "Project native logic, trace depth, source planning and experiment observation/recommendation results into a Markdown or JSON status page. Read the canonical inference result field.",
-        "Ship the bounded Ever Given research tree with common ids and replay cross-reference checks on native in-memory models."
+        "Load the research index and resolve source-library provenance through the native validator.",
+        "Detect copied-content drift and direct evidence or conclusion disagreements between native routes.",
+        "Apply declared anchor ablations in memory and expose uncaught known-bad cases.",
+        "Project the authoritative search stop and root wording license into one five-key verdict; compare current and candidate questions without writing models."
       ],
       "files": [
         "src/researchguard/research.py"
@@ -369,14 +335,15 @@
         "src/researchguard/research.py:status_main"
       ],
       "state": [
-        "loaded native models and index"
+        "loaded research index, native models and optional source library"
       ],
       "side_effects": [
-        "read models; write only explicit --output"
+        "Read indexed model/library files and write only an explicit status --output"
       ],
       "depends_on": [
         "experimentguard",
-        "logicguard",
+        "logic-argument",
+        "logic-library",
         "researchguard-suite",
         "sourceguard",
         "traceguard"
@@ -389,22 +356,219 @@
       ],
       "layer": "tree",
       "status": "confirmed",
-      "fingerprint": "sha256:de9ca6d1966d56e796c8133a17d941e2b8ca15da96fe3413083ecbb783c9f342"
+      "fingerprint": "sha256:904a0e0f8a1d23e6f81c7aab39cd550cf69b2290c6008ca600a223c0948c7f42"
+    },
+    {
+      "entrypoints": [],
+      "depends_on": [
+        "researchguard-suite",
+        "sourceguard"
+      ],
+      "layer": "routes",
+      "id": "logic-argument",
+      "parent": "logicguard",
+      "files": [
+        "src/researchguard/logic/__init__.py",
+        "src/researchguard/logic/acceptance.py",
+        "src/researchguard/logic/argument_modeling.py",
+        "src/researchguard/logic/diagnostics.py",
+        "src/researchguard/logic/evaluator.py",
+        "src/researchguard/logic/execution_depth.py",
+        "src/researchguard/logic/gap_ledger.py",
+        "src/researchguard/logic/hierarchy.py",
+        "src/researchguard/logic/importance.py",
+        "src/researchguard/logic/loader.py",
+        "src/researchguard/logic/localization.py",
+        "src/researchguard/logic/minimal_sets.py",
+        "src/researchguard/logic/model.py",
+        "src/researchguard/logic/provenance.py",
+        "src/researchguard/logic/report.py",
+        "src/researchguard/logic/schema.py",
+        "src/researchguard/logic/simulator.py",
+        "src/researchguard/logic/task_iteration.py",
+        "src/researchguard/logic/trace_import.py",
+        "src/researchguard/logic/validator.py",
+        "src/researchguard/logic/writer.py"
+      ],
+      "summary": "Native argument evaluation, wording licenses, provenance and task-local argument iteration.",
+      "responsibilities": [
+        "Evaluate bounded argument support and attacks, preserve block hierarchy and report deletion-minimal wording licenses.",
+        "Validate content-bound evidence provenance using the canonical source and library resolver.",
+        "Refresh copied handoff provenance without changing author text, edges or unrelated records; iterate on explicit candidates."
+      ],
+      "state": [
+        "argument models, confidence and explicit evidence provenance"
+      ],
+      "side_effects": [
+        "Write argument reports and explicit candidate artifacts only through member commands"
+      ],
+      "tests": [
+        "tests/logic/__init__.py",
+        "tests/logic/test_acceptance.py",
+        "tests/logic/test_authoritative_coverage.py",
+        "tests/logic/test_cli.py",
+        "tests/logic/test_deep_graph_safety.py",
+        "tests/logic/test_diagnostics.py",
+        "tests/logic/test_evaluator.py",
+        "tests/logic/test_execution_depth.py",
+        "tests/logic/test_gap_ledger.py",
+        "tests/logic/test_hierarchy.py",
+        "tests/logic/test_importance.py",
+        "tests/logic/test_minimal_sets.py",
+        "tests/logic/test_owned_sync.py",
+        "tests/logic/test_public_api.py",
+        "tests/logic/test_report.py",
+        "tests/logic/test_schema.py",
+        "tests/logic/test_simulator.py",
+        "tests/logic/test_task_iteration.py"
+      ],
+      "models": [
+        ".flowguard/models/wording_license_model.py"
+      ],
+      "status": "confirmed",
+      "fingerprint": "sha256:7c2781e67c5fcac5ac07ca611f47713822cdaad9f076c66477944c9e81420bff"
+    },
+    {
+      "entrypoints": [],
+      "depends_on": [
+        "logic-argument"
+      ],
+      "layer": "routes",
+      "id": "logic-library",
+      "parent": "logicguard",
+      "files": [
+        "src/researchguard/logic/library_viewer.py",
+        "src/researchguard/logic/source_intake.py",
+        "src/researchguard/logic/source_library.py",
+        "src/researchguard/logic/source_library_io.py",
+        "src/researchguard/logic_viewer/launcher.py",
+        "src/researchguard/logic_viewer/software_update.py",
+        "src/researchguard/logic_viewer/i18n.py",
+        "src/researchguard/logic_viewer/settings.py",
+        "src/researchguard/logic_viewer/ui_data.py",
+        "src/researchguard/logic_viewer/__init__.py",
+        "src/researchguard/logic_viewer/common.py",
+        "src/researchguard/logic_viewer/store.py",
+        "src/researchguard/logic_viewer/desktop_app.py"
+      ],
+      "summary": "Personal source library, per-source argument models and optional desktop browsing.",
+      "responsibilities": [
+        "Import and deduplicate source material, maintain per-source models and project reading lists.",
+        "Browse and export the personal source library without requiring the optional viewer for core commands."
+      ],
+      "state": [
+        "source-library files, project reading lists and node search indexes"
+      ],
+      "side_effects": [
+        "Create or replace explicitly requested library content, indexes, packages and viewer exports"
+      ],
+      "tests": [
+        "tests/logic/test_library_viewer.py",
+        "tests/logic/test_source_intake.py",
+        "tests/logic/test_source_library.py",
+        "tests/logic/test_source_library_io.py"
+      ],
+      "models": [],
+      "status": "confirmed",
+      "fingerprint": "sha256:3f8cbcaac338163b26a9b339b130682b56ea98bd89bba4cb4cc88b6e91b4a9f3"
+    },
+    {
+      "entrypoints": [],
+      "depends_on": [
+        "logic-argument"
+      ],
+      "layer": "routes",
+      "id": "logic-artifact",
+      "parent": "logicguard",
+      "files": [
+        "src/researchguard/logic/citation_matrix.py",
+        "src/researchguard/logic/markdown_structure.py",
+        "src/researchguard/logic/structure_audit.py",
+        "src/researchguard/logic/structured_artifact.py",
+        "src/researchguard/logic/synthesis.py",
+        "src/researchguard/logic/synthesis_contract.py"
+      ],
+      "summary": "Arguments inside written artifacts and an argument-ordered unit plan for writing tools.",
+      "responsibilities": [
+        "Audit structured artifacts and citation coverage against native argument models.",
+        "Produce the stable synthesis-request.v1 and synthesis-plan.v1 bridge; writing tools own outlines and delivery."
+      ],
+      "state": [
+        "structured artifacts, citation mappings and synthesis requests"
+      ],
+      "side_effects": [
+        "Write only explicitly requested structure, citation and synthesis reports"
+      ],
+      "tests": [
+        "tests/logic/test_artifact_synthesis.py",
+        "tests/logic/test_citation_matrix.py",
+        "tests/logic/test_markdown_structure.py",
+        "tests/logic/test_structured_artifact.py",
+        "tests/logic/test_synthesis_contract.py",
+        "tests/logic/test_synthesis_native_closure.py"
+      ],
+      "models": [],
+      "status": "confirmed",
+      "fingerprint": "sha256:7756bcf5dfa3779a000deabf308d13e7bb8ad015ab5517da0cca7ce89885098e"
     }
   ],
   "flows": [
     {
       "id": "direct-member",
+      "summary": "Dispatch one native member through the single console.",
       "steps": [
         "suite-orchestration:main",
         "suite-orchestration:_member_main"
-      ]
+      ],
+      "model": ".flowguard/models/researchguard_suite_model.py"
     },
     {
-      "id": "installation",
+      "id": "status",
+      "summary": "Read the question and present its native-route verdict.",
       "steps": [
-        "author-tools:main"
-      ]
+        "research-tree:status_main",
+        "research-tree:research_status",
+        "research-tree:verdict_for_writers"
+      ],
+      "model": ".flowguard/models/research_tree_model.py"
+    },
+    {
+      "id": "license",
+      "summary": "License wording from native support and attacks.",
+      "steps": [
+        "logic-argument:license_model_claim"
+      ],
+      "model": ".flowguard/models/wording_license_model.py"
+    },
+    {
+      "id": "search-stop",
+      "summary": "Decide whether the complete native search frontier warrants continuing.",
+      "steps": [
+        "sourceguard:decide_model_search_stop"
+      ],
+      "model": ".flowguard/models/sourceguard_stop_decision_model.py"
+    },
+    {
+      "id": "iterate",
+      "summary": "Share lifecycle integrity across the four native predict-observe-revise loops.",
+      "steps": [
+        "logic-argument:run_argument_iteration",
+        "sourceguard:run_search_iteration",
+        "traceguard:compare_prediction_observation",
+        "experimentguard:observe_experiments",
+        "researchguard-suite:select_terminal"
+      ],
+      "model": ".flowguard/models/iteration_kernel_model.py"
+    },
+    {
+      "id": "sync",
+      "summary": "Refresh source-owned copies while preserving downstream reasoning.",
+      "steps": [
+        "sourceguard:sync_traceguard_seed",
+        "traceguard:logicguard_bundle",
+        "logic-argument:sync_trace_bundle"
+      ],
+      "model": ".flowguard/models/research_tree_model.py"
     }
   ],
   "accepted_debts": []

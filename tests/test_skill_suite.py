@@ -70,3 +70,54 @@ def test_current_commands_are_callable() -> None:
             capture_output=True,
         )
         assert result.returncode == 0, result.stdout + result.stderr
+
+
+def test_skill_files_name_only_existing_commands(monkeypatch) -> None:
+    """Read live parsers through the dispatcher without running any command handler."""
+    import argparse
+    from researchguard import cli
+
+    class ParserCaptured(BaseException):
+        def __init__(self, parser):
+            self.parser = parser
+
+    def capture_parser(parser, *args, **kwargs):
+        raise ParserCaptured(parser)
+
+    parsers = {}
+    with monkeypatch.context() as patch:
+        patch.setattr(argparse.ArgumentParser, "parse_args", capture_parser)
+        for route in (*ROUTES, "status"):
+            with pytest.raises(ParserCaptured) as captured:
+                cli.main([route, "--help"])
+            parsers[route] = captured.value.parser
+
+    paths = [ROOT / "README.md", SKILL / "SKILL.md", *sorted((SKILL / "references").rglob("*.md"))]
+    checked = 0
+    for path in paths:
+        text = path.read_text(encoding="utf-8").replace("\\\n", " ")
+        for match in re.finditer(r"\bresearchguard[ \t]+([^\n`]+)", text):
+            command = match.group(1).strip()
+            route = command.split()[0]
+            if "|" in route:
+                assert set(route.split("|")) <= set(parsers), (path, command)
+                continue
+            assert route in parsers, (path, command)
+            parser = parsers[route]
+            active_parsers = [parser]
+            # Positional values and placeholder text cannot invoke a command here.
+            tokens = re.findall(r"--[a-zA-Z][\w-]*|<[^>]+>|[a-zA-Z][\w-]*", command)[1:]
+            for token in tokens:
+                subcommands = next((action for action in parser._actions
+                                    if isinstance(action, argparse._SubParsersAction)), None)
+                if subcommands is None or token.startswith(("<", "--")):
+                    break
+                assert token in subcommands.choices, (path, command, token)
+                parser = subcommands.choices[token]
+                active_parsers.append(parser)
+            options = {option for current in active_parsers for action in current._actions
+                       for option in action.option_strings}
+            for option in re.findall(r"(?<!\w)--[a-zA-Z][\w-]*", command):
+                assert option in options, (path, command, option)
+            checked += 1
+    assert checked, "No documented ResearchGuard commands were found"

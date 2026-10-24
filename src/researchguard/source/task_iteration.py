@@ -12,9 +12,9 @@ import uuid
 from dataclasses import dataclass
 from typing import Any, Mapping, Sequence
 
-from ..gap_lineage import gap_lineage
+from ..iteration import baseline_identity, source_identity, require_prediction_identity, select_terminal, validate_candidate, gap_lineage
 
-from .depth import apply_observation_and_replan, model_fingerprint
+from .depth import apply_observation_and_replan
 from .planner import plan_next_actions
 from .schema import (
     BeliefState,
@@ -27,7 +27,7 @@ from .schema import (
 )
 
 
-SEARCH_OUTCOME_PREDICTION_SCHEMA = "researchguard.source.search-outcome-prediction.v2"
+SEARCH_OUTCOME_PREDICTION_SCHEMA = "researchguard.source.search-outcome-prediction.v3"
 SEARCH_ITERATION_RESULT_SCHEMA = "researchguard.source.search-iteration-result.v1"
 GAP_REDUCTION_LEVELS = frozenset({"none", "partial", "closed"})
 
@@ -35,7 +35,7 @@ GAP_REDUCTION_LEVELS = frozenset({"none", "partial", "closed"})
 @dataclass(frozen=True)
 class SearchOutcomePrediction:
     prediction_id: str
-    baseline_fingerprint: str
+    baseline_identity: str
     action_id: str
     target_gap_id: str
     expected_gap_reduction: str
@@ -58,12 +58,12 @@ class SearchOutcomePrediction:
     def __post_init__(self) -> None:
         if self.schema_version != SEARCH_OUTCOME_PREDICTION_SCHEMA:
             raise ValueError(
-                f"unsupported search prediction schema {self.schema_version!r}"
+                "stale_prediction: re-freeze"
             )
         if not self.prediction_id:
             raise ValueError("prediction_id must not be empty")
-        if not self.baseline_fingerprint:
-            raise ValueError("baseline_fingerprint must not be empty")
+        if not self.baseline_identity:
+            raise ValueError("baseline_identity must not be empty")
         if not self.action_id or not self.target_gap_id:
             raise ValueError("action_id and target_gap_id must not be empty")
         if self.expected_gap_reduction not in GAP_REDUCTION_LEVELS:
@@ -91,7 +91,7 @@ class SearchOutcomePrediction:
         return {
             "schema_version": self.schema_version,
             "prediction_id": self.prediction_id,
-            "baseline_fingerprint": self.baseline_fingerprint,
+            "baseline_identity": self.baseline_identity,
             "action_id": self.action_id,
             "target_gap_id": self.target_gap_id,
             "expected_gap_reduction": self.expected_gap_reduction,
@@ -116,7 +116,7 @@ class SearchOutcomePrediction:
         return cls(
             schema_version=str(raw.get("schema_version", "")),
             prediction_id=str(raw.get("prediction_id", "")),
-            baseline_fingerprint=str(raw.get("baseline_fingerprint", "")),
+            baseline_identity=str(raw.get("baseline_identity", "")),
             action_id=str(raw.get("action_id", "")),
             target_gap_id=str(raw.get("target_gap_id", "")),
             expected_gap_reduction=str(raw.get("expected_gap_reduction", "")),
@@ -323,7 +323,7 @@ def freeze_search_outcome_prediction(
         raise ValueError("coverage gaps are missing from baseline: " + ", ".join(missing_coverage))
     return SearchOutcomePrediction(
         prediction_id=prediction_id or f"prediction-{uuid.uuid4().hex}",
-        baseline_fingerprint=model_fingerprint(baseline),
+        baseline_identity=source_identity(to_plain(baseline)),
         action_id=action.action_id,
         target_gap_id=action.target_gap_id,
         expected_gap_reduction=expected_gap_reduction,
@@ -348,12 +348,7 @@ def validate_search_prediction_binding(
     baseline: BeliefState,
     prediction: SearchOutcomePrediction,
 ) -> SearchAction:
-    actual = model_fingerprint(baseline)
-    if actual != prediction.baseline_fingerprint:
-        raise ValueError(
-            "stale search prediction: baseline fingerprint changed "
-            f"from {prediction.baseline_fingerprint} to {actual}"
-        )
+    require_prediction_identity(prediction.baseline_identity, source_identity(to_plain(baseline)))
     action = _bound_action(baseline, prediction.action_id)
     if action.target_gap_id != prediction.target_gap_id:
         raise ValueError("prediction target gap no longer matches the selected action")
@@ -496,29 +491,29 @@ def revalidate_native_depth(
     baseline: BeliefState,
     candidate: BeliefState,
     observation: Observation | None,
-    receipt: SourceDepthResult,
+    depth: SourceDepthResult,
 ) -> NativeDepthRevalidation:
     """Check that native depth completed and passes the requested claim scope."""
 
     depth_completed = bool(
-        receipt.planning_depth_completed
-        and (receipt.observation_depth_completed if observation is not None else True)
+        depth.planning_depth_completed
+        and (depth.observation_depth_completed if observation is not None else True)
     )
     requested_scope = baseline.depth_policy.requested_claim_scope
     if requested_scope == "broad":
         scope_passed = bool(
-            receipt.requested_claim_scope == "broad"
-            and receipt.covered_claim_scope == "broad"
-            and receipt.status == "pass"
-            and receipt.adequacy_status == "pass"
-            and receipt.broad_claim_licensed
+            depth.requested_claim_scope == "broad"
+            and depth.covered_claim_scope == "broad"
+            and depth.status == "pass"
+            and depth.adequacy_status == "pass"
+            and depth.broad_claim_licensed
         )
     else:
         scope_passed = bool(
-            receipt.requested_claim_scope == requested_scope
-            and receipt.covered_claim_scope in {"bounded", "broad"}
-            and receipt.status in {"bounded", "pass"}
-            and receipt.adequacy_status in {"bounded", "pass"}
+            depth.requested_claim_scope == requested_scope
+            and depth.covered_claim_scope in {"bounded", "broad"}
+            and depth.status in {"bounded", "pass"}
+            and depth.adequacy_status in {"bounded", "pass"}
         )
     reasons: list[str] = []
     if not depth_completed:
@@ -529,8 +524,8 @@ def revalidate_native_depth(
     return NativeDepthRevalidation(
         depth_completed=depth_completed,
         scope_status_passed=scope_passed,
-        status=receipt.status,
-        adequacy_status=receipt.adequacy_status,
+        status=depth.status,
+        adequacy_status=depth.adequacy_status,
         passed=passed,
         reasons=tuple(reasons),
     )
@@ -615,7 +610,7 @@ def run_search_iteration(
         raise ValueError(
             "observation action_id must equal the frozen prediction action_id"
         )
-    candidate, depth_receipt = apply_observation_and_replan(
+    candidate, depth_result = apply_observation_and_replan(
         baseline,
         observation,
         provider_status=normalized_provider,
@@ -651,7 +646,7 @@ def run_search_iteration(
         baseline, candidate, prediction.protected_gap_ids
     )
     native_review = revalidate_native_depth(
-        baseline, candidate, observation, depth_receipt
+        baseline, candidate, observation, depth_result
     )
     def open_gaps(state: BeliefState, depth: SourceDepthResult) -> tuple[str, ...]:
         gaps = state.gap_by_id()
@@ -664,7 +659,7 @@ def run_search_iteration(
 
     _, baseline_depth = apply_observation_and_replan(baseline, None, limit=limit)
     baseline_gap_ids = open_gaps(baseline, baseline_depth)
-    open_gap_ids = open_gaps(candidate, depth_receipt)
+    open_gap_ids = open_gaps(candidate, depth_result)
     can_close = decision == "accept" and review.passed and native_review.passed and not open_gap_ids
     if can_close:
         effective = "accepted"
@@ -694,20 +689,12 @@ def run_search_iteration(
             if action.status == "proposed" and action.target_gap_id in set(open_gap_ids)
         )
     )
-    if can_close:
-        terminal_reason = "model_closed_for_task"
-    elif prediction.iteration >= prediction.max_iterations:
-        terminal_reason = "iteration_limit"
-    elif set(open_gap_ids) == set(prediction.prior_open_gap_ids) and prediction.iteration > 0:
-        terminal_reason = "progress_stalled"
-    elif normalized_provider == "PROVIDER_UNAVAILABLE":
-        terminal_reason = "provider_access_required"
-    elif open_gap_ids and not addressable_action_ids:
-        terminal_reason = "finite_action_exhausted"
-    elif decision == "reject":
-        terminal_reason = "external_input_required"
-    else:
-        terminal_reason = "continue_iteration"
+    terminal_reason = select_terminal(closed=can_close, iteration=prediction.iteration,
+        max_iterations=prediction.max_iterations,
+        stalled=set(open_gap_ids) == set(prediction.prior_open_gap_ids) and prediction.iteration > 0,
+        provider_unavailable=normalized_provider == "PROVIDER_UNAVAILABLE",
+        finite_action_exhausted=bool(open_gap_ids) and not addressable_action_ids,
+        external=decision == "reject")
     resolved_gap_ids, persisted_gap_ids, introduced_gap_ids, gap_transitions = gap_lineage(
         baseline_gap_ids, open_gap_ids
     )

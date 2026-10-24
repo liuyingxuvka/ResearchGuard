@@ -6,7 +6,7 @@ reasoning. It is not calibrated probability or factual causal identification."""
 
 from __future__ import annotations
 
-from importlib import import_module
+from researchguard._exports import lazy_exports
 
 _PUBLIC_API = {
     'researchguard.trace.evaluator': (
@@ -43,7 +43,6 @@ _PUBLIC_API = {
     ),
 }
 
-_LAZY_EXPORTS = {name: module for module, names in _PUBLIC_API.items() for name in names}
 
 __all__ = [
     'ConsolidationFinding',
@@ -68,16 +67,4 @@ __all__ = [
 ]
 
 
-def __getattr__(name: str):
-    try:
-        module_name = _LAZY_EXPORTS[name]
-    except KeyError:
-        raise AttributeError(f"module {__name__!r} has no attribute {name!r}") from None
-    attribute = name
-    value = getattr(import_module(module_name), attribute)
-    globals()[name] = value
-    return value
-
-
-def __dir__():
-    return sorted(set(globals()) | set(_LAZY_EXPORTS))
+__getattr__, __dir__ = lazy_exports(_PUBLIC_API, globals())

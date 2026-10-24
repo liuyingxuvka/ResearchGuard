@@ -112,11 +112,11 @@ def test_broad_causal_storyline_without_alternative_records_gap():
     data["scenario_perturbations"] = []
     data["expected_sensitivities"] = []
 
-    receipt = evaluate_model(_model(data), include_storyline_depth=True).storyline_depth
+    result = evaluate_model(_model(data), include_storyline_depth=True).storyline_depth
 
-    assert receipt.closure_status == "BLOCKED"
+    assert result.closure_status == "BLOCKED"
     assert {"missing_alternative", "unresolved_confounder_review"} <= {
-        gap["gap_id"] for gap in receipt.unresolved_gaps
+        gap["gap_id"] for gap in result.unresolved_gaps
     }
 
 
@@ -147,13 +147,13 @@ def test_important_causal_storyline_without_mechanism_or_confounder_blocks_depth
         }
     ]
 
-    receipt = evaluate_model(_model(data), include_storyline_depth=True).storyline_depth
+    result = evaluate_model(_model(data), include_storyline_depth=True).storyline_depth
 
-    assert receipt.closure_status == "BLOCKED"
+    assert result.closure_status == "BLOCKED"
     assert {
         "missing_causal_mechanism",
         "missing_confounder_review",
-    } <= {gap["gap_id"] for gap in receipt.unresolved_gaps}
+    } <= {gap["gap_id"] for gap in result.unresolved_gaps}
 
 
 def test_model_derived_selection_prefers_later_central_evidence_over_storage_order():
@@ -235,40 +235,40 @@ def test_unlinked_fixed_event_is_ineffective_and_does_not_count_toward_depth():
 
 
 def test_native_result_reports_baseline_alternatives_plan_effects_and_gaps():
-    receipt = evaluate_model(_model(_data()), include_storyline_depth=True).storyline_depth
+    result = evaluate_model(_model(_data()), include_storyline_depth=True).storyline_depth
 
-    assert receipt.schema_version == "researchguard.trace.storyline_depth.v2"
-    assert len(receipt.model_fingerprint) == 64
-    assert receipt.baseline["hypothesis_snapshots"]
-    assert any(row.alternative_ids for row in receipt.alternatives)
-    assert receipt.perturbation_plan
-    assert receipt.effects
-    assert receipt.critical_threshold == CRITICAL_PERTURBATION_THRESHOLD
-    assert receipt.coverage_counts["critical_uncovered_count"] == 0
-    assert receipt.critical_uncovered_ids == ()
-    assert receipt.critical_ineffective_ids == ()
-    assert receipt.sensitivity_mismatch_ids == ()
-    assert receipt.untested_high_impact == ()
-    assert receipt.broad_claim_licensed is True
-    assert receipt.object_coverage_counts["critical_uncovered_count"] == 0
-    assert receipt.object_depth_rows
-    assert all(row["status"] == "pass" for row in receipt.object_depth_rows if row["critical"])
-    assert all(row["start_middle_end_covered"] for row in receipt.temporal_coverage)
-    assert receipt.predictive_holdout_status == "not_requested"
-    assert receipt.predictive_claim_licensed is False
-    assert receipt.covered_claim_scope == "broad"
-    assert receipt.effective_perturbation_count == sum(
-        effect.counts_toward_depth for effect in receipt.effects
+    assert result.schema_version == "researchguard.trace.storyline_depth.v2"
+    assert len(result.model_fingerprint) == 64
+    assert result.baseline["hypothesis_snapshots"]
+    assert any(row.alternative_ids for row in result.alternatives)
+    assert result.perturbation_plan
+    assert result.effects
+    assert result.critical_threshold == CRITICAL_PERTURBATION_THRESHOLD
+    assert result.coverage_counts["critical_uncovered_count"] == 0
+    assert result.critical_uncovered_ids == ()
+    assert result.critical_ineffective_ids == ()
+    assert result.sensitivity_mismatch_ids == ()
+    assert result.untested_high_impact == ()
+    assert result.broad_claim_licensed is True
+    assert result.object_coverage_counts["critical_uncovered_count"] == 0
+    assert result.object_depth_rows
+    assert all(row["status"] == "pass" for row in result.object_depth_rows if row["critical"])
+    assert all(row["start_middle_end_covered"] for row in result.temporal_coverage)
+    assert result.predictive_holdout_status == "not_requested"
+    assert result.predictive_claim_licensed is False
+    assert result.covered_claim_scope == "broad"
+    assert result.effective_perturbation_count == sum(
+        effect.counts_toward_depth for effect in result.effects
     )
-    for effect in receipt.effects:
+    for effect in result.effects:
         assert effect.baseline_solver_id == "osqp.direct.v1"
         assert effect.perturbed_solver_id == effect.baseline_solver_id
         for row in effect.deltas.values():
             assert {"rank", "confidence", "event_support", "contradictions", "gaps"} <= set(row)
-    assert "does not prove factual truth" in receipt.claim_boundary
+    assert "does not prove factual truth" in result.claim_boundary
 
 
-def test_cli_depth_and_model_backed_simulation_expose_native_receipt():
+def test_cli_depth_and_model_backed_simulation_expose_native_result():
     depth = subprocess.run(
         [sys.executable, "-m", "researchguard", "trace", "depth", str(EXAMPLE), "--pretty"],
         cwd=ROOT,
@@ -276,9 +276,9 @@ def test_cli_depth_and_model_backed_simulation_expose_native_receipt():
         capture_output=True,
         check=True,
     )
-    receipt = json.loads(depth.stdout)
-    assert receipt["schema_version"] == "researchguard.trace.storyline_depth.v2"
-    assert receipt["effects"]
+    result = json.loads(depth.stdout)
+    assert result["schema_version"] == "researchguard.trace.storyline_depth.v2"
+    assert result["effects"]
 
     simulation = subprocess.run(
         [
@@ -305,11 +305,11 @@ def test_cli_depth_and_model_backed_simulation_expose_native_receipt():
 
 def test_nonpassing_baseline_cannot_receive_storyline_depth_pass() -> None:
     negative = ROOT / "examples" / "trace" / "operation_before_tender_contradiction.yaml"
-    receipt = evaluate_model(_model(yaml.safe_load(negative.read_text(encoding="utf-8"))), include_storyline_depth=True).storyline_depth
+    result = evaluate_model(_model(yaml.safe_load(negative.read_text(encoding="utf-8"))), include_storyline_depth=True).storyline_depth
 
-    assert receipt.closure_status == "BLOCKED"
-    assert receipt.broad_claim_licensed is False
-    assert "baseline_model_not_ok" in {gap["gap_id"] for gap in receipt.unresolved_gaps}
+    assert result.closure_status == "BLOCKED"
+    assert result.broad_claim_licensed is False
+    assert "baseline_model_not_ok" in {gap["gap_id"] for gap in result.unresolved_gaps}
 
 
 def test_default_plan_executes_every_critical_candidate() -> None:
@@ -320,30 +320,30 @@ def test_default_plan_executes_every_critical_candidate() -> None:
         for item in candidates
         if item.priority_score >= CRITICAL_PERTURBATION_THRESHOLD
     }
-    receipt = evaluate_model(model, include_storyline_depth=True).storyline_depth
-    executed_ids = {effect.perturbation.perturbation_id for effect in receipt.effects}
+    result = evaluate_model(model, include_storyline_depth=True).storyline_depth
+    executed_ids = {effect.perturbation.perturbation_id for effect in result.effects}
 
     assert critical_ids
     assert critical_ids <= executed_ids
-    assert receipt.coverage_counts["critical_count"] == len(critical_ids)
-    assert receipt.coverage_counts["executed_count"] == len(receipt.effects)
-    assert all(row["required_coverage_ratio"] == 1.0 for row in receipt.coverage_by_kind)
+    assert result.coverage_counts["critical_count"] == len(critical_ids)
+    assert result.coverage_counts["executed_count"] == len(result.effects)
+    assert all(row["required_coverage_ratio"] == 1.0 for row in result.coverage_by_kind)
 
 
 def test_budget_exhaustion_preserves_universe_and_blocks_broad_closure() -> None:
     model = _model(_data())
     baseline = evaluate_model(model, include_storyline_depth=False)
-    receipt = evaluate_storyline_depth(model, baseline, max_perturbations=1)
+    result = evaluate_storyline_depth(model, baseline, max_perturbations=1)
 
-    assert receipt.closure_status == "GAP"
-    assert receipt.requested_claim_scope == "broad"
-    assert receipt.covered_claim_scope == "bounded"
-    assert receipt.broad_claim_licensed is False
-    assert receipt.coverage_counts["eligible_count"] > receipt.coverage_counts["executed_count"]
-    assert receipt.coverage_counts["critical_uncovered_count"] > 0
-    assert receipt.untested_high_impact
+    assert result.closure_status == "GAP"
+    assert result.requested_claim_scope == "broad"
+    assert result.covered_claim_scope == "bounded"
+    assert result.broad_claim_licensed is False
+    assert result.coverage_counts["eligible_count"] > result.coverage_counts["executed_count"]
+    assert result.coverage_counts["critical_uncovered_count"] > 0
+    assert result.untested_high_impact
     assert "untested_high_impact_perturbations" in {
-        gap["gap_id"] for gap in receipt.unresolved_gaps
+        gap["gap_id"] for gap in result.unresolved_gaps
     }
 
     cli = subprocess.run(
@@ -361,20 +361,20 @@ def test_budget_exhaustion_preserves_universe_and_blocks_broad_closure() -> None
         capture_output=True,
         check=True,
     )
-    cli_receipt = json.loads(cli.stdout)
-    assert cli_receipt["closure_status"] == "GAP"
-    assert cli_receipt["critical_uncovered_ids"]
+    cli_result = json.loads(cli.stdout)
+    assert cli_result["closure_status"] == "GAP"
+    assert cli_result["critical_uncovered_ids"]
 
 
 def test_bounded_request_never_becomes_broad_license() -> None:
     model = _model(_data())
     baseline = evaluate_model(model, include_storyline_depth=False)
-    receipt = evaluate_storyline_depth(model, baseline, requested_claim_scope="bounded")
+    result = evaluate_storyline_depth(model, baseline, requested_claim_scope="bounded")
 
-    assert receipt.closure_status == "PASS"
-    assert receipt.requested_claim_scope == "bounded"
-    assert receipt.covered_claim_scope == "bounded"
-    assert receipt.broad_claim_licensed is False
+    assert result.closure_status == "PASS"
+    assert result.requested_claim_scope == "bounded"
+    assert result.covered_claim_scope == "bounded"
+    assert result.broad_claim_licensed is False
 
 
 def test_model_freshness_changes_with_authoritative_model() -> None:
@@ -399,15 +399,15 @@ def test_single_event_noncausal_trace_cannot_license_broad_depth() -> None:
     data["scenario_perturbations"] = []
     data["expected_sensitivities"] = []
 
-    receipt = evaluate_model(_model(data), include_storyline_depth=True).storyline_depth
+    result = evaluate_model(_model(data), include_storyline_depth=True).storyline_depth
 
-    assert receipt.broad_claim_licensed is False
-    assert receipt.closure_status == "BLOCKED"
+    assert result.broad_claim_licensed is False
+    assert result.closure_status == "BLOCKED"
     assert any(
         row["object_type"] == "trace"
         and row["status"] == "fail"
         and "trace_event_count_below_native_floor" in row["findings"]
-        for row in receipt.object_depth_rows
+        for row in result.object_depth_rows
     )
 
 
@@ -445,12 +445,12 @@ def test_one_ineffective_critical_perturbation_is_not_hidden_by_effective_ones()
         }
     )
 
-    receipt = evaluate_model(_model(data), include_storyline_depth=True).storyline_depth
+    result = evaluate_model(_model(data), include_storyline_depth=True).storyline_depth
 
-    assert "evidence_ablation:remove_unlinked_control" in receipt.critical_ineffective_ids
-    assert receipt.broad_claim_licensed is False
+    assert "evidence_ablation:remove_unlinked_control" in result.critical_ineffective_ids
+    assert result.broad_claim_licensed is False
     assert "ineffective_critical_perturbations" in {
-        gap["gap_id"] for gap in receipt.unresolved_gaps
+        gap["gap_id"] for gap in result.unresolved_gaps
     }
 
 
@@ -458,14 +458,14 @@ def test_expected_sensitivity_must_match_same_engine_support_effect() -> None:
     data = _data()
     data["expected_sensitivities"][0]["expected_direction"] = "increase"
 
-    receipt = evaluate_model(_model(data), include_storyline_depth=True).storyline_depth
+    result = evaluate_model(_model(data), include_storyline_depth=True).storyline_depth
 
-    assert receipt.sensitivity_mismatch_ids == (
+    assert result.sensitivity_mismatch_ids == (
         "sensitivity_without_strong_signals",
     )
-    assert receipt.broad_claim_licensed is False
+    assert result.broad_claim_licensed is False
     assert "expected_sensitivity_mismatch" in {
-        gap["gap_id"] for gap in receipt.unresolved_gaps
+        gap["gap_id"] for gap in result.unresolved_gaps
     }
 
 
@@ -473,13 +473,13 @@ def test_critical_event_without_time_blocks_object_depth() -> None:
     data = _data()
     next(item for item in data["events"] if item["event_id"] == "event_funding")["time_interval"] = None
 
-    receipt = evaluate_model(_model(data), include_storyline_depth=True).storyline_depth
+    result = evaluate_model(_model(data), include_storyline_depth=True).storyline_depth
 
-    assert receipt.closure_status == "BLOCKED"
+    assert result.closure_status == "BLOCKED"
     assert any(
         row["object_id"] == "event_funding"
         and "event_time_missing_or_unknown" in row["findings"]
-        for row in receipt.object_depth_rows
+        for row in result.object_depth_rows
     )
 
 
@@ -487,13 +487,13 @@ def test_traceguard_never_promotes_internal_perturbation_to_future_prediction() 
     data = _data()
     data["metadata"]["storyline_depth_policy"] = {"prediction_requested": True}
 
-    receipt = evaluate_model(_model(data), include_storyline_depth=True).storyline_depth
+    result = evaluate_model(_model(data), include_storyline_depth=True).storyline_depth
 
-    assert receipt.predictive_holdout_status == "unsupported_without_native_future_holdout"
-    assert receipt.predictive_claim_licensed is False
-    assert receipt.closure_status == "BLOCKED"
+    assert result.predictive_holdout_status == "unsupported_without_native_future_holdout"
+    assert result.predictive_claim_licensed is False
+    assert result.closure_status == "BLOCKED"
     assert "predictive_holdout_not_supported" in {
-        gap["gap_id"] for gap in receipt.unresolved_gaps
+        gap["gap_id"] for gap in result.unresolved_gaps
     }
 
 
@@ -538,10 +538,10 @@ def test_low_importance_explicit_trace_cannot_escape_broad_object_denominator() 
         }
     )
 
-    receipt = evaluate_model(_model(data), include_storyline_depth=True).storyline_depth
+    result = evaluate_model(_model(data), include_storyline_depth=True).storyline_depth
     row = next(
         item
-        for item in receipt.object_depth_rows
+        for item in result.object_depth_rows
         if item["object_type"] == "trace"
         and item["object_id"] == "trace_low_importance_shallow"
     )
@@ -549,7 +549,7 @@ def test_low_importance_explicit_trace_cannot_escape_broad_object_denominator() 
     assert row["critical"] is True
     assert row["status"] == "fail"
     assert "trace_event_count_below_native_floor" in row["findings"]
-    assert receipt.broad_claim_licensed is False
+    assert result.broad_claim_licensed is False
 
 
 def _long_trace_depth_row(
@@ -666,10 +666,10 @@ def test_live_alternatives_exclude_the_leader() -> None:
 
     model = load_model(Path(__file__).parent / "fixtures" / "evergiven" / "tr_v2b.yaml")
     baseline = evaluate_model(model)
-    receipt = evaluate_storyline_depth(model, baseline, max_perturbations=0)
+    result = evaluate_storyline_depth(model, baseline, max_perturbations=0)
     projections = baseline.inference.hypothesis_projections
-    assert {row.hypothesis_id for row in projections if row.rank == 1}.isdisjoint(receipt.live_alternative_ids)
-    assert set(receipt.live_alternative_ids) == {row.hypothesis_id for row in projections if row.live and row.rank != 1}
+    assert {row.hypothesis_id for row in projections if row.rank == 1}.isdisjoint(result.live_alternative_ids)
+    assert set(result.live_alternative_ids) == {row.hypothesis_id for row in projections if row.live and row.rank != 1}
 
 
 def test_depth_self_checks_flag_a_causal_pull(monkeypatch) -> None:
@@ -681,9 +681,9 @@ def test_depth_self_checks_flag_a_causal_pull(monkeypatch) -> None:
     monkeypatch.setattr(engine, "_fix_storyline_support", lambda model, problem, policy: problem, raising=False)
     model = load_model(Path(__file__).parent / "fixtures" / "evergiven" / "tr_v1.yaml")
     baseline = evaluate_model(model)
-    receipt = evaluate_storyline_depth(model, baseline, max_perturbations=0)
-    assert any(row["gap_id"].startswith("causal_declaration_raises_support:") for row in receipt.unresolved_gaps)
-    assert receipt.closure_status == "BLOCKED"
+    result = evaluate_storyline_depth(model, baseline, max_perturbations=0)
+    assert any(row["gap_id"].startswith("causal_declaration_raises_support:") for row in result.unresolved_gaps)
+    assert result.closure_status == "BLOCKED"
 
 
 def test_depth_self_checks_flag_opposition_raising_support(monkeypatch) -> None:
@@ -699,9 +699,9 @@ def test_depth_self_checks_flag_opposition_raising_support(monkeypatch) -> None:
 
     monkeypatch.setattr(compiler, "build_storyline_causal_factors", reverse_opposition)
     model = load_model(Path(__file__).parent / "fixtures" / "evergiven" / "tr_v2b.yaml")
-    receipt = evaluate_storyline_depth(model, evaluate_model(model), max_perturbations=0)
-    assert any(row["gap_id"].startswith("opposition_raises_support:") for row in receipt.unresolved_gaps)
-    assert receipt.closure_status == "BLOCKED"
+    result = evaluate_storyline_depth(model, evaluate_model(model), max_perturbations=0)
+    assert any(row["gap_id"].startswith("opposition_raises_support:") for row in result.unresolved_gaps)
+    assert result.closure_status == "BLOCKED"
 
 
 def test_depth_self_checks_accept_the_evergiven_models() -> None:
@@ -709,5 +709,5 @@ def test_depth_self_checks_accept_the_evergiven_models() -> None:
 
     for path in sorted((Path(__file__).parent / "fixtures" / "evergiven").glob("*.yaml")):
         model = load_model(path)
-        receipt = evaluate_storyline_depth(model, evaluate_model(model), max_perturbations=0)
-        assert not any("raises_support:" in row["gap_id"] for row in receipt.unresolved_gaps)
+        result = evaluate_storyline_depth(model, evaluate_model(model), max_perturbations=0)
+        assert not any("raises_support:" in row["gap_id"] for row in result.unresolved_gaps)

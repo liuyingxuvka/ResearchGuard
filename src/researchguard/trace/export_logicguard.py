@@ -16,6 +16,7 @@ if TYPE_CHECKING:
 
 from .evaluator import EvaluationResult
 from .loader import dump_yaml
+from researchguard.ownership import handoff_source_owned
 
 
 LOGICGUARD_HANDOFF_SCHEMA = "researchguard.trace.logic-handoff.v1"
@@ -72,8 +73,10 @@ def _hypothesis_handoff(model: "TraceGuardModel", inference: Mapping[str, Any], 
             "limiting_evidence_ids": sorted(sides["limit"]),
         })
         involved.update(set().union(*sides.values()))
+    sources = {source.source_id: source for source in model.sources}
     evidence = [{"evidence_id": item.evidence_id, "source_id": item.source_id,
-                 "text": item.raw_text or item.normalized_summary or "", "locator": item.locator or ""}
+                 "text": item.raw_text or item.normalized_summary or "", "locator": item.locator or "",
+                 **(handoff_source_owned(sources[item.source_id]) if item.source_id in sources else {})}
                 for item in model.evidence if item.evidence_id in involved]
     return {"hypotheses": hypotheses, "evidence": evidence}
 

@@ -34,6 +34,9 @@ def test_missing_support_withholds_conclusion() -> None:
         defeats_conclusion=lambda _ids: False,
     )
     assert result.wording_license == "withhold"
+    model = load_model_from_dict({"model": {"id": "unsupported"},
+        "nodes": {"C": {"type": "Claim", "text": "Claim without supporting evidence"}}, "edges": []})
+    assert license_model_claim(model, "C").wording_license == "withhold"
 
 
 def test_model_claim_sets_come_from_the_model_evaluator() -> None:

@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-import hashlib
-import json
+from ..iteration import baseline_identity, gap_lineage, select_terminal
+
 from fractions import Fraction
 from itertools import combinations
 
@@ -18,9 +18,6 @@ from .schema import (
 )
 
 
-def _digest(value: object) -> str:
-    body = json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
-    return f"sha256:{hashlib.sha256(body.encode('utf-8')).hexdigest()}"
 
 
 def _pairs(spec: ExperimentSpec) -> tuple[tuple[str, str], ...]:
@@ -128,7 +125,7 @@ def observe_experiments(spec: ExperimentSpec, observations: tuple[ExperimentObse
         ids = tuple(row.evidence_id for row in unexpected) or tuple(row.evidence_id for row in valid_construction)
         gaps.add("prediction-matrix-revision-required")
         revision_candidate = PredictionMatrixRevisionCandidate(
-            candidate_id=f"matrix-revision:{_digest(ids)[7:27]}",
+            candidate_id=f"matrix-revision:{baseline_identity(ids)[7:27]}",
             unexpected_observation_ids=ids,
             required_actions=("revise_hypothesis_or_prediction_matrix", "freeze_new_matrix_before_replay"),
         )
@@ -180,32 +177,20 @@ def observe_experiments(spec: ExperimentSpec, observations: tuple[ExperimentObse
 
     prior = set(spec.prior_open_gap_ids)
     current = set(gaps)
-    resolved = tuple(sorted(prior - current))
-    persisted = tuple(sorted(prior & current))
-    introduced = tuple(sorted(current - prior))
+    resolved, persisted, introduced, _ = gap_lineage(prior, current)
     progressed = bool(resolved or introduced or (spec.iteration == 0 and observations))
-    if spec.iteration >= spec.max_iterations:
-        terminal = "iteration_limit"
-    elif not current and len(active_ids) == 1:
-        terminal = "model_closed_for_task"
+    closed = not current and len(active_ids) == 1
+    if closed:
         progressed = True
-    elif not current and len(active_ids) > 1 and valid_construction and recommendation.selected_experiment_ids:
-        # Prior gaps/fingerprint cannot prove whether this evidence is historically
-        # new. A concrete remaining experiment permits a bounded next iteration,
-        # without claiming progress or weakening the iteration limit.
-        terminal = "continue_iteration"
-    elif current == prior and spec.iteration > 0:
-        terminal = "progress_stalled"
-    elif revision_candidate or any(gap.startswith(("observation-", "holdout-conflict:")) for gap in current) or "declared-candidates-indistinguishable" in current or "experiment-count-limit-prevents-distinguishing-set" in current:
-        terminal = "external_input_required"
-    elif current:
-        terminal = "continue_iteration"
-    else:
-        terminal = "continue_iteration"
+    continuation = not current and len(active_ids) > 1 and valid_construction and recommendation.selected_experiment_ids
+    terminal = select_terminal(closed=closed, iteration=spec.iteration, max_iterations=spec.max_iterations,
+        stalled=not continuation and current == prior and spec.iteration > 0,
+        external=bool(revision_candidate or any(gap.startswith(("observation-", "holdout-conflict:")) for gap in current) or "declared-candidates-indistinguishable" in current or "experiment-count-limit-prevents-distinguishing-set" in current))
 
     holdout_ids = tuple(row.evidence_id for row in valid_holdouts)
     first_unresolved_gap = sorted(current)[0] if current else ""
     return ExperimentIterationResult(
+        baseline_identity=baseline_identity(spec.to_dict()),
         task_id=spec.task_id,
         iteration=spec.iteration,
         recommendation=recommendation,

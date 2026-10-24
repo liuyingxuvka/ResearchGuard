@@ -78,4 +78,4 @@ def test_synthesis_computes_native_depth_itself():
     assert plan.status == "blocked_support_gap"
     assert "native_depth_not_licensed" in plan.open_gaps
     assert all(f"native_depth_gap:{gap}" in plan.open_gaps for gap in expected.unresolved_gaps)
-    assert not any("receipt" in gap for gap in plan.open_gaps)
+    assert not any("result" in gap for gap in plan.open_gaps)

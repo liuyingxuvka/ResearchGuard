@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.5.14 - 2026-10-24
+
+- Research folders now expose one native verdict for writers, readable status pages and current/candidate comparisons. Optional library, search and anchor-ablation declarations join source, trace, logic and experiment results without replacing their native reasoning rules.
+- Source-owned copied text and metadata are checked for drift. Explicit handoff synchronization refreshes those fields and reports updated identities while preserving downstream links, author summaries and unrelated provenance.
+- Predict-observe-revise loops share canonical baseline_identity, terminal decisions and gap lineage. Older frozen predictions must be frozen again; candidates never overwrite current models.
+- Removed unused interface-binding inputs: remove nonempty block_interfaces and interface_bindings lists. Provenance uses separation_reason in place of separation_receipt_id; empty legacy lists remain readable.
+- Removed logic outline and synthesize --delivery. The stable synthesize request/plan API remains available; writing tools own finished outlines and delivery. LogicWriting should consume the five-key status verdict.
+- The skill explains one research tree and one meaning for target. Maintenance uses FlowGuard 0.70.11, function-based map components and native wording/license and iteration models.
+
 ## v0.5.13 - 2026-10-23
 
 - Keep native route models in one research folder with a `research.yaml` index and shared hypothesis, source and anchor ids. Use `researchguard status <folder>` for a readable or JSON view of hypotheses, evidence, open gaps and next actions.

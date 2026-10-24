@@ -54,3 +54,19 @@ def test_scalar_provenance_names_its_loader_owner(owner) -> None:
         load_model_from_dict(raw, validate=False)
     assert label in str(exc.value)
     assert "not iterable" in str(exc.value)
+
+
+def test_retired_block_interfaces_are_load_errors():
+    from researchguard.logic.loader import ModelLoadError
+    raw = {"model": {"id": "plain", "root_claim": "C"}, "nodes": {"C": {"type": "Claim", "text": "A plain claim"}}}
+    model = load_model_from_dict({**raw, "block_interfaces": []})
+    assert "block_interfaces" not in model.to_dict()
+    with pytest.raises(ModelLoadError, match="block_interfaces.*retired"):
+        load_model_from_dict({**raw, "block_interfaces": [{}]})
+
+
+def test_retired_separation_key_names_the_current_input():
+    from researchguard.logic.provenance import ProvenanceError, ProvenanceRecord
+    with pytest.raises(ProvenanceError, match="separation_receipt_id.*separation_reason"):
+        ProvenanceRecord(origin_kind="external_source", quote="declared quotation",
+                         metadata={"separation_receipt_id": "old-review"})

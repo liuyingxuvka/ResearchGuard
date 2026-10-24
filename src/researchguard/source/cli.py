@@ -9,6 +9,8 @@ Boundary: Source candidates and evidence anchors require downstream TraceGuard/L
 
 from __future__ import annotations
 
+from researchguard._artifact_io import _load_json_object
+
 import argparse
 import json
 import sys
@@ -526,13 +528,13 @@ def run(args: argparse.Namespace) -> int:
     if args.command == "depth":
         model = load_model(args.model)
         observation = _load_observation(args.observation) if args.observation else None
-        updated, receipt = apply_observation_and_replan(
+        updated, depth_result = apply_observation_and_replan(
             model,
             observation,
             provider_status=args.provider_status,
             limit=args.limit,
         )
-        payload = to_plain(receipt)
+        payload = to_plain(depth_result)
         if args.output:
             Path(args.output).write_text(
                 json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
@@ -571,8 +573,8 @@ def run(args: argparse.Namespace) -> int:
             if Path(args.into).resolve() == Path(args.output).resolve():
                 raise ValueError("--output must be different from --into")
             existing = yaml.safe_load(Path(args.into).read_text(encoding="utf-8"))
-            merged, added, conflicts = sync_traceguard_seed(source, existing)
-            payload.update(added=added, conflicts=conflicts)
+            merged, added, updated, conflicts = sync_traceguard_seed(source, existing)
+            payload.update(added=added, updated=updated, conflicts=conflicts)
         else:
             merged = export_traceguard_seed(source)
         write_yaml(args.output, merged)
@@ -590,11 +592,6 @@ def run(args: argparse.Namespace) -> int:
     raise ValueError(f"Unknown command {args.command!r}")
 
 
-def _load_json_object(path: str | Path) -> dict[str, Any]:
-    payload = json.loads(Path(path).read_text(encoding="utf-8"))
-    if not isinstance(payload, dict):
-        raise ValueError(f"JSON artifact must contain an object: {path}")
-    return payload
 
 
 def _write_json(path: str | Path, payload: Mapping[str, Any] | dict[str, Any]) -> None:

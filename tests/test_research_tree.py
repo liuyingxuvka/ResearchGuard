@@ -141,3 +141,118 @@ def test_one_observation_reaches_trace_and_logic_by_sync(tmp_path, capsys):
     status = json.loads(capsys.readouterr().out)
     extra = next(row for row in status['evidence'] if row['anchor'] == 'anc-extra')
     assert 'trace:h_demand:support' in extra['used_by'] and 'logic:anc-extra' in extra['used_by']
+
+
+@pytest.mark.parametrize('route,field,code', [
+    ('trace', 'raw_text', 'copy_drift:trace:a:raw_text'),
+    ('trace_source', 'title', 'copy_drift:trace:s:title'),
+    ('trace_source', 'url', 'copy_drift:trace:s:url'),
+    ('trace_source', 'source_date', 'copy_drift:trace:s:source_date'),
+    ('trace_source', 'lineage_id', 'copy_drift:trace:s:lineage_id'),
+    ('logic', 'quote', 'copy_drift:logic:E:quote'),
+    ('logic', 'content_hash', 'copy_drift:logic:E:content_hash'),
+    ('logic', 'source_reference', 'copy_drift:logic:E:source_reference'),
+    ('logic', 'source_date', 'copy_drift:logic:E:source_date'),
+])
+def test_copy_drift_is_an_error_for_each_copied_field(folder, route, field, code):
+    def drift(data):
+        if route == 'trace':
+            row = data['evidence'][0]
+        elif route == 'trace_source':
+            row = data['sources'][0]
+        else:
+            row = data['nodes']['E']['provenance'][0]
+            if field == 'content_hash':
+                row.pop('quote')
+        row[field] = 'sha256:' + '0' * 64 if field == 'content_hash' else '2026-10-24' if field == 'source_date' else 'Different copied value'
+    _rewrite(folder, 'logic.yaml' if route == 'logic' else 'trace.yaml', drift)
+    tree = load_research(folder)
+    assert code in check_research_tree(tree.index, tree.models, tree.observations)['errors']
+
+
+def test_library_anchored_evidence_gets_one_answer(folder):
+    from researchguard.logic.source_library import SourceLibrary
+    from researchguard.logic.validator import source_model_provenance_problems
+    from researchguard.source.schema import to_plain
+    paper = folder / 'paper.txt'
+    paper.write_text('Observed text')
+    library = SourceLibrary(folder / 'library')
+    imported = library.import_source(paper, title='Paper')
+    library.create_source_model(imported.source.source_id, evidence='Observed text')
+    node = sorted(library.source_node_ids(imported.source.source_id))[0]
+    _rewrite(folder, 'source.yaml', lambda d: d.update(sources=[{'source_id': imported.source.source_id}], anchors=[]))
+    _rewrite(folder, 'logic.yaml', lambda d: d['nodes']['E']['provenance'][0].update(source_id=imported.source.source_id, locator=node))
+    _rewrite(folder, 'research.yaml', lambda d: d.update(library='library', models={'source': 'source.yaml', 'logic': 'logic.yaml'}))
+    tree = load_research(folder)
+    expected = source_model_provenance_problems(tree.models['logic'], to_plain(tree.models['source']), source_library=tree.library)
+    assert expected == []
+    assert check_research_tree(tree.index, tree.models, source_library=tree.library)['errors'] == []
+    without = check_research_tree(tree.index, tree.models)
+    assert any(item.startswith('dangling_anchor:logic:E:') for item in without['errors'])
+    assert without['errors'] == source_model_provenance_problems(tree.models['logic'], to_plain(tree.models['source']))
+
+
+def test_opposite_anchor_directions_are_a_disagreement(folder):
+    from researchguard.research import route_disagreements
+    _rewrite(folder, 'logic.yaml', lambda d: d['edges'].append({'source': 'E', 'target': 'h', 'type': 'attacks'}))
+    tree = load_research(folder)
+    rows = route_disagreements(tree.models, [])
+    assert rows == [{'hypothesis': 'h', 'kind': 'anchor', 'detail': 'a'}]
+
+
+def test_ruled_out_and_accepted_is_a_disagreement():
+    from researchguard.research import route_disagreements
+    rows = route_disagreements({}, [{'id': 'h', 'logic': {'state': 'IN'}, 'trace': {'live': False}, 'experiment': {'status': 'consistent'}}])
+    assert rows and rows[0]['hypothesis'] == 'h' and rows[0]['kind'] == 'status'
+    assert route_disagreements({}, [{'id': 'h', 'logic': {'state': 'UNDECIDED'}, 'experiment': {'status': 'consistent'}}]) == []
+
+
+def test_ablation_nobody_uses_is_named(folder):
+    from researchguard.research import apply_ablations
+    tree = load_research(folder)
+    index = copy.deepcopy(tree.index)
+    index['ablations'] = [{'id': 'unused', 'remove_anchors': ['a'], 'hypothesis': 'h', 'expect': 'weaken'}]
+    rows, errors, warnings = apply_ablations(index, tree.models, {})
+    assert not errors and rows[0]['caught_by'] == []
+    assert warnings == ['ablation_not_caught:unused']
+    index['ablations'].append(dict(index['ablations'][0]))
+    assert 'duplicate_ablation:unused' in apply_ablations(index, tree.models, {})[1]
+    index['ablations'] = [{'id': 'bad', 'remove_anchors': ['missing'], 'hypothesis': 'h', 'expect': 'weaken'}]
+    assert 'unknown_anchor:ablation:bad:missing' in apply_ablations(index, tree.models, {})[1]
+
+
+def test_verdict_matches_each_route_and_page_is_readable():
+    from researchguard.logic.minimal_sets import license_model_claim
+    from researchguard.research import render_status_markdown
+    from researchguard.source.stop_decision import decide_model_search_stop
+    original = Path(__file__).resolve().parents[1] / 'examples/research/evergiven'
+    tree = load_research(original)
+    status = research_status(tree)
+    verdict = status['verdict']
+    assert set(verdict) == {'search', 'root_claim', 'live_hypotheses', 'contested', 'errors'}
+    assert verdict['root_claim']['wording_license'] == license_model_claim(tree.models['logic'], 'h_suez').wording_license == 'withhold'
+    assert verdict['search'] == decide_model_search_stop(tree.models['source'], remaining_budget=3)[1].status == 'continue_search'
+    assert verdict['live_hypotheses'] == ['h_demand', 'h_yantian']
+    assert verdict['contested'] is False and verdict['errors'] == 0
+    assert status['disagreements'] == []
+    assert status['ablations'] and all(row['caught_by'] for row in status['ablations'])
+    page = render_status_markdown(status)
+    assert len(page.encode()) <= 3000
+    assert '{' not in page
+    assert page.split('## ', 1)[1].startswith('Verdict')
+    lines = page.splitlines()
+    for index, line in enumerate(lines):
+        if line.startswith('|---'):
+            assert line.count('|') == lines[index - 1].count('|')
+
+
+def test_candidate_view_lists_only_changes(folder, capsys):
+    from researchguard.research import compare_research_status
+    status = research_status(load_research(folder))
+    assert compare_research_status(status, copy.deepcopy(status))['changes'] == []
+    candidate = copy.deepcopy(status)
+    candidate['hypotheses'][0]['logic']['state'] = 'OUT'
+    changes = compare_research_status(status, candidate)['changes']
+    assert len(changes) == 1 and changes[0]['kind'] == 'hypothesis' and changes[0]['id'] == 'h'
+    assert main(['status', str(folder), '--candidate', str(folder)]) == 0
+    assert capsys.readouterr().out == '## Current and candidate\n\nno changes\n'
