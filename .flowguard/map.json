@@ -251,7 +251,9 @@
         "tests/trace/test_task_iteration.py",
         "tests/trace/test_traceguard.py"
       ],
-      "models": [],
+      "models": [
+        ".flowguard/models/trace_projection_model.py"
+      ],
       "layer": "routes",
       "status": "confirmed",
       "fingerprint": "sha256:3896062679c587297d3ca057fecfad831712f605188f94188c0ce2f91abafe1c"
@@ -286,7 +288,9 @@
       "tests": [
         "tests/experiment/test_recommendation.py"
       ],
-      "models": [],
+      "models": [
+        ".flowguard/models/experiment_elimination_model.py"
+      ],
       "layer": "routes",
       "status": "confirmed",
       "fingerprint": "sha256:4afaed83466f1ac289c360e7789774a4a045943230ef9c294e535d5b6bbe725e"
@@ -480,7 +484,9 @@
         "tests/logic/test_source_library.py",
         "tests/logic/test_source_library_io.py"
       ],
-      "models": [],
+      "models": [
+        ".flowguard/models/source_library_model.py"
+      ],
       "status": "confirmed",
       "fingerprint": "sha256:3f8cbcaac338163b26a9b339b130682b56ea98bd89bba4cb4cc88b6e91b4a9f3"
     },
@@ -519,7 +525,9 @@
         "tests/logic/test_synthesis_contract.py",
         "tests/logic/test_synthesis_native_closure.py"
       ],
-      "models": [],
+      "models": [
+        ".flowguard/models/synthesis_plan_model.py"
+      ],
       "status": "confirmed",
       "fingerprint": "sha256:7756bcf5dfa3779a000deabf308d13e7bb8ad015ab5517da0cca7ce89885098e"
     }

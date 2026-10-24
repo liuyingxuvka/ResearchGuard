@@ -9,6 +9,10 @@ MODEL_ID = "wording_license"
 PARENT = "logic-argument"
 COMPONENTS = ["logic-argument"]
 IMPLEMENTED_BY = {"License": "src/researchguard/logic/minimal_sets.py:license_model_claim"}
+NOT_MODELED = {
+    "src/researchguard/logic/model.py:LogicModel._ensure_edge_indexes": "Rebuilds the in-memory edge index from the edge list; it never changes nodes, edges or argument state.",
+    "src/researchguard/logic/model.py:LogicModel.rebuild_edge_indexes": "Rebuilds the in-memory edge index from the edge list; it never changes nodes, edges or argument state.",
+}
 TESTED_BY = {
     "blocked_claim_is_withheld": ["tests/logic/test_minimal_sets.py:test_blocked_claim_names_its_attackers"],
     "assert_needs_support_and_no_blocker": ["tests/logic/test_minimal_sets.py:test_missing_support_withholds_conclusion"],

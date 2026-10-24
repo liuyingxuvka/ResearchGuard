@@ -675,3 +675,16 @@ def test_invalid_declared_evidence_strength_is_rejected(table):
     payload['metadata']['evidence_type_strength'] = table
     with pytest.raises(SchemaError, match='evidence_type_strength'):
         TraceGuardModel.from_dict(payload)
+
+
+def test_live_hypotheses_lie_within_the_margin_of_the_best() -> None:
+    from researchguard.trace.inference.policy import InferencePolicy
+
+    margin = InferencePolicy().alternative_live_margin
+    for name in ("tr_v2b", "tr_v1"):
+        rows = list(_storyline_projections(load_model(EVERGIVEN / f"{name}.yaml")).values())
+        best = max(row.support for row in rows)
+        for row in rows:
+            assert row.live == (best - row.support <= margin)
+        ordered = sorted(rows, key=lambda row: row.rank)
+        assert [row.hypothesis_id for row in ordered] == [row.hypothesis_id for row in sorted(rows, key=lambda row: (-row.support, row.hypothesis_id))]

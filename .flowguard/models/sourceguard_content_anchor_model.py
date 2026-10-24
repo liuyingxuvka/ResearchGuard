@@ -32,7 +32,7 @@ class AnchorDepthState:
     content_qualified: bool = True
     depth_status: str = "not_run"
     emitted_findings: tuple[str, ...] = ()
-    proof_status: str = "not_run"
+    check_status: str = "not_run"
 
 
 CONTENT_GOOD = AnchorDepthInput(
@@ -62,7 +62,7 @@ class EvaluateContentAnchorFinding:
         "content_qualified",
         "depth_status",
         "emitted_findings",
-        "proof_status",
+        "check_status",
     )
 
     def apply(self, input_obj: AnchorDepthInput, state: AnchorDepthState):
@@ -77,7 +77,7 @@ class EvaluateContentAnchorFinding:
                     content_qualified=input_obj.content_qualified,
                     depth_status="blocked" if blocked else "pass",
                     emitted_findings=input_obj.emitted_findings,
-                    proof_status=(
+                    check_status=(
                         "blocked_proven"
                         if blocked and finding_matches
                         else "good_proven"
@@ -95,7 +95,7 @@ def content_anchor_identity_is_singular(
     trace,
 ) -> InvariantResult:
     del trace
-    if state.proof_status == "not_run":
+    if state.check_status == "not_run":
         return InvariantResult.pass_()
     findings = set(state.emitted_findings)
     if state.content_qualified:
