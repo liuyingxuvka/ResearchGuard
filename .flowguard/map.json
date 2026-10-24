@@ -226,7 +226,9 @@
         "src/researchguard/trace/temporal.py",
         "src/researchguard/trace/validation.py"
       ],
-      "entrypoints": [],
+      "entrypoints": [
+        "src/researchguard/trace/export_logicguard.py:logicguard_bundle"
+      ],
       "state": [
         "trace models, events, storyline hypotheses, ablations and trace case-library data"
       ],
@@ -326,7 +328,8 @@
         "Load the research index and resolve source-library provenance through the native validator.",
         "Detect copied-content drift and direct evidence or conclusion disagreements between native routes.",
         "Apply declared anchor ablations in memory and expose uncaught known-bad cases.",
-        "Project the authoritative search stop and root wording license into one five-key verdict; compare current and candidate questions without writing models."
+        "Project the authoritative search stop and root wording license into one five-key verdict; compare current and candidate questions without writing models.",
+        "The question model lists live hypotheses and contested routes from route states."
       ],
       "files": [
         "src/researchguard/research.py"
@@ -359,7 +362,9 @@
       "fingerprint": "sha256:904a0e0f8a1d23e6f81c7aab39cd550cf69b2290c6008ca600a223c0948c7f42"
     },
     {
-      "entrypoints": [],
+      "entrypoints": [
+        "src/researchguard/logic/trace_import.py:sync_trace_bundle"
+      ],
       "depends_on": [
         "researchguard-suite",
         "sourceguard"
@@ -549,26 +554,53 @@
       "model": ".flowguard/models/sourceguard_stop_decision_model.py"
     },
     {
-      "id": "iterate",
-      "summary": "Share lifecycle integrity across the four native predict-observe-revise loops.",
+      "id": "sync",
+      "summary": "Refresh source-owned copies while preserving downstream reasoning.",
+      "steps": [
+        "sourceguard:sync_traceguard_seed",
+        "traceguard:logicguard_bundle reads trace-next.yaml",
+        "logic-argument:sync_trace_bundle reads bundle.yaml"
+      ],
+      "model": ".flowguard/models/research_tree_model.py"
+    },
+    {
+      "id": "argument-iteration",
+      "summary": "Observe a frozen argument prediction bound to its baseline identity.",
       "steps": [
         "logic-argument:run_argument_iteration",
+        "logic-argument:validate_prediction_binding",
+        "researchguard-suite:require_prediction_identity"
+      ],
+      "model": ".flowguard/models/iteration_kernel_model.py"
+    },
+    {
+      "id": "search-iteration",
+      "summary": "Observe one search outcome against its frozen prediction and choose the terminal reason.",
+      "steps": [
         "sourceguard:run_search_iteration",
-        "traceguard:compare_prediction_observation",
-        "experimentguard:observe_experiments",
+        "sourceguard:validate_search_prediction_binding",
+        "researchguard-suite:require_prediction_identity",
         "researchguard-suite:select_terminal"
       ],
       "model": ".flowguard/models/iteration_kernel_model.py"
     },
     {
-      "id": "sync",
-      "summary": "Refresh source-owned copies while preserving downstream reasoning.",
+      "id": "trace-iteration",
+      "summary": "Compare a frozen trace prediction with a later observation and choose the terminal reason.",
       "steps": [
-        "sourceguard:sync_traceguard_seed",
-        "traceguard:logicguard_bundle",
-        "logic-argument:sync_trace_bundle"
+        "traceguard:compare_prediction_observation",
+        "researchguard-suite:select_terminal"
       ],
-      "model": ".flowguard/models/research_tree_model.py"
+      "model": ".flowguard/models/iteration_kernel_model.py"
+    },
+    {
+      "id": "experiment-observation",
+      "summary": "Eliminate hypotheses from experiment observations and choose the terminal reason.",
+      "steps": [
+        "experimentguard:observe_experiments",
+        "researchguard-suite:select_terminal"
+      ],
+      "model": ".flowguard/models/iteration_kernel_model.py"
     }
   ],
   "accepted_debts": []

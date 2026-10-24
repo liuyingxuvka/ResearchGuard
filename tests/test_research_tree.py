@@ -256,3 +256,35 @@ def test_candidate_view_lists_only_changes(folder, capsys):
     assert len(changes) == 1 and changes[0]['kind'] == 'hypothesis' and changes[0]['id'] == 'h'
     assert main(['status', str(folder), '--candidate', str(folder)]) == 0
     assert capsys.readouterr().out == '## Current and candidate\n\nno changes\n'
+
+
+def test_live_hypotheses_follow_every_route(folder):
+    def index(data):
+        data['hypotheses'] = [{'id': name, 'text': name.title()} for name in ('h', 'out', 'dead', 'other')]
+
+    def logic(data):
+        data['nodes']['out'] = {'type': 'Claim', 'text': 'Out'}
+        data['nodes']['dead'] = {'type': 'Claim', 'text': 'Dead'}
+        data['nodes']['other'] = {'type': 'Claim', 'text': 'Other'}
+        data['nodes']['M'] = {'type': 'Premise', 'text': 'A premise the out hypothesis needs', 'missing': True}
+        data['edges'].append({'source': 'M', 'target': 'out', 'type': 'supports'})
+
+    def trace(data):
+        data['storyline_hypotheses'].append({'hypothesis_id': 'dead', 'claim': 'Dead'})
+        data['hypothesis_evidence_links'].append({'link_id': 'l-dead', 'hypothesis_id': 'dead', 'evidence_id': 'a', 'polarity': 'oppose'})
+
+    _rewrite(folder, 'research.yaml', index)
+    _rewrite(folder, 'logic.yaml', logic)
+    _rewrite(folder, 'trace.yaml', trace)
+    status = research_status(load_research(folder))
+    rows = {row['id']: row for row in status['hypotheses']}
+    assert rows['out']['logic']['state'] == 'OUT'
+    assert rows['dead']['trace']['live'] is False
+    assert rows['other']['experiment']['status'] == 'eliminated'
+    assert status['verdict']['live_hypotheses'] == ['h']
+    assert status['verdict']['contested'] is bool(status['disagreements'])
+    from researchguard.research import route_disagreements, verdict_for_writers
+    tree = load_research(folder)
+    accepted_and_excluded = [dict(rows['h'], logic={'state': 'IN'}, trace={'live': False})]
+    disagreements = route_disagreements({}, accepted_and_excluded)
+    assert disagreements and verdict_for_writers(tree, accepted_and_excluded, disagreements, [])['contested'] is True

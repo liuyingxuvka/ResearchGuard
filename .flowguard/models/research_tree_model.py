@@ -1,4 +1,4 @@
-"""Shared-id reference constraints with known-bad mutations and native replay."""
+"""One research question: per-hypothesis route states and the question-level outputs that status derives from them."""
 from dataclasses import dataclass
 from pathlib import Path
 import sys
@@ -7,113 +7,250 @@ from flowguard import FunctionResult, Invariant, InvariantResult, Workflow
 from flowguard.explorer import Explorer
 
 MODEL_ID = 'research_tree_crossref'
-PARENT = 'system'
+PARENT = 'research-tree'
 COMPONENTS = ['research-tree', 'researchguard-suite', 'sourceguard', 'logic-argument']
 IMPLEMENTED_BY = {'Check': 'src/researchguard/research.py:check_research_tree',
  'Status': 'src/researchguard/research.py:status_main',
- 'CopyCheck': 'src/researchguard/ownership.py:copied_content_problems',
- 'SourceSync': 'src/researchguard/source/handoff.py:sync_traceguard_seed',
- 'LogicSync': 'src/researchguard/logic/trace_import.py:sync_trace_bundle',
  'Disagreements': 'src/researchguard/research.py:route_disagreements',
  'Ablations': 'src/researchguard/research.py:apply_ablations',
  'Verdict': 'src/researchguard/research.py:verdict_for_writers'}
-TESTED_BY = {'dangling_reference_is_an_error': ['tests/test_research_tree.py:test_dangling_references_and_invalid_native_models_are_errors'],
- 'consistent_tree_has_no_error': ['tests/test_research_tree.py:test_consistent_tree_has_no_errors'],
+TESTED_BY = {'dangling_reference_is_an_error': ['tests/test_research_tree.py:test_dangling_references_and_invalid_native_models_are_errors',
+                                                'tests/test_research_tree.py:test_missing_index_exits_2'],
+ 'consistent_tree_has_no_error': ['tests/test_research_tree.py:test_consistent_tree_has_no_errors',
+                                  'tests/test_research_tree.py:test_checker_is_in_memory_and_source_is_optional',
+                                  'tests/test_research_tree.py:test_shipped_evergiven_tree_has_consistent_shared_ids',
+                                  'tests/test_research_tree.py:test_candidate_view_lists_only_changes'],
  'unused_hypothesis_is_only_a_warning': ['tests/test_research_tree.py:test_unused_hypothesis_is_only_a_warning'],
- 'copied_content_matches_owner': ['tests/test_research_tree.py:test_copy_drift_is_an_error_for_each_copied_field'],
+ 'copied_content_matches_owner': ['tests/test_research_tree.py:test_copy_drift_is_an_error_for_each_copied_field',
+                                  'tests/test_research_tree.py:test_one_observation_reaches_trace_and_logic_by_sync'],
  'library_anchors_are_resolved': ['tests/test_research_tree.py:test_library_anchored_evidence_gets_one_answer'],
- 'routes_do_not_contradict_silently': ['tests/test_research_tree.py:test_opposite_anchor_directions_are_a_disagreement'],
+ 'routes_do_not_contradict_silently': ['tests/test_research_tree.py:test_opposite_anchor_directions_are_a_disagreement',
+                                       'tests/test_research_tree.py:test_ruled_out_and_accepted_is_a_disagreement'],
  'every_ablation_is_caught_or_named': ['tests/test_research_tree.py:test_ablation_nobody_uses_is_named'],
- 'verdict_matches_the_routes': ['tests/test_research_tree.py:test_verdict_matches_each_route_and_page_is_readable']}
+ 'verdict_matches_the_routes': ['tests/test_research_tree.py:test_verdict_matches_each_route_and_page_is_readable'],
+ 'live_hypotheses_follow_route_exclusions': ['tests/test_research_tree.py:test_live_hypotheses_follow_every_route'],
+ 'contested_iff_disagreement': ['tests/test_research_tree.py:test_live_hypotheses_follow_every_route',
+                                'tests/test_research_tree.py:test_verdict_matches_each_route_and_page_is_readable']}
 
 
 @dataclass(frozen=True)
-class Case:
-    kind: str
+class Hypothesis:
+    """One hypothesis row: its state in each route and the anchors each route reads for it."""
+    id: str
+    logic: str | None = None          # IN / OUT / UNDECIDED, None when the logic route does not list it
+    trace_live: bool | None = None    # None when the trace route does not list it
+    experiment: str | None = None     # consistent / eliminated / underdetermined / None
+    anchors: tuple[tuple[str, str, str], ...] = ()   # (anchor, route, support|oppose)
+
+
+@dataclass(frozen=True)
+class Question:
+    """The inputs status reads: hypothesis rows, references, copies, ablations and the root claim."""
+    name: str
+    hypotheses: tuple[Hypothesis, ...]
+    dangling: tuple[str, ...] = ()           # problem codes of references to missing anchors or sources
+    drifted: tuple[str, ...] = ()            # problem codes of copied fields that differ from their owner
+    library_anchors: tuple[str, ...] = ()    # anchors that resolve only through the source library
+    ablations: tuple[tuple[str, str, tuple[str, ...]], ...] = ()   # (id, hypothesis, routes whose result moved)
+    root_license: str = ''                   # native wording license of the root claim
 
 
 @dataclass(frozen=True)
 class State:
-    kind: str = ''
+    question: Question | None = None
     errors: tuple[str, ...] = ()
     warnings: tuple[str, ...] = ()
-    satisfied: bool = True
+    disagreements: tuple[tuple[str, str, str], ...] = ()   # (hypothesis, kind, detail)
+    ablations: tuple[tuple[str, tuple[str, ...]], ...] = ()  # (id, caught_by)
+    live_hypotheses: tuple[str, ...] = ()
+    contested: bool = False
+    license: str = ''
 
 
-def expected(kind):
-    if kind == 'trace':
-        return ('dangling_anchor:trace:a',), ()
-    if kind == 'logic':
-        return ('dangling_anchor:logic:E:missing (source s)',), ()
-    if kind == 'unused':
-        return (), ('hypothesis_unused:unused',)
-    return (), ()
+def excluded(row):
+    return row.logic == 'OUT' or row.trace_live is False or row.experiment == 'eliminated'
 
 
-class Check:
-    name = 'Check'
-    reads = ()
-    writes = ('kind', 'errors', 'warnings')
+def accepted(row):
+    return row.logic == 'IN' or row.trace_live is True
+
+
+def unused(row):
+    return row.logic is None and row.trace_live is None and row.experiment is None
+
+
+def route_conflicts(question):
+    """Direct opposite anchor directions, and a hypothesis accepted by one route and excluded by another."""
+    rows = []
+    for row in question.hypotheses:
+        seen = {}
+        for anchor, route, direction in row.anchors:
+            seen.setdefault(anchor, {}).setdefault(route, set()).add(direction)
+        for anchor, routes in sorted(seen.items()):
+            if {frozenset(routes.get('trace', ())), frozenset(routes.get('logic', ()))} == {frozenset({'support'}), frozenset({'oppose'})}:
+                rows.append((row.id, 'anchor', anchor))
+        if accepted(row) and excluded(row):
+            rows.append((row.id, 'status', ''))
+    return tuple(rows)
+
+
+class Status:
+    """status: check references and copies, compare routes, run ablations and project the verdict."""
+    name = 'Status'
+    reads = ('question',)
+    writes = ('errors', 'warnings', 'disagreements', 'ablations', 'live_hypotheses', 'contested', 'license')
     mutation = ''
 
-    def apply(self, case, state):
-        if case.kind in FEATURES:
-            yield FunctionResult(case.kind, State(case.kind, satisfied=self.mutation != FEATURES[case.kind][1]), label=case.kind)
-            return
-        errors, warnings = expected(case.kind)
-        if self.mutation == f'ignore_{case.kind}':
-            errors = ()
-        if self.mutation == 'consistent_as_error' and case.kind == 'consistent':
-            errors = ('invented_error',)
-        if self.mutation == 'warning_as_error' and warnings:
-            errors, warnings = warnings, ()
-        yield FunctionResult((errors, warnings), State(case.kind, errors, warnings), label=case.kind)
+    def apply(self, question, state):
+        wrong = self.mutation
+        errors = [code for code in question.dangling
+                  if not (wrong == 'ignore_trace' and ':trace:' in code) and not (wrong == 'ignore_logic' and ':logic:' in code)]
+        if wrong != 'ignore_copy_drift':
+            errors.extend(question.drifted)
+        if wrong == 'status_ignores_library':
+            errors.extend(f'dangling_anchor:logic:{anchor}' for anchor in question.library_anchors)
+        if wrong == 'consistent_as_error' and not errors:
+            errors.append('invented_error')
+        warnings = []
+        for row in question.hypotheses:
+            if unused(row):
+                (errors if wrong == 'warning_as_error' else warnings).append(f'hypothesis_unused:{row.id}')
+        disagreements = () if wrong == 'skip_route_comparison' else route_conflicts(question)
+        warnings.extend(f'route_disagreement:{h}:{kind}:{detail}' for h, kind, detail in disagreements)
+        ablations = tuple((name, caught) for name, _, caught in question.ablations
+                          if not (wrong == 'drop_uncaught_ablations' and not caught))
+        warnings.extend(f'ablation_not_caught:{name}' for name, caught in ablations if not caught)
+        live = tuple(row.id for row in question.hypotheses
+                     if wrong == 'excluded_hypothesis_stays_live' and row.experiment == 'eliminated' or not excluded(row))
+        contested = bool(disagreements) and wrong != 'disagreement_not_contested'
+        license = 'assert' if wrong == 'verdict_upgrades_license' and question.root_license else question.root_license
+        result = State(question, tuple(sorted(set(errors))), tuple(sorted(set(warnings))), disagreements, ablations, live, contested, license)
+        yield FunctionResult(result, result, label=question.name)
 
 
-def dangling(state, trace):
-    if state.kind in ('trace', 'logic') and not state.errors:
-        return InvariantResult.fail('dangling anchor was not an error')
-    return InvariantResult.pass_()
+def rule(check):
+    def invariant(state, trace):
+        if state.question is None:
+            return InvariantResult.pass_()
+        problem = check(state, state.question)
+        return InvariantResult.fail(problem) if problem else InvariantResult.pass_()
+    return invariant
 
 
-def consistent(state, trace):
-    if state.kind == 'consistent' and state.errors:
-        return InvariantResult.fail('consistent tree received an error')
-    return InvariantResult.pass_()
+def consistent_tree(state, question):
+    if not question.dangling and not question.drifted and state.errors:
+        return f'consistent tree received errors {state.errors}'
 
 
-def warning(state, trace):
-    if state.kind == 'unused' and (state.errors or not state.warnings):
-        return InvariantResult.fail('unused hypothesis must be a warning only')
-    return InvariantResult.pass_()
+def dangling_reference(state, question):
+    missing = [code for code in question.dangling if code not in state.errors]
+    return f'dangling references were not errors: {missing}' if missing else None
+
+
+def unused_hypothesis(state, question):
+    for row in question.hypotheses:
+        if unused(row) and (f'hypothesis_unused:{row.id}' not in state.warnings or any(row.id in code for code in state.errors)):
+            return f'unused hypothesis {row.id} must only warn'
+
+
+def copied_content(state, question):
+    missing = [code for code in question.drifted if code not in state.errors]
+    return f'copy drift was not an error: {missing}' if missing else None
+
+
+def library_anchors(state, question):
+    wrong = [code for code in state.errors for anchor in question.library_anchors if code.endswith(f':{anchor}')]
+    return f'library-resolved anchors reported as dangling: {wrong}' if wrong else None
+
+
+def routes_contradict(state, question):
+    silent = [row for row in route_conflicts(question) if row not in state.disagreements]
+    return f'route disagreements not reported: {silent}' if silent else None
+
+
+def every_ablation(state, question):
+    rows = dict(state.ablations)
+    for name, _, caught in question.ablations:
+        if name not in rows:
+            return f'ablation {name} has no row'
+        if not rows[name] and f'ablation_not_caught:{name}' not in state.warnings:
+            return f'uncaught ablation {name} is not named'
+
+
+def verdict_routes(state, question):
+    if state.license != question.root_license:
+        return f'verdict license {state.license!r} differs from the native license {question.root_license!r}'
+
+
+def live_hypotheses(state, question):
+    want = tuple(row.id for row in question.hypotheses if not excluded(row))
+    if state.live_hypotheses != want:
+        return f'live_hypotheses {state.live_hypotheses} != {want} (index order, no route excludes them)'
+
+
+def contested_rule(state, question):
+    if state.contested != bool(state.disagreements):
+        return f'contested={state.contested} with {len(state.disagreements)} disagreement(s)'
 
 
 INVARIANTS = (
-    Invariant('dangling_reference_is_an_error', 'all dangling references are errors', dangling),
-    Invariant('consistent_tree_has_no_error', 'consistent shared ids have no errors', consistent),
-    Invariant('unused_hypothesis_is_only_a_warning', 'unused index hypotheses only warn', warning),
+    Invariant('consistent_tree_has_no_error', 'A tree without dangling references or drift has no error.', rule(consistent_tree)),
+    Invariant('dangling_reference_is_an_error', 'Every dangling reference is an error.', rule(dangling_reference)),
+    Invariant('unused_hypothesis_is_only_a_warning', 'A hypothesis no route uses only warns.', rule(unused_hypothesis)),
+    Invariant('copied_content_matches_owner', 'Copied values that differ from their SourceGuard owner are errors.', rule(copied_content)),
+    Invariant('library_anchors_are_resolved', 'Anchors resolved through the source library are not dangling.', rule(library_anchors)),
+    Invariant('routes_do_not_contradict_silently', 'Direct route disagreements are reported.', rule(routes_contradict)),
+    Invariant('every_ablation_is_caught_or_named', 'Every declared ablation has a row and uncaught ones are named.', rule(every_ablation)),
+    Invariant('verdict_matches_the_routes', 'The verdict license equals the native root license.', rule(verdict_routes)),
+    Invariant('live_hypotheses_follow_route_exclusions', 'Live hypotheses are those no route excludes, in index order.', rule(live_hypotheses)),
+    Invariant('contested_iff_disagreement', 'The verdict is contested exactly when routes disagree.', rule(contested_rule)),
 )
-CASES = tuple(Case(kind) for kind in ('consistent', 'trace', 'logic', 'unused'))
+
+H = Hypothesis
+CASES = (
+    Question('consistent', (H('h', 'UNDECIDED', True, 'consistent', (('a', 'trace', 'support'), ('a', 'logic', 'support'))),), root_license='withhold'),
+    Question('trace', (H('h', None, True),), dangling=('dangling_anchor:trace:a',)),
+    Question('logic', (H('h', 'UNDECIDED', True),), dangling=('dangling_anchor:logic:E:missing (source s)',), root_license='withhold'),
+    Question('unused', (H('h', 'UNDECIDED', True), H('unused'))),
+    Question('drift', (H('h', 'UNDECIDED', True),), drifted=('copy_drift:trace:a:raw_text',)),
+    Question('library', (H('h', 'UNDECIDED'),), library_anchors=('n1',)),
+    Question('anchor_disagreement', (H('h', 'UNDECIDED', True, None, (('a', 'trace', 'support'), ('a', 'logic', 'oppose'))),)),
+    Question('status_disagreement', (H('h', 'IN', False, 'consistent'),), root_license='assert'),
+    Question('ablation', (H('h', 'UNDECIDED', True),), ablations=(('caught', 'h', ('logic',)), ('unused', 'h', ()))),
+    Question('exclusions', (H('h_out', 'OUT', True), H('h_dead', 'UNDECIDED', False), H('h_gone', 'UNDECIDED', True, 'eliminated'),
+                            H('h_live', 'UNDECIDED', True, 'consistent')), root_license='qualify'),
+)
+
+# Each known-bad variant is one step of status done wrong; every one must break a rule.
+MUTATIONS = {
+    'ignore_trace': 'dangling_reference_is_an_error',
+    'ignore_logic': 'dangling_reference_is_an_error',
+    'consistent_as_error': 'consistent_tree_has_no_error',
+    'warning_as_error': 'unused_hypothesis_is_only_a_warning',
+    'ignore_copy_drift': 'copied_content_matches_owner',
+    'status_ignores_library': 'library_anchors_are_resolved',
+    'skip_route_comparison': 'routes_do_not_contradict_silently',
+    'drop_uncaught_ablations': 'every_ablation_is_caught_or_named',
+    'verdict_upgrades_license': 'verdict_matches_the_routes',
+    'excluded_hypothesis_stays_live': 'live_hypotheses_follow_route_exclusions',
+    'disagreement_not_contested': 'contested_iff_disagreement',
+}
 
 
 def explorer(step):
-    return Explorer(Workflow((step,)), (State(),), CASES + tuple(Case(kind) for kind in FEATURES), INVARIANTS, progress_steps=0)
+    return Explorer(Workflow((step,)), (State(),), CASES, INVARIANTS, progress_steps=0)
 
 
 def build_explorer():
-    return explorer(Check())
+    return explorer(Status())
 
 
 def broken_variants():
     result = {}
-    for name in ('ignore_trace', 'ignore_logic', 'consistent_as_error', 'warning_as_error'):
-        step = Check()
+    for name in MUTATIONS:
+        step = Status()
         step.mutation = name
         result[name] = explorer(step)
-    for _, mutation, _ in FEATURES.values():
-        step = Check()
-        step.mutation = mutation
-        result[mutation] = explorer(step)
     return result
 
 
@@ -141,48 +278,39 @@ def native_case(kind):
     return index, models
 
 
-FEATURES = {
-    'drift': ('copied_content_matches_owner', 'ignore_copy_drift', 'tests/test_research_tree.py:test_copy_drift_is_an_error_for_each_copied_field'),
-    'library': ('library_anchors_are_resolved', 'status_ignores_library', 'tests/test_research_tree.py:test_library_anchored_evidence_gets_one_answer'),
-    'disagreement': ('routes_do_not_contradict_silently', 'skip_route_comparison', 'tests/test_research_tree.py:test_opposite_anchor_directions_are_a_disagreement'),
-    'ablation': ('every_ablation_is_caught_or_named', 'drop_uncaught_ablations', 'tests/test_research_tree.py:test_ablation_nobody_uses_is_named'),
-    'verdict': ('verdict_matches_the_routes', 'verdict_upgrades_license', 'tests/test_research_tree.py:test_verdict_matches_each_route_and_page_is_readable'),
-}
-
-
-def feature_rule(kind):
-    def check(state, trace):
-        if state.kind == kind and not state.satisfied:
-            return InvariantResult.fail(FEATURES[kind][0])
-        return InvariantResult.pass_()
-    return check
-
-
-INVARIANTS += (
-    Invariant('copied_content_matches_owner', 'Copied values match their SourceGuard owner.', feature_rule('drift')),
-    Invariant('library_anchors_are_resolved', 'Native library provenance is accepted consistently.', feature_rule('library')),
-    Invariant('routes_do_not_contradict_silently', 'Direct route disagreements stay visible.', feature_rule('disagreement')),
-    Invariant('every_ablation_is_caught_or_named', 'Uncaught known-bad ablations are named.', feature_rule('ablation')),
-    Invariant('verdict_matches_the_routes', 'The verdict never upgrades native results.', feature_rule('verdict')),
-)
+def project(status, root_license):
+    """Abstract state of a real research_status result, so the same rules run on the real outputs."""
+    rows = []
+    for row in status['hypotheses']:
+        logic, trace, experiment = row.get('logic') or {}, row.get('trace') or {}, row.get('experiment') or {}
+        rows.append(Hypothesis(row['id'], logic.get('state'), trace.get('live'),
+                               experiment.get('status') if experiment.get('status') not in (None, 'not_listed') else None))
+    ablations = tuple((row['id'], row['hypothesis'], tuple(row['caught_by'])) for row in status['ablations'])
+    question = Question('native', tuple(rows), ablations=ablations, root_license=root_license)
+    verdict = status['verdict']
+    return State(question, tuple(status['errors']), tuple(status['warnings']),
+                 tuple((row['hypothesis'], row['kind'], row['detail'] if row['kind'] == 'anchor' else '') for row in status['disagreements']),
+                 tuple((row['id'], tuple(row['caught_by'])) for row in status['ablations']),
+                 tuple(verdict['live_hypotheses']), verdict['contested'],
+                 (verdict['root_claim'] or {}).get('wording_license', ''))
 
 
 def native_features():
+    """Real-code obligations the abstract cases stand for; each value is True when the real code meets it."""
     from dataclasses import replace
     from tempfile import TemporaryDirectory
-    from researchguard.research import check_research_tree, route_disagreements, apply_ablations, load_research, research_status
+    import json
+    from researchguard.research import ResearchTree, check_research_tree, route_disagreements, apply_ablations, verdict_for_writers
     from researchguard.logic.loader import load_model_from_dict
     from researchguard.logic.source_library import SourceLibrary
     from researchguard.source.schema import BeliefState
     from researchguard.source.handoff import export_traceguard_seed, sync_traceguard_seed
     from researchguard.trace.schema import TraceGuardModel, HypothesisEvidenceLink
-    from researchguard.logic.model import Edge
     index, models = native_case('consistent')
     trace = models['trace']
     models['trace'] = replace(trace, evidence=(replace(trace.evidence[0], raw_text='Changed copied text'),))
     drift = 'copy_drift:trace:a:raw_text' in check_research_tree(index, models)['errors']
-    seed = export_traceguard_seed(models['source'])
-    import json
+    export_traceguard_seed(models['source'])
     changed = json.loads(json.dumps(models['trace'].to_dict()))
     changed['evidence'][0]['supports'] = ['h']
     merged, _, updated, conflicts = sync_traceguard_seed(models['source'], changed)
@@ -205,6 +333,8 @@ def native_features():
     drift = drift and not logic_conflicts and updated_logic['nodes'] == ['E'] and not any(error.startswith('copy_drift:logic:') for error in check_research_tree(index, dict(models, logic=refreshed_model))['errors'])
     directional = dict(models, logic=logic, trace=replace(trace, hypothesis_evidence_links=(HypothesisEvidenceLink.from_dict({'link_id': 'l', 'hypothesis_id': 'h', 'evidence_id': 'a', 'polarity': 'support'}),)))
     disagreement = route_disagreements(directional, []) == [{'hypothesis': 'h', 'kind': 'anchor', 'detail': 'a'}]
+    status_rows = [{'id': 'h', 'logic': {'state': 'IN'}, 'trace': {'live': False}, 'experiment': {'status': 'consistent'}}]
+    disagreement = disagreement and [row['kind'] for row in route_disagreements({}, status_rows)] == ['status']
     ablation_index = dict(index, ablations=[{'id': 'unused', 'hypothesis': 'h', 'remove_anchors': ['a'], 'expect': 'weaken'}])
     outcomes, errors, warnings = apply_ablations(ablation_index, models, {})
     ablation = not errors and outcomes[0]['caught_by'] == [] and warnings == ['ablation_not_caught:unused']
@@ -222,18 +352,32 @@ def native_features():
         actual = check_research_tree(index, {'source': source, 'logic': model}, source_library=library)
         unresolved = check_research_tree(index, {'source': source, 'logic': model})
         library_ok = not actual['errors'] and any(error.startswith('dangling_anchor:logic:E:') for error in unresolved['errors'])
-    project = Path(__file__).resolve().parents[2] / 'examples/research/evergiven'
-    from researchguard.research import status_main
+    # live_hypotheses and contested: the real verdict on rows each route excludes once.
+    rows = [{'id': 'h_out', 'logic': {'state': 'OUT'}, 'trace': {'live': True}, 'experiment': {'status': 'consistent'}},
+            {'id': 'h_dead', 'logic': {'state': 'UNDECIDED'}, 'trace': {'live': False}, 'experiment': {'status': 'consistent'}},
+            {'id': 'h_gone', 'logic': {'state': 'UNDECIDED'}, 'trace': {'live': True}, 'experiment': {'status': 'eliminated'}},
+            {'id': 'h_live', 'logic': {'state': 'UNDECIDED'}, 'trace': {'live': True}, 'experiment': {'status': 'consistent'}}]
+    empty = ResearchTree(Path('research.yaml'), {'hypotheses': [{'id': row['id'], 'text': row['id']} for row in rows]})
+    verdict = verdict_for_writers(empty, rows, [], [])
+    contested_rows = route_disagreements({}, [dict(rows[0], logic={'state': 'IN'}, trace={'live': False})])
+    live = verdict['live_hypotheses'] == ['h_live'] and verdict['contested'] is False \
+        and verdict_for_writers(empty, rows, contested_rows, [])['contested'] is True
+    return {'drift': drift, 'library': library_ok, 'disagreement': disagreement, 'ablation': ablation, 'live': live}
+
+
+def evergiven_state():
+    from tempfile import TemporaryDirectory
+    import json
+    from researchguard.research import status_main, load_research
+    from researchguard.logic.minimal_sets import license_model_claim
+    folder = Path(__file__).resolve().parents[2] / 'examples/research/evergiven'
     with TemporaryDirectory() as directory:
         output = Path(directory) / 'status.json'
-        exit_code = status_main([str(project), '--json', '--output', str(output)])
+        exit_code = status_main([str(folder), '--json', '--output', str(output)])
         status = json.loads(output.read_text())
-    if exit_code:
-        return {'drift': drift, 'library': library_ok, 'disagreement': disagreement, 'ablation': ablation, 'verdict': False}
-    verdict = status['verdict']
-    verdict_ok = verdict['root_claim']['wording_license'] == 'withhold' and verdict['search'] == 'continue_search' and not verdict['contested'] and verdict['errors'] == 0
-    ablation = ablation and bool(status['ablations']) and all(row['caught_by'] for row in status['ablations'])
-    return {'drift': drift, 'library': library_ok, 'disagreement': disagreement, 'ablation': ablation, 'verdict': verdict_ok}
+    tree = load_research(folder)
+    native_license = license_model_claim(tree.models['logic'], tree.index['root_claim']).wording_license
+    return exit_code, status, project(status, native_license)
 
 
 def conformance():
@@ -242,17 +386,28 @@ def conformance():
     from flowguard.replay import ReplayObservation
     from researchguard.research import check_research_tree
     observations, violations = [], []
-    for case in CASES:
-        index, models = native_case(case.kind)
+    model = {case.name: next(iter(Status().apply(case, State()))).new_state for case in CASES}
+    for kind in ('consistent', 'trace', 'logic', 'unused'):
+        index, models = native_case(kind)
         result = check_research_tree(index, models)
         actual = (tuple(result['errors']), tuple(result['warnings']))
-        want = expected(case.kind)
-        observations.append(ReplayObservation('Check', actual, State(case.kind, *actual)))
+        want = (model[kind].errors, model[kind].warnings)
+        observations.append(ReplayObservation('Status', actual, model[kind]))
         if actual != want:
-            violations.append(ConformanceViolation(step_index=1, rule_name='Check', message=f'{case.kind}: {actual!r} != {want!r}'))
+            violations.append(ConformanceViolation(step_index=1, rule_name='Status', message=f'{kind}: {actual!r} != {want!r}'))
     for kind, satisfied in native_features().items():
-        observations.append(ReplayObservation('Check', satisfied, State(kind, satisfied=satisfied)))
+        observations.append(ReplayObservation('Status', satisfied, State()))
         if not satisfied:
-            violations.append(ConformanceViolation(step_index=1, rule_name='Check', message=f'{kind}: native obligation failed'))
+            violations.append(ConformanceViolation(step_index=1, rule_name='Status', message=f'{kind}: native obligation failed'))
+    exit_code, status, state = evergiven_state()
+    observations.append(ReplayObservation('Status', exit_code, state))
+    if exit_code:
+        violations.append(ConformanceViolation(step_index=1, rule_name='Status', message=f'evergiven: status exited {exit_code}'))
+    for invariant in INVARIANTS:
+        verdict = invariant.check(state, ())
+        if not verdict.ok:
+            violations.append(ConformanceViolation(step_index=1, rule_name='Status', message=f'evergiven: {invariant.name}: {verdict.message}'))
+    if not (status['ablations'] and all(row['caught_by'] for row in status['ablations'])):
+        violations.append(ConformanceViolation(step_index=1, rule_name='Status', message='evergiven: a declared ablation is not caught by its route'))
     return ConformanceReport(ok=not violations, violations=tuple(violations), replayed_steps=tuple(observations),
-                             summary='Real in-memory cross-reference checker replayed for consistent, trace, logic and unused-id trees.')
+                             summary='Real checker, route comparison, ablations and verdict replayed on small trees and the Ever Given folder; the same rules run on the projected real status.')
