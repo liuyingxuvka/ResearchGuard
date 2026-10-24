@@ -1,0 +1,198 @@
+{
+  "schema": "flowguard.target.v1",
+  "goal": "RG-307: every verdict input has a model (trace_projection, experiment_elimination, synthesis_plan, source_library)",
+  "components": [
+    {
+      "id": "traceguard",
+      "summary": "Temporal and causal trace inference, storyline depth, ablations and trace-to-logic handoff.",
+      "responsibilities": [
+        "Own temporal and causal trace inference, storyline stress, case library updates and readable timeline/hypothesis/depth reporting. Expose native inference/depth results with model freshness only; handoffs carry source-model freshness and case writeback stores gaps and contradictions without solver histories. Use neutral undeclared evidence types and model-authored finite strength tables consistently across every factor; preserve case model declarations.",
+        "Keep command output to analysis results; full JSON is written only with --output.",
+        "Solve storyline support from evidence first; bound causal support below it. Depth checks that neither causal declarations nor oppose links raise support; evaluate does not run depth.",
+        "Freeze with an existing target and coverage; permit future expected evidence/event ids. Append typed observation rows in memory and compare canonical target support direction.",
+        "Preserve newly observed rows in candidates; acceptance is independent of native depth closure. Keep prediction mismatches separate from native gaps, use the suite lineage helper and count only resolved native gaps as progress.",
+        "Export hypothesis ids, native rank/support and signed evidence with original text/source/locator alongside the preserved v1 trace claims.",
+        "One expected-sensitivity check judges trace depth and question ablations."
+      ],
+      "files": [
+        "src/researchguard/trace/__init__.py",
+        "src/researchguard/trace/diagnostics.py",
+        "src/researchguard/trace/entity_resolution.py",
+        "src/researchguard/trace/evaluator.py",
+        "src/researchguard/trace/export_logicguard.py",
+        "src/researchguard/trace/handoff.py",
+        "src/researchguard/trace/inference/__init__.py",
+        "src/researchguard/trace/inference/compiler.py",
+        "src/researchguard/trace/inference/contradiction_core.py",
+        "src/researchguard/trace/inference/engine.py",
+        "src/researchguard/trace/inference/explain.py",
+        "src/researchguard/trace/inference/factors/__init__.py",
+        "src/researchguard/trace/inference/factors/entity.py",
+        "src/researchguard/trace/inference/factors/evidence_trace.py",
+        "src/researchguard/trace/inference/factors/storyline_causal.py",
+        "src/researchguard/trace/inference/factors/temporal_stage.py",
+        "src/researchguard/trace/inference/osqp_backend.py",
+        "src/researchguard/trace/inference/policy.py",
+        "src/researchguard/trace/inference/projection.py",
+        "src/researchguard/trace/inference/types.py",
+        "src/researchguard/trace/library.py",
+        "src/researchguard/trace/loader.py",
+        "src/researchguard/trace/report.py",
+        "src/researchguard/trace/results.py",
+        "src/researchguard/trace/schema.py",
+        "src/researchguard/trace/stage_model.py",
+        "src/researchguard/trace/storyline_depth.py",
+        "src/researchguard/trace/task_iteration.py",
+        "src/researchguard/trace/temporal.py",
+        "src/researchguard/trace/validation.py"
+      ],
+      "entrypoints": [
+        "src/researchguard/trace/export_logicguard.py:logicguard_bundle"
+      ],
+      "state": [
+        "trace models, events, storyline hypotheses, ablations and trace case-library data"
+      ],
+      "side_effects": [
+        "Write explicitly requested trace models, logic bundles, iteration results and case-library files"
+      ],
+      "depends_on": [
+        "researchguard-suite"
+      ],
+      "tests": [
+        "tests/trace/__init__.py",
+        "tests/trace/test_contradiction_core.py",
+        "tests/trace/test_inference_kernel.py",
+        "tests/trace/test_inference_performance.py",
+        "tests/trace/test_logicguard_export_contract.py",
+        "tests/trace/test_starter_fields.py",
+        "tests/trace/test_storyline_depth.py",
+        "tests/trace/test_task_iteration.py",
+        "tests/trace/test_traceguard.py"
+      ],
+      "models": [
+        ".flowguard/models/trace_projection_model.py"
+      ],
+      "layer": "routes"
+    },
+    {
+      "id": "experimentguard",
+      "summary": "Finite experiment discrimination, observation updates and bounded terminal decisions.",
+      "responsibilities": [
+        "Distinguish hypotheses within the declared finite count limit; minimize optional declared costs before count and IDs, retain cost mode in remaining recommendations, and exclude the selected set from alternatives. Report limit failures separately from truly indistinguishable pairs. Return experiment dispositions and revision proposals without matrix self-fingerprints.",
+        "License native closure only for a unique consistent hypothesis with no holdout counterexample and no gaps, while preserving the finite iteration limit first; holdout observations are optional.",
+        "Continue a bounded multi-survivor iteration only with a concrete distinguishing next candidate; preserve valid construction eliminations across matrix misses and never close zero survivors. Do not infer historical progress from unchanged gaps; malformed specs return one JSON error.",
+        "Load native experiment specifications and observations for both the CLI and research folder view."
+      ],
+      "files": [
+        "src/researchguard/experiment/__init__.py",
+        "src/researchguard/experiment/engine.py",
+        "src/researchguard/experiment/schema.py",
+        "src/researchguard/experiment/loader.py"
+      ],
+      "entrypoints": [
+        "src/researchguard/experiment/engine.py:recommend_experiments"
+      ],
+      "state": [
+        "experiment specifications, predictions and explicit observations"
+      ],
+      "side_effects": [
+        "Write an explicitly requested experiment recommendation or observation report"
+      ],
+      "depends_on": [
+        "researchguard-suite"
+      ],
+      "tests": [
+        "tests/experiment/test_recommendation.py"
+      ],
+      "models": [
+        ".flowguard/models/experiment_elimination_model.py"
+      ],
+      "layer": "routes"
+    },
+    {
+      "entrypoints": [],
+      "depends_on": [
+        "logic-argument"
+      ],
+      "layer": "routes",
+      "id": "logic-artifact",
+      "parent": "logicguard",
+      "files": [
+        "src/researchguard/logic/citation_matrix.py",
+        "src/researchguard/logic/markdown_structure.py",
+        "src/researchguard/logic/structure_audit.py",
+        "src/researchguard/logic/structured_artifact.py",
+        "src/researchguard/logic/synthesis.py",
+        "src/researchguard/logic/synthesis_contract.py"
+      ],
+      "summary": "Arguments inside written artifacts and an argument-ordered unit plan for writing tools.",
+      "responsibilities": [
+        "Audit structured artifacts and citation coverage against native argument models.",
+        "Produce the stable synthesis-request.v1 and synthesis-plan.v1 bridge; writing tools own outlines and delivery."
+      ],
+      "state": [
+        "structured artifacts, citation mappings and synthesis requests"
+      ],
+      "side_effects": [
+        "Write only explicitly requested structure, citation and synthesis reports"
+      ],
+      "tests": [
+        "tests/logic/test_artifact_synthesis.py",
+        "tests/logic/test_citation_matrix.py",
+        "tests/logic/test_markdown_structure.py",
+        "tests/logic/test_structured_artifact.py",
+        "tests/logic/test_synthesis_contract.py",
+        "tests/logic/test_synthesis_native_closure.py"
+      ],
+      "models": [
+        ".flowguard/models/synthesis_plan_model.py"
+      ]
+    },
+    {
+      "entrypoints": [],
+      "depends_on": [
+        "logic-argument"
+      ],
+      "layer": "routes",
+      "id": "logic-library",
+      "parent": "logicguard",
+      "files": [
+        "src/researchguard/logic/library_viewer.py",
+        "src/researchguard/logic/source_intake.py",
+        "src/researchguard/logic/source_library.py",
+        "src/researchguard/logic/source_library_io.py",
+        "src/researchguard/logic_viewer/launcher.py",
+        "src/researchguard/logic_viewer/software_update.py",
+        "src/researchguard/logic_viewer/i18n.py",
+        "src/researchguard/logic_viewer/settings.py",
+        "src/researchguard/logic_viewer/ui_data.py",
+        "src/researchguard/logic_viewer/__init__.py",
+        "src/researchguard/logic_viewer/common.py",
+        "src/researchguard/logic_viewer/store.py",
+        "src/researchguard/logic_viewer/desktop_app.py"
+      ],
+      "summary": "Personal source library, per-source argument models and optional desktop browsing.",
+      "responsibilities": [
+        "Import and deduplicate source material, maintain per-source models and project reading lists.",
+        "Browse and export the personal source library without requiring the optional viewer for core commands."
+      ],
+      "state": [
+        "source-library files, project reading lists and node search indexes"
+      ],
+      "side_effects": [
+        "Create or replace explicitly requested library content, indexes, packages and viewer exports"
+      ],
+      "tests": [
+        "tests/logic/test_library_viewer.py",
+        "tests/logic/test_source_intake.py",
+        "tests/logic/test_source_library.py",
+        "tests/logic/test_source_library_io.py"
+      ],
+      "models": [
+        ".flowguard/models/source_library_model.py"
+      ]
+    }
+  ],
+  "flows": [],
+  "remove": []
+}
