@@ -31,7 +31,7 @@ A SourceGuard gap may name the hypotheses it would move (`hypothesis_ids`);
 `status` checks them (`unknown_hypothesis:source:<gap>:<id>`) and adds
 `hypotheses` to each open source gap and next search.
 
-`researchguard status <folder> [--json] [--output <path>] [--candidate <folder2>]`
+`researchguard status <folder> [--json] [--output <path>] [--candidate <folder2> | --hypothesis <id>]`
 reads the index (or its explicit path). Default output is a compact verdict-first
 page; JSON retains complete results. It writes only an explicit `--output`.
 Exit 0 means no errors, 1 means model or reference errors, and 2 means an unreadable
@@ -104,8 +104,11 @@ native domain rules about evidence, protected scope or holdout independence.
 
 ## Verdict for writers
 
-Writers, including LogicWriting, read only `verdict` from
-`researchguard status <folder> --json --output research-status.json`:
+Writers, including LogicWriting, read `verdict` from
+`researchguard status <folder> --json --output research-status.json`, and these
+pinned keys that tie the report to its folder: `question`, `hypotheses[].id` /
+`text`, `models` (route to `{path, status}`), `evidence[].anchor` and
+`evidence[].directions`:
 
 - `search`: the native stop decision with the index's budget/sufficiency, or
   `not_run` without source and `search`. Native values are `continue_search`,
@@ -115,6 +118,27 @@ Writers, including LogicWriting, read only `verdict` from
 - `live_hypotheses`: index-order ids not explicitly excluded by any route.
 - `contested`: whether route disagreements exist; it is a risk, not a new gate.
 - `errors`: the number of errors in this status result.
+
+## Evidence directions
+
+Each `evidence[]` row keeps `used_by` and adds `directions`: rows `{route,
+hypothesis, direction, node}` with `direction` `support`, `oppose` or `limit`,
+sorted by route and hypothesis. Trace uses link polarity and storyline evidence
+lists (`node: null`). Logic uses only the direct edges of the Evidence node whose
+provenance names the anchor, when the edge targets a hypothesis: `supports`,
+`attacks`/`contradicts`/`undercuts`, `qualifies`. Indirect chains carry no
+direction. Route disagreements compare the same rows (`limit` is not compared).
+
+## Read one hypothesis
+
+`researchguard status <folder> --hypothesis <id>` prints Routes (logic state and
+confidence, trace rank/support/live, experiment status; `not in logic` /
+`not in trace`), Evidence (support, oppose, limit), Ablations (its own and those
+whose `effects` name it), Disagreements, Open gaps and Next (searches whose gap
+names it; experiments that predict for it), all taken from the same status. With
+`--json` the keys are `id`, `text`, `routes`, `evidence`, `ablations`,
+`disagreements`, `open_gaps`, `next`. An unknown id prints
+`unknown_hypothesis:<id>` and exits 2. Empty sections print `- none`.
 
 ## Synchronize new evidence
 

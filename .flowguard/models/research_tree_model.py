@@ -13,7 +13,9 @@ IMPLEMENTED_BY = {'Check': 'src/researchguard/research.py:check_research_tree',
  'Status': 'src/researchguard/research.py:status_main',
  'Disagreements': 'src/researchguard/research.py:route_disagreements',
  'Ablations': 'src/researchguard/research.py:apply_ablations',
- 'Verdict': 'src/researchguard/research.py:verdict_for_writers'}
+ 'Verdict': 'src/researchguard/research.py:verdict_for_writers',
+ 'Directions': 'src/researchguard/research.py:evidence_directions',
+ 'HypothesisView': 'src/researchguard/research.py:hypothesis_view'}
 TESTED_BY = {'dangling_reference_is_an_error': ['tests/test_research_tree.py:test_dangling_references_and_invalid_native_models_are_errors',
                                                 'tests/test_research_tree.py:test_missing_index_exits_2'],
  'consistent_tree_has_no_error': ['tests/test_research_tree.py:test_consistent_tree_has_no_errors',
@@ -32,6 +34,9 @@ TESTED_BY = {'dangling_reference_is_an_error': ['tests/test_research_tree.py:tes
  'ablation_agrees_with_trace_depth': ['tests/test_research_tree.py:test_trace_ablation_agrees_with_trace_depth',
                                       'tests/test_research_tree.py:test_ablation_rows_name_side_effects'],
  'gap_names_known_hypotheses': ['tests/test_research_tree.py:test_gap_hypotheses_are_checked_and_grouped'],
+ 'evidence_directions_match_routes': ['tests/test_research_tree.py:test_evidence_directions_cover_both_routes',
+                                      'tests/test_research_tree.py:test_writer_surface_keys_are_pinned'],
+ 'hypothesis_view_matches_status': ['tests/test_research_tree.py:test_hypothesis_view_lists_its_rows'],
  'contested_iff_disagreement': ['tests/test_research_tree.py:test_live_hypotheses_follow_every_route',
                                 'tests/test_research_tree.py:test_verdict_matches_each_route_and_page_is_readable']}
 
@@ -43,7 +48,7 @@ class Hypothesis:
     logic: str | None = None          # IN / OUT / UNDECIDED, None when the logic route does not list it
     trace_live: bool | None = None    # None when the trace route does not list it
     experiment: str | None = None     # consistent / eliminated / underdetermined / None
-    anchors: tuple[tuple[str, str, str], ...] = ()   # (anchor, route, support|oppose)
+    anchors: tuple[tuple[str, str, str], ...] = ()   # direct evidence: (anchor, route, support|oppose|limit)
 
 
 @dataclass(frozen=True)
@@ -70,6 +75,7 @@ class Question:
     library_anchors: tuple[str, ...] = ()    # anchors that resolve only through the source library
     ablations: tuple[Ablation, ...] = ()
     gap_hypotheses: tuple[tuple[str, tuple[str, ...]], ...] = ()   # (source gap id, hypothesis ids it names)
+    searches: tuple[tuple[str, str], ...] = ()   # (next search action id, the gap it targets)
     root_license: str = ''                   # native wording license of the root claim
 
 
@@ -83,6 +89,10 @@ class State:
     live_hypotheses: tuple[str, ...] = ()
     contested: bool = False
     license: str = ''
+    directions: tuple[tuple[str, str, str, str], ...] = ()   # evidence rows: (anchor, route, hypothesis, direction)
+    gap_rows: tuple[tuple[str, tuple[str, ...]], ...] = ()   # open source gaps with the hypotheses they name
+    next_rows: tuple[tuple[str, tuple[str, ...]], ...] = ()  # next searches with the hypotheses they would move
+    views: tuple[tuple[str, tuple[str, ...], tuple[str, ...], tuple[str, ...]], ...] = ()  # (hypothesis, gaps, next, ablations)
 
 
 def excluded(row):
@@ -103,6 +113,8 @@ def route_conflicts(question):
     for row in question.hypotheses:
         seen = {}
         for anchor, route, direction in row.anchors:
+            if direction == 'limit':
+                continue
             seen.setdefault(anchor, {}).setdefault(route, set()).add(direction)
         for anchor, routes in sorted(seen.items()):
             if {frozenset(routes.get('trace', ())), frozenset(routes.get('logic', ()))} == {frozenset({'support'}), frozenset({'oppose'})}:
@@ -150,7 +162,18 @@ class Status:
                      if wrong == 'excluded_hypothesis_stays_live' and row.experiment == 'eliminated' or not excluded(row))
         contested = bool(disagreements) and wrong != 'disagreement_not_contested'
         license = 'assert' if wrong == 'verdict_upgrades_license' and question.root_license else question.root_license
-        result = State(question, tuple(sorted(set(errors))), tuple(sorted(set(warnings))), disagreements, ablations, live, contested, license)
+        directions = tuple(sorted((anchor, route, row.id, direction) for row in question.hypotheses for anchor, route, direction in row.anchors
+                                  if not (wrong == 'logic_direction_dropped' and route == 'logic')))
+        names = dict(question.gap_hypotheses)
+        gap_rows = tuple(question.gap_hypotheses)
+        next_rows = tuple((action, names.get(gap, ())) for action, gap in question.searches)
+        views = tuple((row.id,
+                       () if wrong == 'hypothesis_view_drops_gaps' else tuple(gap for gap, named in gap_rows if row.id in named),
+                       tuple(action for action, named in next_rows if row.id in named),
+                       tuple(item.id for item in question.ablations if item.hypothesis == row.id))
+                      for row in question.hypotheses)
+        result = State(question, tuple(sorted(set(errors))), tuple(sorted(set(warnings))), disagreements, ablations, live, contested, license,
+                       directions, gap_rows, next_rows, views)
         yield FunctionResult(result, result, label=question.name)
 
 
@@ -231,6 +254,24 @@ def live_hypotheses(state, question):
         return f'live_hypotheses {state.live_hypotheses} != {want} (index order, no route excludes them)'
 
 
+def directions_rule(state, question):
+    want = {(anchor, route, row.id, direction) for row in question.hypotheses for anchor, route, direction in row.anchors}
+    if question.name != 'native' and set(state.directions) != want:
+        return f'evidence directions {sorted(set(state.directions) ^ want)} differ from the route models'
+    bad = [row for row in state.directions if row[3] not in ('support', 'oppose', 'limit')]
+    if bad:
+        return f'unknown directions {bad}'
+
+
+def view_rule(state, question):
+    for hypothesis, gaps, actions, ablations in state.views:
+        want = (tuple(gap for gap, named in state.gap_rows if hypothesis in named),
+                tuple(action for action, named in state.next_rows if hypothesis in named),
+                tuple(item.id for item in question.ablations if item.hypothesis == hypothesis))
+        if (gaps, actions, ablations) != want:
+            return f'view of {hypothesis} lists {(gaps, actions, ablations)}, the full status names it in {want}'
+
+
 def contested_rule(state, question):
     if state.contested != bool(state.disagreements):
         return f'contested={state.contested} with {len(state.disagreements)} disagreement(s)'
@@ -248,6 +289,8 @@ INVARIANTS = (
     Invariant('ablation_agrees_with_trace_depth', 'A trace-declared ablation is caught by trace exactly when trace depth passes its expected sensitivity.', rule(trace_depth_agrees)),
     Invariant('verdict_matches_the_routes', 'The verdict license equals the native root license.', rule(verdict_routes)),
     Invariant('live_hypotheses_follow_route_exclusions', 'Live hypotheses are those no route excludes, in index order.', rule(live_hypotheses)),
+    Invariant('evidence_directions_match_routes', 'Each evidence direction row matches its route model, logic included.', rule(directions_rule)),
+    Invariant('hypothesis_view_matches_status', 'One hypothesis view lists exactly the gaps, next searches and ablations that name it.', rule(view_rule)),
     Invariant('contested_iff_disagreement', 'The verdict is contested exactly when routes disagree.', rule(contested_rule)),
 )
 
@@ -258,6 +301,13 @@ CASES = (
     Question('logic', (H('h', 'UNDECIDED', True),), dangling=('dangling_anchor:logic:E:missing (source s)',), root_license='withhold'),
     Question('unused', (H('h', 'UNDECIDED', True), H('unused'))),
     Question('gaps', (H('h', 'UNDECIDED', True), H('h_alt')), gap_hypotheses=(('g_alt', ('h_alt',)), ('g_bad', ('h_missing',)))),
+    Question('readback', (H('h_suez', 'UNDECIDED', False, None, (('anc-unctad-surge', 'trace', 'oppose'), ('anc-sca', 'logic', 'support'))),
+                          H('h_demand', 'UNDECIDED', True, None, (('anc-unctad-surge', 'trace', 'support'), ('anc-unctad-surge', 'logic', 'support'),
+                                                                  ('anc-limits', 'logic', 'limit'))),
+                          H('h_yantian')),
+             gap_hypotheses=(('gap-alt-yantian', ('h_yantian',)), ('gap-pre-trend', ('h_suez', 'h_demand'))),
+             searches=(('act-yantian', 'gap-alt-yantian'), ('act-pre-trend', 'gap-pre-trend')),
+             ablations=(Ablation('abl_no_unctad', 'h_demand', logic_moved=True),)),
     Question('drift', (H('h', 'UNDECIDED', True),), drifted=('copy_drift:trace:a:raw_text',)),
     Question('library', (H('h', 'UNDECIDED'),), library_anchors=('n1',)),
     Question('anchor_disagreement', (H('h', 'UNDECIDED', True, None, (('a', 'trace', 'support'), ('a', 'logic', 'oppose'))),)),
@@ -284,6 +334,8 @@ MUTATIONS = {
     'verdict_upgrades_license': 'verdict_matches_the_routes',
     'ablation_uses_a_second_sensitivity': 'ablation_agrees_with_trace_depth',
     'excluded_hypothesis_stays_live': 'live_hypotheses_follow_route_exclusions',
+    'logic_direction_dropped': 'evidence_directions_match_routes',
+    'hypothesis_view_drops_gaps': 'hypothesis_view_matches_status',
     'disagreement_not_contested': 'contested_iff_disagreement',
 }
 
@@ -329,7 +381,7 @@ def native_case(kind):
     return index, models
 
 
-def project(status, root_license, trace_depth=None):
+def project(status, root_license, trace_depth=None, views=None):
     """Abstract state of a real research_status result, so the same rules run on the real outputs."""
     rows = []
     for row in status['hypotheses']:
@@ -342,11 +394,15 @@ def project(status, root_license, trace_depth=None):
                       for row in status['ablations'])
     question = Question('native', tuple(rows), ablations=ablations, root_license=root_license)
     verdict = status['verdict']
+    directions = tuple(sorted((row['anchor'], item['route'], item['hypothesis'], item['direction'])
+                              for row in status['evidence'] for item in row.get('directions', ())))
+    gap_rows = tuple((row['id'], tuple(row.get('hypotheses', ()))) for row in status['open_gaps'] if row['route'] == 'source')
+    next_rows = tuple((row['id'], tuple(row.get('hypotheses', ()))) for row in status['next'] if row['route'] == 'search')
     return State(question, tuple(status['errors']), tuple(status['warnings']),
                  tuple((row['hypothesis'], row['kind'], row['detail'] if row['kind'] == 'anchor' else '') for row in status['disagreements']),
                  tuple((row['id'], tuple(row['caught_by'])) for row in status['ablations']),
                  tuple(verdict['live_hypotheses']), verdict['contested'],
-                 (verdict['root_claim'] or {}).get('wording_license', ''))
+                 (verdict['root_claim'] or {}).get('wording_license', ''), directions, gap_rows, next_rows, tuple(views or ()))
 
 
 def native_features():
@@ -420,7 +476,21 @@ def native_features():
                                         'gaps': [{'gap_id': 'g', 'hypothesis_ids': ['h', 'h_missing']}]})
     gap_errors = check_research_tree(index, dict(models, source=gap_source))['errors']
     gaps = 'unknown_hypothesis:source:g:h_missing' in gap_errors and 'unknown_hypothesis:source:g:h' not in gap_errors
-    return {'drift': drift, 'gaps': gaps, 'library': library_ok, 'disagreement': disagreement, 'ablation': ablation, 'live': live}
+    try:
+        from researchguard.research import evidence_directions
+    except ImportError:
+        directions = False
+    else:
+        limited = load_model_from_dict({'model': {'id': 'limit'}, 'nodes': {
+            'h': {'type': 'Claim', 'text': 'Hypothesis'}, 'x': {'type': 'Claim', 'text': 'Not a hypothesis'},
+            'E': {'type': 'Evidence', 'text': 'Observed text', 'provenance': [{'origin_kind': 'external_source', 'source_id': 's', 'locator': 'a', 'quote': 'Observed text'}]}},
+            'edges': [{'source': 'E', 'target': 'h', 'type': 'qualifies'}, {'source': 'E', 'target': 'x', 'type': 'supports'}]})
+        rows = evidence_directions(dict(directional, logic=limited), ['h'])
+        directions = sorted((row['route'], row['hypothesis'], row['direction'], row['node']) for row in rows) == [
+            ('logic', 'h', 'limit', 'E'), ('trace', 'h', 'support', None)]
+        rows = evidence_directions(directional, ['h'])
+        directions = directions and sorted((row['route'], row['direction'], row['node']) for row in rows) == [('logic', 'oppose', 'E'), ('trace', 'support', None)]
+    return {'drift': drift, 'gaps': gaps, 'directions': directions, 'library': library_ok, 'disagreement': disagreement, 'ablation': ablation, 'live': live}
 
 
 def evergiven_state():
@@ -435,7 +505,16 @@ def evergiven_state():
         status = json.loads(output.read_text())
     tree = load_research(folder)
     native_license = license_model_claim(tree.models['logic'], tree.index['root_claim']).wording_license
-    return exit_code, status, project(status, native_license, trace_depth_answers(tree.models['trace']))
+    try:
+        from researchguard.research import hypothesis_view
+    except ImportError:
+        return exit_code, status, None
+    views = []
+    for row in status['hypotheses']:
+        view = hypothesis_view(status, row['id'])
+        views.append((row['id'], tuple(item['id'] for item in view['open_gaps']), tuple(item['id'] for item in view['next'] if item['route'] == 'search'),
+                      tuple(item['id'] for item in view['ablations'] if item['hypothesis'] == row['id'])))
+    return exit_code, status, project(status, native_license, trace_depth_answers(tree.models['trace']), views)
 
 
 def trace_depth_answers(trace):
@@ -467,6 +546,9 @@ def conformance():
         if not satisfied:
             violations.append(ConformanceViolation(step_index=1, rule_name='Status', message=f'{kind}: native obligation failed'))
     exit_code, status, state = evergiven_state()
+    if state is None:
+        violations.append(ConformanceViolation(step_index=1, rule_name='Status', message='evergiven: hypothesis_view and evidence directions are not implemented'))
+        return ConformanceReport(ok=False, violations=tuple(violations), replayed_steps=tuple(observations), summary='hypothesis readback missing')
     observations.append(ReplayObservation('Status', exit_code, state))
     if exit_code:
         violations.append(ConformanceViolation(step_index=1, rule_name='Status', message=f'evergiven: status exited {exit_code}'))

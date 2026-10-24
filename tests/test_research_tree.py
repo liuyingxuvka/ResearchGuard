@@ -333,3 +333,63 @@ def test_gap_hypotheses_are_checked_and_grouped(tmp_path, capsys):
     _rewrite(folder, 'source.yaml', dangle)
     assert main(['status', str(folder), '--json']) == 1
     assert 'unknown_hypothesis:source:gap-alt-yantian:h_missing' in json.loads(capsys.readouterr().out)['errors']
+
+
+EVERGIVEN = Path(__file__).resolve().parents[1] / 'examples/research/evergiven'
+
+
+def test_evidence_directions_cover_both_routes():
+    status = research_status(load_research(EVERGIVEN))
+    row = next(item for item in status['evidence'] if item['anchor'] == 'anc-unctad-surge')
+    assert {'route': 'logic', 'hypothesis': 'h_demand', 'direction': 'support', 'node': 'E_pretrend'} in row['directions']
+    assert {'route': 'trace', 'hypothesis': 'h_suez', 'direction': 'oppose', 'node': None} in row['directions']
+    assert row['directions'] == sorted(row['directions'], key=lambda item: (item['route'], item['hypothesis'], item['direction']))
+    assert 'logic:E_pretrend' in row['used_by']
+
+
+def test_hypothesis_view_lists_its_rows(capsys):
+    assert main(['status', str(EVERGIVEN), '--hypothesis', 'h_yantian']) == 0
+    page = capsys.readouterr().out
+    for text in ('not in logic', 'not in trace', 'gap-alt-yantian', 'act-yantian', 'e_yantian_timing'):
+        assert text in page
+    assert main(['status', str(EVERGIVEN), '--hypothesis', 'h_suez', '--json']) == 0
+    view = json.loads(capsys.readouterr().out)
+    assert {'anchor': 'anc-unctad-surge', 'route': 'trace'} in view['evidence']['oppose']
+    assert [row['id'] for row in view['ablations']] == ['question_without_unctad', 'abl_no_unctad']
+    assert main(['status', str(EVERGIVEN), '--hypothesis', 'h_missing']) == 2
+    assert 'unknown_hypothesis:h_missing' in capsys.readouterr().out
+    assert main(['status', str(EVERGIVEN), '--hypothesis', 'h_suez', '--candidate', str(EVERGIVEN)]) == 2
+    status = research_status(load_research(EVERGIVEN))
+    from researchguard.research import hypothesis_view
+    for row in status['hypotheses']:
+        view = hypothesis_view(status, row['id'])
+        assert view['open_gaps'] == [gap for gap in status['open_gaps'] if row['id'] in gap.get('hypotheses', ())]
+        assert [item for item in view['next'] if item['route'] == 'search'] == [
+            item for item in status['next'] if item['route'] == 'search' and row['id'] in item['hypotheses']]
+    from researchguard.research import render_status_markdown
+    lines = render_status_markdown(status).splitlines()
+    at = lines.index('## Disagreements')
+    assert lines[at + 1] == '' and lines[at + 2] == '- none'
+
+
+def test_writer_surface_keys_are_pinned(tmp_path):
+    """The keys LogicWriting reads from status --json; they do not change."""
+    source_only = tmp_path / 'source-only'
+    source_only.mkdir()
+    (source_only / 'source.yaml').write_text(yaml.safe_dump({'sources': [{'source_id': 's'}], 'anchors': [{'anchor_id': 'a', 'source_id': 's', 'text': 'Observed text'}]}))
+    (source_only / 'research.yaml').write_text(yaml.safe_dump({'schema': 'researchguard.research.v1', 'question': 'Only sources?',
+                                                               'hypotheses': [{'id': 'h', 'text': 'Hypothesis'}], 'models': {'source': 'source.yaml'}}))
+    for folder in (EVERGIVEN, source_only):
+        tree = load_research(folder)
+        status = research_status(tree)
+        assert {'question', 'verdict', 'hypotheses', 'models', 'evidence'} <= set(status)
+        assert status['question'] == tree.index['question']
+        assert [(row['id'], row['text']) for row in status['hypotheses']] == [(row['id'], row['text']) for row in tree.index['hypotheses']]
+        assert {route: row['path'] for route, row in status['models'].items()} == {
+            route: path for route, path in tree.index['models'].items() if route != 'experiment_observations'}
+        assert all(set(row) == {'path', 'status'} for row in status['models'].values())
+        assert {row['anchor'] for row in status['evidence']} == {row.anchor_id for row in tree.models['source'].anchors}
+        for row in status['evidence']:
+            for item in row['directions']:
+                assert set(item) == {'route', 'hypothesis', 'direction', 'node'} and item['direction'] in {'support', 'oppose', 'limit'}
+        assert set(status['verdict']) == {'search', 'root_claim', 'live_hypotheses', 'contested', 'errors'}

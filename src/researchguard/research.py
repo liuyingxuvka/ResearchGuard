@@ -178,29 +178,43 @@ def check_research_tree(index: dict[str, Any], models: dict[str, Any], observati
     return {"errors": sorted(set(errors)), "warnings": sorted(set(warnings)), "info": info}
 
 
-def route_disagreements(models, hypotheses):
-    """Compare direct shared-anchor evidence and explicit native conclusions."""
+LOGIC_DIRECTIONS = {"supports": "support", "attacks": "oppose", "contradicts": "oppose", "undercuts": "oppose", "qualifies": "limit"}
+
+
+def evidence_directions(models, hypothesis_ids=None):
+    """Direct evidence directions per route: one row {anchor, route, hypothesis, direction, node}.
+
+    Trace uses link polarity and storyline evidence lists; logic uses the direct edges of the
+    Evidence node whose provenance names the anchor, only when the edge targets a hypothesis
+    (any target when hypothesis_ids is None). Indirect argument chains carry no direction.
+    """
     trace, logic = models.get("trace"), models.get("logic")
-    directions = {"trace": {}, "logic": {}}
-    def add(route, hypothesis, anchor, direction):
-        if direction in {"support", "oppose"}:
-            directions[route].setdefault((hypothesis, anchor), set()).add(direction)
+    rows = set()
     if trace:
         for link in trace.hypothesis_evidence_links:
-            add("trace", link.hypothesis_id, link.evidence_id, link.polarity)
+            if link.polarity in {"support", "oppose", "limit"}:
+                rows.add((link.evidence_id, "trace", link.hypothesis_id, link.polarity, None))
         for hypothesis in trace.storyline_hypotheses:
-            for anchor in hypothesis.evidence_ids:
-                add("trace", hypothesis.hypothesis_id, anchor, "support")
-            for anchor in hypothesis.contradicting_evidence_ids:
-                add("trace", hypothesis.hypothesis_id, anchor, "oppose")
+            rows.update((anchor, "trace", hypothesis.hypothesis_id, "support", None) for anchor in hypothesis.evidence_ids)
+            rows.update((anchor, "trace", hypothesis.hypothesis_id, "oppose", None) for anchor in hypothesis.contradicting_evidence_ids)
     if logic:
         for edge in logic.edges:
             node = logic.nodes.get(edge.source)
-            if node is None or node.type != "Evidence":
+            direction = LOGIC_DIRECTIONS.get(edge.type)
+            if node is None or node.type != "Evidence" or not direction or (hypothesis_ids is not None and edge.target not in hypothesis_ids):
                 continue
-            direction = "support" if edge.type == "supports" else "oppose" if edge.type in {"attacks", "contradicts", "undercuts"} else ""
-            for provenance in validate_evidence_provenance(node.id, node.provenance):
-                add("logic", edge.target, provenance.locator, direction)
+            rows.update((provenance.locator, "logic", edge.target, direction, node.id)
+                        for provenance in validate_evidence_provenance(node.id, node.provenance))
+    return [{"anchor": anchor, "route": route, "hypothesis": hypothesis, "direction": direction, "node": node}
+            for anchor, route, hypothesis, direction, node in sorted(rows, key=lambda row: (row[0], row[1], row[2], row[3], row[4] or ""))]
+
+
+def route_disagreements(models, hypotheses):
+    """Compare direct shared-anchor evidence and explicit native conclusions."""
+    directions = {"trace": {}, "logic": {}}
+    for row in evidence_directions(models):
+        if row["direction"] in {"support", "oppose"}:
+            directions[row["route"]].setdefault((row["hypothesis"], row["anchor"]), set()).add(row["direction"])
     result = []
     for key in sorted(directions["trace"].keys() & directions["logic"].keys()):
         left, right = directions["trace"][key], directions["logic"][key]
@@ -359,6 +373,9 @@ def research_status(tree: ResearchTree) -> dict[str, Any]:
                   for row in tree.index["hypotheses"]]
     evidence = []
     source = tree.models.get("source")
+    directed: dict[str, list[dict[str, Any]]] = {}
+    for row in evidence_directions(tree.models, [item["id"] for item in tree.index["hypotheses"]]):
+        directed.setdefault(row.pop("anchor"), []).append(row)
     if source:
         sources = {row.source_id: row for row in source.sources}
         for anchor in source.anchors:
@@ -378,7 +395,8 @@ def research_status(tree: ResearchTree) -> dict[str, Any]:
                         used_by.append(f"logic:{node.id}")
             evidence.append({"anchor": anchor.anchor_id, "source": anchor.source_id,
                              "lineage": sources[anchor.source_id].lineage_id if anchor.source_id in sources else "",
-                             "used_by": sorted(set(used_by))})
+                             "used_by": sorted(set(used_by)),
+                             "directions": sorted(directed.get(anchor.anchor_id, []), key=lambda row: (row["route"], row["hypothesis"], row["direction"]))})
     gaps: list[dict[str, Any]] = []
     next_actions: list[dict[str, Any]] = []
     plan = results.get("source")
@@ -446,7 +464,7 @@ def render_status_markdown(status: dict[str, Any]) -> str:
         lines.append("| " + " | ".join(cell(item) for item in (row["id"], row["text"], logic_text, trace_text, experiment.get("status", "not_run"))) + " |")
     lines.extend(["", "## Evidence", "", "| anchor | source | lineage | used by |", "|---|---|---|---|"])
     for row in status["evidence"]:
-        lines.append("| " + " | ".join(cell(item) for item in (row["anchor"], row["source"], row["lineage"], ", ".join(row["used_by"]))) + " |")
+        lines.append("| " + " | ".join(cell(item) for item in (row["anchor"], row["source"], row["lineage"], ", ".join(_used_by(row)))) + " |")
     lines.extend(["", "## Open gaps", ""])
     for row in status["open_gaps"]:
         if row["route"] == "source":
@@ -456,18 +474,94 @@ def render_status_markdown(status: dict[str, Any]) -> str:
         else:
             text = f"logic: {row['root_claim']} blocked by {', '.join(row['blocked_by']) or 'none'}"
         lines.append("- " + cell(text))
+    _none(lines, status["open_gaps"])
     lines.extend(["", "## Next", ""])
     for row in status["next"]:
         lines.append("- " + cell(f"search {row['id']}" + _named(row) if row["route"] == "search" else f"experiment: {row.get('status')}; next: {', '.join(row['ids']) or 'none'}"))
+    _none(lines, status["next"])
     lines.extend(["", "## Ablations", ""])
     for row in status["ablations"]:
         effects = "; effects: " + ", ".join(f"{item['hypothesis']} {item['route']} {item['field']} {str(item['before']).lower()} → {str(item['after']).lower()}" for item in row["effects"]) if row.get("effects") else ""
         lines.append(f"- {cell(row['id'])}: {cell(row['hypothesis'])} {row['expect']}; caught by {', '.join(row['caught_by']) or 'none'}{cell(effects)}")
+    _none(lines, status["ablations"])
     lines.extend(["", "## Disagreements", ""])
     lines.extend(f"- {cell(row['hypothesis'])}: {row['kind']} {cell(row['detail'])}" for row in status["disagreements"])
+    _none(lines, status["disagreements"])
     lines.extend(["", "## Problems", ""])
     for kind in ("errors", "warnings", "info"):
         lines.extend(f"- {kind.rstrip('s')} {cell(row)}" for row in status[kind])
+    _none(lines, status["errors"] + status["warnings"] + status["info"])
+    return "\n".join(lines) + "\n"
+
+
+def _none(lines: list[str], rows: list[Any]) -> None:
+    if not rows:
+        lines.append("- none")
+
+
+def _used_by(row: dict[str, Any]) -> list[str]:
+    """Page form of an evidence row: route:hypothesis:direction, or logic:<node> when no direct hypothesis edge."""
+    directed_nodes = {item["node"] for item in row.get("directions", ()) if item["route"] == "logic"}
+    text = [f"{item['route']}:{item['hypothesis']}:{item['direction']}" for item in row.get("directions", ())]
+    text.extend(item for item in row["used_by"] if item.startswith("logic:") and item.split(":", 1)[1] not in directed_nodes)
+    text.extend(item for item in row["used_by"] if item.startswith("trace:") and item not in text)
+    return sorted(set(text))
+
+
+def hypothesis_view(status: dict[str, Any], hypothesis_id: str, experiment: Any = None) -> dict[str, Any]:
+    """One hypothesis read back from an already computed status; no route is run again."""
+    row = next((item for item in status["hypotheses"] if item["id"] == hypothesis_id), None)
+    if row is None:
+        raise KeyError(hypothesis_id)
+    evidence = {"support": [], "oppose": [], "limit": []}
+    for item in status["evidence"]:
+        for direction in item.get("directions", ()):
+            if direction["hypothesis"] == hypothesis_id:
+                evidence[direction["direction"]].append({"anchor": item["anchor"], "route": direction["route"]})
+    predicted = None
+    if experiment is not None:
+        predicted = {experiment_id for prediction in experiment.hypothesis_predictions if prediction.hypothesis_id == hypothesis_id
+                     for experiment_id in prediction.outcomes_by_experiment}
+    next_rows = [item for item in status["next"] if item["route"] == "search" and hypothesis_id in item.get("hypotheses", ())]
+    for item in status["next"]:
+        if item["route"] == "experiment":
+            ids = [value for value in item["ids"] if predicted is None or value in predicted]
+            if ids:
+                next_rows.append({**item, "ids": ids})
+    return {"id": hypothesis_id, "text": row["text"],
+            "routes": {"logic": row["logic"], "trace": row["trace"], "experiment": row["experiment"]},
+            "evidence": evidence,
+            "ablations": [item for item in status["ablations"] if item["hypothesis"] == hypothesis_id
+                          or any(effect["hypothesis"] == hypothesis_id for effect in item.get("effects", ()))],
+            "disagreements": [item for item in status["disagreements"] if item["hypothesis"] == hypothesis_id],
+            "open_gaps": [item for item in status["open_gaps"] if item["route"] == "source" and hypothesis_id in item.get("hypotheses", ())],
+            "next": next_rows}
+
+
+def render_hypothesis_view(view: dict[str, Any]) -> str:
+    routes = view["routes"]
+    logic, trace, experiment = routes["logic"], routes["trace"], routes["experiment"]
+    lines = [f"# {view['id']}: {view['text']}", "", "## Routes", "",
+             "- logic: " + (f"{logic['state']}, confidence {logic['confidence']:.2f}" if logic else "not in logic"),
+             "- trace: " + (f"rank {trace['rank']}, support {trace['support']:.2f}, " + ("live" if trace["live"] else "not live") if trace else "not in trace"),
+             "- experiment: " + (experiment or {}).get("status", "not_listed"), "", "## Evidence", ""]
+    for direction in ("support", "oppose", "limit"):
+        rows = view["evidence"][direction]
+        lines.append(f"- {direction}: " + (", ".join(f"{row['anchor']} ({row['route']})" for row in rows) or "none"))
+    lines.extend(["", "## Ablations", ""])
+    for row in view["ablations"]:
+        effects = [f"{item['hypothesis']} {item['route']} {item['field']} {str(item['before']).lower()} → {str(item['after']).lower()}" for item in row.get("effects", ())]
+        lines.append(f"- {row['id']}: {row['hypothesis']} {row['expect']}; caught by {', '.join(row['caught_by']) or 'none'}" + ("; effects: " + ", ".join(effects) if effects else ""))
+    _none(lines, view["ablations"])
+    lines.extend(["", "## Disagreements", ""])
+    lines.extend(f"- {row['kind']} {row['detail']}" for row in view["disagreements"])
+    _none(lines, view["disagreements"])
+    lines.extend(["", "## Open gaps", ""])
+    lines.extend(f"- source gap {row['id']} ({'blocking' if row['blocking'] else 'optional'}) → next: {', '.join(row['next']) or 'none'}" for row in view["open_gaps"])
+    _none(lines, view["open_gaps"])
+    lines.extend(["", "## Next", ""])
+    lines.extend(f"- search {row['id']}" if row["route"] == "search" else f"- experiment: {', '.join(row['ids'])}" for row in view["next"])
+    _none(lines, view["next"])
     return "\n".join(lines) + "\n"
 
 
@@ -512,16 +606,30 @@ def status_main(argv: list[str]) -> int:
     parser.add_argument("path")
     parser.add_argument("--json", action="store_true")
     parser.add_argument("--candidate", type=Path)
+    parser.add_argument("--hypothesis")
     parser.add_argument("--output", type=Path)
     args = parser.parse_args(argv)
+    if args.hypothesis and args.candidate:
+        print(json.dumps({"errors": ["status_options_conflict: --hypothesis cannot be combined with --candidate"]}, ensure_ascii=False))
+        return 2
     try:
-        status = research_status(load_research(args.path))
+        tree = load_research(args.path)
+        status = research_status(tree)
         if args.candidate:
             status = compare_research_status(status, research_status(load_research(args.candidate)))
     except (OSError, ValueError, TypeError, yaml.YAMLError) as exc:
         print(json.dumps({"errors": [f"research_index_invalid: {exc}"]}, ensure_ascii=False))
         return 2
-    text = json.dumps(status, ensure_ascii=False, indent=2) + "\n" if args.json else render_comparison(status) if args.candidate else render_status_markdown(status)
+    view = None
+    if args.hypothesis:
+        if args.hypothesis not in {row["id"] for row in tree.index["hypotheses"]}:
+            print(json.dumps({"errors": [f"unknown_hypothesis:{args.hypothesis}"]}, ensure_ascii=False))
+            return 2
+        view = hypothesis_view(status, args.hypothesis, tree.models.get("experiment"))
+    if args.json:
+        text = json.dumps(view if view is not None else status, ensure_ascii=False, indent=2) + "\n"
+    else:
+        text = render_hypothesis_view(view) if view is not None else render_comparison(status) if args.candidate else render_status_markdown(status)
     if args.output:
         args.output.write_text(text, encoding="utf-8")
     else:

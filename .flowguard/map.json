@@ -333,7 +333,9 @@
         "Project the authoritative search stop and root wording license into one five-key verdict; compare current and candidate questions without writing models.",
         "The question model lists live hypotheses and contested routes from route states.",
         "Ablation rows name side effects on other hypotheses.",
-        "Open gaps and next searches name the hypotheses they would move."
+        "Open gaps and next searches name the hypotheses they would move.",
+        "Evidence rows carry each route's direct direction per hypothesis.",
+        "One hypothesis reads back with its rows from the full status."
       ],
       "files": [
         "src/researchguard/research.py"
@@ -363,7 +365,7 @@
       ],
       "layer": "tree",
       "status": "confirmed",
-      "fingerprint": "sha256:2d4e27ed3fbf5be5a3e1b517eaa80f2d1c0b2e6d6fe3eb5feeed80e62bc6c8c1"
+      "fingerprint": "sha256:1a41603770b71ccf3fdf49a56dbaa4a7e039d1778be7f6061971f13fb77d9907"
     },
     {
       "entrypoints": [
