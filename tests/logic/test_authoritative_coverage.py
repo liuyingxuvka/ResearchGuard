@@ -10,7 +10,7 @@ from researchguard.logic import (
     build_argument_coverage_universe,
     load_model_from_dict,
 )
-from researchguard.logic.execution_depth import _build_native_depth_analysis, model_fingerprint
+from researchguard.logic.execution_depth import build_native_depth_analysis, model_fingerprint
 
 
 def _role_complete_data() -> dict:
@@ -56,7 +56,7 @@ def _model(data: dict | None = None):
 
 
 def test_role_complete_current_universe_can_license_declared_broad_scope() -> None:
-    result = _build_native_depth_analysis(_model(), budget=8)
+    result = build_native_depth_analysis(_model(), budget=8)
     assert result.status == "pass"
     assert result.broad_claim_licensed is True
     assert result.coverage_universe is not None
@@ -78,7 +78,7 @@ def test_root_plus_one_evidence_is_shallow_and_cannot_license_broad_scope() -> N
         }
     )
 
-    result = _build_native_depth_analysis(model, budget=8)
+    result = build_native_depth_analysis(model, budget=8)
 
     assert result.broad_claim_licensed is False
     assert result.status == "blocked"
@@ -92,7 +92,7 @@ def test_broad_scope_requires_explicit_target_unit_and_card_denominators() -> No
     data["model"].pop("target_units")
     data["model"].pop("model_cards")
 
-    result = _build_native_depth_analysis(_model(data), budget=8)
+    result = build_native_depth_analysis(_model(data), budget=8)
 
     assert "target_unit_inventory_empty" in result.unresolved_gaps
     assert "model_card_inventory_empty" in result.unresolved_gaps
@@ -103,7 +103,7 @@ def test_competing_conclusion_role_must_be_explicitly_covered_or_disposed() -> N
     data = _role_complete_data()
     data["model"].pop("role_dispositions")
 
-    result = _build_native_depth_analysis(_model(data), budget=8)
+    result = build_native_depth_analysis(_model(data), budget=8)
 
     root = next(
         row
@@ -118,7 +118,7 @@ def test_competing_conclusion_role_must_be_explicitly_covered_or_disposed() -> N
 def test_disconnected_important_node_remains_in_authoritative_denominator() -> None:
     data = _role_complete_data()
     data["nodes"]["D1"] = {"type": "Warrant", "importance": 0.95}
-    result = _build_native_depth_analysis(_model(data), budget=10)
+    result = build_native_depth_analysis(_model(data), budget=10)
 
     assert "D1" in result.coverage_universe.important_node_ids
     assert "D1" in result.coverage_universe.unresolved_disconnected_node_ids
@@ -133,13 +133,13 @@ def test_closed_disposition_is_visible_but_unresolved_disposition_still_blocks()
     assert "D1" in closed.terminally_disposed_disconnected_node_ids
 
     data["nodes"]["D1"]["disposition"] = "human_review"
-    unresolved = _build_native_depth_analysis(_model(data), budget=10)
+    unresolved = build_native_depth_analysis(_model(data), budget=10)
     assert "D1" in unresolved.coverage_universe.unresolved_disconnected_node_ids
     assert unresolved.broad_claim_licensed is False
 
 
 def test_importance_policy_is_target_owned_and_has_no_caller_override() -> None:
-    result = _build_native_depth_analysis(_model(), budget=8)
+    result = build_native_depth_analysis(_model(), budget=8)
 
     policy = result.coverage_universe.importance_policy
     assert policy.profile == "enforced"
@@ -154,7 +154,7 @@ def test_nominal_budget_never_drops_a_critical_candidate() -> None:
     data = _role_complete_data()
     data["nodes"]["E1"]["importance"] = 0.95
     data["nodes"]["W1"]["importance"] = 0.95
-    result = _build_native_depth_analysis(_model(data), budget=1)
+    result = build_native_depth_analysis(_model(data), budget=1)
     selected = {item.node_id for item in result.perturbation_plan}
 
     assert {"E1", "W1"} <= selected
@@ -165,7 +165,7 @@ def test_nominal_budget_never_drops_a_critical_candidate() -> None:
 def test_every_critical_perturbation_must_be_effective() -> None:
     data = _role_complete_data()
     data["nodes"]["R1"].update({"active": True, "importance": 0.95})
-    result = _build_native_depth_analysis(_model(data), budget=8)
+    result = build_native_depth_analysis(_model(data), budget=8)
 
     assert "R1" in result.critical_perturbation_coverage["ineffective_ids"]
     assert "ineffective_critical_perturbation:R1" in result.unresolved_gaps
@@ -173,7 +173,7 @@ def test_every_critical_perturbation_must_be_effective() -> None:
 
 
 def test_missing_requested_claim_node_blocks_scope_license() -> None:
-    result = _build_native_depth_analysis(
+    result = build_native_depth_analysis(
         _model(),
         budget=8,
         requested_claim_scope_ids=["C0", "C_MISSING"],
@@ -189,7 +189,7 @@ def test_each_declared_important_card_needs_roles_or_closed_dispositions() -> No
     data["model"]["model_cards"] = [
         {"card_id": "card-shallow", "node_ids": ["C0", "E1"], "importance": 0.9}
     ]
-    result = _build_native_depth_analysis(_model(data), budget=8)
+    result = build_native_depth_analysis(_model(data), budget=8)
     card = next(row for row in result.coverage_universe.role_coverage if row.card_id == "card-shallow")
 
     assert card.status == "blocked"
@@ -235,7 +235,7 @@ def test_rich_aggregate_cannot_hide_one_shallow_critical_card() -> None:
         }
     )
 
-    result = _build_native_depth_analysis(_model(data), budget=12)
+    result = build_native_depth_analysis(_model(data), budget=12)
     root = next(
         row
         for row in result.coverage_universe.role_coverage
@@ -255,16 +255,16 @@ def test_rich_aggregate_cannot_hide_one_shallow_critical_card() -> None:
 
 def test_depth_api_has_no_caller_selectable_profile_or_threshold() -> None:
     with pytest.raises(TypeError):
-        _build_native_depth_analysis(_model(), budget=8, profile="bounded")
+        build_native_depth_analysis(_model(), budget=8, profile="bounded")
     with pytest.raises(TypeError):
-        _build_native_depth_analysis(_model(), budget=8, important_threshold=0.7)
+        build_native_depth_analysis(_model(), budget=8, important_threshold=0.7)
 
 
 def test_model_freshness_changes_with_authoritative_inventory() -> None:
-    first = _build_native_depth_analysis(_model(), budget=8)
+    first = build_native_depth_analysis(_model(), budget=8)
     changed = deepcopy(_role_complete_data())
     changed["model"]["target_unit_ids"] = ["section-1"]
-    second = _build_native_depth_analysis(_model(changed), budget=8)
+    second = build_native_depth_analysis(_model(changed), budget=8)
 
     assert first.model_fingerprint != second.model_fingerprint
     assert "section-1" in second.coverage_universe.unmodeled_target_unit_ids
@@ -302,7 +302,7 @@ def test_low_declared_importance_cannot_remove_an_explicit_shallow_card() -> Non
         }
     )
 
-    result = _build_native_depth_analysis(_model(data), budget=20)
+    result = build_native_depth_analysis(_model(data), budget=20)
     row = next(
         item
         for item in result.coverage_universe.role_coverage
@@ -325,7 +325,7 @@ def test_card_exclusion_requires_closed_reason_and_cannot_hide_active_nodes() ->
             "excluded": True,
         }
     )
-    unresolved_result = _build_native_depth_analysis(_model(unresolved), budget=8)
+    unresolved_result = build_native_depth_analysis(_model(unresolved), budget=8)
     assert (
         "model_card_exclusion_unresolved:card:excluded-unresolved"
         in unresolved_result.unresolved_gaps
@@ -347,7 +347,7 @@ def test_card_exclusion_requires_closed_reason_and_cannot_hide_active_nodes() ->
             "importance": 1.0,
         },
     ]
-    active_result = _build_native_depth_analysis(_model(active), budget=8)
+    active_result = build_native_depth_analysis(_model(active), budget=8)
     assert (
         "excluded_model_card_still_structurally_active:E1"
         in active_result.unresolved_gaps
@@ -373,7 +373,7 @@ def test_closed_disconnected_card_exclusion_is_visible_and_noncontributing() -> 
         }
     )
 
-    result = _build_native_depth_analysis(_model(data), budget=8)
+    result = build_native_depth_analysis(_model(data), budget=8)
     row = next(
         item
         for item in result.coverage_universe.role_coverage
@@ -410,7 +410,7 @@ def test_each_important_claim_needs_its_own_connected_role_universe() -> None:
         }
     )
 
-    result = _build_native_depth_analysis(_model(data), budget=20)
+    result = build_native_depth_analysis(_model(data), budget=20)
     child = next(
         item
         for item in result.coverage_universe.claim_role_coverage
@@ -453,7 +453,7 @@ def test_shared_role_node_requires_explicit_consumer_declaration() -> None:
         }
     )
 
-    implicit = _build_native_depth_analysis(_model(data), budget=20)
+    implicit = build_native_depth_analysis(_model(data), budget=20)
     child = next(
         item
         for item in implicit.coverage_universe.claim_role_coverage
@@ -469,7 +469,7 @@ def test_shared_role_node_requires_explicit_consumer_declaration() -> None:
     )
 
     data["nodes"]["E1"]["shared_claim_ids"] = ["C0", "C_CHILD"]
-    explicit = _build_native_depth_analysis(_model(data), budget=20)
+    explicit = build_native_depth_analysis(_model(data), budget=20)
     assert not any(
         gap.startswith("implicit_shared_role_node:E1:")
         for gap in explicit.unresolved_gaps
@@ -487,7 +487,7 @@ def test_shared_role_node_requires_explicit_consumer_declaration() -> None:
 
 
 def test_each_important_claim_has_claim_local_perturbation_coverage() -> None:
-    result = _build_native_depth_analysis(_model(), budget=1)
+    result = build_native_depth_analysis(_model(), budget=1)
     root = next(
         item for item in result.claim_perturbation_coverage if item.claim_id == "C0"
     )
@@ -580,7 +580,7 @@ def test_nonempty_native_blocks_stay_on_the_explicit_inventory_path() -> None:
 def test_explicit_inventory_semantics_match_the_real_prechange_baseline() -> None:
     model = _model()
     original = deepcopy(model.to_dict())
-    result = _build_native_depth_analysis(model, budget=8)
+    result = build_native_depth_analysis(model, budget=8)
     payload = result.to_dict()
     universe = payload["coverage_universe"]
     actual = {

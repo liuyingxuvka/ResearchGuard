@@ -6,12 +6,12 @@ from typing import Mapping
 from .schema import EXPERIMENT_SPEC_SCHEMA, ExperimentObservation, ExperimentSpec, HypothesisPrediction
 
 
-def _load_spec(path: Path) -> ExperimentSpec:
+def load_spec(path: Path) -> ExperimentSpec:
     payload = json.loads(path.read_text(encoding="utf-8"))
-    return _load_spec_payload(payload)
+    return load_spec_payload(payload)
 
 
-def _load_spec_payload(payload: object) -> ExperimentSpec:
+def load_spec_payload(payload: object) -> ExperimentSpec:
     if not isinstance(payload, Mapping):
         raise ValueError("experiment spec root must be an object")
     if "cost_by_experiment" in payload and not isinstance(payload["cost_by_experiment"], Mapping):
@@ -45,7 +45,7 @@ def _load_spec_payload(payload: object) -> ExperimentSpec:
     )
 
 
-def _load_observations(path: Path) -> tuple[ExperimentObservation, ...]:
+def load_observations(path: Path) -> tuple[ExperimentObservation, ...]:
     payload = json.loads(path.read_text(encoding="utf-8"))
     rows = payload.get("observations", payload) if isinstance(payload, dict) else payload
     if not isinstance(rows, list):

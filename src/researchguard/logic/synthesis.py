@@ -12,7 +12,7 @@ import re
 from typing import Any, Iterable, Mapping
 
 from .citation_matrix import ClaimSourceParagraphMatrix, build_claim_source_paragraph_matrix
-from .execution_depth import _build_native_depth_analysis, build_argument_coverage_universe, model_fingerprint
+from .execution_depth import build_native_depth_analysis, build_argument_coverage_universe, model_fingerprint
 from .evaluator import evaluate_model
 from .importance import ImportanceRecord, summarize_importance
 from .model import LogicModel
@@ -503,7 +503,7 @@ def _native_scope_gaps(
     if required_assertion:
         # Depth is always computed here, on the current model; no external
         # depth result is accepted.
-        depth = _build_native_depth_analysis(
+        depth = build_native_depth_analysis(
             model,
             budget=max(6, len(model.nodes)),
             requested_claim_scope_ids=selected_claims,

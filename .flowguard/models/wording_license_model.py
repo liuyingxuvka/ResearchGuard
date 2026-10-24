@@ -6,8 +6,8 @@ from flowguard import FunctionResult, Invariant, InvariantResult, Workflow
 from flowguard.explorer import Explorer
 
 MODEL_ID = "wording_license"
-PARENT = "logic-argument"
-COMPONENTS = ["logic-argument"]
+PARENT = "logic-evaluation"
+COMPONENTS = ["logic-evaluation"]
 IMPLEMENTED_BY = {"License": "src/researchguard/logic/minimal_sets.py:license_model_claim"}
 NOT_MODELED = {
     "src/researchguard/logic/model.py:LogicModel._ensure_edge_indexes": "Rebuilds the in-memory edge index from the edge list; it never changes nodes, edges or argument state.",

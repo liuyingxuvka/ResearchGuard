@@ -160,13 +160,13 @@ def test_same_gap_partial_evidence_can_continue_without_claiming_historical_prog
 
 
 def test_ordinary_spec_roundtrips_through_native_cli(tmp_path, capsys) -> None:
-    from researchguard.experiment.cli import _load_spec, main
+    from researchguard.experiment.cli import load_spec, main
 
     path = tmp_path / "spec.json"
     payload = _spec().to_dict()
     assert not {"design_root_id", "design_blocks", "target_universe"} & payload.keys()
     path.write_text(json.dumps(payload), encoding="utf-8")
-    loaded = _load_spec(path)
+    loaded = load_spec(path)
     assert (loaded.task_id, loaded.purpose, loaded.coverage_ids) == (
         _spec().task_id, _spec().purpose, _spec().coverage_ids)
     assert recommend_experiments(loaded) == recommend_experiments(_spec())
@@ -459,7 +459,7 @@ def test_invalid_counterexamples_do_not_eliminate_on_a_matrix_miss(status) -> No
 
 
 def test_old_port_fields_are_ignored(tmp_path, capsys) -> None:
-    from researchguard.experiment.cli import _load_observations, _load_spec, main
+    from researchguard.experiment.cli import load_observations, load_spec, main
 
     clean_spec = _spec()
     payload = clean_spec.to_dict()
@@ -467,7 +467,7 @@ def test_old_port_fields_are_ignored(tmp_path, capsys) -> None:
         row.update(observation_port_by_experiment={"e1": "legacy-in"}, outcome_port_by_experiment={"e1": "legacy-out"})
     path = tmp_path / "legacy-spec.json"
     path.write_text(json.dumps(payload))
-    loaded = _load_spec(path)
+    loaded = load_spec(path)
     assert loaded == clean_spec
     assert all(not {"observation_port_by_experiment", "outcome_port_by_experiment"} & row.keys()
                for row in loaded.to_dict()["hypothesis_predictions"])
@@ -477,7 +477,7 @@ def test_old_port_fields_are_ignored(tmp_path, capsys) -> None:
     observations = [dict(row.to_dict(), observation_port_id="legacy-in", outcome_port_id="legacy-out") for row in clean]
     observed_path = tmp_path / "legacy-observations.json"
     observed_path.write_text(json.dumps(observations))
-    assert _load_observations(observed_path) == clean
+    assert load_observations(observed_path) == clean
     assert main(["observe", str(path), str(observed_path)]) == 0
     result = json.loads(capsys.readouterr().out)
     assert result["terminal_reason"] == "model_closed_for_task"

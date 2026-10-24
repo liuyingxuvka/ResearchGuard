@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from researchguard._artifact_io import _load_json_object
+from researchguard._artifact_io import load_json_object
 
 import argparse
 import json
@@ -14,7 +14,7 @@ from typing import Any
 from . import __version__
 from .diagnostics import diagnose_model
 from .evaluator import evaluate_model
-from .execution_depth import _build_native_depth_analysis
+from .execution_depth import build_native_depth_analysis
 from .argument_modeling import create_argument_model
 from .citation_matrix import (
     audit_claim_source_paragraph_matrix,
@@ -534,7 +534,7 @@ def _cmd_argument_iteration_freeze(args: argparse.Namespace) -> int:
 def _cmd_argument_iteration_run(args: argparse.Namespace) -> int:
     baseline = load_model(args.baseline)
     candidate = load_model(args.candidate) if args.candidate else None
-    prediction = ArgumentPrediction.from_dict(_load_json_object(args.prediction))
+    prediction = ArgumentPrediction.from_dict(load_json_object(args.prediction))
     result = run_argument_iteration(
         baseline,
         prediction,
@@ -589,7 +589,7 @@ def _cmd_import_handoff(args: argparse.Namespace) -> int:
 
 def _cmd_depth(args: argparse.Namespace) -> int:
     model = load_model(args.model)
-    analysis = _build_native_depth_analysis(
+    analysis = build_native_depth_analysis(
         model, budget=args.budget, requested_claim_scope_ids=args.claim_scope_node
     )
     if args.output:
@@ -700,7 +700,7 @@ def _cmd_structure_from_markdown(args: argparse.Namespace) -> int:
 
 def _cmd_structure_audit(args: argparse.Namespace) -> int:
     model = load_model(args.model)
-    selection_request = _load_json_object(args.selection_request) if args.selection_request else None
+    selection_request = load_json_object(args.selection_request) if args.selection_request else None
     report = audit_structure(model, selection_request)
     payload: Any = report.to_dict() if args.json or (args.output and args.output.endswith(".json")) else report.to_markdown()
     if args.output:
@@ -712,7 +712,7 @@ def _cmd_structure_audit(args: argparse.Namespace) -> int:
 
 def _cmd_synthesize(args: argparse.Namespace) -> int:
     model = load_model(args.model)
-    selection_request = _load_json_object(args.selection_request)
+    selection_request = load_json_object(args.selection_request)
     source_branches = ()
     library = None
     if args.library_root:

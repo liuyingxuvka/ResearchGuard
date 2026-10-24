@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from researchguard.logic import load_model_from_dict, model_fingerprint, synthesize_artifact_plan
-from researchguard.logic.execution_depth import _build_native_depth_analysis
+from researchguard.logic.execution_depth import build_native_depth_analysis
 from researchguard.logic.structure_audit import audit_structure
 
 
@@ -73,7 +73,7 @@ def test_synthesis_computes_native_depth_itself():
     )
     request = _request(model, units=[_unit("u0", "C0", relation="concludes")], body_order=["u0"])
     plan = synthesize_artifact_plan(model, selection_request=request)
-    expected = _build_native_depth_analysis(model, budget=8, requested_claim_scope_ids=["C0"])
+    expected = build_native_depth_analysis(model, budget=8, requested_claim_scope_ids=["C0"])
 
     assert plan.status == "blocked_support_gap"
     assert "native_depth_not_licensed" in plan.open_gaps

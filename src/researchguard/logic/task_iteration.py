@@ -20,7 +20,7 @@ from .evaluator import evaluate_model
 from .model import LogicModel
 from .schema import STATES
 from .simulator import simulate_model
-from .execution_depth import _build_native_depth_analysis
+from .execution_depth import build_native_depth_analysis
 
 
 ARGUMENT_PREDICTION_SCHEMA = "researchguard.logic.argument-prediction.v3"
@@ -43,7 +43,7 @@ def utc_now() -> str:
 
 
 def _native_depth(model: LogicModel, prediction: "ArgumentPrediction") -> tuple[str, ...]:
-    analysis = _build_native_depth_analysis(
+    analysis = build_native_depth_analysis(
         model,
         requested_claim_scope_ids=prediction.coverage_ids or None,
     )

@@ -1348,7 +1348,7 @@ def _claim_perturbation_coverage(
     return tuple(rows)
 
 
-def _build_native_depth_analysis(
+def build_native_depth_analysis(
     model: LogicModel,
     *,
     budget: int = 6,

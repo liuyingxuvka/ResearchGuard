@@ -12,7 +12,7 @@ from researchguard.logic import (
     load_model_from_dict,
     select_perturbation_plan,
 )
-from researchguard.logic.execution_depth import _build_native_depth_analysis
+from researchguard.logic.execution_depth import build_native_depth_analysis
 
 
 def _model(*, with_objection: bool = False, with_competitor: bool = False):
@@ -68,7 +68,7 @@ def _model(*, with_objection: bool = False, with_competitor: bool = False):
 
 
 def test_native_depth_result_is_model_bound_and_serializable() -> None:
-    result = _build_native_depth_analysis(_model(), budget=8)
+    result = build_native_depth_analysis(_model(), budget=8)
     payload = result.to_dict()
 
     assert result.broad_claim_licensed
@@ -95,7 +95,7 @@ def test_comparable_competing_conclusion_remains_visible() -> None:
 
     assert "C_ALT" in tournament.unresolved_competitor_ids
     assert tournament.status == "bounded"
-    assert _build_native_depth_analysis(model, budget=8).broad_claim_licensed is False
+    assert build_native_depth_analysis(model, budget=8).broad_claim_licensed is False
 
 
 def test_explicitly_unresolved_objection_stays_in_tournament_boundary() -> None:
@@ -160,7 +160,7 @@ def test_plain_shallow_inventory_still_has_real_role_gaps() -> None:
         },
         "edges": [{"source": "E1", "target": "C0", "type": "supports"}],
     })
-    result = _build_native_depth_analysis(model, budget=8)
+    result = build_native_depth_analysis(model, budget=8)
 
     assert result.coverage_universe.implicit_inventory is True
     assert result.status == "blocked" and result.broad_claim_licensed is False
@@ -179,7 +179,7 @@ def test_plain_example_reaches_native_depth_pass() -> None:
     model = load_model(path)
     original = json.loads(json.dumps(model.to_dict()))
     fingerprint = model_fingerprint(model)
-    result = _build_native_depth_analysis(model, budget=24)
+    result = build_native_depth_analysis(model, budget=24)
 
     assert result.coverage_universe.implicit_inventory is True
     assert result.status == "pass"

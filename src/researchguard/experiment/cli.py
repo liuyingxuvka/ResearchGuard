@@ -8,7 +8,7 @@ from pathlib import Path
 
 
 from .engine import observe_experiments, recommend_experiments
-from .loader import _load_spec, _load_spec_payload, _load_observations
+from .loader import load_spec, load_spec_payload, load_observations
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -29,10 +29,10 @@ def _main(argv: list[str] | None = None) -> int:
     observe.add_argument("observations", type=Path)
     args = parser.parse_args(argv)
     if args.command == "recommend":
-        result = recommend_experiments(_load_spec(args.spec))
+        result = recommend_experiments(load_spec(args.spec))
         print(json.dumps(result.to_dict(), ensure_ascii=False, sort_keys=True))
         return 0 if result.status == "recommended" else 2
-    result = observe_experiments(_load_spec(args.spec), _load_observations(args.observations))
+    result = observe_experiments(load_spec(args.spec), load_observations(args.observations))
     print(json.dumps(result.to_dict(), ensure_ascii=False, sort_keys=True))
     return 0 if result.terminal_reason == "model_closed_for_task" else 2
 

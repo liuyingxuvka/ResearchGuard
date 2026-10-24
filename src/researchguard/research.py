@@ -12,7 +12,7 @@ from typing import Any
 import yaml
 
 from . import SUITE_ID
-from .experiment.loader import _load_observations, _load_spec
+from .experiment.loader import load_observations, load_spec
 from .experiment.engine import observe_experiments, recommend_experiments
 from .logic.evaluator import evaluate_model as evaluate_logic
 from .logic.loader import load_model as load_logic
@@ -101,7 +101,7 @@ def load_research(path: str | Path) -> ResearchTree:
             tree.library = library
         else:
             tree.errors.append(f"library_missing:{data['library']}")
-    loaders = {"source": load_source, "trace": load_trace, "logic": load_logic, "experiment": _load_spec}
+    loaders = {"source": load_source, "trace": load_trace, "logic": load_logic, "experiment": load_spec}
     for route, loader in loaders.items():
         if route not in data.get("models", {}):
             continue
@@ -120,7 +120,7 @@ def load_research(path: str | Path) -> ResearchTree:
             tree.errors.append(f"model_missing:experiment_observations:{name}")
             continue
         try:
-            observations.extend(_load_observations(obs_path))
+            observations.extend(load_observations(obs_path))
         except (OSError, ValueError, TypeError, KeyError) as exc:
             tree.errors.append(f"model_invalid:experiment_observations:{name}: {exc}")
     tree.observations = tuple(observations)

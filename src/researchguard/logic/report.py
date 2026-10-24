@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from .diagnostics import diagnose_model
 from .evaluator import evaluate_model
-from .execution_depth import _build_native_depth_analysis
+from .execution_depth import build_native_depth_analysis
 from .model import DiagnosticReport, EvaluationResult, LogicModel, SimulationResult
 from .simulator import dependency_trace, search_counterexamples, simulate_fragility
 from .writer import claim_strength_adjustment
@@ -21,7 +21,7 @@ def generate_markdown_report(
     diagnostics = diagnostics or diagnose_model(model, result)
     fragility = fragility or simulate_fragility(model, root_claim=model.root_claim)
     counterexample = counterexample or search_counterexamples(model, root_claim=model.root_claim)
-    depth_result = _build_native_depth_analysis(model)
+    depth_result = build_native_depth_analysis(model)
     root = result.root()
 
     lines = [

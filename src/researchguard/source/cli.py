@@ -9,7 +9,7 @@ Boundary: Source candidates and evidence anchors require downstream TraceGuard/L
 
 from __future__ import annotations
 
-from researchguard._artifact_io import _load_json_object
+from researchguard._artifact_io import load_json_object
 
 import argparse
 import json
@@ -456,7 +456,7 @@ def _cmd_search_iteration_run(args: argparse.Namespace) -> int:
     )
     baseline = load_model(args.model)
     prediction = SearchOutcomePrediction.from_dict(
-        _load_json_object(args.prediction)
+        load_json_object(args.prediction)
     )
     observation = _load_observation(args.observation) if args.observation else None
     candidate, result = run_search_iteration(
