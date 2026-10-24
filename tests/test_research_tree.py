@@ -410,3 +410,8 @@ def test_candidate_view_shows_verdict_changes(tmp_path, capsys):
     page = capsys.readouterr().out
     assert '- h_suez: logic confidence 0.25 → 0.40' in page and '- verdict root_claim.reason: ' in page
     assert '0.332256954214' not in page
+
+
+def test_missing_index_names_the_template(tmp_path, capsys):
+    assert main(['status', str(tmp_path)]) == 2
+    assert 'Start a question' in capsys.readouterr().out

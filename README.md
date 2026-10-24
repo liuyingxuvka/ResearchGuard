@@ -32,6 +32,10 @@ older versions installed.
 
 ## Starting a model
 
+For a research question, start from its folder: `researchguard status <folder>` reads the verdict,
+open gaps and next actions (`--hypothesis <id>` for one hypothesis). A new question starts with
+`research.yaml` (template in `skills/researchguard/references/research-tree.md`, "Start a question").
+
 `researchguard source create --output source.yaml` and `researchguard trace create --output trace.yaml`
 write complete synthetic teaching examples that validate directly. Source validation warns while
 `example-` rows remain; replace them with retrieved material before using the model for a real claim.
@@ -139,10 +143,10 @@ A self-comparison reports no changes.
 
 ## 一个研究文件夹
 
-同一个问题跨多条路线时，把各路线的原生模型放在同一文件夹，写一个
-`research.yaml` 索引并共用假设、来源和锚点 id。运行
-`researchguard status <folder>` 查看假设、证据、未关缺口和下一步；
-`--json` 输出数据，`--output <path>` 保存结果。格式见
+第一条命令是 `researchguard status <folder>`：查看结论、假设、证据、未关缺口和下一步；
+`--hypothesis <id>` 只看一个假设，`--json` 输出数据，`--output <path>` 保存结果。
+新问题先写 `research.yaml` 索引（模板在 "Start a question"），把各路线的原生模型放在同一文件夹，
+共用假设、来源和锚点 id。格式见
 [research-tree.md](skills/researchguard/references/research-tree.md)。
 
 

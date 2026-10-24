@@ -11,6 +11,13 @@ ResearchGuard SHALL ship exactly one agent skill, `researchguard`, whose SKILL.m
 - **WHEN** an agent is asked to check whether a conclusion is supported
 - **THEN** it SHALL choose the `logic` route in the table and load only `references/routes/logic.md`
 
+### Requirement: The entry starts from the question model
+The SKILL.md SHALL begin with `## Start from the model`: read an existing research folder with `researchguard status <folder>` (or one hypothesis with `--hypothesis <id>`), or write `research.yaml` first for a new question, before choosing a route.
+
+#### Scenario: A research folder already exists
+- **WHEN** an agent receives a request about a question that has a research folder
+- **THEN** it SHALL run `researchguard status <folder>` and take the route that Next names
+
 ### Requirement: Each route is one file plus its own references
 Each former member skill SHALL be one file `references/routes/<route>.md`, and its references SHALL live under `references/<route>/`; a route file loads its references only when their trigger fires.
 

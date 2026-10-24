@@ -1,7 +1,12 @@
 # One research folder is the model of one question
 
 A research folder joins the native source, trace, logic and experiment models by
-shared ids. The index is the question model, not a second reasoning engine:
+shared ids. The index is the question model, not a second reasoning engine.
+
+## Start a question
+
+Write this file first, then build the route models and list them in `models`.
+Changing a question later follows "Current and candidate": copy, sync, compare, replace.
 
 ```yaml
 schema: researchguard.research.v1

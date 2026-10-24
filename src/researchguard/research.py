@@ -676,7 +676,7 @@ def status_main(argv: list[str]) -> int:
         if args.candidate:
             status = compare_research_status(status, research_status(load_research(args.candidate)))
     except (OSError, ValueError, TypeError, yaml.YAMLError) as exc:
-        print(json.dumps({"errors": [f"research_index_invalid: {exc}"]}, ensure_ascii=False))
+        print(json.dumps({"errors": [f"research_index_invalid: {exc}; create research.yaml first (researchguard skill, references/research-tree.md, \"Start a question\")"]}, ensure_ascii=False))
         return 2
     view = None
     if args.hypothesis:

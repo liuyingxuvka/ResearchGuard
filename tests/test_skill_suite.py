@@ -121,3 +121,13 @@ def test_skill_files_name_only_existing_commands(monkeypatch) -> None:
                 assert option in options, (path, command, option)
             checked += 1
     assert checked, "No documented ResearchGuard commands were found"
+
+
+def test_skill_starts_from_the_model():
+    text = (SKILL / "SKILL.md").read_text(encoding="utf-8")
+    headings = [line for line in text.splitlines() if line.startswith("## ")]
+    assert headings[0] == "## Start from the model"
+    assert headings.index("## Choose a route") == 1
+    section = text.split("## Start from the model", 1)[1].split("## Choose a route", 1)[0]
+    for word in ("researchguard status", "--hypothesis", "research.yaml", "Start a question"):
+        assert word in section

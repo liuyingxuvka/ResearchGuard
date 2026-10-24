@@ -7,6 +7,7 @@
 - SourceGuard gaps may list hypothesis_ids; research status checks them against the question and shows which hypothesis each open gap and next search would move.
 - status <folder> --hypothesis <id> reads one hypothesis back: route states, evidence for, against and limiting it, ablations, disagreements, open gaps and next actions. Evidence rows carry directions for both trace and logic; empty sections print none.
 - status --candidate also compares the verdict, ablations and disagreements and prints only the fields that changed, rounded to two decimals; the reference describes one candidate procedure: copy, sync into the copy, compare, replace on acceptance.
+- The skill starts from the model: read an existing research folder with status (or one hypothesis with --hypothesis), or write research.yaml first for a new question; status names the template when no index is found.
 
 ## v0.5.14 - 2026-10-24
 
