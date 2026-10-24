@@ -565,19 +565,58 @@ def render_hypothesis_view(view: dict[str, Any]) -> str:
     return "\n".join(lines) + "\n"
 
 
+HYPOTHESIS_FIELDS = ("state", "confidence", "rank", "support", "live", "status")
+VERDICT_KEYS = ("search", "root_claim.id", "root_claim.wording_license", "root_claim.reason", "live_hypotheses", "contested", "errors")
+
+
+def _verdict_value(verdict, key):
+    if key.startswith("root_claim."):
+        return (verdict.get("root_claim") or {}).get(key.split(".", 1)[1])
+    return verdict.get(key)
+
+
 def compare_research_status(current, candidate):
+    """Compare what readers and writers see: hypothesis fields, verdict keys, ablations, disagreements, anchors and problems."""
     changes = []
     old = {row["id"]: row for row in current["hypotheses"]}
     new = {row["id"]: row for row in candidate["hypotheses"]}
+    projected = lambda row: {route: {key: value for key, value in (row.get(route) or {}).items() if key in HYPOTHESIS_FIELDS} for route in ("logic", "trace", "experiment")}
     for identifier in dict.fromkeys((*old, *new)):
         before, after = old.get(identifier), new.get(identifier)
-        projected = lambda row: {route: {key: value for key, value in (row.get(route) or {}).items() if key in {"state", "confidence", "rank", "support", "live", "status"}} for route in ("logic", "trace", "experiment")} if row else None
+        if before is None or after is None:
+            changes.append({"kind": "hypothesis", "id": identifier, "before": projected(before) if before else None, "after": projected(after) if after else None})
+            continue
         left, right = projected(before), projected(after)
-        if left != right:
-            changes.append({"kind": "hypothesis", "id": identifier, "before": left, "after": right})
-    for key in ("evidence", "errors", "warnings"):
-        left = {row["anchor"] for row in current[key]} if key == "evidence" else set(current[key])
-        right = {row["anchor"] for row in candidate[key]} if key == "evidence" else set(candidate[key])
+        changed_left, changed_right = {}, {}
+        for route in left:
+            for key in dict.fromkeys((*left[route], *right[route])):
+                if left[route].get(key) != right[route].get(key):
+                    changed_left.setdefault(route, {})[key] = left[route].get(key)
+                    changed_right.setdefault(route, {})[key] = right[route].get(key)
+        if changed_left:
+            changes.append({"kind": "hypothesis", "id": identifier, "before": changed_left, "after": changed_right})
+    for key in VERDICT_KEYS:
+        before, after = _verdict_value(current["verdict"], key), _verdict_value(candidate["verdict"], key)
+        if before != after:
+            changes.append({"kind": "verdict", "id": key, "before": before, "after": after})
+    old_ablations = {row["id"]: row for row in current.get("ablations", [])}
+    new_ablations = {row["id"]: row for row in candidate.get("ablations", [])}
+    for identifier in dict.fromkeys((*old_ablations, *new_ablations)):
+        before, after = old_ablations.get(identifier), new_ablations.get(identifier)
+        if before is None or after is None:
+            changes.append({"kind": "ablation", "id": identifier, "change": "added" if before is None else "removed"})
+            continue
+        shown = lambda row: {key: row.get(key, []) for key in ("caught_by", "effects")}
+        if shown(before) != shown(after):
+            left, right = shown(before), shown(after)
+            changes.append({"kind": "ablation", "id": identifier,
+                            "before": {key: value for key, value in left.items() if value != right[key]},
+                            "after": {key: value for key, value in right.items() if value != left[key]}})
+    disagreement = lambda rows: {f"{row['hypothesis']}:{row['kind']}:{row['detail']}" for row in rows}
+    for key, values in (("evidence", lambda status: {row["anchor"] for row in status["evidence"]}),
+                        ("disagreement", lambda status: disagreement(status.get("disagreements", []))),
+                        ("errors", lambda status: set(status["errors"])), ("warnings", lambda status: set(status["warnings"]))):
+        left, right = values(current), values(candidate)
         for value in sorted(left - right):
             changes.append({"kind": key, "id": value, "change": "removed"})
         for value in sorted(right - left):
@@ -585,17 +624,36 @@ def compare_research_status(current, candidate):
     return {"current": current, "candidate": candidate, "changes": changes}
 
 
+def _shown(value):
+    if isinstance(value, bool):
+        return str(value).lower()
+    if isinstance(value, float):
+        return f"{value:.2f}"
+    if isinstance(value, str):
+        return json.dumps(value, ensure_ascii=False)
+    if value is None:
+        return "none"
+    if isinstance(value, list):
+        return "[" + ", ".join(_shown(item) if not isinstance(item, str) else item for item in value) + "]"
+    return str(value)
+
+
 def render_comparison(comparison):
-    def short(value):
-        if value is None:
-            return "not listed"
-        return "; ".join(f"{route}: " + ", ".join(f"{key}={item}" for key, item in data.items()) for route, data in value.items() if data)
     lines = ["## Current and candidate", ""]
     for row in comparison["changes"]:
-        if row["kind"] == "hypothesis":
-            lines.append(f"- {row['id']}: {short(row['before'])} → {short(row['after'])}")
-        else:
+        if row["kind"] == "hypothesis" and (row["before"] is None or row["after"] is None):
+            lines.append(f"- hypothesis {'added' if row['before'] is None else 'removed'}: {row['id']}")
+        elif row["kind"] == "hypothesis":
+            for route, fields in row["before"].items():
+                for key, before in fields.items():
+                    lines.append(f"- {row['id']}: {route} {key} {_shown(before)} → {_shown(row['after'][route][key])}")
+        elif row["kind"] == "verdict":
+            lines.append(f"- verdict {row['id']}: {_shown(row['before'])} → {_shown(row['after'])}")
+        elif "change" in row:
             lines.append(f"- {row['kind']} {row['change']}: {row['id']}")
+        else:
+            for key, before in row["before"].items():
+                lines.append(f"- {row['kind']} {row['id']}: {key} {_shown(before)} → {_shown(row['after'][key])}")
     if not comparison["changes"]:
         lines.append("no changes")
     return "\n".join(lines) + "\n"

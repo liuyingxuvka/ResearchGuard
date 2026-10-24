@@ -83,13 +83,23 @@ logic `state` flips. No model files are changed; observations are not ablated.
 
 ## Current and candidate
 
-The research folder is current; a candidate folder is the target that replaces it
-when accepted. Run `researchguard status <current> --candidate <candidate>` to
-see changed hypothesis states/confidences, trace rank/support/live, experiment
-status, anchor additions/removals and changed errors/warnings. Equal folders show
-`no changes`. JSON contains `current`, `candidate`, `changes`; exit 1 follows the
-candidate's errors. Acceptance is explicitly replacing current files (or updating
-index paths), with history in git. The kernel never replaces a model for you.
+The research folder is the current model; a candidate copy is the target:
+
+1. Copy the folder as the candidate.
+2. Sync new evidence into the copy (each `--output` inside the copy, and the
+   copy's `research.yaml` points at the new files).
+3. Run `researchguard status <current> --candidate <copy>` to see before and after.
+4. Accept by replacing the current folder with the copy (git keeps history);
+   otherwise delete the copy. The kernel never replaces a model for you.
+
+`changes` rows are `{kind, id, before, after}` or `{kind, id, change}` with kind
+`hypothesis` (only changed fields, route to field to value), `verdict` (one row
+per changed `search`, `root_claim.id`, `root_claim.wording_license`,
+`root_claim.reason`, `live_hypotheses`, `contested`, `errors`), `ablation`
+(changed `caught_by` or `effects`, added or removed), `disagreement`, `evidence`,
+`errors`, `warnings`. The page prints one change per line with two decimals,
+e.g. `- h_suez: logic confidence 0.25 → 0.40`; equal folders show `no changes`.
+JSON contains `current`, `candidate`, `changes`; exit 1 follows the candidate.
 
 All four native predict-observe-revise loops use `researchguard.iteration`: one
 canonical `baseline_identity`, gap lineage and terminal selection. Source models
@@ -148,8 +158,9 @@ researchguard trace export-logicguard trace-next.yaml --output bundle.yaml
 researchguard logic import-handoff bundle.yaml --into logic.yaml --output logic-next.yaml
 ```
 
-Every output must differ from the input/`--into` path. Sync reports `added`,
-`updated`, `conflicts`; a second unchanged sync has empty lists. Source anchors
-usable for claims or traces export as usable evidence; AI still owns the links.
-Update index paths to the accepted files, then read `status` again. Route results
-remain scoped to their own declared evidence and do not establish factual truth.
+Run these inside the candidate copy. Every output must differ from the
+input/`--into` path. Sync reports `added`, `updated`, `conflicts`; a second
+unchanged sync has empty lists. Source anchors usable for claims or traces export
+as usable evidence; AI still owns the links. Point the copy's `research.yaml` at
+the outputs, then compare with `status <current> --candidate <copy>`. Route
+results remain scoped to their own declared evidence and do not establish truth.

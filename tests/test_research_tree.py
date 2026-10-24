@@ -393,3 +393,20 @@ def test_writer_surface_keys_are_pinned(tmp_path):
             for item in row['directions']:
                 assert set(item) == {'route', 'hypothesis', 'direction', 'node'} and item['direction'] in {'support', 'oppose', 'limit'}
         assert set(status['verdict']) == {'search', 'root_claim', 'live_hypotheses', 'contested', 'errors'}
+
+
+def test_candidate_view_shows_verdict_changes(tmp_path, capsys):
+    import shutil
+    from researchguard.research import compare_research_status
+    candidate = tmp_path / 'candidate'
+    shutil.copytree(EVERGIVEN, candidate)
+    removed = {('R_pretrend', 'attacks'), ('h_demand', 'contradicts')}
+    _rewrite(candidate, 'logic.yaml', lambda d: d.update(edges=[e for e in d['edges'] if not (e['target'] == 'h_suez' and (e['source'], e['type']) in removed)]))
+    changes = compare_research_status(research_status(load_research(EVERGIVEN)), research_status(load_research(candidate)))['changes']
+    assert any(row['kind'] == 'verdict' and row['id'] == 'root_claim.reason' for row in changes)
+    suez = next(row for row in changes if row['kind'] == 'hypothesis' and row['id'] == 'h_suez')
+    assert suez['before'] == {'logic': {'confidence': 0.25}} and suez['after'] == {'logic': {'confidence': 0.4}}
+    assert main(['status', str(EVERGIVEN), '--candidate', str(candidate)]) == 0
+    page = capsys.readouterr().out
+    assert '- h_suez: logic confidence 0.25 → 0.40' in page and '- verdict root_claim.reason: ' in page
+    assert '0.332256954214' not in page

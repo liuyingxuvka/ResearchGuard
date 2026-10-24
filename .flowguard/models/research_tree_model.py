@@ -15,7 +15,8 @@ IMPLEMENTED_BY = {'Check': 'src/researchguard/research.py:check_research_tree',
  'Ablations': 'src/researchguard/research.py:apply_ablations',
  'Verdict': 'src/researchguard/research.py:verdict_for_writers',
  'Directions': 'src/researchguard/research.py:evidence_directions',
- 'HypothesisView': 'src/researchguard/research.py:hypothesis_view'}
+ 'HypothesisView': 'src/researchguard/research.py:hypothesis_view',
+ 'Compare': 'src/researchguard/research.py:compare_research_status'}
 TESTED_BY = {'dangling_reference_is_an_error': ['tests/test_research_tree.py:test_dangling_references_and_invalid_native_models_are_errors',
                                                 'tests/test_research_tree.py:test_missing_index_exits_2'],
  'consistent_tree_has_no_error': ['tests/test_research_tree.py:test_consistent_tree_has_no_errors',
@@ -37,6 +38,7 @@ TESTED_BY = {'dangling_reference_is_an_error': ['tests/test_research_tree.py:tes
  'evidence_directions_match_routes': ['tests/test_research_tree.py:test_evidence_directions_cover_both_routes',
                                       'tests/test_research_tree.py:test_writer_surface_keys_are_pinned'],
  'hypothesis_view_matches_status': ['tests/test_research_tree.py:test_hypothesis_view_lists_its_rows'],
+ 'candidate_view_shows_verdict_changes': ['tests/test_research_tree.py:test_candidate_view_shows_verdict_changes'],
  'contested_iff_disagreement': ['tests/test_research_tree.py:test_live_hypotheses_follow_every_route',
                                 'tests/test_research_tree.py:test_verdict_matches_each_route_and_page_is_readable']}
 
@@ -76,6 +78,7 @@ class Question:
     ablations: tuple[Ablation, ...] = ()
     gap_hypotheses: tuple[tuple[str, tuple[str, ...]], ...] = ()   # (source gap id, hypothesis ids it names)
     searches: tuple[tuple[str, str], ...] = ()   # (next search action id, the gap it targets)
+    candidate_verdict_changes: tuple[str, ...] = ()   # verdict keys whose value differs in a candidate folder
     root_license: str = ''                   # native wording license of the root claim
 
 
@@ -93,6 +96,7 @@ class State:
     gap_rows: tuple[tuple[str, tuple[str, ...]], ...] = ()   # open source gaps with the hypotheses they name
     next_rows: tuple[tuple[str, tuple[str, ...]], ...] = ()  # next searches with the hypotheses they would move
     views: tuple[tuple[str, tuple[str, ...], tuple[str, ...], tuple[str, ...]], ...] = ()  # (hypothesis, gaps, next, ablations)
+    changes: tuple[tuple[str, str], ...] = ()   # candidate comparison rows: (kind, id)
 
 
 def excluded(row):
@@ -172,8 +176,9 @@ class Status:
                        tuple(action for action, named in next_rows if row.id in named),
                        tuple(item.id for item in question.ablations if item.hypothesis == row.id))
                       for row in question.hypotheses)
+        changes = () if wrong == 'candidate_ignores_verdict' else tuple(('verdict', key) for key in question.candidate_verdict_changes)
         result = State(question, tuple(sorted(set(errors))), tuple(sorted(set(warnings))), disagreements, ablations, live, contested, license,
-                       directions, gap_rows, next_rows, views)
+                       directions, gap_rows, next_rows, views, changes)
         yield FunctionResult(result, result, label=question.name)
 
 
@@ -272,6 +277,11 @@ def view_rule(state, question):
             return f'view of {hypothesis} lists {(gaps, actions, ablations)}, the full status names it in {want}'
 
 
+def candidate_rule(state, question):
+    missing = [key for key in question.candidate_verdict_changes if ('verdict', key) not in state.changes]
+    return f'candidate view hides verdict changes {missing}' if missing else None
+
+
 def contested_rule(state, question):
     if state.contested != bool(state.disagreements):
         return f'contested={state.contested} with {len(state.disagreements)} disagreement(s)'
@@ -291,6 +301,7 @@ INVARIANTS = (
     Invariant('live_hypotheses_follow_route_exclusions', 'Live hypotheses are those no route excludes, in index order.', rule(live_hypotheses)),
     Invariant('evidence_directions_match_routes', 'Each evidence direction row matches its route model, logic included.', rule(directions_rule)),
     Invariant('hypothesis_view_matches_status', 'One hypothesis view lists exactly the gaps, next searches and ablations that name it.', rule(view_rule)),
+    Invariant('candidate_view_shows_verdict_changes', 'Every verdict key that differs in the candidate has a change row.', rule(candidate_rule)),
     Invariant('contested_iff_disagreement', 'The verdict is contested exactly when routes disagree.', rule(contested_rule)),
 )
 
@@ -308,6 +319,8 @@ CASES = (
              gap_hypotheses=(('gap-alt-yantian', ('h_yantian',)), ('gap-pre-trend', ('h_suez', 'h_demand'))),
              searches=(('act-yantian', 'gap-alt-yantian'), ('act-pre-trend', 'gap-pre-trend')),
              ablations=(Ablation('abl_no_unctad', 'h_demand', logic_moved=True),)),
+    Question('candidate', (H('h_suez', 'UNDECIDED', False),), root_license='withhold',
+             candidate_verdict_changes=('root_claim.reason', 'live_hypotheses')),
     Question('drift', (H('h', 'UNDECIDED', True),), drifted=('copy_drift:trace:a:raw_text',)),
     Question('library', (H('h', 'UNDECIDED'),), library_anchors=('n1',)),
     Question('anchor_disagreement', (H('h', 'UNDECIDED', True, None, (('a', 'trace', 'support'), ('a', 'logic', 'oppose'))),)),
@@ -335,6 +348,7 @@ MUTATIONS = {
     'ablation_uses_a_second_sensitivity': 'ablation_agrees_with_trace_depth',
     'excluded_hypothesis_stays_live': 'live_hypotheses_follow_route_exclusions',
     'logic_direction_dropped': 'evidence_directions_match_routes',
+    'candidate_ignores_verdict': 'candidate_view_shows_verdict_changes',
     'hypothesis_view_drops_gaps': 'hypothesis_view_matches_status',
     'disagreement_not_contested': 'contested_iff_disagreement',
 }
@@ -490,7 +504,16 @@ def native_features():
             ('logic', 'h', 'limit', 'E'), ('trace', 'h', 'support', None)]
         rows = evidence_directions(directional, ['h'])
         directions = directions and sorted((row['route'], row['direction'], row['node']) for row in rows) == [('logic', 'oppose', 'E'), ('trace', 'support', None)]
-    return {'drift': drift, 'gaps': gaps, 'directions': directions, 'library': library_ok, 'disagreement': disagreement, 'ablation': ablation, 'live': live}
+    import copy
+    from researchguard.research import compare_research_status, load_research, research_status
+    current = research_status(load_research(Path(__file__).resolve().parents[2] / 'examples/research/evergiven'))
+    candidate = copy.deepcopy(current)
+    candidate['verdict']['root_claim']['reason'] = 'A different reason.'
+    candidate['verdict']['live_hypotheses'] = ['h_demand']
+    rows = {(row['kind'], row['id']) for row in compare_research_status(current, candidate)['changes']}
+    compare = {('verdict', 'root_claim.reason'), ('verdict', 'live_hypotheses')} <= rows \
+        and compare_research_status(current, copy.deepcopy(current))['changes'] == []
+    return {'drift': drift, 'gaps': gaps, 'directions': directions, 'compare': compare, 'library': library_ok, 'disagreement': disagreement, 'ablation': ablation, 'live': live}
 
 
 def evergiven_state():

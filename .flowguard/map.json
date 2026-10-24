@@ -335,7 +335,8 @@
         "Ablation rows name side effects on other hypotheses.",
         "Open gaps and next searches name the hypotheses they would move.",
         "Evidence rows carry each route's direct direction per hypothesis.",
-        "One hypothesis reads back with its rows from the full status."
+        "One hypothesis reads back with its rows from the full status.",
+        "The candidate view lists every changed verdict key, ablation and disagreement."
       ],
       "files": [
         "src/researchguard/research.py"
@@ -365,7 +366,7 @@
       ],
       "layer": "tree",
       "status": "confirmed",
-      "fingerprint": "sha256:1a41603770b71ccf3fdf49a56dbaa4a7e039d1778be7f6061971f13fb77d9907"
+      "fingerprint": "sha256:342aeb8391da36139ee1a5ee746ee5221d2bac09c4b6d16fed05d7030dbd29fd"
     },
     {
       "entrypoints": [
