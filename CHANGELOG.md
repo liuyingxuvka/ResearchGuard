@@ -1,13 +1,14 @@
 # Changelog
 
-## Unreleased
+## v0.5.15 - 2026-10-24
 
-- Maintenance checks of ResearchGuard's own model tree run on FlowGuard 0.70.12.
-- Question-level ablations judge the trace route with TraceGuard's own expected-sensitivity check, so status and trace depth agree; each ablation row lists side effects on other hypotheses.
-- SourceGuard gaps may list hypothesis_ids; research status checks them against the question and shows which hypothesis each open gap and next search would move.
-- status <folder> --hypothesis <id> reads one hypothesis back: route states, evidence for, against and limiting it, ablations, disagreements, open gaps and next actions. Evidence rows carry directions for both trace and logic; empty sections print none.
-- status --candidate also compares the verdict, ablations and disagreements and prints only the fields that changed, rounded to two decimals; the reference describes one candidate procedure: copy, sync into the copy, compare, replace on acceptance.
-- The skill starts from the model: read an existing research folder with status (or one hypothesis with --hypothesis), or write research.yaml first for a new question; status names the template when no index is found.
+- Read one hypothesis back with `researchguard status <folder> --hypothesis <id>`: its state in each route, the evidence for, against and limiting it, its ablations, disagreements, open gaps and next actions. An unknown id exits 2. Empty status sections print `none`.
+- Evidence rows in `status --json` carry `directions` (route, hypothesis, support/oppose/limit, logic node) for both trace and logic, counting direct evidence only; `used_by` is unchanged. The page shows the same directions.
+- Question-level ablations judge the trace route with TraceGuard's own expected-sensitivity check, so `status` and `trace depth` agree; each ablation row lists `effects` on other hypotheses (for example a hypothesis that becomes live).
+- SourceGuard gaps may list `hypothesis_ids`; `status` checks them against the question and shows which hypotheses each open gap and next search would move.
+- `status --candidate` also compares the verdict, ablations and disagreements and prints only the fields that changed, with two decimals. The reference describes one candidate procedure: copy the folder, sync new evidence into the copy, compare, replace on acceptance.
+- The skill starts from the model: read an existing research folder with `status`, or write `research.yaml` first for a new question; `status` names the template when no index is found.
+- Maintenance: ResearchGuard's own model tree is checked with FlowGuard 0.70.12 and now models trace projection, experiment elimination, synthesis plans and the source library. Several helper functions are public under names without a leading underscore (`load_spec`, `load_spec_payload`, `load_observations`, `build_native_depth_analysis`, `load_json_object`, `apply_declared_perturbation`, `expected_sensitivity_matches`); the underscore names are gone.
 
 ## v0.5.14 - 2026-10-24
 
