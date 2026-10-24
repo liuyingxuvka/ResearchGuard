@@ -1,0 +1,102 @@
+{
+  "schema": "flowguard.target.v1",
+  "goal": "RG-304: source gaps name the hypotheses they would move (rule gap_names_known_hypotheses)",
+  "components": [
+    {
+      "id": "sourceguard",
+      "summary": "Source belief states, anchors, search frontiers and native stop decisions.",
+      "responsibilities": [
+        "Own evidence discovery, expected-utility search plans, stop decisions, source/anchor qualification and readable source/anchor/closure reporting. Return SourceDepthResult with actual model freshness and native coverage, without result versions, result-model or universe self-hashes.",
+        "Load, plan, update and iterate on a model file alone; models carry no contract; the action and every protected or coverage gap a prediction names must exist in the model when it is frozen.",
+        "Decide whether to keep searching from the model itself: all executable declared and generated actions, selecting an affordable target by native utility, the open blocking gaps and the caller-declared budget.",
+        "Combine source semantic-state, depth and coverage gaps from each actual model and delegate transition sets to the shared suite helper; resolved obligations alone count as progress.",
+        "Read all recorded observations for native depth and preview a new observation only on a clone; current-call provider status remains explicit.",
+        "Generate gap queries from the gap description and at most two domain hints, bounded to 120 characters; preserve executable declared actions and suppress their generated duplicates.",
+        "Default only absent gap semantic_state to discovered, keep retired status invalid, and warn on synthetic starter ids during validation. Be the sole owner of source ids, roles, lineage and anchors; export a TraceGuard seed, with no unconsumed LogicGuard candidate export. Refresh source-owned trace copies by identity while preserving downstream fields; claim-usable anchors are trace-usable.",
+        "Gaps may list hypothesis ids that SourceGuard stores but never reads."
+      ],
+      "files": [
+        "src/researchguard/source/__init__.py",
+        "src/researchguard/source/depth.py",
+        "src/researchguard/source/handoff.py",
+        "src/researchguard/source/loader.py",
+        "src/researchguard/source/planner.py",
+        "src/researchguard/source/report.py",
+        "src/researchguard/source/schema.py",
+        "src/researchguard/source/scoring.py",
+        "src/researchguard/source/stop_decision.py",
+        "src/researchguard/source/task_iteration.py",
+        "src/researchguard/source/update.py"
+      ],
+      "entrypoints": [],
+      "state": [
+        "source beliefs: sources, anchors, gaps, actions and stop rules"
+      ],
+      "side_effects": [
+        "Write explicit source models, TraceGuard seeds and source reports; refresh only source-owned copies"
+      ],
+      "depends_on": [
+        "researchguard-suite"
+      ],
+      "tests": [
+        "tests/source/__init__.py",
+        "tests/source/test_cli.py",
+        "tests/source/test_handoff.py",
+        "tests/source/test_planner.py",
+        "tests/source/test_schema.py",
+        "tests/source/test_scoring.py",
+        "tests/source/test_semantic_gap_depth.py",
+        "tests/source/test_stop_decision.py",
+        "tests/source/test_task_iteration.py",
+        "tests/source/test_update.py"
+      ],
+      "models": [
+        ".flowguard/models/sourceguard_content_anchor_model.py",
+        ".flowguard/models/sourceguard_stop_decision_model.py"
+      ],
+      "layer": "routes"
+    },
+    {
+      "id": "research-tree",
+      "summary": "One research question: cross-route identities, copy drift, ablations, candidate comparison and one verdict for writers.",
+      "responsibilities": [
+        "Load the research index and resolve source-library provenance through the native validator.",
+        "Detect copied-content drift and direct evidence or conclusion disagreements between native routes.",
+        "Apply declared anchor ablations in memory and expose uncaught known-bad cases.",
+        "Project the authoritative search stop and root wording license into one five-key verdict; compare current and candidate questions without writing models.",
+        "The question model lists live hypotheses and contested routes from route states.",
+        "Ablation rows name side effects on other hypotheses.",
+        "Open gaps and next searches name the hypotheses they would move."
+      ],
+      "files": [
+        "src/researchguard/research.py"
+      ],
+      "entrypoints": [
+        "src/researchguard/research.py:status_main"
+      ],
+      "state": [
+        "loaded research index, native models and optional source library"
+      ],
+      "side_effects": [
+        "Read indexed model/library files and write only an explicit status --output"
+      ],
+      "depends_on": [
+        "experimentguard",
+        "logic-argument",
+        "logic-library",
+        "researchguard-suite",
+        "sourceguard",
+        "traceguard"
+      ],
+      "tests": [
+        "tests/test_research_tree.py"
+      ],
+      "models": [
+        ".flowguard/models/research_tree_model.py"
+      ],
+      "layer": "tree"
+    }
+  ],
+  "flows": [],
+  "remove": []
+}
