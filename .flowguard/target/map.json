@@ -1,0 +1,238 @@
+{
+  "schema": "flowguard.target.v1",
+  "goal": "RG-302: the question model lives under research-tree (rules live_hypotheses_follow_route_exclusions, contested_iff_disagreement)",
+  "components": [
+    {
+      "id": "research-tree",
+      "summary": "One research question: cross-route identities, copy drift, ablations, candidate comparison and one verdict for writers.",
+      "responsibilities": [
+        "Load the research index and resolve source-library provenance through the native validator.",
+        "Detect copied-content drift and direct evidence or conclusion disagreements between native routes.",
+        "Apply declared anchor ablations in memory and expose uncaught known-bad cases.",
+        "Project the authoritative search stop and root wording license into one five-key verdict; compare current and candidate questions without writing models.",
+        "The question model lists live hypotheses and contested routes from route states."
+      ],
+      "files": [
+        "src/researchguard/research.py"
+      ],
+      "entrypoints": [
+        "src/researchguard/research.py:status_main"
+      ],
+      "state": [
+        "loaded research index, native models and optional source library"
+      ],
+      "side_effects": [
+        "Read indexed model/library files and write only an explicit status --output"
+      ],
+      "depends_on": [
+        "experimentguard",
+        "logic-argument",
+        "logic-library",
+        "researchguard-suite",
+        "sourceguard",
+        "traceguard"
+      ],
+      "tests": [
+        "tests/test_research_tree.py"
+      ],
+      "models": [
+        ".flowguard/models/research_tree_model.py"
+      ],
+      "layer": "tree"
+    },
+    {
+      "id": "traceguard",
+      "summary": "Temporal and causal trace inference, storyline depth, ablations and trace-to-logic handoff.",
+      "responsibilities": [
+        "Own temporal and causal trace inference, storyline stress, case library updates and readable timeline/hypothesis/depth reporting. Expose native inference/depth results with model freshness only; handoffs carry source-model freshness and case writeback stores gaps and contradictions without solver histories. Use neutral undeclared evidence types and model-authored finite strength tables consistently across every factor; preserve case model declarations.",
+        "Keep command output to analysis results; full JSON is written only with --output.",
+        "Solve storyline support from evidence first; bound causal support below it. Depth checks that neither causal declarations nor oppose links raise support; evaluate does not run depth.",
+        "Freeze with an existing target and coverage; permit future expected evidence/event ids. Append typed observation rows in memory and compare canonical target support direction.",
+        "Preserve newly observed rows in candidates; acceptance is independent of native depth closure. Keep prediction mismatches separate from native gaps, use the suite lineage helper and count only resolved native gaps as progress.",
+        "Export hypothesis ids, native rank/support and signed evidence with original text/source/locator alongside the preserved v1 trace claims."
+      ],
+      "files": [
+        "src/researchguard/trace/__init__.py",
+        "src/researchguard/trace/diagnostics.py",
+        "src/researchguard/trace/entity_resolution.py",
+        "src/researchguard/trace/evaluator.py",
+        "src/researchguard/trace/export_logicguard.py",
+        "src/researchguard/trace/handoff.py",
+        "src/researchguard/trace/inference/__init__.py",
+        "src/researchguard/trace/inference/compiler.py",
+        "src/researchguard/trace/inference/contradiction_core.py",
+        "src/researchguard/trace/inference/engine.py",
+        "src/researchguard/trace/inference/explain.py",
+        "src/researchguard/trace/inference/factors/__init__.py",
+        "src/researchguard/trace/inference/factors/entity.py",
+        "src/researchguard/trace/inference/factors/evidence_trace.py",
+        "src/researchguard/trace/inference/factors/storyline_causal.py",
+        "src/researchguard/trace/inference/factors/temporal_stage.py",
+        "src/researchguard/trace/inference/osqp_backend.py",
+        "src/researchguard/trace/inference/policy.py",
+        "src/researchguard/trace/inference/projection.py",
+        "src/researchguard/trace/inference/types.py",
+        "src/researchguard/trace/library.py",
+        "src/researchguard/trace/loader.py",
+        "src/researchguard/trace/report.py",
+        "src/researchguard/trace/results.py",
+        "src/researchguard/trace/schema.py",
+        "src/researchguard/trace/stage_model.py",
+        "src/researchguard/trace/storyline_depth.py",
+        "src/researchguard/trace/task_iteration.py",
+        "src/researchguard/trace/temporal.py",
+        "src/researchguard/trace/validation.py"
+      ],
+      "entrypoints": [
+        "src/researchguard/trace/export_logicguard.py:logicguard_bundle"
+      ],
+      "state": [
+        "trace models, events, storyline hypotheses, ablations and trace case-library data"
+      ],
+      "side_effects": [
+        "Write explicitly requested trace models, logic bundles, iteration results and case-library files"
+      ],
+      "depends_on": [
+        "researchguard-suite"
+      ],
+      "tests": [
+        "tests/trace/__init__.py",
+        "tests/trace/test_contradiction_core.py",
+        "tests/trace/test_inference_kernel.py",
+        "tests/trace/test_inference_performance.py",
+        "tests/trace/test_logicguard_export_contract.py",
+        "tests/trace/test_starter_fields.py",
+        "tests/trace/test_storyline_depth.py",
+        "tests/trace/test_task_iteration.py",
+        "tests/trace/test_traceguard.py"
+      ],
+      "models": [],
+      "layer": "routes"
+    },
+    {
+      "entrypoints": [
+        "src/researchguard/logic/trace_import.py:sync_trace_bundle"
+      ],
+      "depends_on": [
+        "researchguard-suite",
+        "sourceguard"
+      ],
+      "layer": "routes",
+      "id": "logic-argument",
+      "parent": "logicguard",
+      "files": [
+        "src/researchguard/logic/__init__.py",
+        "src/researchguard/logic/acceptance.py",
+        "src/researchguard/logic/argument_modeling.py",
+        "src/researchguard/logic/diagnostics.py",
+        "src/researchguard/logic/evaluator.py",
+        "src/researchguard/logic/execution_depth.py",
+        "src/researchguard/logic/gap_ledger.py",
+        "src/researchguard/logic/hierarchy.py",
+        "src/researchguard/logic/importance.py",
+        "src/researchguard/logic/loader.py",
+        "src/researchguard/logic/localization.py",
+        "src/researchguard/logic/minimal_sets.py",
+        "src/researchguard/logic/model.py",
+        "src/researchguard/logic/provenance.py",
+        "src/researchguard/logic/report.py",
+        "src/researchguard/logic/schema.py",
+        "src/researchguard/logic/simulator.py",
+        "src/researchguard/logic/task_iteration.py",
+        "src/researchguard/logic/trace_import.py",
+        "src/researchguard/logic/validator.py",
+        "src/researchguard/logic/writer.py"
+      ],
+      "summary": "Native argument evaluation, wording licenses, provenance and task-local argument iteration.",
+      "responsibilities": [
+        "Evaluate bounded argument support and attacks, preserve block hierarchy and report deletion-minimal wording licenses.",
+        "Validate content-bound evidence provenance using the canonical source and library resolver.",
+        "Refresh copied handoff provenance without changing author text, edges or unrelated records; iterate on explicit candidates."
+      ],
+      "state": [
+        "argument models, confidence and explicit evidence provenance"
+      ],
+      "side_effects": [
+        "Write argument reports and explicit candidate artifacts only through member commands"
+      ],
+      "tests": [
+        "tests/logic/__init__.py",
+        "tests/logic/test_acceptance.py",
+        "tests/logic/test_authoritative_coverage.py",
+        "tests/logic/test_cli.py",
+        "tests/logic/test_deep_graph_safety.py",
+        "tests/logic/test_diagnostics.py",
+        "tests/logic/test_evaluator.py",
+        "tests/logic/test_execution_depth.py",
+        "tests/logic/test_gap_ledger.py",
+        "tests/logic/test_hierarchy.py",
+        "tests/logic/test_importance.py",
+        "tests/logic/test_minimal_sets.py",
+        "tests/logic/test_owned_sync.py",
+        "tests/logic/test_public_api.py",
+        "tests/logic/test_report.py",
+        "tests/logic/test_schema.py",
+        "tests/logic/test_simulator.py",
+        "tests/logic/test_task_iteration.py"
+      ],
+      "models": [
+        ".flowguard/models/wording_license_model.py"
+      ]
+    }
+  ],
+  "flows": [
+    {
+      "id": "argument-iteration",
+      "summary": "Observe a frozen argument prediction and choose the loop's terminal reason.",
+      "steps": [
+        "logic-argument:run_argument_iteration",
+        "logic-argument:validate_prediction_binding",
+        "researchguard-suite:require_prediction_identity",
+        "researchguard-suite:select_terminal"
+      ],
+      "model": ".flowguard/models/iteration_kernel_model.py"
+    },
+    {
+      "id": "search-iteration",
+      "summary": "Observe one search outcome against its frozen prediction and choose the terminal reason.",
+      "steps": [
+        "sourceguard:run_search_iteration",
+        "sourceguard:validate_search_prediction_binding",
+        "researchguard-suite:require_prediction_identity",
+        "researchguard-suite:select_terminal"
+      ],
+      "model": ".flowguard/models/iteration_kernel_model.py"
+    },
+    {
+      "id": "trace-iteration",
+      "summary": "Compare a frozen trace prediction with a later observation and choose the terminal reason.",
+      "steps": [
+        "traceguard:compare_prediction_observation",
+        "researchguard-suite:select_terminal"
+      ],
+      "model": ".flowguard/models/iteration_kernel_model.py"
+    },
+    {
+      "id": "experiment-observation",
+      "summary": "Eliminate hypotheses from experiment observations and choose the terminal reason.",
+      "steps": [
+        "experimentguard:observe_experiments",
+        "researchguard-suite:select_terminal"
+      ],
+      "model": ".flowguard/models/iteration_kernel_model.py"
+    },
+    {
+      "id": "sync",
+      "summary": "Refresh source-owned copies while preserving downstream reasoning.",
+      "steps": [
+        "sourceguard:sync_traceguard_seed",
+        "traceguard:logicguard_bundle reads trace-next.yaml",
+        "logic-argument:sync_trace_bundle reads bundle.yaml"
+      ],
+      "model": ".flowguard/models/research_tree_model.py"
+    }
+  ],
+  "remove": [
+    "flow:iterate"
+  ]
+}
