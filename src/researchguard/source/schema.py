@@ -629,6 +629,7 @@ class Gap:
     closure_basis: GapClosureBasis = field(default_factory=GapClosureBasis)
     review_required: bool = False
     requires_claim_usability: bool = True
+    hypothesis_ids: list[str] = field(default_factory=list)
     notes: str = ""
 
     def __post_init__(self) -> None:
@@ -663,6 +664,9 @@ class Gap:
         qualification = GapQualification.from_dict(data.get("qualification"))
         closure_basis = GapClosureBasis.from_dict(data.get("closure_basis"))
         review_required = as_bool(data.get("review_required"), False)
+        hypothesis_ids = data.get("hypothesis_ids", [])
+        if not isinstance(hypothesis_ids, list) or any(not isinstance(item, str) or not item.strip() for item in hypothesis_ids):
+            raise SchemaError("gap.hypothesis_ids must be a list of nonempty hypothesis id strings")
         notes = as_string(data.get("notes"))
         if semantic_state == "closed" and not closure_basis.is_complete():
             raise SchemaError(
@@ -692,6 +696,7 @@ class Gap:
             closure_basis=closure_basis,
             review_required=review_required,
             requires_claim_usability=as_bool(data.get("requires_claim_usability"), True),
+            hypothesis_ids=list(hypothesis_ids),
             notes=notes,
         )
 

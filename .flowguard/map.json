@@ -138,7 +138,8 @@
         "Combine source semantic-state, depth and coverage gaps from each actual model and delegate transition sets to the shared suite helper; resolved obligations alone count as progress.",
         "Read all recorded observations for native depth and preview a new observation only on a clone; current-call provider status remains explicit.",
         "Generate gap queries from the gap description and at most two domain hints, bounded to 120 characters; preserve executable declared actions and suppress their generated duplicates.",
-        "Default only absent gap semantic_state to discovered, keep retired status invalid, and warn on synthetic starter ids during validation. Be the sole owner of source ids, roles, lineage and anchors; export a TraceGuard seed, with no unconsumed LogicGuard candidate export. Refresh source-owned trace copies by identity while preserving downstream fields; claim-usable anchors are trace-usable."
+        "Default only absent gap semantic_state to discovered, keep retired status invalid, and warn on synthetic starter ids during validation. Be the sole owner of source ids, roles, lineage and anchors; export a TraceGuard seed, with no unconsumed LogicGuard candidate export. Refresh source-owned trace copies by identity while preserving downstream fields; claim-usable anchors are trace-usable.",
+        "Gaps may list hypothesis ids that SourceGuard stores but never reads."
       ],
       "files": [
         "src/researchguard/source/__init__.py",
@@ -181,7 +182,7 @@
       ],
       "layer": "routes",
       "status": "confirmed",
-      "fingerprint": "sha256:f7951ada971c7659222cf50bd317a882121e6e8f341a2c17d74c6f4989719106"
+      "fingerprint": "sha256:5914bfd1f581a94b1866443057cc0adb0672190f0a05c71bebd1e4c35883868d"
     },
     {
       "id": "traceguard",
@@ -331,7 +332,8 @@
         "Apply declared anchor ablations in memory and expose uncaught known-bad cases.",
         "Project the authoritative search stop and root wording license into one five-key verdict; compare current and candidate questions without writing models.",
         "The question model lists live hypotheses and contested routes from route states.",
-        "Ablation rows name side effects on other hypotheses."
+        "Ablation rows name side effects on other hypotheses.",
+        "Open gaps and next searches name the hypotheses they would move."
       ],
       "files": [
         "src/researchguard/research.py"
@@ -361,7 +363,7 @@
       ],
       "layer": "tree",
       "status": "confirmed",
-      "fingerprint": "sha256:a1879e06e8a1061d96cc5440a74ebebe78f4ce7d30b4af7a137def4e208ce572"
+      "fingerprint": "sha256:2d4e27ed3fbf5be5a3e1b517eaa80f2d1c0b2e6d6fe3eb5feeed80e62bc6c8c1"
     },
     {
       "entrypoints": [

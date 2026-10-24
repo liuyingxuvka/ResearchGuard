@@ -158,6 +158,8 @@ def check_research_tree(index: dict[str, Any], models: dict[str, Any], observati
         if "source" not in index.get("models", {}):
             info.append("source_model_not_listed")
     else:
+        errors.extend(f"unknown_hypothesis:source:{gap.gap_id}:{item}" for gap in source.gaps
+                      for item in gap.hypothesis_ids if item not in ids)
         source_ids = {row.source_id for row in source.sources}
         anchors = {row.anchor_id: row.source_id for row in source.anchors}
         if trace is not None:
@@ -381,9 +383,12 @@ def research_status(tree: ResearchTree) -> dict[str, Any]:
     next_actions: list[dict[str, Any]] = []
     plan = results.get("source")
     if plan:
-        next_actions.extend({"route": "search", "id": row.action_id, "query": row.query} for row in plan.selected_actions)
+        named = {row.gap_id: list(row.hypothesis_ids) for row in tree.models["source"].gaps}
+        next_actions.extend({"route": "search", "id": row.action_id, "query": row.query,
+                             "hypotheses": named.get(row.target_gap_id, [])} for row in plan.selected_actions)
         gaps.extend({"route": "source", "id": row.gap_id, "blocking": row.blocking,
-                     "next": [action.action_id for action in plan.selected_actions if action.target_gap_id == row.gap_id]}
+                     "next": [action.action_id for action in plan.selected_actions if action.target_gap_id == row.gap_id],
+                     "hypotheses": named.get(row.gap_id, [])}
                     for row in plan.open_gaps)
     if trace and trace.storyline_depth:
         depth = trace.storyline_depth.to_dict()
@@ -418,6 +423,10 @@ def research_status(tree: ResearchTree) -> dict[str, Any]:
         "next": next_actions, **problems}
 
 
+def _named(row: dict[str, Any]) -> str:
+    return f" ({', '.join(row['hypotheses'])})" if row.get("hypotheses") else ""
+
+
 def render_status_markdown(status: dict[str, Any]) -> str:
     def cell(value):
         return str(value).replace("|", "\\|").replace("\n", " ")
@@ -441,7 +450,7 @@ def render_status_markdown(status: dict[str, Any]) -> str:
     lines.extend(["", "## Open gaps", ""])
     for row in status["open_gaps"]:
         if row["route"] == "source":
-            text = f"source gap {row['id']} ({'blocking' if row['blocking'] else 'optional'}) → next: {', '.join(row['next']) or 'none'}"
+            text = f"source gap {row['id']} ({'blocking' if row['blocking'] else 'optional'}) → next: {', '.join(row['next']) or 'none'}" + _named(row)
         elif row["route"] == "trace depth":
             text = f"trace depth: {row['closure_status']}, {len(row['unresolved_gaps'])} unresolved gaps"
         else:
@@ -449,7 +458,7 @@ def render_status_markdown(status: dict[str, Any]) -> str:
         lines.append("- " + cell(text))
     lines.extend(["", "## Next", ""])
     for row in status["next"]:
-        lines.append("- " + cell(f"search {row['id']}" if row["route"] == "search" else f"experiment: {row.get('status')}; next: {', '.join(row['ids']) or 'none'}"))
+        lines.append("- " + cell(f"search {row['id']}" + _named(row) if row["route"] == "search" else f"experiment: {row.get('status')}; next: {', '.join(row['ids']) or 'none'}"))
     lines.extend(["", "## Ablations", ""])
     for row in status["ablations"]:
         effects = "; effects: " + ", ".join(f"{item['hypothesis']} {item['route']} {item['field']} {str(item['before']).lower()} → {str(item['after']).lower()}" for item in row["effects"]) if row.get("effects") else ""

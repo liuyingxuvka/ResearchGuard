@@ -230,6 +230,8 @@ anchors:
   unconsumed_output_disposition: ''
 gaps:
 - gap_id: gap-event-dates
+  hypothesis_ids:
+  - h_suez
   lead_id: lead-cause
   gap_type: missing_primary_source
   description: Official dates of grounding and refloating.
@@ -284,6 +286,9 @@ gaps:
   requires_claim_usability: true
   notes: Semantically qualified and closed.
 - gap_id: gap-rate-series
+  hypothesis_ids:
+  - h_suez
+  - h_demand
   lead_id: lead-cause
   gap_type: missing_numeric_provenance
   description: A weekly Shanghai-Rotterdam spot-rate series covering Oct 2020 - Dec
@@ -339,6 +344,9 @@ gaps:
   requires_claim_usability: true
   notes: Semantically qualified and closed.
 - gap_id: gap-pre-trend
+  hypothesis_ids:
+  - h_suez
+  - h_demand
   lead_id: lead-cause
   gap_type: missing_counterevidence
   description: Evidence on whether rates were already rising before 23 Mar 2021.
@@ -394,6 +402,8 @@ gaps:
   requires_claim_usability: true
   notes: Semantically qualified and closed.
 - gap_id: gap-alt-yantian
+  hypothesis_ids:
+  - h_yantian
   lead_id: lead-cause
   gap_type: missing_counterevidence
   description: Dates and scale of the Yantian port disruption (alternative cause).
@@ -442,6 +452,9 @@ gaps:
   requires_claim_usability: true
   notes: ''
 - gap_id: counter-source-src-unctad-rmt2021
+  hypothesis_ids:
+  - h_demand
+  - h_suez
   lead_id: ''
   gap_type: contradiction
   description: 'Counterevidence candidate observed: UNCTAD Review of Maritime Transport
@@ -492,6 +505,9 @@ gaps:
   notes: Counterevidence should be modeled downstream rather than overwriting prior
     support.
 - gap_id: counter-source-src-wci-transpacific
+  hypothesis_ids:
+  - h_demand
+  - h_suez
   lead_id: ''
   gap_type: contradiction
   description: 'Counterevidence candidate observed: Drewry WCI Shanghai-Los Angeles

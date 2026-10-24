@@ -31,6 +31,7 @@ TESTED_BY = {'dangling_reference_is_an_error': ['tests/test_research_tree.py:tes
  'live_hypotheses_follow_route_exclusions': ['tests/test_research_tree.py:test_live_hypotheses_follow_every_route'],
  'ablation_agrees_with_trace_depth': ['tests/test_research_tree.py:test_trace_ablation_agrees_with_trace_depth',
                                       'tests/test_research_tree.py:test_ablation_rows_name_side_effects'],
+ 'gap_names_known_hypotheses': ['tests/test_research_tree.py:test_gap_hypotheses_are_checked_and_grouped'],
  'contested_iff_disagreement': ['tests/test_research_tree.py:test_live_hypotheses_follow_every_route',
                                 'tests/test_research_tree.py:test_verdict_matches_each_route_and_page_is_readable']}
 
@@ -68,6 +69,7 @@ class Question:
     drifted: tuple[str, ...] = ()            # problem codes of copied fields that differ from their owner
     library_anchors: tuple[str, ...] = ()    # anchors that resolve only through the source library
     ablations: tuple[Ablation, ...] = ()
+    gap_hypotheses: tuple[tuple[str, tuple[str, ...]], ...] = ()   # (source gap id, hypothesis ids it names)
     root_license: str = ''                   # native wording license of the root claim
 
 
@@ -125,6 +127,9 @@ class Status:
             errors.extend(question.drifted)
         if wrong == 'status_ignores_library':
             errors.extend(f'dangling_anchor:logic:{anchor}' for anchor in question.library_anchors)
+        known = {row.id for row in question.hypotheses}
+        if wrong != 'dangling_gap_hypothesis_accepted':
+            errors.extend(f'unknown_hypothesis:source:{gap}:{name}' for gap, names in question.gap_hypotheses for name in names if name not in known)
         if wrong == 'consistent_as_error' and not errors:
             errors.append('invented_error')
         warnings = []
@@ -158,8 +163,13 @@ def rule(check):
     return invariant
 
 
+def unknown_gap_hypotheses(question):
+    known = {row.id for row in question.hypotheses}
+    return [f'unknown_hypothesis:source:{gap}:{name}' for gap, names in question.gap_hypotheses for name in names if name not in known]
+
+
 def consistent_tree(state, question):
-    if not question.dangling and not question.drifted and state.errors:
+    if not question.dangling and not question.drifted and not unknown_gap_hypotheses(question) and state.errors:
         return f'consistent tree received errors {state.errors}'
 
 
@@ -172,6 +182,11 @@ def unused_hypothesis(state, question):
     for row in question.hypotheses:
         if unused(row) and (f'hypothesis_unused:{row.id}' not in state.warnings or any(row.id in code for code in state.errors)):
             return f'unused hypothesis {row.id} must only warn'
+
+
+def gap_hypotheses(state, question):
+    missing = [code for code in unknown_gap_hypotheses(question) if code not in state.errors]
+    return f'gaps name unknown hypotheses without an error: {missing}' if missing else None
 
 
 def copied_content(state, question):
@@ -225,6 +240,7 @@ INVARIANTS = (
     Invariant('consistent_tree_has_no_error', 'A tree without dangling references or drift has no error.', rule(consistent_tree)),
     Invariant('dangling_reference_is_an_error', 'Every dangling reference is an error.', rule(dangling_reference)),
     Invariant('unused_hypothesis_is_only_a_warning', 'A hypothesis no route uses only warns.', rule(unused_hypothesis)),
+    Invariant('gap_names_known_hypotheses', 'A source gap may name only hypotheses of the question.', rule(gap_hypotheses)),
     Invariant('copied_content_matches_owner', 'Copied values that differ from their SourceGuard owner are errors.', rule(copied_content)),
     Invariant('library_anchors_are_resolved', 'Anchors resolved through the source library are not dangling.', rule(library_anchors)),
     Invariant('routes_do_not_contradict_silently', 'Direct route disagreements are reported.', rule(routes_contradict)),
@@ -241,6 +257,7 @@ CASES = (
     Question('trace', (H('h', None, True),), dangling=('dangling_anchor:trace:a',)),
     Question('logic', (H('h', 'UNDECIDED', True),), dangling=('dangling_anchor:logic:E:missing (source s)',), root_license='withhold'),
     Question('unused', (H('h', 'UNDECIDED', True), H('unused'))),
+    Question('gaps', (H('h', 'UNDECIDED', True), H('h_alt')), gap_hypotheses=(('g_alt', ('h_alt',)), ('g_bad', ('h_missing',)))),
     Question('drift', (H('h', 'UNDECIDED', True),), drifted=('copy_drift:trace:a:raw_text',)),
     Question('library', (H('h', 'UNDECIDED'),), library_anchors=('n1',)),
     Question('anchor_disagreement', (H('h', 'UNDECIDED', True, None, (('a', 'trace', 'support'), ('a', 'logic', 'oppose'))),)),
@@ -260,6 +277,7 @@ MUTATIONS = {
     'consistent_as_error': 'consistent_tree_has_no_error',
     'warning_as_error': 'unused_hypothesis_is_only_a_warning',
     'ignore_copy_drift': 'copied_content_matches_owner',
+    'dangling_gap_hypothesis_accepted': 'gap_names_known_hypotheses',
     'status_ignores_library': 'library_anchors_are_resolved',
     'skip_route_comparison': 'routes_do_not_contradict_silently',
     'drop_uncaught_ablations': 'every_ablation_is_caught_or_named',
@@ -398,7 +416,11 @@ def native_features():
     contested_rows = route_disagreements({}, [dict(rows[0], logic={'state': 'IN'}, trace={'live': False})])
     live = verdict['live_hypotheses'] == ['h_live'] and verdict['contested'] is False \
         and verdict_for_writers(empty, rows, contested_rows, [])['contested'] is True
-    return {'drift': drift, 'library': library_ok, 'disagreement': disagreement, 'ablation': ablation, 'live': live}
+    gap_source = BeliefState.from_dict({'sources': [{'source_id': 's'}], 'anchors': [{'anchor_id': 'a', 'source_id': 's', 'text': 'Observed text'}],
+                                        'gaps': [{'gap_id': 'g', 'hypothesis_ids': ['h', 'h_missing']}]})
+    gap_errors = check_research_tree(index, dict(models, source=gap_source))['errors']
+    gaps = 'unknown_hypothesis:source:g:h_missing' in gap_errors and 'unknown_hypothesis:source:g:h' not in gap_errors
+    return {'drift': drift, 'gaps': gaps, 'library': library_ok, 'disagreement': disagreement, 'ablation': ablation, 'live': live}
 
 
 def evergiven_state():

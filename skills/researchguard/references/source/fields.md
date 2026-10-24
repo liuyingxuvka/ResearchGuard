@@ -49,6 +49,7 @@ default; they are declared heuristics, not calibrated probabilities.
 | `importance` | Optional score, `0.5`. |
 | `blocking`, `review_required` | Optional booleans, `false`. |
 | `requires_claim_usability` | Optional boolean, `true`. |
+| `hypothesis_ids` | Optional list of hypothesis ids from `research.yaml`, `[]`. SourceGuard only stores it; `researchguard status` checks the ids and groups gaps and next searches by them. |
 | `suggested_source_roles` | Optional list drawn from `SOURCE_ROLES`, `[]`. |
 | `suggested_modalities` | Optional list drawn from `MODALITIES`, `[]`. |
 | `structure_unit_id`, `parent_goal`, `unit_job`, `contribution_type`, `downstream_consumer`, `structural_role_needed` | Optional structural-context strings, `""`. |

@@ -27,6 +27,9 @@ All paths are relative to `research.yaml`. Routes, `library`, `search` and
 model requires its root Claim. Hypothesis ids are shared by logic Claims, trace
 hypotheses and experiment predictions. Source ids and evidence anchor ids keep
 their SourceGuard identities. Every route's native loader still validates it.
+A SourceGuard gap may name the hypotheses it would move (`hypothesis_ids`);
+`status` checks them (`unknown_hypothesis:source:<gap>:<id>`) and adds
+`hypotheses` to each open source gap and next search.
 
 `researchguard status <folder> [--json] [--output <path>] [--candidate <folder2>]`
 reads the index (or its explicit path). Default output is a compact verdict-first

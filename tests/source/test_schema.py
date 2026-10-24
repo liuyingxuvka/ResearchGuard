@@ -43,3 +43,24 @@ def test_source_candidate_does_not_auto_become_evidence():
     )
     assert model.sources[0].source_status == "candidate"
     assert model.anchors == []
+
+
+def test_gap_hypothesis_ids_are_optional_strings():
+    from researchguard.source.planner import plan_next_actions
+    from researchguard.source.schema import BeliefState, Gap, SchemaError, to_plain
+    assert Gap.from_dict({'gap_id': 'g'}).hypothesis_ids == []
+    assert Gap.from_dict({'gap_id': 'g', 'hypothesis_ids': ['h']}).hypothesis_ids == ['h']
+    for bad in ('h', [1], [''], {'h': 1}):
+        with pytest.raises(SchemaError):
+            Gap.from_dict({'gap_id': 'g', 'hypothesis_ids': bad})
+    base = {'sources': [{'source_id': 's'}], 'leads': [{'lead_id': 'l'}],
+            'gaps': [{'gap_id': 'g', 'lead_id': 'l', 'blocking': True}],
+            'search_actions': [{'action_id': 'a', 'target_gap_id': 'g', 'query': 'q'}]}
+    named = {**base, 'gaps': [{**base['gaps'][0], 'hypothesis_ids': ['h']}]}
+    def plain(data):
+        result = to_plain(plan_next_actions(BeliefState.from_dict(data)))
+        for row in result['open_gaps']:
+            row.pop('hypothesis_ids')
+        return result
+    assert plain(base) == plain(named)
+    assert BeliefState.from_dict(named).gaps[0].hypothesis_ids == ['h']

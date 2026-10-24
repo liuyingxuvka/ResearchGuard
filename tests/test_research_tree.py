@@ -316,3 +316,20 @@ def test_ablation_rows_name_side_effects():
     for name in ('abl_no_unctad', 'question_without_unctad'):
         assert {'hypothesis': 'h_suez', 'route': 'trace', 'field': 'live', 'before': False, 'after': True} in rows[name]['effects']
     assert '; effects: h_suez trace live false → true' in render_status_markdown(status)
+
+
+def test_gap_hypotheses_are_checked_and_grouped(tmp_path, capsys):
+    import shutil
+    original = Path(__file__).resolve().parents[1] / 'examples/research/evergiven'
+    status = research_status(load_research(original))
+    gap = next(row for row in status['open_gaps'] if row.get('id') == 'gap-alt-yantian')
+    search = next(row for row in status['next'] if row.get('id') == 'act-yantian')
+    assert gap['hypotheses'] == ['h_yantian'] and search['hypotheses'] == ['h_yantian']
+    folder = tmp_path / 'research'
+    shutil.copytree(original, folder)
+
+    def dangle(data):
+        next(row for row in data['gaps'] if row['gap_id'] == 'gap-alt-yantian')['hypothesis_ids'] = ['h_missing']
+    _rewrite(folder, 'source.yaml', dangle)
+    assert main(['status', str(folder), '--json']) == 1
+    assert 'unknown_hypothesis:source:gap-alt-yantian:h_missing' in json.loads(capsys.readouterr().out)['errors']
