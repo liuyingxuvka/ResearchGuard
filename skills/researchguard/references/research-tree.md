@@ -36,7 +36,7 @@ A SourceGuard gap may name the hypotheses it would move (`hypothesis_ids`);
 `status` checks them (`unknown_hypothesis:source:<gap>:<id>`) and adds
 `hypotheses` to each open source gap and next search.
 
-`researchguard status <folder> [--json] [--output <path>] [--candidate <folder2> | --hypothesis <id>]`
+`researchguard status <folder> [--json] [--output <path>] [--candidate <copy> | --hypothesis <id>]`
 reads the index (or its explicit path). Default output is a compact verdict-first
 page; JSON retains complete results. It writes only an explicit `--output`.
 Exit 0 means no errors, 1 means model or reference errors, and 2 means an unreadable
