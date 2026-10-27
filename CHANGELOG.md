@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- The question cross-reference model now requires status to name every input; JSON reports include file digests and evidence locator, summary and boundary.
+
 - Maintenance checks run on FlowGuard 0.70.13.
 
 ## v0.5.15 - 2026-10-24

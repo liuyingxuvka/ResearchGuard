@@ -306,7 +306,8 @@
         "Project the authoritative search stop and root wording license into one five-key verdict.",
         "The verdict lists live hypotheses and is contested exactly when routes disagree.",
         "Evidence, gap and search rows name the hypotheses they bear on.",
-        "Status reads one hypothesis back and compares candidate folders without writing models."
+        "Status reads one hypothesis back and compares candidate folders without writing models.",
+        "Name every file read in JSON input_digests, including consulted library files, and expose source-owned evidence locator, summary and boundary."
       ],
       "files": [
         "src/researchguard/research.py"
@@ -343,7 +344,7 @@
       ],
       "layer": "tree",
       "status": "confirmed",
-      "fingerprint": "sha256:bcbe06742a631375729ab7c7de2479691ed8b546c312d93a3e7f485f04e9a174"
+      "fingerprint": "sha256:96bde0d584ab283355e0c45be1e37d1afb0dc73ba400b364b08e1e6c8fdbdca3"
     },
     {
       "entrypoints": [
@@ -859,7 +860,7 @@
     ".flowguard/models/experiment_elimination_model.py": "2e570412ce71382c28ed5ec1706d15fd2db1fc3d792c270a4b04d9408d8e05cc",
     ".flowguard/models/iteration_kernel_model.py": "89821ac785bb2f2eae1f1bad7193079c737f1bb7663908c7cf11fa7a57ca431e",
     ".flowguard/models/research_ablations_model.py": "c27c5ae35794dd7868f5ef51ac44dd4060b5eae51f711030735075e9c138fc6e",
-    ".flowguard/models/research_tree_model.py": "7641c605109cc80a554261a08e84656ef5e863ddd85a92e2c1979b92ccb2d946",
+    ".flowguard/models/research_tree_model.py": "2eb6c3ad7acca0e5cd1ad0409d42e0df0d060c969bd56906595241ddaa0a127d",
     ".flowguard/models/research_verdict_model.py": "2780de1b152afc2e93f872bc5b1a2b91849bea23919d353beffc952f38078cd1",
     ".flowguard/models/research_views_model.py": "6c13d77fa5e5f6e01f29747b0dc1b59a8f3ea897bc694a76ef2e5b6ca7be82ac",
     ".flowguard/models/researchguard_suite_model.py": "a04ba684aeb51e0cebf51fbfc4b45bec62955938f51b6667ef0138adcc18aa03",

@@ -119,6 +119,8 @@ native domain rules about evidence, protected scope or holdout independence.
 
 ## Verdict for writers
 
+The JSON report includes `input_digests`, the raw SHA-256 hashes of every file read. Writers compare them with current files to check whether a saved report is still current.
+
 Writers, including LogicWriting, read `verdict` from
 `researchguard status <folder> --json --output research-status.json`, and these
 pinned keys that tie the report to its folder: `question`, `hypotheses[].id` /

@@ -147,6 +147,17 @@ def test_library_anchored_evidence_gets_one_answer(folder):
     without = check_research_tree(tree.index, tree.models)
     assert any(item.startswith('dangling_anchor:logic:E:') for item in without['errors'])
     assert without['errors'] == source_model_provenance_problems(tree.models['logic'], to_plain(tree.models['source']))
+    import hashlib
+    external = folder.parent / 'external-library'
+    library.root.rename(external)
+    _rewrite(folder, 'research.yaml', lambda d: d.update(library='../external-library'))
+    status = research_status(load_research(folder))
+    digests = {row['path']: row['sha256'] for row in status['input_digests']}
+    expected_library = ['../external-library/index/sources.json',
+                        '../external-library/source_models/' + library.source_model_path(imported.source.source_id).name]
+    assert sorted(digests) == sorted(['research.yaml', 'source.yaml', 'logic.yaml', *expected_library])
+    assert all(digest == hashlib.sha256((folder / path).read_bytes()).hexdigest() for path, digest in digests.items())
+
 
 def test_candidate_view_lists_only_changes(folder, capsys):
     from researchguard.research import compare_research_status
@@ -178,3 +189,19 @@ def test_gap_hypotheses_are_checked_and_grouped(tmp_path, capsys):
 def test_missing_index_names_the_template(tmp_path, capsys):
     assert main(['status', str(tmp_path)]) == 2
     assert 'Start a question' in capsys.readouterr().out
+
+
+def test_status_reports_input_digests(tmp_path):
+    import hashlib
+    import shutil
+    from research_tree_support import EVERGIVEN
+    folder = tmp_path / 'research'
+    shutil.copytree(EVERGIVEN, folder)
+    status = research_status(load_research(folder))
+    paths = ['exp-obs1.json', 'experiment.json', 'logic.yaml', 'research.yaml', 'source.yaml', 'trace.yaml']
+    assert status['input_digests'] == [{'path': path, 'sha256': hashlib.sha256((folder / path).read_bytes()).hexdigest()} for path in paths]
+    original = {row['path']: row['sha256'] for row in status['input_digests']}
+    source = folder / 'source.yaml'
+    source.write_bytes(source.read_bytes() + b'\n')
+    changed = {row['path']: row['sha256'] for row in research_status(load_research(folder))['input_digests']}
+    assert [key for key in paths if original[key] != changed[key]] == ['source.yaml']

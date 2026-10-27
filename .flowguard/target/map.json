@@ -1,7 +1,0 @@
-{
-  "schema": "flowguard.target.v1",
-  "goal": "RG-403: the status names every input file it read (rule status_names_its_inputs)",
-  "components": [],
-  "flows": [],
-  "remove": []
-}

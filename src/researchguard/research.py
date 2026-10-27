@@ -3,6 +3,8 @@ from __future__ import annotations
 
 import argparse
 import copy
+import hashlib
+import os
 from dataclasses import dataclass, field
 import json
 import math
@@ -36,6 +38,28 @@ class ResearchTree:
     observations: tuple[Any, ...] = ()
     errors: list[str] = field(default_factory=list)
     library: Any = None
+    input_paths: list[Path] = field(default_factory=list)
+
+
+class _ResearchLibrary(SourceLibrary):
+    """Record only the library files that the research checker actually reads."""
+
+    def __init__(self, root, input_paths):
+        super().__init__(root)
+        self.input_paths = input_paths
+
+    def list_sources(self):
+        result = super().list_sources()
+        if self.source_index_path.is_file():
+            self.input_paths.append(self.source_index_path)
+        return result
+
+    def source_node_ids(self, source_id):
+        result = super().source_node_ids(source_id)
+        path = self.source_model_path(source_id)
+        if path.is_file():
+            self.input_paths.append(path)
+        return result
 
 
 def _validate_index(data: Any) -> dict[str, Any]:
@@ -93,10 +117,10 @@ def load_research(path: str | Path) -> ResearchTree:
     if index_path.is_dir():
         index_path /= "research.yaml"
     data = _validate_index(yaml.safe_load(index_path.read_text(encoding="utf-8")))
-    tree = ResearchTree(index_path, data)
+    tree = ResearchTree(index_path, data, input_paths=[index_path])
     if "library" in data:
         library_path = index_path.parent / data["library"]
-        library = SourceLibrary(library_path)
+        library = _ResearchLibrary(library_path, tree.input_paths)
         if library.source_index_path.is_file():
             tree.library = library
         else:
@@ -109,6 +133,7 @@ def load_research(path: str | Path) -> ResearchTree:
         if not model_path.is_file():
             tree.errors.append(f"model_missing:{route}")
             continue
+        tree.input_paths.append(model_path)
         try:
             tree.models[route] = loader(model_path)
         except (OSError, ValueError, TypeError, KeyError, yaml.YAMLError) as exc:
@@ -119,6 +144,7 @@ def load_research(path: str | Path) -> ResearchTree:
         if not obs_path.is_file():
             tree.errors.append(f"model_missing:experiment_observations:{name}")
             continue
+        tree.input_paths.append(obs_path)
         try:
             observations.extend(load_observations(obs_path))
         except (OSError, ValueError, TypeError, KeyError) as exc:
@@ -395,6 +421,9 @@ def research_status(tree: ResearchTree) -> dict[str, Any]:
                         used_by.append(f"logic:{node.id}")
             evidence.append({"anchor": anchor.anchor_id, "source": anchor.source_id,
                              "lineage": sources[anchor.source_id].lineage_id if anchor.source_id in sources else "",
+                             "locator": anchor.locator,
+                             "summary": anchor.normalized_summary or anchor.text[:200],
+                             "boundary": sources[anchor.source_id].cannot_support_structural_use if anchor.source_id in sources else "",
                              "used_by": sorted(set(used_by)),
                              "directions": sorted(directed.get(anchor.anchor_id, []), key=lambda row: (row["route"], row["hypothesis"], row["direction"]))})
     gaps: list[dict[str, Any]] = []
@@ -433,7 +462,15 @@ def research_status(tree: ResearchTree) -> dict[str, Any]:
     except (ValueError, TypeError, KeyError, ArithmeticError) as exc:
         problems["errors"].append(f"model_invalid:verdict: {exc}")
         verdict = {"search": "not_run", "root_claim": None, "live_hypotheses": [], "contested": bool(disagreements), "errors": len(problems["errors"])}
-    return {"suite": SUITE_ID, "question": tree.index["question"], "verdict": verdict,
+    input_digests = []
+    for path in set(tree.input_paths):
+        try:
+            digest = hashlib.sha256(path.read_bytes()).hexdigest()
+        except OSError:
+            continue
+        input_digests.append({"path": Path(os.path.relpath(path, tree.path.parent)).as_posix(), "sha256": digest})
+    input_digests.sort(key=lambda row: row['path'])
+    return {"input_digests": input_digests, "suite": SUITE_ID, "question": tree.index["question"], "verdict": verdict,
         "ablations": ablations, "disagreements": disagreements, "models": {
         key: {"path": value, "status": "ok" if key in results else "invalid"}
         for key, value in tree.index.get("models", {}).items() if key != "experiment_observations"},

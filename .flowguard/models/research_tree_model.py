@@ -1,6 +1,7 @@
 """research_tree_crossref: one independent aspect of the question status."""
 
 from dataclasses import dataclass
+import hashlib
 
 from pathlib import Path
 
@@ -12,28 +13,31 @@ from flowguard.explorer import Explorer
 
 from _research_cases import (Hypothesis, Ablation, Question, excluded, accepted, unused, route_conflicts, rule, unknown_gap_hypotheses, consistent_tree, dangling_reference, unused_hypothesis, gap_hypotheses, copied_content, library_anchors, routes_contradict, every_ablation, trace_depth_agrees, verdict_routes, live_hypotheses, directions_rule, view_rule, candidate_rule, contested_rule, CASES, native_case, project, trace_depth_answers, REPO_ROOT, EVERGIVEN, native_crossref, native_ablations, native_verdict, native_views)
 
+QUESTION_FILES = ('research.yaml', 'source.yaml', 'trace.yaml', 'logic.yaml')
+
 MODEL_ID = 'research_tree_crossref'
 
 PARENT = 'research-tree'
 
 COMPONENTS = ['research-tree', 'researchguard-suite']
 
-IMPLEMENTED_BY = {'Check': 'src/researchguard/research.py:check_research_tree', 'Status': 'src/researchguard/research.py:status_main', 'CopyCheck': 'src/researchguard/ownership.py:copied_content_problems'}
+IMPLEMENTED_BY = {'Load': 'src/researchguard/research.py:load_research', 'Check': 'src/researchguard/research.py:check_research_tree', 'Status': 'src/researchguard/research.py:status_main', 'CopyCheck': 'src/researchguard/ownership.py:copied_content_problems'}
 
 USES = {'SourceSync': 'src/researchguard/source/handoff.py:sync_traceguard_seed', 'LogicSync': 'src/researchguard/logic/trace_import.py:sync_trace_bundle'}
 
-TESTED_BY = {'consistent_tree_has_no_error': ['tests/test_research_tree_crossref.py:test_consistent_tree_has_no_errors', 'tests/test_research_tree_crossref.py:test_checker_is_in_memory_and_source_is_optional', 'tests/test_research_tree_crossref.py:test_shipped_evergiven_tree_has_consistent_shared_ids', 'tests/test_research_tree_crossref.py:test_candidate_view_lists_only_changes'], 'dangling_reference_is_an_error': ['tests/test_research_tree_crossref.py:test_dangling_references_and_invalid_native_models_are_errors', 'tests/test_research_tree_crossref.py:test_missing_index_exits_2', 'tests/test_research_tree_crossref.py:test_missing_index_names_the_template'], 'unused_hypothesis_is_only_a_warning': ['tests/test_research_tree_crossref.py:test_unused_hypothesis_is_only_a_warning'], 'gap_names_known_hypotheses': ['tests/test_research_tree_crossref.py:test_gap_hypotheses_are_checked_and_grouped'], 'copied_content_matches_owner': ['tests/test_research_tree_crossref.py:test_copy_drift_is_an_error_for_each_copied_field', 'tests/test_research_tree_crossref.py:test_one_observation_reaches_trace_and_logic_by_sync'], 'library_anchors_are_resolved': ['tests/test_research_tree_crossref.py:test_library_anchored_evidence_gets_one_answer']}
+TESTED_BY = {'status_names_its_inputs': ['tests/test_research_tree_crossref.py:test_status_reports_input_digests'], 'consistent_tree_has_no_error': ['tests/test_research_tree_crossref.py:test_consistent_tree_has_no_errors', 'tests/test_research_tree_crossref.py:test_checker_is_in_memory_and_source_is_optional', 'tests/test_research_tree_crossref.py:test_shipped_evergiven_tree_has_consistent_shared_ids', 'tests/test_research_tree_crossref.py:test_candidate_view_lists_only_changes'], 'dangling_reference_is_an_error': ['tests/test_research_tree_crossref.py:test_dangling_references_and_invalid_native_models_are_errors', 'tests/test_research_tree_crossref.py:test_missing_index_exits_2', 'tests/test_research_tree_crossref.py:test_missing_index_names_the_template'], 'unused_hypothesis_is_only_a_warning': ['tests/test_research_tree_crossref.py:test_unused_hypothesis_is_only_a_warning'], 'gap_names_known_hypotheses': ['tests/test_research_tree_crossref.py:test_gap_hypotheses_are_checked_and_grouped'], 'copied_content_matches_owner': ['tests/test_research_tree_crossref.py:test_copy_drift_is_an_error_for_each_copied_field', 'tests/test_research_tree_crossref.py:test_one_observation_reaches_trace_and_logic_by_sync'], 'library_anchors_are_resolved': ['tests/test_research_tree_crossref.py:test_library_anchored_evidence_gets_one_answer']}
 
 @dataclass(frozen=True)
 class State:
     question: Question | None = None
     errors: tuple[str, ...] = ()
     warnings: tuple[str, ...] = ()
+    inputs: tuple[str, ...] = ()
 
 class Status:
     name = 'Status'
     reads = ('question',)
-    writes = ('question', 'errors', 'warnings')
+    writes = ('question', 'errors', 'warnings', 'inputs')
     mutation = ''
 
     def apply(self, question, state):
@@ -49,11 +53,16 @@ class Status:
         warnings = []
         for row in question.hypotheses:
             if unused(row): (errors if wrong == 'warning_as_error' else warnings).append(f'hypothesis_unused:{row.id}')
-        result = State(question, tuple(sorted(set(errors))), tuple(sorted(set(warnings))))
+        inputs = tuple(path for path in QUESTION_FILES if wrong != 'digest_omits_a_model' or path != 'trace.yaml')
+        result = State(question, tuple(sorted(set(errors))), tuple(sorted(set(warnings))), inputs)
         yield FunctionResult(result, result, label=question.name)
 
 
+def status_inputs(state, question):
+    return '' if state.inputs == QUESTION_FILES else 'status must name every input file exactly once'
+
 INVARIANTS = (
+    Invariant('status_names_its_inputs', 'A status names every input file it read.', rule(status_inputs)),
     Invariant('consistent_tree_has_no_error', 'A tree without dangling references or drift has no error.', rule(consistent_tree)),
     Invariant('dangling_reference_is_an_error', 'Every dangling reference is an error.', rule(dangling_reference)),
     Invariant('unused_hypothesis_is_only_a_warning', 'A hypothesis no route uses only warns.', rule(unused_hypothesis)),
@@ -62,7 +71,7 @@ INVARIANTS = (
     Invariant('library_anchors_are_resolved', 'Anchors resolved through the source library are not dangling.', rule(library_anchors)),
 )
 
-MUTATIONS = {'ignore_trace': 'dangling_reference_is_an_error', 'ignore_logic': 'dangling_reference_is_an_error', 'consistent_as_error': 'consistent_tree_has_no_error', 'warning_as_error': 'unused_hypothesis_is_only_a_warning', 'ignore_copy_drift': 'copied_content_matches_owner', 'dangling_gap_hypothesis_accepted': 'gap_names_known_hypotheses', 'status_ignores_library': 'library_anchors_are_resolved'}
+MUTATIONS = {'digest_omits_a_model': 'status_names_its_inputs', 'ignore_trace': 'dangling_reference_is_an_error', 'ignore_logic': 'dangling_reference_is_an_error', 'consistent_as_error': 'consistent_tree_has_no_error', 'warning_as_error': 'unused_hypothesis_is_only_a_warning', 'ignore_copy_drift': 'copied_content_matches_owner', 'dangling_gap_hypothesis_accepted': 'gap_names_known_hypotheses', 'status_ignores_library': 'library_anchors_are_resolved'}
 
 def explorer(step):
     return Explorer(Workflow((step,)), (State(),), CASES, INVARIANTS, progress_steps=0)
@@ -103,8 +112,11 @@ def conformance():
         code = status_main([str(EVERGIVEN), '--json', '--output', str(output)])
         status = json.loads(output.read_text())
     observe('status_exit', code, 0)
+    expected_paths = ('exp-obs1.json', 'experiment.json', 'logic.yaml', 'research.yaml', 'source.yaml', 'trace.yaml')
+    expected_digests = [{'path': path, 'sha256': hashlib.sha256((EVERGIVEN / path).read_bytes()).hexdigest()} for path in expected_paths]
+    observe('status_names_its_inputs', status.get('input_digests'), expected_digests)
     projected = project(status, '')
-    state = State(projected.question, projected.errors, tuple(w for w in projected.warnings if w.startswith('hypothesis_unused:')))
+    state = State(projected.question, projected.errors, tuple(w for w in projected.warnings if w.startswith('hypothesis_unused:')), QUESTION_FILES)
     observe('live_crossref', not state.errors, state=state)
 
     for invariant in INVARIANTS:

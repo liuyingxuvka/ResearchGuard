@@ -94,7 +94,7 @@ def test_writer_surface_keys_are_pinned(tmp_path):
     for folder in (EVERGIVEN, source_only):
         tree = load_research(folder)
         status = research_status(tree)
-        assert {'question', 'verdict', 'hypotheses', 'models', 'evidence'} <= set(status)
+        assert {'question', 'verdict', 'hypotheses', 'models', 'evidence', 'input_digests'} <= set(status)
         assert status['question'] == tree.index['question']
         assert [(row['id'], row['text']) for row in status['hypotheses']] == [(row['id'], row['text']) for row in tree.index['hypotheses']]
         assert {route: row['path'] for route, row in status['models'].items()} == {
@@ -102,6 +102,12 @@ def test_writer_surface_keys_are_pinned(tmp_path):
         assert all(set(row) == {'path', 'status'} for row in status['models'].values())
         assert {row['anchor'] for row in status['evidence']} == {row.anchor_id for row in tree.models['source'].anchors}
         for row in status['evidence']:
+            assert {'locator', 'summary', 'boundary'} <= set(row)
+            anchor = next(a for a in tree.models['source'].anchors if a.anchor_id == row['anchor'])
+            source = next(a for a in tree.models['source'].sources if a.source_id == row['source'])
+            assert row['locator'] == anchor.locator
+            assert row['summary'] == (anchor.normalized_summary or anchor.text[:200])
+            assert row['boundary'] == source.cannot_support_structural_use
             for item in row['directions']:
                 assert set(item) == {'route', 'hypothesis', 'direction', 'node'} and item['direction'] in {'support', 'oppose', 'limit'}
         assert set(status['verdict']) == {'search', 'root_claim', 'live_hypotheses', 'contested', 'errors'}
