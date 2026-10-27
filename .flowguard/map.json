@@ -330,7 +330,11 @@
         "trace-model"
       ],
       "tests": [
-        "tests/test_research_tree.py"
+        "tests/test_research_tree.py",
+        "tests/test_research_ablations.py",
+        "tests/test_research_tree_crossref.py",
+        "tests/test_research_verdict.py",
+        "tests/test_research_views.py"
       ],
       "models": [
         ".flowguard/models/research_tree_model.py"
