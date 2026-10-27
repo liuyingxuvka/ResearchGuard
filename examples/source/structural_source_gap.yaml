@@ -19,7 +19,6 @@ sources:
   source_status: candidate
   source_role: historical_background
   access_status: public
-  can_support_structural_use: background context for technology summary
   cannot_support_structural_use: method-choice bridge or conclusion recovery
   notes: Synthetic source for public-safe tests.
 anchors: []
@@ -37,14 +36,5 @@ gaps:
   - text
   - pdf_page
   structure_unit_id: chapter_3.technology_summary
-  parent_goal: Derive the method gap from technical limits.
-  unit_job: Turn background technology material into requirements consumed by the method chapter.
-  contribution_type: technology_summary
-  downstream_consumer: chapter_4.method_gap
-  structural_role_needed: bridge evidence from technology limits to method choice
-  can_support_structural_use: ''
-  cannot_support_structural_use: background-only sources cannot support the method bridge
-  allowed_wording: Existing background sources describe the technology context.
-  unsafe_wording: The reviewed technology proves the method choice.
   semantic_state: discovered
 actions: []

@@ -52,8 +52,7 @@ default; they are declared heuristics, not calibrated probabilities.
 | `hypothesis_ids` | Optional list of hypothesis ids from `research.yaml`, `[]`. SourceGuard only stores it; `researchguard status` checks the ids and groups gaps and next searches by them. |
 | `suggested_source_roles` | Optional list drawn from `SOURCE_ROLES`, `[]`. |
 | `suggested_modalities` | Optional list drawn from `MODALITIES`, `[]`. |
-| `structure_unit_id`, `parent_goal`, `unit_job`, `contribution_type`, `downstream_consumer`, `structural_role_needed` | Optional structural-context strings, `""`. |
-| `can_support_structural_use`, `cannot_support_structural_use`, `allowed_wording`, `unsafe_wording` | Optional claim-boundary strings, `""`. |
+| `structure_unit_id` | Optional structural-context strings, `""`. |
 | `qualification`, `closure_basis` | Optional nested mappings with the defaults below. A `closed` gap requires a complete `closure_basis`. |
 
 `gap.status` is retired and is rejected whenever present. Use the single
@@ -109,7 +108,7 @@ or newly observed anchor alone does not close a gap.
 | `source_role` | Optional `SOURCE_ROLES`, `unknown`. `official_claim` is a role; `government_record` is a type. |
 | `access_status` | Optional `ACCESS_STATUSES`, `unknown`. |
 | `source_reliability` | Optional score, `0.0`. |
-| `title`, `url`, `lineage_id`, `source_date`, `coverage_period`, `language`, `country`, `can_support_structural_use`, `cannot_support_structural_use`, `notes` | Optional strings, `""`. |
+| `title`, `url`, `lineage_id`, `source_date`, `coverage_period`, `language`, `country`, `cannot_support_structural_use`, `notes` | Optional strings, `""`. |
 | `content_fingerprint`, `retrieval_request_fingerprint` | Optional strings, `""`; when supplied, use `sha256:` followed by the 64-character digest. |
 | `provider_id`, `provider_revision`, `retrieved_at`, `unconsumed_output_disposition` | Optional strings, `""`. |
 

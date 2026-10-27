@@ -51,7 +51,6 @@ traces:
   structure_unit_id: chapter_3.technology_summary
   source_unit_id: chapter_3.technology_summary
   destination_unit_id: chapter_4.method_gap
-  downstream_consumer: chapter_4.method_gap
   trace_layer: requirement_to_design
   weakest_link: Only one synthetic method note is present.
   conclusion_transfer_status: partial

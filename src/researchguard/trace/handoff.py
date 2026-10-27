@@ -30,7 +30,6 @@ class TraceHandoff:
     trace_layer: str = ""
     weakest_link: str = ""
     conclusion_transfer_status: str = ""
-    downstream_consumer: str = ""
     handoff_schema: str = "researchguard.trace.logic-handoff.v1"
     domain_proposition: str = ""
     domain_mechanism_refs: tuple[str, ...] = ()
@@ -62,7 +61,6 @@ class TraceHandoff:
             "trace_layer": self.trace_layer,
             "weakest_link": self.weakest_link,
             "conclusion_transfer_status": self.conclusion_transfer_status,
-            "downstream_consumer": self.downstream_consumer,
             "handoff_schema": self.handoff_schema,
             "domain_proposition": self.domain_proposition,
             "domain_mechanism_refs": list(self.domain_mechanism_refs),
@@ -149,7 +147,6 @@ def derive_trace_handoffs(result: Any) -> tuple[TraceHandoff, ...]:
                 trace_layer=getattr(trace, "trace_layer", ""),
                 weakest_link=getattr(trace, "weakest_link", ""),
                 conclusion_transfer_status=getattr(trace, "conclusion_transfer_status", ""),
-                downstream_consumer=getattr(trace, "downstream_consumer", ""),
                 handoff_schema="researchguard.trace.logic-handoff.v1",
                 domain_proposition=getattr(trace, "domain_proposition", ""),
                 domain_mechanism_refs=tuple(getattr(trace, "domain_mechanism_refs", ())),

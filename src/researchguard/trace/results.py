@@ -67,7 +67,6 @@ class TraceEvaluation:
     trace_layer: str = ""
     weakest_link: str = ""
     conclusion_transfer_status: str = ""
-    downstream_consumer: str = ""
     domain_proposition: str = ""
     domain_mechanism_refs: tuple[str, ...] = ()
     domain_assumption_refs: tuple[str, ...] = ()
@@ -101,7 +100,6 @@ class TraceEvaluation:
             "trace_layer": self.trace_layer,
             "weakest_link": self.weakest_link,
             "conclusion_transfer_status": self.conclusion_transfer_status,
-            "downstream_consumer": self.downstream_consumer,
             "domain_proposition": self.domain_proposition,
             "domain_mechanism_refs": list(self.domain_mechanism_refs),
             "domain_assumption_refs": list(self.domain_assumption_refs),

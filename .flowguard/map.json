@@ -137,7 +137,7 @@
     },
     {
       "id": "sourceguard",
-      "summary": "Source belief states, anchors, search frontiers and native stop decisions. Write sparse YAML by omitting only dataclass defaults; add source-owned anchors while preserving observation upserts and rejecting duplicate ids in explicit creation. Counter-source gaps generate one title query and declared searches win equal-score ties.",
+      "summary": "Source belief states, anchors, search frontiers and native stop decisions. Write sparse YAML by omitting only dataclass defaults; add source-owned anchors while preserving observation upserts and rejecting duplicate ids in explicit creation. Counter-source gaps generate one title query and declared searches win equal-score ties. Retired writing-plan gap keys and source capability-copy fields are omitted on rewrite; validation names legacy gap keys while structural coverage ids and source boundaries remain.",
       "responsibilities": [
         "Own evidence discovery, expected-utility search plans, stop decisions, source/anchor qualification and readable source/anchor/closure reporting. Return SourceDepthResult with actual model freshness and native coverage, without result versions, result-model or universe self-hashes.",
         "Load, plan, update and iterate on a model file alone; models carry no contract; the action and every protected or coverage gap a prediction names must exist in the model when it is frozen.",
@@ -188,11 +188,11 @@
       ],
       "layer": "routes",
       "status": "confirmed",
-      "fingerprint": "sha256:e4bbe53606672363e5cb563c42e389ef0506f8cee1d1942bb98cc30cd2744695"
+      "fingerprint": "sha256:46802ad0b1615a478712b348d100fa81c86a031c6e652c98337fba76a4acbd66"
     },
     {
       "id": "traceguard",
-      "summary": "TraceGuard: trace models, handoffs and reports around inference, depth and the case library.",
+      "summary": "TraceGuard: trace models, handoffs and reports around inference, depth and the case library. Trace handoffs and LogicGuard exports omit retired writing-plan consumer fields.",
       "responsibilities": [
         "Handoffs export ranked hypotheses and signed evidence to LogicGuard.",
         "Reports print timelines, hypotheses and depth from native results.",
@@ -226,7 +226,7 @@
       ],
       "layer": "routes",
       "status": "confirmed",
-      "fingerprint": "sha256:e387fc031547e028ff9e5ba4c3416f10814732fa3ca649afbe00d55f13734a8b"
+      "fingerprint": "sha256:eae7366bc934723223bf44c90a560ae1e3ef054c1d5eb4ab97461db5b1acd2a4"
     },
     {
       "id": "experimentguard",
@@ -300,7 +300,7 @@
     },
     {
       "id": "research-tree",
-      "summary": "One research question: cross-route identities, copy drift, ablations, candidate comparison and one verdict for writers. Pages name each search gap and query, group each anchor\u2019s routes, and show only relevant ablation effects.",
+      "summary": "One research question: cross-route identities, copy drift, ablations, candidate comparison and one verdict for writers. Pages name each search gap and query, group each anchor’s routes, and show only relevant ablation effects.",
       "responsibilities": [
         "Load the research index and resolve source-library provenance through the native validator. Name every file read in JSON input_digests, including consulted library files, and expose source-owned evidence locator, summary and boundary.",
         "Detect copied-content drift and direct evidence or conclusion disagreements between native routes.",
@@ -486,7 +486,7 @@
       "id": "trace-model",
       "parent": "traceguard",
       "layer": "routes",
-      "summary": "Trace model schema, loading, validation and shared trace facts.",
+      "summary": "Trace model schema, loading, validation and shared trace facts. Trace input records omit the retired singular writing-plan consumer field and still reject authored inference outputs.",
       "responsibilities": [
         "TraceGuard loads and validates trace models of events and storylines.",
         "Results carry diagnostics and resolved entities for every route."
@@ -511,7 +511,7 @@
         "tests/trace/test_starter_fields.py"
       ],
       "status": "confirmed",
-      "fingerprint": "sha256:03fe5d8f29cefd142f240e75e0105df05a824cf026e0564e00a1cece705b4482"
+      "fingerprint": "sha256:b36965bbdae1732175412bcac6203e0a1864f2f114adc168bf8ff606362e1274"
     },
     {
       "state": [],
@@ -521,7 +521,7 @@
       "layer": "routes",
       "id": "trace-inference",
       "parent": "traceguard",
-      "summary": "Trace inference: solved storyline support and hypothesis projections.",
+      "summary": "Trace inference: solved storyline support and hypothesis projections. Inference does not copy a retired writing-plan consumer field into trace results.",
       "files": [
         "src/researchguard/trace/inference/__init__.py",
         "src/researchguard/trace/inference/compiler.py",
@@ -553,7 +553,7 @@
         "tests/trace/test_inference_performance.py"
       ],
       "status": "confirmed",
-      "fingerprint": "sha256:957ac79522b3de6aa751666f637886e119adb54014d0fd41c6727cb3f0244483"
+      "fingerprint": "sha256:2163721d8aadedbb7003e49e36e7cb28d3e1075b061f39b6ba2277a0d57e8571"
     },
     {
       "state": [],
@@ -665,7 +665,7 @@
       "layer": "routes",
       "id": "logic-depth",
       "parent": "logic-argument",
-      "summary": "Native argument depth analysis, diagnostics and importance.",
+      "summary": "Native argument depth analysis, diagnostics and importance. Node coverage reads the research-owned plural downstream_consumers field without the retired singular alias.",
       "files": [
         "src/researchguard/logic/execution_depth.py",
         "src/researchguard/logic/diagnostics.py",
@@ -686,7 +686,7 @@
         "tests/logic/test_importance.py"
       ],
       "status": "confirmed",
-      "fingerprint": "sha256:e29ab867388ab71a765c6cf23d4a4a7d6fbe73b018baa260a3771dd1e815aab5"
+      "fingerprint": "sha256:af46a1901ad4e6d4a24cd28941d13ff9a351bc4bbbcc6d7e8b7aded78dcf2ea0"
     }
   ],
   "flows": [

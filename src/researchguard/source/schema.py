@@ -400,7 +400,6 @@ class SourceRecord:
     language: str = ""
     country: str = ""
     access_status: str = "unknown"
-    can_support_structural_use: str = ""
     cannot_support_structural_use: str = ""
     notes: str = ""
     content_fingerprint: str = ""
@@ -432,7 +431,6 @@ class SourceRecord:
             language=as_string(data.get("language")),
             country=as_string(data.get("country")),
             access_status=require_choice(data.get("access_status"), ACCESS_STATUSES, "source.access_status"),
-            can_support_structural_use=as_string(data.get("can_support_structural_use")),
             cannot_support_structural_use=as_string(data.get("cannot_support_structural_use")),
             notes=as_string(data.get("notes")),
             content_fingerprint=optional_sha256(data.get("content_fingerprint"), "source.content_fingerprint"),
@@ -635,15 +633,6 @@ class Gap:
     suggested_source_roles: list[str] = field(default_factory=list)
     suggested_modalities: list[str] = field(default_factory=list)
     structure_unit_id: str = ""
-    parent_goal: str = ""
-    unit_job: str = ""
-    contribution_type: str = ""
-    downstream_consumer: str = ""
-    structural_role_needed: str = ""
-    can_support_structural_use: str = ""
-    cannot_support_structural_use: str = ""
-    allowed_wording: str = ""
-    unsafe_wording: str = ""
     semantic_state: str = "discovered"
     qualification: GapQualification = field(default_factory=GapQualification)
     closure_basis: GapClosureBasis = field(default_factory=GapClosureBasis)
@@ -702,15 +691,6 @@ class Gap:
             suggested_source_roles=roles,
             suggested_modalities=modalities,
             structure_unit_id=as_string(data.get("structure_unit_id")),
-            parent_goal=as_string(data.get("parent_goal")),
-            unit_job=as_string(data.get("unit_job")),
-            contribution_type=as_string(data.get("contribution_type")),
-            downstream_consumer=as_string(data.get("downstream_consumer")),
-            structural_role_needed=as_string(data.get("structural_role_needed")),
-            can_support_structural_use=as_string(data.get("can_support_structural_use")),
-            cannot_support_structural_use=as_string(data.get("cannot_support_structural_use")),
-            allowed_wording=as_string(data.get("allowed_wording")),
-            unsafe_wording=as_string(data.get("unsafe_wording")),
             semantic_state=semantic_state,
             qualification=qualification,
             closure_basis=closure_basis,

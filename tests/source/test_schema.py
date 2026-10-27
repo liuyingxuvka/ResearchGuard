@@ -80,3 +80,23 @@ def test_dump_omits_defaults_and_round_trips():
     assert len(rendered.encode()) <= 15300
     assert to_plain_without_defaults({'explicit': False, 'zero': 0, 'empty': []}) == {'explicit': False, 'zero': 0, 'empty': []}
     assert to_plain(SourceRecord(source_id='s'))['source_status'] == 'candidate'
+
+
+def test_retired_writing_fields_warn(tmp_path):
+    import yaml
+    from researchguard.source.loader import validate_model, write_yaml, load_model
+    retired = ('parent_goal', 'unit_job', 'contribution_type', 'downstream_consumer',
+               'structural_role_needed', 'allowed_wording', 'unsafe_wording',
+               'can_support_structural_use', 'cannot_support_structural_use')
+    path = tmp_path / 'source.yaml'
+    data = {'gaps': [{'gap_id': 'g', 'structure_unit_id': 'unit', **dict.fromkeys(retired, 'old')}],
+            'sources': [{'source_id': 's', 'cannot_support_structural_use': 'No causal conclusion'}]}
+    path.write_text(yaml.safe_dump(data))
+    assert validate_model(path)['warnings'] == ['retired_field:' + name for name in sorted(retired)]
+    model = load_model(path)
+    assert model.gaps[0].structure_unit_id == 'unit'
+    assert model.sources[0].cannot_support_structural_use == 'No causal conclusion'
+    write_yaml(path, model)
+    rewritten = yaml.safe_load(path.read_text())
+    assert not set(rewritten['gaps'][0]) & set(retired)
+    assert rewritten['sources'][0]['cannot_support_structural_use'] == 'No causal conclusion'

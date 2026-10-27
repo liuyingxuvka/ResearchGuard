@@ -129,7 +129,6 @@ def logicguard_bundle(result: EvaluationResult, *, model: "TraceGuardModel | Non
                 "trace_layer": trace.trace_layer,
                 "weakest_link": trace.weakest_link,
                 "conclusion_transfer_status": trace.conclusion_transfer_status,
-                "downstream_consumer": trace.downstream_consumer,
                 "rebuttal": [item.message for item in trace.contradictions],
             }
         )

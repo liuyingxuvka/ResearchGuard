@@ -34,8 +34,15 @@ def model_to_dict(belief_state: BeliefState) -> dict[str, Any]:
     return to_plain(belief_state)
 
 
+RETIRED_GAP_FIELDS = ('allowed_wording', 'can_support_structural_use', 'cannot_support_structural_use', 'contribution_type', 'downstream_consumer', 'parent_goal', 'structural_role_needed', 'unit_job', 'unsafe_wording')
+
 def validate_model(path: str | Path) -> dict[str, Any]:
     belief_state = load_model(path)
+    raw = yaml.safe_load(Path(path).read_text(encoding="utf-8")) or {}
+    retired = sorted({name for gap in raw.get('gaps', []) if isinstance(gap, dict)
+                      for name in RETIRED_GAP_FIELDS if name in gap}
+                     | {'can_support_structural_use' for source in raw.get('sources', [])
+                        if isinstance(source, dict) and 'can_support_structural_use' in source})
     example_ids = sorted({
         getattr(row, id_field)
         for collection, id_field in (
@@ -49,7 +56,7 @@ def validate_model(path: str | Path) -> dict[str, Any]:
     return {
         "ok": True,
         "path": str(path),
-        "warnings": ["starter example rows still present: " + ", ".join(example_ids)] if example_ids else [],
+        "warnings": (["starter example rows still present: " + ", ".join(example_ids)] if example_ids else []) + ["retired_field:" + name for name in retired],
         "lead_count": len(belief_state.leads),
         "source_count": len(belief_state.sources),
         "anchor_count": len(belief_state.anchors),

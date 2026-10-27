@@ -553,10 +553,6 @@ def infer_model(
                 projection.trace_id
             ].conclusion_transfer_status
             or "",
-            downstream_consumer=trace_by_id[
-                projection.trace_id
-            ].downstream_consumer
-            or "",
             domain_proposition=domain_by_trace[projection.trace_id].proposition,
             domain_mechanism_refs=domain_by_trace[projection.trace_id].mechanism_refs,
             domain_assumption_refs=domain_by_trace[projection.trace_id].assumption_refs,

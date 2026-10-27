@@ -45,7 +45,6 @@ sources:
   language: ''
   country: ''
   access_status: public
-  can_support_structural_use: ''
   cannot_support_structural_use: ''
   notes: ''
   content_fingerprint: ''
@@ -68,7 +67,6 @@ sources:
   language: ''
   country: ''
   access_status: public
-  can_support_structural_use: ''
   cannot_support_structural_use: ''
   notes: ''
   content_fingerprint: ''
@@ -90,7 +88,6 @@ sources:
   language: ''
   country: ''
   access_status: public
-  can_support_structural_use: ''
   cannot_support_structural_use: ''
   notes: ''
   content_fingerprint: ''
@@ -193,15 +190,6 @@ gaps:
   suggested_modalities:
   - text
   structure_unit_id: ''
-  parent_goal: ''
-  unit_job: ''
-  contribution_type: ''
-  downstream_consumer: ''
-  structural_role_needed: ''
-  can_support_structural_use: ''
-  cannot_support_structural_use: ''
-  allowed_wording: ''
-  unsafe_wording: ''
   semantic_state: closed
   qualification:
     anchor_id: anc-sca-dates
@@ -248,15 +236,6 @@ gaps:
   suggested_modalities:
   - table
   structure_unit_id: ''
-  parent_goal: ''
-  unit_job: ''
-  contribution_type: ''
-  downstream_consumer: ''
-  structural_role_needed: ''
-  can_support_structural_use: ''
-  cannot_support_structural_use: ''
-  allowed_wording: ''
-  unsafe_wording: ''
   semantic_state: closed
   qualification:
     anchor_id: anc-wci-series
@@ -303,15 +282,6 @@ gaps:
   - text
   - table
   structure_unit_id: ''
-  parent_goal: ''
-  unit_job: ''
-  contribution_type: ''
-  downstream_consumer: ''
-  structural_role_needed: ''
-  can_support_structural_use: ''
-  cannot_support_structural_use: ''
-  allowed_wording: ''
-  unsafe_wording: ''
   semantic_state: closed
   qualification:
     anchor_id: anc-unctad-surge
@@ -357,15 +327,6 @@ gaps:
   suggested_modalities:
   - text
   structure_unit_id: ''
-  parent_goal: ''
-  unit_job: ''
-  contribution_type: ''
-  downstream_consumer: ''
-  structural_role_needed: ''
-  can_support_structural_use: ''
-  cannot_support_structural_use: ''
-  allowed_wording: ''
-  unsafe_wording: ''
   semantic_state: discovered
   qualification:
     anchor_id: ''
@@ -406,15 +367,6 @@ gaps:
   - limiting_evidence
   suggested_modalities: []
   structure_unit_id: ''
-  parent_goal: ''
-  unit_job: ''
-  contribution_type: ''
-  downstream_consumer: ''
-  structural_role_needed: ''
-  can_support_structural_use: ''
-  cannot_support_structural_use: ''
-  allowed_wording: ''
-  unsafe_wording: ''
   semantic_state: contradicted
   qualification:
     anchor_id: ''
@@ -519,7 +471,6 @@ observations:
     language: ''
     country: ''
     access_status: public
-    can_support_structural_use: ''
     cannot_support_structural_use: ''
     notes: ''
     content_fingerprint: ''
@@ -579,7 +530,6 @@ observations:
     language: ''
     country: ''
     access_status: public
-    can_support_structural_use: ''
     cannot_support_structural_use: ''
     notes: ''
     content_fingerprint: ''
@@ -639,7 +589,6 @@ observations:
     language: ''
     country: ''
     access_status: public
-    can_support_structural_use: ''
     cannot_support_structural_use: ''
     notes: ''
     content_fingerprint: ''

@@ -448,7 +448,6 @@ class TraceCandidate:
     trace_layer: str | None = None
     weakest_link: str | None = None
     conclusion_transfer_status: str | None = None
-    downstream_consumer: str | None = None
     notes: str | None = None
     importance: float = 0.5
     object_fingerprint: str = ""
@@ -487,7 +486,6 @@ class TraceCandidate:
             trace_layer=data.get("trace_layer"),
             weakest_link=data.get("weakest_link"),
             conclusion_transfer_status=data.get("conclusion_transfer_status"),
-            downstream_consumer=data.get("downstream_consumer"),
             notes=data.get("notes"),
             object_fingerprint=optional_sha256(data.get("object_fingerprint"), "trace.object_fingerprint"),
             normalizer_id=str(data.get("normalizer_id", "")),

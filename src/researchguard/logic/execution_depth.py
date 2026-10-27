@@ -1027,7 +1027,7 @@ def compute_depth_coverage(
         importance = importance_for_node(model, node_id).importance
         responses = _response_nodes(model, node_id, result) if node.type in {"Rebuttal", "Undercutter"} else ()
         disposition = str(node.get("disposition", "") or "").strip().lower()
-        consumers = _string_tuple(node.get("downstream_consumers", node.get("downstream_consumer", ())))
+        consumers = _string_tuple(node.get("downstream_consumers", ()))
         evaluated = evaluation is not None
         status = "covered" if evaluated else "not_evaluated"
         reason = "The native evaluator produced a current node result." if evaluated else "No native evaluation result exists."

@@ -76,12 +76,8 @@ def render_markdown(value: PlanResult | BeliefState) -> str:
     lines.extend(["", "## Open Gaps"])
     for gap in plan.open_gaps:
         structural = ""
-        if gap.structure_unit_id or gap.structural_role_needed:
-            structural = (
-                f" [structure: {gap.structure_unit_id or 'unspecified'}; "
-                f"role: {gap.structural_role_needed or gap.contribution_type or 'unspecified'}; "
-                f"consumer: {gap.downstream_consumer or 'unspecified'}]"
-            )
+        if gap.structure_unit_id:
+            structural = f" [structure: {gap.structure_unit_id}]"
         lines.append(
             f"- `{gap.gap_id}`: {gap.gap_type} - {gap.description}{structural} "
             f"(semantic state: {gap.semantic_state}; review required: {str(gap.review_required).lower()})"

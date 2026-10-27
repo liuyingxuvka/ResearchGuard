@@ -123,7 +123,6 @@ In the tables, **required** means the row must supply the field. All other cells
 | `trace_layer` | `null` |
 | `weakest_link` | `null` |
 | `conclusion_transfer_status` | `null` |
-| `downstream_consumer` | `null` |
 | `notes` | `null` |
 | `object_fingerprint` | `null` |
 | `normalizer_id` | `""` |

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Research inputs drop writing-plan fields; validation warns about retired gap keys and rewriting omits them. Structural coverage ids and source boundaries remain research-owned.
+
 - The search-stop model requires declared searches to win ties. Counter-source gaps generate one source-title query; pages name each search gap and group anchor routes on one line.
 
 - The content-anchor model requires source ownership for new anchors. `source add-anchor` creates source-owned anchors and rejects duplicate ids.

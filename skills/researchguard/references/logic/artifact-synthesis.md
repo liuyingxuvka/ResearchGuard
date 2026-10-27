@@ -26,3 +26,5 @@ researchguard logic citation audit examples/logic/engineering_efficiency_argumen
 ```
 
 Stop at the native plan terminal. A ready plan licenses the declared argument boundary; it does not establish factual truth or finish the writer's prose. The writing owner rechecks affected claims and citations after material changes.
+
+LogicWriting does not import this plan; its own CompositionPlan is the plan of a piece.
