@@ -288,7 +288,8 @@
       "tests": [
         "tests/test_prompt_bundles.py",
         "tests/contract/test_privacy_scan.py",
-        "tests/test_install_skill.py"
+        "tests/test_install_skill.py",
+        "tests/test_prompt_size.py"
       ],
       "models": [
         ".flowguard/models/researchguard_suite_model.py"
@@ -299,7 +300,7 @@
     },
     {
       "id": "research-tree",
-      "summary": "One research question: cross-route identities, copy drift, ablations, candidate comparison and one verdict for writers. Pages name each search gap and query, group each anchor’s routes, and show only relevant ablation effects.",
+      "summary": "One research question: cross-route identities, copy drift, ablations, candidate comparison and one verdict for writers. Pages name each search gap and query, group each anchor\u2019s routes, and show only relevant ablation effects.",
       "responsibilities": [
         "Load the research index and resolve source-library provenance through the native validator. Name every file read in JSON input_digests, including consulted library files, and expose source-owned evidence locator, summary and boundary.",
         "Detect copied-content drift and direct evidence or conclusion disagreements between native routes.",

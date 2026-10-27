@@ -1,5 +1,7 @@
 # ExperimentGuard
 
+Inside a research folder: run `researchguard status <folder>` first; do the step its `Next` names.
+
 Recommend finite sets that distinguish caller-declared hypotheses structurally.
 
 ## Use / do not use

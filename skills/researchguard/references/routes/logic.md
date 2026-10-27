@@ -1,5 +1,7 @@
 # LogicGuard
 
+Inside a research folder: run `researchguard status <folder>` first; do the step its `Next` names.
+
 Audit argument support, hierarchy, source-library structure and evidence-bounded
 synthesis. Select one internal route and model the task before drafting a conclusion.
 

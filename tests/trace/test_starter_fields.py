@@ -16,7 +16,7 @@ from researchguard.trace.validation import validate_references
 
 
 ROOT = Path(__file__).resolve().parents[2]
-FIELD_SHEET = ROOT / "skills/researchguard/references/trace/fields.md"
+FIELD_SHEET = tuple(ROOT / "skills/researchguard/references/trace" / name for name in ('fields-create.md', 'fields-depth.md', 'fields-observations.md', 'fields-starter.md'))
 MODEL_LISTS = (
     "sources", "evidence", "events", "traces", "storyline_hypotheses",
     "hypothesis_evidence_links", "hypothesis_relations", "causal_mechanisms",
@@ -26,7 +26,7 @@ MODEL_LISTS = (
 
 
 def test_documented_starter_is_the_real_nonempty_create_model(tmp_path: Path) -> None:
-    text = FIELD_SHEET.read_text(encoding="utf-8")
+    text = "\n".join(path.read_text(encoding="utf-8") for path in FIELD_SHEET)
     examples = re.findall(r"```yaml\n(.*?)\n```", text, re.DOTALL)
     assert len(examples) == 1
     payload = yaml.safe_load(examples[0])
@@ -50,7 +50,7 @@ def test_documented_starter_is_the_real_nonempty_create_model(tmp_path: Path) ->
 
 
 def test_field_sheet_names_all_requested_lists_and_current_enum_values() -> None:
-    text = FIELD_SHEET.read_text(encoding="utf-8")
+    text = "\n".join(path.read_text(encoding="utf-8") for path in FIELD_SHEET)
     for name in MODEL_LISTS:
         assert f"## {name}\n" in text
     for choices in (
@@ -66,7 +66,7 @@ def test_field_sheet_names_all_requested_lists_and_current_enum_values() -> None
 
 
 def test_documented_observation_has_every_current_field_and_resolves_ids() -> None:
-    text = FIELD_SHEET.read_text(encoding="utf-8")
+    text = "\n".join(path.read_text(encoding="utf-8") for path in FIELD_SHEET)
     examples = re.findall(r"```json\n(.*?)\n```", text, re.DOTALL)
     assert len(examples) == 1
     payload = json.loads(examples[0])

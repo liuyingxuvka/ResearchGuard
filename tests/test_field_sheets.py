@@ -14,11 +14,11 @@ from researchguard.source import schema
 from researchguard.source.cli import main as source_main, starter_model_dict
 
 ROOT = Path(__file__).resolve().parents[1]
-FIELDS = ROOT / "skills/researchguard/references/source/fields.md"
+FIELDS = tuple(ROOT / "skills/researchguard/references/source" / name for name in ('fields-create.md', 'fields-depth.md', 'fields-examples.md'))
 
 
 def test_source_field_sheet_has_current_enums_and_valid_starter(tmp_path, capsys) -> None:
-    text = FIELDS.read_text(encoding="utf-8")
+    text = "\n".join(path.read_text(encoding="utf-8") for path in FIELDS)
     for name in ("SOURCE_TYPES", "SOURCE_ROLES", "GAP_TYPES", "SEMANTIC_GAP_STATES", "ACTION_TYPES", "ANCHOR_TYPES", "MODALITIES"):
         assert all(value in text for value in getattr(schema, name)), name
     examples = [yaml.safe_load(value) for value in re.findall(r"```yaml\n(.*?)```", text, re.S)]

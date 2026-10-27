@@ -7,9 +7,10 @@ description: "Use for research-quality checks: argument structure and claim supp
 
 ## Start from the model
 
-- Existing folder: run `researchguard status <folder>` first; read Verdict, Open gaps and Next (`--hypothesis <id>` for one); take the route Next names.
+- Existing folder: run `researchguard status <folder>` first; read Verdict, Open gaps and Next; take the route Next names.
 - New question: write `research.yaml` first (template: `references/research-tree.md`, "Start a question"); each route's first step builds its model, listed in `models`.
 - After each route step run `status` again; discuss hypotheses, anchors and the verdict.
+- Keep the source, trace, logic and experiment models as separate route models joined by shared ids, add only the routes and hypotheses the question needs, and read one hypothesis with status --hypothesis <id>.
 
 ## Choose a route
 

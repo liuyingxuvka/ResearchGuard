@@ -1,45 +1,244 @@
 {
   "schema_version": "researchguard.prompt-bundle-manifest.v1",
   "bundles": [
-    {"bundle_id": "researchguard", "entry_files": ["skills/researchguard/SKILL.md", "skills/researchguard/agents/openai.yaml"], "max_entry_bytes": 3600, "minimum_headroom_bytes": 600},
-    {"bundle_id": "route:logic", "entry_files": ["skills/researchguard/references/routes/logic.md"], "max_entry_bytes": 4000, "minimum_headroom_bytes": 1000},
-    {"bundle_id": "route:source", "entry_files": ["skills/researchguard/references/routes/source.md"], "max_entry_bytes": 4000, "minimum_headroom_bytes": 1000},
-    {"bundle_id": "route:trace", "entry_files": ["skills/researchguard/references/routes/trace.md"], "max_entry_bytes": 4000, "minimum_headroom_bytes": 1000},
-    {"bundle_id": "route:experiment", "entry_files": ["skills/researchguard/references/routes/experiment.md"], "max_entry_bytes": 4000, "minimum_headroom_bytes": 600}
+    {
+      "bundle_id": "researchguard",
+      "entry_files": [
+        "skills/researchguard/SKILL.md",
+        "skills/researchguard/agents/openai.yaml"
+      ],
+      "max_entry_bytes": 3800,
+      "minimum_headroom_bytes": 600
+    },
+    {
+      "bundle_id": "route:logic",
+      "entry_files": [
+        "skills/researchguard/references/routes/logic.md"
+      ],
+      "max_entry_bytes": 4100,
+      "minimum_headroom_bytes": 1000
+    },
+    {
+      "bundle_id": "route:source",
+      "entry_files": [
+        "skills/researchguard/references/routes/source.md"
+      ],
+      "max_entry_bytes": 4100,
+      "minimum_headroom_bytes": 1000
+    },
+    {
+      "bundle_id": "route:trace",
+      "entry_files": [
+        "skills/researchguard/references/routes/trace.md"
+      ],
+      "max_entry_bytes": 4100,
+      "minimum_headroom_bytes": 1000
+    },
+    {
+      "bundle_id": "route:experiment",
+      "entry_files": [
+        "skills/researchguard/references/routes/experiment.md"
+      ],
+      "max_entry_bytes": 4000,
+      "minimum_headroom_bytes": 600
+    }
   ],
   "reference_edges": [
-    {"trigger_id": "trigger:research-tree", "declared_in": "skills/researchguard/SKILL.md", "reference": "skills/researchguard/references/research-tree.md"},
-    {"trigger_id": "", "declared_in": "skills/researchguard/SKILL.md", "reference": "skills/researchguard/references/routes/logic.md"},
-    {"trigger_id": "", "declared_in": "skills/researchguard/SKILL.md", "reference": "skills/researchguard/references/routes/source.md"},
-    {"trigger_id": "", "declared_in": "skills/researchguard/SKILL.md", "reference": "skills/researchguard/references/routes/trace.md"},
-    {"trigger_id": "", "declared_in": "skills/researchguard/SKILL.md", "reference": "skills/researchguard/references/routes/experiment.md"},
-    {"trigger_id": "route:general-argument", "declared_in": "skills/researchguard/references/routes/logic.md", "reference": "skills/researchguard/references/logic/general-argument.md"},
-    {"trigger_id": "route:source-library", "declared_in": "skills/researchguard/references/routes/logic.md", "reference": "skills/researchguard/references/logic/source-library.md"},
-    {"trigger_id": "route:structured-artifact", "declared_in": "skills/researchguard/references/routes/logic.md", "reference": "skills/researchguard/references/logic/structured-artifact.md"},
-    {"trigger_id": "route:model-deepening", "declared_in": "skills/researchguard/references/routes/logic.md", "reference": "skills/researchguard/references/logic/model-deepening.md"},
-    {"trigger_id": "route:artifact-synthesis", "declared_in": "skills/researchguard/references/routes/logic.md", "reference": "skills/researchguard/references/logic/artifact-synthesis.md"},
-    {"trigger_id": "route:project-library-viewer", "declared_in": "skills/researchguard/references/routes/logic.md", "reference": "skills/researchguard/references/logic/project-library-viewer.md"},
-    {"trigger_id": "trigger:task-model-maturation", "declared_in": "skills/researchguard/references/routes/logic.md", "reference": "skills/researchguard/references/logic/task-model-maturation.md"},
-    {"trigger_id": "trigger:broad-depth-closure", "declared_in": "skills/researchguard/references/routes/logic.md", "reference": "skills/researchguard/references/logic/broad-depth-and-closure.md"},
-    {"trigger_id": "trigger:structural-contribution", "declared_in": "skills/researchguard/references/routes/logic.md", "reference": "skills/researchguard/references/logic/structural-contribution.md"},
-    {"trigger_id": "trigger:citation-grounding", "declared_in": "skills/researchguard/references/routes/logic.md", "reference": "skills/researchguard/references/logic/citation-grounding.md"},
-    {"trigger_id": "trigger:commands", "declared_in": "skills/researchguard/references/routes/logic.md", "reference": "skills/researchguard/references/logic/commands.md"},
-    {"trigger_id": "trigger:model-creation", "declared_in": "skills/researchguard/references/routes/logic.md", "reference": "skills/researchguard/references/logic/h-wadf-quick-reference.md"},
-    {"trigger_id": "route:source-model", "declared_in": "skills/researchguard/references/routes/source.md", "reference": "skills/researchguard/references/source/source-model-protocol.md"},
-    {"trigger_id": "trigger:retrieval-workflow", "declared_in": "skills/researchguard/references/routes/source.md", "reference": "skills/researchguard/references/source/retrieval-workflow.md"},
-    {"trigger_id": "trigger:task-iteration", "declared_in": "skills/researchguard/references/routes/source.md", "reference": "skills/researchguard/references/source/task-iteration.md"},
-    {"trigger_id": "trigger:broad-depth-closure", "declared_in": "skills/researchguard/references/routes/source.md", "reference": "skills/researchguard/references/source/broad-depth-and-closure.md"},
-    {"trigger_id": "trigger:commands", "declared_in": "skills/researchguard/references/routes/source.md", "reference": "skills/researchguard/references/source/commands.md"},
-    {"trigger_id": "trigger:safe-output", "declared_in": "skills/researchguard/references/routes/source.md", "reference": "skills/researchguard/references/source/safe-output.md"},
-    {"trigger_id": "route:general-trace", "declared_in": "skills/researchguard/references/routes/trace.md", "reference": "skills/researchguard/references/trace/general-trace.md"},
-    {"trigger_id": "route:general-trace", "declared_in": "skills/researchguard/references/routes/trace.md", "reference": "skills/researchguard/references/trace/unified_inference_protocol.md"},
-    {"trigger_id": "route:case-library", "declared_in": "skills/researchguard/references/routes/trace.md", "reference": "skills/researchguard/references/trace/case-library.md"},
-    {"trigger_id": "trigger:task-iteration", "declared_in": "skills/researchguard/references/routes/trace.md", "reference": "skills/researchguard/references/trace/task-iteration.md"},
-    {"trigger_id": "trigger:depth-closure", "declared_in": "skills/researchguard/references/routes/trace.md", "reference": "skills/researchguard/references/trace/depth-and-closure.md"},
-    {"trigger_id": "trigger:commands-handoffs", "declared_in": "skills/researchguard/references/routes/trace.md", "reference": "skills/researchguard/references/trace/commands-and-handoffs.md"},
-    {"trigger_id": "trigger:safe-output", "declared_in": "skills/researchguard/references/routes/trace.md", "reference": "skills/researchguard/references/trace/safe-output.md"},
-    {"trigger_id": "trigger:fields", "declared_in": "skills/researchguard/references/routes/source.md", "reference": "skills/researchguard/references/source/fields.md"},
-    {"trigger_id": "trigger:fields", "declared_in": "skills/researchguard/references/routes/trace.md", "reference": "skills/researchguard/references/trace/fields.md"}
+    {
+      "trigger_id": "trigger:research-tree",
+      "declared_in": "skills/researchguard/SKILL.md",
+      "reference": "skills/researchguard/references/research-tree.md"
+    },
+    {
+      "trigger_id": "",
+      "declared_in": "skills/researchguard/SKILL.md",
+      "reference": "skills/researchguard/references/routes/logic.md"
+    },
+    {
+      "trigger_id": "",
+      "declared_in": "skills/researchguard/SKILL.md",
+      "reference": "skills/researchguard/references/routes/source.md"
+    },
+    {
+      "trigger_id": "",
+      "declared_in": "skills/researchguard/SKILL.md",
+      "reference": "skills/researchguard/references/routes/trace.md"
+    },
+    {
+      "trigger_id": "",
+      "declared_in": "skills/researchguard/SKILL.md",
+      "reference": "skills/researchguard/references/routes/experiment.md"
+    },
+    {
+      "trigger_id": "route:general-argument",
+      "declared_in": "skills/researchguard/references/routes/logic.md",
+      "reference": "skills/researchguard/references/logic/general-argument.md"
+    },
+    {
+      "trigger_id": "route:source-library",
+      "declared_in": "skills/researchguard/references/routes/logic.md",
+      "reference": "skills/researchguard/references/logic/source-library.md"
+    },
+    {
+      "trigger_id": "route:structured-artifact",
+      "declared_in": "skills/researchguard/references/routes/logic.md",
+      "reference": "skills/researchguard/references/logic/structured-artifact.md"
+    },
+    {
+      "trigger_id": "route:model-deepening",
+      "declared_in": "skills/researchguard/references/routes/logic.md",
+      "reference": "skills/researchguard/references/logic/model-deepening.md"
+    },
+    {
+      "trigger_id": "route:artifact-synthesis",
+      "declared_in": "skills/researchguard/references/routes/logic.md",
+      "reference": "skills/researchguard/references/logic/artifact-synthesis.md"
+    },
+    {
+      "trigger_id": "route:project-library-viewer",
+      "declared_in": "skills/researchguard/references/routes/logic.md",
+      "reference": "skills/researchguard/references/logic/project-library-viewer.md"
+    },
+    {
+      "trigger_id": "trigger:task-model-maturation",
+      "declared_in": "skills/researchguard/references/routes/logic.md",
+      "reference": "skills/researchguard/references/logic/task-model-maturation.md"
+    },
+    {
+      "trigger_id": "trigger:broad-depth-closure",
+      "declared_in": "skills/researchguard/references/routes/logic.md",
+      "reference": "skills/researchguard/references/logic/broad-depth-and-closure.md"
+    },
+    {
+      "trigger_id": "trigger:structural-contribution",
+      "declared_in": "skills/researchguard/references/routes/logic.md",
+      "reference": "skills/researchguard/references/logic/structural-contribution.md"
+    },
+    {
+      "trigger_id": "trigger:citation-grounding",
+      "declared_in": "skills/researchguard/references/routes/logic.md",
+      "reference": "skills/researchguard/references/logic/citation-grounding.md"
+    },
+    {
+      "trigger_id": "trigger:commands",
+      "declared_in": "skills/researchguard/references/routes/logic.md",
+      "reference": "skills/researchguard/references/logic/commands.md"
+    },
+    {
+      "trigger_id": "trigger:model-creation",
+      "declared_in": "skills/researchguard/references/routes/logic.md",
+      "reference": "skills/researchguard/references/logic/h-wadf-quick-reference.md"
+    },
+    {
+      "trigger_id": "route:source-model",
+      "declared_in": "skills/researchguard/references/routes/source.md",
+      "reference": "skills/researchguard/references/source/source-model-protocol.md"
+    },
+    {
+      "trigger_id": "trigger:retrieval-workflow",
+      "declared_in": "skills/researchguard/references/routes/source.md",
+      "reference": "skills/researchguard/references/source/retrieval-workflow.md"
+    },
+    {
+      "trigger_id": "trigger:task-iteration",
+      "declared_in": "skills/researchguard/references/routes/source.md",
+      "reference": "skills/researchguard/references/source/task-iteration.md"
+    },
+    {
+      "trigger_id": "trigger:broad-depth-closure",
+      "declared_in": "skills/researchguard/references/routes/source.md",
+      "reference": "skills/researchguard/references/source/broad-depth-and-closure.md"
+    },
+    {
+      "trigger_id": "trigger:commands",
+      "declared_in": "skills/researchguard/references/routes/source.md",
+      "reference": "skills/researchguard/references/source/commands.md"
+    },
+    {
+      "trigger_id": "trigger:safe-output",
+      "declared_in": "skills/researchguard/references/routes/source.md",
+      "reference": "skills/researchguard/references/source/safe-output.md"
+    },
+    {
+      "trigger_id": "route:general-trace",
+      "declared_in": "skills/researchguard/references/routes/trace.md",
+      "reference": "skills/researchguard/references/trace/general-trace.md"
+    },
+    {
+      "trigger_id": "route:general-trace",
+      "declared_in": "skills/researchguard/references/routes/trace.md",
+      "reference": "skills/researchguard/references/trace/unified_inference_protocol.md"
+    },
+    {
+      "trigger_id": "route:case-library",
+      "declared_in": "skills/researchguard/references/routes/trace.md",
+      "reference": "skills/researchguard/references/trace/case-library.md"
+    },
+    {
+      "trigger_id": "trigger:task-iteration",
+      "declared_in": "skills/researchguard/references/routes/trace.md",
+      "reference": "skills/researchguard/references/trace/task-iteration.md"
+    },
+    {
+      "trigger_id": "trigger:depth-closure",
+      "declared_in": "skills/researchguard/references/routes/trace.md",
+      "reference": "skills/researchguard/references/trace/depth-and-closure.md"
+    },
+    {
+      "trigger_id": "trigger:commands-handoffs",
+      "declared_in": "skills/researchguard/references/routes/trace.md",
+      "reference": "skills/researchguard/references/trace/commands-and-handoffs.md"
+    },
+    {
+      "trigger_id": "trigger:safe-output",
+      "declared_in": "skills/researchguard/references/routes/trace.md",
+      "reference": "skills/researchguard/references/trace/safe-output.md"
+    },
+    {
+      "trigger_id": "trigger:fields",
+      "declared_in": "skills/researchguard/references/routes/source.md",
+      "reference": "skills/researchguard/references/source/fields.md"
+    },
+    {
+      "trigger_id": "trigger:fields",
+      "declared_in": "skills/researchguard/references/routes/trace.md",
+      "reference": "skills/researchguard/references/trace/fields.md"
+    },
+    {
+      "trigger_id": "trigger:fields",
+      "declared_in": "skills/researchguard/references/source/fields.md",
+      "reference": "skills/researchguard/references/source/fields-create.md"
+    },
+    {
+      "trigger_id": "trigger:fields",
+      "declared_in": "skills/researchguard/references/source/fields.md",
+      "reference": "skills/researchguard/references/source/fields-depth.md"
+    },
+    {
+      "trigger_id": "trigger:fields",
+      "declared_in": "skills/researchguard/references/source/fields.md",
+      "reference": "skills/researchguard/references/source/fields-examples.md"
+    },
+    {
+      "trigger_id": "trigger:fields",
+      "declared_in": "skills/researchguard/references/trace/fields.md",
+      "reference": "skills/researchguard/references/trace/fields-create.md"
+    },
+    {
+      "trigger_id": "trigger:fields",
+      "declared_in": "skills/researchguard/references/trace/fields.md",
+      "reference": "skills/researchguard/references/trace/fields-depth.md"
+    },
+    {
+      "trigger_id": "trigger:fields",
+      "declared_in": "skills/researchguard/references/trace/fields.md",
+      "reference": "skills/researchguard/references/trace/fields-observations.md"
+    },
+    {
+      "trigger_id": "trigger:fields",
+      "declared_in": "skills/researchguard/references/trace/fields.md",
+      "reference": "skills/researchguard/references/trace/fields-starter.md"
+    }
   ],
   "claim_boundary": "This manifest checks prompt entry byte budgets and conditional reference edges only. Byte totals are deterministic prompt-regression proxies, not provider token counts."
 }

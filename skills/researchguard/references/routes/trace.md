@@ -1,5 +1,7 @@
 # TraceGuard
 
+Inside a research folder: run `researchguard status <folder>` first; do the step its `Next` names.
+
 Reconstruct temporal/execution/effect chains and competing stories; review bounded cause. Declare scope, evidence/event boundaries and alternatives first.
 
 ## Use / not use

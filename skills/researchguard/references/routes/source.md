@@ -1,5 +1,7 @@
 # SourceGuard
 
+Inside a research folder: run `researchguard status <folder>` first; do the step its `Next` names.
+
 ## Purpose
 Find sources; qualify anchors. Utility ranks search value, not truth/probability.
 
