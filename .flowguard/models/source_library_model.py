@@ -18,39 +18,7 @@ TESTED_BY = {
     'deleting_a_project_keeps_sources': ['tests/logic/test_source_library.py:test_delete_project_removes_project_relationships_without_deleting_sources_or_models',
                                          'tests/logic/test_source_library.py:test_project_branch_uses_references_not_source_copies'],
 }
-NOT_MODELED = {
-    'src/researchguard/logic_viewer/desktop_app.py:KbDesktopApp._build_layout': 'Desktop viewer drawing and event handlers (optional viewer extra); they read the library through SourceLibrary and change only window state.',
-    'src/researchguard/logic_viewer/desktop_app.py:KbDesktopApp._draw_card': 'Desktop viewer drawing and event handlers (optional viewer extra); they read the library through SourceLibrary and change only window state.',
-    'src/researchguard/logic_viewer/desktop_app.py:KbDesktopApp._draw_card_surface': 'Desktop viewer drawing and event handlers (optional viewer extra); they read the library through SourceLibrary and change only window state.',
-    'src/researchguard/logic_viewer/desktop_app.py:KbDesktopApp._draw_dissolve_project_badge': 'Desktop viewer drawing and event handlers (optional viewer extra); they read the library through SourceLibrary and change only window state.',
-    'src/researchguard/logic_viewer/desktop_app.py:KbDesktopApp._draw_export_badge': 'Desktop viewer drawing and event handlers (optional viewer extra); they read the library through SourceLibrary and change only window state.',
-    'src/researchguard/logic_viewer/desktop_app.py:KbDesktopApp._draw_gradient_surface': 'Desktop viewer drawing and event handlers (optional viewer extra); they read the library through SourceLibrary and change only window state.',
-    'src/researchguard/logic_viewer/desktop_app.py:KbDesktopApp._draw_import_badge': 'Desktop viewer drawing and event handlers (optional viewer extra); they read the library through SourceLibrary and change only window state.',
-    'src/researchguard/logic_viewer/desktop_app.py:KbDesktopApp._draw_update_badge': 'Desktop viewer drawing and event handlers (optional viewer extra); they read the library through SourceLibrary and change only window state.',
-    'src/researchguard/logic_viewer/desktop_app.py:KbDesktopApp._footer_row': 'Desktop viewer drawing and event handlers (optional viewer extra); they read the library through SourceLibrary and change only window state.',
-    'src/researchguard/logic_viewer/desktop_app.py:KbDesktopApp._load_image_assets': 'Desktop viewer drawing and event handlers (optional viewer extra); they read the library through SourceLibrary and change only window state.',
-    'src/researchguard/logic_viewer/desktop_app.py:KbDesktopApp._load_source_view': 'Desktop viewer drawing and event handlers (optional viewer extra); they read the library through SourceLibrary and change only window state.',
-    'src/researchguard/logic_viewer/desktop_app.py:KbDesktopApp._load_status_view': 'Desktop viewer drawing and event handlers (optional viewer extra); they read the library through SourceLibrary and change only window state.',
-    'src/researchguard/logic_viewer/desktop_app.py:KbDesktopApp._load_type_view': 'Desktop viewer drawing and event handlers (optional viewer extra); they read the library through SourceLibrary and change only window state.',
-    'src/researchguard/logic_viewer/desktop_app.py:KbDesktopApp._move_selection': 'Desktop viewer drawing and event handlers (optional viewer extra); they read the library through SourceLibrary and change only window state.',
-    'src/researchguard/logic_viewer/desktop_app.py:KbDesktopApp._nav_row': 'Desktop viewer drawing and event handlers (optional viewer extra); they read the library through SourceLibrary and change only window state.',
-    'src/researchguard/logic_viewer/desktop_app.py:KbDesktopApp._on_card_click': 'Desktop viewer drawing and event handlers (optional viewer extra); they read the library through SourceLibrary and change only window state.',
-    'src/researchguard/logic_viewer/desktop_app.py:KbDesktopApp._on_card_leave': 'Desktop viewer drawing and event handlers (optional viewer extra); they read the library through SourceLibrary and change only window state.',
-    'src/researchguard/logic_viewer/desktop_app.py:KbDesktopApp._on_card_motion': 'Desktop viewer drawing and event handlers (optional viewer extra); they read the library through SourceLibrary and change only window state.',
-    'src/researchguard/logic_viewer/desktop_app.py:KbDesktopApp._on_main_configure': 'Desktop viewer drawing and event handlers (optional viewer extra); they read the library through SourceLibrary and change only window state.',
-    'src/researchguard/logic_viewer/desktop_app.py:KbDesktopApp._on_sidebar_click': 'Desktop viewer drawing and event handlers (optional viewer extra); they read the library through SourceLibrary and change only window state.',
-    'src/researchguard/logic_viewer/desktop_app.py:KbDesktopApp._perform_search': 'Desktop viewer drawing and event handlers (optional viewer extra); they read the library through SourceLibrary and change only window state.',
-    'src/researchguard/logic_viewer/desktop_app.py:KbDesktopApp._render_footer': 'Desktop viewer drawing and event handlers (optional viewer extra); they read the library through SourceLibrary and change only window state.',
-    'src/researchguard/logic_viewer/desktop_app.py:KbDesktopApp._render_main': 'Desktop viewer drawing and event handlers (optional viewer extra); they read the library through SourceLibrary and change only window state.',
-    'src/researchguard/logic_viewer/desktop_app.py:KbDesktopApp._render_sidebar': 'Desktop viewer drawing and event handlers (optional viewer extra); they read the library through SourceLibrary and change only window state.',
-    'src/researchguard/logic_viewer/desktop_app.py:KbDesktopApp._route_row': 'Desktop viewer drawing and event handlers (optional viewer extra); they read the library through SourceLibrary and change only window state.',
-    'src/researchguard/logic_viewer/desktop_app.py:KbDesktopApp._run_scheduled_search': 'Desktop viewer drawing and event handlers (optional viewer extra); they read the library through SourceLibrary and change only window state.',
-    'src/researchguard/logic_viewer/desktop_app.py:KbDesktopApp._schedule_search': 'Desktop viewer drawing and event handlers (optional viewer extra); they read the library through SourceLibrary and change only window state.',
-    'src/researchguard/logic_viewer/desktop_app.py:KbDesktopApp._section_row': 'Desktop viewer drawing and event handlers (optional viewer extra); they read the library through SourceLibrary and change only window state.',
-    'src/researchguard/logic_viewer/desktop_app.py:KbDesktopApp._set_searching': 'Desktop viewer drawing and event handlers (optional viewer extra); they read the library through SourceLibrary and change only window state.',
-    'src/researchguard/logic_viewer/desktop_app.py:KbDesktopApp.load_route': 'Desktop viewer drawing and event handlers (optional viewer extra); they read the library through SourceLibrary and change only window state.',
-    'src/researchguard/logic_viewer/desktop_app.py:KbDesktopApp.open_selected_detail': 'Desktop viewer drawing and event handlers (optional viewer extra); they read the library through SourceLibrary and change only window state.',
-}
+NOT_MODELED = {}
 
 
 @dataclass(frozen=True)

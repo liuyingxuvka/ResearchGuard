@@ -9,7 +9,8 @@
   ],
   "ignore": [
     "openspec/**",
-    "docs/**"
+    "docs/**",
+    "src/researchguard/logic_viewer/desktop_app.py"
   ],
   "test_command": "python -m pytest -q",
   "components": [
@@ -413,10 +414,9 @@
         "src/researchguard/logic_viewer/ui_data.py",
         "src/researchguard/logic_viewer/__init__.py",
         "src/researchguard/logic_viewer/common.py",
-        "src/researchguard/logic_viewer/store.py",
-        "src/researchguard/logic_viewer/desktop_app.py"
+        "src/researchguard/logic_viewer/store.py"
       ],
-      "summary": "Personal source library, per-source argument models and optional desktop browsing.",
+      "summary": "Source library import, model IO and project queries. The optional tkinter window (logic_viewer/desktop_app.py) is outside the map: it only draws and reads the library through SourceLibrary.",
       "responsibilities": [
         "Import and deduplicate source material, maintain per-source models and project reading lists.",
         "Browse and export the personal source library without requiring the optional viewer for core commands."
@@ -437,7 +437,7 @@
         ".flowguard/models/source_library_model.py"
       ],
       "status": "confirmed",
-      "fingerprint": "sha256:3f8cbcaac338163b26a9b339b130682b56ea98bd89bba4cb4cc88b6e91b4a9f3"
+      "fingerprint": "sha256:587d5f041fdd41d0a831b23720bb5c695a097f82f07656e8387e9c8f6f3832ff"
     },
     {
       "entrypoints": [],
@@ -782,17 +782,6 @@
       "reason": "SourceGuard has one job, the source belief state; its planner, scoring, depth and field definitions read the same schema."
     },
     {
-      "code": "large_component",
-      "component": "logic-library",
-      "reason": "Most of the size is the optional desktop viewer (viewer extra); the library core is source_library.py and its IO."
-    },
-    {
-      "code": "large_file",
-      "component": "logic-library",
-      "contains": "src/researchguard/logic_viewer/desktop_app.py",
-      "reason": "Optional desktop viewer: one tkinter window class whose drawing and event handlers share window state."
-    },
-    {
       "code": "large_file",
       "component": "logic-library",
       "contains": "src/researchguard/logic/source_library.py",
@@ -863,7 +852,7 @@
     ".flowguard/models/research_verdict_model.py": "2780de1b152afc2e93f872bc5b1a2b91849bea23919d353beffc952f38078cd1",
     ".flowguard/models/research_views_model.py": "6c13d77fa5e5f6e01f29747b0dc1b59a8f3ea897bc694a76ef2e5b6ca7be82ac",
     ".flowguard/models/researchguard_suite_model.py": "a04ba684aeb51e0cebf51fbfc4b45bec62955938f51b6667ef0138adcc18aa03",
-    ".flowguard/models/source_library_model.py": "53c8b7d49c97fb08292e73b7320e9dcc6cee49edc7998e277f60dcf45c0ed1fc",
+    ".flowguard/models/source_library_model.py": "a6d0417e7b01046244503375ad15a4cf2ee99a69b56ff2c8a72f410044ec771e",
     ".flowguard/models/sourceguard_content_anchor_model.py": "985a6e7659c0308435e05de864780a8ea1a77e80085c57cf8a0a677fab9ea706",
     ".flowguard/models/sourceguard_stop_decision_model.py": "389e891d59a5b3dbbe915c8784174c8e6fc86b01de0a13086e2cdbc6d002cb34",
     ".flowguard/models/synthesis_plan_model.py": "6be9b8dad1874fbca66daf24349d0aceb5ac0559e9cac57139eb3f6055393e67",
