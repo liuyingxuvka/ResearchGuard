@@ -28,6 +28,13 @@ def test_hypothesis_view_lists_its_rows(capsys):
         assert [item for item in view['next'] if item['route'] == 'search'] == [
             item for item in status['next'] if item['route'] == 'search' and row['id'] in item['hypotheses']]
     from researchguard.research import render_status_markdown
+    page = render_status_markdown(status)
+    searches = [row for row in status['next'] if row['route'] == 'search']
+    assert len(searches) == 3
+    for search in searches:
+        gap = next(gap['id'] for gap in status['open_gaps'] if search['id'] in gap.get('next', ()))
+        assert f"search {search['id']} -> {gap}" in page
+        assert search['query'] in page
     lines = render_status_markdown(status).splitlines()
     at = lines.index('## Disagreements')
     assert lines[at + 1] == '' and lines[at + 2] == '- none'

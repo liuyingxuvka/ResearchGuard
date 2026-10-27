@@ -144,10 +144,10 @@ def _actions_for_gap(gap: Gap, belief_state: BeliefState) -> list[SearchAction]:
             _action(gap, "text_search", "limiting_evidence", query=f"{query} limitation"),
         ]
     if gap.gap_type == "contradiction":
-        return [
-            _action(gap, "exact_phrase_search", "primary_source", query=f"\"{query}\"", parameters={"freshness_focused": True}),
-            _action(gap, "report_page_search", "independent_report", "pdf_page", query=f"{query} dated report", parameters={"freshness_focused": True}),
-        ]
+        source = belief_state.source_by_id().get(gap.gap_id.removeprefix("counter-source-"))
+        title = source.title if source and source.title else query
+        return [_action(gap, "report_page_search", "independent_report", "pdf_page",
+                        query=title, parameters={"freshness_focused": True})]
     if gap.gap_type == "permission_gap":
         if _policy_allows_internal(belief_state):
             return [_action(gap, "internal_source_search", "primary_source", "text", query=query, permission_risk=0.6)]
@@ -260,7 +260,8 @@ def plan_next_actions(belief_state: BeliefState, limit: int | None = 5) -> PlanR
             )
         )
     ]
-    scored = sorted(scored, key=lambda item: item.total_score, reverse=True)
+    declared_ids = {action.action_id for action in belief_state.actions}
+    scored = sorted(scored, key=lambda item: (-item.total_score, item.action_id not in declared_ids))
     by_id = state_for_scoring.action_by_id()
     selected = [by_id[item.action_id] for item in scored[:limit] if item.action_id in by_id]
     open_gaps = [

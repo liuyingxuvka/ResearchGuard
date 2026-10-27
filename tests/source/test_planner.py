@@ -118,3 +118,23 @@ def test_lead_only_generated_query_keeps_real_question_with_nonempty_character_b
         assert 0 < len(action.query) <= 120
         assert question.startswith(action.query)
         assert action.query != "unclear_scope"
+
+
+def test_declared_search_comes_first():
+    from dataclasses import replace
+    from researchguard.source.schema import BeliefState, Gap, SourceRecord
+    from researchguard.source.planner import plan_next_actions, generate_actions_from_gaps
+    model = BeliefState(sources=[SourceRecord('s', title='A dated source')],
+        gaps=[Gap('counter-source-s', gap_type='contradiction', description='Counterevidence candidate observed')])
+    generated = generate_actions_from_gaps(model)
+    assert len(generated) == 1
+    assert generated[0].action_type == 'report_page_search' and generated[0].query == 'A dated source'
+    declared = replace(generated[0], action_id='declared', query='Independent source')
+    model = replace(model, actions=[declared], sources=[*model.sources, SourceRecord('t', title='Another source')],
+        gaps=[*model.gaps, replace(model.gaps[0], gap_id='counter-source-t')])
+    generated = generate_actions_from_gaps(model)
+    assert len(generated) == 1
+    plan = plan_next_actions(model, limit=None)
+    scores = {row.action_id: row.total_score for row in plan.scored_actions}
+    assert scores['declared'] == scores[generated[0].action_id]
+    assert plan.selected_actions[0].action_id == 'declared'

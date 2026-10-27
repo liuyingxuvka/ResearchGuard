@@ -514,7 +514,12 @@ def render_status_markdown(status: dict[str, Any]) -> str:
     _none(lines, status["open_gaps"])
     lines.extend(["", "## Next", ""])
     for row in status["next"]:
-        lines.append("- " + cell(f"search {row['id']}" + _named(row) if row["route"] == "search" else f"experiment: {row.get('status')}; next: {', '.join(row['ids']) or 'none'}"))
+        if row["route"] == "search":
+            gaps = [gap['id'] for gap in status['open_gaps'] if gap['route'] == 'source' and row['id'] in gap['next']]
+            text = f"search {row['id']} -> {', '.join(gaps) or 'none'}" + _named(row) + f": {row['query']}"
+        else:
+            text = f"experiment: {row.get('status')}; next: {', '.join(row['ids']) or 'none'}"
+        lines.append("- " + cell(text))
     _none(lines, status["next"])
     lines.extend(["", "## Ablations", ""])
     for row in status["ablations"]:
@@ -584,11 +589,21 @@ def render_hypothesis_view(view: dict[str, Any]) -> str:
              "- experiment: " + (experiment or {}).get("status", "not_listed"), "", "## Evidence", ""]
     for direction in ("support", "oppose", "limit"):
         rows = view["evidence"][direction]
-        lines.append(f"- {direction}: " + (", ".join(f"{row['anchor']} ({row['route']})" for row in rows) or "none"))
+        anchors = {}
+        for row in rows:
+            anchors.setdefault(row['anchor'], set()).add(row['route'])
+        lines.append(f"- {direction}:")
+        lines.extend(f"  - {anchor} ({', '.join(sorted(routes))})" for anchor, routes in anchors.items())
+        if not anchors:
+            lines.append("  - none")
     lines.extend(["", "## Ablations", ""])
     for row in view["ablations"]:
-        effects = [f"{item['hypothesis']} {item['route']} {item['field']} {str(item['before']).lower()} → {str(item['after']).lower()}" for item in row.get("effects", ())]
-        lines.append(f"- {row['id']}: {row['hypothesis']} {row['expect']}; caught by {', '.join(row['caught_by']) or 'none'}" + ("; effects: " + ", ".join(effects) if effects else ""))
+        effects = [f"{item['hypothesis']} {item['route']} {item['field']} {str(item['before']).lower()} → {str(item['after']).lower()}" for item in row.get("effects", ()) if item['hypothesis'] == view['id']]
+        if row['hypothesis'] != view['id']:
+            if effects:
+                lines.append(f"- {row['id']} (targets {row['hypothesis']}): effects " + ", ".join(effects))
+        else:
+            lines.append(f"- {row['id']}: {row['hypothesis']} {row['expect']}; caught by {', '.join(row['caught_by']) or 'none'}" + ("; effects: " + ", ".join(effects) if effects else ""))
     _none(lines, view["ablations"])
     lines.extend(["", "## Disagreements", ""])
     lines.extend(f"- {row['kind']} {row['detail']}" for row in view["disagreements"])

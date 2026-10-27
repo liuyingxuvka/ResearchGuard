@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- The search-stop model requires declared searches to win ties. Counter-source gaps generate one source-title query; pages name each search gap and group anchor routes on one line.
+
 - The content-anchor model requires source ownership for new anchors. `source add-anchor` creates source-owned anchors and rejects duplicate ids.
 - Source YAML omits dataclass defaults while retaining identical loaded values.
 

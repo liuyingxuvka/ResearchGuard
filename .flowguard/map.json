@@ -136,7 +136,7 @@
     },
     {
       "id": "sourceguard",
-      "summary": "Source belief states, anchors, search frontiers and native stop decisions. Write sparse YAML by omitting only dataclass defaults; add source-owned anchors while preserving observation upserts and rejecting duplicate ids in explicit creation.",
+      "summary": "Source belief states, anchors, search frontiers and native stop decisions. Write sparse YAML by omitting only dataclass defaults; add source-owned anchors while preserving observation upserts and rejecting duplicate ids in explicit creation. Counter-source gaps generate one title query and declared searches win equal-score ties.",
       "responsibilities": [
         "Own evidence discovery, expected-utility search plans, stop decisions, source/anchor qualification and readable source/anchor/closure reporting. Return SourceDepthResult with actual model freshness and native coverage, without result versions, result-model or universe self-hashes.",
         "Load, plan, update and iterate on a model file alone; models carry no contract; the action and every protected or coverage gap a prediction names must exist in the model when it is frozen.",
@@ -187,7 +187,7 @@
       ],
       "layer": "routes",
       "status": "confirmed",
-      "fingerprint": "sha256:9fe381aa1469227d240cf4133aaca98c00f00316050dcecd43bddf2096d47848"
+      "fingerprint": "sha256:e4bbe53606672363e5cb563c42e389ef0506f8cee1d1942bb98cc30cd2744695"
     },
     {
       "id": "traceguard",
@@ -298,7 +298,7 @@
     },
     {
       "id": "research-tree",
-      "summary": "One research question: cross-route identities, copy drift, ablations, candidate comparison and one verdict for writers.",
+      "summary": "One research question: cross-route identities, copy drift, ablations, candidate comparison and one verdict for writers. Pages name each search gap and query, group each anchor’s routes, and show only relevant ablation effects.",
       "responsibilities": [
         "Load the research index and resolve source-library provenance through the native validator. Name every file read in JSON input_digests, including consulted library files, and expose source-owned evidence locator, summary and boundary.",
         "Detect copied-content drift and direct evidence or conclusion disagreements between native routes.",
@@ -343,7 +343,7 @@
       ],
       "layer": "tree",
       "status": "confirmed",
-      "fingerprint": "sha256:96bde0d584ab283355e0c45be1e37d1afb0dc73ba400b364b08e1e6c8fdbdca3"
+      "fingerprint": "sha256:1c16c3c35b36d85f97295ba3876056bfa14518c9bdf4b69aec172ba2a52d200f"
     },
     {
       "entrypoints": [
@@ -865,7 +865,7 @@
     ".flowguard/models/researchguard_suite_model.py": "a04ba684aeb51e0cebf51fbfc4b45bec62955938f51b6667ef0138adcc18aa03",
     ".flowguard/models/source_library_model.py": "53c8b7d49c97fb08292e73b7320e9dcc6cee49edc7998e277f60dcf45c0ed1fc",
     ".flowguard/models/sourceguard_content_anchor_model.py": "985a6e7659c0308435e05de864780a8ea1a77e80085c57cf8a0a677fab9ea706",
-    ".flowguard/models/sourceguard_stop_decision_model.py": "7acdefebe81ab9ff648bd745ac5194b533e3316cab884545b528146a3df5da9c",
+    ".flowguard/models/sourceguard_stop_decision_model.py": "389e891d59a5b3dbbe915c8784174c8e6fc86b01de0a13086e2cdbc6d002cb34",
     ".flowguard/models/synthesis_plan_model.py": "6be9b8dad1874fbca66daf24349d0aceb5ac0559e9cac57139eb3f6055393e67",
     ".flowguard/models/trace_projection_model.py": "ef73b3bca124bb829773a92fad70daf280e3864e2ff66cd89dc07d357f8a085d",
     ".flowguard/models/wording_license_model.py": "cb36479e2c1b3d95a3f6fa18d86199abc997fbf22a71b051600731f4174df3fb"
