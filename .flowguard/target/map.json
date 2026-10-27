@@ -1,0 +1,7 @@
+{
+  "schema": "flowguard.target.v1",
+  "goal": "RG-405: a declared search comes before generated ones (rule declared_search_comes_first)",
+  "components": [],
+  "flows": [],
+  "remove": []
+}
