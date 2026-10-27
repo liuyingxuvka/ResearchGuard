@@ -1,0 +1,7 @@
+{
+  "schema": "flowguard.target.v1",
+  "goal": "RG-401: writes declare every field their blocks change; trace_projection covers only the components it anchors",
+  "components": [],
+  "flows": [],
+  "remove": []
+}
