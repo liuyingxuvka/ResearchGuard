@@ -74,7 +74,7 @@ class State:
 class Library:
     name = 'Library'
     reads = ('operation',)
-    writes = ('sources', 'link_accepted', 'sources_after_delete')
+    writes = ('sources', 'link_accepted', 'sources_after_delete', 'operation')
     mutation = ''
 
     def apply(self, operation, state):

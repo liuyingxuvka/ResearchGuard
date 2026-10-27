@@ -50,7 +50,7 @@
       ],
       "layer": "foundation",
       "status": "confirmed",
-      "fingerprint": "sha256:1241bbe349cc118fc48a6d186b7a677ab7cb32a549a1fece883a16b10b301a36"
+      "fingerprint": "sha256:08585347ecd51294cb6dbf70a09b502b9caa5b22e3e20e8a2bfc07a5bcb1b56a"
     },
     {
       "id": "suite-orchestration",
@@ -337,7 +337,10 @@
         "tests/test_research_views.py"
       ],
       "models": [
-        ".flowguard/models/research_tree_model.py"
+        ".flowguard/models/research_tree_model.py",
+        ".flowguard/models/research_ablations_model.py",
+        ".flowguard/models/research_verdict_model.py",
+        ".flowguard/models/research_views_model.py"
       ],
       "layer": "tree",
       "status": "confirmed",
@@ -738,7 +741,8 @@
       "steps": [
         "logic-argument:run_argument_iteration",
         "logic-argument:validate_prediction_binding",
-        "researchguard-suite:require_prediction_identity"
+        "researchguard-suite:require_prediction_identity",
+        "researchguard-suite:select_terminal"
       ],
       "model": ".flowguard/models/iteration_kernel_model.py"
     },
@@ -835,6 +839,37 @@
       "code": "high_fan_out",
       "component": "suite-orchestration",
       "reason": "The single console and the four member command lines dispatch to every route component and its map children."
+    },
+    {
+      "code": "hub",
+      "component": "trace-depth",
+      "reason": "splitting trace-depth creates an import cycle (RG-310): evaluator.py and storyline_depth.py import each other, and its three users read one depth snapshot"
+    },
+    {
+      "code": "test_file_mixes_models",
+      "component": "tests/experiment/test_recommendation.py",
+      "reason": "split in RG-409"
+    },
+    {
+      "code": "test_file_mixes_models",
+      "component": "tests/trace/test_inference_kernel.py",
+      "reason": "split in RG-409"
     }
-  ]
+  ],
+  "model_digests": {
+    ".flowguard/models/experiment_elimination_model.py": "2e570412ce71382c28ed5ec1706d15fd2db1fc3d792c270a4b04d9408d8e05cc",
+    ".flowguard/models/iteration_kernel_model.py": "89821ac785bb2f2eae1f1bad7193079c737f1bb7663908c7cf11fa7a57ca431e",
+    ".flowguard/models/research_ablations_model.py": "c27c5ae35794dd7868f5ef51ac44dd4060b5eae51f711030735075e9c138fc6e",
+    ".flowguard/models/research_tree_model.py": "7641c605109cc80a554261a08e84656ef5e863ddd85a92e2c1979b92ccb2d946",
+    ".flowguard/models/research_verdict_model.py": "2780de1b152afc2e93f872bc5b1a2b91849bea23919d353beffc952f38078cd1",
+    ".flowguard/models/research_views_model.py": "6c13d77fa5e5f6e01f29747b0dc1b59a8f3ea897bc694a76ef2e5b6ca7be82ac",
+    ".flowguard/models/researchguard_suite_model.py": "a04ba684aeb51e0cebf51fbfc4b45bec62955938f51b6667ef0138adcc18aa03",
+    ".flowguard/models/source_library_model.py": "53c8b7d49c97fb08292e73b7320e9dcc6cee49edc7998e277f60dcf45c0ed1fc",
+    ".flowguard/models/sourceguard_content_anchor_model.py": "4996ca2ed69330436946da7cd49f9d98d71ed60dadbf6e20bae105b6d87ad579",
+    ".flowguard/models/sourceguard_stop_decision_model.py": "7acdefebe81ab9ff648bd745ac5194b533e3316cab884545b528146a3df5da9c",
+    ".flowguard/models/synthesis_plan_model.py": "6be9b8dad1874fbca66daf24349d0aceb5ac0559e9cac57139eb3f6055393e67",
+    ".flowguard/models/trace_projection_model.py": "ef73b3bca124bb829773a92fad70daf280e3864e2ff66cd89dc07d357f8a085d",
+    ".flowguard/models/wording_license_model.py": "cb36479e2c1b3d95a3f6fa18d86199abc997fbf22a71b051600731f4174df3fb"
+  },
+  "fingerprint_format": 2
 }

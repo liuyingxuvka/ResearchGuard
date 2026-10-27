@@ -38,7 +38,7 @@ class State:
 class Synthesize:
     name = 'Synthesize'
     reads = ('request',)
-    writes = ('status',)
+    writes = ('status', 'request')
     mutation = ''
 
     def apply(self, request, state):

@@ -7,7 +7,7 @@ from flowguard.explorer import Explorer
 
 MODEL_ID = 'trace_projection'
 PARENT = 'traceguard'
-COMPONENTS = ['traceguard']
+COMPONENTS = ["trace-inference", "trace-depth"]
 IMPLEMENTED_BY = {'Project': 'src/researchguard/trace/inference/projection.py:project_hypotheses',
                   'Evaluate': 'src/researchguard/trace/evaluator.py:evaluate_model',
                   'Sensitivity': 'src/researchguard/trace/storyline_depth.py:expected_sensitivity_matches'}
@@ -47,7 +47,7 @@ class State:
 class Project:
     name = 'Project'
     reads = ('story',)
-    writes = ('support', 'ranks', 'live', 'sensitivity_matched')
+    writes = ('support', 'ranks', 'live', 'sensitivity_matched', 'story')
     mutation = ''
 
     def apply(self, story, state):

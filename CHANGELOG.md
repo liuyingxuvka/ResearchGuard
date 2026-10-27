@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Maintenance checks run on FlowGuard 0.70.13.
+
 ## v0.5.15 - 2026-10-24
 
 - Read one hypothesis back with `researchguard status <folder> --hypothesis <id>`: its state in each route, the evidence for, against and limiting it, its ablations, disagreements, open gaps and next actions. An unknown id exits 2. Empty status sections print `none`.

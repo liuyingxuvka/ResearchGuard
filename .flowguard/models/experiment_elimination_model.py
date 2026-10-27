@@ -47,7 +47,7 @@ def separates(selected, pair, table):
 class Observe:
     name = 'Observe'
     reads = ('trial',)
-    writes = ('statuses', 'selected')
+    writes = ('statuses', 'selected', 'trial')
     mutation = ''
 
     def apply(self, trial, state):
