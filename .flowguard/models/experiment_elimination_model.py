@@ -11,12 +11,12 @@ COMPONENTS = ['experimentguard']
 IMPLEMENTED_BY = {'Observe': 'src/researchguard/experiment/engine.py:observe_experiments',
                   'Recommend': 'src/researchguard/experiment/engine.py:recommend_experiments'}
 TESTED_BY = {
-    'contradicted_prediction_eliminates': ['tests/experiment/test_recommendation.py:test_real_observation_closes_only_with_independent_holdout',
-                                           'tests/experiment/test_recommendation.py:test_eliminated_hypothesis_stays_eliminated_on_a_matrix_miss'],
-    'unexpected_outcome_is_model_miss': ['tests/experiment/test_recommendation.py:test_zero_survivors_is_model_miss_and_never_closes'],
-    'holdout_observation_never_eliminates': ['tests/experiment/test_recommendation.py:test_every_valid_holdout_counterexample_blocks_closure'],
-    'recommendation_separates_every_separable_pair': ['tests/experiment/test_recommendation.py:test_recommends_all_tied_minimum_sets_deterministically',
-                                                      'tests/experiment/test_recommendation.py:test_reports_indistinguishable_hypothesis_pairs'],
+    'contradicted_prediction_eliminates': ['tests/experiment/test_experiment_elimination.py:test_real_observation_closes_only_with_independent_holdout',
+                                           'tests/experiment/test_experiment_elimination.py:test_eliminated_hypothesis_stays_eliminated_on_a_matrix_miss'],
+    'unexpected_outcome_is_model_miss': ['tests/experiment/test_experiment_elimination.py:test_zero_survivors_is_model_miss_and_never_closes'],
+    'holdout_observation_never_eliminates': ['tests/experiment/test_experiment_elimination.py:test_every_valid_holdout_counterexample_blocks_closure'],
+    'recommendation_separates_every_separable_pair': ['tests/experiment/test_experiment_elimination.py:test_recommends_all_tied_minimum_sets_deterministically',
+                                                      'tests/experiment/test_experiment_elimination.py:test_reports_indistinguishable_hypothesis_pairs'],
 }
 
 

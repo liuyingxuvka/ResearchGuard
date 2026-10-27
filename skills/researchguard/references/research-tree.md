@@ -119,7 +119,7 @@ native domain rules about evidence, protected scope or holdout independence.
 
 ## Verdict for writers
 
-The JSON report includes `input_digests`, the raw SHA-256 hashes of every file read. Writers compare them with current files to check whether a saved report is still current.
+The JSON report includes `input_digests`, the raw SHA-256 hashes of every file read. Writers compare them with current files to check whether a saved report is still current. Paths are sorted, relative to the research folder (including `../` library inputs), and hashes cover raw file bytes. Each evidence row also carries source-owned `locator`, `summary` (normalized summary or the first 200 text characters) and `boundary`.
 
 Writers, including LogicWriting, read `verdict` from
 `researchguard status <folder> --json --output research-status.json`, and these
@@ -171,3 +171,5 @@ unchanged sync has empty lists. Source anchors usable for claims or traces expor
 as usable evidence; AI still owns the links. Point the copy's `research.yaml` at
 the outputs, then compare with `status <current> --candidate <copy>`. Route
 results remain scoped to their own declared evidence and do not establish truth.
+
+Source edits can use `researchguard source add-anchor <model> --source-id S --anchor-id A --quote TEXT --locator L --output <file>`; the command can add the source and writes YAML without defaults. `Next` displays each search’s gap and usable query; declared searches win equal-score ties. A hypothesis view groups the routes for each anchor and includes only ablation effects relevant to that hypothesis. Field-table indexes link separate create, depth and example steps; load only the step needed.

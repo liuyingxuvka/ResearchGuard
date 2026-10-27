@@ -21,7 +21,7 @@ PARENT = 'research-tree'
 
 COMPONENTS = ['research-tree', 'researchguard-suite']
 
-IMPLEMENTED_BY = {'Load': 'src/researchguard/research.py:load_research', 'Check': 'src/researchguard/research.py:check_research_tree', 'Status': 'src/researchguard/research.py:status_main', 'CopyCheck': 'src/researchguard/ownership.py:copied_content_problems'}
+IMPLEMENTED_BY = {'LibrarySources': 'src/researchguard/research.py:_ResearchLibrary.list_sources', 'LibraryNodes': 'src/researchguard/research.py:_ResearchLibrary.source_node_ids', 'Load': 'src/researchguard/research.py:load_research', 'Check': 'src/researchguard/research.py:check_research_tree', 'Status': 'src/researchguard/research.py:status_main', 'CopyCheck': 'src/researchguard/ownership.py:copied_content_problems'}
 
 USES = {'SourceSync': 'src/researchguard/source/handoff.py:sync_traceguard_seed', 'LogicSync': 'src/researchguard/logic/trace_import.py:sync_trace_bundle'}
 
@@ -124,5 +124,19 @@ def conformance():
         if not verdict.ok:
             violations.append(ConformanceViolation(step_index=1, rule_name='Status', message=f'evergiven: {invariant.name}: {verdict.message}'))
 
+    from researchguard.research import _ResearchLibrary
+    from researchguard.logic.source_library import SourceLibrary
+    with TemporaryDirectory() as directory:
+        root = Path(directory)
+        paper = root / 'paper.txt'
+        paper.write_text('Observed text')
+        library = SourceLibrary(root / 'library')
+        source = library.import_source(paper, title='Paper').source
+        library.create_source_model(source.source_id, evidence='Observed text')
+        paths = []
+        tracked = _ResearchLibrary(library.root, paths)
+        tracked.list_sources()
+        tracked.source_node_ids(source.source_id)
+        observe('status_library_inputs', set(paths), {library.source_index_path, library.source_model_path(source.source_id)})
     return ConformanceReport(ok=not violations, violations=tuple(violations), replayed_steps=tuple(observations),
                              summary='crossref: real functions and all unchanged rules replayed on the live Ever Given status.')

@@ -12,12 +12,12 @@ IMPLEMENTED_BY = {'Project': 'src/researchguard/trace/inference/projection.py:pr
                   'Evaluate': 'src/researchguard/trace/evaluator.py:evaluate_model',
                   'Sensitivity': 'src/researchguard/trace/storyline_depth.py:expected_sensitivity_matches'}
 TESTED_BY = {
-    'live_within_margin_of_best': ['tests/trace/test_inference_kernel.py:test_live_hypotheses_lie_within_the_margin_of_the_best',
+    'live_within_margin_of_best': ['tests/trace/test_trace_projection.py:test_live_hypotheses_lie_within_the_margin_of_the_best',
                                    'tests/trace/test_storyline_depth.py:test_live_alternatives_exclude_the_leader'],
-    'rank_follows_support': ['tests/trace/test_inference_kernel.py:test_better_supported_alternative_ranks_first',
-                             'tests/trace/test_inference_kernel.py:test_live_hypotheses_lie_within_the_margin_of_the_best'],
-    'causal_and_oppose_links_never_raise_support': ['tests/trace/test_inference_kernel.py:test_causal_declaration_never_raises_storyline_support',
-                                                    'tests/trace/test_inference_kernel.py:test_opposition_lowers_support'],
+    'rank_follows_support': ['tests/trace/test_trace_projection.py:test_better_supported_alternative_ranks_first',
+                             'tests/trace/test_trace_projection.py:test_live_hypotheses_lie_within_the_margin_of_the_best'],
+    'causal_and_oppose_links_never_raise_support': ['tests/trace/test_trace_projection.py:test_causal_declaration_never_raises_storyline_support',
+                                                    'tests/trace/test_trace_projection.py:test_opposition_lowers_support'],
     'expected_sensitivity_uses_snapshot_score': ['tests/trace/test_storyline_depth.py:test_expected_sensitivity_must_match_same_engine_support_effect'],
 }
 MARGIN = 0.12

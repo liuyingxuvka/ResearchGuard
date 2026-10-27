@@ -32,6 +32,9 @@ older versions installed.
 
 ## Starting a model
 
+Build only the routes and hypotheses the question needs. JSON status reports include raw input file digests and source-owned evidence locators, summaries and boundaries; compare the digests before reusing a saved report. `source add-anchor` adds source-owned anchors by command and writes compact YAML without defaults. Search readback names the gap and query, with declared searches first on equal scores. The source and trace field indexes load one step at a time.
+
+
 For a research question, start from its folder: `researchguard status <folder>` reads the verdict,
 open gaps and next actions (`--hypothesis <id>` for one hypothesis). A new question starts with
 `research.yaml` (template in `skills/researchguard/references/research-tree.md`, "Start a question").
