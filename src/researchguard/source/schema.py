@@ -9,7 +9,7 @@ Boundary: Source candidates and evidence anchors require downstream TraceGuard/L
 
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass, field, is_dataclass
+from dataclasses import MISSING, asdict, dataclass, field, fields, is_dataclass
 from datetime import datetime, timezone
 from typing import Any, Mapping
 
@@ -362,6 +362,26 @@ def to_plain(value: Any) -> Any:
         return [to_plain(item) for item in value]
     if isinstance(value, list):
         return [to_plain(item) for item in value]
+    return value
+
+
+def to_plain_without_defaults(value: Any) -> Any:
+    """Serialize dataclasses sparsely; preserve arbitrary user mapping contents."""
+    if is_dataclass(value):
+        result = {}
+        for definition in fields(value):
+            item = getattr(value, definition.name)
+            default = definition.default
+            if default is MISSING and definition.default_factory is not MISSING:
+                default = definition.default_factory()
+            if default is not MISSING and item == default:
+                continue
+            result[definition.name] = to_plain_without_defaults(item)
+        return result
+    if isinstance(value, Mapping):
+        return {str(key): to_plain_without_defaults(item) for key, item in value.items()}
+    if isinstance(value, (tuple, list)):
+        return [to_plain_without_defaults(item) for item in value]
     return value
 
 

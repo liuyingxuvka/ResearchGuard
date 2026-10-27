@@ -33,6 +33,7 @@ class AnchorDepthState:
     depth_status: str = "not_run"
     emitted_findings: tuple[str, ...] = ()
     check_status: str = "not_run"
+    added_source_present: bool = True
 
 
 CONTENT_GOOD = AnchorDepthInput(
@@ -56,6 +57,7 @@ class EvaluateContentAnchorFinding:
     """Input x State -> Set(Output x State) for the owned identity boundary."""
 
     name = "EvaluateContentAnchorFinding"
+    omit_added_source = False
     reads = ()
     writes = (
         "case_id",
@@ -63,6 +65,7 @@ class EvaluateContentAnchorFinding:
         "depth_status",
         "emitted_findings",
         "check_status",
+        "added_source_present",
     )
 
     def apply(self, input_obj: AnchorDepthInput, state: AnchorDepthState):
@@ -77,6 +80,7 @@ class EvaluateContentAnchorFinding:
                     content_qualified=input_obj.content_qualified,
                     depth_status="blocked" if blocked else "pass",
                     emitted_findings=input_obj.emitted_findings,
+                    added_source_present=not self.omit_added_source,
                     check_status=(
                         "blocked_proven"
                         if blocked and finding_matches
@@ -129,8 +133,15 @@ def workflow() -> Workflow:
     )
 
 
+def added_anchor_belongs_to_its_source(state, trace):
+    if state.added_source_present:
+        return InvariantResult.pass_()
+    return InvariantResult.fail("An added anchor must have its source in the model.")
+
+
 def invariants() -> tuple[Invariant, ...]:
     return (
+        Invariant("added_anchor_belongs_to_its_source", "An added anchor belongs to a present source.", added_anchor_belongs_to_its_source),
         Invariant(
             "content_anchor_identity_is_singular",
             "Content-anchor depth reports one finding for contentless anchors.",
@@ -174,8 +185,8 @@ def scenarios() -> tuple[Scenario, ...]:
 
 
 COMPONENTS = ["sourceguard"]
-IMPLEMENTED_BY = {"content_qualification": "src/researchguard/source/depth.py:_anchor_depth_rows"}
-TESTED_BY = {"content_anchor_identity_is_singular": ["tests/source/test_semantic_gap_depth.py:test_contentless_anchor_is_blocked_by_source_depth"]}
+IMPLEMENTED_BY = {"AddAnchor": "src/researchguard/source/update.py:add_anchor", "content_qualification": "src/researchguard/source/depth.py:_anchor_depth_rows"}
+TESTED_BY = {"added_anchor_belongs_to_its_source": ["tests/source/test_cli.py:test_add_anchor_adds_source_and_anchor"], "content_anchor_identity_is_singular": ["tests/source/test_semantic_gap_depth.py:test_contentless_anchor_is_blocked_by_source_depth"]}
 
 
 def build_explorer():
@@ -185,7 +196,10 @@ def build_explorer():
 
 def broken_variants():
     from flowguard.explorer import Explorer
-    return {"retired_finding": Explorer(workflow(), (AnchorDepthState(),), (CONTENT_BAD_DRIFTED,), invariants())}
+    wrong = EvaluateContentAnchorFinding()
+    wrong.omit_added_source = True
+    return {"anchor_added_without_source": Explorer(Workflow((wrong,)), (AnchorDepthState(),), (CONTENT_GOOD,), invariants()),
+            "retired_finding": Explorer(workflow(), (AnchorDepthState(),), (CONTENT_BAD_DRIFTED,), invariants())}
 
 
 def conformance():
@@ -209,6 +223,12 @@ def conformance():
         observations.append(ReplayObservation("content_qualification", qualified, content))
         if qualified != content:
             violations.append(ConformanceViolation(step_index=1, message=f"native content qualification differs: {content}", rule_name="content_qualification"))
+    from researchguard.source.update import add_anchor
+    added = add_anchor(BeliefState(), EvidenceAnchor(anchor_id="new-a", source_id="new-s", text="quote"))
+    present = any(row.source_id == "new-s" for row in added.sources)
+    observations.append(ReplayObservation("AddAnchor", present, True))
+    if not present:
+        violations.append(ConformanceViolation(step_index=1, rule_name="added_anchor_belongs_to_its_source", message="added anchor has no source"))
     # Code facts: the depth owner emits exactly the declared finding identity.
     source = (Path(__file__).resolve().parents[2] / "src" / "researchguard" / "source" / "depth.py").read_text(encoding="utf-8")
     emitted = (f'"{DECLARED_FINDING}"' in source, f'"{RETIRED_FINDING}"' in source)

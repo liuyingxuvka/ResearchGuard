@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- The content-anchor model requires source ownership for new anchors. `source add-anchor` creates source-owned anchors and rejects duplicate ids.
+- Source YAML omits dataclass defaults while retaining identical loaded values.
+
 - The question cross-reference model now requires status to name every input; JSON reports include file digests and evidence locator, summary and boundary.
 
 - Maintenance checks run on FlowGuard 0.70.13.

@@ -30,10 +30,12 @@ from .report import render_json, render_markdown, render_text
 from .schema import (
     BeliefState,
     Observation,
+    EvidenceAnchor,
+    SourceRecord,
     to_plain,
 )
 from .stop_decision import decide_model_search_stop
-from .update import apply_observation
+from .update import add_anchor, apply_observation
 from .task_iteration import (
     GAP_REDUCTION_LEVELS,
     SearchOutcomePrediction,
@@ -170,6 +172,14 @@ def build_parser() -> argparse.ArgumentParser:
     depth.add_argument("--output", default="")
     depth.add_argument("--updated-model-output", default="")
     depth.add_argument("--pretty", action="store_true")
+
+    anchor = sub.add_parser("add-anchor", help="Add one source-owned content anchor.")
+    anchor.add_argument("model")
+    for option in ("source-id", "anchor-id", "quote", "locator", "output"):
+        anchor.add_argument("--" + option, required=True)
+    for option in ("title", "url", "date"):
+        anchor.add_argument("--" + option, default="")
+    anchor.add_argument("--pretty", action="store_true")
 
     add_obs = sub.add_parser("add-observation")
     add_obs.add_argument("model")
@@ -543,6 +553,19 @@ def run(args: argparse.Namespace) -> int:
         if args.updated_model_output:
             write_yaml(args.updated_model_output, updated)
         _json_out(payload, args.pretty)
+        return 0
+    if args.command == "add-anchor":
+        try:
+            model = load_model(args.model)
+            updated = add_anchor(model, EvidenceAnchor(anchor_id=args.anchor_id, source_id=args.source_id,
+                text=args.quote, locator=args.locator), source=SourceRecord(source_id=args.source_id,
+                title=args.title, url=args.url, source_date=args.date), create_only=True)
+            BeliefState.from_dict(to_plain(updated))
+        except (ValueError, TypeError, KeyError) as exc:
+            _json_out({"ok": False, "error": str(exc)}, args.pretty)
+            return 1
+        write_yaml(args.output, updated)
+        _json_out({"ok": True, "output": args.output}, args.pretty)
         return 0
     if args.command == "add-observation":
         model = load_model(args.model)

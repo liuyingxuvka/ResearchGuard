@@ -78,3 +78,10 @@ It reports `added`, `updated` and `conflicts`; typed links and hand-built non-ow
 Identity conflicts are reported rather than overwritten. Repeating a successful sync is idempotent.
 `--output` must differ from `--into`; no input is overwritten. Source anchors usable
 for claims or traces are exported as usable trace evidence; AI still owns links.
+
+
+## Add an anchor
+
+`researchguard source add-anchor <model> --source-id S --anchor-id A --quote TEXT --locator L [--title T --url U --date D] --output <file>`
+
+Creates a missing source and adds one anchor, validates and writes YAML without defaults. An existing anchor id exits 1 with a JSON error and writes nothing.

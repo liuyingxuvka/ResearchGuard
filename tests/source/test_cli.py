@@ -191,3 +191,25 @@ def test_retired_logic_export_is_an_unknown_command():
     result = _run("export-logicguard", "unused.yaml", "--output", "unused-output.yaml")
     assert result.returncode == 2
     assert "invalid choice" in result.stderr
+
+
+def test_add_anchor_adds_source_and_anchor(tmp_path):
+    from researchguard.source.cli import main
+    from researchguard.source.loader import load_model, write_yaml
+    from researchguard.source.schema import BeliefState
+    model = tmp_path / 'source.yaml'
+    write_yaml(model, BeliefState())
+    def add(source_id, anchor_id, output):
+        return main(['add-anchor', str(model), '--source-id', source_id, '--anchor-id', anchor_id,
+            '--quote', 'A verified passage', '--locator', 'page 4', '--title', 'A source',
+            '--url', 'https://example.org', '--date', '2026-10-27', '--output', str(output)])
+    assert add('s', 'a', model) == 0
+    assert add('s', 'b', model) == 0
+    result = load_model(model)
+    assert len(result.sources) == 1 and [a.anchor_id for a in result.anchors] == ['a', 'b']
+    assert result.sources[0].source_date == '2026-10-27'
+    assert result.anchors[0].text == 'A verified passage' and result.anchors[0].locator == 'page 4'
+    before = model.read_bytes()
+    assert add('s', 'a', model) == 1 and model.read_bytes() == before
+    absent = tmp_path / 'absent.yaml'
+    assert add('other', 'a', absent) == 1 and not absent.exists()

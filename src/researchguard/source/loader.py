@@ -14,7 +14,7 @@ from typing import Any
 
 import yaml
 
-from .schema import BeliefState, to_plain
+from .schema import BeliefState, to_plain, to_plain_without_defaults
 
 def load_model(path: str | Path) -> BeliefState:
     data = yaml.safe_load(Path(path).read_text(encoding="utf-8"))
@@ -23,7 +23,7 @@ def load_model(path: str | Path) -> BeliefState:
     return BeliefState.from_dict(data)
 
 def dump_yaml(data: Any) -> str:
-    return yaml.safe_dump(to_plain(data), sort_keys=False, allow_unicode=True)
+    return yaml.safe_dump(to_plain_without_defaults(data), sort_keys=False, allow_unicode=True)
 
 
 def write_yaml(path: str | Path, data: Any) -> None:

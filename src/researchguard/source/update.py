@@ -52,7 +52,15 @@ def add_source(belief_state: BeliefState, source: SourceRecord) -> BeliefState:
     return replace(belief_state, sources=_upsert_by_id(belief_state.sources, source, "source_id"))
 
 
-def add_anchor(belief_state: BeliefState, anchor: EvidenceAnchor) -> BeliefState:
+def add_anchor(belief_state: BeliefState, anchor: EvidenceAnchor, *, source: SourceRecord | None = None,
+               create_only: bool = False) -> BeliefState:
+    """Keep anchors source-owned; explicit creation rejects an existing identity."""
+    if create_only and any(row.anchor_id == anchor.anchor_id for row in belief_state.anchors):
+        raise ValueError(f"duplicate anchor id: {anchor.anchor_id}")
+    if source is not None and source.source_id != anchor.source_id:
+        raise ValueError(f"anchor {anchor.anchor_id} belongs to {anchor.source_id}, not {source.source_id}")
+    if not any(row.source_id == anchor.source_id for row in belief_state.sources):
+        belief_state = add_source(belief_state, source or SourceRecord(source_id=anchor.source_id))
     return replace(belief_state, anchors=_upsert_by_id(belief_state.anchors, anchor, "anchor_id"))
 
 

@@ -54,7 +54,7 @@
     },
     {
       "id": "suite-orchestration",
-      "summary": "Own the researchguard console and the four member command lines; dispatch each member command directly to its owner.",
+      "summary": "Own the researchguard console and the four member command lines; dispatch each member command directly to its owner. Dispatch source add-anchor with source metadata, quote and locator; validate before writing and return JSON exit 1 for duplicate ids.",
       "responsibilities": [
         "Dispatch researchguard logic|source|trace|experiment straight to the member main; unknown commands return one typed JSON error.",
         "Own member command lines, including stable source stop rules, trace iteration direction and report/gaps/compare research-state views while retaining complete JSON output. Expose plain results with model freshness and no result identities. Require the viewer extra and tkinter only for the desktop viewer; reject the retired projectradar simulation mode.",
@@ -113,7 +113,7 @@
       ],
       "layer": "interface",
       "status": "confirmed",
-      "fingerprint": "sha256:beeca54df54c1453b4d7409b2e577ba95e7a01fe83e15b2f14f36b9a51197161"
+      "fingerprint": "sha256:682562c6c0c85f2ca7267706fdf9bae73185c24e9a4f46154223ad634959fc3b"
     },
     {
       "id": "logicguard",
@@ -136,7 +136,7 @@
     },
     {
       "id": "sourceguard",
-      "summary": "Source belief states, anchors, search frontiers and native stop decisions.",
+      "summary": "Source belief states, anchors, search frontiers and native stop decisions. Write sparse YAML by omitting only dataclass defaults; add source-owned anchors while preserving observation upserts and rejecting duplicate ids in explicit creation.",
       "responsibilities": [
         "Own evidence discovery, expected-utility search plans, stop decisions, source/anchor qualification and readable source/anchor/closure reporting. Return SourceDepthResult with actual model freshness and native coverage, without result versions, result-model or universe self-hashes.",
         "Load, plan, update and iterate on a model file alone; models carry no contract; the action and every protected or coverage gap a prediction names must exist in the model when it is frozen.",
@@ -187,7 +187,7 @@
       ],
       "layer": "routes",
       "status": "confirmed",
-      "fingerprint": "sha256:5914bfd1f581a94b1866443057cc0adb0672190f0a05c71bebd1e4c35883868d"
+      "fingerprint": "sha256:9fe381aa1469227d240cf4133aaca98c00f00316050dcecd43bddf2096d47848"
     },
     {
       "id": "traceguard",
@@ -300,14 +300,13 @@
       "id": "research-tree",
       "summary": "One research question: cross-route identities, copy drift, ablations, candidate comparison and one verdict for writers.",
       "responsibilities": [
-        "Load the research index and resolve source-library provenance through the native validator.",
+        "Load the research index and resolve source-library provenance through the native validator. Name every file read in JSON input_digests, including consulted library files, and expose source-owned evidence locator, summary and boundary.",
         "Detect copied-content drift and direct evidence or conclusion disagreements between native routes.",
         "Apply declared anchor ablations in memory and name uncaught ones and their side effects.",
         "Project the authoritative search stop and root wording license into one five-key verdict.",
         "The verdict lists live hypotheses and is contested exactly when routes disagree.",
         "Evidence, gap and search rows name the hypotheses they bear on.",
-        "Status reads one hypothesis back and compares candidate folders without writing models.",
-        "Name every file read in JSON input_digests, including consulted library files, and expose source-owned evidence locator, summary and boundary."
+        "Status reads one hypothesis back and compares candidate folders without writing models."
       ],
       "files": [
         "src/researchguard/research.py"
@@ -865,7 +864,7 @@
     ".flowguard/models/research_views_model.py": "6c13d77fa5e5f6e01f29747b0dc1b59a8f3ea897bc694a76ef2e5b6ca7be82ac",
     ".flowguard/models/researchguard_suite_model.py": "a04ba684aeb51e0cebf51fbfc4b45bec62955938f51b6667ef0138adcc18aa03",
     ".flowguard/models/source_library_model.py": "53c8b7d49c97fb08292e73b7320e9dcc6cee49edc7998e277f60dcf45c0ed1fc",
-    ".flowguard/models/sourceguard_content_anchor_model.py": "4996ca2ed69330436946da7cd49f9d98d71ed60dadbf6e20bae105b6d87ad579",
+    ".flowguard/models/sourceguard_content_anchor_model.py": "985a6e7659c0308435e05de864780a8ea1a77e80085c57cf8a0a677fab9ea706",
     ".flowguard/models/sourceguard_stop_decision_model.py": "7acdefebe81ab9ff648bd745ac5194b533e3316cab884545b528146a3df5da9c",
     ".flowguard/models/synthesis_plan_model.py": "6be9b8dad1874fbca66daf24349d0aceb5ac0559e9cac57139eb3f6055393e67",
     ".flowguard/models/trace_projection_model.py": "ef73b3bca124bb829773a92fad70daf280e3864e2ff66cd89dc07d357f8a085d",
