@@ -9,10 +9,6 @@ MODEL_ID = "wording_license"
 PARENT = "logic-evaluation"
 COMPONENTS = ["logic-evaluation"]
 IMPLEMENTED_BY = {"License": "src/researchguard/logic/minimal_sets.py:license_model_claim"}
-USES = {
-    'LoadModel': 'src/researchguard/logic/loader.py:load_model',
-    'LoadModelFromDict': 'src/researchguard/logic/loader.py:load_model_from_dict',
-}
 NOT_MODELED = {
     "src/researchguard/logic/model.py:LogicModel._ensure_edge_indexes": "Rebuilds the in-memory edge index from the edge list; it never changes nodes, edges or argument state.",
     "src/researchguard/logic/model.py:LogicModel.rebuild_edge_indexes": "Rebuilds the in-memory edge index from the edge list; it never changes nodes, edges or argument state.",

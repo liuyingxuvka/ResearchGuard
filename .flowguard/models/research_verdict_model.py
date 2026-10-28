@@ -18,14 +18,7 @@ PARENT = 'research-tree'
 
 IMPLEMENTED_BY = {'Disagreements': 'src/researchguard/research.py:route_disagreements', 'Verdict': 'src/researchguard/research.py:verdict_for_writers', 'Directions': 'src/researchguard/research.py:evidence_directions'}
 
-USES = {
-    'LoadModelFromDict': 'src/researchguard/logic/loader.py:load_model_from_dict',
-    'LoadResearch': 'src/researchguard/research.py:load_research',
-    'ResearchStatus': 'src/researchguard/research.py:research_status',
-    'BeliefStateFromDict': 'src/researchguard/source/schema.py:BeliefState.from_dict',
-    'HypothesisEvidenceLinkFromDict': 'src/researchguard/trace/schema.py:HypothesisEvidenceLink.from_dict',
-    'TraceGuardModelFromDict': 'src/researchguard/trace/schema.py:TraceGuardModel.from_dict',
-}
+USES = {}
 
 TESTED_BY = {'routes_do_not_contradict_silently': ['tests/test_research_verdict.py:test_opposite_anchor_directions_are_a_disagreement', 'tests/test_research_verdict.py:test_ruled_out_and_accepted_is_a_disagreement'], 'verdict_matches_the_routes': ['tests/test_research_verdict.py:test_verdict_matches_each_route_and_page_is_readable'], 'live_hypotheses_follow_route_exclusions': ['tests/test_research_verdict.py:test_live_hypotheses_follow_every_route'], 'evidence_directions_match_routes': ['tests/test_research_verdict.py:test_evidence_directions_cover_both_routes', 'tests/test_research_verdict.py:test_writer_surface_keys_are_pinned'], 'contested_iff_disagreement': ['tests/test_research_verdict.py:test_live_hypotheses_follow_every_route', 'tests/test_research_verdict.py:test_verdict_matches_each_route_and_page_is_readable']}
 

@@ -18,14 +18,7 @@ PARENT = 'research-tree'
 
 IMPLEMENTED_BY = {'Ablations': 'src/researchguard/research.py:apply_ablations'}
 
-USES = {
-    'Sensitivity': 'src/researchguard/trace/storyline_depth.py:expected_sensitivity_matches',
-    'LoadModelFromDict': 'src/researchguard/logic/loader.py:load_model_from_dict',
-    'LoadResearch': 'src/researchguard/research.py:load_research',
-    'ResearchStatus': 'src/researchguard/research.py:research_status',
-    'BeliefStateFromDict': 'src/researchguard/source/schema.py:BeliefState.from_dict',
-    'TraceGuardModelFromDict': 'src/researchguard/trace/schema.py:TraceGuardModel.from_dict',
-}
+USES = {'Sensitivity': 'src/researchguard/trace/storyline_depth.py:expected_sensitivity_matches'}
 
 TESTED_BY = {'every_ablation_is_caught_or_named': ['tests/test_research_ablations.py:test_ablation_nobody_uses_is_named'], 'ablation_agrees_with_trace_depth': ['tests/test_research_ablations.py:test_trace_ablation_agrees_with_trace_depth', 'tests/test_research_ablations.py:test_ablation_rows_name_side_effects']}
 

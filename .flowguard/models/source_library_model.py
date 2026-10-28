@@ -12,13 +12,6 @@ COMPONENTS = ['logic-library']
 IMPLEMENTED_BY = {'Import': 'src/researchguard/logic/source_library.py:SourceLibrary.import_source',
                   'Link': 'src/researchguard/logic/source_library.py:SourceLibrary.link_node',
                   'DeleteProject': 'src/researchguard/logic/source_library.py:SourceLibrary.delete_project'}
-USES = {
-    'SourceLibrary': 'src/researchguard/logic/source_library.py:SourceLibrary',
-    'SourceLibraryCreateProject': 'src/researchguard/logic/source_library.py:SourceLibrary.create_project',
-    'SourceLibraryCreateSourceModel': 'src/researchguard/logic/source_library.py:SourceLibrary.create_source_model',
-    'SourceLibrarySelectSource': 'src/researchguard/logic/source_library.py:SourceLibrary.select_source',
-    'SourceLibrarySourceNodeIds': 'src/researchguard/logic/source_library.py:SourceLibrary.source_node_ids',
-}
 TESTED_BY = {
     'import_deduplicates_by_content_hash': ['tests/logic/test_source_library.py:test_import_source_deduplicates_by_content_hash'],
     'project_link_requires_selected_source': ['tests/logic/test_source_library.py:test_project_link_requires_selected_source'],
