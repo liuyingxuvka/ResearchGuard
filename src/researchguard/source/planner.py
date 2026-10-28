@@ -10,6 +10,7 @@ Boundary: Source candidates and evidence anchors require downstream TraceGuard/L
 from __future__ import annotations
 
 from dataclasses import replace
+import re
 from typing import Iterable
 
 from .schema import BeliefState, Gap, PlanResult, SearchAction
@@ -107,30 +108,79 @@ def _actions_for_gap(gap: Gap, belief_state: BeliefState) -> list[SearchAction]:
     if gap.gap_type == "missing_primary_source":
         return [
             _action(gap, "primary_source_search", "primary_source", query=query),
-            _action(gap, "source_domain_search", "official_claim", query=f"{query} official source"),
+            _action(
+                gap, "source_domain_search", "official_claim", query=f"{query} official source"
+            ),
         ]
     if gap.gap_type == "missing_independent_source":
         return [
             _action(gap, "text_search", "independent_report", query=f"{query} independent report"),
-            _action(gap, "source_domain_search", "independent_report", query=f"{query} local media regulator"),
+            _action(
+                gap,
+                "source_domain_search",
+                "independent_report",
+                query=f"{query} local media regulator",
+            ),
         ]
     if gap.gap_type == "missing_date":
         return [
-            _action(gap, "exact_phrase_search", "primary_source", query=f"\"{query}\" date"),
-            _action(gap, "report_page_search", "primary_source", "pdf_page", query=f"{query} report page date"),
+            _action(gap, "exact_phrase_search", "primary_source", query=f'"{query}" date'),
+            _action(
+                gap,
+                "report_page_search",
+                "primary_source",
+                "pdf_page",
+                query=f"{query} report page date",
+            ),
         ]
     if gap.gap_type == "missing_location":
         return [
-            _action(gap, "map_location_search", "primary_source", "map", query=f"{query} map address"),
-            _action(gap, "image_search", "visual_evidence", "image", query=f"{query} site photo location"),
-            _action(gap, "source_domain_search", "independent_report", query=f"{query} local source location"),
+            _action(
+                gap, "map_location_search", "primary_source", "map", query=f"{query} map address"
+            ),
+            _action(
+                gap,
+                "image_search",
+                "visual_evidence",
+                "image",
+                query=f"{query} site photo location",
+            ),
+            _action(
+                gap,
+                "source_domain_search",
+                "independent_report",
+                query=f"{query} local source location",
+            ),
         ]
     if gap.gap_type == "missing_execution_evidence":
         return [
-            _action(gap, "source_domain_search", "primary_source", query=f"{query} official implementation record"),
-            _action(gap, "image_search", "visual_evidence", "image", query=f"{query} direct visual observation"),
-            _action(gap, "video_search", "visual_evidence", "video", query=f"{query} recorded operation outcome"),
-            _action(gap, "report_page_search", "independent_report", "pdf_page", query=f"{query} independent implementation outcome report"),
+            _action(
+                gap,
+                "source_domain_search",
+                "primary_source",
+                query=f"{query} official implementation record",
+            ),
+            _action(
+                gap,
+                "image_search",
+                "visual_evidence",
+                "image",
+                query=f"{query} direct visual observation",
+            ),
+            _action(
+                gap,
+                "video_search",
+                "visual_evidence",
+                "video",
+                query=f"{query} recorded operation outcome",
+            ),
+            _action(
+                gap,
+                "report_page_search",
+                "independent_report",
+                "pdf_page",
+                query=f"{query} independent implementation outcome report",
+            ),
         ]
     if gap.gap_type == "weak_signal_only":
         return [
@@ -146,11 +196,34 @@ def _actions_for_gap(gap: Gap, belief_state: BeliefState) -> list[SearchAction]:
     if gap.gap_type == "contradiction":
         source = belief_state.source_by_id().get(gap.gap_id.removeprefix("counter-source-"))
         title = source.title if source and source.title else query
-        return [_action(gap, "report_page_search", "independent_report", "pdf_page",
-                        query=title, parameters={"freshness_focused": True})]
+        while True:
+            cleaned = re.sub(r"\s*\([^)]*\)$", "", title)
+            if cleaned == title:
+                break
+            title = cleaned
+        title = title or query
+        return [
+            _action(
+                gap,
+                "report_page_search",
+                "independent_report",
+                "pdf_page",
+                query=title,
+                parameters={"freshness_focused": True},
+            )
+        ]
     if gap.gap_type == "permission_gap":
         if _policy_allows_internal(belief_state):
-            return [_action(gap, "internal_source_search", "primary_source", "text", query=query, permission_risk=0.6)]
+            return [
+                _action(
+                    gap,
+                    "internal_source_search",
+                    "primary_source",
+                    "text",
+                    query=query,
+                    permission_risk=0.6,
+                )
+            ]
         return [
             _action(
                 gap,
@@ -187,12 +260,23 @@ def _actions_for_gap(gap: Gap, belief_state: BeliefState) -> list[SearchAction]:
     if gap.gap_type == "missing_bridge_evidence":
         return [
             _action(gap, "text_search", "bridge_evidence", query=query),
-            _action(gap, "report_page_search", "validation_evidence", "pdf_page", query=f"{query} report evidence"),
+            _action(
+                gap,
+                "report_page_search",
+                "validation_evidence",
+                "pdf_page",
+                query=f"{query} report evidence",
+            ),
         ]
     if gap.gap_type == "missing_conclusion_recovery_source":
         return [
             _action(gap, "text_search", "limiting_evidence", query=query),
-            _action(gap, "source_domain_search", "validation_evidence", query=f"{query} validation conclusion evidence"),
+            _action(
+                gap,
+                "source_domain_search",
+                "validation_evidence",
+                query=f"{query} validation conclusion evidence",
+            ),
         ]
     return [_action(gap, "text_search", "unknown", query=query)]
 

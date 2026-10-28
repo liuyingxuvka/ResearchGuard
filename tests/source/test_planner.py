@@ -138,3 +138,35 @@ def test_declared_search_comes_first():
     scores = {row.action_id: row.total_score for row in plan.scored_actions}
     assert scores['declared'] == scores[generated[0].action_id]
     assert plan.selected_actions[0].action_id == 'declared'
+
+
+def test_counter_source_query_drops_trailing_notes():
+    from researchguard.source.schema import SourceRecord
+
+    cases = [
+        (
+            "UNCTAD Review of Maritime Transport 2021, ch. 3 (trial transcription)",
+            "UNCTAD Review of Maritime Transport 2021, ch. 3",
+        ),
+        (
+            "Drewry WCI Shanghai-Los Angeles lane (trial transcription, approximate)",
+            "Drewry WCI Shanghai-Los Angeles lane",
+        ),
+        ("Port report (draft) (copy)", "Port report"),
+        ("Port (Yantian) congestion", "Port (Yantian) congestion"),
+        ("(note only)", "Find an independent source"),
+    ]
+    for title, expected in cases:
+        state = BeliefState(
+            sources=[SourceRecord("s", title=title)],
+            gaps=[
+                Gap(
+                    "counter-source-s",
+                    gap_type="contradiction",
+                    description="Find an independent source",
+                )
+            ],
+        )
+        actions = generate_actions_from_gaps(state)
+        assert len(actions) == 1
+        assert actions[0].query == expected
