@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Maintenance checks run on FlowGuard 0.70.14.
+
 ## v0.5.16 - 2026-10-27 - Fresh status reports and the question model split by aspect
 
 - Research inputs drop writing-plan fields; validation warns about retired gap keys and rewriting omits them. Structural coverage ids and source boundaries remain research-owned.
