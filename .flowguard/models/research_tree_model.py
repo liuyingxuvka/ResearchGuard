@@ -23,7 +23,19 @@ COMPONENTS = ['research-tree', 'researchguard-suite']
 
 IMPLEMENTED_BY = {'LibrarySources': 'src/researchguard/research.py:_ResearchLibrary.list_sources', 'LibraryNodes': 'src/researchguard/research.py:_ResearchLibrary.source_node_ids', 'Load': 'src/researchguard/research.py:load_research', 'Check': 'src/researchguard/research.py:check_research_tree', 'Status': 'src/researchguard/research.py:status_main', 'CopyCheck': 'src/researchguard/ownership.py:copied_content_problems'}
 
-USES = {'SourceSync': 'src/researchguard/source/handoff.py:sync_traceguard_seed', 'LogicSync': 'src/researchguard/logic/trace_import.py:sync_trace_bundle'}
+USES = {
+    'SourceSync': 'src/researchguard/source/handoff.py:sync_traceguard_seed',
+    'LogicSync': 'src/researchguard/logic/trace_import.py:sync_trace_bundle',
+    'LoadModelFromDict': 'src/researchguard/logic/loader.py:load_model_from_dict',
+    'SourceLibrary': 'src/researchguard/logic/source_library.py:SourceLibrary',
+    'SourceLibraryCreateSourceModel': 'src/researchguard/logic/source_library.py:SourceLibrary.create_source_model',
+    'SourceLibraryImportSource': 'src/researchguard/logic/source_library.py:SourceLibrary.import_source',
+    'SourceLibrarySourceIndexPath': 'src/researchguard/logic/source_library.py:SourceLibrary.source_index_path',
+    'SourceLibrarySourceModelPath': 'src/researchguard/logic/source_library.py:SourceLibrary.source_model_path',
+    'SourceLibrarySourceNodeIds': 'src/researchguard/logic/source_library.py:SourceLibrary.source_node_ids',
+    'BeliefStateFromDict': 'src/researchguard/source/schema.py:BeliefState.from_dict',
+    'TraceGuardModelFromDict': 'src/researchguard/trace/schema.py:TraceGuardModel.from_dict',
+}
 
 TESTED_BY = {'status_names_its_inputs': ['tests/test_research_tree_crossref.py:test_status_reports_input_digests'], 'consistent_tree_has_no_error': ['tests/test_research_tree_crossref.py:test_consistent_tree_has_no_errors', 'tests/test_research_tree_crossref.py:test_checker_is_in_memory_and_source_is_optional', 'tests/test_research_tree_crossref.py:test_shipped_evergiven_tree_has_consistent_shared_ids', 'tests/test_research_tree_crossref.py:test_candidate_view_lists_only_changes'], 'dangling_reference_is_an_error': ['tests/test_research_tree_crossref.py:test_dangling_references_and_invalid_native_models_are_errors', 'tests/test_research_tree_crossref.py:test_missing_index_exits_2', 'tests/test_research_tree_crossref.py:test_missing_index_names_the_template'], 'unused_hypothesis_is_only_a_warning': ['tests/test_research_tree_crossref.py:test_unused_hypothesis_is_only_a_warning'], 'gap_names_known_hypotheses': ['tests/test_research_tree_crossref.py:test_gap_hypotheses_are_checked_and_grouped'], 'copied_content_matches_owner': ['tests/test_research_tree_crossref.py:test_copy_drift_is_an_error_for_each_copied_field', 'tests/test_research_tree_crossref.py:test_one_observation_reaches_trace_and_logic_by_sync'], 'library_anchors_are_resolved': ['tests/test_research_tree_crossref.py:test_library_anchored_evidence_gets_one_answer']}
 

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- The self-models declare the product functions their replays call, so a change to research_status selects every research-tree model that runs it.
+
 - Maintenance checks run on FlowGuard 0.70.14.
 
 ## v0.5.16 - 2026-10-27 - Fresh status reports and the question model split by aspect
