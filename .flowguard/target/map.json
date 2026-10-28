@@ -1,0 +1,7 @@
+{
+  "schema": "flowguard.target.v1",
+  "goal": "RG-504: keep the route test binding current after removing its size cap (no rule change)",
+  "components": [],
+  "flows": [],
+  "remove": []
+}
