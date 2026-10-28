@@ -857,17 +857,17 @@
   "model_digests": {
     ".flowguard/models/experiment_elimination_model.py": "fc92d69022bd134ed79ff3ba33dc6e0c5784e3c2d5433ef6bcc22432ec7d8eb2",
     ".flowguard/models/iteration_kernel_model.py": "89821ac785bb2f2eae1f1bad7193079c737f1bb7663908c7cf11fa7a57ca431e",
-    ".flowguard/models/research_ablations_model.py": "c27c5ae35794dd7868f5ef51ac44dd4060b5eae51f711030735075e9c138fc6e",
-    ".flowguard/models/research_tree_model.py": "23849e1c57fc8dc922db1be1a56df791b43365a55697dc9138d3636de3cd485f",
-    ".flowguard/models/research_verdict_model.py": "2780de1b152afc2e93f872bc5b1a2b91849bea23919d353beffc952f38078cd1",
-    ".flowguard/models/research_views_model.py": "6c13d77fa5e5f6e01f29747b0dc1b59a8f3ea897bc694a76ef2e5b6ca7be82ac",
+    ".flowguard/models/research_ablations_model.py": "ff2108a45a97328bf12f85f33b39301015e1648e306ac73de3a056bf52eb42f2",
+    ".flowguard/models/research_tree_model.py": "4cc31266f48233dbddc7316c825e96fb71cb36a1765580d5d867e0ff046db521",
+    ".flowguard/models/research_verdict_model.py": "828fbd628c13560936f5550005677e9e996b8460dc50855e3651060ae5701ced",
+    ".flowguard/models/research_views_model.py": "f1bb429120345c1ff61d01317c398fde254eef567451a68e23ce2b545e1b77ac",
     ".flowguard/models/researchguard_suite_model.py": "a04ba684aeb51e0cebf51fbfc4b45bec62955938f51b6667ef0138adcc18aa03",
-    ".flowguard/models/source_library_model.py": "a6d0417e7b01046244503375ad15a4cf2ee99a69b56ff2c8a72f410044ec771e",
+    ".flowguard/models/source_library_model.py": "d8fc194edde8b30ec91ccd88b431a7b3b517899a44d99688db382b70f79ca43f",
     ".flowguard/models/sourceguard_content_anchor_model.py": "985a6e7659c0308435e05de864780a8ea1a77e80085c57cf8a0a677fab9ea706",
     ".flowguard/models/sourceguard_stop_decision_model.py": "389e891d59a5b3dbbe915c8784174c8e6fc86b01de0a13086e2cdbc6d002cb34",
     ".flowguard/models/synthesis_plan_model.py": "6be9b8dad1874fbca66daf24349d0aceb5ac0559e9cac57139eb3f6055393e67",
-    ".flowguard/models/trace_projection_model.py": "1f6de0d7f7a731c4fdf84671c980d7656ea08415d1dd30b8db6556cafb44e7ba",
-    ".flowguard/models/wording_license_model.py": "cb36479e2c1b3d95a3f6fa18d86199abc997fbf22a71b051600731f4174df3fb"
+    ".flowguard/models/trace_projection_model.py": "be259dd820760edd66321c927f04d4b45d9973fd782e821f0c2f423c11ca0ad7",
+    ".flowguard/models/wording_license_model.py": "50074b5e0b933c336f4eb63cb94529a9a67c73615d1ad1ac17a0ca6c033bbcae"
   },
   "fingerprint_format": 2
 }

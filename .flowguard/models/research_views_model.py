@@ -18,7 +18,10 @@ PARENT = 'research-tree'
 
 IMPLEMENTED_BY = {'HypothesisView': 'src/researchguard/research.py:hypothesis_view', 'Compare': 'src/researchguard/research.py:compare_research_status'}
 
-USES = {}
+USES = {
+    'LoadResearch': 'src/researchguard/research.py:load_research',
+    'ResearchStatus': 'src/researchguard/research.py:research_status',
+}
 
 TESTED_BY = {'hypothesis_view_matches_status': ['tests/test_research_views.py:test_hypothesis_view_lists_its_rows'], 'candidate_view_shows_verdict_changes': ['tests/test_research_views.py:test_candidate_view_shows_verdict_changes']}
 

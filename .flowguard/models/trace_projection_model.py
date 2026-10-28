@@ -11,6 +11,9 @@ COMPONENTS = ["trace-inference", "trace-depth"]
 IMPLEMENTED_BY = {'Project': 'src/researchguard/trace/inference/projection.py:project_hypotheses',
                   'Evaluate': 'src/researchguard/trace/evaluator.py:evaluate_model',
                   'Sensitivity': 'src/researchguard/trace/storyline_depth.py:expected_sensitivity_matches'}
+USES = {
+    'LoadModel': 'src/researchguard/trace/loader.py:load_model',
+}
 TESTED_BY = {
     'live_within_margin_of_best': ['tests/trace/test_trace_projection.py:test_live_hypotheses_lie_within_the_margin_of_the_best',
                                    'tests/trace/test_storyline_depth.py:test_live_alternatives_exclude_the_leader'],
