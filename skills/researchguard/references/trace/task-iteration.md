@@ -10,7 +10,7 @@ Freeze the storyline or hypothesis named by `target_id`, expected evidence footp
 
 ## Observe and compare
 
-Use the observation v2 fields in [fields.md](fields.md#evidence-batch-observation-v2). Existing evidence, event and source IDs may be listed directly. Four optional lists, each defaulting to `[]`, add typed TraceGuard rows: `new_sources`, `new_evidence`, `new_events`, and `new_links` (hypothesis-evidence links). IDs in each new-record collection must be unique within that collection and absent from its corresponding baseline collection, even for identical rows. To refer to an existing record, list its ID instead of adding it again.
+Use the observation v2 fields in [observation fields](fields-observations.md#evidence-batch-observation-v2). Existing evidence, event and source IDs may be listed directly. Four optional lists, each defaulting to `[]`, add typed TraceGuard rows: `new_sources`, `new_evidence`, `new_events`, and `new_links` (hypothesis-evidence links). IDs in each new-record collection must be unique within that collection and absent from its corresponding baseline collection, even for identical rows. To refer to an existing record, list its ID instead of adding it again.
 
 Comparison appends those rows in memory, rebinds the combined model through the native schema and reference validator, and runs the canonical evaluator and depth route. Observation references must resolve in that combined model. Expected IDs are matched against both the explicit ID lists and new rows; `event_order` may use IDs from `event_ids` or `new_events`.
 

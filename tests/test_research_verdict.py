@@ -25,25 +25,42 @@ def test_verdict_matches_each_route_and_page_is_readable():
     from researchguard.logic.minimal_sets import license_model_claim
     from researchguard.research import render_status_markdown
     from researchguard.source.stop_decision import decide_model_search_stop
-    original = Path(__file__).resolve().parents[1] / 'examples/research/evergiven'
+
+    original = Path(__file__).resolve().parents[1] / "examples/research/evergiven"
     tree = load_research(original)
     status = research_status(tree)
-    verdict = status['verdict']
-    assert set(verdict) == {'search', 'root_claim', 'live_hypotheses', 'contested', 'errors'}
-    assert verdict['root_claim']['wording_license'] == license_model_claim(tree.models['logic'], 'h_suez').wording_license == 'withhold'
-    assert verdict['search'] == decide_model_search_stop(tree.models['source'], remaining_budget=3)[1].status == 'continue_search'
-    assert verdict['live_hypotheses'] == ['h_demand', 'h_yantian']
-    assert verdict['contested'] is False and verdict['errors'] == 0
-    assert status['disagreements'] == []
-    assert status['ablations'] and all(row['caught_by'] for row in status['ablations'])
+    verdict = status["verdict"]
+    assert set(verdict) == {"search", "root_claim", "live_hypotheses", "contested", "errors"}
+    assert (
+        verdict["root_claim"]["wording_license"]
+        == license_model_claim(tree.models["logic"], "h_suez").wording_license
+        == "withhold"
+    )
+    assert (
+        verdict["search"]
+        == decide_model_search_stop(tree.models["source"], remaining_budget=3)[1].status
+        == "continue_search"
+    )
+    assert verdict["live_hypotheses"] == ["h_demand", "h_yantian"]
+    assert verdict["contested"] is False and verdict["errors"] == 0
+    assert status["disagreements"] == []
+    assert status["ablations"] and all(row["caught_by"] for row in status["ablations"])
     page = render_status_markdown(status)
-    assert len(page.encode()) <= 3000
-    assert '{' not in page
-    assert page.split('## ', 1)[1].startswith('Verdict')
+    headings = [line for line in page.splitlines() if line.startswith("## ")]
+    assert len(headings) == len(set(headings))
+    hypothesis_table = page.split("## Hypotheses", 1)[1].split("\n## ", 1)[0]
+    shown = [
+        line.split("|")[1].strip()
+        for line in hypothesis_table.splitlines()
+        if line.startswith("| h")
+    ]
+    assert sorted(shown) == sorted(row["id"] for row in status["hypotheses"])
+    assert "{" not in page
+    assert page.split("## ", 1)[1].startswith("Verdict")
     lines = page.splitlines()
     for index, line in enumerate(lines):
-        if line.startswith('|---'):
-            assert line.count('|') == lines[index - 1].count('|')
+        if line.startswith("|---"):
+            assert line.count("|") == lines[index - 1].count("|")
 
 def test_live_hypotheses_follow_every_route(folder):
     def index(data):

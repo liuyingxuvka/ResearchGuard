@@ -6,41 +6,31 @@
       "entry_files": [
         "skills/researchguard/SKILL.md",
         "skills/researchguard/agents/openai.yaml"
-      ],
-      "max_entry_bytes": 3800,
-      "minimum_headroom_bytes": 600
+      ]
     },
     {
       "bundle_id": "route:logic",
       "entry_files": [
         "skills/researchguard/references/routes/logic.md"
-      ],
-      "max_entry_bytes": 4100,
-      "minimum_headroom_bytes": 1000
+      ]
     },
     {
       "bundle_id": "route:source",
       "entry_files": [
         "skills/researchguard/references/routes/source.md"
-      ],
-      "max_entry_bytes": 4100,
-      "minimum_headroom_bytes": 1000
+      ]
     },
     {
       "bundle_id": "route:trace",
       "entry_files": [
         "skills/researchguard/references/routes/trace.md"
-      ],
-      "max_entry_bytes": 4100,
-      "minimum_headroom_bytes": 1000
+      ]
     },
     {
       "bundle_id": "route:experiment",
       "entry_files": [
         "skills/researchguard/references/routes/experiment.md"
-      ],
-      "max_entry_bytes": 4000,
-      "minimum_headroom_bytes": 600
+      ]
     }
   ],
   "reference_edges": [
@@ -240,5 +230,5 @@
       "reference": "skills/researchguard/references/trace/fields-starter.md"
     }
   ],
-  "claim_boundary": "This manifest checks prompt entry byte budgets and conditional reference edges only. Byte totals are deterministic prompt-regression proxies, not provider token counts."
+  "claim_boundary": "This manifest checks prompt entry files and conditional reference edges only. Byte totals are deterministic reports, not size limits or provider token counts."
 }

@@ -1,4 +1,4 @@
-"""Check the researchguard skill's entry and route budgets and its conditional reference edges."""
+"""Report exact prompt entry totals and check conditional reference edges."""
 
 from __future__ import annotations
 
@@ -37,22 +37,15 @@ def check_prompt_bundles(
         selected_files.update(path.relative_to(ROOT).as_posix() for path in paths)
         missing = [path.relative_to(ROOT).as_posix() for path in paths if not path.is_file()]
         if missing:
-            failures.append({"code": "entry-file-missing", "bundle_id": bundle_id, "detail": ", ".join(missing)})
+            failures.append(
+                {"code": "entry-file-missing", "bundle_id": bundle_id, "detail": ", ".join(missing)}
+            )
             continue
         total = sum(path.stat().st_size for path in paths)
-        limit = int(row.get("max_entry_bytes", 0))
-        headroom = limit - total
-        minimum = int(row.get("minimum_headroom_bytes", 0))
-        if total > limit:
-            failures.append({"code": "entry-budget-exceeded", "bundle_id": bundle_id, "detail": f"{total}>{limit}"})
-        if headroom < minimum:
-            failures.append({"code": "entry-headroom-insufficient", "bundle_id": bundle_id, "detail": f"{headroom}<{minimum}"})
         bundles.append(
             {
                 "bundle_id": bundle_id,
                 "entry_bytes": total,
-                "limit_bytes": limit,
-                "headroom_bytes": headroom,
                 "entry_files": [path.relative_to(ROOT).as_posix() for path in paths],
             }
         )
@@ -66,12 +59,20 @@ def check_prompt_bundles(
         declared_in = ROOT / declared
         target = ROOT / reference
         if not declared_in.is_file() or not target.is_file():
-            failures.append({"code": "reference-edge-missing", "bundle_id": declared, "detail": reference})
+            failures.append(
+                {"code": "reference-edge-missing", "bundle_id": declared, "detail": reference}
+            )
             continue
         text = declared_in.read_text(encoding="utf-8")
         relative_reference = target.relative_to(SKILL_ROOT).as_posix()
         if relative_reference not in text or (trigger and trigger not in text):
-            failures.append({"code": "reference-edge-undeclared", "bundle_id": declared, "detail": f"{trigger}:{relative_reference}"})
+            failures.append(
+                {
+                    "code": "reference-edge-undeclared",
+                    "bundle_id": declared,
+                    "detail": f"{trigger}:{relative_reference}",
+                }
+            )
 
     return {
         "schema_version": "researchguard.prompt-bundle-check.v1",

@@ -20,18 +20,11 @@ def test_current_prompt_bundles_and_index_pass() -> None:
     result = MODULE.check_prompt_bundles()
     assert result["status"] == "pass", result["failures"]
     assert {row["bundle_id"] for row in result["bundles"]} == {
-        "researchguard", "route:logic", "route:source", "route:trace", "route:experiment"
-    }
-    assert all(row["headroom_bytes"] > 0 for row in result["bundles"])
-
-
-def test_entry_budget_without_headroom_fails() -> None:
-    payload = manifest()
-    row = next(row for row in payload["bundles"] if row["bundle_id"] == "route:logic")
-    row["max_entry_bytes"] = 1
-    result = MODULE.check_prompt_bundles(payload)
-    assert {row["code"] for row in result["failures"]} >= {
-        "entry-budget-exceeded", "entry-headroom-insufficient"
+        "researchguard",
+        "route:logic",
+        "route:source",
+        "route:trace",
+        "route:experiment",
     }
 
 

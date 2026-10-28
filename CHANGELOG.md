@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Size caps on skill text, prompt bundles and command output are replaced by checks for repeated paragraphs, dead links, unknown names and complete output; byte totals are printed, not limited.
+
 - Counter-source searches use the source title without trailing curation notes such as "(trial transcription)".
 
 - The self-models declare the product functions their replays call, so a change to research_status selects every research-tree model that runs it.

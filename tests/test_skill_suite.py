@@ -17,12 +17,13 @@ SKILL = ROOT / "skills" / "researchguard"
 ROUTES = ("logic", "source", "trace", "experiment")
 
 
-def test_one_skill_with_a_route_table_and_a_short_description() -> None:
-    assert sorted(path.name for path in (ROOT / "skills").iterdir() if path.is_dir()) == ["researchguard"]
+def test_one_skill_with_a_route_table_and_a_description() -> None:
+    assert sorted(path.name for path in (ROOT / "skills").iterdir() if path.is_dir()) == [
+        "researchguard"
+    ]
     text = SKILL.joinpath("SKILL.md").read_text(encoding="utf-8")
     metadata = yaml.safe_load(text.split("---", 2)[1])
     assert metadata["name"] == "researchguard"
-    assert len(metadata["description"]) <= 300
     assert re.fullmatch(r"Use for .+\. Not for .+; use [a-z-]+\.", metadata["description"])
     for route in ROUTES:
         assert f"`references/routes/{route}.md`" in text

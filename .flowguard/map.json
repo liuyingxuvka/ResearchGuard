@@ -290,14 +290,14 @@
         "tests/test_prompt_bundles.py",
         "tests/contract/test_privacy_scan.py",
         "tests/test_install_skill.py",
-        "tests/test_prompt_size.py"
+        "tests/test_route_text.py"
       ],
       "models": [
         ".flowguard/models/researchguard_suite_model.py"
       ],
       "layer": "interface",
       "status": "confirmed",
-      "fingerprint": "sha256:7feaea02daff65fd7b9a298e36648910ba31bc35d24725c6faf8fb858cad0158"
+      "fingerprint": "sha256:97adc6e6286b83c675e97e8d1525d9affdb8b468b1dc44a9fb285326db040073"
     },
     {
       "id": "research-tree",
@@ -861,7 +861,7 @@
     ".flowguard/models/research_tree_model.py": "4cc31266f48233dbddc7316c825e96fb71cb36a1765580d5d867e0ff046db521",
     ".flowguard/models/research_verdict_model.py": "828fbd628c13560936f5550005677e9e996b8460dc50855e3651060ae5701ced",
     ".flowguard/models/research_views_model.py": "f1bb429120345c1ff61d01317c398fde254eef567451a68e23ce2b545e1b77ac",
-    ".flowguard/models/researchguard_suite_model.py": "a04ba684aeb51e0cebf51fbfc4b45bec62955938f51b6667ef0138adcc18aa03",
+    ".flowguard/models/researchguard_suite_model.py": "d5bfabfb144557b8ed5301706ce111e4bae928b6e325e15669e3affd727005f5",
     ".flowguard/models/source_library_model.py": "d8fc194edde8b30ec91ccd88b431a7b3b517899a44d99688db382b70f79ca43f",
     ".flowguard/models/sourceguard_content_anchor_model.py": "985a6e7659c0308435e05de864780a8ea1a77e80085c57cf8a0a677fab9ea706",
     ".flowguard/models/sourceguard_stop_decision_model.py": "389e891d59a5b3dbbe915c8784174c8e6fc86b01de0a13086e2cdbc6d002cb34",

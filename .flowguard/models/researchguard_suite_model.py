@@ -202,7 +202,7 @@ TESTED_BY = {
     "no_alternate_success": ["tests/test_root_cli.py:test_direct_member_request_does_not_require_task_facts"],
     "terminal_failure_stays_terminal": ["tests/test_root_cli.py:test_retired_standalone_routes_are_unknown_commands"],
     "route_matches_member": [
-        "tests/test_skill_suite.py:test_one_skill_with_a_route_table_and_a_short_description",
+        "tests/test_skill_suite.py:test_one_skill_with_a_route_table_and_a_description",
         "tests/test_install_skill.py:test_install_copies_one_skill_removes_retired_members_and_check_detects_drift",
     ],
 }
