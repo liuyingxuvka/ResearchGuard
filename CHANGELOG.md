@@ -12,6 +12,8 @@
 
 - A number in an evidence summary that occurs in neither its quote nor its anchor gives the warning summary_number_not_in_quote.
 
+- The skill description also routes an AI that is about to state a causal or evidential conclusion to status, with a three-line quick check.
+
 ## v0.5.17 - 2026-10-28 - Declared replays and usable counter-source queries
 
 - Size caps on skill text, prompt bundles and command output are replaced by checks for repeated paragraphs, dead links, unknown names and complete output; byte totals are printed, not limited.

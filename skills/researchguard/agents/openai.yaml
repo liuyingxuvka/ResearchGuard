@@ -1,4 +1,4 @@
 interface:
   display_name: "ResearchGuard"
-  short_description: "Check arguments, sources, timelines and experiments"
+  short_description: "Check claims, sources, timelines and experiments before you assert a cause"
   default_prompt: "Use $researchguard to check a research task: pick the route (logic, source, trace or experiment), run the researchguard command it names, and claim only what the output supports."

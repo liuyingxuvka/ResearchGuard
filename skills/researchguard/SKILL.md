@@ -1,11 +1,16 @@
 ---
 name: researchguard
-description: "Use for research-quality checks: argument structure and claim support, evidence and source discovery, timelines and causal storylines, and the least costly or fewest declared experiments that tell hypotheses apart. Not for writing the finished report, paper, story or guide; use logic-writing."
+description: "Use for research-quality checks: argument structure and claim support, evidence and source discovery, timelines and causal storylines, and the least costly or fewest declared experiments that tell hypotheses apart; also before you state a causal or evidential conclusion in an answer (if a research folder exists, read its status first). Not for writing the finished report, paper, story or guide; use logic-writing."
 ---
 
 # ResearchGuard
 
 ## Start from the model
+
+Quick check before a conclusion:
+- A research folder exists: run `researchguard status <folder>` and read Verdict before you answer.
+- No folder: name the claim and its sources; if a source is missing, say so instead of asserting.
+- New evidence in a folder listing a source model: `researchguard source add-anchor`, then `researchguard sync <folder>`, then `researchguard status <current> --candidate <folder>`.
 
 - Existing folder: run `researchguard status <folder>` first; read Verdict, Open gaps and Next; take the route Next names.
 - New question: write `research.yaml` first (template: `references/research-tree.md`, "Start a question"); each route's first step builds its model, listed in `models`.
