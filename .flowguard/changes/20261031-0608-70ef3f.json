@@ -1,0 +1,46 @@
+{
+  "kind": "change",
+  "goal": "RG-604: Logic evidence without a source anchor is an error when a source model exists",
+  "requests": [
+    {
+      "id": "R1",
+      "part": true
+    }
+  ],
+  "base": "f74e3c5ac9f72182075c7359eb29a57548bc8344",
+  "tree": "70ef3f28aad797ee990c118df8b6a4009926b499c268ab27549c623d30b6eb1f",
+  "promoted": "2026-10-31T06:08:06.733650+00:00",
+  "plan": [
+    {
+      "line": "changes: research_tree_crossref.unanchored_evidence_is_an_error by R1 \"新建规则 `unanchored_evidence_is_an_error`（说明 “when the folder lists a source model, logic evidence without a source anchor is an error”）\"",
+      "added_after_code": null,
+      "cleared": []
+    },
+    {
+      "line": "touch: src/researchguard/research.py:check_research_tree",
+      "added_after_code": null,
+      "cleared": []
+    }
+  ],
+  "rules": [
+    {
+      "id": "research_tree_crossref.unanchored_evidence_is_an_error",
+      "old": null,
+      "new": "fp:00838d5de7b0d5bb444abd49124049e5ef97fc1c3a26383a5c38a3f1bca8d4e6",
+      "provenance": "owner R1"
+    }
+  ],
+  "acceptances": [],
+  "existing_cleared": [],
+  "implemented_by": [
+    "src/researchguard/research.py:check_research_tree",
+    "tests/test_research_tree_crossref.py:_add_unanchored_evidence",
+    "tests/test_research_tree_crossref.py:_add_unanchored_evidence.add_reference",
+    "tests/test_research_tree_crossref.py:test_unanchored_logic_evidence_is_an_error_with_a_source_model",
+    "tests/test_research_tree_crossref.py:test_unanchored_logic_evidence_is_listed_without_a_source_model",
+    "tests/test_research_tree_crossref.py:unanchored_folder"
+  ],
+  "new_actions": [],
+  "corrections": [],
+  "checked": "This promotion ran one fresh target check with bound tests and the remaining function-selected tests; 1 warning(s) remained. The tree identifies the checked post-promotion content, before later component confirmation. Implementation provenance lists changed Python function definitions from the Git diff. Available static rule identities and checked PLAN lines are recorded. PLAN edit ordering, per-item clearance, acceptances, existing-item clearance and new-action judgments are not assessed; unknown order is null and unsupported lists are empty."
+}

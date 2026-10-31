@@ -18,7 +18,7 @@ from .experiment.loader import load_observations, load_spec
 from .experiment.engine import observe_experiments, recommend_experiments
 from .logic.evaluator import evaluate_model as evaluate_logic
 from .logic.loader import load_model as load_logic
-from .logic.provenance import content_hash_for, validate_evidence_provenance
+from .logic.provenance import coerce_provenance, content_hash_for, validate_evidence_provenance
 from .logic.minimal_sets import license_model_claim
 from .logic.source_library import SourceLibrary
 from .logic.validator import source_model_provenance_problems
@@ -244,6 +244,13 @@ def check_research_tree(index: dict[str, Any], models: dict[str, Any], observati
         if root not in claims:
             errors.append(f"root_claim_missing:{root}")
         warnings.extend(f"hypothesis_not_in_logic:{item}" for item in sorted(ids - claims))
+        for node in logic.nodes.values():
+            if node.type != "Evidence" or any(record.source_id for record in coerce_provenance(node.provenance)):
+                continue
+            if "source" in index.get("models", {}):
+                errors.append(f"evidence_not_in_source:logic:{node.id} (its provenance names no source_id; add the anchor with researchguard source add-anchor, then run researchguard sync <folder>)")
+            else:
+                info.append(f"evidence_unanchored:logic:{node.id}")
     warnings.extend(f"hypothesis_unused:{item}" for item in sorted(ids - used))
     source = models.get("source")
     if source is None:

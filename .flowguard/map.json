@@ -350,7 +350,7 @@
       ],
       "layer": "tree",
       "status": "confirmed",
-      "fingerprint": "sha256:7cbfbeb9d8a760b004f28fd4e91868b14579c756db52c13aa9e1d78fd1748600"
+      "fingerprint": "sha256:86d96b097ebf21320ee40cf8197e70ca8a6b12806baf8b5039a381423e65dd7a"
     },
     {
       "entrypoints": [
@@ -813,7 +813,7 @@
     ".flowguard/models/experiment_elimination_model.py": "fc92d69022bd134ed79ff3ba33dc6e0c5784e3c2d5433ef6bcc22432ec7d8eb2",
     ".flowguard/models/iteration_kernel_model.py": "89821ac785bb2f2eae1f1bad7193079c737f1bb7663908c7cf11fa7a57ca431e",
     ".flowguard/models/research_ablations_model.py": "ff2108a45a97328bf12f85f33b39301015e1648e306ac73de3a056bf52eb42f2",
-    ".flowguard/models/research_tree_model.py": "4cc31266f48233dbddc7316c825e96fb71cb36a1765580d5d867e0ff046db521",
+    ".flowguard/models/research_tree_model.py": "49fa132435893073bd68dc7e202ae7bcc7a0f6b677288bc3215a9af7fa506b95",
     ".flowguard/models/research_verdict_model.py": "9a9d433f72c47410b4dee15c2a0017dc981913503b9f9fadc33f820f6e9f6e65",
     ".flowguard/models/research_views_model.py": "793c3074af7b96e8aea9afad31aa54bee5634da43bad930db3de42e1f388cac7",
     ".flowguard/models/researchguard_suite_model.py": "1e0e508cbcba840b52e8307b2ad1a3e75fb5209ac56c94574e0a1aea831a13a5",

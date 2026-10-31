@@ -472,3 +472,18 @@ def native_sync():
                 # Preserve the real missing-command evidence; do not simulate success.
                 break
         return results
+
+def native_unanchored():
+    """Check actual anchored, reference-only and source-absent boundary cases."""
+    from researchguard.research import check_research_tree
+    from researchguard.logic.loader import load_model_from_dict
+
+    index, models = native_case('reference_only')
+    with_source = check_research_tree(index, models)
+    without_index = dict(index, models={})
+    without_source = check_research_tree(without_index, {key: value for key, value in models.items() if key != 'source'})
+    anchored = models['logic'].to_dict()
+    anchored['nodes'].pop('E_reference')
+    anchored['edges'] = [edge for edge in anchored['edges'] if edge['source'] != 'E_reference']
+    normal = check_research_tree(index, dict(models, logic=load_model_from_dict(anchored)))
+    return {'with_source': with_source, 'without_source': without_source, 'normal': normal}

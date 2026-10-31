@@ -53,6 +53,42 @@ def test_status_names_a_non_index_error(folder, capsys, monkeypatch):
     assert errors == [f'research_status_failed: {folder / "research.yaml"}: TypeError: probe (research.yaml was read; this is a ResearchGuard defect)']
     assert 'create research.yaml first' not in errors[0]
 
+def _add_unanchored_evidence(candidate, hypothesis):
+    def add_reference(data):
+        data['nodes']['E_lloyds'] = {'type': 'Evidence',
+            'text': "Lloyd's List: the blockage alone doubled Asia-Europe spot rates in April 2021.",
+            'confidence': 0.85, 'scope': 'Asia-Europe spot rates, 2021',
+            'provenance': [{'origin_kind': 'external_source', 'source_reference': "Lloyd's List, April 2021",
+                            'quote': 'The Suez blockage alone doubled Asia-Europe spot rates in April 2021.'}]}
+        data['edges'].append({'source': 'E_lloyds', 'target': hypothesis, 'type': 'supports', 'weight': 0.9})
+
+    _rewrite(candidate, 'logic.yaml', add_reference)
+
+@pytest.fixture
+def unanchored_folder(tmp_path):
+    import shutil
+    from research_tree_support import EVERGIVEN
+    candidate = tmp_path / 'unanchored'
+    shutil.copytree(EVERGIVEN, candidate)
+    _add_unanchored_evidence(candidate, 'h_suez')
+    return candidate
+
+def test_unanchored_logic_evidence_is_an_error_with_a_source_model(unanchored_folder, capsys):
+    from research_tree_support import EVERGIVEN
+    error = 'evidence_not_in_source:logic:E_lloyds (its provenance names no source_id; add the anchor with researchguard source add-anchor, then run researchguard sync <folder>)'
+    assert main(['status', str(unanchored_folder), '--json']) == 1
+    assert json.loads(capsys.readouterr().out)['errors'] == [error]
+    assert main(['status', str(EVERGIVEN), '--candidate', str(unanchored_folder)]) == 1
+    assert f'- errors added: {error}' in capsys.readouterr().out
+
+def test_unanchored_logic_evidence_is_listed_without_a_source_model(folder, capsys):
+    _add_unanchored_evidence(folder, 'h')
+    _rewrite(folder, 'research.yaml', lambda data: data['models'].pop('source'))
+    assert main(['status', str(folder), '--json']) == 0
+    status = json.loads(capsys.readouterr().out)
+    assert status['errors'] == []
+    assert 'evidence_unanchored:logic:E_lloyds' in status['info']
+
 def test_checker_is_in_memory_and_source_is_optional(folder, capsys):
     tree = load_research(folder)
     index = copy.deepcopy(tree.index)

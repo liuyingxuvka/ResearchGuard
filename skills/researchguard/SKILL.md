@@ -26,7 +26,7 @@ Pick one route and load only its file.
 - Node: a hypothesis in `research.yaml`; `status <folder> --hypothesis <id>` shows its route states, directed evidence, ablations, gaps and next actions, and a failing one shows the route result, copied field or anchor that disagrees.
 - Parent: the question in `research.yaml`; the source, trace, logic and experiment models are its parts, joined by shared ids.
 - Known-bad: `ablations:` in `research.yaml` (remove anchors, expect weaken or eliminate); each one must be caught, else `status` reports `ablation_not_caught`.
-- Real binding: anchors owned by the source model; trace and logic copies are checked (`copy_drift`) and refreshed by `--into` syncs.
+- Real binding: anchors owned by the source model; trace and logic copies are checked (`copy_drift`) and refreshed by `--into` syncs. In research folders that list a source model, add new source evidence with researchguard source add-anchor, then researchguard sync to keep the trace and logic copies aligned.
 - Test binding: predict-observe-revise loops and experiment observations.
 - Readback: `researchguard status <folder>` (verdict first; `--hypothesis <id>` for one node; `--json`).
 - Current vs target: the research folder is the current model; a candidate copy is the target: `researchguard sync <copy>` brings new anchors into the copy, compare with `status <folder> --candidate <copy>`, and replace the folder with it when accepted.

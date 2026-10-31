@@ -8,6 +8,8 @@
 
 - researchguard sync <folder> brings source anchors into the trace and logic models of that folder in one command; the shipped Ever Given example is synced, so a sync of it reports no change.
 
+- When research.yaml lists a source model, logic evidence that names no source anchor is an error (evidence_not_in_source) with the command that fixes it; without a source model it is listed as evidence_unanchored.
+
 ## v0.5.17 - 2026-10-28 - Declared replays and usable counter-source queries
 
 - Size caps on skill text, prompt bundles and command output are replaced by checks for repeated paragraphs, dead links, unknown names and complete output; byte totals are printed, not limited.
