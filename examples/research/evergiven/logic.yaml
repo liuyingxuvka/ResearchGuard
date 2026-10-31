@@ -28,6 +28,7 @@ nodes:
       source_id: src-sca-2021
       quote: The Ever Given ran aground on 23 March 2021 and was refloated on 29 March
         2021; navigation resumed the same day.
+      content_hash: sha256:40cc22317a3d8b1d69aee57a63adf767df239fc1f09c2bc2190e27632c4c7cd1
   E_series:
     type: Evidence
     text: 'WCI Shanghai-Rotterdam: ~2,000 (Oct 2020), ~8,000 (Jan 2021), ~7,000 (mid
@@ -41,6 +42,7 @@ nodes:
       source_id: src-drewry-wci
       quote: 'Approx. USD/FEU: Oct 2020 ~2,000; early Jan 2021 ~8,000; mid Mar 2021
         ~7,000; early Apr 2021 ~8,000; Jun 2021 ~10,500; Sep 2021 ~14,000 (peak).'
+      content_hash: sha256:ff9b57dff58f10bba2f3e01d14bd8259cdb2e659af572eae901d01a378fefae5
   E_pretrend:
     type: Evidence
     text: 'UNCTAD RMT 2021: rates surged from H2 2020 on demand rebound and container
@@ -55,6 +57,8 @@ nodes:
       quote: Container spot rates began surging in the second half of 2020 as demand
         rebounded and empty containers were scarce; the Suez Canal blockage in March
         2021 added further pressure.
+      source_date: '2021-11-18'
+      content_hash: sha256:59b706fae0e981a8d21928e982677baaeabb9fe6e45f0b9e94dddedfa155dbb3
   W_capacity:
     type: Warrant
     text: Removing transit capacity for ~1-2 weeks raises spot rates on the affected
@@ -81,6 +85,16 @@ nodes:
       locator: anc-transpacific
       source_id: src-wci-transpacific
       quote: 'Approx. USD/FEU Shanghai-Los Angeles: Jan 2021 ~4,000; Sep 2021 ~12,000.'
+      content_hash: sha256:d56cd81222332df35a7f2b796e0e33fb035aa4d30e83e5d3cdef566b2ed21efe
+  R_h_suez_anc-transpacific:
+    type: Rebuttal
+    text: 'Opposing evidence for h_suez: Approx. USD/FEU Shanghai-Los Angeles: Jan
+      2021 ~4,000; Sep 2021 ~12,000.'
+  R_h_suez_anc-unctad-surge:
+    type: Rebuttal
+    text: 'Opposing evidence for h_suez: Container spot rates began surging in the
+      second half of 2020 as demand rebounded and empty containers were scarce; the
+      Suez Canal blockage in March 2021 added further pressure.'
 edges:
 - source: E_dates
   target: h_suez
@@ -130,6 +144,18 @@ edges:
   target: h_demand
   type: supports
   weight: 0.8
+- source: R_h_suez_anc-transpacific
+  target: h_suez
+  type: attacks
+- source: E_transpacific
+  target: R_h_suez_anc-transpacific
+  type: supports
+- source: R_h_suez_anc-unctad-surge
+  target: h_suez
+  type: attacks
+- source: E_pretrend
+  target: R_h_suez_anc-unctad-surge
+  type: supports
 acceptance:
   h_suez:
     all_of:

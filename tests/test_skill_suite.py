@@ -88,7 +88,7 @@ def test_skill_files_name_only_existing_commands(monkeypatch) -> None:
     parsers = {}
     with monkeypatch.context() as patch:
         patch.setattr(argparse.ArgumentParser, "parse_args", capture_parser)
-        for route in (*ROUTES, "status"):
+        for route in (*ROUTES, "status", "sync"):
             with pytest.raises(ParserCaptured) as captured:
                 cli.main([route, "--help"])
             parsers[route] = captured.value.parser

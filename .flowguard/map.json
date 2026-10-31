@@ -55,7 +55,7 @@
     },
     {
       "id": "suite-orchestration",
-      "summary": "Own the researchguard console and the four member command lines; dispatch each member command directly to its owner. Dispatch source add-anchor with source metadata, quote and locator; validate before writing and return JSON exit 1 for duplicate ids.",
+      "summary": "Own the researchguard console and the four member command lines; dispatch each member command directly to its owner. Dispatch source add-anchor with source metadata, quote and locator; validate before writing and return JSON exit 1 for duplicate ids. Dispatch sync to the research-folder owner.",
       "responsibilities": [
         "Dispatch researchguard logic|source|trace|experiment straight to the member main; unknown commands return one typed JSON error.",
         "Own member command lines, including stable source stop rules, trace iteration direction and report/gaps/compare research-state views while retaining complete JSON output. Expose plain results with model freshness and no result identities. Require the viewer extra and tkinter only for the desktop viewer; reject the retired projectradar simulation mode.",
@@ -114,7 +114,7 @@
       ],
       "layer": "interface",
       "status": "confirmed",
-      "fingerprint": "sha256:682562c6c0c85f2ca7267706fdf9bae73185c24e9a4f46154223ad634959fc3b"
+      "fingerprint": "sha256:1821d34dee9918e7ceacc329938cc3e2107551e5b3fe3d009f82c911435b3d93"
     },
     {
       "id": "logicguard",
@@ -301,7 +301,7 @@
     },
     {
       "id": "research-tree",
-      "summary": "One research question: cross-route identities, copy drift, ablations, candidate comparison and one verdict for writers. Pages name each search gap and query, group each anchor’s routes, and show only relevant ablation effects.",
+      "summary": "One research question: cross-route identities, copy drift, ablations, candidate comparison and one verdict for writers. Pages name each search gap and query, group each anchor’s routes, and show only relevant ablation effects. Sync source anchors into trace and logic within the same folder, preserving reasoning and leaving all files unchanged on conflict.",
       "responsibilities": [
         "Load the research index and resolve source-library provenance through the native validator. Name every file read in JSON input_digests, including consulted library files, and expose source-owned evidence locator, summary and boundary.",
         "Detect copied-content drift and direct evidence or conclusion disagreements between native routes.",
@@ -315,28 +315,32 @@
         "src/researchguard/research.py"
       ],
       "entrypoints": [
-        "src/researchguard/research.py:status_main"
+        "src/researchguard/research.py:status_main",
+        "src/researchguard/research.py:sync_main"
       ],
       "state": [
         "loaded research index, native models and optional source library"
       ],
       "side_effects": [
-        "Read indexed model/library files and write only an explicit status --output"
+        "Read indexed model/library files; status writes only an explicit --output; sync stages within its folder and updates only conflict-free trace/logic models, preserving source and index."
       ],
       "depends_on": [
         "experimentguard",
+        "logic-argument",
         "logic-evaluation",
         "logic-library",
         "researchguard-suite",
         "sourceguard",
         "trace-depth",
-        "trace-model"
+        "trace-model",
+        "traceguard"
       ],
       "tests": [
         "tests/test_research_ablations.py",
         "tests/test_research_tree_crossref.py",
         "tests/test_research_verdict.py",
-        "tests/test_research_views.py"
+        "tests/test_research_views.py",
+        "tests/test_research_sync.py"
       ],
       "models": [
         ".flowguard/models/research_tree_model.py",
@@ -346,7 +350,7 @@
       ],
       "layer": "tree",
       "status": "confirmed",
-      "fingerprint": "sha256:a6156e3c82eb901c6d978a2c123655a3891a8a9906e0b38d5c4e041636f86793"
+      "fingerprint": "sha256:7cbfbeb9d8a760b004f28fd4e91868b14579c756db52c13aa9e1d78fd1748600"
     },
     {
       "entrypoints": [
@@ -811,8 +815,8 @@
     ".flowguard/models/research_ablations_model.py": "ff2108a45a97328bf12f85f33b39301015e1648e306ac73de3a056bf52eb42f2",
     ".flowguard/models/research_tree_model.py": "4cc31266f48233dbddc7316c825e96fb71cb36a1765580d5d867e0ff046db521",
     ".flowguard/models/research_verdict_model.py": "9a9d433f72c47410b4dee15c2a0017dc981913503b9f9fadc33f820f6e9f6e65",
-    ".flowguard/models/research_views_model.py": "f1bb429120345c1ff61d01317c398fde254eef567451a68e23ce2b545e1b77ac",
-    ".flowguard/models/researchguard_suite_model.py": "d5bfabfb144557b8ed5301706ce111e4bae928b6e325e15669e3affd727005f5",
+    ".flowguard/models/research_views_model.py": "793c3074af7b96e8aea9afad31aa54bee5634da43bad930db3de42e1f388cac7",
+    ".flowguard/models/researchguard_suite_model.py": "1e0e508cbcba840b52e8307b2ad1a3e75fb5209ac56c94574e0a1aea831a13a5",
     ".flowguard/models/source_library_model.py": "d8fc194edde8b30ec91ccd88b431a7b3b517899a44d99688db382b70f79ca43f",
     ".flowguard/models/sourceguard_content_anchor_model.py": "985a6e7659c0308435e05de864780a8ea1a77e80085c57cf8a0a677fab9ea706",
     ".flowguard/models/sourceguard_stop_decision_model.py": "389e891d59a5b3dbbe915c8784174c8e6fc86b01de0a13086e2cdbc6d002cb34",

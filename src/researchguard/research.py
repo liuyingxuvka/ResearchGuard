@@ -158,6 +158,67 @@ def load_research(path: str | Path) -> ResearchTree:
     return tree
 
 
+def sync_main(argv: list[str]) -> int:
+    """Compose native handoffs in one folder; apply only after conflict checks."""
+    from shlex import quote
+    from tempfile import TemporaryDirectory
+    from .source.handoff import sync_traceguard_seed
+    from .trace.export_logicguard import logicguard_bundle
+    from .logic.trace_import import sync_trace_bundle
+
+    parser = argparse.ArgumentParser(prog="researchguard sync")
+    parser.add_argument("folder")
+    args = parser.parse_args(argv)
+    folder = Path(args.folder).resolve()
+    try:
+        index_path = (folder / "research.yaml").resolve()
+        if not index_path.is_relative_to(folder):
+            raise ValueError("research.yaml must remain inside the research folder")
+        index = _validate_index(yaml.safe_load(index_path.read_text(encoding="utf-8")))
+        if not {"source", "trace", "logic"} <= index.get("models", {}).keys():
+            print(json.dumps({"errors": ["sync_needs_models: research.yaml must list source, trace and logic models"]}))
+            return 2
+        paths = {route: (folder / index["models"][route]).resolve() for route in ("source", "trace", "logic")}
+        if any(not path.is_relative_to(folder) for path in paths.values()):
+            raise ValueError("source, trace and logic models must remain inside the research folder")
+        if len({index_path, *paths.values()}) != 4:
+            raise ValueError("source, trace, logic and research.yaml must name distinct files")
+        source = load_source(paths["source"])
+        old_trace = yaml.safe_load(paths["trace"].read_text(encoding="utf-8"))
+        old_logic = yaml.safe_load(paths["logic"].read_text(encoding="utf-8"))
+        trace, trace_added, trace_updated, conflicts = sync_traceguard_seed(source, old_trace)
+        if conflicts:
+            print(json.dumps({"errors": [f"sync_conflict: {sorted(conflicts, key=lambda row: row['id'])}"]}, ensure_ascii=False))
+            return 1
+        with TemporaryDirectory(prefix=".researchguard-sync-", dir=folder) as temporary:
+            stage = Path(temporary)
+            trace_input = paths["trace"]
+            if trace != old_trace:
+                trace_input = stage / "trace.yaml"
+                trace_input.write_text(yaml.safe_dump(trace, sort_keys=False, allow_unicode=True), encoding="utf-8")
+            trace_model = load_trace(trace_input)
+            bundle = logicguard_bundle(evaluate_trace(trace_model), model=trace_model)
+            logic, logic_added, logic_updated, conflicts = sync_trace_bundle(bundle, old_logic)
+            if conflicts:
+                print(json.dumps({"errors": [f"sync_conflict: {sorted(conflicts, key=lambda row: row['id'])}"]}, ensure_ascii=False))
+                return 1
+            if logic != old_logic:
+                (stage / "logic.yaml").write_text(yaml.safe_dump(logic, sort_keys=False, allow_unicode=True), encoding="utf-8")
+            if trace != old_trace:
+                trace_input.replace(paths["trace"])
+            if logic != old_logic:
+                (stage / "logic.yaml").replace(paths["logic"])
+    except (OSError, ValueError, TypeError, yaml.YAMLError) as exc:
+        print(json.dumps({"errors": [f"sync_invalid_folder: {exc}"]}, ensure_ascii=False))
+        return 2
+    shown = lambda ids: json.dumps(sorted(ids), ensure_ascii=False)
+    print(f"sync: trace evidence added {shown(trace_added['evidence'])} updated {shown(trace_updated['evidence'])}; "
+          f"logic nodes added {shown(logic_added['nodes'])} updated {shown(logic_updated['nodes'])}; conflicts []")
+    print(f"next: researchguard status {quote(str(folder))}")
+    print("note: To compare, pass the unchanged current folder to status and this synced folder to --candidate.")
+    return 0
+
+
 def check_research_tree(index: dict[str, Any], models: dict[str, Any], observations: tuple[Any, ...] = (), *, source_library=None) -> dict[str, list[str]]:
     """Check already-loaded native models in memory; perform no file I/O or solving."""
     errors: list[str] = []

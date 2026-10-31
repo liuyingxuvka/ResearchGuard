@@ -404,3 +404,71 @@ def native_views(status):
     rows = {(row['kind'], row['id']) for row in compare_research_status(current, candidate)['changes']}
     compare = {('verdict', 'root_claim.reason'), ('verdict', 'live_hypotheses')} <= rows and compare_research_status(current, copy.deepcopy(current))['changes'] == []
     return {'compare': compare}
+
+def native_sync():
+    """Replay real sync on an already-synced folder, one added anchor and a true conflict."""
+    import contextlib
+    import io
+    import shutil
+    from tempfile import TemporaryDirectory
+    import yaml
+    from researchguard.cli import main
+    from researchguard.research import load_research, research_status, compare_research_status
+    from researchguard.source.loader import load_model as load_source
+    from researchguard.source.handoff import sync_traceguard_seed
+    from researchguard.trace.loader import load_model as load_trace
+    from researchguard.trace.evaluator import evaluate_model
+    from researchguard.trace.export_logicguard import logicguard_bundle
+    from researchguard.logic.trace_import import sync_trace_bundle
+
+    def bytes_in(folder):
+        return {str(path.relative_to(folder)): path.read_bytes() for path in folder.rglob('*') if path.is_file()}
+
+    with TemporaryDirectory() as directory:
+        root = Path(directory)
+        baseline = root / 'baseline'
+        shutil.copytree(EVERGIVEN, baseline)
+        # Establish the precondition with the old, existing native member APIs.
+        trace_path, logic_path = baseline / 'trace.yaml', baseline / 'logic.yaml'
+        trace, _, _, conflicts = sync_traceguard_seed(load_source(baseline / 'source.yaml'), yaml.safe_load(trace_path.read_text()))
+        assert not conflicts, conflicts
+        trace_path.write_text(yaml.safe_dump(trace, sort_keys=False, allow_unicode=True))
+        trace_model = load_trace(trace_path)
+        bundle = logicguard_bundle(evaluate_model(trace_model), model=trace_model)
+        logic, _, _, conflicts = sync_trace_bundle(bundle, yaml.safe_load(logic_path.read_text()))
+        assert not conflicts, conflicts
+        logic_path.write_text(yaml.safe_dump(logic, sort_keys=False, allow_unicode=True))
+        baseline_status = research_status(load_research(baseline))
+        results = {}
+        for label in ('unchanged', 'added_anchor', 'conflict'):
+            folder = root / label
+            shutil.copytree(baseline, folder)
+            if label == 'added_anchor':
+                with contextlib.redirect_stdout(io.StringIO()):
+                    added = main(['source', 'add-anchor', str(folder / 'source.yaml'), '--source-id', 'src-lloyds',
+                                  '--anchor-id', 'anc-lloyds', '--quote', 'The Suez blockage alone doubled Asia-Europe spot rates in April 2021.',
+                                  '--locator', "Lloyd's List, April 2021", '--output', str(folder / 'source.yaml')])
+                assert added == 0, added
+            if label == 'conflict':
+                trace_path = folder / 'trace.yaml'
+                trace = yaml.safe_load(trace_path.read_text())
+                evidence = trace['evidence'][0]
+                evidence['source_id'] = next(row['source_id'] for row in trace['sources'] if row['source_id'] != evidence['source_id'])
+                trace_path.write_text(yaml.safe_dump(trace, sort_keys=False))
+            before = bytes_in(folder)
+            current = research_status(load_research(folder)) if label == 'conflict' else baseline_status
+            output = io.StringIO()
+            with contextlib.redirect_stdout(output):
+                result = main(['sync', str(folder)])
+            after = bytes_in(folder)
+            preserved = before == after if label != 'added_anchor' else (
+                set(before) == set(after) and all(after[name] == value for name, value in before.items()
+                                                if name not in ('trace.yaml', 'logic.yaml')))
+            changes = compare_research_status(current, research_status(load_research(folder)))['changes']
+            results[label] = {'exit': result, 'output': output.getvalue().strip(), 'preserved': preserved,
+                              'new_anchor': 'anc-lloyds' if label == 'added_anchor' else '',
+                              'conflict': label == 'conflict', 'changes': changes}
+            if result == 2:
+                # Preserve the real missing-command evidence; do not simulate success.
+                break
+        return results

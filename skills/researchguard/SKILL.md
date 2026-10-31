@@ -29,7 +29,7 @@ Pick one route and load only its file.
 - Real binding: anchors owned by the source model; trace and logic copies are checked (`copy_drift`) and refreshed by `--into` syncs.
 - Test binding: predict-observe-revise loops and experiment observations.
 - Readback: `researchguard status <folder>` (verdict first; `--hypothesis <id>` for one node; `--json`).
-- Current vs target: the research folder is the current model; a candidate copy is the target: sync new evidence into the copy, compare with `status <folder> --candidate <copy>`, and replace the folder with it when accepted.
+- Current vs target: the research folder is the current model; a candidate copy is the target: `researchguard sync <copy>` brings new anchors into the copy, compare with `status <folder> --candidate <copy>`, and replace the folder with it when accepted.
 
 ## Rules for every route
 

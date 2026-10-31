@@ -46,6 +46,7 @@ def _print_help() -> None:
                 "source  execute the SourceGuard native owner",
                 "trace   execute the TraceGuard native owner",
                 "status  inspect a research folder and check shared ids",
+                "sync    bring source anchors into this folder's trace and logic models",
                 "experiment  execute the ExperimentGuard recommendation owner",
             )
         )
@@ -66,6 +67,10 @@ def main(argv: list[str] | None = None) -> int:
         from .research import status_main
 
         return status_main(command_argv)
+    if command == "sync":
+        from .research import sync_main
+
+        return sync_main(command_argv)
     if command in {"logic", "source", "trace", "experiment"}:
         return _execute(f"{command}guard", command_argv)
     print(

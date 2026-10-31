@@ -49,8 +49,8 @@ def test_candidate_view_shows_verdict_changes(tmp_path, capsys):
     changes = compare_research_status(research_status(load_research(EVERGIVEN)), research_status(load_research(candidate)))['changes']
     assert any(row['kind'] == 'verdict' and row['id'] == 'root_claim.reason' for row in changes)
     suez = next(row for row in changes if row['kind'] == 'hypothesis' and row['id'] == 'h_suez')
-    assert suez['before'] == {'logic': {'confidence': 0.25}} and suez['after'] == {'logic': {'confidence': 0.4}}
+    assert suez['before'] == {'logic': {'confidence': 0.16}} and suez['after'] == {'logic': {'confidence': 0.2}}
     assert main(['status', str(EVERGIVEN), '--candidate', str(candidate)]) == 0
     page = capsys.readouterr().out
-    assert '- h_suez: logic confidence 0.25 → 0.40' in page and '- verdict root_claim.reason: ' in page
+    assert '- h_suez: logic confidence 0.16 → 0.20' in page and '- verdict root_claim.reason: ' in page
     assert '0.332256954214' not in page

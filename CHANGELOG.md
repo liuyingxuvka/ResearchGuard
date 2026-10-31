@@ -6,6 +6,8 @@
 
 - status no longer crashes on evidence that names only a source_reference, and an error that is not about research.yaml is reported as research_status_failed with the real exception.
 
+- researchguard sync <folder> brings source anchors into the trace and logic models of that folder in one command; the shipped Ever Given example is synced, so a sync of it reports no change.
+
 ## v0.5.17 - 2026-10-28 - Declared replays and usable counter-source queries
 
 - Size caps on skill text, prompt bundles and command output are replaced by checks for repeated paragraphs, dead links, unknown names and complete output; byte totals are printed, not limited.

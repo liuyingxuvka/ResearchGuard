@@ -1,0 +1,62 @@
+{
+  "kind": "change",
+  "goal": "RG-603: One sync command; a synced folder syncs to no change",
+  "requests": [
+    {
+      "id": "R1",
+      "part": true
+    }
+  ],
+  "base": "55973663994a6b03fe6606110bd5b35177bbcd62",
+  "tree": "824459303e6bdb64a68b2bf6f39417de0ccea42bbd87018063f63c3b1cb53128",
+  "promoted": "2026-10-31T05:50:48.657344+00:00",
+  "plan": [
+    {
+      "line": "changes: research_views.sync_changes_only_the_new_anchor by R1 \"新建规则 `sync_changes_only_the_new_anchor`（说明 “a sync of an unchanged folder changes nothing; after one added anchor, the candidate view shows only that anchor”）。\"",
+      "added_after_code": null,
+      "cleared": []
+    },
+    {
+      "line": "touch: src/researchguard/research.py:sync_main",
+      "added_after_code": null,
+      "cleared": []
+    },
+    {
+      "line": "touch: src/researchguard/cli.py:main",
+      "added_after_code": null,
+      "cleared": []
+    },
+    {
+      "line": "touch: src/researchguard/cli.py:_print_help",
+      "added_after_code": null,
+      "cleared": []
+    }
+  ],
+  "rules": [
+    {
+      "id": "research_views.sync_changes_only_the_new_anchor",
+      "old": null,
+      "new": "fp:3c185db3ca0849467f5ed20ef3a898e6b65d73a4c58b8ab202b4c1f2976d7ce6",
+      "provenance": "owner R1"
+    }
+  ],
+  "acceptances": [],
+  "existing_cleared": [],
+  "implemented_by": [
+    "src/researchguard/cli.py:_print_help",
+    "src/researchguard/cli.py:main",
+    "src/researchguard/research.py:sync_main",
+    "tests/test_research_sync.py:_files",
+    "tests/test_research_sync.py:test_sync_after_add_anchor_adds_only_that_anchor",
+    "tests/test_research_sync.py:test_sync_conflict_writes_nothing",
+    "tests/test_research_sync.py:test_sync_of_the_synced_example_changes_nothing",
+    "tests/test_research_sync.py:test_sync_rejects_incomplete_outside_and_aliased_paths_before_loading",
+    "tests/test_research_sync.py:test_sync_rejects_incomplete_outside_and_aliased_paths_before_loading.must_not_load",
+    "tests/test_research_views.py:test_candidate_view_shows_verdict_changes",
+    "tests/test_root_cli.py:test_root_cli_has_only_current_public_commands",
+    "tests/test_skill_suite.py:test_skill_files_name_only_existing_commands"
+  ],
+  "new_actions": [],
+  "corrections": [],
+  "checked": "This promotion ran one fresh target check with bound tests and the remaining function-selected tests; 0 warning(s) remained. The tree identifies the checked post-promotion content, before later component confirmation. Implementation provenance lists changed Python function definitions from the Git diff. Available static rule identities and checked PLAN lines are recorded. PLAN edit ordering, per-item clearance, acceptances, existing-item clearance and new-action judgments are not assessed; unknown order is null and unsupported lists are empty."
+}

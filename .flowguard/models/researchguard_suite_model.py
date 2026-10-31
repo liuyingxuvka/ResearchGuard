@@ -204,6 +204,7 @@ TESTED_BY = {
     "route_matches_member": [
         "tests/test_skill_suite.py:test_one_skill_with_a_route_table_and_a_description",
         "tests/test_install_skill.py:test_install_copies_one_skill_removes_retired_members_and_check_detects_drift",
+        "tests/test_root_cli.py:test_root_cli_has_only_current_public_commands",
     ],
 }
 
@@ -280,6 +281,14 @@ def conformance():
         check(f"route:{route}", f"researchguard.{picked.route}.cli", _member_main(picked.member).__module__)
     with contextlib.redirect_stdout(io.StringIO()):
         check("retired_umbrella_run", 2, main(["run"]))
+    sync_help = io.StringIO()
+    with contextlib.redirect_stdout(sync_help):
+        try:
+            sync_exit = main(["sync", "--help"])
+        except SystemExit as exc:
+            sync_exit = exc.code
+    check("sync_public_command", 0, sync_exit)
+    check("sync_help", True, "researchguard sync" in sync_help.getvalue())
     check("member_ids", tuple(MEMBER_BY_ROUTE.values()), tuple(MEMBER_IDS))
     # Code facts: the skill is one route table whose route files exist, and no member skill is left.
     skill = (root / "skills" / "researchguard" / "SKILL.md").read_text(encoding="utf-8")
