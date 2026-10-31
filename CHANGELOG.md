@@ -4,6 +4,8 @@
 
 - Maintenance runs on FlowGuard 0.71.0: the project rules name req add and every exit of target check, CLAUDE.md imports AGENTS.md, and each accepted debt carries an expiry.
 
+- status no longer crashes on evidence that names only a source_reference, and an error that is not about research.yaml is reported as research_status_failed with the real exception.
+
 ## v0.5.17 - 2026-10-28 - Declared replays and usable counter-source queries
 
 - Size caps on skill text, prompt bundles and command output are replaced by checks for repeated paragraphs, dead links, unknown names and complete output; byte totals are printed, not limited.

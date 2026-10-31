@@ -43,6 +43,16 @@ def test_missing_index_exits_2(tmp_path, capsys):
     assert main(['status', str(tmp_path), '--json']) == 2
     assert 'research_index_invalid' in capsys.readouterr().out
 
+def test_status_names_a_non_index_error(folder, capsys, monkeypatch):
+    def fail(tree):
+        raise TypeError('probe')
+
+    monkeypatch.setattr('researchguard.research.research_status', fail)
+    assert main(['status', str(folder)]) == 2
+    errors = json.loads(capsys.readouterr().out)['errors']
+    assert errors == [f'research_status_failed: {folder / "research.yaml"}: TypeError: probe (research.yaml was read; this is a ResearchGuard defect)']
+    assert 'create research.yaml first' not in errors[0]
+
 def test_checker_is_in_memory_and_source_is_optional(folder, capsys):
     tree = load_research(folder)
     index = copy.deepcopy(tree.index)

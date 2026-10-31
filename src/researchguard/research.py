@@ -116,7 +116,12 @@ def load_research(path: str | Path) -> ResearchTree:
     index_path = Path(path)
     if index_path.is_dir():
         index_path /= "research.yaml"
-    data = _validate_index(yaml.safe_load(index_path.read_text(encoding="utf-8")))
+    try:
+        data = _validate_index(yaml.safe_load(index_path.read_text(encoding="utf-8")))
+    except (OSError, ValueError, TypeError, yaml.YAMLError) as exc:
+        # Mark only the index boundary, preserving the public exception type and text.
+        setattr(exc, "_research_index_invalid", True)
+        raise
     tree = ResearchTree(index_path, data, input_paths=[index_path])
     if "library" in data:
         library_path = index_path.parent / data["library"]
@@ -230,7 +235,7 @@ def evidence_directions(models, hypothesis_ids=None):
             if node is None or node.type != "Evidence" or not direction or (hypothesis_ids is not None and edge.target not in hypothesis_ids):
                 continue
             rows.update((provenance.locator, "logic", edge.target, direction, node.id)
-                        for provenance in validate_evidence_provenance(node.id, node.provenance))
+                        for provenance in validate_evidence_provenance(node.id, node.provenance) if provenance.locator)
     return [{"anchor": anchor, "route": route, "hypothesis": hypothesis, "direction": direction, "node": node}
             for anchor, route, hypothesis, direction, node in sorted(rows, key=lambda row: (row[0], row[1], row[2], row[3], row[4] or ""))]
 
@@ -722,13 +727,22 @@ def status_main(argv: list[str]) -> int:
     if args.hypothesis and args.candidate:
         print(json.dumps({"errors": ["status_options_conflict: --hypothesis cannot be combined with --candidate"]}, ensure_ascii=False))
         return 2
+    active_path = args.path
     try:
-        tree = load_research(args.path)
+        tree = load_research(active_path)
         status = research_status(tree)
         if args.candidate:
-            status = compare_research_status(status, research_status(load_research(args.candidate)))
+            active_path = args.candidate
+            status = compare_research_status(status, research_status(load_research(active_path)))
     except (OSError, ValueError, TypeError, yaml.YAMLError) as exc:
-        print(json.dumps({"errors": [f"research_index_invalid: {exc}; create research.yaml first (researchguard skill, references/research-tree.md, \"Start a question\")"]}, ensure_ascii=False))
+        if getattr(exc, "_research_index_invalid", False):
+            error = f"research_index_invalid: {exc}; create research.yaml first (researchguard skill, references/research-tree.md, \"Start a question\")"
+        else:
+            index_path = Path(active_path)
+            if index_path.is_dir():
+                index_path /= "research.yaml"
+            error = f"research_status_failed: {index_path}: {type(exc).__name__}: {exc} (research.yaml was read; this is a ResearchGuard defect)"
+        print(json.dumps({"errors": [error]}, ensure_ascii=False))
         return 2
     view = None
     if args.hypothesis:

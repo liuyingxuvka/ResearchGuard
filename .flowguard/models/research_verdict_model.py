@@ -27,7 +27,7 @@ USES = {
     'TraceGuardModelFromDict': 'src/researchguard/trace/schema.py:TraceGuardModel.from_dict',
 }
 
-TESTED_BY = {'routes_do_not_contradict_silently': ['tests/test_research_verdict.py:test_opposite_anchor_directions_are_a_disagreement', 'tests/test_research_verdict.py:test_ruled_out_and_accepted_is_a_disagreement'], 'verdict_matches_the_routes': ['tests/test_research_verdict.py:test_verdict_matches_each_route_and_page_is_readable'], 'live_hypotheses_follow_route_exclusions': ['tests/test_research_verdict.py:test_live_hypotheses_follow_every_route'], 'evidence_directions_match_routes': ['tests/test_research_verdict.py:test_evidence_directions_cover_both_routes', 'tests/test_research_verdict.py:test_writer_surface_keys_are_pinned'], 'contested_iff_disagreement': ['tests/test_research_verdict.py:test_live_hypotheses_follow_every_route', 'tests/test_research_verdict.py:test_verdict_matches_each_route_and_page_is_readable']}
+TESTED_BY = {'routes_do_not_contradict_silently': ['tests/test_research_verdict.py:test_opposite_anchor_directions_are_a_disagreement', 'tests/test_research_verdict.py:test_ruled_out_and_accepted_is_a_disagreement'], 'verdict_matches_the_routes': ['tests/test_research_verdict.py:test_verdict_matches_each_route_and_page_is_readable'], 'live_hypotheses_follow_route_exclusions': ['tests/test_research_verdict.py:test_live_hypotheses_follow_every_route'], 'evidence_directions_match_routes': ['tests/test_research_verdict.py:test_evidence_directions_cover_both_routes', 'tests/test_research_verdict.py:test_writer_surface_keys_are_pinned', 'tests/test_research_verdict.py:test_reference_only_evidence_has_no_direction'], 'contested_iff_disagreement': ['tests/test_research_verdict.py:test_live_hypotheses_follow_every_route', 'tests/test_research_verdict.py:test_verdict_matches_each_route_and_page_is_readable']}
 
 @dataclass(frozen=True)
 class State:
@@ -53,6 +53,8 @@ class Status:
         license = 'assert' if wrong == 'verdict_upgrades_license' and question.root_license else question.root_license
         directions = tuple(sorted((anchor, route, row.id, direction) for row in question.hypotheses for anchor, route, direction in row.anchors
                                   if not (wrong == 'logic_direction_dropped' and route == 'logic')))
+        if wrong == 'reference_only_row_gets_a_direction' and question.name == 'reference_only':
+            directions += (('', 'logic', question.hypotheses[0].id, 'support'),)
         result = State(question, disagreements, live, contested, license, directions)
         yield FunctionResult(result, result, label=question.name)
 
@@ -65,7 +67,7 @@ INVARIANTS = (
     Invariant('contested_iff_disagreement', 'The verdict is contested exactly when routes disagree.', rule(contested_rule)),
 )
 
-MUTATIONS = {'skip_route_comparison': 'routes_do_not_contradict_silently', 'verdict_upgrades_license': 'verdict_matches_the_routes', 'excluded_hypothesis_stays_live': 'live_hypotheses_follow_route_exclusions', 'logic_direction_dropped': 'evidence_directions_match_routes', 'disagreement_not_contested': 'contested_iff_disagreement'}
+MUTATIONS = {'skip_route_comparison': 'routes_do_not_contradict_silently', 'verdict_upgrades_license': 'verdict_matches_the_routes', 'excluded_hypothesis_stays_live': 'live_hypotheses_follow_route_exclusions', 'logic_direction_dropped': 'evidence_directions_match_routes', 'disagreement_not_contested': 'contested_iff_disagreement', 'reference_only_row_gets_a_direction': 'evidence_directions_match_routes'}
 
 def explorer(step):
     return Explorer(Workflow((step,)), (State(),), CASES, INVARIANTS, progress_steps=0)

@@ -177,6 +177,7 @@ H = Hypothesis
 
 CASES = (
     Question('consistent', (H('h', 'UNDECIDED', True, 'consistent', (('a', 'trace', 'support'), ('a', 'logic', 'support'))),), root_license='withhold'),
+    Question('reference_only', (H('h', 'UNDECIDED', None, None, (('a', 'logic', 'support'),)),), root_license='withhold'),
     Question('trace', (H('h', None, True),), dangling=('dangling_anchor:trace:a',)),
     Question('logic', (H('h', 'UNDECIDED', True),), dangling=('dangling_anchor:logic:E:missing (source s)',), root_license='withhold'),
     Question('unused', (H('h', 'UNDECIDED', True), H('unused'))),
@@ -216,9 +217,17 @@ def native_case(kind):
         'h': {'type': 'Claim', 'text': 'Hypothesis'}, 'E': {'type': 'Evidence', 'text': 'Observed text',
             'provenance': [{'origin_kind': 'external_source', 'source_id': 's',
                             'locator': 'missing' if kind == 'logic' else 'a', 'quote': 'Observed text'}]}}, 'edges': []})
+    if kind == 'reference_only':
+        raw = logic.to_dict()
+        raw['nodes']['E_reference'] = {'type': 'Evidence', 'text': 'A reference-only supporting sentence',
+            'provenance': [{'origin_kind': 'external_source', 'source_reference': 'Named publication',
+                            'quote': 'A reference-only supporting sentence'}]}
+        raw['edges'] = [{'source': 'E', 'target': 'h', 'type': 'supports'},
+                        {'source': 'E_reference', 'target': 'h', 'type': 'supports'}]
+        logic = load_model_from_dict(raw)
     # The trace fault concerns only trace references, so omit the independent logic route.
     models = {'source': source, 'trace': trace}
-    if kind == 'logic':
+    if kind in ('logic', 'reference_only'):
         models['logic'] = logic
     index = {'hypotheses': [{'id': 'h', 'text': 'Hypothesis'}], 'root_claim': 'h', 'models': {'source': 'source.yaml'}}
     if kind == 'unused':
@@ -348,7 +357,10 @@ def native_verdict():
         directions = sorted(((row['route'], row['hypothesis'], row['direction'], row['node']) for row in rows)) == [('logic', 'h', 'limit', 'E'), ('trace', 'h', 'support', None)]
         rows = evidence_directions(directional, ['h'])
         directions = directions and sorted(((row['route'], row['direction'], row['node']) for row in rows)) == [('logic', 'oppose', 'E'), ('trace', 'support', None)]
-    return {'disagreement': disagreement, 'live': live, 'directions': directions}
+    _, reference_models = native_case('reference_only')
+    reference_rows = evidence_directions(reference_models, ['h'])
+    reference_only = {(row['anchor'], row['node']) for row in reference_rows} == {('a', 'E')}
+    return {'disagreement': disagreement, 'live': live, 'directions': directions, 'reference_only': reference_only}
 
 def native_ablations():
     from dataclasses import replace

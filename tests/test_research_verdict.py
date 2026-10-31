@@ -101,6 +101,24 @@ def test_evidence_directions_cover_both_routes():
     assert row['directions'] == sorted(row['directions'], key=lambda item: (item['route'], item['hypothesis'], item['direction']))
     assert 'logic:E_pretrend' in row['used_by']
 
+def test_reference_only_evidence_has_no_direction(tmp_path):
+    import shutil
+    candidate = tmp_path / 'reference-only'
+    shutil.copytree(EVERGIVEN, candidate)
+
+    def add_reference(data):
+        data['nodes']['E_lloyds'] = {
+            'type': 'Evidence', 'text': "Lloyd's List: the blockage alone doubled Asia-Europe spot rates in April 2021.",
+            'confidence': 0.85, 'scope': 'Asia-Europe spot rates, 2021',
+            'provenance': [{'origin_kind': 'external_source', 'source_reference': "Lloyd's List, April 2021",
+                            'quote': 'The Suez blockage alone doubled Asia-Europe spot rates in April 2021.'}],
+        }
+        data['edges'].append({'source': 'E_lloyds', 'target': 'h_suez', 'type': 'supports', 'weight': 0.9})
+
+    _rewrite(candidate, 'logic.yaml', add_reference)
+    status = research_status(load_research(candidate))
+    assert not any(direction['node'] == 'E_lloyds' for row in status['evidence'] for direction in row['directions'])
+
 def test_writer_surface_keys_are_pinned(tmp_path):
     """The keys LogicWriting reads from status --json; they do not change."""
     source_only = tmp_path / 'source-only'
