@@ -119,6 +119,36 @@ def test_reference_only_evidence_has_no_direction(tmp_path):
     status = research_status(load_research(candidate))
     assert not any(direction['node'] == 'E_lloyds' for row in status['evidence'] for direction in row['directions'])
 
+def test_summary_number_not_in_quote_warns(tmp_path):
+    import shutil
+    candidate = tmp_path / 'C2'
+    shutil.copytree(EVERGIVEN, candidate)
+    baseline = research_status(load_research(EVERGIVEN))
+    path = candidate / 'logic.yaml'
+    path.write_text(path.read_text().replace('~7,000 (mid', '~3,500 (mid'))
+    warning = 'summary_number_not_in_quote:E_series'
+    c2 = research_status(load_research(candidate))
+    assert c2['warnings'].count(warning) == 1
+    assert not any(item.startswith('summary_number_not_in_quote:') for item in baseline['warnings'])
+    assert c2['verdict'] == baseline['verdict'] and c2['errors'] == [] and set(c2) == set(baseline)
+
+    source_path = candidate / 'source.yaml'
+    source = yaml.safe_load(source_path.read_text())
+    matched = next(row for row in source['anchors'] if (row['source_id'], row['anchor_id']) == ('src-drewry-wci', 'anc-wci-series'))
+    unrelated = next(row for row in source['anchors'] if row is not matched)
+    unrelated['normalized_summary'] = (unrelated.get('normalized_summary') or '') + ' 3,500'
+    source_path.write_text(yaml.safe_dump(source, sort_keys=False))
+    assert research_status(load_research(candidate))['warnings'].count(warning) == 1
+    matched['normalized_summary'] = (matched.get('normalized_summary') or '') + ' 3,500'
+    source_path.write_text(yaml.safe_dump(source, sort_keys=False))
+    anchor_supported = research_status(load_research(candidate))
+    assert warning not in anchor_supported['warnings'] and anchor_supported['errors'] == []
+
+    path.write_text(path.read_text().replace('~3,500 (mid', '~7000 (mid'))
+    assert research_status(load_research(candidate))['warnings'].count(warning) == 1
+    _rewrite(candidate, 'logic.yaml', lambda data: data['nodes']['E_series'].update(text='上涨3500元，报价3500USD。'))
+    assert research_status(load_research(candidate))['warnings'].count(warning) == 1
+
 def test_writer_surface_keys_are_pinned(tmp_path):
     """The keys LogicWriting reads from status --json; they do not change."""
     source_only = tmp_path / 'source-only'

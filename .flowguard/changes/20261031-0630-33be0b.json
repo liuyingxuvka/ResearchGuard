@@ -1,0 +1,42 @@
+{
+  "kind": "change",
+  "goal": "RG-605: A number in an evidence summary must occur in its quote or anchor",
+  "requests": [
+    {
+      "id": "R1",
+      "part": true
+    }
+  ],
+  "base": "7b9fab726227ed7c8ee04dd8c3b26f4a43782b43",
+  "tree": "33be0b4127a8b935895db034b5843b764c2997a1123069ea6c1de12d870b85f4",
+  "promoted": "2026-10-31T06:30:55.274537+00:00",
+  "plan": [
+    {
+      "line": "changes: research_verdict.summary_numbers_come_from_the_source by R1 \"新建规则 `summary_numbers_come_from_the_source`（说明 “a number in an evidence summary that occurs in neither its quote nor its anchor is warned once”）\"",
+      "added_after_code": null,
+      "cleared": []
+    },
+    {
+      "line": "touch: src/researchguard/research.py:research_status",
+      "added_after_code": null,
+      "cleared": []
+    }
+  ],
+  "rules": [
+    {
+      "id": "research_verdict.summary_numbers_come_from_the_source",
+      "old": null,
+      "new": "fp:90ede47821cfe48fce2606aa484b828013c7efec9eb8aa56c8321ea617704f58",
+      "provenance": "owner R1"
+    }
+  ],
+  "acceptances": [],
+  "existing_cleared": [],
+  "implemented_by": [
+    "src/researchguard/research.py:research_status",
+    "tests/test_research_verdict.py:test_summary_number_not_in_quote_warns"
+  ],
+  "new_actions": [],
+  "corrections": [],
+  "checked": "This promotion ran one fresh target check with bound tests and the remaining function-selected tests; 1 warning(s) remained. The tree identifies the checked post-promotion content, before later component confirmation. Implementation provenance lists changed Python function definitions from the Git diff. Available static rule identities and checked PLAN lines are recorded. PLAN edit ordering, per-item clearance, acceptances, existing-item clearance and new-action judgments are not assessed; unknown order is null and unsupported lists are empty."
+}

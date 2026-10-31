@@ -8,6 +8,7 @@ import os
 from dataclasses import dataclass, field
 import json
 import math
+import re
 from pathlib import Path
 from typing import Any
 
@@ -472,6 +473,22 @@ def research_status(tree: ResearchTree) -> dict[str, Any]:
                   for row in tree.index["hypotheses"]]
     evidence = []
     source = tree.models.get("source")
+    logic_model = tree.models.get("logic")
+    if logic_model is not None:
+        numbers = re.compile(r"\d+(?:[,.]\d+)*")
+        anchors = {(row.source_id, row.anchor_id): row for row in source.anchors} if source else {}
+        for node in logic_model.nodes.values():
+            if node.type != "Evidence":
+                continue
+            source_text = []
+            for record in coerce_provenance(node.provenance):
+                source_text.append(record.quote or "")
+                anchor = anchors.get((record.source_id, record.locator))
+                if anchor is not None:
+                    source_text.extend((anchor.text, anchor.normalized_summary))
+            supported = set(numbers.findall(" ".join(source_text)))
+            if any(number not in supported for number in numbers.findall(node.text)):
+                problems["warnings"].append(f"summary_number_not_in_quote:{node.id}")
     directed: dict[str, list[dict[str, Any]]] = {}
     for row in evidence_directions(tree.models, [item["id"] for item in tree.index["hypotheses"]]):
         directed.setdefault(row.pop("anchor"), []).append(row)

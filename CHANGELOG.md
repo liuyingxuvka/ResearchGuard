@@ -10,6 +10,8 @@
 
 - When research.yaml lists a source model, logic evidence that names no source anchor is an error (evidence_not_in_source) with the command that fixes it; without a source model it is listed as evidence_unanchored.
 
+- A number in an evidence summary that occurs in neither its quote nor its anchor gives the warning summary_number_not_in_quote.
+
 ## v0.5.17 - 2026-10-28 - Declared replays and usable counter-source queries
 
 - Size caps on skill text, prompt bundles and command output are replaced by checks for repeated paragraphs, dead links, unknown names and complete output; byte totals are printed, not limited.

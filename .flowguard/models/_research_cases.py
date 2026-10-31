@@ -487,3 +487,30 @@ def native_unanchored():
     anchored['edges'] = [edge for edge in anchored['edges'] if edge['source'] != 'E_reference']
     normal = check_research_tree(index, dict(models, logic=load_model_from_dict(anchored)))
     return {'with_source': with_source, 'without_source': without_source, 'normal': normal}
+
+def native_summary_numbers():
+    """Use the real example and C2, plus a valid quote-only view without a source model."""
+    import shutil
+    from tempfile import TemporaryDirectory
+    import yaml
+    from researchguard.research import load_research, research_status
+
+    baseline = research_status(load_research(EVERGIVEN))
+    with TemporaryDirectory() as directory:
+        folder = Path(directory) / 'C2'
+        shutil.copytree(EVERGIVEN, folder)
+        logic_path = folder / 'logic.yaml'
+        before = logic_path.read_text()
+        changed = before.replace('~7,000 (mid', '~3,500 (mid')
+        assert changed != before, 'the fixed C2 edit must reach E_series'
+        logic_path.write_text(changed)
+        c2 = research_status(load_research(folder))
+        # A source-free question cannot retain source-owned ablations. Keep the
+        # same actual logic and quotes, with only that route listed in the index.
+        index_path = folder / 'research.yaml'
+        index = yaml.safe_load(index_path.read_text())
+        index['models'] = {'logic': 'logic.yaml'}
+        index['ablations'] = []
+        index_path.write_text(yaml.safe_dump(index, sort_keys=False))
+        quote_only = research_status(load_research(folder))
+    return {'baseline': baseline, 'C2': c2, 'quote_only': quote_only}
