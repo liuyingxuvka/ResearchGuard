@@ -595,7 +595,7 @@
         "tests/trace/test_task_iteration.py"
       ],
       "status": "confirmed",
-      "fingerprint": "sha256:25351bb50c07606b88778099d6abe5c189fa6e19bafdd61efe56e0c0cc875b9e"
+      "fingerprint": "sha256:46d83260abf8f8fe598a8fe3b3562048b13053751c9398021e42d61ec89d1431"
     },
     {
       "state": [],

@@ -1655,13 +1655,26 @@ def evaluate_storyline_depth(
         critical_threshold=CRITICAL_PERTURBATION_THRESHOLD,
     )
     effects: list[PerturbationEffect] = []
+    declared_results: dict[str, tuple[tuple[HypothesisSnapshot, ...], str]] = {}
     for item in plan:
-        effect, _, _ = run_single_perturbation(
-            model,
-            baseline_result,
-            item,
-            hypotheses,
+        declared_id = (
+            item.declared_perturbation_id
+            if item.kind in {"evidence_ablation", "expected_sensitivity"}
+            else ""
         )
+        if declared_id in declared_results:
+            after, solver_id = declared_results[declared_id]
+            effect = replace(
+                compare_perturbation(item, baseline_snapshots, after),
+                baseline_solver_id=baseline_result.inference.solver_id,
+                perturbed_solver_id=solver_id,
+            )
+        else:
+            effect, _, _ = run_single_perturbation(
+                model, baseline_result, item, hypotheses,
+            )
+            if declared_id:
+                declared_results[declared_id] = effect.after, effect.perturbed_solver_id
         effects.append(effect)
     unresolved = [*alternative_gaps, *causal_gaps, *object_gaps, *_inference_self_check_gaps(model, baseline_result)]
     raw_policy = model.metadata.get("storyline_depth_policy") or {}

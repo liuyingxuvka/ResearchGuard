@@ -3,17 +3,20 @@ from __future__ import annotations
 import json
 import subprocess
 import sys
+from collections import Counter
 from copy import deepcopy
 from pathlib import Path
 
 import yaml
 
+from researchguard.trace import evaluator as trace_evaluator
 from researchguard.trace.evaluator import evaluate_model
-from researchguard.trace.schema import TraceGuardModel
+from researchguard.trace.schema import TraceGuardModel, trace_model_fingerprint
 from researchguard.trace.storyline_depth import (
     CRITICAL_PERTURBATION_THRESHOLD,
     PerturbationPlanItem,
     _object_depth_coverage,
+    apply_declared_perturbation,
     evaluate_storyline_depth,
     hypotheses_for_model,
     perturbation_candidates,
@@ -467,6 +470,62 @@ def test_expected_sensitivity_must_match_same_engine_support_effect() -> None:
     assert "expected_sensitivity_mismatch" in {
         gap["gap_id"] for gap in result.unresolved_gaps
     }
+
+
+def test_declared_variant_is_evaluated_once_per_depth_call(monkeypatch) -> None:
+    data = _data()
+    data["evidence_ablations"].append(
+        {
+            **data["evidence_ablations"][0],
+            "ablation_id": "remove_company_only",
+            "remove_evidence_ids": ["ev_company"],
+        }
+    )
+    data["expected_sensitivities"].append(
+        {
+            **data["expected_sensitivities"][0],
+            "sensitivity_id": "sensitivity_company_only",
+            "perturbation_id": "remove_company_only",
+            "expected_direction": "increase",
+        }
+    )
+    model = _model(data)
+    baseline = evaluate_model(model, include_storyline_depth=False)
+    plan, _ = select_perturbation_plan(model)
+    declared = [
+        item for item in plan
+        if item.kind in {"evidence_ablation", "expected_sensitivity"}
+    ]
+    assert len(declared) == 4
+    expected = {
+        item.perturbation_id: run_single_perturbation(model, baseline, item)[0]
+        for item in declared
+    }
+    fingerprints = {
+        trace_model_fingerprint(apply_declared_perturbation(model, item.declared_perturbation_id))
+        for item in declared
+    }
+    assert len(fingerprints) == 2
+    calls = Counter()
+    native_evaluate = trace_evaluator.evaluate_model
+
+    def counted_evaluate(variant, **kwargs):
+        calls[trace_model_fingerprint(variant)] += 1
+        return native_evaluate(variant, **kwargs)
+
+    monkeypatch.setattr(trace_evaluator, "evaluate_model", counted_evaluate)
+    for invocation in (1, 2):
+        result = evaluate_storyline_depth(model, baseline)
+        actual = {
+            effect.perturbation.perturbation_id: effect
+            for effect in result.effects
+            if effect.perturbation.kind in {"evidence_ablation", "expected_sensitivity"}
+        }
+        assert actual == expected
+        assert result.sensitivity_mismatch_ids == ("sensitivity_company_only",)
+        assert {key: calls[key] for key in fingerprints} == {
+            key: invocation for key in fingerprints
+        }
 
 
 def test_critical_event_without_time_blocks_object_depth() -> None:

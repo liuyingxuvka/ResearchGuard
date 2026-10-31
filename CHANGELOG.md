@@ -10,6 +10,8 @@
 
 - A number in an evidence summary that occurs in neither its quote nor its anchor gives the warning summary_number_not_in_quote.
 
+- Trace depth checks evaluate each declared evidence ablation once per call while preserving its separate sensitivity results.
+
 - The skill description now names causal and evidential conclusions, with a three-item quick check that leaves lightweight, folder-free answers available.
 
 - README rewritten: the problem it solves for an AI user, a before/after example and a quick start from the git tag.
