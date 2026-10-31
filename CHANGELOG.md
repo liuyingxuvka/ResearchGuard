@@ -2,19 +2,19 @@
 
 ## Unreleased
 
-- Maintenance runs on FlowGuard 0.71.0: the project rules name req add and every exit of target check, CLAUDE.md imports AGENTS.md, and each accepted debt carries an expiry.
-
 - status no longer crashes on evidence that names only a source_reference, and an error that is not about research.yaml is reported as research_status_failed with the real exception.
 
-- researchguard sync <folder> brings source anchors into the trace and logic models of that folder in one command; the shipped Ever Given example is synced, so a sync of it reports no change.
+- researchguard sync <folder> refreshes source-owned copies through the native trace and logic handoffs; the shipped Ever Given example is synced, so a sync of it reports no change.
 
-- When research.yaml lists a source model, logic evidence that names no source anchor is an error (evidence_not_in_source) with the command that fixes it; without a source model it is listed as evidence_unanchored.
+- When research.yaml lists a source model, logic evidence that names no source identity is an error (evidence_not_in_source); the README explains source intake and explicit provenance binding. Without a source model it is listed as evidence_unanchored.
 
 - A number in an evidence summary that occurs in neither its quote nor its anchor gives the warning summary_number_not_in_quote.
 
-- The skill description also routes an AI that is about to state a causal or evidential conclusion to status, with a three-line quick check.
+- The skill description now names causal and evidential conclusions, with a three-item quick check that leaves lightweight, folder-free answers available.
 
 - README rewritten: the problem it solves for an AI user, a before/after example and a quick start from the git tag.
+
+- Maintenance runs on FlowGuard 0.71.0: the project rules name req add and every exit of target check, CLAUDE.md imports AGENTS.md, and each accepted debt carries an expiry.
 
 ## v0.5.17 - 2026-10-28 - Declared replays and usable counter-source queries
 
