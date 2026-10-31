@@ -786,72 +786,23 @@
   ],
   "accepted_debts": [
     {
-      "code": "large_component",
-      "component": "sourceguard",
-      "reason": "SourceGuard has one job, the source belief state; its planner, scoring, depth and field definitions read the same schema."
-    },
-    {
-      "code": "large_file",
-      "component": "logic-library",
-      "contains": "src/researchguard/logic/source_library.py",
-      "reason": "One SourceLibrary class owns imports, per-source models, projects and the index over one directory layout."
-    },
-    {
-      "code": "large_file",
-      "component": "sourceguard",
-      "contains": "src/researchguard/source/schema.py",
-      "reason": "All SourceGuard fields are defined in one file so they can be checked against the field table."
-    },
-    {
-      "code": "large_file",
-      "component": "trace-model",
-      "contains": "src/researchguard/trace/schema.py",
-      "reason": "All TraceGuard model fields are defined in one file so they can be checked against the field table."
-    },
-    {
-      "code": "large_file",
-      "component": "trace-depth",
-      "contains": "src/researchguard/trace/storyline_depth.py",
-      "reason": "One storyline depth check: perturbation plan, effects, expected sensitivities and closure read the same snapshots."
-    },
-    {
-      "code": "large_file",
-      "component": "logic-depth",
-      "contains": "src/researchguard/logic/execution_depth.py",
-      "reason": "One native depth analysis: coverage universe, perturbations and closure share one evaluation."
-    },
-    {
-      "code": "large_file",
-      "component": "logic-evaluation",
-      "contains": "src/researchguard/logic/model.py",
-      "reason": "The LogicModel dataclasses and their edge index form one argument model type."
-    },
-    {
-      "code": "large_file",
-      "component": "suite-orchestration",
-      "contains": "src/researchguard/logic/cli.py",
-      "reason": "The LogicGuard command line: one argparse tree whose subcommands only dispatch to member functions."
-    },
-    {
-      "code": "high_fan_out",
-      "component": "suite-orchestration",
-      "reason": "The single console and the four member command lines dispatch to every route component and its map children."
-    },
-    {
       "code": "hub",
       "component": "trace-depth",
-      "reason": "splitting trace-depth creates an import cycle (RG-310): evaluator.py and storyline_depth.py import each other, and its three users read one depth snapshot"
+      "reason": "splitting trace-depth creates an import cycle (RG-310): evaluator.py and storyline_depth.py import each other, and its three users read one depth snapshot",
+      "expires": "v0.7.0"
     },
     {
       "code": "unmodeled_owner",
       "component": "trace-library",
-      "reason": "Case library file IO (create, persist, search, gap writeback) with no state machine of its own; tests/trace/test_traceguard.py covers it."
+      "reason": "Case library file IO (create, persist, search, gap writeback) with no state machine of its own; tests/trace/test_traceguard.py covers it.",
+      "expires": "v0.6.1"
     },
     {
       "code": "never_imported",
       "component": "logic-library",
       "contains": "src/researchguard/logic_viewer/settings.py",
-      "reason": "settings.py is imported by the optional desktop_app.py, deliberately outside the map in RG-406; tests/logic/test_library_viewer.py covers the viewer boundary."
+      "reason": "settings.py is imported by the optional desktop_app.py, deliberately outside the map in RG-406; tests/logic/test_library_viewer.py covers the viewer boundary.",
+      "expires": "v0.7.0"
     }
   ],
   "model_digests": {
