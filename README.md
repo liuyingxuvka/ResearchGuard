@@ -1,158 +1,255 @@
 # ResearchGuard
 
-ResearchGuard is one versioned research-quality guard suite with one agent
-skill, `researchguard`, and four routes:
+<p align="center"><strong>Your AI tells a confident causal story that its sources do not support. ResearchGuard keeps the sources, the timeline and the argument as separate, linked models whose constraints can be checked, and tells the AI whether a claim may be asserted, must be qualified, or must be withheld.</strong></p>
 
-- `logic` (LogicGuard) audits argument structure and claim support.
-- `source` (SourceGuard) plans evidence and source discovery.
-- `trace` (TraceGuard) reconstructs and stress-tests evidence-backed timelines
-  and qualitative causal storylines.
-- `experiment` (ExperimentGuard) recommends finite experiment sets that distinguish
-  caller-declared hypotheses, minimizing declared cost or experiment count.
+| Version | Runtime | Package | License |
+| --- | --- | --- | --- |
+| `v0.6.0` | Python 3.11+ | `researchguard` | MIT |
 
-All four routes use one `researchguard` Python distribution, one suite version
-and one console: `researchguard logic|source|trace|experiment ...`. A selected
-route's failure is terminal. ResearchGuard does not retry through another
-route, silently downgrade, or load legacy package formats.
+ResearchGuard is a Python tool and an agent skill (Claude Code, Codex) for one question at a time. The question lives
+in a folder: the hypotheses, the sources with the exact passages quoted from them (anchors), a timeline, an argument
+and, if useful, a set of experiments that would tell the hypotheses apart. The AI builds these explicit models; native tools check their bindings, constraints and disagreements,
+then compute a bounded verdict from the declared evidence and argument structure.
 
-The first release was `v0.1.0`.
+## 30 seconds: did the Ever Given cause the 2021 freight rate rise?
 
-## Install
+A user asks: *Did the Ever Given grounding in the Suez Canal (23–29 March 2021) cause the 2021 Asia–Europe container
+freight rate rise?*
 
-```bash
-python -m pip install -e .
-python scripts/install_skill.py --target "$CODEX_HOME/skills"   # or ~/.claude/skills
-python scripts/install_skill.py --target "$CODEX_HOME/skills" --check
+**Without ResearchGuard**, the AI may answer from the story everybody remembers:
+
+> Yes. The six-day blockage of the Suez Canal disrupted Asia–Europe shipping and caused the 2021 freight rate rise.
+
+**With ResearchGuard**, the AI keeps the question as a research folder and reads its status. The folder ships as
+`examples/research/evergiven/`:
+
+```console
+$ researchguard status examples/research/evergiven | head -19
+# Did the Ever Given grounding (23–29 March 2021) cause the 2021 Asia–Europe container freight rate rise?
+
+## Verdict
+
+- search: continue_search
+- root_claim: h_suez: withhold — h_suez is UNDECIDED: R_h_suez_anc-transpacific (Rebuttal) blocks it; R_h_suez_anc-unctad-surge (Rebuttal) blocks it; R_pretrend (Rebuttal) blocks it; h_demand (Claim) blocks it.
+- live_hypotheses: h_demand, h_yantian
+- contested: false
+- errors: 0
+
+Models: source ok (source.yaml) | trace ok (trace.yaml) | logic ok (logic.yaml) | experiment ok (experiment.json)
+
+## Hypotheses
+
+| id | text | logic | trace | experiment |
+|---|---|---|---|---|
+| h_suez | The Suez blockage caused the rise. | UNDECIDED 0.16 | rank 2, support 0.33, not live, causal 0.33 | eliminated |
+| h_demand | Demand rebound and container scarcity drove the rise. | IN 0.74 | rank 1, support 0.45, live | consistent |
+| h_yantian | The Yantian disruption drove the rise. | not listed | not listed | consistent |
 ```
 
-The first line installs the `researchguard` console; the second copies the
-`researchguard` skill folder into the agent's skills directory and removes the
-`logicguard`, `sourceguard`, `traceguard` and `experimentguard` folders that
-older versions installed.
+The claim the AI wanted to make is `h_suez`, and its wording licence is **withhold**. The argument lists four
+blockers, including the pre-trend rebuttal and the competing demand claim. The timeline does not keep h_suez live,
+and the declared experiment record eliminates it. `search: continue_search` says the counter-source search is unfinished.
+The answer licensed by this folder is therefore: *these records do not support asserting that the blockage caused the
+rise; demand rebound remains a live alternative, and the Suez claim is withheld.* The page also lists source-bound
+evidence, open gaps and next searches, so the AI can choose the next useful check.
 
-## Starting a model
+### The shortcut it closes
 
-Build only the routes and hypotheses the question needs. JSON status reports include raw input file digests and source-owned evidence locators, summaries and boundaries; compare the digests before reusing a saved report. `source add-anchor` adds source-owned anchors by command and writes compact YAML without defaults. Search readback names the gap and query, with declared searches first on equal scores. The source and trace field indexes load one step at a time.
+The AI's easiest way to rescue its first answer is to type a supporting sentence straight into the argument, for example
+a newspaper line "the blockage alone doubled Asia–Europe spot rates in April 2021", without adding the source it came
+from. When the folder declares a source model, that evidence has no source identity to check against. From `v0.6.0` it
+is an error:
 
+```console
+$ researchguard status <copy> | tail -4
+## Problems
 
-For a research question, start from its folder: `researchguard status <folder>` reads the verdict,
-open gaps and next actions (`--hypothesis <id>` for one hypothesis). A new question starts with
-`research.yaml` (template in `skills/researchguard/references/research-tree.md`, "Start a question").
+- error evidence_not_in_source:logic:E_lloyds (its provenance names no source_id; add the anchor with researchguard source add-anchor, then run researchguard sync <folder>)
+- warning hypothesis_not_in_logic:h_yantian
+```
 
-`researchguard source create --output source.yaml` and `researchguard trace create --output trace.yaml`
-write complete synthetic teaching examples that validate directly. Source validation warns while
-`example-` rows remain; replace them with retrieved material before using the model for a real claim.
-Source gaps default to `discovered` only when `semantic_state` is omitted; retired `status` remains invalid.
-The source and trace field sheets list current fields, defaults, allowed values and observation formats.
-Logic Evidence provenance may use an exact-text `quote` to calculate its content hash; a supplied hash
-must match, and validation errors name the affected node.
+Re-enter the evidence through the source model, starting from a clean candidate copy. Quote the passage as an anchor,
+sync the copy, then compare it with the current folder before accepting it. Sync preserves authored nodes; an existing
+unanchored insertion needs an explicit source binding rather than silent deletion. To keep the original `E_lloyds`,
+set its provenance to `origin_kind: external_source`, `source_id: src-lloyds`, `locator: anc-lloyds` and the anchor's
+exact `quote`; remove or refresh a stale `source_reference`. Its text and authored edges can stay. The clean-copy route is:
 
-## Codex-facing source intake contract
+```console
+$ cp -r examples/research/evergiven ../evergiven-copy
+$ researchguard source add-anchor ../evergiven-copy/source.yaml --source-id src-lloyds --anchor-id anc-lloyds --quote "The Suez blockage alone doubled Asia-Europe spot rates in April 2021." --locator "Lloyd's List, April 2021" --output ../evergiven-copy/source.yaml
+{"ok": true, "output": "../evergiven-copy/source.yaml"}
+$ researchguard sync ../evergiven-copy
+sync: trace evidence added ["anc-lloyds"] updated []; logic nodes added [] updated []; conflicts []
+next: researchguard status /workspace/guard11/evergiven-copy
+note: To compare, pass the unchanged current folder to status and this synced folder to --candidate.
+$ researchguard status examples/research/evergiven --candidate ../evergiven-copy
+## Current and candidate
 
-The CLI preservation step is not enough by itself. When concrete source
-material is provided, Codex preserves it, reads it, writes a content-level model,
-and verifies the model with `view-graph` or `view-snapshot`. If reading
-or modeling is blocked, the source is reported as preserved with modeling
-incomplete; generated prose is never promoted to evidence.
+- evidence added: anc-lloyds
+```
 
-## Skill layout
+A new anchor is only a new piece of evidence. Whether it changes the verdict depends on what the argument and the
+timeline do with it, and that is decided by the routes, not by the AI's wish.
 
-- `skills/researchguard/SKILL.md` is a route table; the agent loads only the
-  chosen `references/routes/<route>.md`.
-- LogicGuard's source library, structured-artifact audit, model deepening,
-  artifact synthesis and project library viewer are sub-routes of the `logic`
-  route; TraceGuard's case library is a sub-route of the `trace` route.
+## Quick start
 
-`researchguard source stop-decision` checks every executable search addressing an
-open gap. An affordable critical search continues; a critical gap without one
-stays blocked. Without blocking gaps, `--sufficient` stops even when optional
-followups remain; those followups stay visible. Only cost is compared with budget.
-`trace report` in Markdown or text shows dated events, ranked hypotheses and native
-depth blockers; `trace gaps` includes those unresolved depth gaps. `trace compare`
-also reports hypothesis and source/evidence/event/link inventory changes. Source reports
-show source roles and lineage, anchor locators and each closed gap's declared closure basis.
+**1. Install the tool, from the release tag.**
 
-Ordinary logic arguments use an internal unit/card inventory when no inventory or role
-declarations are present. Explicit declarations, including empty ones, keep their checks.
-Depth exposes `coverage_universe.implicit_inventory` and informational shared Evidence IDs;
-real role, scope, competition and perturbation gaps still block closure.
-See `examples/logic/plain_research_argument.yaml` for a complete synthetic example.
+```bash
+python -m pip install "git+https://github.com/liuyingxuvka/ResearchGuard.git@v0.6.0"
+```
 
-TraceGuard can expose a deletion-minimal contradiction core;
-`researchguard logic minimal-sets` exposes deletion-minimal support and attack
-sets with a conservative wording license. Candidates are split by the edge
-entering the claim; when support is unavailable, the result names the native
-blockers and their types instead of claiming an empty minimal attack core. ExperimentGuard is
-recommendation-only: it never executes an experiment or invents probabilities.
+This installs the `researchguard` command. Python 3.11 or newer.
 
-Experiment specs may declare non-negative finite `cost_by_experiment` values.
-With costs, select by total cost, then count and IDs (at most 16 candidates);
-without them, keep count first. Unlisted costs default to 1. Alternatives omit
-the selected set, and valid prior counterevidence keeps a hypothesis eliminated
-even when a later observation misses the prediction matrix. Retired port fields
-are ignored in old JSON inputs and omitted from current output.
+**2. Install the skill for your AI**, from the same tag:
 
-TraceGuard solves storyline support from evidence first, then bounds causal
-support beneath it. Declaring a causal candidate cannot improve a storyline's
-support; unresolved or partly addressed confounders provide no positive support.
-`trace depth` always checks applicable causal-declaration and opposing-evidence
-removals for self-boosting support, and blocks closure if either check fails.
-Its live alternatives exclude the leading hypothesis.
-Competition remains comparison context, without turning opposition to one
-hypothesis into extra absolute support for another.
+```bash
+git clone --depth 1 --branch v0.6.0 https://github.com/liuyingxuvka/ResearchGuard.git
+python ResearchGuard/scripts/install_skill.py --target ~/.claude/skills          # Claude Code
+python ResearchGuard/scripts/install_skill.py --target ~/.codex/skills           # Codex (or "$CODEX_HOME/skills")
+python ResearchGuard/scripts/install_skill.py --target ~/.claude/skills --check  # is the installed copy current?
+```
 
-Each route's task-local loop (predict, observe, revise) works on plain model
-files and keeps purpose, coverage, assumptions, unknowns, predictions, computed
-gap transitions, addressable next actions, and exact stop reasons. Trace predictions
-require an existing hypothesis or trace and coverage, but may expect evidence or events not yet
-in the baseline. An observation can append native source/evidence/event/link rows;
-comparison computes the checked hypothesis's support and its declared expected direction. Native
-depth gaps remain separate from prediction mismatches. A candidate must preserve
-those new rows; accepting a revision with remaining depth gaps continues iteration.
-A holdout claim or observation is optional; when given, it must be independent of the evidence
-used to build the model. The loop never writes the model file, so rolling back
-means restoring the previous file. SourceGuard preserves provider and
-finite-action stop boundaries.
-The routes share one current/candidate lifecycle kernel. Frozen predictions use v3
-with `baseline_identity`; older predictions require `stale_prediction: re-freeze`.
-A changed baseline must be frozen again.
+The script copies `skills/researchguard/` (its `SKILL.md` and the `agents/` and `references/` folders) into
+`<target>/researchguard/`, replaces an older copy, and removes the `logicguard`, `sourceguard`, `traceguard` and
+`experimentguard` folders that versions before the merge installed.
 
-The source, logic and trace loops compute gap transitions from the actual
-baseline and candidate models through one shared set operation. Only resolved
-gaps mean `progressed`; newly discovered gaps stay visible without claiming a
-quality gain. `--prior-open-gap-id` controls stagnation, not the baseline.
-Trace prediction mismatches remain rejection reasons, separate from native gap
-transitions.
+**3. The first commands**, in the cloned folder:
 
-Trace-to-logic handoffs preserve each hypothesis id, signed evidence links,
-evidence text and source provenance. Opposing evidence supports a rebuttal,
-limiting evidence supports a limitation, and neither becomes direct support for
-the the claim being checked. Import preserves the primary hypothesis as root without
-inventing a warrant or relationships between hypotheses. Old trace-only bundles
-and the result-only export API remain supported.
+```bash
+cd ResearchGuard
+researchguard status examples/research/evergiven
+researchguard status examples/research/evergiven --hypothesis h_suez
+researchguard status examples/research/evergiven --json --output ../evergiven-status.json
+```
 
-`source depth` includes observations already recorded in the model. A supplied
-observation previews an additional cloned update; without any observations it
-remains planning-only. Recorded depth never implies a provider ran in this call.
+The first prints the verdict page shown above; the second shows one hypothesis with the evidence for and against it,
+the known-bad checks that touch it, its open gaps and the next actions; the third saves the full report as JSON, which
+is what LogicWriting reads.
 
-Source plans keep executable declared actions without generating duplicates for
-the same gap. Generated gap queries use its description and at most two domain
-hints, capped at 120 characters. `score-actions` and `plan --all-scores` share
-the complete native candidate/scoring path; scoring weights are unchanged.
+**Your own question.** Start a folder with `research.yaml` (the template is
+["Start a question" in `research-tree.md`](./skills/researchguard/references/research-tree.md)), add only the route
+models the question needs, list them under `models`, and run `researchguard status <folder>` after every step. When the folder lists a source model, add new source evidence as an anchor
+(`researchguard source add-anchor`), then `researchguard sync <folder>`. Standalone and source-free models remain supported.
 
-`source compare` compares versions of the same model using native semantic gap
-state and qualification decisions, without restoring the retired gap status.
-A self-comparison reports no changes.
+## How it works
 
-## 一个研究文件夹
+```mermaid
+flowchart LR
+  Q["research.yaml<br/>the question and its hypotheses"] --> S
+  S["source model<br/>sources and quoted anchors"] -- "sync" --> T["trace model<br/>timeline and causal story"]
+  T -- "sync relevant evidence" --> L["logic model<br/>argument and rebuttals"]
+  E["experiment model<br/>what would tell them apart"]
+  S & T & L & E --> ST["researchguard status on the folder"]
+  ST --> V["verdict: assert, qualify or withhold<br/>open gaps and next searches"]
+```
 
-第一条命令是 `researchguard status <folder>`：查看结论、假设、证据、未关缺口和下一步；
-`--hypothesis <id>` 只看一个假设，`--json` 输出数据，`--output <path>` 保存结果。
-新问题先写 `research.yaml` 索引（模板在 "Start a question"），把各路线的原生模型放在同一文件夹，
-共用假设、来源和锚点 id。格式见
-[research-tree.md](skills/researchguard/references/research-tree.md)。
+Each part of the question is an explicit model, joined to the others only by shared ids (hypotheses, sources, anchors):
 
+| Model | What it holds | Route the skill loads |
+| --- | --- | --- |
+| Source model | where each piece of evidence comes from, the quoted passage, open source gaps, when to stop searching | `source` |
+| Trace model | dated events, competing causal stories, which evidence supports or opposes each | `trace` |
+| Logic model | the argument: claims, evidence, rebuttals, what a claim may be worded as | `logic` |
+| Experiment model | the fewest or cheapest experiments that would tell the hypotheses apart (recommended, never run) | `experiment` |
 
-The optional desktop viewer requires the `viewer` extra
-(`python -m pip install -e ".[viewer]"`) and Python with tkinter.
-Core argument, source, trace and experiment commands do not require Pillow.
+`researchguard status <folder>` reads them together and checks what one AI-written record cannot check about itself:
+
+- **Copies agree with their source.** The trace and the argument carry copies of each quoted passage; a copy that
+  differs from the source model is `copy_drift`, an evidence id that names no source is `dangling_source`.
+- **The routes agree with each other.** If the argument counts a piece of evidence as support and the timeline counts
+  it as opposition, the verdict says `contested: true` and the hypothesis lists a route disagreement.
+- **The verdict is computed, not written.** The wording licence of the root claim (`assert`, `qualify` or `withhold`)
+  comes from the argument's native licensing check. Timeline and experiment states are reported alongside it.
+- **Known-bad checks.** `ablations:` in `research.yaml` remove anchors and say what must happen (`weaken`,
+  `eliminate`); an ablation the folder does not react to is reported as not caught.
+
+Changes go through a copy: edit or sync the copy, then `researchguard status <folder> --candidate <copy>` lists exactly
+what changed (evidence, verdict, errors), and you replace the folder with the copy when you accept it.
+
+Exit codes of `status`: 0 no errors (warnings allowed), 1 model or reference errors, 2 request/index problems or a reported unexpected status failure.
+
+## How it works with the other Guard skills
+
+**ResearchGuard → LogicWriting, through the saved report.** When the finished piece is a report or a paper,
+LogicWriting writes it; ResearchGuard never writes prose. Save the folder's status, then name the folder and the saved
+file in LogicWriting's brief (`research_folder`, `research_status`):
+
+```bash
+researchguard status <folder> --json --output research-status.json
+```
+
+LogicWriting reads that saved report; it does not call ResearchGuard while it checks the text. The evidence anchors its
+plan cites are taken from the report, and when the folder changes after the report was saved, LogicWriting refuses to
+close the piece until the report is refreshed (`research_report_stale`, then `run_chain.py --refresh-providers`). What
+else LogicWriting holds each claim to (the verdict, the wording licence of the root claim) is described in
+[its README](https://github.com/liuyingxuvka/LogicWriting).
+
+<!-- BEGIN GUARD FAMILY TABLE -->
+## The Guard family
+
+Five skills, one idea: make structure, relationships and constraints explicit in a separate, inspectable model. Tools check the AI's answer or changes against that model and expose counterexamples, taking over the steps where the AI tends to slip. Each skill works on its own. The only data hand-over is LogicWriting reading the saved reports of ResearchGuard and WorldGuard.
+
+| Skill | The AI weakness it makes up for | Use it when | Works with the others |
+|---|---|---|---|
+| [FlowGuard](https://github.com/liuyingxuvka/FlowGuard) | It changes one part of the software and does not see what that broke elsewhere; it rebuilds what already exists, or puts new code in the wrong place | you change, extend, refactor or audit software code, including the code of a simulation | Sends calculation results to PhysicsGuard, causal claims to ResearchGuard, story or plan consistency to WorldGuard, long texts to LogicWriting. The other four Guards are developed with FlowGuard |
+| [PhysicsGuard](https://github.com/liuyingxuvka/PhysicsGuard) | It does physics in its head and is confidently wrong about units, signs and balances | a number comes from physics: a simulation result, test data, or a calculation the AI made itself | Sends the simulation's code to FlowGuard. No other Guard reads its reports |
+| [ResearchGuard](https://github.com/liuyingxuvka/ResearchGuard) | It tells a confident causal story that its sources do not support | before a causal or evidential conclusion is stated: claims, sources, timelines, competing explanations | LogicWriting reads its saved status report. Sends the writing of the finished report to LogicWriting |
+| [WorldGuard](https://github.com/liuyingxuvka/WorldGuard) | Across chapters, days or steps it forgets who holds what and who is where, and writes events that cannot happen | a story, trip, plan or process must stay consistent from step to step | LogicWriting reads its saved check report. Sends software code to FlowGuard |
+| [LogicWriting](https://github.com/liuyingxuvka/LogicWriting) | In a long text it drifts away from its own plan and evidence | you need a finished piece for real readers: an investigation report, a paper, fiction or a story plan, a travel guide | Reads the saved reports of ResearchGuard and WorldGuard. Sends the checking of claims on their own to ResearchGuard |
+<!-- END GUARD FAMILY TABLE -->
+
+## Honest limits
+
+**What it does not do.**
+- It does not find, download or judge sources on its own. It checks the records the AI builds from them: where each
+  piece of evidence comes from, whether the copies match, whether the routes agree, and what the structure licenses.
+- A verdict is about the folder, not about the world. `withhold` means "these records do not support the claim", not
+  "the claim is false". The numbers in the Ever Given example are approximate transcriptions of public data, not
+  established conclusions. Displayed model scores are not calibrated probabilities.
+- ExperimentGuard recommends experiments; it never runs them and never invents probabilities.
+
+**Where it can still miss.**
+- The AI still writes the argument and the timeline. A misread source is caught only when another record disagrees with
+  it (a source quote, the other route); if every record repeats the same misreading, nothing disagrees.
+- A summary in the AI's own words can carry a wrong number. From `v0.6.0` a number in an evidence summary that is in
+  neither its quote nor its anchor gives the warning `summary_number_not_in_quote`; it is a warning, not an error,
+  because a summary may legitimately derive a number ("doubled").
+- Without a source model in the folder, evidence without an anchor is allowed and listed as `evidence_unanchored`.
+
+**What has been checked, and what has not.**
+- Verified on finite examples: the shipped folder has a computed `withhold` licence; reference-only evidence produces
+  the source-identity error; C2's changed summary number adds one warning without changing the verdict; syncing a
+  clean copy with one added anchor changes only that evidence. These cases do not establish general causal accuracy.
+- Not measured: whether an AI reaches for ResearchGuard on its own before stating a conclusion, how it behaves on
+  large folders, or whether it reduces total AI token use. The description asks for earlier use; that is not adoption evidence.
+
+## Developing ResearchGuard
+
+```bash
+python -m pip install -e ".[test,viewer]"
+python -m pytest -q
+```
+
+The `test` extra adds pytest and FlowGuard, which ResearchGuard uses to maintain itself; the extra pins the FlowGuard
+release this version is developed with. FlowGuard is installed only from its git tag
+(`git+https://github.com/liuyingxuvka/FlowGuard.git@<tag>`), because the package with that name on PyPI is a different
+project. Ordinary use of ResearchGuard does not need FlowGuard. AI contributors start from [`AGENTS.md`](./AGENTS.md);
+`CLAUDE.md` points Claude Code to the same file.
+
+The optional desktop viewer of the logic route needs the `viewer` extra (Pillow) and a Python with tkinter; the core
+commands do not.
+
+## Links
+
+- The skill: [`SKILL.md`](./skills/researchguard/SKILL.md), the research folder
+  ([`research-tree.md`](./skills/researchguard/references/research-tree.md)) and the four routes:
+  [logic](./skills/researchguard/references/routes/logic.md),
+  [source](./skills/researchguard/references/routes/source.md),
+  [trace](./skills/researchguard/references/routes/trace.md),
+  [experiment](./skills/researchguard/references/routes/experiment.md)
+- The worked example: [`examples/research/evergiven/`](./examples/research/evergiven/README.md)
+- Background: [diagram semantics](./docs/diagram_semantics.md), [source library workflow](./docs/source_library_workflow.md),
+  [project library viewer](./docs/project_library_viewer.md), [writing workflow](./docs/writing_workflow.md)
+- [Changelog](./CHANGELOG.md)
+- License: [MIT](./LICENSE)

@@ -14,6 +14,8 @@
 
 - The skill description also routes an AI that is about to state a causal or evidential conclusion to status, with a three-line quick check.
 
+- README rewritten: the problem it solves for an AI user, a before/after example and a quick start from the git tag.
+
 ## v0.5.17 - 2026-10-28 - Declared replays and usable counter-source queries
 
 - Size caps on skill text, prompt bundles and command output are replaced by checks for repeated paragraphs, dead links, unknown names and complete output; byte totals are printed, not limited.
