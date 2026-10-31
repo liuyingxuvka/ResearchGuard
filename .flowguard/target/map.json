@@ -1,0 +1,13 @@
+{
+  "schema": "flowguard.target.v1",
+  "goal": "RG-604: Logic evidence without a source anchor is an error when a source model exists",
+  "components": [],
+  "flows": [],
+  "remove": [],
+  "requests": [
+    {
+      "id": "R1",
+      "part": true
+    }
+  ]
+}
