@@ -95,3 +95,56 @@ def test_the_example_discussion_shows_the_computed_picture(capsys):
     assert shown, "the example README must carry the picture between its markers"
     assert main(["status", str(EVERGIVEN), "--picture"]) == 0
     assert shown.group(1) == capsys.readouterr().out
+
+
+def test_a_logic_model_that_fails_to_load_is_reported_not_drawn_as_absent(tmp_path, capsys):
+    folder = tmp_path / "broken-logic"
+    shutil.copytree(EVERGIVEN, folder)
+    (folder / "logic.yaml").write_text("nodes: [not, a, mapping]\n", encoding="utf-8")
+    assert main(["status", str(folder), "--picture", "--json"]) == 1
+    picture = json.loads(capsys.readouterr().out)
+    assert picture["boxes"] == [] and picture["arrows"] == []
+    assert len(picture["cannot_draw"]) == 1 and picture["cannot_draw"][0].startswith("model_invalid:logic: ")
+    assert main(["status", str(folder), "--picture"]) == 1
+    text = capsys.readouterr().out
+    assert text.startswith("**What h_suez rests on: not drawn**\n") and picture["cannot_draw"][0] in text
+    assert "```mermaid" not in text and "not in the logic route" not in text and "has no node in the logic model" not in text
+
+
+def test_an_anchor_the_source_model_does_not_hold_is_not_drawn_as_source_support(tmp_path):
+    folder = tmp_path / "made-up-anchor"
+    shutil.copytree(EVERGIVEN, folder)
+
+    def made_up(data):
+        for record in data["nodes"]["E_series"]["provenance"]:
+            record["locator"] = "anc-made-up"
+
+    _rewrite(folder, "logic.yaml", made_up)
+    picture = _picture(folder, "h_suez")
+    lines = {row["id"]: row for row in picture["boxes"]}["E_series"]["lines"]
+    assert "anc-made-up: not an anchor of src-drewry-wci in the source model" in lines
+    assert not any("Drewry" in line for line in lines)
+    problem = "dangling_anchor:logic:E_series:anc-made-up (source src-drewry-wci)"
+    assert {"level": "error", "text": problem} in picture["problems"]
+    text = render_picture_markdown(picture)
+    assert "**Problems in what is drawn**" in text and f"- error {problem}" in text
+
+
+def test_anchors_are_not_checked_when_the_source_model_fails_to_load(tmp_path):
+    folder = tmp_path / "broken-source"
+    shutil.copytree(EVERGIVEN, folder)
+    (folder / "source.yaml").write_text("sources: 7\n", encoding="utf-8")
+    picture = _picture(folder, "h_suez")
+    lines = {row["id"]: row for row in picture["boxes"]}["E_dates"]["lines"]
+    assert "anc-sca-dates: not checked, the source model failed to load" in lines
+    assert any(row["text"].startswith("model_invalid:source: ") for row in picture["problems"])
+
+
+def test_a_failed_trace_route_is_named_in_the_picture(tmp_path):
+    folder = tmp_path / "broken-trace"
+    shutil.copytree(EVERGIVEN, folder)
+    (folder / "trace.yaml").write_text("events: 7\n", encoding="utf-8")
+    picture = _picture(folder, "h_suez")
+    assert not any("trace" in row["routes"] for row in picture["arrows"])
+    assert any(row["text"].startswith("model_invalid:trace: ") for row in picture["problems"])
+    assert "the trace route's evidence directions: the trace model failed to load" in picture["not_drawn"]

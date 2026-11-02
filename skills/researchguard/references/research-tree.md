@@ -167,9 +167,17 @@ route's evidence directions. It holds the claim, the nodes with an edge into it
 and, while it stays readable (12 boxes, 20 arrows), the nodes one step further.
 Blocking edges are thick, trace-only links dotted, and an edge both routes
 agree on is drawn once. Its `Not drawn` list names every node it left out, the
-nodes the claim does not rest on and the route states it gives as text. With
-`--json` it returns `claim`, `boxes`, `arrows`, `blocked_by`, `not_drawn` and
-`limits`; with `--candidate` it exits 2.
+nodes the claim does not rest on and the route states it gives as text. An
+evidence box shows its anchor and source only when the source model holds that
+anchor for that source; a locator the source model does not hold is drawn as
+`not an anchor of <source> in the source model`. `Problems in what is drawn`
+lists every status error and warning that names a drawn node, anchor or source,
+and every route that failed to load; a box named there is dashed red. When the
+logic model cannot be read, the picture is not drawn and says why. With
+`--json` it returns `claim`, `boxes`, `arrows`, `blocked_by`, `not_drawn`,
+`problems` and `limits` (and `cannot_draw` instead of boxes when the logic model
+cannot be read); with `--candidate` it exits 2. The exit code is the status exit
+code of the folder.
 
 ## Synchronize new evidence
 

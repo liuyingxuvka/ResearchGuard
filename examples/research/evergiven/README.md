@@ -66,6 +66,10 @@ Drawn: 11 boxes and 18 arrows, computed from the logic model, its evaluation, th
 
 - route states shown as text, not boxes: trace not live; experiment eliminated
 - the timeline order of the trace route and the search plan are not drawn
+
+**Problems in what is drawn**
+
+- none: status reports no error or warning about anything drawn here
 <!-- END COMPUTED PICTURE -->
 
 Reply: *Two anchored pieces of evidence support the claim directly (the grounding dates and the Shanghai-Rotterdam

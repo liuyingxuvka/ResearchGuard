@@ -139,7 +139,9 @@ is what LogicWriting reads.
 
 To discuss a conclusion, draw what it rests on: `researchguard status examples/research/evergiven --picture` prints a
 Mermaid flowchart of `h_suez`, its four blockers, its direct support with each anchor and source, and the trace links,
-computed from the folder's models, followed by a list of what it left out. The example's
+computed from the folder's models, followed by a list of what it left out and of every status problem that names
+something drawn. An anchor the source model does not hold is drawn as such, and a logic model that cannot be read is
+reported instead of drawn. The example's
 [README](./examples/research/evergiven/README.md#discussing-the-verdict) shows it in a reply.
 
 **Your own question.** Start a folder with `research.yaml` (the template is

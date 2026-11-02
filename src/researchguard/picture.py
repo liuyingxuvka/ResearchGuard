@@ -1,14 +1,18 @@
 """The picture of one conclusion: which argument nodes, anchors and sources it rests on.
 
-Everything drawn is computed from the folder's own models: the logic model's edges and its
-native evaluation (state, confidence, blockers), the source model's anchors and sources, and the
-evidence directions that research_status derives for the trace route. Nothing is drawn from text
-the caller writes. The picture keeps to the discussed claim and its two nearest steps, stops at a
-readable size, and lists by id everything it leaves out.
+Boxes and arrows come from the folder's own models: the logic model's edges and its native
+evaluation (state, confidence, blockers), the source model's anchors and sources, and the evidence
+directions that research_status derives for the trace route. A provenance locator is drawn as
+source support only when the source model holds that anchor for that source; otherwise the box says
+it is not. The picture lists every status error and warning that names something it draws, and a
+logic model that cannot be read is reported as such instead of being drawn as absent. It keeps to
+the discussed claim and its two nearest steps, stops at a readable size, and lists by id everything
+it leaves out.
 """
 from __future__ import annotations
 
 from collections import deque
+import re
 from typing import Any
 
 from .logic.evaluator import evaluate_model as evaluate_logic
@@ -30,11 +34,23 @@ def _short(text: str, limit: int) -> str:
     return text if len(text) <= limit else text[: limit - 3].rstrip() + "..."
 
 
+def _route_failure(status: dict[str, Any], route: str) -> list[str]:
+    """The status errors saying that the listed model of ``route`` could not be read or evaluated."""
+    return [item for item in status["errors"] if item.startswith(f"model_invalid:{route}:") or item == f"model_missing:{route}"]
+
+
 def support_picture(tree: Any, status: dict[str, Any], claim_id: str, *,
                     max_boxes: int = MAX_BOXES, max_arrows: int = MAX_ARROWS) -> dict[str, Any]:
-    """Compute the boxes, arrows and omissions of the picture of ``claim_id``."""
+    """Compute the boxes, arrows, omissions and status problems of the picture of ``claim_id``."""
+    limits = {"boxes": max_boxes, "arrows": max_arrows}
+    logic_failure = _route_failure(status, "logic")
+    if logic_failure:
+        return {"claim": claim_id, "cannot_draw": logic_failure, "boxes": [], "arrows": [], "blocked_by": [],
+                "not_drawn": [], "problems": _problems(status, set()), "limits": limits}
+    listed = tree.index.get("models", {})
     logic = tree.models.get("logic")
     source = tree.models.get("source")
+    source_failure = _route_failure(status, "source")
     nodes = logic.nodes if logic is not None else {}
     results = evaluate_logic(logic).node_results if logic is not None else {}
     incoming: dict[str, list[Any]] = {}
@@ -52,6 +68,23 @@ def support_picture(tree: Any, status: dict[str, Any], claim_id: str, *,
             if record.locator and record.source_id:
                 anchor_of.setdefault(node_id, (record.locator, record.source_id))
                 node_of_anchor.setdefault(record.locator, node_id)
+    library_sources = {row.source_id for row in tree.library.list_sources()} if tree.library is not None else set()
+
+    def anchor_line(anchor_id: str, source_id: str) -> str:
+        """Whether the source model holds this anchor for this source, computed rather than taken from the locator."""
+        if source_failure:
+            return f"{anchor_id}: not checked, the source model failed to load"
+        if source is None:
+            return f"{anchor_id}: research.yaml lists no source model"
+        anchor = anchors.get(anchor_id)
+        if anchor is not None and anchor.source_id == source_id:
+            return f"{anchor_id} · {_source_line(sources.get(source_id), source_id)}"
+        if source_id in library_sources and anchor_id in tree.library.source_node_ids(source_id):
+            return f"{anchor_id} · node of library source {source_id}"
+        if source_id not in sources:
+            return f"{anchor_id}: source {source_id} is not in the source model"
+        return f"{anchor_id}: not an anchor of {source_id} in the source model"
+
     trace_direction = {row["anchor"]: item["direction"] for row in status["evidence"] for item in row.get("directions", ())
                        if item["route"] == "trace" and item["hypothesis"] == claim_id}
     disagreeing = {row["detail"] for row in status.get("disagreements", ())
@@ -106,10 +139,13 @@ def support_picture(tree: Any, status: dict[str, Any], claim_id: str, *,
 
     def box(item: str) -> dict[str, Any]:
         if item.startswith("anchor:"):
-            anchor = anchors.get(item.split(":", 1)[1])
-            lines = [item.split(":", 1)[1], _short(anchor.text if anchor else "", 48)]
-            if anchor is not None:
-                lines.append(_source_line(sources.get(anchor.source_id), anchor.source_id))
+            anchor_id = item.split(":", 1)[1]
+            anchor = anchors.get(anchor_id)
+            if anchor is None or source_failure:
+                lines = [anchor_id, "not checked, the source model failed to load" if source_failure
+                         else "not an anchor in the source model"]
+            else:
+                lines = [anchor_id, _short(anchor.text, 48), _source_line(sources.get(anchor.source_id), anchor.source_id)]
             return {"id": item, "kind": "anchor", "lines": lines}
         node = nodes.get(item)
         if node is None:
@@ -118,8 +154,7 @@ def support_picture(tree: Any, status: dict[str, Any], claim_id: str, *,
         state = f"{node_result.state} {node_result.confidence:.2f}" if node_result is not None else ""
         lines = [item if node.type in {"Claim", "Evidence"} else f"{item} ({node.type})", _short(node.text, 60 if item == claim_id else 48)]
         if node.type == "Evidence" and item in anchor_of:
-            anchor_id, source_id = anchor_of[item]
-            lines.append(f"{anchor_id} · {_source_line(sources.get(source_id), source_id)}")
+            lines.append(anchor_line(*anchor_of[item]))
         elif node.type == "Evidence":
             lines.append("no anchor in the source model")
         if item == claim_id:
@@ -148,11 +183,33 @@ def support_picture(tree: Any, status: dict[str, Any], claim_id: str, *,
         if routes:
             not_drawn.append("route states shown as text, not boxes: " + "; ".join(routes))
     not_drawn.append("the timeline order of the trace route and the search plan are not drawn")
-    if logic is None or claim_id not in nodes:
+    if _route_failure(status, "trace"):
+        not_drawn.append("the trace route's evidence directions: the trace model failed to load")
+    if "logic" not in listed:
+        not_drawn.insert(0, f"research.yaml lists no logic model, so no argument edges reach {claim_id}")
+    elif claim_id not in nodes:
         not_drawn.insert(0, f"{claim_id} has no node in the logic model, so no argument edges reach it")
-    return {"claim": claim_id, "boxes": [box(item) for item in order], "arrows": arrows(drawn),
-            "blocked_by": sorted(blockers), "not_drawn": not_drawn,
-            "limits": {"boxes": max_boxes, "arrows": max_arrows}}
+    boxes = [box(item) for item in order]
+    named = {item.split(":", 1)[1] if item.startswith("anchor:") else item for item in order}
+    named |= {part for item in order if item in anchor_of for part in anchor_of[item]}
+    named |= {anchors[item.split(":", 1)[1]].source_id for item in order
+              if item.startswith("anchor:") and item.split(":", 1)[1] in anchors}
+    problems = _problems(status, named)
+    flagged = {token for row in problems for token in _tokens(row["text"])}
+    for row in boxes:
+        row["problem"] = bool({row["id"], row["id"].split(":", 1)[-1]} & flagged)
+    return {"claim": claim_id, "boxes": boxes, "arrows": arrows(drawn), "blocked_by": sorted(blockers),
+            "not_drawn": not_drawn, "problems": problems, "limits": limits}
+
+
+def _tokens(text: str) -> set[str]:
+    return set(re.split(r"[\s:(),]+", text))
+
+
+def _problems(status: dict[str, Any], named: set[str]) -> list[dict[str, str]]:
+    """Every status error and warning that names a drawn node, anchor or source, and every failed route."""
+    return [{"level": level.rstrip("s"), "text": text} for level in ("errors", "warnings") for text in status[level]
+            if text.startswith(("model_invalid:", "model_missing:")) or _tokens(text) & named]
 
 
 def _source_line(source: Any, source_id: str) -> str:
@@ -201,7 +258,24 @@ def _label(lines: list[str]) -> str:
     return "<br/>".join(escaped)
 
 
+def _render_problems(picture: dict[str, Any]) -> list[str]:
+    lines = ["", "**Problems in what is drawn**", ""]
+    lines.extend(f"- {row['level']} {row['text']}" for row in picture["problems"])
+    if not picture["problems"]:
+        lines.append("- none: status reports no error or warning about anything drawn here")
+    return lines
+
+
 def render_picture_markdown(picture: dict[str, Any]) -> str:
+    if picture.get("cannot_draw"):
+        lines = [f"**What {picture['claim']} rests on: not drawn**", ""]
+        lines.extend(f"- {row}" for row in picture["cannot_draw"])
+        lines.extend(["", "The argument cannot be drawn while its logic model cannot be read."])
+        others = [row for row in picture["problems"] if row["text"] not in picture["cannot_draw"]]
+        if others:
+            lines.extend(["", "**Other routes that failed**", ""])
+            lines.extend(f"- {row['level']} {row['text']}" for row in others)
+        return "\n".join(lines) + "\n"
     ids = {row["id"]: f"n{index}" for index, row in enumerate(picture["boxes"])}
     claim = picture["boxes"][0]
     lines = [f"**What {picture['claim']} rests on**", "",
@@ -219,10 +293,15 @@ def render_picture_markdown(picture: dict[str, Any]) -> str:
     if blocking:
         lines.append("  classDef blocker stroke:#b03030,stroke-width:2px")
         lines.append(f"  class {','.join(blocking)} blocker")
+    flagged = [ids[row["id"]] for row in picture["boxes"] if row.get("problem")]
+    if flagged:
+        lines.append("  classDef problem stroke:#b03030,stroke-dasharray:4 3")
+        lines.append(f"  class {','.join(flagged)} problem")
     lines.extend(["```", "",
                   f"Drawn: {_count(len(picture['boxes']), 'box', 'boxes')} and {_count(len(picture['arrows']), 'arrow', 'arrows')}, computed from the logic model, "
                   "its evaluation, the source model and the trace route's evidence directions "
                   f"(readable size {picture['limits']['boxes']} boxes, {picture['limits']['arrows']} arrows).",
                   "", "**Not drawn**", ""])
     lines.extend(f"- {row}" for row in picture["not_drawn"])
+    lines.extend(_render_problems(picture))
     return "\n".join(lines) + "\n"
