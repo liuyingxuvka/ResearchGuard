@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Maintenance runs on FlowGuard 0.72.0 with its four plain project rules: check status first, store only the owner's own words, find code with where, run the tests and commit in your own words. The round-11 plan list that was stored as an owner request is marked as not the owner's words.
+
+- Version numbers: a release that adds features raises the second number and a release with only small fixes raises the third.
+
 ## v0.6.0 - 2026-10-31 - Sync evidence and keep claims tied to their sources
 
 - status no longer crashes on evidence that names only a source_reference, and an error that is not about research.yaml is reported as research_status_failed with the real exception.
