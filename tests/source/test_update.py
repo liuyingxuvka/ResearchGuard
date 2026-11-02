@@ -111,6 +111,74 @@ def test_anything_else_is_not_an_outside_locator_and_says_why(url):
     assert kind == '' and reason
 
 
+@pytest.mark.parametrize('url,reason', [
+    # Review round 4: a port that is no number counted as a link, and a valid IPv6 link was called no link at all.
+    ('https://slack.com:abc/', "the port 'abc' of https://slack.com:abc/ is not a number from 0 to 65535"),
+    ('https://slack.com:99999/x', "the port '99999' of https://slack.com:99999/x is not a number from 0 to 65535"),
+    ('https://slack.com:80:90/x', "the port '80:90' of https://slack.com:80:90/x is not a number from 0 to 65535"),
+    ('http://[::1]/x', 'the host ::1 of http://[::1]/x is a loopback IP address, not a public host name'),
+    ('https://[2001:DB8::1]:8443/x', 'the host 2001:db8::1 of https://[2001:DB8::1]:8443/x is an IP address, not a public host name'),
+    ('http://[::ffff:192.0.2.1]/x', 'the host ::ffff:192.0.2.1 of http://[::ffff:192.0.2.1]/x is an IP address, not a public host name'),
+    ('https://127.0.0.1/x', 'the host 127.0.0.1 of https://127.0.0.1/x is a loopback IP address, not a public host name'),
+    ('https://10.0.0.1:8080/x', 'the host 10.0.0.1 of https://10.0.0.1:8080/x is an IP address, not a public host name'),
+    ('https://[zz]/x', "'https://[zz]/x' is not an http or https link, a DOI, an ISBN or an arXiv id"),
+    ('https://[::1/x', "'https://[::1/x' is not an http or https link, a DOI, an ISBN or an arXiv id"),
+    ('https://[1.2.3.4]/x', "'https://[1.2.3.4]/x' is not an http or https link, a DOI, an ISBN or an arXiv id"),
+    ('https://[::1]x/', "'https://[::1]x/' is not an http or https link, a DOI, an ISBN or an arXiv id"),
+    ('https://[fe80::1%25eth0]/x', "'https://[fe80::1%25eth0]/x' is not an http or https link, a DOI, an ISBN or an arXiv id"),
+])
+def test_why_a_link_is_not_an_outside_locator(url, reason):
+    from researchguard.source.update import outside_locator
+    assert outside_locator(url) == ('', reason)
+
+
+@pytest.mark.parametrize('url,well_formed', [
+    ('https://slack.com:abc/', False),
+    ('https://slack.com:99999/x', False),
+    ('https://slack.com:/x', True),        # an empty port is allowed by the URL standard
+    ('https://slack.com:65535/x', True),
+    ('http://[::1]/x', True),              # a well-formed link, but no outside locator
+    ('https://[2001:db8::1]/x', True),
+    ('https://[zz]/x', False),
+])
+def test_a_link_with_a_bad_port_is_malformed_and_an_ip_literal_is_not(url, well_formed):
+    from researchguard.source.update import source_identity
+    identity = source_identity(SourceRecord(source_id='src', title="Lloyd's List", url=url))
+    assert (not identity.problems) is well_formed, identity.problems
+    public = url.startswith('https://slack.com:') and well_formed
+    assert bool(identity.unverifiable) is not public, identity.unverifiable
+
+
+def test_no_url_makes_the_locator_check_raise():
+    import random
+    from researchguard.source.update import outside_locator, source_identity
+    rng = random.Random(801)
+    for _ in range(20000):
+        url = rng.choice(('https://', 'http://', 'HTTP://', '')) + ''.join(
+            rng.choice('[]:@/?#.%-a1fz:[]') for _ in range(rng.randint(0, 24)))
+        kind, reason = outside_locator(url)
+        assert bool(kind) is not bool(reason), url
+        source_identity(SourceRecord(source_id='src', title='T', url=url))
+
+
+def test_the_ipv6_check_accepts_exactly_what_the_address_parser_accepts():
+    """The URL parser and ipaddress raise on a bracketed host they reject, so ResearchGuard checks it first."""
+    import ipaddress
+    import random
+    from researchguard.source.update import _ipv6_literal
+    rng = random.Random(803)
+    samples = ['::', '::1', '1::', '1:2:3:4:5:6:7:8', '1:2:3:4:5:6:7::', '::2:3:4:5:6:7:8', '1:2:3:4:5:6:7:8:9', '1:2:3',
+               ':1::2', '1::2::3', '::ffff:1.2.3.4', '::ffff:01.2.3.4', '1:2:3:4:5:6:1.2.3.4', '1:2:3:4:5:6:7:1.2.3.4',
+               '12345::', 'g::', '::1.2.3', '::256.1.1.1', '', ':', ':::', '1:', ':1', '::1%eth0', '1:2:3:4:5:6:7:8::']
+    samples += [''.join(rng.choice('0123456789abcdefABCDEF:.g%') for _ in range(rng.randint(0, 40))) for _ in range(20000)]
+    for text in samples:
+        try:
+            expected = isinstance(ipaddress.ip_address(text), ipaddress.IPv6Address) and '%' not in text
+        except ValueError:
+            expected = False
+        assert _ipv6_literal(text) is expected, text
+
+
 def test_a_title_never_makes_a_source_verifiable():
     from researchguard.source.update import source_identity
     for title in ("Colleague's note, 2021", 'Slack message', 'Personal communication, J. Smith',

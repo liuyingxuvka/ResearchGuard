@@ -12,6 +12,7 @@ from __future__ import annotations
 from calendar import monthrange
 from dataclasses import dataclass, replace
 from datetime import date
+import ipaddress
 import re
 import unicodedata
 from urllib.parse import urlparse
@@ -83,6 +84,10 @@ _ISBN = re.compile(r"^(?:urn:)?isbn(?:-1[03])?(?::\s*|\s+)([0-9][0-9 -]{8,15}[0-
 _ARXIV = re.compile(r"^arxiv:\s*(?:\d{2}(?:0[1-9]|1[0-2])\.\d{4,5}|[a-z]+(?:-[a-z]+)*(?:\.[a-z]{2})?/\d{2}(?:0[1-9]|1[0-2])\d{3})"
                     r"(?:v\d+)?$", re.IGNORECASE)
 _HOST_LABEL = re.compile(r"^[^\W_](?:[^\W_]|-){0,62}$")
+_AUTHORITY = re.compile(r"https?://([^/?#]*)", re.IGNORECASE)
+_PORT = re.compile(r"\d{0,5}", re.ASCII)
+_HEXTET = re.compile(r"[0-9a-f]{1,4}", re.ASCII | re.IGNORECASE)
+_IPV4 = re.compile(r"(?:0|[1-9]\d{0,2})(?:\.(?:0|[1-9]\d{0,2})){3}", re.ASCII)
 # Host names that exist only for examples or tests, and the top-level domains that name no public host.
 _EXAMPLE_HOSTS = ("example.com", "example.net", "example.org")
 _NO_PUBLIC_HOST = frozenset({"arpa", "onion"})
@@ -135,7 +140,8 @@ class SourceIdentity:
     A title names a document unless it has no letter or digit, or is made only of placeholders, words for
     a person or a kind of message or document, and small connecting words ("colleague's note", "n/a").
     That is all a tool can check about a title: an invented title passes. A link must be an http or https
-    URL with a host name, a DOI, an ISBN or an arXiv id. A date must be a calendar date that is not in the
+    URL with a dotted host name or an IP address and, if it has one, a port from 0 to 65535, or a DOI, an
+    ISBN or an arXiv id. A date must be a calendar date that is not in the
     future. A source names its document when it has a title that names one or a link; a date alone names
     none. A source is unverifiable unless its link is an outside locator (see ``outside_locator``): then
     ``unverifiable`` says why, whatever the title says.
@@ -193,9 +199,14 @@ def outside_locator(url: str) -> tuple[str, str]:
         return ("ISBN", "") if _isbn_checks(isbn[1]) else ("", f"the ISBN in {url!r} has a wrong check digit")
     if _ARXIV.match(url):
         return "arXiv id", ""
-    host = _url_host(url)
+    host, port = _url_host(url)
     if not host:
         return "", f"{url!r} is not an http or https link, a DOI, an ISBN or an arXiv id"
+    if not _port_checks(port):
+        return "", f"the port {port!r} of {url} is not a number from 0 to 65535"
+    address = _ip_address(host)
+    if address is not None:
+        return "", f"the host {host} of {url} is {'a loopback' if address.is_loopback else 'an'} IP address, not a public host name"
     if not _public_host(host):
         return "", f"the host {host} of {url} is not a public host name"
     return "link", ""
@@ -211,13 +222,60 @@ def _isbn_checks(text: str) -> bool:
     return False
 
 
-def _url_host(url: str) -> str:
-    """The host of an http or https URL, or "" for anything else; the URL parser is never given input it rejects."""
+def _url_host(url: str) -> tuple[str, str]:
+    """The host and the port text of an http or https URL, or ``("", "")`` for anything else.
+
+    A host is a name or an IPv6 address in brackets; any other bracket, or a space, makes no URL. The port
+    text is returned unchecked (see ``_port_checks``). The URL parser is never given input it rejects: it
+    raises on a bracketed host that is not an IPv6 address, and on a port that is not a number.
+    """
     url = unicodedata.normalize("NFKC", url)
-    if any(char.isspace() for char in url) or "[" in url or "]" in url:
-        return ""
-    parsed = urlparse(url)
-    return (parsed.hostname or "") if parsed.scheme in {"http", "https"} else ""
+    authority = _AUTHORITY.match(url)
+    if authority is None or any(char.isspace() for char in url):
+        return "", ""
+    hostport = authority[1].rpartition("@")[2]
+    start = authority.end(1) - len(hostport)
+    if hostport.startswith("["):
+        literal, closed, after = hostport[1:].partition("]")
+        rest = url[:start] + url[start + len(literal) + 2:]
+        if not closed or not _ipv6_literal(literal) or (after and not after.startswith(":")) or "[" in rest or "]" in rest:
+            return "", ""
+        return literal.casefold(), after[1:]
+    if "[" in url or "]" in url:
+        return "", ""
+    return urlparse(url).hostname or "", hostport.partition(":")[2]
+
+
+def _port_checks(port: str) -> bool:
+    """Whether the port text of a URL is empty or a number from 0 to 65535."""
+    return bool(_PORT.fullmatch(port)) and (not port or int(port) <= 65535)
+
+
+def _ipv6_literal(text: str) -> bool:
+    """Whether ``text`` is an IPv6 address the URL parser accepts in brackets (no zone id), checked without it."""
+    if "%" in text:
+        return False
+    head, double, tail = text.partition("::")
+    if "::" in tail:
+        return False
+    groups = [group for part in (head, tail) if part for group in part.split(":")]
+    if groups and "." in groups[-1]:
+        if not _IPV4.fullmatch(groups[-1]) or any(int(octet) > 255 for octet in groups[-1].split(".")) \
+                or (not tail and double):
+            return False
+        groups[-1:] = ["0", "0"]
+    if not all(_HEXTET.fullmatch(group) for group in groups):
+        return False
+    return len(groups) < 8 if double else len(groups) == 8
+
+
+def _ip_address(host: str) -> ipaddress.IPv4Address | ipaddress.IPv6Address | None:
+    """The IP address a URL host is, or None for a host name; only text checked first is given to ipaddress."""
+    if _ipv6_literal(host):
+        return ipaddress.IPv6Address(host)
+    if _IPV4.fullmatch(host) and all(int(octet) <= 255 for octet in host.split(".")):
+        return ipaddress.IPv4Address(host)
+    return None
 
 
 def _public_host(host: str) -> bool:
@@ -266,8 +324,12 @@ def date_period_end(text: str) -> date:
 
 
 def _is_link(url: str) -> bool:
-    """Whether a url field is well formed: an outside locator, or an http or https URL with a dotted host."""
-    return bool(outside_locator(url)[0]) or "." in _url_host(url).strip(".")
+    """Whether a url field is well formed: an outside locator, or an http or https URL whose host is dotted
+    or an IP address and whose port, if any, is a number from 0 to 65535."""
+    if outside_locator(url)[0]:
+        return True
+    host, port = _url_host(url)
+    return _port_checks(port) and ("." in host.strip(".") or _ip_address(host) is not None)
 
 
 def _is_date(text: str) -> bool:
