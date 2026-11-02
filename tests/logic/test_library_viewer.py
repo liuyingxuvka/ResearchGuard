@@ -208,6 +208,16 @@ def test_detail_header_meta_hides_internal_source_noise() -> None:
     assert "有风险点" not in meta
 
 
+def test_skill_badge_reads_the_count_every_card_carries_and_refuses_a_card_without_it() -> None:
+    from researchguard.logic_viewer.card_text import _skill_badge_label
+
+    assert _skill_badge_label({"skill_dependency_count": 0}) == ""
+    assert _skill_badge_label({"skill_dependency_count": 2}) == "2 Skills"
+    assert _skill_badge_label({"skill_dependency_count": 1}, "zh-CN") == "1 个技能"
+    with pytest.raises(KeyError, match="skill_dependency_count"):
+        _skill_badge_label({"title": "a card that ui_data did not build"})
+
+
 def test_viewer_search_matches_temporal_context(tmp_path: Path) -> None:
     source_file = tmp_path / "report.pdf"
     source_file.write_text("Report", encoding="utf-8")

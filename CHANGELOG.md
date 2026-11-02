@@ -24,7 +24,7 @@
 
 - README has a new Errors section that states how each kind of failure is reported.
 
-- For maintainers: the tests find every error handler in the code and scripts that does not re-raise (including contextlib.suppress and a finally that returns), and each must be listed under one of the README Errors sentences; the test checks the handler's code against that sentence, so a handler that swallows an error fails whatever it is listed as. No test may skip, be marked expected-to-fail or stop the run early; any of these fails the run.
+- For maintainers: the tests find every place in the code and scripts that can end an error without raising it (an except that does not re-raise, a finally that returns, contextlib.suppress under any name or inside an ExitStack, an exit callback, an __exit__ that returns true), and each must be listed under one of the README Errors sentences. The test then checks the handler's own code against that sentence: a command must print the error and return a nonzero code, and only functions whose result becomes the exit code count as commands; a result handler must put the error into what its function returns or into a list it was given, before any way out. Keeping the error in an unused local, a throwaway list or dict, or only testing it does not count. This is a check of the code's shape, not a proof. No test may skip, be marked expected-to-fail or end the run early; the test process also refuses os._exit and exec, and the run's result is recounted from the test reports, so a test that resets the failure count does not turn a failed run into a pass.
 
 ## v0.6.0 - 2026-10-31 - Sync evidence and keep claims tied to their sources
 

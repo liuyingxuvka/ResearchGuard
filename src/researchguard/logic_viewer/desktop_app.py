@@ -35,6 +35,7 @@ from researchguard.logic_viewer.card_text import (
     _detail_header_meta_line,
     _detail_header_project_label,
     _modeling_status_label,
+    _skill_badge_label,
     _temporal_values,
 )
 from researchguard.logic_viewer.i18n import (
@@ -587,20 +588,6 @@ def _confidence_label(card: dict[str, Any]) -> str:
     return f"{float(value):.2f}"
 
 
-def _skill_dependency_count(card: dict[str, Any]) -> int:
-    # ui_data sets skill_dependency_count on every card it builds.
-    return int(card.get("skill_dependency_count", 0))
-
-
-def _skill_badge_label(card: dict[str, Any], language: str = DEFAULT_LANGUAGE) -> str:
-    count = _skill_dependency_count(card)
-    if count <= 0:
-        return ""
-    if normalize_language(language) == ZH_CN:
-        return f"{count} 个技能"
-    return f"{count} Skill" if count == 1 else f"{count} Skills"
-
-
 def _source_scope_display(scope: str, language: str = DEFAULT_LANGUAGE) -> str:
     normalized_language = normalize_language(language)
     value = str(scope or "").strip().lower()
@@ -862,8 +849,8 @@ class KbDesktopApp(tk.Tk):
             except tk.TclError:
                 self._app_icon_photo = None
         if BRAND_ICON_PATH.exists():
+            icon_size = self._u(52)
             try:
-                icon_size = self._u(52)
                 with Image.open(BRAND_ICON_PATH) as image:
                     self._brand_icon_photo = ImageTk.PhotoImage(
                         image.convert("RGBA").resize((icon_size, icon_size), Image.Resampling.LANCZOS)

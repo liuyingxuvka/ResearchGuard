@@ -1,14 +1,17 @@
 """One route per function: every error handler in the product is listed with the documented
 behaviour it serves, and the handler's own code must have that behaviour's shape.
 
-The inventory is computed from the source: every ``except`` whose body does not end in ``raise``
-(or returns, breaks or continues before it), every ``contextlib.suppress`` and every ``finally``
-that returns is found. Each must appear in HANDLED under one of the CONTRACTS, a documented
-sentence of README.md "Errors", and the test then checks the handler's code against that contract:
-a command boundary prints the error and returns a nonzero code, a result row carries the error text,
-a dialog shows it, and a display fallback only guards a window-system call in the desktop viewer.
-A listed handler that no longer exists fails too, so the list cannot go stale. The tests below it
-each inject an error into a route that used to hide it and require a failure.
+The inventory is computed from the source of src/ and scripts/: every ``except`` that does not
+re-raise (or that returns, breaks or continues before it does), every ``finally`` that returns, every
+use of ``contextlib.suppress`` however it is imported or entered, every ExitStack exit callback and
+every ``__exit__`` that returns a true value. Each must appear in HANDLED under one of the CONTRACTS,
+the sentences of README.md "Errors", and the test then checks the handler's code against its sentence
+(see ``_shapes``): a command, found from the entry points and what they dispatch to, prints a value
+that carries the error and returns a nonzero code; a result handler puts a value that carries the
+error into what its function returns before any way out; a dialog shows it; a display fallback only
+guards window-system calls in the viewer. A listed handler that no longer exists fails too, so the
+list cannot go stale. This reads the shape of the code; it is not a proof. The tests below it each
+inject an error into a route that used to hide it and require a failure.
 """
 from __future__ import annotations
 
@@ -31,7 +34,7 @@ SCANNED = {SRC: "", ROOT / "scripts": "scripts/"}
 # The behaviours a handler that does not re-raise may serve, as README.md "Errors" states them.
 CONTRACTS = {
     "exit": "A command that fails prints the error and exits with a nonzero code; it never answers with a default value.",
-    "row": "A check or library step that fails puts the error into the result it returns, as a named error, gap, finding or error field with the error text, so the caller sees it.",
+    "row": "A check or library step that fails puts the error into the result it returns, as a named error, gap, finding or error field that names the error, so the caller sees it.",
     "dialog": "In the desktop library viewer, a failed import, export or dissolve shows the error in an error dialog and changes nothing.",
     "display": "When the desktop library viewer cannot use a window-system feature (maximizing, screen DPI, an icon, a dialog), it draws the plain form instead; this changes what is shown, never a result.",
 }
@@ -83,11 +86,14 @@ HANDLED = {
     ("scripts/install_skill.py", "differences", "OSError"): (1, "row"),
 }
 
-PRINTERS = {"print", "_print_json", "_json_out", "write"}
-ROW_SINKS = {"append", "extend"}
+PRINTERS = {"print", "_print_json", "_json_out"}
+STREAMS = {"stderr", "stdout"}
+ROW_SINKS = {"append", "extend", "add", "insert", "update", "setdefault"}
 WINDOW_NAMES = {"tk", "ctypes", "ImageTk", "Image", "messagebox"}
 WINDOW_ATTRIBUTES = {"tk", "winfo_fpixels", "state", "iconphoto", "PhotoImage"}
 DISPLAY_TYPES = {"tk.TclError", "OSError", "AttributeError", "ValueError", "ImportError"}
+EXITS = (ast.Return, ast.Break, ast.Continue)
+FUNCTIONS = (ast.FunctionDef, ast.AsyncFunctionDef)
 
 
 def _own_nodes(statements):
@@ -97,91 +103,378 @@ def _own_nodes(statements):
         node = stack.pop()
         yield node
         stack.extend(child for child in ast.iter_child_nodes(node)
-                     if not isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef, ast.Lambda)))
-
-
-def _mentions(node, name):
-    return name is not None and any(isinstance(item, ast.Name) and item.id == name for item in ast.walk(node))
+                     if not isinstance(child, (*FUNCTIONS, ast.ClassDef, ast.Lambda)))
 
 
 def _callee(call):
     return call.func.attr if isinstance(call.func, ast.Attribute) else getattr(call.func, "id", "")
 
 
+def _carried(node):
+    """The names whose value flows into what ``node`` evaluates to; a name that is only tested is not carried."""
+    if node is None or isinstance(node, (ast.Constant, ast.Compare, ast.UnaryOp, ast.Lambda)):
+        return set()
+    if isinstance(node, ast.Name):
+        return {node.id}
+    if isinstance(node, ast.IfExp):  # both branches carry it, or the test is the value and its true branch carries it
+        carried = _carried(node.body) & _carried(node.orelse)
+        if isinstance(node.test, ast.Name) and node.test.id in _carried(node.body):
+            carried.add(node.test.id)
+        return carried
+    if isinstance(node, ast.BoolOp):
+        return set.intersection(*(_carried(value) for value in node.values))
+    if isinstance(node, ast.Call):
+        parts = [*node.args, *(keyword.value for keyword in node.keywords)]
+        if isinstance(node.func, ast.Attribute):
+            parts.append(node.func.value)  # str(exc).strip(), "{}".format(exc)
+        return set().union(*(_carried(part) for part in parts))
+    if isinstance(node, (ast.Attribute, ast.Subscript, ast.Starred, ast.FormattedValue, ast.NamedExpr)):
+        return _carried(node.value)
+    if isinstance(node, ast.BinOp):
+        return _carried(node.left) | _carried(node.right)
+    if isinstance(node, ast.JoinedStr):
+        return set().union(*(_carried(value) for value in node.values))
+    if isinstance(node, ast.Dict):
+        return set().union(*(_carried(value) for value in (*node.keys, *node.values) if value is not None))
+    if isinstance(node, (ast.List, ast.Tuple, ast.Set)):
+        return set().union(*(_carried(item) for item in node.elts))
+    return set()
+
+
+def _labelled(node):
+    """The names ``node`` carries into a place named as an error: an ``error`` key or keyword, or ``skip_reason``."""
+    def named(label):
+        return isinstance(label, str) and ("error" in label or label == "skip_reason")
+
+    if isinstance(node, ast.Dict):
+        return set().union(*((_carried(value) if isinstance(key, ast.Constant) and named(key.value) else _labelled(value))
+                             for key, value in zip(node.keys, node.values)))
+    if isinstance(node, ast.Call):
+        return set().union(*(_labelled(arg) for arg in node.args),
+                           *((_carried(item.value) if named(item.arg) else _labelled(item.value)) for item in node.keywords))
+    if isinstance(node, ast.IfExp):
+        labelled = _labelled(node.body) & _labelled(node.orelse)
+        if isinstance(node.test, ast.Name) and node.test.id in _labelled(node.body):
+            labelled.add(node.test.id)
+        return labelled
+    if isinstance(node, (ast.List, ast.Tuple)):
+        return set().union(*(_labelled(item) for item in node.elts))
+    if isinstance(node, ast.Starred):
+        return _labelled(node.value)
+    return set()
+
+
+def _root(node):
+    """The name an attribute, item or method chain hangs on (``problems`` for ``problems['errors'].append``)."""
+    while isinstance(node, (ast.Attribute, ast.Subscript, ast.Call)):
+        node = node.func if isinstance(node, ast.Call) else node.value
+    return node.id if isinstance(node, ast.Name) else None
+
+
+def _tainted(body, name):
+    """The exception name and every name the handler assigns from a value that carries it."""
+    tainted = {name}
+    while True:
+        new = {item.id for node in _own_nodes(body)
+               if isinstance(node, (ast.Assign, ast.AnnAssign, ast.AugAssign)) and _carried(node.value) & tainted
+               for target in (node.targets if isinstance(node, ast.Assign) else [node.target])
+               for item in ast.walk(target) if isinstance(item, ast.Name)} - tainted
+        if not new:
+            return tainted
+        tainted |= new
+
+
+def _results(function):
+    """What a function hands back: the names its returns carry in an error field, and the names that hold
+    its result (names its returns carry, and the collections a caller passed in)."""
+    if function is None:
+        return set(), set()
+    values = [node.value for node in _own_nodes(function.body) if isinstance(node, (ast.Return, ast.Yield, ast.YieldFrom))]
+    arguments = function.args
+    parameters = {item.arg for item in (*arguments.posonlyargs, *arguments.args, *arguments.kwonlyargs,
+                                        arguments.vararg, arguments.kwarg) if item is not None} - {"self", "cls"}
+    return set().union(*map(_labelled, values)), set().union(*map(_carried, values)) | parameters
+
+
+def _first(body, test):
+    """Index of the first top-level statement that passes ``test``, if no exit comes before it."""
+    for index, statement in enumerate(body):
+        if test(statement):
+            return index
+        if any(isinstance(node, EXITS) for node in _own_nodes([statement])):
+            return None
+    return None
+
+
+def _touches_window(statements):
+    """Every statement uses the window system, directly or through a name bound from it in this block."""
+    names = set(WINDOW_NAMES)
+    for statement in statements:
+        nodes = list(_own_nodes([statement]))
+        if not any((isinstance(node, ast.Name) and node.id in names)
+                   or (isinstance(node, ast.Attribute) and node.attr in WINDOW_ATTRIBUTES)
+                   or (isinstance(node, (ast.Import, ast.ImportFrom)) and "tkinter" in ast.unparse(node))
+                   for node in nodes):
+            return False
+        for node in nodes:
+            if isinstance(node, (ast.Assign, ast.AnnAssign)):
+                targets = node.targets if isinstance(node, ast.Assign) else [node.target]
+                names |= {item.id for target in targets for item in ast.walk(target) if isinstance(item, ast.Name)}
+            elif isinstance(node, ast.withitem) and node.optional_vars is not None:
+                names |= {item.id for item in ast.walk(node.optional_vars) if isinstance(item, ast.Name)}
+            elif isinstance(node, (ast.Import, ast.ImportFrom)):
+                names |= {alias.asname or alias.name.split(".")[0] for alias in node.names}
+    return bool(statements)
+
+
 def _shapes(row):
-    """The contracts a handler's own code satisfies, computed from its AST."""
-    kind, name, body, guarded, path, caught = (row[key] for key in ("kind", "name", "body", "guarded", "path", "caught"))
-    nodes = list(_own_nodes(body))
-    calls = [node for node in nodes if isinstance(node, ast.Call)]
+    """The contracts a handler's own code satisfies, computed from its AST.
+
+    exit: in a command (a function whose return value becomes the process exit code), the handler first
+      prints a value that carries the error, then every way out of it returns a constant code of 1 or more.
+    row: before any way out, the handler puts a value that carries the error into the result: it returns
+      it, assigns it to a name the function returns, or adds it to a collection the function returns or
+      was given. A value that only tests the error, or a list or dict nobody holds, does not count.
+    dialog: in the viewer, before any way out, the handler shows a value that carries the error in showerror.
+    display: in the viewer, every statement it guards uses the window system and it catches only
+      window-system error types.
+    """
+    kind, path, body = row["kind"], row["path"], row["body"]
     shapes = set()
-    if kind == "except" and _mentions(ast.Module(body=body, type_ignores=[]), name):
-        if any(_callee(call) in PRINTERS for call in calls) and any(
-                isinstance(node, ast.Return) and isinstance(node.value, ast.Constant)
-                and isinstance(node.value.value, int) and node.value.value >= 1 for node in nodes):
+    if kind == "except" and row["name"] is not None:
+        tainted = _tainted(body, row["name"])
+        returned, holders = _results(row["owner"])
+
+        def carries(node):
+            return bool(_carried(node) & tainted)
+
+        def call_carries(call):
+            return any(carries(part) for part in (*call.args, *(keyword.value for keyword in call.keywords)))
+
+        def printed(statement):
+            call = statement.value if isinstance(statement, ast.Expr) and isinstance(statement.value, ast.Call) else None
+            stream = (call is not None and isinstance(call.func, ast.Attribute) and call.func.attr == "write"
+                      and isinstance(call.func.value, ast.Attribute) and call.func.value.attr in STREAMS)
+            return call is not None and (_callee(call) in PRINTERS or stream) and call_carries(call)
+
+        def recorded(statement):
+            if isinstance(statement, ast.Return):
+                return bool(_labelled(statement.value) & tainted)
+            if isinstance(statement, ast.Expr) and isinstance(statement.value, ast.Call):
+                call = statement.value
+                return (isinstance(call.func, ast.Attribute) and call.func.attr in ROW_SINKS
+                        and _root(call.func.value) in holders and call_carries(call))
+            if isinstance(statement, (ast.Assign, ast.AnnAssign, ast.AugAssign)) and carries(statement.value):
+                targets = statement.targets if isinstance(statement, ast.Assign) else [statement.target]
+                return any((isinstance(target, ast.Name) and target.id in returned)
+                           or (isinstance(target, ast.Subscript) and isinstance(target.slice, ast.Constant)
+                               and "error" in str(target.slice.value) and _root(target) in holders)
+                           or (isinstance(target, ast.Attribute) and "error" in target.attr and _root(target) in holders)
+                           or (isinstance(statement, ast.AugAssign) and isinstance(target, ast.Name) and target.id in holders)
+                           for target in targets)
+            return False
+
+        def shown(statement):
+            return (isinstance(statement, ast.Expr) and isinstance(statement.value, ast.Call)
+                    and _callee(statement.value) == "showerror" and call_carries(statement.value))
+
+        exits = [node for node in _own_nodes(body) if isinstance(node, EXITS)]
+        codes = all(isinstance(node, ast.Return) and isinstance(node.value, ast.Constant)
+                    and type(node.value.value) is int and node.value.value >= 1 for node in exits)
+        if row["command"] and _first(body, printed) is not None and codes and isinstance(body[-1], ast.Return):
             shapes.add("exit")
-        carried = [arg for call in calls if _callee(call) in ROW_SINKS for arg in call.args]
-        carried += [value for node in nodes if isinstance(node, ast.Dict)
-                    for key, value in zip(node.keys, node.values)
-                    if isinstance(key, ast.Constant) and "error" in str(key.value)]
-        carried += [keyword.value for call in calls for keyword in call.keywords if keyword.arg in {"error", "skip_reason"}]
-        carried += [node.value for node in nodes if isinstance(node, ast.Assign)
-                    and any(isinstance(target, ast.Name) and "error" in target.id for target in node.targets)]
-        if any(_mentions(value, name) for value in carried):
+        if _first(body, recorded) is not None:
             shapes.add("row")
-        if any(_callee(call) == "showerror" and any(_mentions(arg, name) for arg in call.args) for call in calls):
+        if path.startswith("logic_viewer/") and _first(body, shown) is not None:
             shapes.add("dialog")
-    touches_window = any((isinstance(node, ast.Name) and node.id in WINDOW_NAMES)
-                         or (isinstance(node, ast.Attribute) and node.attr in WINDOW_ATTRIBUTES)
-                         or (isinstance(node, (ast.Import, ast.ImportFrom)) and "tkinter" in ast.unparse(node))
-                         for node in _own_nodes(guarded))
-    types = {part.strip() for part in caught.strip("()").split(",")}
-    if kind in {"except", "suppress"} and path.startswith("logic_viewer/") and touches_window and types <= DISPLAY_TYPES:
+    types = {part.strip() for part in row["caught"].strip("()").split(",")}
+    if (kind in {"except", "suppress"} and path.startswith("logic_viewer/") and types <= DISPLAY_TYPES
+            and _touches_window(row["guarded"])):
         shapes.add("display")
     return shapes
 
 
-def handlers_in(text, path):
-    """Every handler in ``text`` that does not re-raise, with what the contract checks need."""
-    tree = ast.parse(text)
+def _module(path):
+    parts = path[:-3].split("/")
+    if parts[-1] == "__init__":
+        parts = parts[:-1]
+    return tuple(parts) if parts[:1] == ["scripts"] else ("researchguard", *parts)
+
+
+def _defs(tree):
+    return {node.name: node for node in tree.body if isinstance(node, FUNCTIONS)}
+
+
+def _resolve(trees, path, scope, name):
+    """The (file, function) pairs that ``name`` can mean inside ``scope`` (a function, or None for the module).
+
+    A function may import the same name in several branches; each import is one meaning.
+    """
+    meanings = set()
+    for places in ([*_own_nodes(scope.body)] if scope is not None else [], trees[path].body):
+        for node in places:
+            if not isinstance(node, ast.ImportFrom):
+                continue
+            for alias in node.names:
+                if (alias.asname or alias.name) != name:
+                    continue
+                if node.level:
+                    own = _module(path)
+                    package = own[: len(own) - (0 if path.endswith("__init__.py") else 1) - (node.level - 1)]
+                    module = (*package, *(node.module.split(".") if node.module else ()))
+                else:
+                    module = tuple((node.module or "").split("."))
+                target = next((candidate for candidate in trees if _module(candidate) == module), None)
+                if target is not None and alias.name in _defs(trees[target]):
+                    meanings.add((target, alias.name))
+        if meanings:
+            return meanings
+    return {(path, name)} if name in _defs(trees[path]) else set()
+
+
+def _loop_values(tree, name):
+    """``name`` itself, or, when a for loop binds it from a written-out list, every name in that list."""
+    values = {name}
+    for node in ast.walk(tree):
+        if (isinstance(node, ast.For) and any(isinstance(item, ast.Name) and item.id == name for item in ast.walk(node.target))
+                and isinstance(node.iter, (ast.List, ast.Tuple))):
+            values |= {item.id for item in ast.walk(node.iter) if isinstance(item, ast.Name)}
+    return values
+
+
+def command_functions(trees, entries):
+    """Functions whose return value becomes the process exit code.
+
+    They are the entry points, the functions passed to SystemExit or sys.exit, and whatever a command
+    returns the result of: a function it calls by name, the handlers set_defaults registers when it
+    returns ``args.<name>(args)``, and the functions a factory returns when it returns ``factory(...)(...)``.
+    """
+    commands = set(entries)
+    dispatch = {path: {} for path in trees}
+    for path, tree in trees.items():
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.Call):
+                continue
+            exit_call = _callee(node) == "SystemExit" or (isinstance(node.func, ast.Attribute) and node.func.attr == "exit"
+                                                          and getattr(node.func.value, "id", "") == "sys")
+            if exit_call:
+                for arg in node.args:
+                    if isinstance(arg, ast.Call) and isinstance(arg.func, ast.Name):
+                        commands |= _resolve(trees, path, None, arg.func.id)
+            if isinstance(node.func, ast.Attribute) and node.func.attr == "set_defaults":
+                for keyword in node.keywords:
+                    if isinstance(keyword.value, ast.Name):
+                        dispatch[path].setdefault(keyword.arg, set()).update(_loop_values(tree, keyword.value.id))
+    queue = list(commands)
+    while queue:
+        path, name = queue.pop()
+        function = _defs(trees[path]).get(name) if path in trees else None
+        if function is None:
+            continue
+        found = set()
+        for node in _own_nodes(function.body):
+            value = node.value if isinstance(node, ast.Return) else None
+            while isinstance(value, ast.Call) and isinstance(value.func, ast.Name) and value.func.id == "int" and len(value.args) == 1:
+                value = value.args[0]
+            if not isinstance(value, ast.Call):
+                continue
+            if isinstance(value.func, ast.Name):
+                found |= _resolve(trees, path, function, value.func.id)
+            elif isinstance(value.func, ast.Attribute):
+                for item in dispatch[path].get(value.func.attr, ()):
+                    found |= _resolve(trees, path, None, item)
+            elif isinstance(value.func, ast.Call) and isinstance(value.func.func, ast.Name):
+                for factory_path, factory_name in _resolve(trees, path, function, value.func.func.id):
+                    made = _defs(trees[factory_path])[factory_name]
+                    for item in _own_nodes(made.body):
+                        if isinstance(item, ast.Return) and isinstance(item.value, ast.Name):
+                            found |= _resolve(trees, factory_path, made, item.value.id)
+        for item in found - commands:
+            commands.add(item)
+            queue.append(item)
+    return commands
+
+
+def _scan(tree, path):
+    """Every place in one file that can end an error without raising it."""
     parents = {child: node for node in ast.walk(tree) for child in ast.iter_child_nodes(node)}
 
-    def owner_name(node):
-        names, owner = [], parents.get(node)
-        while owner is not None:
-            if isinstance(owner, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
-                names.append(owner.name)
-            owner = parents.get(owner)
-        return ".".join(reversed(names)) or "<module>"
+    def owner(node):
+        names, function, parent = [], None, parents.get(node)
+        while parent is not None:
+            if isinstance(parent, (*FUNCTIONS, ast.ClassDef)):
+                names.append(parent.name)
+                if function is None and isinstance(parent, FUNCTIONS):
+                    function = parent
+            parent = parents.get(parent)
+        return ".".join(reversed(names)) or "<module>", function
 
+    def row(kind, node, name, caught, body, guarded):
+        qualified, function = owner(node)
+        return {"kind": kind, "path": path, "function": qualified, "owner": function, "name": name,
+                "caught": caught, "body": body, "guarded": guarded}
+
+    imports = [node for node in ast.walk(tree) if isinstance(node, ast.ImportFrom) and node.module == "contextlib"]
+    quiet = {alias.asname or alias.name for node in imports for alias in node.names if alias.name in {"suppress", "*"}}
+    quiet |= {"suppress"} if "*" in quiet else set()
+    uses_contextlib = bool(imports) or any(isinstance(node, ast.Import) and any(alias.name == "contextlib" for alias in node.names)
+                                           for node in ast.walk(tree))
+    with_items = {id(item.context_expr.func): (item.context_expr, statement) for statement in ast.walk(tree)
+                  if isinstance(statement, (ast.With, ast.AsyncWith)) for item in statement.items
+                  if isinstance(item.context_expr, ast.Call)}
     rows = []
     for node in ast.walk(tree):
         if isinstance(node, (ast.Try, getattr(ast, "TryStar", ast.Try))):
             for handler in node.handlers:
-                exits = [item for item in _own_nodes(handler.body) if isinstance(item, (ast.Return, ast.Break, ast.Continue))]
+                exits = [item for item in _own_nodes(handler.body) if isinstance(item, EXITS)]
                 if isinstance(handler.body[-1], ast.Raise) and not exits:
                     continue
-                rows.append({"kind": "except", "path": path, "function": owner_name(handler), "name": handler.name,
-                             "caught": ast.unparse(handler.type) if handler.type else "<bare>",
-                             "body": handler.body, "guarded": node.body})
-            if any(isinstance(item, (ast.Return, ast.Break, ast.Continue)) for item in _own_nodes(node.finalbody)):
-                rows.append({"kind": "finally", "path": path, "function": owner_name(node), "name": None,
-                             "caught": "finally", "body": node.finalbody, "guarded": node.body})
-        if isinstance(node, (ast.With, ast.AsyncWith)):
-            for item in node.items:
-                call = item.context_expr
-                if isinstance(call, ast.Call) and _callee(call) == "suppress":
-                    rows.append({"kind": "suppress", "path": path, "function": owner_name(node), "name": None,
-                                 "caught": ", ".join(ast.unparse(arg) for arg in call.args) or "<none>",
-                                 "body": [], "guarded": node.body})
+                rows.append(row("except", handler, handler.name, ast.unparse(handler.type) if handler.type else "<bare>",
+                                handler.body, node.body))
+            if any(isinstance(item, EXITS) for item in _own_nodes(node.finalbody)):
+                rows.append(row("finally", node, None, "finally", node.finalbody, node.body))
+        names_suppress = ((isinstance(node, ast.Name) and node.id in quiet and isinstance(node.ctx, ast.Load))
+                          or (isinstance(node, ast.Attribute) and node.attr == "suppress")
+                          or (isinstance(node, ast.Constant) and node.value == "suppress"))  # getattr, __dict__[...]
+        if names_suppress:  # however suppress is named or reached, and whether or not a with statement enters it
+            call, statement = with_items.get(id(node), (None, None))
+            caught = ", ".join(ast.unparse(arg) for arg in call.args) or "<none>" if call is not None else f"<{ast.unparse(node)}>"
+            rows.append(row("suppress", node, None, caught, [], statement.body if statement is not None else []))
+        if (uses_contextlib and isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute)
+                and node.func.attr in {"push", "push_async_exit"}):
+            rows.append(row("exit callback", node, None, f"<{ast.unparse(node)}>", [], []))
+        if isinstance(node, FUNCTIONS) and node.name in {"__exit__", "__aexit__"}:
+            kept = [item for item in _own_nodes(node.body) if isinstance(item, ast.Return) and item.value is not None
+                    and not (isinstance(item.value, ast.Constant) and item.value.value in (None, False))]
+            if kept:
+                rows.append(row("exit method", kept[0], None, node.name, [], []))
     return rows
+
+
+def inventory(texts, entries=frozenset()):
+    """Every handler in these files that does not re-raise, with what the contract checks need."""
+    trees = {path: ast.parse(text) for path, text in texts.items()}
+    commands = command_functions(trees, entries)
+    rows = [item for path, tree in trees.items() for item in _scan(tree, path)]
+    for item in rows:
+        item["command"] = (item["path"], item["function"]) in commands
+    return rows
+
+
+def handlers_in(text, path):
+    return inventory({path: text})
+
+
+def _entry_points():
+    import tomllib
+    scripts = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]["scripts"]
+    return {("/".join(target.split(":")[0].split(".")[1:]) + ".py", target.split(":")[1]) for target in scripts.values()}
 
 
 def _handlers():
-    rows = []
-    for base, prefix in SCANNED.items():
-        for path in sorted(base.rglob("*.py")):
-            rows.extend(handlers_in(path.read_text(encoding="utf-8"), prefix + path.relative_to(base).as_posix()))
-    return rows
+    texts = {prefix + path.relative_to(base).as_posix(): path.read_text(encoding="utf-8")
+             for base, prefix in SCANNED.items() for path in sorted(base.rglob("*.py"))}
+    return inventory(texts, _entry_points())
 
 
 def inventory_problems(rows, handled):
@@ -216,6 +509,31 @@ SWALLOWERS = {
     "suppress": "import contextlib\ndef f(x):\n    with contextlib.suppress(Exception):\n        return int(x)\n    return 0\n",
     "return inside finally": "def f(x):\n    try:\n        return int(x)\n    finally:\n        return 0\n",
     "pass in the viewer": "def f(x):\n    try:\n        return int(x)\n    except ValueError:\n        pass\n",
+    # Review round 2: each of these was accepted under the listing in brackets.
+    "error kept in a local the function never returns [row]":
+        "def licence(x):\n    try:\n        return int(x)\n    except Exception as exc:\n        error = exc\n        return 'licence open'\n",
+    "error appended to a list nobody holds [row]":
+        "def licence(x):\n    try:\n        return int(x)\n    except Exception as exc:\n        [].append(exc)\n        return 'licence open'\n",
+    "error put in a dict that is thrown away [row]":
+        "def licence(x):\n    try:\n        return int(x)\n    except Exception as exc:\n        {'error': exc}\n        return 'licence open'\n",
+    "error only tested, never carried [row]":
+        "def licence(x):\n    try:\n        return int(x)\n    except Exception as exc:\n        return 'open' if exc else 'closed'\n",
+    "error stored on the object, default returned [row]":
+        "class Card:\n    def licence(self, x):\n        try:\n            return int(x)\n        except Exception as exc:\n            self.error = exc\n            return 0\n",
+    "default returned before the error is recorded [row]":
+        "def check(x, errors):\n    try:\n        return int(x)\n    except ValueError as exc:\n        if x:\n            return 0\n        errors.append(str(exc))\n",
+    "print and exit code in a helper that is no command [exit]":
+        "def helper(x):\n    try:\n        return int(x)\n    except ValueError as exc:\n        print(exc)\n        return 1\n",
+    "suppress imported under another name":
+        "from contextlib import suppress as quiet\ndef f(x):\n    with quiet(Exception):\n        return int(x)\n    return 0\n",
+    "suppress fetched by name":
+        "import contextlib\ndef f(x):\n    quiet = getattr(contextlib, 'suppress')\n    with quiet(ValueError):\n        return int(x)\n",
+    "suppress entered through an ExitStack":
+        "import contextlib\ndef f(x):\n    with contextlib.ExitStack() as stack:\n        stack.enter_context(contextlib.suppress(ValueError))\n        return int(x)\n",
+    "exit callback that swallows":
+        "import contextlib\ndef f(x):\n    with contextlib.ExitStack() as stack:\n        stack.push(lambda *exc: True)\n        return int(x)\n",
+    "context manager whose __exit__ swallows":
+        "class Quiet:\n    def __enter__(self):\n        return self\n    def __exit__(self, *exc):\n        return True\n",
 }
 
 
@@ -232,7 +550,8 @@ def test_the_inventory_refuses_a_swallowing_handler_under_any_listing(name):
 
 def test_the_inventory_accepts_handlers_that_carry_the_error():
     good = {
-        "exit": "def main():\n    try:\n        run()\n    except ValueError as exc:\n        print(exc)\n        return 2\n",
+        "exit": "def main():\n    try:\n        run()\n    except ValueError as exc:\n        print(exc)\n        return 2\n\n\n"
+                "if __name__ == '__main__':\n    raise SystemExit(main())\n",
         "row": "def check(errors):\n    try:\n        run()\n    except ValueError as exc:\n        errors.append(f'bad: {exc}')\n",
         "dialog": "def act(self):\n    try:\n        run()\n    except Exception as exc:\n        messagebox.showerror('x', str(exc))\n",
         "display": "def icon(self):\n    try:\n        self.iconphoto(True, tk.PhotoImage(file='a.png'))\n    except tk.TclError:\n        self.icon = None\n",
@@ -242,6 +561,18 @@ def test_the_inventory_accepts_handlers_that_carry_the_error():
         key = (rows[0]["path"], rows[0]["function"], rows[0]["caught"])
         assert inventory_problems(rows, {key: (1, contract)}) == [], contract
     assert handlers_in("def f():\n    try:\n        run()\n    except ValueError:\n        raise\n", "x.py") == []
+
+
+def test_a_command_is_found_from_the_entry_point_through_dispatch():
+    files = {
+        "cli.py": "def main(argv):\n    from .member.cli import main as member\n    if argv:\n        return member(argv)\n    return helper()\n\n"
+                  "def helper():\n    return 0\n",
+        "member/cli.py": "def main(argv):\n    args = parser(argv)\n    return int(args.handler(args))\n\n"
+                         "def parser(argv):\n    sub.set_defaults(handler=cmd_show)\n\n"
+                         "def cmd_show(args):\n    return 0\n\ndef unrelated(args):\n    return 1\n",
+    }
+    found = command_functions({path: ast.parse(text) for path, text in files.items()}, {("cli.py", "main")})
+    assert found == {("cli.py", "main"), ("cli.py", "helper"), ("member/cli.py", "main"), ("member/cli.py", "cmd_show")}
 
 
 # Each test below injects an error into a route that used to answer with a default or skip it.
@@ -433,6 +764,15 @@ def test_an_injected_route_failure_fails_status_instead_of_passing(folder, capsy
     assert "model_invalid:logic: injected logic failure" in errors
 
 
+@pytest.mark.parametrize("option,builder", [("--picture", "researchguard.picture.support_picture"),
+                                            (None, "researchguard.research.hypothesis_view")])
+def test_status_json_prints_the_view_it_was_asked_for_even_when_it_is_empty(folder, capsys, monkeypatch, option, builder):
+    from researchguard.cli import main
+    monkeypatch.setattr(builder, lambda *args, **kwargs: {})
+    main(["status", str(folder), "--hypothesis", "h", *([option] if option else []), "--json"])
+    assert json.loads(capsys.readouterr().out) == {}
+
+
 # No test may end skipped, expected to fail or cut short: each exits 0 and would hide a swallowed error.
 
 BYPASSES = {
@@ -514,6 +854,43 @@ def test_it():
 
 def test_later():
     assert False
+""",
+    # Review round 2: os._exit(0) inside a test ended the run with exit code 0.
+    "os._exit with code 0 after a failure": """
+import os
+
+def test_first():
+    assert False
+
+def test_it():
+    os._exit(0)
+""",
+    "the platform module's _exit": """
+import importlib
+import os
+
+def test_first():
+    assert False
+
+def test_it():
+    importlib.import_module(os.name)._exit(0)
+""",
+    "exec into a process that exits 0": """
+import os
+import sys
+
+def test_first():
+    assert False
+
+def test_it():
+    os.execv(sys.executable, [sys.executable, "-c", "pass"])
+""",
+    "a test that clears the failure count": """
+def test_first():
+    assert False
+
+def test_second(request):
+    request.session.testsfailed = 0
 """,
 }
 

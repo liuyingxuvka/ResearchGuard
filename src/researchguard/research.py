@@ -861,11 +861,12 @@ def status_main(argv: list[str]) -> int:
     elif args.hypothesis:
         view = hypothesis_view(status, args.hypothesis, tree.models.get("experiment"))
     if args.json:
-        text = json.dumps(picture or view or status, ensure_ascii=False, indent=2) + "\n"
-    elif picture is not None:
+        shown = picture if args.picture else view if args.hypothesis else status
+        text = json.dumps(shown, ensure_ascii=False, indent=2) + "\n"
+    elif args.picture:
         text = render_picture_markdown(picture)
     else:
-        text = render_hypothesis_view(view) if view is not None else render_comparison(status) if args.candidate else render_status_markdown(status)
+        text = render_hypothesis_view(view) if args.hypothesis else render_comparison(status) if args.candidate else render_status_markdown(status)
     if args.output:
         args.output.write_text(text, encoding="utf-8")
     else:

@@ -77,3 +77,13 @@ def _detail_header_project_label(card: dict[str, Any], language: str = DEFAULT_L
         label = project_ids[0]
         return f"项目：{label}" if normalized == ZH_CN else f"Project: {label}"
     return f"{len(project_ids)} 个项目" if normalized == ZH_CN else f"{len(project_ids)} projects"
+
+
+def _skill_badge_label(card: dict[str, Any], language: str = DEFAULT_LANGUAGE) -> str:
+    # ui_data sets skill_dependency_count on every card it builds; a card without it is a defect, not zero.
+    count = int(card["skill_dependency_count"])
+    if count <= 0:
+        return ""
+    if normalize_language(language) == ZH_CN:
+        return f"{count} 个技能"
+    return f"{count} Skill" if count == 1 else f"{count} Skills"

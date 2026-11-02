@@ -227,7 +227,7 @@ Five skills, one idea: make structure, relationships and constraints explicit in
 ResearchGuard says where a failure happened; it never replaces a failure with a default or a second path:
 
 - A command that fails prints the error and exits with a nonzero code; it never answers with a default value.
-- A check or library step that fails puts the error into the result it returns, as a named error, gap, finding or error field with the error text, so the caller sees it.
+- A check or library step that fails puts the error into the result it returns, as a named error, gap, finding or error field that names the error, so the caller sees it.
 - In the desktop library viewer, a failed import, export or dissolve shows the error in an error dialog and changes nothing.
 - When the desktop library viewer cannot use a window-system feature (maximizing, screen DPI, an icon, a dialog), it draws the plain form instead; this changes what is shown, never a result.
 - Text where a number belongs, a number outside its range, or a policy that is not a mapping is an error that names the field.
@@ -273,12 +273,20 @@ release this version is developed with. FlowGuard is installed only from its git
 project. Ordinary use of ResearchGuard does not need FlowGuard. AI contributors start from [`AGENTS.md`](./AGENTS.md);
 `CLAUDE.md` points Claude Code to the same file.
 
-Every function has one route (see [Errors](#errors)). `tests/test_error_routes.py` finds every error handler in
-`src/` and `scripts/` that does not re-raise, including `contextlib.suppress` and a `finally` that returns. Each one is
-listed under one of the sentences in Errors, and the test checks the handler's code against that sentence: a command
-prints the error and returns a nonzero code, a result carries the error text, a dialog shows it, and a display fallback
-only guards a window-system call in the viewer. A new handler that is unlisted, or listed under a sentence its code does
-not follow, fails. No test may skip, be marked expected-to-fail or stop the run early; the suite fails if one does.
+Every function has one route (see [Errors](#errors)). `tests/test_error_routes.py` finds every place in `src/` and
+`scripts/` that can end an error without raising it: an `except` that does not re-raise, a `finally` that returns, any
+use of `contextlib.suppress` under any name or entered through an `ExitStack`, an exit callback pushed on an `ExitStack`, and an
+`__exit__` that returns a true value. Each one is listed under one of the sentences in Errors, and the test checks the
+handler's own code against that sentence. A command (a function whose return value becomes the exit code, found from
+the entry points and the commands they dispatch to) must print a value that carries the error and then return a
+nonzero code. A result handler must, before any way out, put a value that carries the error into what its function
+returns: an error field of the returned value, or a list the function returns or was given. A value that only tests
+the error, a local nobody returns, or a list or dict nobody holds does not count. A dialog must show the error; a
+display fallback may guard only window-system calls in the viewer. A new handler that is unlisted, or listed under a
+sentence its code does not follow, fails. This reads the shape of the code; it is not a proof, and code written to
+look like a contract can still pass. No test may skip, be marked expected-to-fail or end the run early: the suite
+fails if one does, the test process refuses `os._exit` and the `exec` functions, and the end of the run recounts
+failed and unrun tests from the test reports themselves.
 
 The optional desktop viewer of the logic route needs the `viewer` extra (Pillow) and a Python with tkinter; the core
 commands do not.
