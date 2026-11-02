@@ -200,9 +200,9 @@ def _intake_one(library: SourceLibrary, material: IntakeMaterial, options: Intak
 def _assign_project(library: SourceLibrary, source_id: str, options: IntakeOptions) -> str:
     if not options.project_id:
         return ""
-    try:
+    if library.project_dir(options.project_id).exists():
         project = library.require_project(options.project_id)
-    except SourceLibraryError:
+    else:
         project = library.create_project(options.project_id, topic=options.project_topic or options.project_id)
     library.select_source(project.project_id, source_id)
     return project.project_id
@@ -256,8 +256,8 @@ def _read_text_for_extraction(material: IntakeMaterial, source_file: Path) -> st
         return ""
     try:
         return source_file.read_text(encoding="utf-8")[:200_000]
-    except UnicodeDecodeError:
-        return ""
+    except UnicodeDecodeError as exc:
+        raise SourceLibraryError(f"{source_file.name} is not UTF-8 text, so no fields can be read from it; save it as UTF-8") from exc
 
 
 def _parse_labeled_fields(text: str) -> dict[str, str]:

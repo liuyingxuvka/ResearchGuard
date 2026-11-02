@@ -160,7 +160,7 @@ def _order_index(node_id: str, value: object) -> float:
         try:
             return float(value)
         except (TypeError, ValueError):
-            pass
+            raise ValueError(f"node {node_id}: order_index must be a number, got {value!r}")
     digits = "".join(ch for ch in node_id if ch.isdigit())
     if digits:
         return float(digits)

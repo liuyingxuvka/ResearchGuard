@@ -249,6 +249,10 @@ release this version is developed with. FlowGuard is installed only from its git
 project. Ordinary use of ResearchGuard does not need FlowGuard. AI contributors start from [`AGENTS.md`](./AGENTS.md);
 `CLAUDE.md` points Claude Code to the same file.
 
+Every function has one route: an error is raised or reported, never replaced by a default or a second path.
+`tests/test_error_routes.py` lists each error handler that does not re-raise, with the reason its error stays visible,
+and fails when a new one appears unlisted. A test may skip only when the Python has no tkinter; any other skip fails.
+
 The optional desktop viewer of the logic route needs the `viewer` extra (Pillow) and a Python with tkinter; the core
 commands do not.
 

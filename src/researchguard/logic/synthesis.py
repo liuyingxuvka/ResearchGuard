@@ -753,8 +753,9 @@ def _item_from_branch(branch: Any) -> SynthesisItem:
     candidate_id = _branch_candidate_id(source_id, branch_id) if source_id and branch_id else branch_id
     topic, role, source_date = str(data.get("topic_focus", "")), str(data.get("branch_role", "")), str(data.get("source_date", ""))
     coverage, note, locator = str(data.get("coverage_period", "")), str(data.get("note", "")), str(data.get("locator", ""))
-    try: importance = 0.55 if data.get("importance") in (None, "") else float(data.get("importance"))
-    except (TypeError, ValueError): importance = 0.55
+    raw_importance = data.get("importance")
+    try: importance = 0.55 if raw_importance in (None, "") else float(raw_importance)
+    except (TypeError, ValueError): raise ValueError(f"branch {branch_id}: importance must be a number, got {raw_importance!r}")
     salience = str(data.get("salience", "")) or _salience_for_branch_role(role, importance)
     anchor_node, anchor_block = str(data.get("anchor_node_id", "")), str(data.get("anchor_block_id", ""))
     source_nodes = data.get("node_ids", ())

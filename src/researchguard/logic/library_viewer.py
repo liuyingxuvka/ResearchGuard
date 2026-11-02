@@ -137,7 +137,12 @@ def build_source_graph_payload(root: str | Path, source_id: str, *, language: st
 
 
 def _source_card(library: SourceLibrary, source: SourceRecord, project_ids: tuple[str, ...]) -> dict[str, Any]:
-    model = _load_source_model_if_present(library, source.source_id)
+    model, model_error = None, ""
+    if library.source_model_path(source.source_id).exists():
+        try:
+            model = load_model(library.source_model_path(source.source_id))
+        except ModelLoadError as exc:
+            model_error = str(exc)
     source_file = library.root / source.source_path if source.source_path else None
     model_path = library.source_model_path(source.source_id)
     counts = _model_counts(model)
@@ -169,8 +174,9 @@ def _source_card(library: SourceLibrary, source: SourceRecord, project_ids: tupl
             "source_date": source.source_date or source.year,
             "coverage_period": source.coverage_period,
         },
-        "modeling_status": "modeled" if modeled else "unmodeled",
-        "status": "risk" if risk_count else ("modeled" if modeled else "unmodeled"),
+        "modeling_status": "invalid_model" if model_error else ("modeled" if modeled else "unmodeled"),
+        "status": "invalid_model" if model_error else ("risk" if risk_count else ("modeled" if modeled else "unmodeled")),
+        **({"error": model_error} if model_error else {}),
         "node_count": counts["node_count"],
         "logic_node_count": counts["logic_node_count"],
         "edge_count": counts["edge_count"],
@@ -407,16 +413,6 @@ def _view_recommendation_reason(view_id: str, language: str) -> str:
         "argument_map": "Recommended because this source is clearest as claim support: evidence, warrants, qualifications, and rebuttal relations.",
         "research_flow": "Recommended because this source contains method, evidence/result, conclusion, and boundary material that reads clearest as a research sequence.",
     }.get(view_id, "")
-
-
-def _load_source_model_if_present(library: SourceLibrary, source_id: str) -> LogicModel | None:
-    path = library.source_model_path(source_id)
-    if not path.exists():
-        return None
-    try:
-        return load_model(path)
-    except ModelLoadError:
-        return None
 
 
 def _project_membership(projects: Iterable[ProjectBranch]) -> dict[str, tuple[str, ...]]:

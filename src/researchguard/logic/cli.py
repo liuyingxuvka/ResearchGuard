@@ -991,12 +991,8 @@ def _load_i18n_payload(value: str) -> dict[str, Any]:
     text = str(value or "").strip()
     if not text:
         return {}
-    try:
-        path = Path(text)
-        if path.exists() and path.is_file():
-            text = path.read_text(encoding="utf-8")
-    except OSError:
-        pass
+    if not text.startswith("{"):
+        text = Path(text).read_text(encoding="utf-8")
     payload = json.loads(text)
     if not isinstance(payload, dict):
         raise SystemExit("--i18n-json must decode to a JSON object")

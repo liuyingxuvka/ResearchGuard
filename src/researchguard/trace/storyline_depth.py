@@ -12,7 +12,7 @@ import json
 import math
 import re
 from dataclasses import asdict, dataclass, field, replace
-from typing import Any, Iterable
+from typing import Any, Iterable, Mapping
 
 from .schema import (
     EvidenceItem,
@@ -216,19 +216,25 @@ def _ordered_unique(values: Iterable[str]) -> list[str]:
     return result
 
 
-def _positive_int(value: Any, default: int) -> int:
+def _positive_int(policy: Mapping[str, Any], key: str, default: int) -> int:
+    value = policy.get(key)
+    if value is None:
+        return default
     try:
         parsed = int(value)
     except (TypeError, ValueError):
-        return default
+        raise ValueError(f"storyline_depth_policy.{key} must be an integer, got {value!r}")
     return parsed if parsed > 0 else default
 
 
-def _ratio(value: Any, default: float = 0.0) -> float:
+def _ratio(policy: Mapping[str, Any], key: str, default: float) -> float:
+    value = policy.get(key)
+    if value is None:
+        return default
     try:
         parsed = float(value)
     except (TypeError, ValueError):
-        return default
+        raise ValueError(f"storyline_depth_policy.{key} must be a number in [0, 1], got {value!r}")
     return min(1.0, max(0.0, parsed))
 
 
@@ -357,18 +363,9 @@ def _object_depth_coverage(
     raw_policy = model.metadata.get("storyline_depth_policy") or {}
     if not isinstance(raw_policy, dict):
         raw_policy = {}
-    declared_minimum_count = _positive_int(
-        raw_policy.get("minimum_per_trace_qualified_event_count"),
-        0,
-    )
-    declared_minimum_ratio = _ratio(
-        raw_policy.get("minimum_per_trace_qualified_event_ratio"),
-        0.0,
-    )
-    declared_maximum_run = _positive_int(
-        raw_policy.get("maximum_per_trace_unqualified_run"),
-        0,
-    )
+    declared_minimum_count = _positive_int(raw_policy, "minimum_per_trace_qualified_event_count", 0)
+    declared_minimum_ratio = _ratio(raw_policy, "minimum_per_trace_qualified_event_ratio", 0.0)
+    declared_maximum_run = _positive_int(raw_policy, "maximum_per_trace_unqualified_run", 0)
 
     for trace in model.traces:
         eligible_event_ids = _ordered_unique(trace.event_ids)

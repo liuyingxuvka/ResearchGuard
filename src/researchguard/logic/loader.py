@@ -79,7 +79,7 @@ def load_model_from_dict(raw: Mapping[str, Any], *, validate: bool = True) -> Lo
             level=str(node_data.get("level", "")),
             scope=_string_or_none(node_data.get("scope")),
             state=str(node_data.get("state", "UNDECIDED")),
-            confidence=_float_or_default(node_data.get("confidence"), 0.5),
+            confidence=_float_or_default(node_data.get("confidence"), 0.5, f"node {node_id}: confidence"),
             active=bool(node_data.get("active", False)),
             impact=_string_or_none(node_data.get("impact")),
             importance=_optional_float(node_data.get("importance")),
@@ -108,7 +108,7 @@ def load_model_from_dict(raw: Mapping[str, Any], *, validate: bool = True) -> Lo
                 source=str(edge_data.get("source", "")),
                 target=str(edge_data.get("target", "")),
                 type=str(edge_data.get("type", "")),
-                weight=_float_or_default(edge_data.get("weight"), 1.0),
+                weight=_float_or_default(edge_data.get("weight"), 1.0, f"edge {edge_index}: weight"),
                 explanation=str(edge_data.get("explanation", "")),
                 importance=_optional_float(edge_data.get("importance")),
                 salience=_string_or_none(edge_data.get("salience")),
@@ -221,11 +221,13 @@ def _provenance_records(value: Any, owner: str) -> list[Any]:
         raise ModelLoadError(f"{owner}: {exc}") from exc
 
 
-def _float_or_default(value: Any, default: float) -> float:
+def _float_or_default(value: Any, default: float, field: str) -> float:
+    if value is None:
+        return default
     try:
         return float(value)
     except (TypeError, ValueError):
-        return default
+        raise ModelLoadError(f"{field} must be a number, got {value!r}")
 
 
 def _optional_float(value: Any) -> float | None:

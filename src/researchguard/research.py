@@ -557,10 +557,7 @@ def research_status(tree: ResearchTree) -> dict[str, Any]:
         verdict = {"search": "not_run", "root_claim": None, "live_hypotheses": [], "contested": bool(disagreements), "errors": len(problems["errors"])}
     input_digests = []
     for path in set(tree.input_paths):
-        try:
-            digest = hashlib.sha256(path.read_bytes()).hexdigest()
-        except OSError:
-            continue
+        digest = hashlib.sha256(path.read_bytes()).hexdigest()
         input_digests.append({"path": Path(os.path.relpath(path, tree.path.parent)).as_posix(), "sha256": digest})
     input_digests.sort(key=lambda row: row['path'])
     return {"input_digests": input_digests, "suite": SUITE_ID, "question": tree.index["question"], "verdict": verdict,

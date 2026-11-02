@@ -10,6 +10,16 @@
 
 - status warns source_without_identity for any source that names no title, URL or date, so a bare source written by hand shows up in status and as an added warning in a candidate comparison.
 
+- Text where a number belongs (a confidence, edge weight, reliability or other source score, importance, order index or storyline-depth policy value) is now an error that names the field. Before, it was silently replaced by a default.
+
+- status fails with research_status_failed when an input file can no longer be read for its digest, instead of leaving that file out of the saved report.
+
+- Intake of a text file that is not UTF-8 reports an error instead of extracting nothing. Importing a library package that names a project file it does not contain is refused, and a source card whose model cannot be read shows invalid_model instead of unmodeled.
+
+- --i18n-json takes inline JSON that starts with { or the path of a readable file; a missing file is reported as missing instead of as broken JSON.
+
+- For maintainers: the tests list every error handler that does not re-raise, with the reason its error stays visible, and a test may skip only when the Python has no tkinter.
+
 ## v0.6.0 - 2026-10-31 - Sync evidence and keep claims tied to their sources
 
 - status no longer crashes on evidence that names only a source_reference, and an error that is not about research.yaml is reported as research_status_failed with the real exception.

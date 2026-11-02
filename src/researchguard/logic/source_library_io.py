@@ -557,10 +557,7 @@ def _read_project_member(
     member = str(paths.get(key) or "")
     if not member:
         return dict(default)
-    try:
-        return _read_package_json(archive, member)
-    except SourceLibraryError:
-        return dict(default)
+    return _read_package_json(archive, member)
 
 
 def _merge_project_files(
@@ -653,9 +650,6 @@ def _slug(value: str) -> str:
 
 
 def _created_by() -> str:
-    try:
-        from . import __version__
+    from . import __version__
 
-        return f"logicguard {__version__}"
-    except Exception:
-        return "logicguard"
+    return f"logicguard {__version__}"

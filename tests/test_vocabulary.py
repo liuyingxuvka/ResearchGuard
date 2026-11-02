@@ -2,19 +2,15 @@
 from pathlib import Path
 import ast
 import subprocess
-import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
 def test_no_receipt_vocabulary():
     paths = ["src", "skills", "docs", "examples", "scripts", "tests", "openspec/specs", "README.md", "AGENTS.md"]
-    try:
-        probe = subprocess.run(["git", "rev-parse", "--show-toplevel"], cwd=ROOT, capture_output=True, text=True)
-    except FileNotFoundError:
-        pytest.skip("git is unavailable")
-    if probe.returncode:
-        pytest.skip("installed package has no git checkout")
+    # The check reads the tracked files, so it needs git and a checkout; without them it fails.
+    probe = subprocess.run(["git", "rev-parse", "--show-toplevel"], cwd=ROOT, capture_output=True, text=True)
+    assert probe.returncode == 0, f"the vocabulary check needs a git checkout of ResearchGuard: {probe.stderr}"
     result = subprocess.run(["git", "grep", "-n", "-i", "-E",
                              "receipt|blueprint_interfaces_required|interface_bindings|block_interfaces", "--", *paths],
                             cwd=ROOT, capture_output=True, text=True)

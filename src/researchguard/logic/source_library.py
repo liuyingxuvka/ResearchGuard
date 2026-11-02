@@ -356,12 +356,10 @@ class SourceLibrary:
             return []
         projects: list[ProjectBranch] = []
         for project_dir in sorted(self.projects_dir.iterdir()):
-            if not project_dir.is_dir():
+            # create_project names every project folder by its slug; other folders are not projects.
+            if not project_dir.is_dir() or _slug(project_dir.name) != project_dir.name:
                 continue
-            try:
-                projects.append(self.require_project(project_dir.name))
-            except SourceLibraryError:
-                continue
+            projects.append(self.require_project(project_dir.name))
         return projects
 
     def import_source(
@@ -1245,13 +1243,13 @@ def _score(tokens: tuple[str, ...], value: str) -> float:
     return score
 
 
-def _optional_float(value: Any) -> float | None:
+def _optional_float(value: Any, field: str = "importance") -> float | None:
     if value in (None, ""):
         return None
     try:
         return float(value)
     except (TypeError, ValueError):
-        return None
+        raise SourceLibraryError(f"{field} must be a number, got {value!r}")
 
 
 def _read_json(path: Path, *, default: dict[str, Any]) -> dict[str, Any]:
