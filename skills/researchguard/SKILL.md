@@ -15,6 +15,7 @@ Quick check before a conclusion:
 - Existing folder: run `researchguard status <folder>` first; read Verdict, Open gaps and Next; take the route Next names.
 - New research folder: write `research.yaml` first (template: `references/research-tree.md`, "Start a question"); each route's first step builds its model, listed in `models`.
 - After each route step run `status` again; discuss hypotheses, anchors and the verdict.
+- Discussing or analysing a conclusion with the owner: put the output of `researchguard status <folder> --picture` (or `--hypothesis <id> --picture`) in the reply and say what its Not drawn list leaves out; never draw the support from memory.
 - Keep the source, trace, logic and experiment models as separate route models joined by shared ids, add only the routes and hypotheses the question needs, and read one hypothesis with status --hypothesis <id>.
 
 ## Choose a route

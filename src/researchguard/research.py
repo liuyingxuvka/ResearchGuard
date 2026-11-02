@@ -807,11 +807,14 @@ def status_main(argv: list[str]) -> int:
     parser.add_argument("--json", action="store_true")
     parser.add_argument("--candidate", type=Path)
     parser.add_argument("--hypothesis")
+    parser.add_argument("--picture", action="store_true",
+                        help="draw what the root claim (or --hypothesis) rests on, computed from the models")
     parser.add_argument("--output", type=Path)
     args = parser.parse_args(argv)
-    if args.hypothesis and args.candidate:
-        print(json.dumps({"errors": ["status_options_conflict: --hypothesis cannot be combined with --candidate"]}, ensure_ascii=False))
-        return 2
+    for option, given in (("--hypothesis", args.hypothesis), ("--picture", args.picture)):
+        if given and args.candidate:
+            print(json.dumps({"errors": [f"status_options_conflict: {option} cannot be combined with --candidate"]}, ensure_ascii=False))
+            return 2
     active_path = args.path
     try:
         tree = load_research(active_path)
@@ -829,14 +832,23 @@ def status_main(argv: list[str]) -> int:
             error = f"research_status_failed: {index_path}: {type(exc).__name__}: {exc} (research.yaml was read; this is a ResearchGuard defect)"
         print(json.dumps({"errors": [error]}, ensure_ascii=False))
         return 2
-    view = None
-    if args.hypothesis:
-        if args.hypothesis not in {row["id"] for row in tree.index["hypotheses"]}:
-            print(json.dumps({"errors": [f"unknown_hypothesis:{args.hypothesis}"]}, ensure_ascii=False))
+    view = picture = None
+    if args.hypothesis and args.hypothesis not in {row["id"] for row in tree.index["hypotheses"]}:
+        print(json.dumps({"errors": [f"unknown_hypothesis:{args.hypothesis}"]}, ensure_ascii=False))
+        return 2
+    if args.picture:
+        from .picture import render_picture_markdown, support_picture
+        claim = args.hypothesis or tree.index.get("root_claim")
+        if not claim:
+            print(json.dumps({"errors": ["picture_needs_a_claim: research.yaml names no root_claim; pass --hypothesis <id>"]}, ensure_ascii=False))
             return 2
+        picture = support_picture(tree, status, claim)
+    elif args.hypothesis:
         view = hypothesis_view(status, args.hypothesis, tree.models.get("experiment"))
     if args.json:
-        text = json.dumps(view if view is not None else status, ensure_ascii=False, indent=2) + "\n"
+        text = json.dumps(picture or view or status, ensure_ascii=False, indent=2) + "\n"
+    elif picture is not None:
+        text = render_picture_markdown(picture)
     else:
         text = render_hypothesis_view(view) if view is not None else render_comparison(status) if args.candidate else render_status_markdown(status)
     if args.output:

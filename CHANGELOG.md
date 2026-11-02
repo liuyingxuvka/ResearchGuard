@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- status --picture draws what the root claim rests on, and --hypothesis <id> --picture one hypothesis: a Mermaid flowchart computed from the argument, its evaluation, the anchors and sources and the timeline's evidence directions. It keeps to about 12 boxes and 20 arrows, draws blocking edges thick and trace-only links dotted, and lists every node and route it leaves out. The skill asks the AI to put this picture in replies that discuss a conclusion; the Ever Given example shows one.
+
 - Maintenance runs on FlowGuard 0.72.0 with its four plain project rules: check status first, store only the owner's own words, find code with where, run the tests and commit in your own words. The round-11 plan list that was stored as an owner request is marked as not the owner's words.
 
 - Version numbers: a release that adds features raises the second number and a release with only small fixes raises the third.

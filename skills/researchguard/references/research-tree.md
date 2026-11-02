@@ -157,6 +157,20 @@ names it; experiments that predict for it), all taken from the same status. With
 `disagreements`, `open_gaps`, `next`. An unknown id prints
 `unknown_hypothesis:<id>` and exits 2. Empty sections print `- none`.
 
+## Picture of one conclusion
+
+`researchguard status <folder> --picture` draws what the root claim rests on;
+`--hypothesis <id> --picture` draws one hypothesis instead. The picture is a
+Mermaid flowchart computed from the logic edges and their evaluation (state,
+confidence, blockers), the source model's anchors and sources, and the trace
+route's evidence directions. It holds the claim, the nodes with an edge into it
+and, while it stays readable (12 boxes, 20 arrows), the nodes one step further.
+Blocking edges are thick, trace-only links dotted, and an edge both routes
+agree on is drawn once. Its `Not drawn` list names every node it left out, the
+nodes the claim does not rest on and the route states it gives as text. With
+`--json` it returns `claim`, `boxes`, `arrows`, `blocked_by`, `not_drawn` and
+`limits`; with `--candidate` it exits 2.
+
 ## Synchronize new evidence
 
 ```sh

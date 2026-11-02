@@ -137,6 +137,11 @@ The first prints the verdict page shown above; the second shows one hypothesis w
 the known-bad checks that touch it, its open gaps and the next actions; the third saves the full report as JSON, which
 is what LogicWriting reads.
 
+To discuss a conclusion, draw what it rests on: `researchguard status examples/research/evergiven --picture` prints a
+Mermaid flowchart of `h_suez`, its four blockers, its direct support with each anchor and source, and the trace links,
+computed from the folder's models, followed by a list of what it left out. The example's
+[README](./examples/research/evergiven/README.md#discussing-the-verdict) shows it in a reply.
+
 **Your own question.** Start a folder with `research.yaml` (the template is
 ["Start a question" in `research-tree.md`](./skills/researchguard/references/research-tree.md)), add only the route
 models the question needs, list them under `models`, and run `researchguard status <folder>` after every step. When the folder lists a source model, add new source evidence as an anchor
