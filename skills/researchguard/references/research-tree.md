@@ -168,14 +168,16 @@ and, while it stays readable (12 boxes, 20 arrows), the nodes one step further.
 Blocking edges are thick, trace-only links dotted, and an edge both routes
 agree on is drawn once. Its `Not drawn` list names every node it left out, the
 nodes the claim does not rest on and the route states it gives as text. An
-evidence box shows its anchor and source only when the source model holds that
-anchor for that source; a locator the source model does not hold is drawn as
+evidence box shows every provenance record of its node, not only the first:
+each anchor with its source when the source model holds that anchor for that
+source, and the source of a record that names no anchor (`no anchor named`); a
+locator the source model does not hold is drawn as
 `not an anchor of <source> in the source model`. `Problems in what is drawn`
 lists every status error and warning that names a drawn node, anchor or source,
 and every route that failed to load. A box is dashed red when one of them is
-about its node, or about the anchor or source the box shows (an id in the
+about its node, or about any anchor or source the box shows (an id in the
 problem's code, before its details: `anchor_locator_names_no_place:<anchor>`
-marks the evidence box that shows that anchor). When the
+marks the evidence box that shows that anchor, also as its second record). When the
 logic model cannot be read, the picture is not drawn and says why. With
 `--json` it returns `claim`, `boxes`, `arrows`, `blocked_by`, `not_drawn`,
 `problems` and `limits` (and `cannot_draw` instead of boxes when the logic model

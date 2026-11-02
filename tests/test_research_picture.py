@@ -200,3 +200,52 @@ def test_an_unverifiable_source_is_dashed_in_the_picture(tmp_path):
     assert "anc-lloyds · Colleague's note, 2021 · unverifiable source" in box["lines"]
     assert box["problem"]
     assert any(row["text"].startswith("unverifiable_source:src-lloyds (") for row in picture["problems"])
+
+
+def _add_second_record(folder, anchor, source=None):
+    """Give E_dates a second provenance record, citing ``anchor`` (and adding ``source`` when given)."""
+    def add_anchor(data):
+        if source is not None:
+            data["sources"].append(source)
+        data["anchors"].append(anchor)
+
+    _rewrite(folder, "source.yaml", add_anchor)
+    _rewrite(folder, "logic.yaml", lambda data: data["nodes"]["E_dates"]["provenance"].append(
+        {"origin_kind": "external_source", "source_id": anchor["source_id"], "locator": anchor["anchor_id"], "quote": anchor["text"]}))
+
+
+def test_every_provenance_record_of_a_drawn_evidence_box_counts(tmp_path):
+    # Review round 4: only the first provenance record of an evidence node was read, so an unverifiable
+    # second anchor and a warning naming only a second anchor left E_dates drawn as if nothing were wrong.
+    folder = tmp_path / "second-note"
+    shutil.copytree(EVERGIVEN, folder)
+    _add_second_record(folder, {"anchor_id": "anc-note", "source_id": "src-note", "locator": "email 2021",
+                                "text": "The canal reopened on 29 March 2021."},
+                       {"source_id": "src-note", "title": "Colleague's note, 2021"})
+    picture = _picture(folder, "h_suez")
+    box = {row["id"]: row for row in picture["boxes"]}["E_dates"]
+    assert "anc-sca-dates · Suez Canal Authority statements on th..." in box["lines"]
+    assert "anc-note · Colleague's note, 2021 · unverifiable source" in box["lines"]
+    assert any(row["text"].startswith("unverifiable_source:src-note (") for row in picture["problems"])
+    assert "E_dates" in _flagged(picture) and "E_series" not in _flagged(picture)
+    folder = tmp_path / "second-late"
+    shutil.copytree(EVERGIVEN, folder)
+    _add_second_record(folder, {"anchor_id": "anc-sca-extra", "source_id": "src-sca-2021", "locator": "para 9",
+                                "text": "Rates doubled in April 2021."})
+    picture = _picture(folder, "h_suez")
+    warning = "anchor_after_source_date:anc-sca-extra (the quote names April 2021; src-sca-2021 is dated 2021-03-29)"
+    assert {"level": "warning", "text": warning} in picture["problems"]
+    assert "E_dates" in _flagged(picture) and "E_series" not in _flagged(picture)
+    ids = {row["id"]: f"n{index}" for index, row in enumerate(picture["boxes"])}
+    assert re.search(rf"^  class (\S+,)?{ids['E_dates']}(,\S+)? problem$", render_picture_markdown(picture), re.M)
+    # A record that names a source but no anchor counts too.
+    folder = tmp_path / "second-source-only"
+    shutil.copytree(EVERGIVEN, folder)
+    _rewrite(folder, "source.yaml", lambda data: data["sources"].append({"source_id": "src-note", "title": "Colleague's note, 2021"}))
+    _rewrite(folder, "logic.yaml", lambda data: data["nodes"]["E_dates"]["provenance"].append(
+        {"origin_kind": "external_source", "source_id": "src-note", "quote": "The canal reopened on 29 March 2021."}))
+    picture = _picture(folder, "h_suez")
+    box = {row["id"]: row for row in picture["boxes"]}["E_dates"]
+    assert "no anchor named · Colleague's note, 2021 · unverifiable source" in box["lines"]
+    assert any(row["text"].startswith("unverifiable_source:src-note (") for row in picture["problems"])
+    assert "E_dates" in _flagged(picture)
