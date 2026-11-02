@@ -117,11 +117,12 @@ colleague's note from a document either ("Colleague's note, 2021" passes it), so
 read from the title: a source whose url field holds no outside locator (an http or https link whose host name ends in a
 top-level domain of the root zone and is not an example name, a DOI, an ISBN with a correct check digit, or an arXiv id)
 is an `unverifiable_source` warning in every `status`, on each evidence row and conclusion evidence list it appears in,
-and as a dashed box in the picture. No title clears it; only a locator a reader can follow does, and the link itself is
-shown to the owner (ResearchGuard looks nothing up, so an invented link, DOI or ISBN still passes). The shipped
-example's transpacific lane, cited by title only, carries this warning. A new anchor is only a new piece of
-evidence. Whether it changes the verdict depends on what the argument and the
-timeline do with it, and that is decided by the routes, not by the AI's wish.
+and as a dashed box in the picture. This holds for every source, old or new: a source a folder already held before this
+version warns too, with no change to the folder. No title clears it; only a locator a reader can follow does, and the
+link itself is shown to the owner (ResearchGuard looks nothing up, so an invented link, DOI or ISBN still passes). The
+shipped example's transpacific lane, cited by title only, carries this warning: the example's files hold no link for
+it, so none was made up. A new anchor is only a new piece of evidence. Whether it changes the verdict depends on what
+the argument and the timeline do with it, and that is decided by the routes, not by the AI's wish.
 
 ## Quick start
 

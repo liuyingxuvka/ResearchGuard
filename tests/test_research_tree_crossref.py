@@ -113,6 +113,45 @@ def test_shipped_evergiven_tree_has_consistent_shared_ids(capsys):
                                   'unverifiable_source:src-wci-transpacific (no link, DOI, ISBN or arXiv id; '
                                   'nothing outside this folder to check it against)']
 
+# Every source, old or new, without an outside locator warns; the docs must say so plainly.
+OLD_SOURCES_WARN = ('This holds for every source, old or new: a source a folder already held before this version '
+                    'warns too, with no change to the folder.')
+
+
+def _unreleased(text):
+    return text.split('## Unreleased', 1)[1].split('\n## ', 1)[0]
+
+
+def test_the_docs_say_plainly_that_old_sources_warn_too():
+    root = Path(__file__).resolve().parents[1]
+    texts = {'CHANGELOG.md "## Unreleased"': _unreleased((root / 'CHANGELOG.md').read_text(encoding='utf-8')),
+             'README.md': (root / 'README.md').read_text(encoding='utf-8'),
+             'research-tree.md': (root / 'skills/researchguard/references/research-tree.md').read_text(encoding='utf-8')}
+    for name, text in texts.items():
+        assert OLD_SOURCES_WARN in ' '.join(text.split()), name
+    skill = (root / 'skills/researchguard/SKILL.md').read_text(encoding='utf-8')
+    assert 'stays `unverifiable_source` whatever its title, old or new' in skill
+
+
+def test_the_example_says_why_its_transpacific_source_warns(capsys):
+    # The example holds no link for the transpacific lane, so it warns; no link is made up to silence it.
+    root = Path(__file__).resolve().parents[1]
+    example = root / 'examples/research/evergiven'
+    source = next(row for row in yaml.safe_load((example / 'source.yaml').read_text())['sources']
+                  if row['source_id'] == 'src-wci-transpacific')
+    trace = next(row for row in yaml.safe_load((example / 'trace.yaml').read_text())['sources']
+                 if row['source_id'] == 'src-wci-transpacific')
+    assert 'url' not in source and trace['url'] is None
+    assert any(item.startswith('unverifiable_source:src-wci-transpacific (')
+               for item in research_status(load_research(example))['warnings'])
+    readme = ' '.join((example / 'README.md').read_text(encoding='utf-8').split())
+    assert ('`src-wci-transpacific` is cited by title only: neither `source.yaml` nor `trace.yaml` gives it a link, '
+            'DOI, ISBN or arXiv id (`trace.yaml` has `url: null`).') in readme
+    assert ('Status warns `unverifiable_source` for every source, old or new, that a reader outside the folder cannot '
+            'look up, so this warning is expected. No link is made up to silence it: it stays until a locator for '
+            'that lane is recorded.') in readme
+
+
 def test_one_observation_reaches_trace_and_logic_by_sync(tmp_path, capsys):
     import shutil
     from researchguard.source.loader import load_model, write_yaml

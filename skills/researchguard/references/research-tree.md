@@ -208,7 +208,9 @@ alike. A passage with no such document is not source evidence. `status` warns
 a day or month after the date of its source. It also warns `unverifiable_source`
 for every source, new or old, whose url field holds no outside locator: an http or
 https link whose host name ends in a top-level domain of the root zone and is not
-an example name, a DOI, an ISBN with a correct check digit, or an arXiv id. Only
+an example name, a DOI, an ISBN with a correct check digit, or an arXiv id. This
+holds for every source, old or new: a source a folder already held before this
+version warns too, with no change to the folder. Only
 that field is read, never the title, so no title clears it; the status Evidence
 table, the `--hypothesis` Evidence list (and their JSON, `unverifiable_source`)
 and the picture mark each piece of evidence filed under such a source. Nothing is
