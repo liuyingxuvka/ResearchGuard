@@ -61,11 +61,12 @@ from. When the folder declares a source model, that evidence has no source ident
 is an error:
 
 ```console
-$ researchguard status <copy> | tail -4
+$ researchguard status <copy> | tail -5
 ## Problems
 
 - error evidence_not_in_source:logic:E_lloyds (its provenance names no source_id; add the anchor with researchguard source add-anchor, then run researchguard sync <folder>)
 - warning hypothesis_not_in_logic:h_yantian
+- warning unverifiable_source:src-wci-transpacific (no link, DOI, ISBN or arXiv id; nothing outside this folder to check it against)
 ```
 
 Re-enter the evidence through the source model, starting from a clean candidate copy. Quote the passage as an anchor,
@@ -106,11 +107,19 @@ $ researchguard status examples/research/evergiven --candidate ../evergiven-copy
 
 - source added: src-lloyds (title "Lloyd's List"; no link; date 2021-04)
 - evidence added: anc-lloyds (in src-lloyds at "Lloyd's List, April 2021"; title "Lloyd's List"; no link; date 2021-04)
+- warnings added: unverifiable_source:src-lloyds (no link, DOI, ISBN or arXiv id; nothing outside this folder to check it against)
 ```
 
 ResearchGuard cannot tell a real title from an invented one, or check that a quote is printed where its locator says,
 so every new source is listed with its title, link and date, and every new piece of evidence with the source and place
-it is filed under; the owner sees what the evidence now rests on before accepting the copy. A new anchor is only a new piece of
+it is filed under; the owner sees what the evidence now rests on before accepting the copy. A word list cannot tell a
+colleague's note from a document either ("Colleague's note, 2021" passes it), so one more thing is computed instead of
+read from the title: a source whose url field holds no outside locator (an http or https link whose host name ends in a
+top-level domain of the root zone and is not an example name, a DOI, an ISBN with a correct check digit, or an arXiv id)
+is an `unverifiable_source` warning in every `status`, on each evidence row and conclusion evidence list it appears in,
+and as a dashed box in the picture. No title clears it; only a locator a reader can follow does, and the link itself is
+shown to the owner (ResearchGuard looks nothing up, so an invented link, DOI or ISBN still passes). The shipped
+example's transpacific lane, cited by title only, carries this warning. A new anchor is only a new piece of
 evidence. Whether it changes the verdict depends on what the argument and the
 timeline do with it, and that is decided by the routes, not by the AI's wish.
 
@@ -187,6 +196,8 @@ Each part of the question is an explicit model, joined to the others only by sha
 
 - **Copies agree with their source.** The trace and the argument carry copies of each quoted passage; a copy that
   differs from the source model is `copy_drift`, an evidence id that names no source is `dangling_source`.
+- **A source can be looked up.** A source with no link, DOI, ISBN or arXiv id a reader can follow is
+  `unverifiable_source`, whatever its title says, and every piece of evidence filed under it says so.
 - **The routes agree with each other.** If the argument counts a piece of evidence as support and the timeline counts
   it as opposition, the verdict says `contested: true` and the hypothesis lists a route disagreement.
 - **The verdict is computed, not written.** The wording licence of the root claim (`assert`, `qualify` or `withhold`)

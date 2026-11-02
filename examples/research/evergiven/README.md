@@ -8,6 +8,7 @@ Question: did the March 2021 Suez blockage cause the Asia–Europe freight rate 
 `experiment.json` and `exp-obs1.json` declare finite predictions and observations.
 Run `researchguard status examples/research/evergiven` (`--json` for data).
 `h_yantian` appears only in experiment; its missing-logic warning is expected.
+`src-wci-transpacific` is cited by title only, with no link, so status warns `unverifiable_source` for it.
 Numbers are approximate public-data transcriptions, not established conclusions.
 `experiment observe` returns 2 (`continue_iteration`): demand and Yantian both survive; the next check is `e_yantian_timing`.
 
@@ -34,7 +35,7 @@ flowchart BT
   n6["E_dates<br/>Grounding 23 Mar 2021, refloated 29 Mar 2021...<br/>anc-sca-dates · Suez Canal Authority statements on th...<br/>IN 0.90"]
   n7["E_series<br/>WCI Shanghai-Rotterdam: ~2,000 (Oct 2020), ~8...<br/>anc-wci-series · Drewry World Container Index, Shangha...<br/>IN 0.70"]
   n8["W_capacity (Warrant)<br/>Removing transit capacity for ~1-2 weeks rais...<br/>IN 0.60"]
-  n9["E_transpacific<br/>WCI Shanghai-Los Angeles (no Suez exposure):...<br/>anc-transpacific · Drewry WCI Shanghai-Los Angeles lane...<br/>IN 0.70"]
+  n9["E_transpacific<br/>WCI Shanghai-Los Angeles (no Suez exposure):...<br/>anc-transpacific · Drewry WCI Shanghai-Los Angeles lane... · unverifiable source<br/>IN 0.70"]
   n10["E_pretrend<br/>UNCTAD RMT 2021: rates surged from H2 2020 on...<br/>anc-unctad-surge · UNCTAD Review of Maritime Transport 2...<br/>IN 0.80"]
   n9 -->|"supports"| n1
   n10 -->|"supports"| n2
@@ -58,6 +59,8 @@ flowchart BT
   class n0 claim
   classDef blocker stroke:#b03030,stroke-width:2px
   class n1,n2,n3,n4 blocker
+  classDef problem stroke:#b03030,stroke-dasharray:4 3
+  class n9 problem
 ```
 
 Drawn: 11 boxes and 18 arrows, computed from the logic model, its evaluation, the source model and the trace route's evidence directions (readable size 12 boxes, 20 arrows).
@@ -69,12 +72,14 @@ Drawn: 11 boxes and 18 arrows, computed from the logic model, its evaluation, th
 
 **Problems in what is drawn**
 
-- none: status reports no error or warning about anything drawn here
+- warning unverifiable_source:src-wci-transpacific (no link, DOI, ISBN or arXiv id; nothing outside this folder to check it against)
 <!-- END COMPUTED PICTURE -->
 
 Reply: *Two anchored pieces of evidence support the claim directly (the grounding dates and the Shanghai-Rotterdam
 series), with a warrant and a timing assumption; the timeline agrees on both pieces. Four nodes block it: the
 pre-trend rebuttal, the demand explanation, and two rebuttals built from the UNCTAD surge and the transpacific lane,
 which had no Suez exposure but rose too. The timeline counts those two anchors against the claim as well. So the
-folder licenses only "withhold": these records do not support saying the blockage caused the rise. The picture leaves
-out the experiment route, which has eliminated the claim, and the timeline order.*
+folder licenses only "withhold": these records do not support saying the blockage caused the rise. The transpacific
+lane is drawn dashed because its source is cited by title only: nobody can look it up yet, so it needs a link before
+the answer leans on it. The picture leaves out the experiment route, which has eliminated the claim, and the timeline
+order.*

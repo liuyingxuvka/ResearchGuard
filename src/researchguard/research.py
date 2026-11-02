@@ -269,6 +269,9 @@ def check_research_tree(index: dict[str, Any], models: dict[str, Any], observati
                                 if not identity.title else
                                 f"source_without_identity:{source_id} ({identity.title_summary()}, and there is no link)")
             warnings.extend(f"source_identity_invalid:{source_id} ({problem})" for problem in identity.problems)
+            if identity.unverifiable:
+                warnings.append(f"unverifiable_source:{source_id} ({identity.unverifiable}; nothing outside this "
+                                "folder to check it against)")
         for row in source.anchors:
             if row.locator.strip() and not names_place(row.locator):
                 warnings.append(f"anchor_locator_names_no_place:{row.anchor_id} (locator {row.locator!r} in {row.source_id})")
@@ -527,6 +530,8 @@ def research_status(tree: ResearchTree) -> dict[str, Any]:
                                                      for row in validate_evidence_provenance(node.id, node.provenance)):
                         used_by.append(f"logic:{node.id}")
             evidence.append({"anchor": anchor.anchor_id, "source": anchor.source_id,
+                             "unverifiable_source": anchor.source_id not in sources
+                                                    or bool(source_identity(sources[anchor.source_id]).unverifiable),
                              "lineage": sources[anchor.source_id].lineage_id if anchor.source_id in sources else "",
                              "locator": anchor.locator,
                              "summary": anchor.normalized_summary or anchor.text[:200],
@@ -607,7 +612,8 @@ def render_status_markdown(status: dict[str, Any]) -> str:
         lines.append("| " + " | ".join(cell(item) for item in (row["id"], row["text"], logic_text, trace_text, experiment.get("status", "not_run"))) + " |")
     lines.extend(["", "## Evidence", "", "| anchor | source | lineage | used by |", "|---|---|---|---|"])
     for row in status["evidence"]:
-        lines.append("| " + " | ".join(cell(item) for item in (row["anchor"], row["source"], row["lineage"], ", ".join(_used_by(row)))) + " |")
+        source = row["source"] + (" (warning: unverifiable source)" if row["unverifiable_source"] else "")
+        lines.append("| " + " | ".join(cell(item) for item in (row["anchor"], source, row["lineage"], ", ".join(_used_by(row)))) + " |")
     lines.extend(["", "## Open gaps", ""])
     for row in status["open_gaps"]:
         if row["route"] == "source":
@@ -665,7 +671,9 @@ def hypothesis_view(status: dict[str, Any], hypothesis_id: str, experiment: Any 
     for item in status["evidence"]:
         for direction in item.get("directions", ()):
             if direction["hypothesis"] == hypothesis_id:
-                evidence[direction["direction"]].append({"anchor": item["anchor"], "route": direction["route"]})
+                evidence[direction["direction"]].append({"anchor": item["anchor"], "route": direction["route"],
+                                                         "source": item["source"],
+                                                         "unverifiable_source": item["unverifiable_source"]})
     predicted = None
     if experiment is not None:
         predicted = {experiment_id for prediction in experiment.hypothesis_predictions if prediction.hypothesis_id == hypothesis_id
@@ -695,11 +703,13 @@ def render_hypothesis_view(view: dict[str, Any]) -> str:
              "- experiment: " + (experiment or {}).get("status", "not_listed"), "", "## Evidence", ""]
     for direction in ("support", "oppose", "limit"):
         rows = view["evidence"][direction]
-        anchors = {}
+        anchors, unverifiable = {}, {}
         for row in rows:
             anchors.setdefault(row['anchor'], set()).add(row['route'])
+            if row["unverifiable_source"]:
+                unverifiable[row["anchor"]] = f"; warning: unverifiable source {row['source']}"
         lines.append(f"- {direction}:")
-        lines.extend(f"  - {anchor} ({', '.join(sorted(routes))})" for anchor, routes in anchors.items())
+        lines.extend(f"  - {anchor} ({', '.join(sorted(routes))}){unverifiable.get(anchor, '')}" for anchor, routes in anchors.items())
         if not anchors:
             lines.append("  - none")
     lines.extend(["", "## Ablations", ""])

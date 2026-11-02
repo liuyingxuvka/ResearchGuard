@@ -191,7 +191,8 @@ researchguard status <current folder> --candidate <folder>
 ```
 
 Run these inside the candidate copy. A new source id must name the document the
-quote is printed in by a link (http or https with a host name, or a DOI) or by a
+quote is printed in by a link (http or https with a host name, a DOI, an ISBN or
+an arXiv id) or by a
 title that names one: a title with no letter or digit, or made only of
 placeholders and words for a person or a kind of message or document
 ("colleague's note"), names none, and neither does a date alone. A malformed link
@@ -202,7 +203,14 @@ holds. Every refusal writes nothing, for `add-anchor` and for `add-observation`
 alike. A passage with no such document is not source evidence. `status` warns
 `source_without_identity`, `source_identity_invalid`,
 `anchor_locator_names_no_place`, and `anchor_after_source_date` when a quote names
-a day or month after the date of its source. The candidate comparison lists every
+a day or month after the date of its source. It also warns `unverifiable_source`
+for every source, new or old, whose url field holds no outside locator: an http or
+https link whose host name ends in a top-level domain of the root zone and is not
+an example name, a DOI, an ISBN with a correct check digit, or an arXiv id. Only
+that field is read, never the title, so no title clears it; the status Evidence
+table, the `--hypothesis` Evidence list (and their JSON, `unverifiable_source`)
+and the picture mark each piece of evidence filed under such a source. Nothing is
+looked up, so an invented link, DOI or ISBN passes. The candidate comparison lists every
 added source with its title, link and date and every added piece of evidence with
 the source and place it is filed under (`evidence added: <anchor> (in <source> at
 "<locator>"; title "…"; …)`), because no tool can check a title or a locator. `sync` brings source anchors into the trace

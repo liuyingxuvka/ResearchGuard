@@ -469,6 +469,8 @@ def native_sync():
             results[label] = {'exit': result, 'output': output.getvalue().strip(), 'preserved': preserved,
                               'new_anchor': 'anc-lloyds' if label == 'added_anchor' else '',
                               'new_source': 'src-lloyds' if label == 'added_anchor' else '',
+                              # The added Lloyd's List source has a title and a date but no link.
+                              'unverifiable': label == 'added_anchor',
                               'conflict': label == 'conflict', 'changes': changes}
             if result == 2:
                 # Preserve the real missing-command evidence; do not simulate success.

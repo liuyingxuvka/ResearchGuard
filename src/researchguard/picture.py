@@ -228,9 +228,9 @@ def _source_line(source: Any, source_id: str) -> str:
     if source is None:
         return f"{source_id} (not in the source model)"
     identity = source_identity(source)
-    if not identity.names_document:
-        return f"{source_id} names no document"
-    return _short(identity.title if identity.title_names_document else identity.link, 40)
+    named = _short(identity.title if identity.title_names_document else identity.link, 40) if identity.names_document \
+        else f"{source_id} names no document"
+    return named + (" · unverifiable source" if identity.unverifiable else "")
 
 
 def _licence(logic: Any, claim_id: str, status: dict[str, Any]) -> str:

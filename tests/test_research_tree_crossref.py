@@ -108,7 +108,10 @@ def test_shipped_evergiven_tree_has_consistent_shared_ids(capsys):
     assert status['errors'] == []
     assert {row['id'] for row in status['hypotheses']} == {'h_suez', 'h_demand', 'h_yantian'}
     assert any(row['anchor'] == 'anc-transpacific' for row in status['evidence'])
-    assert status['warnings'] == ['hypothesis_not_in_logic:h_yantian']
+    # The transpacific lane is cited by title only, so no reader can look it up: status says so.
+    assert status['warnings'] == ['hypothesis_not_in_logic:h_yantian',
+                                  'unverifiable_source:src-wci-transpacific (no link, DOI, ISBN or arXiv id; '
+                                  'nothing outside this folder to check it against)']
 
 def test_one_observation_reaches_trace_and_logic_by_sync(tmp_path, capsys):
     import shutil
@@ -289,7 +292,7 @@ def test_a_source_without_title_url_or_date_is_warned(tmp_path, capsys):
 @pytest.mark.parametrize('identity,warning', [
     ({'title': '   '}, 'source_without_identity:src-lloyds (no title and no link name the document it stands for)'),
     ({'source_date': '2021-04'}, 'source_without_identity:src-lloyds (no title and no link name the document it stands for)'),
-    ({'title': "Lloyd's List", 'url': 'x'}, "source_identity_invalid:src-lloyds (url 'x' is not a link: http or https with a host name, or a DOI)"),
+    ({'title': "Lloyd's List", 'url': 'x'}, "source_identity_invalid:src-lloyds (url 'x' is not a link: http or https with a host name, a DOI, an ISBN or an arXiv id)"),
     ({'title': "Lloyd's List", 'source_date': 'unknown'}, "source_identity_invalid:src-lloyds (date 'unknown' is not a calendar date: YYYY, YYYY-MM or YYYY-MM-DD, not in the future)"),
     # Review round 2: titles that name no document passed with no warning.
     ({'title': "colleague's note"}, 'source_without_identity:src-lloyds (title "colleague\'s note" names no document, and there is no link)'),
@@ -369,3 +372,80 @@ def test_the_shipped_example_names_no_time_after_its_sources_and_every_locator_a
     from research_tree_support import EVERGIVEN
     warnings = research_status(load_research(EVERGIVEN))['warnings']
     assert not any(item.startswith(('anchor_after_source_date:', 'anchor_locator_names_no_place:')) for item in warnings)
+
+
+def _add_titled_source_evidence(candidate, title, locator):
+    """Review round 3: the A3 flow with one more word in the title and a locator such as 'email 2021'."""
+    _add_bare_source_evidence(candidate)
+
+    def name(data):
+        data['sources'][-1]['title'] = title
+        data['anchors'][-1]['locator'] = locator
+    _rewrite(candidate, 'source.yaml', name)
+
+
+@pytest.mark.parametrize('title,locator', [
+    ("Colleague's note, 2021", 'email 2021'),
+    ('Slack message', 'Bob said'),
+    ('Personal communication, J. Smith', ''),
+    ("Lloyd's List, 29 March 2021, p. 3", 'p. 3'),
+])
+def test_a_new_source_with_no_outside_locator_is_an_unverifiable_source_in_plain_status(tmp_path, capsys, title, locator):
+    import shutil
+    from research_tree_support import EVERGIVEN
+    candidate = tmp_path / 'titled-source'
+    shutil.copytree(EVERGIVEN, candidate)
+    _add_titled_source_evidence(candidate, title, locator)
+    assert main(['status', str(candidate), '--json']) == 0
+    status = json.loads(capsys.readouterr().out)
+    assert any(item.startswith('unverifiable_source:src-lloyds (') for item in status['warnings'])
+    row = next(row for row in status['evidence'] if row['anchor'] == 'anc-lloyds')
+    assert row['unverifiable_source'] is True
+    # Plain status names it in the Problems list and on the evidence row.
+    assert main(['status', str(candidate)]) == 0
+    page = capsys.readouterr().out
+    assert '- warning unverifiable_source:src-lloyds (' in page
+    assert '| anc-lloyds | src-lloyds (warning: unverifiable source) |' in page
+    # So does the evidence list of the conclusion the quote is drawn into.
+    assert main(['status', str(candidate), '--hypothesis', 'h_suez']) == 0
+    assert '- anc-lloyds (logic); warning: unverifiable source src-lloyds' in capsys.readouterr().out
+    assert main(['status', str(candidate), '--hypothesis', 'h_suez', '--json']) == 0
+    support = json.loads(capsys.readouterr().out)['evidence']['support']
+    assert {'anchor': 'anc-lloyds', 'route': 'logic', 'source': 'src-lloyds', 'unverifiable_source': True} in support
+
+
+def test_only_an_outside_locator_clears_an_unverifiable_source(tmp_path, capsys):
+    import shutil
+    from research_tree_support import EVERGIVEN
+    candidate = tmp_path / 'linked-source'
+    shutil.copytree(EVERGIVEN, candidate)
+    _add_titled_source_evidence(candidate, "Lloyd's List", "Lloyd's List, April 2021")
+    for url, unverifiable in (('https://example.org/lloyds', True), ('https://lloyds.note/x', True),
+                              ('https://www.lloydslist.com/LL1136183', False), ('isbn:978-0-13-110362-7', False)):
+        _rewrite(candidate, 'source.yaml', lambda data: data['sources'][-1].update(url=url))
+        warnings = research_status(load_research(candidate))['warnings']
+        assert any(item.startswith('unverifiable_source:src-lloyds (') for item in warnings) is unverifiable, url
+        assert not any(item.startswith('source_identity_invalid:src-lloyds') for item in warnings), url
+
+
+def test_the_candidate_comparison_adds_the_unverifiable_source_warning(tmp_path, capsys):
+    import shutil
+    from research_tree_support import EVERGIVEN
+    candidate = tmp_path / 'titled-source'
+    shutil.copytree(EVERGIVEN, candidate)
+    _add_titled_source_evidence(candidate, "Colleague's note, 2021", 'email 2021')
+    assert main(['status', str(EVERGIVEN), '--candidate', str(candidate)]) == 0
+    assert '- warnings added: unverifiable_source:src-lloyds (' in capsys.readouterr().out
+
+
+def test_a_link_the_url_parser_rejects_is_reported_not_a_status_failure(tmp_path, capsys):
+    import shutil
+    from research_tree_support import EVERGIVEN
+    candidate = tmp_path / 'bracketed-host'
+    shutil.copytree(EVERGIVEN, candidate)
+    _add_titled_source_evidence(candidate, "Lloyd's List", 'p. 3')
+    _rewrite(candidate, 'source.yaml', lambda data: data['sources'][-1].update(url='https://[zz]/x'))
+    assert main(['status', str(candidate), '--json']) == 0
+    warnings = json.loads(capsys.readouterr().out)['warnings']
+    assert any(item.startswith("source_identity_invalid:src-lloyds (url 'https://[zz]/x' is not a link") for item in warnings)
+    assert any(item.startswith('unverifiable_source:src-lloyds (') for item in warnings)

@@ -15,7 +15,8 @@ def test_hypothesis_view_lists_its_rows(capsys):
         assert text in page
     assert main(['status', str(EVERGIVEN), '--hypothesis', 'h_suez', '--json']) == 0
     view = json.loads(capsys.readouterr().out)
-    assert {'anchor': 'anc-unctad-surge', 'route': 'trace'} in view['evidence']['oppose']
+    assert {'anchor': 'anc-unctad-surge', 'route': 'trace', 'source': 'src-unctad-rmt2021', 'unverifiable_source': False} in view['evidence']['oppose']
+    assert {'anchor': 'anc-transpacific', 'route': 'trace', 'source': 'src-wci-transpacific', 'unverifiable_source': True} in view['evidence']['oppose']
     assert [row['id'] for row in view['ablations']] == ['question_without_unctad', 'abl_no_unctad']
     assert main(['status', str(EVERGIVEN), '--hypothesis', 'h_missing']) == 2
     assert 'unknown_hypothesis:h_missing' in capsys.readouterr().out

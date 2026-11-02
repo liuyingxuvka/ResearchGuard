@@ -77,7 +77,7 @@ def test_an_unnamed_source_is_visible_in_the_picture(tmp_path):
     shutil.copytree(EVERGIVEN, folder)
     _add_bare_source_evidence(folder)
     boxes = {row["id"]: row for row in _picture(folder, "h_suez")["boxes"]}
-    assert "anc-lloyds · src-lloyds names no document" in boxes["E_lloyds"]["lines"]
+    assert "anc-lloyds · src-lloyds names no document · unverifiable source" in boxes["E_lloyds"]["lines"]
 
 
 def test_picture_options(capsys):
@@ -188,3 +188,15 @@ def test_a_source_named_only_in_the_details_of_a_warning_marks_no_box(tmp_path):
     warning = "anchor_after_source_date:anc-late (the quote names April 2021; src-sca-2021 is dated 2021-03-29)"
     assert {"level": "warning", "text": warning} in picture["problems"]
     assert "E_dates" not in _flagged(picture)
+
+
+def test_an_unverifiable_source_is_dashed_in_the_picture(tmp_path):
+    from test_research_tree_crossref import _add_titled_source_evidence
+    folder = tmp_path / "titled"
+    shutil.copytree(EVERGIVEN, folder)
+    _add_titled_source_evidence(folder, "Colleague's note, 2021", "email 2021")
+    picture = _picture(folder, "h_suez")
+    box = {row["id"]: row for row in picture["boxes"]}["E_lloyds"]
+    assert "anc-lloyds · Colleague's note, 2021 · unverifiable source" in box["lines"]
+    assert box["problem"]
+    assert any(row["text"].startswith("unverifiable_source:src-lloyds (") for row in picture["problems"])

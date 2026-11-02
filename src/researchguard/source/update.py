@@ -16,6 +16,7 @@ import re
 import unicodedata
 from urllib.parse import urlparse
 
+from .root_zone import TOP_LEVEL_DOMAINS
 from .schema import (
     BeliefState,
     EvidenceAnchor,
@@ -78,7 +79,15 @@ def add_anchor(belief_state: BeliefState, anchor: EvidenceAnchor, *, source: Sou
 
 
 _DOI = re.compile(r"^(?:doi:\s*)?10\.\d{4,9}/\S+$", re.IGNORECASE)
+_ISBN = re.compile(r"^(?:urn:)?isbn(?:-1[03])?(?::\s*|\s+)([0-9][0-9 -]{8,15}[0-9X])$", re.IGNORECASE)
+_ARXIV = re.compile(r"^arxiv:\s*(?:\d{2}(?:0[1-9]|1[0-2])\.\d{4,5}|[a-z]+(?:-[a-z]+)*(?:\.[a-z]{2})?/\d{2}(?:0[1-9]|1[0-2])\d{3})"
+                    r"(?:v\d+)?$", re.IGNORECASE)
+_HOST_LABEL = re.compile(r"^[^\W_](?:[^\W_]|-){0,62}$")
+# Host names that exist only for examples or tests, and the top-level domains that name no public host.
+_EXAMPLE_HOSTS = ("example.com", "example.net", "example.org")
+_NO_PUBLIC_HOST = frozenset({"arpa", "onion"})
 _DATE = re.compile(r"^(\d{4})(?:-(\d{2})(?:-(\d{2}))?)?$")
+_NO_OUTSIDE_LOCATOR = "no link, DOI, ISBN or arXiv id"
 
 
 # Words that, on their own, name no document: placeholders, words for a person or a kind of message,
@@ -126,8 +135,10 @@ class SourceIdentity:
     A title names a document unless it has no letter or digit, or is made only of placeholders, words for
     a person or a kind of message or document, and small connecting words ("colleague's note", "n/a").
     That is all a tool can check about a title: an invented title passes. A link must be an http or https
-    URL with a host name, or a DOI. A date must be a calendar date that is not in the future. A source
-    names its document when it has a title that names one or a link; a date alone names none.
+    URL with a host name, a DOI, an ISBN or an arXiv id. A date must be a calendar date that is not in the
+    future. A source names its document when it has a title that names one or a link; a date alone names
+    none. A source is unverifiable unless its link is an outside locator (see ``outside_locator``): then
+    ``unverifiable`` says why, whatever the title says.
     """
 
     title: str
@@ -135,6 +146,7 @@ class SourceIdentity:
     link: str
     date: str
     problems: tuple[str, ...]
+    unverifiable: str
 
     @property
     def names_document(self) -> bool:
@@ -154,12 +166,68 @@ def source_identity(source: SourceRecord) -> SourceIdentity:
     url, when, title = source.url.strip(), source.source_date.strip(), visible_text(source.title)
     problems = []
     if url and not _is_link(url):
-        problems.append(f"url {url!r} is not a link: http or https with a host name, or a DOI")
+        problems.append(f"url {url!r} is not a link: http or https with a host name, a DOI, an ISBN or an arXiv id")
     if when and not _is_date(when):
         problems.append(f"date {when!r} is not a calendar date: YYYY, YYYY-MM or YYYY-MM-DD, not in the future")
     return SourceIdentity(title=title, title_names_document=bool(title) and not _names_nothing(title, _TITLE_WORDS),
                           link=url if url and _is_link(url) else "", date=when if when and _is_date(when) else "",
-                          problems=tuple(problems))
+                          problems=tuple(problems), unverifiable=outside_locator(url)[1])
+
+
+def outside_locator(url: str) -> tuple[str, str]:
+    """What a reader outside this folder can look the document up by, read from a source's url field only.
+
+    Returns ``(kind, "")`` with kind ``"link"`` (an http or https URL whose host name ends in a top-level
+    domain of the root zone and is not an example, onion or .arpa name), ``"DOI"``, ``"ISBN"`` (with a
+    correct check digit) or ``"arXiv id"``, and ``("", reason)`` for anything else. No title, locator or
+    date is read, and nothing is looked up on the network: an invented link, DOI or ISBN passes, and the
+    owner sees it in the candidate comparison.
+    """
+    url = url.strip()
+    if not url:
+        return "", _NO_OUTSIDE_LOCATOR
+    if _DOI.match(url):
+        return "DOI", ""
+    isbn = _ISBN.match(url)
+    if isbn:
+        return ("ISBN", "") if _isbn_checks(isbn[1]) else ("", f"the ISBN in {url!r} has a wrong check digit")
+    if _ARXIV.match(url):
+        return "arXiv id", ""
+    host = _url_host(url)
+    if not host:
+        return "", f"{url!r} is not an http or https link, a DOI, an ISBN or an arXiv id"
+    if not _public_host(host):
+        return "", f"the host {host} of {url} is not a public host name"
+    return "link", ""
+
+
+def _isbn_checks(text: str) -> bool:
+    digits = text.replace("-", "").replace(" ", "").upper()
+    if len(digits) == 10 and digits[:9].isdigit() and (digits[9].isdigit() or digits[9] == "X"):
+        values = [int(char) for char in digits[:9]] + [10 if digits[9] == "X" else int(digits[9])]
+        return sum((10 - index) * value for index, value in enumerate(values)) % 11 == 0
+    if len(digits) == 13 and digits.isdigit() and digits[:3] in {"978", "979"}:
+        return sum((1 if index % 2 == 0 else 3) * int(char) for index, char in enumerate(digits)) % 10 == 0
+    return False
+
+
+def _url_host(url: str) -> str:
+    """The host of an http or https URL, or "" for anything else; the URL parser is never given input it rejects."""
+    url = unicodedata.normalize("NFKC", url)
+    if any(char.isspace() for char in url) or "[" in url or "]" in url:
+        return ""
+    parsed = urlparse(url)
+    return (parsed.hostname or "") if parsed.scheme in {"http", "https"} else ""
+
+
+def _public_host(host: str) -> bool:
+    """Whether a host name could be a public one: labels of letters, digits and hyphens under a top-level
+    domain of the root zone, and not a name kept for examples. An IP address is not a host name."""
+    name = host.casefold().rstrip(".")
+    labels = name.split(".")
+    return (len(labels) >= 2 and all(_HOST_LABEL.match(label) and not label.endswith("-") for label in labels)
+            and labels[-1] in TOP_LEVEL_DOMAINS and labels[-1] not in _NO_PUBLIC_HOST
+            and not any(name == example or name.endswith("." + example) for example in _EXAMPLE_HOSTS))
 
 
 _MONTHS = {name: number for number, names in enumerate(
@@ -198,11 +266,8 @@ def date_period_end(text: str) -> date:
 
 
 def _is_link(url: str) -> bool:
-    if _DOI.match(url):
-        return True
-    parsed = urlparse(url)
-    host = parsed.hostname or ""
-    return parsed.scheme in {"http", "https"} and "." in host.strip(".") and not any(char.isspace() for char in url)
+    """Whether a url field is well formed: an outside locator, or an http or https URL with a dotted host."""
+    return bool(outside_locator(url)[0]) or "." in _url_host(url).strip(".")
 
 
 def _is_date(text: str) -> bool:
