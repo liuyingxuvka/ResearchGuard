@@ -172,7 +172,10 @@ evidence box shows its anchor and source only when the source model holds that
 anchor for that source; a locator the source model does not hold is drawn as
 `not an anchor of <source> in the source model`. `Problems in what is drawn`
 lists every status error and warning that names a drawn node, anchor or source,
-and every route that failed to load; a box named there is dashed red. When the
+and every route that failed to load. A box is dashed red when one of them is
+about its node, or about the anchor or source the box shows (an id in the
+problem's code, before its details: `anchor_locator_names_no_place:<anchor>`
+marks the evidence box that shows that anchor). When the
 logic model cannot be read, the picture is not drawn and says why. With
 `--json` it returns `claim`, `boxes`, `arrows`, `blocked_by`, `not_drawn`,
 `problems` and `limits` (and `cannot_draw` instead of boxes when the logic model

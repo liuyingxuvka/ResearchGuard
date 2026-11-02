@@ -4,7 +4,8 @@ Boxes and arrows come from the folder's own models: the logic model's edges and 
 evaluation (state, confidence, blockers), the source model's anchors and sources, and the evidence
 directions that research_status derives for the trace route. A provenance locator is drawn as
 source support only when the source model holds that anchor for that source; otherwise the box says
-it is not. The picture lists every status error and warning that names something it draws, and a
+it is not. The picture lists every status error and warning that names something it draws, and
+draws a box dashed when such a problem is about its node or about the anchor or source it shows. A
 logic model that cannot be read is reported as such instead of being drawn as absent. It keeps to
 the discussed claim and its two nearest steps, stops at a readable size, and lists by id everything
 it leaves out.
@@ -189,21 +190,32 @@ def support_picture(tree: Any, status: dict[str, Any], claim_id: str, *,
         not_drawn.insert(0, f"research.yaml lists no logic model, so no argument edges reach {claim_id}")
     elif claim_id not in nodes:
         not_drawn.insert(0, f"{claim_id} has no node in the logic model, so no argument edges reach it")
+    def shown(item: str) -> set[str]:
+        """The anchor and source a box shows, which a problem can name instead of the box itself."""
+        if item.startswith("anchor:"):
+            anchor_id = item.split(":", 1)[1]
+            return {anchor_id, anchors[anchor_id].source_id} if anchor_id in anchors else {anchor_id}
+        return set(anchor_of.get(item, ()))
+
     boxes = [box(item) for item in order]
     named = {item.split(":", 1)[1] if item.startswith("anchor:") else item for item in order}
-    named |= {part for item in order if item in anchor_of for part in anchor_of[item]}
-    named |= {anchors[item.split(":", 1)[1]].source_id for item in order
-              if item.startswith("anchor:") and item.split(":", 1)[1] in anchors}
+    named |= {part for item in order for part in shown(item)}
     problems = _problems(status, named)
     flagged = {token for row in problems for token in _tokens(row["text"])}
+    about = {token for row in problems for token in _subject(row["text"])}
     for row in boxes:
-        row["problem"] = bool({row["id"], row["id"].split(":", 1)[-1]} & flagged)
+        row["problem"] = bool({row["id"], row["id"].split(":", 1)[-1]} & flagged or shown(row["id"]) & about)
     return {"claim": claim_id, "boxes": boxes, "arrows": arrows(drawn), "blocked_by": sorted(blockers),
             "not_drawn": not_drawn, "problems": problems, "limits": limits}
 
 
 def _tokens(text: str) -> set[str]:
     return set(re.split(r"[\s:(),]+", text))
+
+
+def _subject(text: str) -> set[str]:
+    """The ids a status problem is about: those in its code, before the details that follow the first space."""
+    return _tokens(text.split(" ", 1)[0])
 
 
 def _problems(status: dict[str, Any], named: set[str]) -> list[dict[str, str]]:

@@ -148,3 +148,43 @@ def test_a_failed_trace_route_is_named_in_the_picture(tmp_path):
     assert not any("trace" in row["routes"] for row in picture["arrows"])
     assert any(row["text"].startswith("model_invalid:trace: ") for row in picture["problems"])
     assert "the trace route's evidence directions: the trace model failed to load" in picture["not_drawn"]
+
+
+def _flagged(picture):
+    return {row["id"] for row in picture["boxes"] if row["problem"]}
+
+
+def test_a_warning_about_the_anchor_or_source_of_a_drawn_evidence_box_marks_that_box(tmp_path):
+    # Review round 3: anchor_locator_names_no_place:anc-sca-dates was listed under Problems, but the
+    # E_dates box that shows anc-sca-dates was drawn as if nothing were wrong.
+    folder = tmp_path / "placeless-locator"
+    shutil.copytree(EVERGIVEN, folder)
+    _rewrite(folder, "source.yaml", lambda data: next(row for row in data["anchors"]
+                                                      if row["anchor_id"] == "anc-sca-dates").update(locator="colleague"))
+    picture = _picture(folder, "h_suez")
+    warning = "anchor_locator_names_no_place:anc-sca-dates (locator 'colleague' in src-sca-2021)"
+    assert {"level": "warning", "text": warning} in picture["problems"]
+    assert "E_dates" in _flagged(picture) and "E_series" not in _flagged(picture)
+    ids = {row["id"]: f"n{index}" for index, row in enumerate(picture["boxes"])}
+    assert re.search(rf"^  class (\S+,)?{ids['E_dates']}(,\S+)? problem$", render_picture_markdown(picture), re.M)
+    # A warning about a source marks every drawn box that shows an anchor of that source.
+    folder = tmp_path / "bad-link"
+    shutil.copytree(EVERGIVEN, folder)
+    _rewrite(folder, "source.yaml", lambda data: next(row for row in data["sources"]
+                                                      if row["source_id"] == "src-drewry-wci").update(url="x"))
+    picture = _picture(folder, "h_suez")
+    assert any(row["text"].startswith("source_identity_invalid:src-drewry-wci ") for row in picture["problems"])
+    assert "E_series" in _flagged(picture) and "E_dates" not in _flagged(picture)
+
+
+def test_a_source_named_only_in_the_details_of_a_warning_marks_no_box(tmp_path):
+    # The warning is about anc-late, which is not drawn; it mentions src-sca-2021 only to say what it is
+    # compared with, so the E_dates box filed under that source is listed with it but not marked.
+    folder = tmp_path / "late-quote"
+    shutil.copytree(EVERGIVEN, folder)
+    _rewrite(folder, "source.yaml", lambda data: data["anchors"].append(
+        {"anchor_id": "anc-late", "source_id": "src-sca-2021", "locator": "para 9", "text": "Rates doubled in April 2021."}))
+    picture = _picture(folder, "h_suez")
+    warning = "anchor_after_source_date:anc-late (the quote names April 2021; src-sca-2021 is dated 2021-03-29)"
+    assert {"level": "warning", "text": warning} in picture["problems"]
+    assert "E_dates" not in _flagged(picture)
