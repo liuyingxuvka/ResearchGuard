@@ -188,16 +188,21 @@ researchguard status <current folder> --candidate <folder>
 ```
 
 Run these inside the candidate copy. A new source id must name the document the
-quote is printed in by its title or a link (http or https with a host name, or a
-DOI); a date alone names no document, and a malformed link or date
-(`new_source_identity_invalid`) is refused like a missing one
-(`new_source_without_identity`). Either refusal writes nothing, for
-`add-anchor` and for `add-observation` alike. A passage with no such document is
-not source evidence. `status` warns `source_without_identity` on a source with no
-title and no link and `source_identity_invalid` on a malformed link or date, and
-the candidate comparison lists every added source with its title, link and date
-(`source added: <id> (title "…"; no link; date …)`), because a title cannot be
-checked. `sync` brings source anchors into the trace
+quote is printed in by a link (http or https with a host name, or a DOI) or by a
+title that names one: a title with no letter or digit, or made only of
+placeholders and words for a person or a kind of message or document
+("colleague's note"), names none, and neither does a date alone. A malformed link
+or date (`new_source_identity_invalid`) is refused like a missing one
+(`new_source_without_identity`), and so is a locator that names no place in the
+document (`anchor_locator_names_no_place`), also on a source the model already
+holds. Every refusal writes nothing, for `add-anchor` and for `add-observation`
+alike. A passage with no such document is not source evidence. `status` warns
+`source_without_identity`, `source_identity_invalid`,
+`anchor_locator_names_no_place`, and `anchor_after_source_date` when a quote names
+a day or month after the date of its source. The candidate comparison lists every
+added source with its title, link and date and every added piece of evidence with
+the source and place it is filed under (`evidence added: <anchor> (in <source> at
+"<locator>"; title "…"; …)`), because no tool can check a title or a locator. `sync` brings source anchors into the trace
 and logic models named by `research.yaml`. Follow its printed `next:` to inspect
 that folder; comparison separately names the unchanged current folder first and
 the synced candidate with `--candidate`, as shown above.

@@ -567,10 +567,10 @@ def run(args: argparse.Namespace) -> int:
             _json_out({"ok": False, "error": str(exc)}, args.pretty)
             return 1
         write_yaml(args.output, updated)
-        payload = {"ok": True, "output": args.output}
-        if created:  # a title cannot be checked, so the new source is shown as it was named
-            payload["new_source"] = {"id": args.source_id, "identity": source_identity(record).summary()}
-        _json_out(payload, args.pretty)
+        # No tool can check that the quote is printed in this document, so the source it is filed under is shown.
+        filed_under = record if created else next(row for row in updated.sources if row.source_id == args.source_id)
+        _json_out({"ok": True, "output": args.output, "source": {
+            "id": args.source_id, "identity": source_identity(filed_under).summary(), "created": created}}, args.pretty)
         return 0
     if args.command == "add-observation":
         model = load_model(args.model)

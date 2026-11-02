@@ -238,6 +238,15 @@ def _known_source_model(tmp_path):
     (('--date', 'unknown'), 'new_source_identity_invalid'),
     (('--title', "Lloyd's List", '--url', 'lloyds list'), 'new_source_identity_invalid'),
     (('--title', "Lloyd's List", '--date', '2021-13'), 'new_source_identity_invalid'),
+    # Review round 2: a title of one more self-written word passed. A title must name a document:
+    # one with no letter or digit, a placeholder, or only words for a person or a kind of message names none.
+    (('--title', "colleague's note"), 'new_source_without_identity'),
+    (('--title', '.'), 'new_source_without_identity'),
+    (('--title', 'unknown'), 'new_source_without_identity'),
+    (('--title', 'n/a'), 'new_source_without_identity'),
+    (('--title', '\u200b'), 'new_source_without_identity'),        # a zero-width space shows as nothing
+    (('--title', 'Email from a colleague', '--date', '2021-04'), 'new_source_without_identity'),
+    (('--title', '同事的笔记'), 'new_source_without_identity'),
 ])
 def test_add_anchor_refuses_a_new_source_that_names_no_document(tmp_path, capsys, identity, code):
     """A new source must be named by a title or a well-formed link; a malformed link or date is refused too."""
@@ -251,7 +260,7 @@ def test_add_anchor_refuses_a_new_source_that_names_no_document(tmp_path, capsys
     assert model.read_bytes() == before
 
 
-def test_add_anchor_reports_the_identity_of_the_source_it_creates(tmp_path, capsys):
+def test_add_anchor_names_the_source_it_adds_the_quote_to(tmp_path, capsys):
     from researchguard.source.loader import load_model
     model = _known_source_model(tmp_path)
     for source_id, identity, shown in (
@@ -259,10 +268,39 @@ def test_add_anchor_reports_the_identity_of_the_source_it_creates(tmp_path, caps
             ('src-url', ('--url', 'https://example.org/a'), 'no title; link https://example.org/a; no date'),
             ('src-doi', ('--url', 'doi:10.1000/xyz123'), 'no title; link doi:10.1000/xyz123; no date')):
         assert _add_anchor(model, source_id, f'anc-{source_id}', *identity) == 0
-        assert json.loads(capsys.readouterr().out)['new_source'] == {'id': source_id, 'identity': shown}
+        assert json.loads(capsys.readouterr().out)['source'] == {'id': source_id, 'identity': shown, 'created': True}
+    # A quote added to a source the model already holds names that source too, so the attribution is visible.
     assert _add_anchor(model, 'known', 'anc-known') == 0
-    assert 'new_source' not in json.loads(capsys.readouterr().out)
+    assert json.loads(capsys.readouterr().out)['source'] == {'id': 'known', 'identity': 'title "A known report"; no link; no date',
+                                                             'created': False}
     assert {row.source_id for row in load_model(model).sources} == {'known', 'src-title', 'src-url', 'src-doi'}
+
+
+@pytest.mark.parametrize('locator', ['colleague', "my colleague's email", '.', 'unknown', 'personal communication'])
+def test_add_anchor_refuses_a_locator_that_names_no_place_in_the_document(tmp_path, capsys, locator):
+    # Review round 2: the colleague's quote was added to an existing, real source with --locator colleague.
+    from researchguard.source.cli import main
+    model = _known_source_model(tmp_path)
+    before = model.read_bytes()
+    assert main(['add-anchor', str(model), '--source-id', 'known', '--anchor-id', 'anc-note', '--quote', 'A remark.',
+                 '--locator', locator, '--output', str(model)]) == 1
+    error = json.loads(capsys.readouterr().out)['error']
+    assert error.startswith('anchor_locator_names_no_place:anc-note')
+    assert model.read_bytes() == before
+    assert main(['add-anchor', str(model), '--source-id', 'known', '--anchor-id', 'anc-page', '--quote', 'A passage.',
+                 '--locator', 'p. 4', '--output', str(model)]) == 0
+
+
+def test_add_observation_refuses_an_anchor_whose_locator_names_no_place(tmp_path, capsys):
+    from researchguard.source.cli import main
+    model = _known_source_model(tmp_path)
+    observation = tmp_path / 'obs.yaml'
+    observation.write_text(yaml.safe_dump({'observation_id': 'obs-1', 'observed_anchors': [
+        {'anchor_id': 'anc-note', 'source_id': 'known', 'locator': 'colleague', 'text': 'A remark.'}]}), encoding='utf-8')
+    output = tmp_path / 'out.yaml'
+    assert main(['add-observation', str(model), '--observation', str(observation), '--output', str(output)]) != 0
+    assert 'anchor_locator_names_no_place:anc-note' in capsys.readouterr().err
+    assert not output.exists()
 
 
 def test_add_observation_refuses_a_source_that_names_no_document(tmp_path, capsys):

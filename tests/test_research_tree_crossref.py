@@ -291,6 +291,11 @@ def test_a_source_without_title_url_or_date_is_warned(tmp_path, capsys):
     ({'source_date': '2021-04'}, 'source_without_identity:src-lloyds (no title and no link name the document it stands for)'),
     ({'title': "Lloyd's List", 'url': 'x'}, "source_identity_invalid:src-lloyds (url 'x' is not a link: http or https with a host name, or a DOI)"),
     ({'title': "Lloyd's List", 'source_date': 'unknown'}, "source_identity_invalid:src-lloyds (date 'unknown' is not a calendar date: YYYY, YYYY-MM or YYYY-MM-DD, not in the future)"),
+    # Review round 2: titles that name no document passed with no warning.
+    ({'title': "colleague's note"}, 'source_without_identity:src-lloyds (title "colleague\'s note" names no document, and there is no link)'),
+    ({'title': '.'}, 'source_without_identity:src-lloyds (title "." names no document, and there is no link)'),
+    ({'title': 'n/a', 'source_date': '2021-04'}, 'source_without_identity:src-lloyds (title "n/a" names no document, and there is no link)'),
+    ({'title': '\u200b'}, 'source_without_identity:src-lloyds (no title and no link name the document it stands for)'),
 ])
 def test_status_computes_whether_a_source_names_its_document(tmp_path, capsys, identity, warning):
     import shutil
@@ -312,11 +317,55 @@ def test_the_candidate_comparison_shows_each_new_source_with_its_identity(tmp_pa
     _rewrite(candidate, 'source.yaml', lambda data: data['sources'][-1].update(title="colleague's note"))
     assert main(['status', str(EVERGIVEN), '--candidate', str(candidate)]) == 0
     text = capsys.readouterr().out
-    assert '- source added: src-lloyds (title "colleague\'s note"; no link; no date)' in text
+    assert '- source added: src-lloyds (title "colleague\'s note" names no document; no link; no date)' in text
+    assert '- evidence added: anc-lloyds (in src-lloyds at "Lloyd\'s List, April 2021"; title "colleague\'s note" names no document; no link; no date)' in text
     # A changed identity of a source both folders hold is listed too.
     current = tmp_path / 'note-source-current'
     shutil.copytree(candidate, current)
     _rewrite(candidate, 'source.yaml', lambda data: data['sources'][-1].update(url='https://example.org/lloyds'))
     assert main(['status', str(current), '--candidate', str(candidate)]) == 0
-    assert ('- source src-lloyds: identity "title \\"colleague\'s note\\"; no link; no date" → '
-            '"title \\"colleague\'s note\\"; link https://example.org/lloyds; no date"') in capsys.readouterr().out
+    assert ('- source src-lloyds: identity "title \\"colleague\'s note\\" names no document; no link; no date" → '
+            '"title \\"colleague\'s note\\" names no document; link https://example.org/lloyds; no date"') in capsys.readouterr().out
+
+
+def _attach_quote_to_a_real_source(candidate, locator):
+    """Review round 2: the colleague's quote added as a new anchor of the existing SCA source."""
+    quote = 'The Suez blockage alone doubled Asia-Europe spot rates in April 2021.'
+    _rewrite(candidate, 'source.yaml', lambda data: data['anchors'].append(
+        {'anchor_id': 'anc-lloyds', 'source_id': 'src-sca-2021', 'locator': locator, 'text': quote}))
+
+
+def test_a_quote_on_a_real_source_is_shown_with_that_source_and_checked_against_it(tmp_path, capsys):
+    import shutil
+    from research_tree_support import EVERGIVEN
+    candidate = tmp_path / 'attached'
+    shutil.copytree(EVERGIVEN, candidate)
+    _attach_quote_to_a_real_source(candidate, 'colleague')
+    assert main(['status', str(EVERGIVEN), '--candidate', str(candidate)]) == 0
+    text = capsys.readouterr().out
+    # The added evidence names the source it is filed under, so the owner sees the attribution.
+    assert ('- evidence added: anc-lloyds (in src-sca-2021 at "colleague"; title "Suez Canal Authority statements on the Ever Given '
+            'grounding and refloating (trial transcription)"; link https://www.suezcanal.gov.eg/; date 2021-03-29)') in text
+    # A locator of only a person or a kind of message names no place in the document.
+    assert '- warnings added: anchor_locator_names_no_place:anc-lloyds (locator \'colleague\' in src-sca-2021)' in text
+    # The quote names April 2021, after the date of the document it is filed under.
+    assert ('- warnings added: anchor_after_source_date:anc-lloyds (the quote names April 2021; '
+            'src-sca-2021 is dated 2021-03-29)') in text
+
+
+def test_a_made_up_locator_on_a_real_source_still_shows_the_later_date(tmp_path, capsys):
+    import shutil
+    from research_tree_support import EVERGIVEN
+    candidate = tmp_path / 'attached-page'
+    shutil.copytree(EVERGIVEN, candidate)
+    _attach_quote_to_a_real_source(candidate, 'p. 2')
+    assert main(['status', str(candidate), '--json']) == 0
+    warnings = json.loads(capsys.readouterr().out)['warnings']
+    assert 'anchor_after_source_date:anc-lloyds (the quote names April 2021; src-sca-2021 is dated 2021-03-29)' in warnings
+    assert not any(item.startswith('anchor_locator_names_no_place:') for item in warnings)
+
+
+def test_the_shipped_example_names_no_time_after_its_sources_and_every_locator_a_place():
+    from research_tree_support import EVERGIVEN
+    warnings = research_status(load_research(EVERGIVEN))['warnings']
+    assert not any(item.startswith(('anchor_after_source_date:', 'anchor_locator_names_no_place:')) for item in warnings)

@@ -218,7 +218,7 @@ def _source_line(source: Any, source_id: str) -> str:
     identity = source_identity(source)
     if not identity.names_document:
         return f"{source_id} names no document"
-    return _short(identity.title or identity.link, 40)
+    return _short(identity.title if identity.title_names_document else identity.link, 40)
 
 
 def _licence(logic: Any, claim_id: str, status: dict[str, Any]) -> str:

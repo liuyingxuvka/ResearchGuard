@@ -13,6 +13,7 @@ from calendar import monthrange
 from dataclasses import dataclass, replace
 from datetime import date
 import re
+import unicodedata
 from urllib.parse import urlparse
 
 from .schema import (
@@ -68,6 +69,11 @@ def add_anchor(belief_state: BeliefState, anchor: EvidenceAnchor, *, source: Sou
         new_source = source or SourceRecord(source_id=anchor.source_id)
         require_document(new_source, "this anchor would create")
         belief_state = add_source(belief_state, new_source)
+    if anchor.locator.strip() and not names_place(anchor.locator):
+        raise ValueError(
+            f"anchor_locator_names_no_place:{anchor.anchor_id}: locator {anchor.locator!r} names no place in "
+            f"{anchor.source_id}; it names a person, a kind of message, or nothing. A quote belongs to the document "
+            "it is printed in, at the place it is printed. Nothing was written.")
     return replace(belief_state, anchors=_upsert_by_id(belief_state.anchors, anchor, "anchor_id"))
 
 
@@ -75,39 +81,120 @@ _DOI = re.compile(r"^(?:doi:\s*)?10\.\d{4,9}/\S+$", re.IGNORECASE)
 _DATE = re.compile(r"^(\d{4})(?:-(\d{2})(?:-(\d{2}))?)?$")
 
 
+# Words that, on their own, name no document: placeholders, words for a person or a kind of message,
+# small connecting words, and (for a title) words for a kind of document. A title or locator made only of
+# these, or of single Latin letters, or with no letter or digit at all, names nothing another reader can find.
+_PLACEHOLDER_WORDS = frozenset(
+    "unknown unk none null nil na tbd tba todo untitled unnamed anonymous anon placeholder missing empty blank "
+    "xxx xx test misc various same ibid see above below".split())
+_PERSONAL_WORDS = frozenset(
+    "note notes memo memos email emails mail message messages msg chat chats call calls phone conversation "
+    "conversations discussion meeting comment comments remark remarks colleague colleagues coworker coworkers "
+    "worker workers friend friends boss manager someone somebody person people expert insider contact personal "
+    "communication private internal verbal oral informal unpublished own my our his her their me we you they "
+    "told said says heard mentioned".split())
+_CONNECTING_WORDS = frozenset("the of from by with to and or on in about at for an this that".split())
+_DOCUMENT_KIND_WORDS = frozenset(
+    "title source sources document documents doc docs file item entry reference ref citation quote quotation "
+    "excerpt passage text record article report paper page website site web online link book".split())
+_PLACEHOLDER_PHRASES = frozenset("未知 不详 无 无标题 同事 同事的笔记 同事笔记 笔记 备注 来源 资料 聊天记录 邮件 个人通信".split())
+_TITLE_WORDS = _PLACEHOLDER_WORDS | _PERSONAL_WORDS | _CONNECTING_WORDS | _DOCUMENT_KIND_WORDS
+_LOCATOR_WORDS = _PLACEHOLDER_WORDS | _PERSONAL_WORDS | _CONNECTING_WORDS
+
+
+def visible_text(text: str) -> str:
+    """``text`` as a reader sees it: invisible characters such as a zero-width space removed, spaces collapsed."""
+    shown = "".join(char for char in unicodedata.normalize("NFKC", text) if unicodedata.category(char) not in {"Cf", "Cc", "Co", "Cn"})
+    return " ".join(shown.split())
+
+
+def _names_nothing(text: str, generic: frozenset[str]) -> bool:
+    words = re.findall(r"[^\W_]+", visible_text(text).casefold())
+    return all(word in generic or word in _PLACEHOLDER_PHRASES or (len(word) == 1 and word.isascii() and word.isalpha())
+               for word in words)
+
+
+def names_place(locator: str) -> bool:
+    """Whether a locator can point into a document: it is not only a person, a kind of message or a placeholder."""
+    return not _names_nothing(locator, _LOCATOR_WORDS)
+
+
 @dataclass(frozen=True)
 class SourceIdentity:
-    """What a source record says about its document, checked for form by the tool.
+    """What a source record says about its document, checked by the tool.
 
-    A title is taken as written (stripped); it cannot be checked. A link must be an http or https URL
-    with a host name, or a DOI. A date must be a calendar date that is not in the future. A source names
-    its document when it has a title or a link; a date alone names none.
+    A title names a document unless it has no letter or digit, or is made only of placeholders, words for
+    a person or a kind of message or document, and small connecting words ("colleague's note", "n/a").
+    That is all a tool can check about a title: an invented title passes. A link must be an http or https
+    URL with a host name, or a DOI. A date must be a calendar date that is not in the future. A source
+    names its document when it has a title that names one or a link; a date alone names none.
     """
 
     title: str
+    title_names_document: bool
     link: str
     date: str
     problems: tuple[str, ...]
 
     @property
     def names_document(self) -> bool:
-        return bool(self.title or self.link)
+        return self.title_names_document or bool(self.link)
+
+    def title_summary(self) -> str:
+        if not self.title:
+            return "no title"
+        return f'title "{self.title}"' + ("" if self.title_names_document else " names no document")
 
     def summary(self) -> str:
-        return "; ".join((f'title "{self.title}"' if self.title else "no title",
-                          f"link {self.link}" if self.link else "no link",
+        return "; ".join((self.title_summary(), f"link {self.link}" if self.link else "no link",
                           f"date {self.date}" if self.date else "no date"))
 
 
 def source_identity(source: SourceRecord) -> SourceIdentity:
-    url, when = source.url.strip(), source.source_date.strip()
+    url, when, title = source.url.strip(), source.source_date.strip(), visible_text(source.title)
     problems = []
     if url and not _is_link(url):
         problems.append(f"url {url!r} is not a link: http or https with a host name, or a DOI")
     if when and not _is_date(when):
         problems.append(f"date {when!r} is not a calendar date: YYYY, YYYY-MM or YYYY-MM-DD, not in the future")
-    return SourceIdentity(title=" ".join(source.title.split()), link=url if url and _is_link(url) else "",
-                          date=when if when and _is_date(when) else "", problems=tuple(problems))
+    return SourceIdentity(title=title, title_names_document=bool(title) and not _names_nothing(title, _TITLE_WORDS),
+                          link=url if url and _is_link(url) else "", date=when if when and _is_date(when) else "",
+                          problems=tuple(problems))
+
+
+_MONTHS = {name: number for number, names in enumerate(
+    (("january", "jan"), ("february", "feb"), ("march", "mar"), ("april", "apr"), ("may",), ("june", "jun"),
+     ("july", "jul"), ("august", "aug"), ("september", "sep", "sept"), ("october", "oct"), ("november", "nov"),
+     ("december", "dec")), start=1) for name in names}
+_NAMED_TIME = re.compile(
+    r"\b(?:(\d{1,2})\s+)?(" + "|".join(sorted(_MONTHS, key=len, reverse=True)) + r")\.?(?:\s+(\d{1,2}),?)?\s+(\d{4})\b"
+    r"|\b(\d{4})-(\d{2})(?:-(\d{2}))?\b", re.IGNORECASE)
+
+
+def times_named(text: str) -> list[tuple[str, date]]:
+    """Each day or month a text names (``29 March 2021``, ``April 2021``, ``2021-04``) with the day it starts on.
+
+    A bare year is not read: in a quote it is as often an amount as a time.
+    """
+    named = []
+    for match in _NAMED_TIME.finditer(text):
+        if match[4]:
+            year, month, day = int(match[4]), _MONTHS[match[2].lower()], int(match[1] or match[3] or 1)
+        else:
+            year, month, day = int(match[5]), int(match[6]), int(match[7] or 1)
+        if 1 <= year and 1 <= month <= 12 and 1 <= day <= monthrange(year, month)[1]:
+            named.append((match[0], date(year, month, day)))
+    return named
+
+
+def date_period_end(text: str) -> date:
+    """The last day a well-formed source date (YYYY, YYYY-MM or YYYY-MM-DD) covers."""
+    match = _DATE.match(text)
+    if match is None:
+        raise ValueError(f"not a source date: {text!r}")
+    year = int(match[1])
+    month = int(match[2] or 12)
+    return date(year, month, int(match[3] or monthrange(year, month)[1]))
 
 
 def _is_link(url: str) -> bool:

@@ -27,7 +27,7 @@ from .source.loader import load_model as load_source
 from .source.planner import plan_next_actions
 from .source.stop_decision import decide_model_search_stop
 from .source.schema import to_plain
-from .source.update import source_identity
+from .source.update import date_period_end, names_place, source_identity, times_named
 from .trace.evaluator import evaluate_model as evaluate_trace
 from .trace.loader import load_model as load_trace
 
@@ -262,11 +262,22 @@ def check_research_tree(index: dict[str, Any], models: dict[str, Any], observati
         errors.extend(f"unknown_hypothesis:source:{gap.gap_id}:{item}" for gap in source.gaps
                       for item in gap.hypothesis_ids if item not in ids)
         source_ids = {row.source_id for row in source.sources}
-        for row in source.sources:
-            identity = source_identity(row)
+        identities = {row.source_id: source_identity(row) for row in source.sources}
+        for source_id, identity in identities.items():
             if not identity.names_document:
-                warnings.append(f"source_without_identity:{row.source_id} (no title and no link name the document it stands for)")
-            warnings.extend(f"source_identity_invalid:{row.source_id} ({problem})" for problem in identity.problems)
+                warnings.append(f"source_without_identity:{source_id} (no title and no link name the document it stands for)"
+                                if not identity.title else
+                                f"source_without_identity:{source_id} ({identity.title_summary()}, and there is no link)")
+            warnings.extend(f"source_identity_invalid:{source_id} ({problem})" for problem in identity.problems)
+        for row in source.anchors:
+            if row.locator.strip() and not names_place(row.locator):
+                warnings.append(f"anchor_locator_names_no_place:{row.anchor_id} (locator {row.locator!r} in {row.source_id})")
+            dated = identities.get(row.source_id)
+            if dated is not None and dated.date:
+                later = [named for named, start in times_named(row.text) if start > date_period_end(dated.date)]
+                if later:
+                    warnings.append(f"anchor_after_source_date:{row.anchor_id} (the quote names {', '.join(later)}; "
+                                    f"{row.source_id} is dated {dated.date})")
         anchors = {row.anchor_id: row.source_id for row in source.anchors}
         if trace is not None:
             errors.extend(f"dangling_source:trace:{row.source_id}" for row in trace.sources if row.source_id not in source_ids)
@@ -769,9 +780,24 @@ def compare_research_status(current, candidate):
             changes.append({"kind": "source", "id": identifier, "change": "removed", "identity": before})
         elif before != after:
             changes.append({"kind": "source", "id": identifier, "before": {"identity": before}, "after": {"identity": after}})
+    # Each piece of evidence is shown with the source it is filed under and where in it, because no tool can
+    # check that the quote is printed there: the owner reads the attribution here.
+    old_evidence = {row["anchor"]: row for row in current["evidence"]}
+    new_evidence = {row["anchor"]: row for row in candidate["evidence"]}
+    filed = lambda row: {"source": row["source"], "locator": row["locator"]}
+    for identifier in dict.fromkeys((*old_evidence, *new_evidence)):
+        before, after = old_evidence.get(identifier), new_evidence.get(identifier)
+        if before is None or after is None:
+            row, sources = (after, new_sources) if before is None else (before, old_sources)
+            changes.append({"kind": "evidence", "id": identifier, "change": "added" if before is None else "removed",
+                            "detail": f'in {row["source"]} at "{row["locator"]}"; ' + (
+                                sources[row["source"]] if row["source"] in sources else "not a source in the source model")})
+        elif filed(before) != filed(after):
+            changes.append({"kind": "evidence", "id": identifier,
+                            "before": {key: value for key, value in filed(before).items() if value != filed(after)[key]},
+                            "after": {key: value for key, value in filed(after).items() if value != filed(before)[key]}})
     disagreement = lambda rows: {f"{row['hypothesis']}:{row['kind']}:{row['detail']}" for row in rows}
-    for key, values in (("evidence", lambda status: {row["anchor"] for row in status["evidence"]}),
-                        ("disagreement", lambda status: disagreement(status.get("disagreements", []))),
+    for key, values in (("disagreement", lambda status: disagreement(status.get("disagreements", []))),
                         ("errors", lambda status: set(status["errors"])), ("warnings", lambda status: set(status["warnings"]))):
         left, right = values(current), values(candidate)
         for value in sorted(left - right):
@@ -807,7 +833,8 @@ def render_comparison(comparison):
         elif row["kind"] == "verdict":
             lines.append(f"- verdict {row['id']}: {_shown(row['before'])} → {_shown(row['after'])}")
         elif "change" in row:
-            lines.append(f"- {row['kind']} {row['change']}: {row['id']}" + (f" ({row['identity']})" if row.get("identity") else ""))
+            shown = row.get("identity") or row.get("detail")
+            lines.append(f"- {row['kind']} {row['change']}: {row['id']}" + (f" ({shown})" if shown else ""))
         else:
             for key, before in row["before"].items():
                 lines.append(f"- {row['kind']} {row['id']}: {key} {_shown(before)} → {_shown(row['after'][key])}")

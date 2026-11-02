@@ -74,8 +74,10 @@ unanchored insertion needs an explicit source binding rather than silent deletio
 set its provenance to `origin_kind: external_source`, `source_id: src-lloyds`, `locator: anc-lloyds` and the anchor's
 exact `quote`; remove or refresh a stale `source_reference`. Its text and authored edges can stay.
 
-The anchor must come from a document. A new source id that names no document (no title and no link; a date alone does
-not count) is refused, and so is a malformed link or date; nothing is written:
+The anchor must come from a document. A new source id that names no document is refused, and so is a malformed link or
+date; nothing is written. A source names its document by a link, or by a title that has a letter or digit and is not
+made only of placeholders ("unknown", "n/a") and words for a person or a kind of message or document ("colleague's
+note"); a date alone does not count, and invisible characters such as a zero-width space are not a title:
 
 ```console
 $ cp -r examples/research/evergiven ../evergiven-copy
@@ -85,12 +87,16 @@ $ researchguard source add-anchor ../evergiven-copy/source.yaml --source-id src-
 
 The message does not list fields to fill in: a remark does not become a source by giving it a title. A source record
 written by hand that names no document gives the warning `source_without_identity` in `status`, a malformed link or date
-gives `source_identity_invalid`, and `source add-observation` refuses such a source as `add-anchor` does. When the
-line really was printed in Lloyd's List, the clean-copy route names that document:
+gives `source_identity_invalid`, and `source add-observation` refuses such a source as `add-anchor` does. Filing the
+remark under a source the folder already holds does not help either: a locator made only of such words (`--locator
+colleague`) names no place in that document and is refused (`anchor_locator_names_no_place`), and `status` warns
+`anchor_after_source_date` when a quote names a day or month after the date of the document it is filed under (the
+colleague's "April 2021" under the Suez Canal Authority statement of 29 March 2021). When the line really was printed
+in Lloyd's List, the clean-copy route names that document:
 
 ```console
 $ researchguard source add-anchor ../evergiven-copy/source.yaml --source-id src-lloyds --anchor-id anc-lloyds --quote "The Suez blockage alone doubled Asia-Europe spot rates in April 2021." --locator "Lloyd's List, April 2021" --title "Lloyd's List" --date 2021-04 --output ../evergiven-copy/source.yaml
-{"ok": true, "output": "../evergiven-copy/source.yaml", "new_source": {"id": "src-lloyds", "identity": "title \"Lloyd's List\"; no link; date 2021-04"}}
+{"ok": true, "output": "../evergiven-copy/source.yaml", "source": {"id": "src-lloyds", "identity": "title \"Lloyd's List\"; no link; date 2021-04", "created": true}}
 $ researchguard sync ../evergiven-copy
 sync: trace evidence added ["anc-lloyds"] updated []; logic nodes added [] updated []; conflicts []
 next: researchguard status /workspace/guard11/evergiven-copy
@@ -99,11 +105,12 @@ $ researchguard status examples/research/evergiven --candidate ../evergiven-copy
 ## Current and candidate
 
 - source added: src-lloyds (title "Lloyd's List"; no link; date 2021-04)
-- evidence added: anc-lloyds
+- evidence added: anc-lloyds (in src-lloyds at "Lloyd's List, April 2021"; title "Lloyd's List"; no link; date 2021-04)
 ```
 
-ResearchGuard cannot tell a real title from an invented one, so every new source is listed with its title, link and
-date, and the owner sees what the evidence now rests on before accepting the copy. A new anchor is only a new piece of
+ResearchGuard cannot tell a real title from an invented one, or check that a quote is printed where its locator says,
+so every new source is listed with its title, link and date, and every new piece of evidence with the source and place
+it is filed under; the owner sees what the evidence now rests on before accepting the copy. A new anchor is only a new piece of
 evidence. Whether it changes the verdict depends on what the argument and the
 timeline do with it, and that is decided by the routes, not by the AI's wish.
 
@@ -249,9 +256,13 @@ ResearchGuard says where a failure happened; it never replaces a failure with a 
   neither its quote nor its anchor gives the warning `summary_number_not_in_quote`; it is a warning, not an error,
   because a summary may legitimately derive a number ("doubled").
 - Without a source model in the folder, evidence without an anchor is allowed and listed as `evidence_unanchored`.
-- A source must name its document by a title or a link; a date alone does not count, and a link or a date must be well
-  formed. ResearchGuard cannot check that the document exists or says what the anchor quotes: an invented title passes.
-  It is shown, with the link and date, as `source added` in the candidate comparison, where the owner reads it.
+- A source must name its document by a link or by a title that names one; a date alone does not count, and a link or a
+  date must be well formed. The title check only refuses titles with no letter or digit, placeholders and words for a
+  person or a kind of message or document; ResearchGuard cannot check that the document exists or says what the anchor
+  quotes, so an invented title ("Lloyd's market note") or an invented locator ("p. 2") passes. Each new source and each
+  new piece of evidence is shown, with the source it is filed under, in the candidate comparison, where the owner reads
+  it. The date check reads only days and months written out in the quote ("29 March 2021", "April 2021", "2021-04"); a
+  quote that forecasts a later month is warned too.
 
 **What has been checked, and what has not.**
 - Verified on finite examples: the shipped folder has a computed `withhold` licence; reference-only evidence produces
