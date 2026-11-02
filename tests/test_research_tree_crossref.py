@@ -276,7 +276,7 @@ def test_a_source_without_title_url_or_date_is_warned(tmp_path, capsys):
     candidate = tmp_path / 'bare-source'
     shutil.copytree(EVERGIVEN, candidate)
     _add_bare_source_evidence(candidate)
-    warning = 'source_without_identity:src-lloyds (no title, url or date names the document it stands for)'
+    warning = 'source_without_identity:src-lloyds (no title and no link name the document it stands for)'
     assert main(['status', str(candidate), '--json']) == 0
     status = json.loads(capsys.readouterr().out)
     assert warning in status['warnings'] and status['errors'] == []
@@ -284,3 +284,39 @@ def test_a_source_without_title_url_or_date_is_warned(tmp_path, capsys):
     assert f'- warnings added: {warning}' in capsys.readouterr().out
     # The shipped sources each carry a title, so the example itself stays without this warning.
     assert not any(item.startswith('source_without_identity:') for item in research_status(load_research(EVERGIVEN))['warnings'])
+
+
+@pytest.mark.parametrize('identity,warning', [
+    ({'title': '   '}, 'source_without_identity:src-lloyds (no title and no link name the document it stands for)'),
+    ({'source_date': '2021-04'}, 'source_without_identity:src-lloyds (no title and no link name the document it stands for)'),
+    ({'title': "Lloyd's List", 'url': 'x'}, "source_identity_invalid:src-lloyds (url 'x' is not a link: http or https with a host name, or a DOI)"),
+    ({'title': "Lloyd's List", 'source_date': 'unknown'}, "source_identity_invalid:src-lloyds (date 'unknown' is not a calendar date: YYYY, YYYY-MM or YYYY-MM-DD, not in the future)"),
+])
+def test_status_computes_whether_a_source_names_its_document(tmp_path, capsys, identity, warning):
+    import shutil
+    from research_tree_support import EVERGIVEN
+    candidate = tmp_path / 'weak-source'
+    shutil.copytree(EVERGIVEN, candidate)
+    _add_bare_source_evidence(candidate)
+    _rewrite(candidate, 'source.yaml', lambda data: data['sources'][-1].update(identity))
+    assert main(['status', str(candidate), '--json']) == 0
+    assert warning in json.loads(capsys.readouterr().out)['warnings']
+
+
+def test_the_candidate_comparison_shows_each_new_source_with_its_identity(tmp_path, capsys):
+    import shutil
+    from research_tree_support import EVERGIVEN
+    candidate = tmp_path / 'note-source'
+    shutil.copytree(EVERGIVEN, candidate)
+    _add_bare_source_evidence(candidate)
+    _rewrite(candidate, 'source.yaml', lambda data: data['sources'][-1].update(title="colleague's note"))
+    assert main(['status', str(EVERGIVEN), '--candidate', str(candidate)]) == 0
+    text = capsys.readouterr().out
+    assert '- source added: src-lloyds (title "colleague\'s note"; no link; no date)' in text
+    # A changed identity of a source both folders hold is listed too.
+    current = tmp_path / 'note-source-current'
+    shutil.copytree(candidate, current)
+    _rewrite(candidate, 'source.yaml', lambda data: data['sources'][-1].update(url='https://example.org/lloyds'))
+    assert main(['status', str(current), '--candidate', str(candidate)]) == 0
+    assert ('- source src-lloyds: identity "title \\"colleague\'s note\\"; no link; no date" → '
+            '"title \\"colleague\'s note\\"; link https://example.org/lloyds; no date"') in capsys.readouterr().out

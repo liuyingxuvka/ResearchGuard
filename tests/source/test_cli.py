@@ -216,30 +216,64 @@ def test_add_anchor_adds_source_and_anchor(tmp_path):
     assert add('other', 'a', absent) == 1 and not absent.exists()
 
 
-def test_add_anchor_refuses_a_new_source_without_identity(tmp_path, capsys):
-    """A source created by add-anchor must name its document; a bare id is not an external identity."""
+def _add_anchor(model, source_id, anchor_id, *identity):
     from researchguard.source.cli import main
-    from researchguard.source.loader import load_model, write_yaml
+    return main(['add-anchor', str(model), '--source-id', source_id, '--anchor-id', anchor_id,
+        '--quote', 'The blockage alone doubled spot rates.', '--locator', 'April 2021', *identity, '--output', str(model)])
+
+
+def _known_source_model(tmp_path):
+    from researchguard.source.loader import write_yaml
     from researchguard.source.schema import BeliefState, SourceRecord
     model = tmp_path / 'source.yaml'
     write_yaml(model, BeliefState(sources=[SourceRecord(source_id='known', title='A known report')]))
+    return model
+
+
+@pytest.mark.parametrize('identity,code', [
+    ((), 'new_source_without_identity'),
+    (('--date', '2021-04'), 'new_source_without_identity'),        # a date names no document
+    (('--title', '   '), 'new_source_without_identity'),            # whitespace is no title
+    (('--url', 'x'), 'new_source_identity_invalid'),
+    (('--date', 'unknown'), 'new_source_identity_invalid'),
+    (('--title', "Lloyd's List", '--url', 'lloyds list'), 'new_source_identity_invalid'),
+    (('--title', "Lloyd's List", '--date', '2021-13'), 'new_source_identity_invalid'),
+])
+def test_add_anchor_refuses_a_new_source_that_names_no_document(tmp_path, capsys, identity, code):
+    """A new source must be named by a title or a well-formed link; a malformed link or date is refused too."""
+    model = _known_source_model(tmp_path)
     before = model.read_bytes()
-
-    def add(source_id, anchor_id, *identity):
-        return main(['add-anchor', str(model), '--source-id', source_id, '--anchor-id', anchor_id,
-            '--quote', 'The blockage alone doubled spot rates.', '--locator', 'a colleague', *identity,
-            '--output', str(model)])
-
-    assert add('src-note', 'anc-note') == 1
+    assert _add_anchor(model, 'src-note', 'anc-note', *identity) == 1
     error = json.loads(capsys.readouterr().out)['error']
-    assert error.startswith('new_source_without_identity:src-note')
-    assert 'not source evidence' in error
+    assert error.startswith(f'{code}:src-note')
+    # The message names what a source is; it does not hand out the fields that would silence it.
+    assert not any(flag in error for flag in ('--title', '--url', '--date'))
     assert model.read_bytes() == before
-    # Any one external identity is enough for a new source, and an existing source keeps its own.
-    for flag, value in (('--title', 'Lloyd\'s List'), ('--url', 'https://example.org/a'), ('--date', '2021-04-01')):
-        assert add(f'src{flag}', f'anc{flag}', flag, value) == 0
-    assert add('known', 'anc-known') == 0
-    assert {row.source_id for row in load_model(model).sources} == {'known', 'src--title', 'src--url', 'src--date'}
+
+
+def test_add_anchor_reports_the_identity_of_the_source_it_creates(tmp_path, capsys):
+    from researchguard.source.loader import load_model
+    model = _known_source_model(tmp_path)
+    for source_id, identity, shown in (
+            ('src-title', ('--title', "Lloyd's List", '--date', '2021-04'), 'title "Lloyd\'s List"; no link; date 2021-04'),
+            ('src-url', ('--url', 'https://example.org/a'), 'no title; link https://example.org/a; no date'),
+            ('src-doi', ('--url', 'doi:10.1000/xyz123'), 'no title; link doi:10.1000/xyz123; no date')):
+        assert _add_anchor(model, source_id, f'anc-{source_id}', *identity) == 0
+        assert json.loads(capsys.readouterr().out)['new_source'] == {'id': source_id, 'identity': shown}
+    assert _add_anchor(model, 'known', 'anc-known') == 0
+    assert 'new_source' not in json.loads(capsys.readouterr().out)
+    assert {row.source_id for row in load_model(model).sources} == {'known', 'src-title', 'src-url', 'src-doi'}
+
+
+def test_add_observation_refuses_a_source_that_names_no_document(tmp_path, capsys):
+    from researchguard.source.cli import main
+    model = _known_source_model(tmp_path)
+    observation = tmp_path / 'obs.yaml'
+    observation.write_text(yaml.safe_dump({'observation_id': 'obs-1', 'observed_sources': [{'source_id': 'src-note'}]}), encoding='utf-8')
+    output = tmp_path / 'out.yaml'
+    assert main(['add-observation', str(model), '--observation', str(observation), '--output', str(output)]) != 0
+    assert 'new_source_without_identity:src-note' in capsys.readouterr().err
+    assert not output.exists()
 
 
 def test_an_observation_cannot_create_a_source_without_identity():

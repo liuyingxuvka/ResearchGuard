@@ -35,7 +35,7 @@ from .schema import (
     to_plain,
 )
 from .stop_decision import decide_model_search_stop
-from .update import add_anchor, apply_observation
+from .update import add_anchor, apply_observation, source_identity
 from .task_iteration import (
     GAP_REDUCTION_LEVELS,
     SearchOutcomePrediction,
@@ -177,8 +177,9 @@ def build_parser() -> argparse.ArgumentParser:
     anchor.add_argument("model")
     for option in ("source-id", "anchor-id", "quote", "locator", "output"):
         anchor.add_argument("--" + option, required=True)
-    for option in ("title", "url", "date"):
-        anchor.add_argument("--" + option, default="")
+    anchor.add_argument("--title", default="", help="title of the document the quote is printed in, as printed")
+    anchor.add_argument("--url", default="", help="link to that document: http or https with a host name, or a DOI")
+    anchor.add_argument("--date", default="", help="date of that document: YYYY, YYYY-MM or YYYY-MM-DD")
     anchor.add_argument("--pretty", action="store_true")
 
     add_obs = sub.add_parser("add-observation")
@@ -555,17 +556,21 @@ def run(args: argparse.Namespace) -> int:
         _json_out(payload, args.pretty)
         return 0
     if args.command == "add-anchor":
+        record = SourceRecord(source_id=args.source_id, title=args.title, url=args.url, source_date=args.date)
         try:
             model = load_model(args.model)
+            created = not any(row.source_id == args.source_id for row in model.sources)
             updated = add_anchor(model, EvidenceAnchor(anchor_id=args.anchor_id, source_id=args.source_id,
-                text=args.quote, locator=args.locator), source=SourceRecord(source_id=args.source_id,
-                title=args.title, url=args.url, source_date=args.date), create_only=True)
+                text=args.quote, locator=args.locator), source=record, create_only=True)
             BeliefState.from_dict(to_plain(updated))
         except (ValueError, TypeError, KeyError) as exc:
             _json_out({"ok": False, "error": str(exc)}, args.pretty)
             return 1
         write_yaml(args.output, updated)
-        _json_out({"ok": True, "output": args.output}, args.pretty)
+        payload = {"ok": True, "output": args.output}
+        if created:  # a title cannot be checked, so the new source is shown as it was named
+            payload["new_source"] = {"id": args.source_id, "identity": source_identity(record).summary()}
+        _json_out(payload, args.pretty)
         return 0
     if args.command == "add-observation":
         model = load_model(args.model)

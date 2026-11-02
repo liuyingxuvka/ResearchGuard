@@ -468,6 +468,7 @@ def native_sync():
             changes = compare_research_status(current, research_status(load_research(folder)))['changes']
             results[label] = {'exit': result, 'output': output.getvalue().strip(), 'preserved': preserved,
                               'new_anchor': 'anc-lloyds' if label == 'added_anchor' else '',
+                              'new_source': 'src-lloyds' if label == 'added_anchor' else '',
                               'conflict': label == 'conflict', 'changes': changes}
             if result == 2:
                 # Preserve the real missing-command evidence; do not simulate success.

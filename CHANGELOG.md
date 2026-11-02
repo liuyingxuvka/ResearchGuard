@@ -8,9 +8,9 @@
 
 - Version numbers: a release that adds features raises the second number and a release with only small fixes raises the third.
 
-- source add-anchor refuses to create a new source that names no title, URL or date, and writes nothing. Its message says that a remark with no document, such as a colleague's note, is not source evidence. The same rule holds when an observation adds an anchor for an unknown source.
+- source add-anchor refuses to create a new source that names no document. It needs a title or a link (http or https with a host name, or a DOI); a date alone does not count, a title of only spaces is no title, and a malformed link or date is refused too. Nothing is written. The message says that a remark with no document, such as a colleague's note, is not source evidence, and it does not list fields to fill in. On success the command names the new source and its title, link and date. source add-observation refuses an observed source that names no document in the same way.
 
-- status warns source_without_identity for any source that names no title, URL or date, so a bare source written by hand shows up in status and as an added warning in a candidate comparison.
+- status warns source_without_identity for a source with no title and no link, and source_identity_invalid for a malformed link or date. Because a title cannot be checked, the candidate comparison lists every added or changed source with its title, link and date (source added: ...).
 
 - Text where a number belongs (a confidence, edge weight, reliability or other source score, importance, order index or storyline-depth policy value) is now an error that names the field. Before, it was silently replaced by a default.
 

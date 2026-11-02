@@ -10,7 +10,7 @@ description: "Use for research-quality checks: argument structure and claim supp
 Quick check before a conclusion:
 - A research folder exists: run `researchguard status <folder>` and read Verdict before you answer.
 - No folder: name the claim and its sources; if a source is missing, say so instead of asserting.
-- New evidence in a folder listing a source model: `researchguard source add-anchor` (a new source names its document with `--title`, `--url` or `--date`; a remark with no document is not evidence), then `researchguard sync <folder>`, then `researchguard status <current> --candidate <folder>`.
+- New evidence in a folder listing a source model: `researchguard source add-anchor` (a new source is a document another reader can find, named by its own title or link; a remark or your own summary is not evidence and stays out of the argument; show the owner the `source added` lines of the comparison, because a title cannot be checked), then `researchguard sync <folder>`, then `researchguard status <current> --candidate <folder>`.
 
 - Existing folder: run `researchguard status <folder>` first; read Verdict, Open gaps and Next; take the route Next names.
 - New research folder: write `research.yaml` first (template: `references/research-tree.md`, "Start a question"); each route's first step builds its model, listed in `models`.

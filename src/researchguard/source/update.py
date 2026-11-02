@@ -9,7 +9,11 @@ Boundary: Source candidates and evidence anchors require downstream TraceGuard/L
 
 from __future__ import annotations
 
-from dataclasses import replace
+from calendar import monthrange
+from dataclasses import dataclass, replace
+from datetime import date
+import re
+from urllib.parse import urlparse
 
 from .schema import (
     BeliefState,
@@ -62,20 +66,82 @@ def add_anchor(belief_state: BeliefState, anchor: EvidenceAnchor, *, source: Sou
         raise ValueError(f"anchor {anchor.anchor_id} belongs to {anchor.source_id}, not {source.source_id}")
     if not any(row.source_id == anchor.source_id for row in belief_state.sources):
         new_source = source or SourceRecord(source_id=anchor.source_id)
-        if not source_has_identity(new_source):
-            raise ValueError(
-                f"new_source_without_identity:{anchor.source_id}: this anchor would create a source that names no "
-                "title, url or date. Name the document the quote is printed in (--title, --url or --date, as the "
-                "document gives them). A passage with no such document, such as a colleague's remark or your own "
-                "summary, is not source evidence: leave it out of the argument; finding its document is an open "
-                "source gap.")
+        require_document(new_source, "this anchor would create")
         belief_state = add_source(belief_state, new_source)
     return replace(belief_state, anchors=_upsert_by_id(belief_state.anchors, anchor, "anchor_id"))
 
 
-def source_has_identity(source: SourceRecord) -> bool:
-    """A source has an external identity when it names its document by title, URL or date."""
-    return bool(source.title or source.url or source.source_date)
+_DOI = re.compile(r"^(?:doi:\s*)?10\.\d{4,9}/\S+$", re.IGNORECASE)
+_DATE = re.compile(r"^(\d{4})(?:-(\d{2})(?:-(\d{2}))?)?$")
+
+
+@dataclass(frozen=True)
+class SourceIdentity:
+    """What a source record says about its document, checked for form by the tool.
+
+    A title is taken as written (stripped); it cannot be checked. A link must be an http or https URL
+    with a host name, or a DOI. A date must be a calendar date that is not in the future. A source names
+    its document when it has a title or a link; a date alone names none.
+    """
+
+    title: str
+    link: str
+    date: str
+    problems: tuple[str, ...]
+
+    @property
+    def names_document(self) -> bool:
+        return bool(self.title or self.link)
+
+    def summary(self) -> str:
+        return "; ".join((f'title "{self.title}"' if self.title else "no title",
+                          f"link {self.link}" if self.link else "no link",
+                          f"date {self.date}" if self.date else "no date"))
+
+
+def source_identity(source: SourceRecord) -> SourceIdentity:
+    url, when = source.url.strip(), source.source_date.strip()
+    problems = []
+    if url and not _is_link(url):
+        problems.append(f"url {url!r} is not a link: http or https with a host name, or a DOI")
+    if when and not _is_date(when):
+        problems.append(f"date {when!r} is not a calendar date: YYYY, YYYY-MM or YYYY-MM-DD, not in the future")
+    return SourceIdentity(title=" ".join(source.title.split()), link=url if url and _is_link(url) else "",
+                          date=when if when and _is_date(when) else "", problems=tuple(problems))
+
+
+def _is_link(url: str) -> bool:
+    if _DOI.match(url):
+        return True
+    parsed = urlparse(url)
+    host = parsed.hostname or ""
+    return parsed.scheme in {"http", "https"} and "." in host.strip(".") and not any(char.isspace() for char in url)
+
+
+def _is_date(text: str) -> bool:
+    match = _DATE.match(text)
+    if not match:
+        return False
+    year, month, day = int(match[1]), int(match[2] or 1), int(match[3] or 1)
+    if not (1 <= year and 1 <= month <= 12 and 1 <= day <= monthrange(year, month)[1]):
+        return False
+    return date(year, month, day) <= date.today()
+
+
+def require_document(source: SourceRecord, action: str) -> SourceIdentity:
+    """Refuse to write a source record that names no document or whose link or date is malformed."""
+    identity = source_identity(source)
+    if identity.problems:
+        raise ValueError(f"new_source_identity_invalid:{source.source_id}: {'; '.join(identity.problems)}. "
+                         "Nothing was written.")
+    if not identity.names_document:
+        raise ValueError(
+            f"new_source_without_identity:{source.source_id}: {action} a source that names no document "
+            f"({identity.summary()}). A source is a document that another reader can find; a date alone does "
+            "not name one, and a colleague's remark or your own summary is not one. Nothing was written. Leave "
+            "the passage out of the argument and keep its missing document as an open source gap until you "
+            "have the document itself.")
+    return identity
 
 
 def add_gap(belief_state: BeliefState, gap: Gap) -> BeliefState:
@@ -286,6 +352,7 @@ def apply_observation(belief_state: BeliefState, observation: Observation) -> Be
     state = belief_state
     warnings = list(state.metadata.get("warnings", []))
     for source in observation.observed_sources:
+        require_document(source, "this observation would write")
         state = add_source(state, source)
         if source.access_status in {"permission_gated", "unavailable"} or source.source_status == "permission_gated":
             warnings.append(f"Source {source.source_id} is permission-gated or unavailable and remains an access gap.")

@@ -77,7 +77,7 @@ def test_an_unnamed_source_is_visible_in_the_picture(tmp_path):
     shutil.copytree(EVERGIVEN, folder)
     _add_bare_source_evidence(folder)
     boxes = {row["id"]: row for row in _picture(folder, "h_suez")["boxes"]}
-    assert "anc-lloyds · src-lloyds: no title, url or date" in boxes["E_lloyds"]["lines"]
+    assert "anc-lloyds · src-lloyds names no document" in boxes["E_lloyds"]["lines"]
 
 
 def test_picture_options(capsys):

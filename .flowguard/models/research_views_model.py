@@ -37,11 +37,18 @@ TESTED_BY = {'hypothesis_view_matches_status': ['tests/test_research_views.py:te
 @dataclass(frozen=True)
 class SyncQuestion(Question):
     new_anchor: str = ''
+    new_source: str = ''  # the source the added anchor created, listed with its identity
     conflict: bool = False
+
+
+def _sync_changes(question):
+    if not question.new_anchor or question.conflict:
+        return ()
+    return ((('source', question.new_source),) if question.new_source else ()) + (('evidence', question.new_anchor),)
 
 def sync_rule(state, question):
     if isinstance(question, SyncQuestion):
-        want = (('evidence', question.new_anchor),) if question.new_anchor and not question.conflict else ()
+        want = _sync_changes(question)
         if state.changes != want:
             return f'sync changed {state.changes}, expected only {want}'
 
@@ -71,7 +78,7 @@ class Status:
                       for row in question.hypotheses)
         changes = () if wrong == 'candidate_ignores_verdict' else tuple(('verdict', key) for key in question.candidate_verdict_changes)
         if isinstance(question, SyncQuestion):
-            changes = (('evidence', question.new_anchor),) if question.new_anchor and not question.conflict else ()
+            changes = _sync_changes(question)
             if wrong == 'sync_rewrites_unrelated_logic':
                 changes += (('verdict', 'root_claim.reason'),)
         result = State(question, gap_rows, next_rows, views, changes)
@@ -81,13 +88,13 @@ class Status:
 INVARIANTS = (
     Invariant('hypothesis_view_matches_status', 'One hypothesis view lists exactly the gaps, next searches and ablations that name it.', rule(view_rule)),
     Invariant('candidate_view_shows_verdict_changes', 'Every verdict key that differs in the candidate has a change row.', rule(candidate_rule)),
-    Invariant('sync_changes_only_the_new_anchor', 'A sync of an unchanged folder changes nothing; after one added anchor, the candidate view shows only that anchor; a conflict writes nothing.', rule(sync_rule)),
+    Invariant('sync_changes_only_the_new_anchor', 'A sync of an unchanged folder changes nothing; after one added anchor, the candidate view shows only that anchor and the source it created; a conflict writes nothing.', rule(sync_rule)),
 )
 
 MUTATIONS = {'candidate_ignores_verdict': 'candidate_view_shows_verdict_changes', 'hypothesis_view_drops_gaps': 'hypothesis_view_matches_status', 'sync_rewrites_unrelated_logic': 'sync_changes_only_the_new_anchor'}
 
 def explorer(step):
-    sync_cases = (SyncQuestion('sync_unchanged', ()), SyncQuestion('sync_added_anchor', (), new_anchor='anc-new'),
+    sync_cases = (SyncQuestion('sync_unchanged', ()), SyncQuestion('sync_added_anchor', (), new_anchor='anc-new', new_source='src-new'),
                   SyncQuestion('sync_conflict', (), new_anchor='anc-new', conflict=True))
     return Explorer(Workflow((step,)), (State(),), CASES + sync_cases, INVARIANTS, progress_steps=0)
 
@@ -117,13 +124,13 @@ def conformance():
     status = research_status(tree)
     for kind, value in native_views(status).items(): observe(kind, value)
     for label, row in native_sync().items():
-        question = SyncQuestion(label, (), new_anchor=row['new_anchor'], conflict=row['conflict'])
+        question = SyncQuestion(label, (), new_anchor=row['new_anchor'], new_source=row['new_source'], conflict=row['conflict'])
         actual = State(question, changes=tuple((change['kind'], change['id']) for change in row['changes']))
         want_exit = 1 if question.conflict else 0
         observe(f"sync {label}: exit {row['output'] if row['exit'] != want_exit else ''}", row['exit'], want_exit, actual)
         observe(f'sync {label}: preserved bytes', row['preserved'], True, actual)
-        want_changes = [{'kind': 'evidence', 'id': question.new_anchor, 'change': 'added'}] if question.new_anchor and not question.conflict else []
-        observe(f'sync {label}: candidate changes', row['changes'], want_changes, actual)
+        want_changes = [(kind, identifier, 'added') for kind, identifier in _sync_changes(question)]
+        observe(f'sync {label}: candidate changes', [(change['kind'], change['id'], change.get('change')) for change in row['changes']], want_changes, actual)
         verdict = INVARIANTS[-1].check(actual, ())
         if not verdict.ok:
             violations.append(ConformanceViolation(step_index=1, rule_name='sync_changes_only_the_new_anchor', message=verdict.message))

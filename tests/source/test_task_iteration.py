@@ -111,6 +111,7 @@ def test_loaded_prediction_accepts_missing_optional_task_fields() -> None:
 def _observation(*, close_holdout: bool = False) -> Observation:
     source = SourceRecord(
         source_id="source-independent",
+        title="Independent paper",
         source_type="paper",
         source_role="independent_report",
         source_reliability=0.9,

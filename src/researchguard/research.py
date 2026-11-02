@@ -27,7 +27,7 @@ from .source.loader import load_model as load_source
 from .source.planner import plan_next_actions
 from .source.stop_decision import decide_model_search_stop
 from .source.schema import to_plain
-from .source.update import source_has_identity
+from .source.update import source_identity
 from .trace.evaluator import evaluate_model as evaluate_trace
 from .trace.loader import load_model as load_trace
 
@@ -262,8 +262,11 @@ def check_research_tree(index: dict[str, Any], models: dict[str, Any], observati
         errors.extend(f"unknown_hypothesis:source:{gap.gap_id}:{item}" for gap in source.gaps
                       for item in gap.hypothesis_ids if item not in ids)
         source_ids = {row.source_id for row in source.sources}
-        warnings.extend(f"source_without_identity:{row.source_id} (no title, url or date names the document it stands for)"
-                        for row in source.sources if not source_has_identity(row))
+        for row in source.sources:
+            identity = source_identity(row)
+            if not identity.names_document:
+                warnings.append(f"source_without_identity:{row.source_id} (no title and no link name the document it stands for)")
+            warnings.extend(f"source_identity_invalid:{row.source_id} ({problem})" for problem in identity.problems)
         anchors = {row.anchor_id: row.source_id for row in source.anchors}
         if trace is not None:
             errors.extend(f"dangling_source:trace:{row.source_id}" for row in trace.sources if row.source_id not in source_ids)
@@ -565,6 +568,8 @@ def research_status(tree: ResearchTree) -> dict[str, Any]:
         key: {"path": value, "status": "ok" if key in results else "invalid"}
         for key, value in tree.index.get("models", {}).items() if key != "experiment_observations"},
         "hypotheses": hypotheses, "evidence": evidence, "open_gaps": gaps,
+        "sources": [{"id": row.source_id, "identity": source_identity(row).summary()}
+                    for row in (tree.models["source"].sources if "source" in tree.models else ())],
         "next": next_actions, **problems}
 
 
@@ -754,6 +759,16 @@ def compare_research_status(current, candidate):
             changes.append({"kind": "ablation", "id": identifier,
                             "before": {key: value for key, value in left.items() if value != right[key]},
                             "after": {key: value for key, value in right.items() if value != left[key]}})
+    old_sources = {row["id"]: row["identity"] for row in current.get("sources", [])}
+    new_sources = {row["id"]: row["identity"] for row in candidate.get("sources", [])}
+    for identifier in dict.fromkeys((*old_sources, *new_sources)):
+        before, after = old_sources.get(identifier), new_sources.get(identifier)
+        if before is None:
+            changes.append({"kind": "source", "id": identifier, "change": "added", "identity": after})
+        elif after is None:
+            changes.append({"kind": "source", "id": identifier, "change": "removed", "identity": before})
+        elif before != after:
+            changes.append({"kind": "source", "id": identifier, "before": {"identity": before}, "after": {"identity": after}})
     disagreement = lambda rows: {f"{row['hypothesis']}:{row['kind']}:{row['detail']}" for row in rows}
     for key, values in (("evidence", lambda status: {row["anchor"] for row in status["evidence"]}),
                         ("disagreement", lambda status: disagreement(status.get("disagreements", []))),
@@ -792,7 +807,7 @@ def render_comparison(comparison):
         elif row["kind"] == "verdict":
             lines.append(f"- verdict {row['id']}: {_shown(row['before'])} → {_shown(row['after'])}")
         elif "change" in row:
-            lines.append(f"- {row['kind']} {row['change']}: {row['id']}")
+            lines.append(f"- {row['kind']} {row['change']}: {row['id']}" + (f" ({row['identity']})" if row.get("identity") else ""))
         else:
             for key, before in row["before"].items():
                 lines.append(f"- {row['kind']} {row['id']}: {key} {_shown(before)} → {_shown(row['after'][key])}")

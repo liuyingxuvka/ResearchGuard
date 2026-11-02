@@ -46,6 +46,7 @@ def _qualified_observation(*, add_gap: bool = False) -> Observation:
         observed_sources=[
             SourceRecord(
                 source_id="s1",
+                title="Independent report s1",
                 source_type="paper",
                 source_role="independent_report",
                 source_reliability=0.9,
@@ -86,6 +87,7 @@ def test_locator_only_anchor_does_not_close_or_become_claim_usable() -> None:
         observed_sources=[
             SourceRecord(
                 source_id="s1",
+                title="Independent report s1",
                 source_role="independent_report",
                 source_reliability=0.0,
                 access_status="public",
@@ -261,6 +263,7 @@ def _broad_observation(*, shared_lineage: bool = False) -> Observation:
         observed_sources=[
             SourceRecord(
                 source_id=source_id,
+                title=f"Report {source_id}",
                 source_type="report",
                 source_role=role,
                 lineage_id="shared-origin" if shared_lineage else f"origin:{source_id}",

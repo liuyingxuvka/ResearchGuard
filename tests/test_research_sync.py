@@ -39,7 +39,9 @@ def test_sync_after_add_anchor_adds_only_that_anchor(tmp_path, capsys):
     assert (folder / 'source.yaml').read_bytes() == source
     assert (folder / 'research.yaml').read_bytes() == index
     changes = compare_research_status(research_status(load_research(EVERGIVEN)), research_status(load_research(folder)))['changes']
-    assert changes == [{'kind': 'evidence', 'id': 'anc-lloyds', 'change': 'added'}]
+    # The new source is listed with its identity, then the one new piece of evidence.
+    assert changes == [{'kind': 'source', 'id': 'src-lloyds', 'change': 'added', 'identity': 'title "Lloyd\'s List"; no link; date 2021-04'},
+                       {'kind': 'evidence', 'id': 'anc-lloyds', 'change': 'added'}]
 
 
 def test_sync_conflict_writes_nothing(tmp_path, capsys):

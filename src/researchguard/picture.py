@@ -18,7 +18,7 @@ from typing import Any
 from .logic.evaluator import evaluate_model as evaluate_logic
 from .logic.minimal_sets import license_model_claim
 from .logic.provenance import coerce_provenance
-from .source.update import source_has_identity
+from .source.update import source_identity
 
 # A person reads about this many boxes and arrows at once (FlowGuard design M8); the picture
 # groups toward it and lists what it leaves out, it never fails for size.
@@ -215,9 +215,10 @@ def _problems(status: dict[str, Any], named: set[str]) -> list[dict[str, str]]:
 def _source_line(source: Any, source_id: str) -> str:
     if source is None:
         return f"{source_id} (not in the source model)"
-    if not source_has_identity(source):
-        return f"{source_id}: no title, url or date"
-    return _short(source.title or source.url or source.source_date, 40)
+    identity = source_identity(source)
+    if not identity.names_document:
+        return f"{source_id} names no document"
+    return _short(identity.title or identity.link, 40)
 
 
 def _licence(logic: Any, claim_id: str, status: dict[str, Any]) -> str:
