@@ -214,6 +214,16 @@ Five skills, one idea: make structure, relationships and constraints explicit in
 | [LogicWriting](https://github.com/liuyingxuvka/LogicWriting) | In a long text it drifts away from its own plan and evidence | you need a finished piece for real readers: an investigation report, a paper, fiction or a story plan, a travel guide | Reads the saved reports of ResearchGuard and WorldGuard. Sends the checking of claims on their own to ResearchGuard |
 <!-- END GUARD FAMILY TABLE -->
 
+## Errors
+
+ResearchGuard says where a failure happened; it never replaces a failure with a default or a second path:
+
+- A command that fails prints the error and exits with a nonzero code; it never answers with a default value.
+- A check or library step that fails puts the error into the result it returns, as a named error, gap, finding or error field with the error text, so the caller sees it.
+- In the desktop library viewer, a failed import, export or dissolve shows the error in an error dialog and changes nothing.
+- When the desktop library viewer cannot use a window-system feature (maximizing, screen DPI, an icon, a dialog), it draws the plain form instead; this changes what is shown, never a result.
+- Text where a number belongs, a number outside its range, or a policy that is not a mapping is an error that names the field.
+
 ## Honest limits
 
 **What it does not do.**
@@ -254,9 +264,12 @@ release this version is developed with. FlowGuard is installed only from its git
 project. Ordinary use of ResearchGuard does not need FlowGuard. AI contributors start from [`AGENTS.md`](./AGENTS.md);
 `CLAUDE.md` points Claude Code to the same file.
 
-Every function has one route: an error is raised or reported, never replaced by a default or a second path.
-`tests/test_error_routes.py` lists each error handler that does not re-raise, with the reason its error stays visible,
-and fails when a new one appears unlisted. A test may skip only when the Python has no tkinter; any other skip fails.
+Every function has one route (see [Errors](#errors)). `tests/test_error_routes.py` finds every error handler in
+`src/` and `scripts/` that does not re-raise, including `contextlib.suppress` and a `finally` that returns. Each one is
+listed under one of the sentences in Errors, and the test checks the handler's code against that sentence: a command
+prints the error and returns a nonzero code, a result carries the error text, a dialog shows it, and a display fallback
+only guards a window-system call in the viewer. A new handler that is unlisted, or listed under a sentence its code does
+not follow, fails. No test may skip, be marked expected-to-fail or stop the run early; the suite fails if one does.
 
 The optional desktop viewer of the logic route needs the `viewer` extra (Pillow) and a Python with tkinter; the core
 commands do not.

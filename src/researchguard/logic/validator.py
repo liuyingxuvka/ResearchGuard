@@ -222,6 +222,7 @@ def validate_model(model: LogicModel, *, source_library: Any = None, source_mode
     if block_cycle:
         errors.append(f"argument-block hierarchy contains a cycle: {' -> '.join(block_cycle)}")
 
+    errors = list(dict.fromkeys(errors))  # malformed provenance is found by both provenance passes
     return ValidationResult(ok=not errors, errors=errors, warnings=warnings)
 
 
@@ -242,8 +243,9 @@ def source_model_provenance_problems(
             continue
         try:
             records = validate_evidence_provenance(node_id, node.provenance)
-        except ProvenanceError:
-            continue  # Structural validation reports malformed provenance.
+        except ProvenanceError as exc:
+            problems.append(str(exc))
+            continue
         for record in records:
             if not record.source_id:
                 continue

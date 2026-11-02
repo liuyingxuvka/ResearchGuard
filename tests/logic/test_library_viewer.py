@@ -182,9 +182,7 @@ def test_source_graph_payload_localizes_model_content_and_view_modes(tmp_path: P
 
 
 def test_detail_header_meta_hides_internal_source_noise() -> None:
-    pytest.importorskip("tkinter")
-    pytest.importorskip("PIL")
-    from researchguard.logic_viewer.desktop_app import _detail_header_meta_line
+    from researchguard.logic_viewer.card_text import _detail_header_meta_line
 
     card = {
         "type": "paper",

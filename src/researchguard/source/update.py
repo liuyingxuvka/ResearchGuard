@@ -19,8 +19,9 @@ from .schema import (
     GapQualification,
     Lead,
     Observation,
+    SchemaError,
     SourceRecord,
-    clamp01,
+    unit_score,
     utc_now,
 )
 
@@ -107,11 +108,13 @@ def _source_is_accessible_candidate(belief_state: BeliefState, source_id: str) -
 
 
 def _qualification_thresholds(belief_state: BeliefState) -> dict[str, float]:
-    configured = belief_state.metadata.get("qualification_thresholds") or {}
-    if not isinstance(configured, dict):
+    configured = belief_state.metadata.get("qualification_thresholds")
+    if configured is None:
         configured = {}
+    if not isinstance(configured, dict):
+        raise SchemaError(f"metadata.qualification_thresholds must be a mapping, got {configured!r}")
     return {
-        name: clamp01(configured.get(name), default)
+        name: unit_score(configured.get(name), default, f"metadata.qualification_thresholds.{name}")
         for name, default in DEFAULT_QUALIFICATION_THRESHOLDS.items()
     }
 

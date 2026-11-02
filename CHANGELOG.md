@@ -14,13 +14,17 @@
 
 - Text where a number belongs (a confidence, edge weight, reliability or other source score, importance, order index or storyline-depth policy value) is now an error that names the field. Before, it was silently replaced by a default.
 
+- A score or importance outside 0 to 1 (for example a source reliability of 1.7, a qualification threshold of 1.5 or a branch importance of 5), a storyline-depth ratio outside 0 to 1, a negative or fractional storyline-depth count, and a storyline-depth policy or qualification-threshold setting that is not a mapping are now errors that name the field. Before, they were clamped or replaced by a default without a word.
+
 - status fails with research_status_failed when an input file can no longer be read for its digest, instead of leaving that file out of the saved report.
 
 - Intake of a text file that is not UTF-8 reports an error instead of extracting nothing. Importing a library package that names a project file it does not contain is refused, and a source card whose model cannot be read shows invalid_model instead of unmodeled.
 
 - --i18n-json takes inline JSON that starts with { or the path of a readable file; a missing file is reported as missing instead of as broken JSON.
 
-- For maintainers: the tests list every error handler that does not re-raise, with the reason its error stays visible, and a test may skip only when the Python has no tkinter.
+- README has a new Errors section that states how each kind of failure is reported.
+
+- For maintainers: the tests find every error handler in the code and scripts that does not re-raise (including contextlib.suppress and a finally that returns), and each must be listed under one of the README Errors sentences; the test checks the handler's code against that sentence, so a handler that swallows an error fails whatever it is listed as. No test may skip, be marked expected-to-fail or stop the run early; any of these fails the run.
 
 ## v0.6.0 - 2026-10-31 - Sync evidence and keep claims tied to their sources
 

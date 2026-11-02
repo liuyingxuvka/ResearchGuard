@@ -1244,12 +1244,16 @@ def _score(tokens: tuple[str, ...], value: str) -> float:
 
 
 def _optional_float(value: Any, field: str = "importance") -> float | None:
+    """An optional score in [0, 1]; text or a number outside [0, 1] is an error."""
     if value in (None, ""):
         return None
     try:
-        return float(value)
+        number = float(value)
     except (TypeError, ValueError):
-        raise SourceLibraryError(f"{field} must be a number, got {value!r}")
+        raise SourceLibraryError(f"{field} must be a number in [0, 1], got {value!r}")
+    if not 0.0 <= number <= 1.0:
+        raise SourceLibraryError(f"{field} must be a number in [0, 1], got {value!r}")
+    return number
 
 
 def _read_json(path: Path, *, default: dict[str, Any]) -> dict[str, Any]:

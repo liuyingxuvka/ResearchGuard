@@ -27,7 +27,7 @@ A supplied search-iteration observation requires provider status
 | Fields | Optional defaults and constraints |
 |---|---|
 | `requested_claim_scope` | `bounded`; only `bounded` or `broad`. |
-| `important_threshold` | `0.6`; bounded to `[0, 1]`, then capped at `0.6`. |
+| `important_threshold` | `0.6`; a number in `[0, 1]` (outside it is an error), then capped at `0.6`. |
 | `required_portfolio_classes` | `[]`; each member is a `SOURCE_PORTFOLIO_CLASSES` value. |
 | `required_source_roles` | `[]`; each member is a `SOURCE_ROLES` value. |
 | `minimum_independent_lineages` | `2`; input must parse as an integer at least 1, and the effective minimum is 2. |
@@ -36,7 +36,7 @@ A supplied search-iteration observation requires provider status
 | `require_explicit_lineage`, `require_anchor_content`, `per_gap_portfolio_required` | Booleans, each `true`. |
 | `required_gap_ids`, `required_lineage_slot_ids`, `required_anchor_requirement_ids`, `required_handoff_ids` | String lists, `[]`. |
 | `known_good_case_ids`, `known_bad_case_ids` | String lists, `[]`. |
-| `coverage_floors` | Numeric mapping, `{}`; values are bounded to `[0, 1]`, with `1.0` as the fallback for an empty/invalid value. |
+| `coverage_floors` | Numeric mapping, `{}`; values are numbers in `[0, 1]` (text or a number outside it is an error); an empty value gives `1.0`. |
 | `policy_origin` | Native value `sourceguard-native-depth-v2`; a supplied replacement does not change the native origin. |
 
 ## Complete enum values

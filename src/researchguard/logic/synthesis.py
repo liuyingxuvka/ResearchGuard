@@ -631,7 +631,8 @@ def _source_library_binding_gaps(binding: Mapping[str, Any], candidate: Synthesi
     try:
         branches = library.list_deepening_branches(candidate.source_id, project_id=candidate.source_project_id)
     except Exception as exc:
-        return [f"source_library_unresolved:{type(exc).__name__}"]
+        gaps.append(f"source_library_unresolved:{type(exc).__name__}")
+        return gaps
     current = [item for item in branches if str(getattr(item, "branch_id", "")) == candidate.branch_id]
     if len(current) != 1:
         gaps.append("source_library_branch_identity_unresolved")
@@ -755,14 +756,16 @@ def _item_from_branch(branch: Any) -> SynthesisItem:
     coverage, note, locator = str(data.get("coverage_period", "")), str(data.get("note", "")), str(data.get("locator", ""))
     raw_importance = data.get("importance")
     try: importance = 0.55 if raw_importance in (None, "") else float(raw_importance)
-    except (TypeError, ValueError): raise ValueError(f"branch {branch_id}: importance must be a number, got {raw_importance!r}")
+    except (TypeError, ValueError): raise ValueError(f"branch {branch_id}: importance must be a number in [0, 1], got {raw_importance!r}")
+    if not 0.0 <= importance <= 1.0:
+        raise ValueError(f"branch {branch_id}: importance must be a number in [0, 1], got {raw_importance!r}")
     salience = str(data.get("salience", "")) or _salience_for_branch_role(role, importance)
     anchor_node, anchor_block = str(data.get("anchor_node_id", "")), str(data.get("anchor_block_id", ""))
     source_nodes = data.get("node_ids", ())
     source_node_ids = tuple(str(value) for value in source_nodes if str(value)) if isinstance(source_nodes, (list, tuple, set)) else ()
     native_ref = str(data.get("native_evidence_ref", data.get("current_native_evidence_ref", "")) or "")
     return SynthesisItem(node_id=candidate_id or f"source_branch:{source_id}:{topic}", node_type="SourceBranch", salience=salience,
-        importance=min(1.0, max(0.0, importance)), text=" | ".join(part for part in (topic, role, note, locator) if part) or branch_id or source_id,
+        importance=importance, text=" | ".join(part for part in (topic, role, note, locator) if part) or branch_id or source_id,
         reason=f"Reusable source-library deepening branch{f' anchored to {anchor_node or anchor_block}' if anchor_node or anchor_block else ''}.",
         treatment=_treatment_for("SourceBranch", salience, importance), source_id=source_id, branch_id=branch_id,
         anchor_node_id=anchor_node, anchor_block_id=anchor_block, branch_role=role, source_date=source_date, coverage_period=coverage,

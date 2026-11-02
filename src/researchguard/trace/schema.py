@@ -61,7 +61,7 @@ def require01(value: Any, field_name: str) -> float:
         numeric = float(value)
     except (TypeError, ValueError) as exc:
         raise SchemaError(f"{field_name} must be a number in [0, 1]") from exc
-    if numeric < 0 or numeric > 1:
+    if not 0 <= numeric <= 1:  # also refuses NaN
         raise SchemaError(f"{field_name} must be in [0, 1], got {numeric}")
     return numeric
 

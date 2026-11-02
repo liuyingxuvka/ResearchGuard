@@ -216,26 +216,34 @@ def _ordered_unique(values: Iterable[str]) -> list[str]:
     return result
 
 
-def _positive_int(policy: Mapping[str, Any], key: str, default: int) -> int:
-    value = policy.get(key)
-    if value is None:
-        return default
-    try:
-        parsed = int(value)
-    except (TypeError, ValueError):
-        raise ValueError(f"storyline_depth_policy.{key} must be an integer, got {value!r}")
-    return parsed if parsed > 0 else default
+def _storyline_policy(model: TraceGuardModel) -> Mapping[str, Any]:
+    """The declared storyline depth policy; an absent policy is empty, any other non-mapping is an error."""
+    policy = model.metadata.get("storyline_depth_policy")
+    if policy is None:
+        return {}
+    if not isinstance(policy, Mapping):
+        raise ValueError(f"storyline_depth_policy must be a mapping, got {policy!r}")
+    return policy
 
 
-def _ratio(policy: Mapping[str, Any], key: str, default: float) -> float:
+def _count(policy: Mapping[str, Any], key: str) -> int:
+    """A declared count: a whole number of at least 0, where 0 (or no value) means no requirement."""
     value = policy.get(key)
     if value is None:
-        return default
-    try:
-        parsed = float(value)
-    except (TypeError, ValueError):
+        return 0
+    if isinstance(value, bool) or not isinstance(value, (int, float)) or not float(value).is_integer() or value < 0:
+        raise ValueError(f"storyline_depth_policy.{key} must be a whole number of at least 0, got {value!r}")
+    return int(value)
+
+
+def _ratio(policy: Mapping[str, Any], key: str) -> float:
+    """A declared ratio in [0, 1], where 0 (or no value) means no requirement."""
+    value = policy.get(key)
+    if value is None:
+        return 0.0
+    if isinstance(value, bool) or not isinstance(value, (int, float)) or not 0.0 <= float(value) <= 1.0:
         raise ValueError(f"storyline_depth_policy.{key} must be a number in [0, 1], got {value!r}")
-    return min(1.0, max(0.0, parsed))
+    return float(value)
 
 
 def _longest_unqualified_run(
@@ -360,12 +368,10 @@ def _object_depth_coverage(
             {"trace_ids": list(hypothesis.trace_ids), "event_ids": event_ids, "evidence_ids": evidence_ids},
         )
 
-    raw_policy = model.metadata.get("storyline_depth_policy") or {}
-    if not isinstance(raw_policy, dict):
-        raw_policy = {}
-    declared_minimum_count = _positive_int(raw_policy, "minimum_per_trace_qualified_event_count", 0)
-    declared_minimum_ratio = _ratio(raw_policy, "minimum_per_trace_qualified_event_ratio", 0.0)
-    declared_maximum_run = _positive_int(raw_policy, "maximum_per_trace_unqualified_run", 0)
+    raw_policy = _storyline_policy(model)
+    declared_minimum_count = _count(raw_policy, "minimum_per_trace_qualified_event_count")
+    declared_minimum_ratio = _ratio(raw_policy, "minimum_per_trace_qualified_event_ratio")
+    declared_maximum_run = _count(raw_policy, "maximum_per_trace_unqualified_run")
 
     for trace in model.traces:
         eligible_event_ids = _ordered_unique(trace.event_ids)
@@ -1674,9 +1680,7 @@ def evaluate_storyline_depth(
                 declared_results[declared_id] = effect.after, effect.perturbed_solver_id
         effects.append(effect)
     unresolved = [*alternative_gaps, *causal_gaps, *object_gaps, *_inference_self_check_gaps(model, baseline_result)]
-    raw_policy = model.metadata.get("storyline_depth_policy") or {}
-    if not isinstance(raw_policy, dict):
-        raw_policy = {}
+    raw_policy = _storyline_policy(model)
     prediction_requested = bool(
         raw_policy.get("prediction_requested")
         or model.metadata.get("prediction_requested")

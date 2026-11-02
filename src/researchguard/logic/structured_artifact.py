@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import math
 from typing import Any, Iterable
 
 from .hierarchy import build_children_index, hierarchy_roots
@@ -158,9 +159,12 @@ def node_block_index(model: LogicModel) -> dict[str, str]:
 def _order_index(node_id: str, value: object) -> float:
     if value not in (None, ""):
         try:
-            return float(value)
+            number = float(value)
         except (TypeError, ValueError):
             raise ValueError(f"node {node_id}: order_index must be a number, got {value!r}")
+        if not math.isfinite(number):
+            raise ValueError(f"node {node_id}: order_index must be a finite number, got {value!r}")
+        return number
     digits = "".join(ch for ch in node_id if ch.isdigit())
     if digits:
         return float(digits)

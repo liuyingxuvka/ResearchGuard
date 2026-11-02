@@ -15,21 +15,52 @@ os.environ["PYTHONPATH"] = (
 )
 
 
+import sys
+
 import pytest
 
-# A test may skip only because this Python lacks a platform feature the code needs. Any
-# other skip, for example one taken inside an ``except`` that swallowed an error, fails.
-ALLOWED_SKIP_PREFIXES = ("could not import 'tkinter'",)
+# No test in this suite may end skipped, expected to fail or cut short. Each of those exits 0, so a
+# test that swallowed an error and skipped would look like a passing run. A test that needs a
+# platform feature tests code that does not import it instead (see logic_viewer/card_text.py).
+NO_SKIP = "this suite allows no skip, xfail or early exit"
+_early_exits: list[str] = []
+
+
+def _reason(report) -> str:
+    if isinstance(report.longrepr, tuple):
+        return str(report.longrepr[2]).removeprefix("Skipped: ")
+    return str(report.longrepr)
 
 
 @pytest.hookimpl(hookwrapper=True)
 def pytest_runtest_makereport(item, call):
-    outcome = yield
-    report = outcome.get_result()
-    if not report.skipped or hasattr(report, "wasxfail"):
+    report = (yield).get_result()
+    if hasattr(report, "wasxfail"):
+        what, reason = "expected to fail", report.wasxfail
+        del report.wasxfail  # a report that keeps it is not counted as failed
+    elif report.skipped:
+        what, reason = "skipped", _reason(report)
+    else:
         return
-    reason = report.longrepr[2] if isinstance(report.longrepr, tuple) else str(report.longrepr)
-    reason = reason.removeprefix("Skipped: ")
-    if not reason.startswith(ALLOWED_SKIP_PREFIXES):
+    report.outcome = "failed"
+    report.longrepr = f"test {what} ({reason}); {NO_SKIP}"
+
+
+@pytest.hookimpl(hookwrapper=True)
+def pytest_make_collect_report(collector):
+    report = (yield).get_result()
+    if report.skipped:
         report.outcome = "failed"
-        report.longrepr = f"skipped for a reason that is not an absent platform feature: {reason}"
+        report.longrepr = f"{collector.nodeid or collector.path} skipped at collection ({_reason(report)}); {NO_SKIP}"
+
+
+def pytest_keyboard_interrupt(excinfo):
+    if isinstance(excinfo.value, pytest.exit.Exception):
+        _early_exits.append(str(excinfo.value.msg))
+
+
+def pytest_sessionfinish(session, exitstatus):
+    if _early_exits:
+        sys.stderr.write(f"pytest.exit() ended the run early ({'; '.join(_early_exits)}); {NO_SKIP}\n")
+        if session.exitstatus == pytest.ExitCode.OK:
+            session.exitstatus = pytest.ExitCode.TESTS_FAILED

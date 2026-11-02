@@ -255,7 +255,9 @@ def _card_inventory(
             try:
                 card["importance"] = float(record["importance"])
             except (TypeError, ValueError):
-                raise ValueError(f"model card {card_id}: importance must be a number, got {record['importance']!r}")
+                raise ValueError(f"model card {card_id}: importance must be a number in [0, 1], got {record['importance']!r}")
+            if not 0.0 <= card["importance"] <= 1.0:
+                raise ValueError(f"model card {card_id}: importance must be a number in [0, 1], got {record['importance']!r}")
         dispositions = record.get("role_dispositions") or {}
         if isinstance(dispositions, Mapping):
             card["role_dispositions"].update(
@@ -408,9 +410,9 @@ def _role_coverage(
             (importance_for_node(model, node_id).importance for node_id in node_ids),
             default=0.0,
         )
-        # _card_inventory has already refused a non-numeric declared importance.
+        # _card_inventory has already refused a declared importance outside [0, 1].
         declared_importance = raw.get("importance")
-        declared_numeric = None if declared_importance is None else max(0.0, min(1.0, float(declared_importance)))
+        declared_numeric = None if declared_importance is None else float(declared_importance)
         structural_importance = _structural_card_importance(model, node_ids)
         importance = max(
             member_importance,

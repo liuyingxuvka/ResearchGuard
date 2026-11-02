@@ -457,8 +457,8 @@ def _cmd_library_viewer(args: argparse.Namespace) -> int:
     try:
         import PIL  # noqa: F401 - optional viewer dependency gate
         import tkinter  # noqa: F401 - supplied by the Python distribution
-    except ImportError:
-        print(json.dumps({"ok": False, "error": "The viewer extra and a Python with tkinter are required; install with python -m pip install -e \".[viewer]\"."}))
+    except ImportError as exc:
+        print(json.dumps({"ok": False, "error": f"{exc}: the viewer extra and a Python with tkinter are required; install with python -m pip install -e \".[viewer]\"."}))
         return 2
     from researchguard.logic_viewer.launcher import main as viewer_main
 

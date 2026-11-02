@@ -286,18 +286,24 @@ def utc_now() -> str:
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat()
 
 
-def clamp01(value: Any, default: float = 0.0, field: str = "score") -> float:
+def unit_score(value: Any, default: float, field: str) -> float:
+    """A declared score in [0, 1]; no value gives ``default``, anything else outside [0, 1] is an error."""
     if value is None or value == "":
         return float(default)
     try:
         numeric = float(value)
     except (TypeError, ValueError):
         raise SchemaError(f"{field} must be a number in [0, 1], got {value!r}")
-    if numeric < 0.0:
-        return 0.0
-    if numeric > 1.0:
-        return 1.0
+    if isinstance(value, bool) or not 0.0 <= numeric <= 1.0:
+        raise SchemaError(f"{field} must be a number in [0, 1], got {value!r}")
     return numeric
+
+
+def clamp01(value: float, default: float = 0.0) -> float:
+    """Keep a computed score in [0, 1]; declared inputs go through unit_score instead."""
+    if value is None or value == "":
+        return float(default)
+    return min(1.0, max(0.0, float(value)))
 
 
 def require_mapping(value: Any, label: str = "model root") -> Mapping[str, Any]:
@@ -423,7 +429,7 @@ class SourceRecord:
             source_status=require_choice(
                 data.get("source_status", "candidate"), SOURCE_STATUSES, "source.source_status", "candidate"
             ),
-            source_reliability=clamp01(data.get("source_reliability"), 0.0, "source_reliability"),
+            source_reliability=unit_score(data.get("source_reliability"), 0.0, "source_reliability"),
             source_role=require_choice(data.get("source_role"), SOURCE_ROLES, "source.source_role"),
             lineage_id=as_string(data.get("lineage_id")),
             source_date=as_string(data.get("source_date")),
@@ -489,8 +495,8 @@ class EvidenceAnchor:
             normalized_summary=as_string(data.get("normalized_summary")),
             modality=require_choice(data.get("modality"), MODALITIES, "anchor.modality"),
             observed_at=as_string(data.get("observed_at")),
-            extraction_confidence=clamp01(data.get("extraction_confidence"), 0.0, "extraction_confidence"),
-            specificity=clamp01(data.get("specificity"), 0.0, "specificity"),
+            extraction_confidence=unit_score(data.get("extraction_confidence"), 0.0, "extraction_confidence"),
+            specificity=unit_score(data.get("specificity"), 0.0, "specificity"),
             supports=list_of_strings(data.get("supports")),
             limits=list_of_strings(data.get("limits")),
             claim_use_ids=list_of_strings(data.get("claim_use_ids")),
@@ -533,7 +539,7 @@ class Lead:
             lead_id=lead_id,
             question=as_string(data.get("question")),
             hypothesis=as_string(data.get("hypothesis")),
-            importance=clamp01(data.get("importance"), 0.5, "importance"),
+            importance=unit_score(data.get("importance"), 0.5, "importance"),
             status=require_choice(data.get("status", "open"), LEAD_STATUSES, "lead.status", "open"),
             related_entities=list_of_strings(data.get("related_entities")),
             related_sources=list_of_strings(data.get("related_sources")),
@@ -570,9 +576,9 @@ class GapQualification:
             observation_id=as_string(data.get("observation_id")),
             locator_present=as_bool(data.get("locator_present"), False),
             source_accessible=as_bool(data.get("source_accessible"), False),
-            source_reliability=clamp01(data.get("source_reliability"), 0.0, "source_reliability"),
-            extraction_confidence=clamp01(data.get("extraction_confidence"), 0.0, "extraction_confidence"),
-            specificity=clamp01(data.get("specificity"), 0.0, "specificity"),
+            source_reliability=unit_score(data.get("source_reliability"), 0.0, "source_reliability"),
+            extraction_confidence=unit_score(data.get("extraction_confidence"), 0.0, "extraction_confidence"),
+            specificity=unit_score(data.get("specificity"), 0.0, "specificity"),
             supports_gap=as_bool(data.get("supports_gap"), False),
             role_match=as_bool(data.get("role_match"), False),
             modality_match=as_bool(data.get("modality_match"), False),
@@ -603,7 +609,7 @@ class GapClosureBasis:
             anchor_ids=list_of_strings(data.get("anchor_ids")),
             source_ids=list_of_strings(data.get("source_ids")),
             observation_ids=list_of_strings(data.get("observation_ids")),
-            thresholds={str(key): clamp01(value, 0.0, f"thresholds.{key}") for key, value in raw_thresholds.items()},
+            thresholds={str(key): unit_score(value, 0.0, f"thresholds.{key}") for key, value in raw_thresholds.items()},
             target_match=as_string(data.get("target_match")),
             claim_use_decision=as_string(data.get("claim_use_decision")),
             qualified=as_bool(data.get("qualified"), False),
@@ -686,7 +692,7 @@ class Gap:
             lead_id=as_string(data.get("lead_id")),
             gap_type=require_choice(data.get("gap_type"), GAP_TYPES, "gap.gap_type"),
             description=as_string(data.get("description")),
-            importance=clamp01(data.get("importance"), 0.5, "importance"),
+            importance=unit_score(data.get("importance"), 0.5, "importance"),
             blocking=as_bool(data.get("blocking"), False),
             suggested_source_roles=roles,
             suggested_modalities=modalities,
@@ -738,8 +744,8 @@ class SearchAction:
             ),
             expected_modality=require_choice(data.get("expected_modality"), MODALITIES, "action.expected_modality"),
             source_policy=as_string(data.get("source_policy"), "public_only"),
-            cost=clamp01(data.get("cost"), 0.3, "cost"),
-            permission_risk=clamp01(data.get("permission_risk"), 0.0, "permission_risk"),
+            cost=unit_score(data.get("cost"), 0.3, "cost"),
+            permission_risk=unit_score(data.get("permission_risk"), 0.0, "permission_risk"),
             status=require_choice(data.get("status", "proposed"), ACTION_STATUSES, "action.status", "proposed"),
             parameters=dict(parameters),
             notes=as_string(data.get("notes")),
@@ -845,7 +851,7 @@ class SourceDepthPolicy:
         }
         return cls(
             requested_claim_scope=requested_scope,
-            important_threshold=min(clamp01(data.get("important_threshold"), 0.6, "important_threshold"), 0.6),
+            important_threshold=min(unit_score(data.get("important_threshold"), 0.6, "important_threshold"), 0.6),
             required_portfolio_classes=classes,
             required_source_roles=roles,
             minimum_independent_lineages=max(2, minimum_lineages),
@@ -862,7 +868,7 @@ class SourceDepthPolicy:
             required_handoff_ids=list_of_strings(data.get("required_handoff_ids")),
             known_good_case_ids=list_of_strings(data.get("known_good_case_ids")),
             known_bad_case_ids=list_of_strings(data.get("known_bad_case_ids")),
-            coverage_floors={str(key): clamp01(value, 1.0, f"depth_policy.coverage_floors.{key}") for key, value in raw_floors.items()},
+            coverage_floors={str(key): unit_score(value, 1.0, f"depth_policy.coverage_floors.{key}") for key, value in raw_floors.items()},
             policy_origin=SOURCE_DEPTH_NATIVE_POLICY_ORIGIN,
         )
 

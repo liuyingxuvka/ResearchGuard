@@ -66,13 +66,16 @@ def main(argv: list[str] | None = None) -> None:
 
 
 def _show_startup_error(message: str) -> None:
+    print(message, file=sys.stderr)
     try:
         import tkinter as tk
         from tkinter import messagebox
-
+    except ImportError:
+        return  # no window system: the message is on stderr
+    try:
         root = tk.Tk()
         root.withdraw()
         messagebox.showerror("LogicGuard Library Viewer", message)
         root.destroy()
-    except Exception:
-        print(message, file=sys.stderr)
+    except tk.TclError:
+        return  # no display to open a dialog on: the message is on stderr

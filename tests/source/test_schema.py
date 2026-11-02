@@ -16,12 +16,16 @@ def test_valid_yaml_can_load():
     assert model.metadata["math_boundary"]
 
 
-def test_invalid_score_values_are_clamped():
-    source = SourceRecord.from_dict({"source_id": "s1", "source_reliability": 3, "source_type": "paper"})
-    action = SearchAction.from_dict({"action_id": "a1", "action_type": "text_search", "cost": -2, "permission_risk": 7})
-    assert source.source_reliability == 1.0
-    assert action.cost == 0.0
-    assert action.permission_risk == 1.0
+def test_score_values_outside_zero_to_one_are_refused():
+    # A score outside [0, 1] was clamped silently before; it is now an error that names the field.
+    with pytest.raises(SchemaError, match="source_reliability"):
+        SourceRecord.from_dict({"source_id": "s1", "source_reliability": 3, "source_type": "paper"})
+    with pytest.raises(SchemaError, match="cost"):
+        SearchAction.from_dict({"action_id": "a1", "action_type": "text_search", "cost": -2})
+    with pytest.raises(SchemaError, match="permission_risk"):
+        SearchAction.from_dict({"action_id": "a1", "action_type": "text_search", "permission_risk": 7})
+    action = SearchAction.from_dict({"action_id": "a1", "action_type": "text_search", "cost": 0, "permission_risk": 1})
+    assert (action.cost, action.permission_risk) == (0.0, 1.0)
 
 
 def test_invalid_status_raises():

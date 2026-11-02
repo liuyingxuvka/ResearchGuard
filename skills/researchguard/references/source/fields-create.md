@@ -20,13 +20,14 @@ ISO timestamp.
 | `purpose`, `repository`, `skill`, `math_boundary`, `cli`, `boundary`, `version` | Descriptive strings; omitted keys remain absent. |
 | `source_policy` | String; planning uses `public_only` when absent. |
 | `domain_hints` | List of actual search-domain hints; omitted means no hints. |
-| `qualification_thresholds` | Mapping with optional `source_reliability`, `extraction_confidence`, `specificity`; each defaults to `0.5` and is clamped to `[0, 1]`. |
+| `qualification_thresholds` | Mapping with optional `source_reliability`, `extraction_confidence`, `specificity`; each defaults to `0.5`; a value outside `[0, 1]`, or a value that is not a mapping, is an error. |
 | `warnings`, `handoff_ids` | Optional lists of strings used by the corresponding workflow. |
 
 Use YAML booleans (`true`, `false`), numeric values, and lists of strings. Unless a
 row says otherwise, optional string fields default to `""`, list fields to `[]`,
-and mappings to `{}`. Scores below are bounded to `[0, 1]` using their stated
-default; they are declared heuristics, not calibrated probabilities.
+and mappings to `{}`. Scores below are numbers in `[0, 1]`: no value gives the stated
+default, and text or a number outside `[0, 1]` is an error that names the field. They are
+declared heuristics, not calibrated probabilities.
 
 ## Leads
 
@@ -78,7 +79,7 @@ the closure-basis `target_match` describes the actual claim fit.
 A `closed` gap requires **all** of: `qualified: true`; nonempty `anchor_ids`,
 `source_ids`, and `observation_ids`; `thresholds` containing `source_reliability`,
 `extraction_confidence`, and `specificity`; and nonempty `target_match` and
-`claim_use_decision`. Threshold values are scores bounded to `[0, 1]`. Actual
+`claim_use_decision`. Threshold values are scores in `[0, 1]`. Actual
 closure still depends on accessible sources, the qualification thresholds,
 content, role/modality/claim fit, and claim usability where required. A locator
 or newly observed anchor alone does not close a gap.
