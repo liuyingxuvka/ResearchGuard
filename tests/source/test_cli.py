@@ -320,3 +320,17 @@ def test_an_observation_cannot_create_a_source_without_identity():
     from researchguard.source.update import add_anchor
     with pytest.raises(ValueError, match='new_source_without_identity:src-note'):
         add_anchor(BeliefState(), EvidenceAnchor(anchor_id='a', source_id='src-note', text='A remark'))
+
+
+def test_add_anchor_url_help_says_what_is_accepted(capsys):
+    # Review round 4: the help still said "http or https with a host name, or a DOI", though an ISBN or an
+    # arXiv id is accepted too and only an outside locator keeps the source from being unverifiable.
+    from researchguard.source.cli import main
+    with pytest.raises(SystemExit) as stop:
+        main(['add-anchor', '--help'])
+    assert stop.value.code == 0
+    text = ' '.join(capsys.readouterr().out.split())
+    url_help = text.split('--url URL ', 1)[1].split(' --date DATE', 1)[0]
+    for accepted in ('http or https', 'DOI', 'ISBN', 'arXiv id', 'port', 'top-level domain', 'IP address',
+                     'unverifiable_source'):
+        assert accepted in url_help, url_help

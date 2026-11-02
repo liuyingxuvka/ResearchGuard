@@ -178,7 +178,12 @@ def build_parser() -> argparse.ArgumentParser:
     for option in ("source-id", "anchor-id", "quote", "locator", "output"):
         anchor.add_argument("--" + option, required=True)
     anchor.add_argument("--title", default="", help="title of the document the quote is printed in, as printed")
-    anchor.add_argument("--url", default="", help="link to that document: http or https with a host name, or a DOI")
+    anchor.add_argument("--url", default="", help=(
+        "link to that document: an http or https URL whose host is a dotted name or an IP address (a port, if "
+        "given, from 0 to 65535), a DOI, an ISBN or an arXiv id. Only a link whose host ends in a top-level "
+        "domain of the root zone and is not an example name or an IP address, a DOI, an ISBN with a correct "
+        "check digit or an arXiv id is an outside locator; with anything else, or no link, status warns "
+        "unverifiable_source"))
     anchor.add_argument("--date", default="", help="date of that document: YYYY, YYYY-MM or YYYY-MM-DD")
     anchor.add_argument("--pretty", action="store_true")
 
