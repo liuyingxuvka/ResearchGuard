@@ -224,7 +224,8 @@ def conformance():
         if qualified != content:
             violations.append(ConformanceViolation(step_index=1, message=f"native content qualification differs: {content}", rule_name="content_qualification"))
     from researchguard.source.update import add_anchor
-    added = add_anchor(BeliefState(), EvidenceAnchor(anchor_id="new-a", source_id="new-s", text="quote"))
+    added = add_anchor(BeliefState(), EvidenceAnchor(anchor_id="new-a", source_id="new-s", text="quote"),
+                       source=SourceRecord(source_id="new-s", title="A named report"))
     present = any(row.source_id == "new-s" for row in added.sources)
     observations.append(ReplayObservation("AddAnchor", present, True))
     if not present:

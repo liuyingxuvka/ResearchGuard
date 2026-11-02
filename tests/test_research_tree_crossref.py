@@ -251,3 +251,36 @@ def test_status_reports_input_digests(tmp_path):
     source.write_bytes(source.read_bytes() + b'\n')
     changed = {row['path']: row['sha256'] for row in research_status(load_research(folder))['input_digests']}
     assert [key for key in paths if original[key] != changed[key]] == ['source.yaml']
+
+
+def _add_bare_source_evidence(candidate):
+    """The A3 end state written by hand: a source with only an id, its anchor, and evidence citing it."""
+    quote = 'The Suez blockage alone doubled Asia-Europe spot rates in April 2021.'
+
+    def add_source(data):
+        data['sources'].append({'source_id': 'src-lloyds'})
+        data['anchors'].append({'anchor_id': 'anc-lloyds', 'source_id': 'src-lloyds', 'locator': "Lloyd's List, April 2021", 'text': quote})
+
+    def add_evidence(data):
+        data['nodes']['E_lloyds'] = {'type': 'Evidence', 'text': "Lloyd's List: the blockage alone doubled Asia-Europe spot rates in April 2021.",
+            'confidence': 0.85, 'provenance': [{'origin_kind': 'external_source', 'source_id': 'src-lloyds', 'locator': 'anc-lloyds', 'quote': quote}]}
+        data['edges'].append({'source': 'E_lloyds', 'target': 'h_suez', 'type': 'supports', 'weight': 0.9})
+
+    _rewrite(candidate, 'source.yaml', add_source)
+    _rewrite(candidate, 'logic.yaml', add_evidence)
+
+
+def test_a_source_without_title_url_or_date_is_warned(tmp_path, capsys):
+    import shutil
+    from research_tree_support import EVERGIVEN
+    candidate = tmp_path / 'bare-source'
+    shutil.copytree(EVERGIVEN, candidate)
+    _add_bare_source_evidence(candidate)
+    warning = 'source_without_identity:src-lloyds (no title, url or date names the document it stands for)'
+    assert main(['status', str(candidate), '--json']) == 0
+    status = json.loads(capsys.readouterr().out)
+    assert warning in status['warnings'] and status['errors'] == []
+    assert main(['status', str(EVERGIVEN), '--candidate', str(candidate)]) == 0
+    assert f'- warnings added: {warning}' in capsys.readouterr().out
+    # The shipped sources each carry a title, so the example itself stays without this warning.
+    assert not any(item.startswith('source_without_identity:') for item in research_status(load_research(EVERGIVEN))['warnings'])

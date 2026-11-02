@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 
 import yaml
+import pytest
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -213,3 +214,36 @@ def test_add_anchor_adds_source_and_anchor(tmp_path):
     assert add('s', 'a', model) == 1 and model.read_bytes() == before
     absent = tmp_path / 'absent.yaml'
     assert add('other', 'a', absent) == 1 and not absent.exists()
+
+
+def test_add_anchor_refuses_a_new_source_without_identity(tmp_path, capsys):
+    """A source created by add-anchor must name its document; a bare id is not an external identity."""
+    from researchguard.source.cli import main
+    from researchguard.source.loader import load_model, write_yaml
+    from researchguard.source.schema import BeliefState, SourceRecord
+    model = tmp_path / 'source.yaml'
+    write_yaml(model, BeliefState(sources=[SourceRecord(source_id='known', title='A known report')]))
+    before = model.read_bytes()
+
+    def add(source_id, anchor_id, *identity):
+        return main(['add-anchor', str(model), '--source-id', source_id, '--anchor-id', anchor_id,
+            '--quote', 'The blockage alone doubled spot rates.', '--locator', 'a colleague', *identity,
+            '--output', str(model)])
+
+    assert add('src-note', 'anc-note') == 1
+    error = json.loads(capsys.readouterr().out)['error']
+    assert error.startswith('new_source_without_identity:src-note')
+    assert 'not source evidence' in error
+    assert model.read_bytes() == before
+    # Any one external identity is enough for a new source, and an existing source keeps its own.
+    for flag, value in (('--title', 'Lloyd\'s List'), ('--url', 'https://example.org/a'), ('--date', '2021-04-01')):
+        assert add(f'src{flag}', f'anc{flag}', flag, value) == 0
+    assert add('known', 'anc-known') == 0
+    assert {row.source_id for row in load_model(model).sources} == {'known', 'src--title', 'src--url', 'src--date'}
+
+
+def test_an_observation_cannot_create_a_source_without_identity():
+    from researchguard.source.schema import BeliefState, EvidenceAnchor
+    from researchguard.source.update import add_anchor
+    with pytest.raises(ValueError, match='new_source_without_identity:src-note'):
+        add_anchor(BeliefState(), EvidenceAnchor(anchor_id='a', source_id='src-note', text='A remark'))

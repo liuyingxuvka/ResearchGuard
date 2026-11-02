@@ -31,7 +31,8 @@ def test_sync_after_add_anchor_adds_only_that_anchor(tmp_path, capsys):
     shutil.copytree(EVERGIVEN, folder)
     assert main(['source', 'add-anchor', str(folder / 'source.yaml'), '--source-id', 'src-lloyds',
                  '--anchor-id', 'anc-lloyds', '--quote', 'The Suez blockage alone doubled Asia-Europe spot rates in April 2021.',
-                 '--locator', "Lloyd's List, April 2021", '--output', str(folder / 'source.yaml')]) == 0
+                 '--locator', "Lloyd's List, April 2021", '--title', "Lloyd's List", '--date', '2021-04',
+                 '--output', str(folder / 'source.yaml')]) == 0
     capsys.readouterr()
     source, index = (folder / 'source.yaml').read_bytes(), (folder / 'research.yaml').read_bytes()
     assert main(['sync', str(folder)]) == 0

@@ -84,4 +84,4 @@ for claims or traces are exported as usable trace evidence; AI still owns links.
 
 `researchguard source add-anchor <model> --source-id S --anchor-id A --quote TEXT --locator L [--title T --url U --date D] --output <file>`
 
-Creates a missing source and adds one anchor, validates and writes YAML without defaults. An existing anchor id exits 1 with a JSON error and writes nothing.
+Creates a missing source and adds one anchor, validates and writes YAML without defaults. A missing source must be named by at least one of `--title`, `--url` or `--date`, taken from the document the quote is printed in; otherwise it exits 1 with `new_source_without_identity` and writes nothing. An existing anchor id exits 1 with a JSON error and writes nothing.

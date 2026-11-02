@@ -72,11 +72,21 @@ Re-enter the evidence through the source model, starting from a clean candidate 
 sync the copy, then compare it with the current folder before accepting it. Sync preserves authored nodes; an existing
 unanchored insertion needs an explicit source binding rather than silent deletion. To keep the original `E_lloyds`,
 set its provenance to `origin_kind: external_source`, `source_id: src-lloyds`, `locator: anc-lloyds` and the anchor's
-exact `quote`; remove or refresh a stale `source_reference`. Its text and authored edges can stay. The clean-copy route is:
+exact `quote`; remove or refresh a stale `source_reference`. Its text and authored edges can stay.
+
+The anchor must come from a document. A new source id with no title, URL or date is refused, and nothing is written:
 
 ```console
 $ cp -r examples/research/evergiven ../evergiven-copy
 $ researchguard source add-anchor ../evergiven-copy/source.yaml --source-id src-lloyds --anchor-id anc-lloyds --quote "The Suez blockage alone doubled Asia-Europe spot rates in April 2021." --locator "Lloyd's List, April 2021" --output ../evergiven-copy/source.yaml
+{"ok": false, "error": "new_source_without_identity:src-lloyds: this anchor would create a source that names no title, url or date. Name the document the quote is printed in (--title, --url or --date, as the document gives them). A passage with no such document, such as a colleague's remark or your own summary, is not source evidence: leave it out of the argument; finding its document is an open source gap."}
+```
+
+A source record written by hand with only an id gives the warning `source_without_identity` in `status`. When the
+line really was printed in Lloyd's List, the clean-copy route names that document:
+
+```console
+$ researchguard source add-anchor ../evergiven-copy/source.yaml --source-id src-lloyds --anchor-id anc-lloyds --quote "The Suez blockage alone doubled Asia-Europe spot rates in April 2021." --locator "Lloyd's List, April 2021" --title "Lloyd's List" --date 2021-04 --output ../evergiven-copy/source.yaml
 {"ok": true, "output": "../evergiven-copy/source.yaml"}
 $ researchguard sync ../evergiven-copy
 sync: trace evidence added ["anc-lloyds"] updated []; logic nodes added [] updated []; conflicts []
@@ -216,6 +226,8 @@ Five skills, one idea: make structure, relationships and constraints explicit in
   neither its quote nor its anchor gives the warning `summary_number_not_in_quote`; it is a warning, not an error,
   because a summary may legitimately derive a number ("doubled").
 - Without a source model in the folder, evidence without an anchor is allowed and listed as `evidence_unanchored`.
+- A source must name its document by title, URL or date, but ResearchGuard cannot check that the document exists or
+  says what the anchor quotes. An invented title passes; it is at least written down where a reader can check it.
 
 **What has been checked, and what has not.**
 - Verified on finite examples: the shipped folder has a computed `withhold` licence; reference-only evidence produces

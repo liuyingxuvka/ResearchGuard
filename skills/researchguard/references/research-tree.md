@@ -160,12 +160,16 @@ names it; experiments that predict for it), all taken from the same status. With
 ## Synchronize new evidence
 
 ```sh
-researchguard source add-anchor <folder>/source.yaml --source-id S --anchor-id A --quote TEXT --locator L --output <folder>/source.yaml
+researchguard source add-anchor <folder>/source.yaml --source-id S --anchor-id A --quote TEXT --locator L [--title T --url U --date D] --output <folder>/source.yaml
 researchguard sync <folder>
 researchguard status <current folder> --candidate <folder>
 ```
 
-Run these inside the candidate copy. `sync` brings source anchors into the trace
+Run these inside the candidate copy. A new source id needs the title, URL or
+date of the document the quote is printed in; without one `add-anchor` refuses
+(`new_source_without_identity`) and writes nothing. A passage with no such
+document is not source evidence, and `status` warns `source_without_identity`
+on any source that names none of the three. `sync` brings source anchors into the trace
 and logic models named by `research.yaml`. Follow its printed `next:` to inspect
 that folder; comparison separately names the unchanged current folder first and
 the synced candidate with `--candidate`, as shown above.
@@ -175,4 +179,4 @@ Source anchors usable for claims or traces export as usable evidence; AI still
 owns the links. Route results remain scoped to their own declared evidence and
 do not establish truth.
 
-Source edits can use `researchguard source add-anchor <model> --source-id S --anchor-id A --quote TEXT --locator L --output <file>`; the command can add the source and writes YAML without defaults. `Next` displays each search’s gap and usable query; declared searches win equal-score ties. A hypothesis view groups the routes for each anchor and includes only ablation effects relevant to that hypothesis. Field-table indexes link separate create, depth and example steps; load only the step needed.
+Source edits can use `researchguard source add-anchor <model> --source-id S --anchor-id A --quote TEXT --locator L --output <file>`; the command can add a source that names its document and writes YAML without defaults. `Next` displays each search’s gap and usable query; declared searches win equal-score ties. A hypothesis view groups the routes for each anchor and includes only ablation effects relevant to that hypothesis. Field-table indexes link separate create, depth and example steps; load only the step needed.

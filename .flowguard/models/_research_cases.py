@@ -447,7 +447,8 @@ def native_sync():
                 with contextlib.redirect_stdout(io.StringIO()):
                     added = main(['source', 'add-anchor', str(folder / 'source.yaml'), '--source-id', 'src-lloyds',
                                   '--anchor-id', 'anc-lloyds', '--quote', 'The Suez blockage alone doubled Asia-Europe spot rates in April 2021.',
-                                  '--locator', "Lloyd's List, April 2021", '--output', str(folder / 'source.yaml')])
+                                  '--locator', "Lloyd's List, April 2021", '--title', "Lloyd's List", '--date', '2021-04',
+                                  '--output', str(folder / 'source.yaml')])
                 assert added == 0, added
             if label == 'conflict':
                 trace_path = folder / 'trace.yaml'

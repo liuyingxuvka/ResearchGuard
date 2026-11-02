@@ -27,6 +27,7 @@ from .source.loader import load_model as load_source
 from .source.planner import plan_next_actions
 from .source.stop_decision import decide_model_search_stop
 from .source.schema import to_plain
+from .source.update import source_has_identity
 from .trace.evaluator import evaluate_model as evaluate_trace
 from .trace.loader import load_model as load_trace
 
@@ -261,6 +262,8 @@ def check_research_tree(index: dict[str, Any], models: dict[str, Any], observati
         errors.extend(f"unknown_hypothesis:source:{gap.gap_id}:{item}" for gap in source.gaps
                       for item in gap.hypothesis_ids if item not in ids)
         source_ids = {row.source_id for row in source.sources}
+        warnings.extend(f"source_without_identity:{row.source_id} (no title, url or date names the document it stands for)"
+                        for row in source.sources if not source_has_identity(row))
         anchors = {row.anchor_id: row.source_id for row in source.anchors}
         if trace is not None:
             errors.extend(f"dangling_source:trace:{row.source_id}" for row in trace.sources if row.source_id not in source_ids)

@@ -6,6 +6,10 @@
 
 - Version numbers: a release that adds features raises the second number and a release with only small fixes raises the third.
 
+- source add-anchor refuses to create a new source that names no title, URL or date, and writes nothing. Its message says that a remark with no document, such as a colleague's note, is not source evidence. The same rule holds when an observation adds an anchor for an unknown source.
+
+- status warns source_without_identity for any source that names no title, URL or date, so a bare source written by hand shows up in status and as an added warning in a candidate comparison.
+
 ## v0.6.0 - 2026-10-31 - Sync evidence and keep claims tied to their sources
 
 - status no longer crashes on evidence that names only a source_reference, and an error that is not about research.yaml is reported as research_status_failed with the real exception.

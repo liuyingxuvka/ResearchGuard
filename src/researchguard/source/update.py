@@ -60,8 +60,21 @@ def add_anchor(belief_state: BeliefState, anchor: EvidenceAnchor, *, source: Sou
     if source is not None and source.source_id != anchor.source_id:
         raise ValueError(f"anchor {anchor.anchor_id} belongs to {anchor.source_id}, not {source.source_id}")
     if not any(row.source_id == anchor.source_id for row in belief_state.sources):
-        belief_state = add_source(belief_state, source or SourceRecord(source_id=anchor.source_id))
+        new_source = source or SourceRecord(source_id=anchor.source_id)
+        if not source_has_identity(new_source):
+            raise ValueError(
+                f"new_source_without_identity:{anchor.source_id}: this anchor would create a source that names no "
+                "title, url or date. Name the document the quote is printed in (--title, --url or --date, as the "
+                "document gives them). A passage with no such document, such as a colleague's remark or your own "
+                "summary, is not source evidence: leave it out of the argument; finding its document is an open "
+                "source gap.")
+        belief_state = add_source(belief_state, new_source)
     return replace(belief_state, anchors=_upsert_by_id(belief_state.anchors, anchor, "anchor_id"))
+
+
+def source_has_identity(source: SourceRecord) -> bool:
+    """A source has an external identity when it names its document by title, URL or date."""
+    return bool(source.title or source.url or source.source_date)
 
 
 def add_gap(belief_state: BeliefState, gap: Gap) -> BeliefState:
