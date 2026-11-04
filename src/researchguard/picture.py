@@ -126,29 +126,27 @@ def support_picture(tree: Any, status: dict[str, Any], claim_id: str, *,
     candidates = [item for item in candidates if item != claim_id]
 
     def arrows(drawn: set[str]) -> list[dict[str, Any]]:
-        rows: dict[tuple[str, str], dict[str, Any]] = {}
+        rows: list[dict[str, Any]] = []
         for target in sorted(drawn):
             for edge in incoming.get(target, ()):
                 if edge.source in drawn:
                     blocking = target == claim_id and edge.source in blockers
-                    rows[(edge.source, target)] = {"from": edge.source, "to": target, "relation": edge.type,
-                                                   "routes": ["logic"], "style": "block" if blocking else "logic",
-                                                   "label": edge.type + (" · blocks" if blocking else "")}
+                    rows.append({"from": edge.source, "to": target, "relation": edge.type,
+                                 "routes": ["logic"], "style": "block" if blocking else "logic",
+                                 "label": edge.type + (" · blocks" if blocking else "")})
         for anchor, direction in sorted(trace_direction.items()):
             box = node_of_anchor.get(anchor, f"anchor:{anchor}")
             if box not in drawn:
                 continue
-            row = rows.get((box, claim_id))
-            if row is not None and DIRECTION.get(row["relation"]) == direction and anchor not in disagreeing:
+            parallel = [row for row in rows if row["from"] == box and row["to"] == claim_id]
+            for row in parallel:
                 row["routes"].append("trace")
-                row["label"] += " · trace agrees"
-            elif row is not None:
-                row["routes"].append("trace")
-                row["label"] += f" · trace says {direction} (routes disagree)"
-            else:
-                rows[(box, claim_id)] = {"from": box, "to": claim_id, "relation": direction, "routes": ["trace"],
-                                         "style": "trace", "label": f"trace: {direction}"}
-        return list(rows.values())
+                row["label"] += (" · trace agrees" if DIRECTION.get(row["relation"]) == direction and anchor not in disagreeing
+                                 else f" · trace says {direction} (routes disagree)")
+            if not parallel:
+                rows.append({"from": box, "to": claim_id, "relation": direction, "routes": ["trace"],
+                             "style": "trace", "label": f"trace: {direction}"})
+        return rows
 
     drawn = {claim_id}
     left_out: list[str] = []

@@ -4,6 +4,8 @@ import re
 import shutil
 from pathlib import Path
 
+import pytest
+
 from researchguard.cli import main
 from researchguard.picture import MAX_ARROWS, MAX_BOXES, render_picture_markdown, support_picture
 from researchguard.research import load_research, research_status
@@ -32,6 +34,35 @@ def test_root_claim_picture_shows_its_blockers_support_and_sources():
                                                     "routes": ["trace"], "style": "trace", "label": "trace: oppose"}
     assert len(picture["boxes"]) <= MAX_BOXES and len(picture["arrows"]) <= MAX_ARROWS
     assert "route states shown as text, not boxes: trace not live; experiment eliminated" in picture["not_drawn"]
+
+
+@pytest.mark.parametrize("reverse", [False, True])
+def test_parallel_relations_are_both_drawn_and_keep_their_trace_labels(tmp_path, reverse):
+    folder = tmp_path / "parallel"
+    shutil.copytree(EVERGIVEN, folder)
+
+    def parallel(data):
+        data["edges"].append({"source": "E_dates", "target": "h_suez", "type": "qualifies", "weight": 0.6})
+        if reverse:
+            data["edges"].reverse()
+
+    _rewrite(folder, "logic.yaml", parallel)
+    picture = _picture(folder, "h_suez")
+    arrows = [row for row in picture["arrows"] if (row["from"], row["to"]) == ("E_dates", "h_suez")]
+    assert {row["relation"] for row in arrows} == {"supports", "qualifies"}
+    assert len(arrows) == 2
+    assert {row["label"] for row in arrows} == {"supports · trace agrees", "qualifies · trace says support (routes disagree)"}
+    assert all(row["routes"] == ["logic", "trace"] for row in arrows)
+    text = render_picture_markdown(picture)
+    assert all(f'|"{row["label"]}"|' in text for row in arrows)
+
+    tree = load_research(folder)
+    bounded = support_picture(tree, research_status(tree), "h_suez", max_arrows=5)
+    assert len(bounded["arrows"]) <= 5
+    kept = [row for row in bounded["arrows"] if row["from"] == "E_dates"]
+    assert len(kept) in (0, 2)
+    if not kept:
+        assert any(item.startswith("E_dates ") and "kept out to stay readable" in item for item in bounded["not_drawn"])
 
 
 def test_the_picture_follows_the_model_not_a_description(tmp_path):
