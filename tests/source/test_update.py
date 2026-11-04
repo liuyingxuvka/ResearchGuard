@@ -137,6 +137,10 @@ def test_why_a_link_is_not_an_outside_locator(url, reason):
     ('https://slack.com:99999/x', False),
     ('https://slack.com:/x', True),        # an empty port is allowed by the URL standard
     ('https://slack.com:65535/x', True),
+    ('https://slack.com:000080/x', True),
+    ('https://slack.com:000000/x', True),
+    ('https://slack.com:00065535/x', True),
+    ('https://slack.com:00065536/x', False),
     ('http://[::1]/x', True),              # a well-formed link, but no outside locator
     ('https://[2001:db8::1]/x', True),
     ('https://[zz]/x', False),

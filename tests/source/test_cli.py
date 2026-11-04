@@ -334,3 +334,18 @@ def test_add_anchor_url_help_says_what_is_accepted(capsys):
     for accepted in ('http or https', 'DOI', 'ISBN', 'arXiv id', 'port', 'top-level domain', 'IP address',
                      'unverifiable_source'):
         assert accepted in url_help, url_help
+    assert 'an ISBN with a correct check digit' in url_help
+    assert '.onion' in url_help and '.arpa' in url_help
+
+
+def test_add_anchor_bad_port_refusal_preserves_the_specific_reason(tmp_path, capsys):
+    from researchguard.source.cli import main
+    from researchguard.source.loader import write_yaml
+    from researchguard.source.schema import BeliefState
+    model, output = tmp_path / 'source.yaml', tmp_path / 'candidate.yaml'
+    write_yaml(model, BeliefState())
+    assert main(['add-anchor', str(model), '--source-id', 'src-test', '--anchor-id', 'anc-test',
+                 '--quote', 'A quote.', '--locator', 'page 4', '--title', 'A report',
+                 '--url', 'https://slack.com:abc/', '--output', str(output)]) == 1
+    assert "the port 'abc'" in capsys.readouterr().out
+    assert not output.exists()

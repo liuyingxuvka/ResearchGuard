@@ -248,7 +248,8 @@ def _url_host(url: str) -> tuple[str, str]:
 
 def _port_checks(port: str) -> bool:
     """Whether the port text of a URL is empty or a number from 0 to 65535."""
-    return bool(_PORT.fullmatch(port)) and (not port or int(port) <= 65535)
+    number = port.lstrip("0")
+    return bool(_PORT.fullmatch(number)) and (not number or int(number) <= 65535)
 
 
 def _ipv6_literal(text: str) -> bool:
@@ -346,7 +347,10 @@ def require_document(source: SourceRecord, action: str) -> SourceIdentity:
     """Refuse to write a source record that names no document or whose link or date is malformed."""
     identity = source_identity(source)
     if identity.problems:
-        raise ValueError(f"new_source_identity_invalid:{source.source_id}: {'; '.join(identity.problems)}. "
+        problems = '; '.join(identity.problems)
+        if source.url and not _is_link(source.url):
+            problems += '; ' + outside_locator(source.url)[1]
+        raise ValueError(f"new_source_identity_invalid:{source.source_id}: {problems}. "
                          "Nothing was written.")
     if not identity.names_document:
         raise ValueError(

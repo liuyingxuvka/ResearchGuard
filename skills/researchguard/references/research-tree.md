@@ -172,7 +172,11 @@ evidence box shows every provenance record of its node, not only the first:
 each anchor with its source when the source model holds that anchor for that
 source, and the source of a record that names no anchor (`no anchor named`); a
 locator the source model does not hold is drawn as
-`not an anchor of <source> in the source model`. `Problems in what is drawn`
+`not an anchor of <source> in the source model`. A record with no source id is
+also drawn, with its locator and source reference (or an explicit missing-field
+label), and says `names no source in the source model`. The picture marks its
+evidence box dashed and lists `provenance_names_no_source:<node>`; this picture
+diagnostic does not change the folder's ordinary status. `Problems in what is drawn`
 lists every status error and warning that names a drawn node, anchor or source,
 and every route that failed to load. A box is dashed red when one of them is
 about its node, or about any anchor or source the box shows (an id in the
@@ -206,9 +210,9 @@ alike. A passage with no such document is not source evidence. `status` warns
 `source_without_identity`, `source_identity_invalid`,
 `anchor_locator_names_no_place`, and `anchor_after_source_date` when a quote names
 a day or month after the date of its source. It also warns `unverifiable_source`
-for every source, new or old, whose url field holds no outside locator: an http or
+for every source whose url field holds no outside locator: an http or
 https link whose host name ends in a top-level domain of the root zone and is not
-an example name, a DOI, an ISBN with a correct check digit, or an arXiv id. This
+an example, .onion or .arpa name, a DOI, an ISBN with a correct check digit, or an arXiv id. This
 holds for every source, old or new: a source a folder already held before this
 version warns too, with no change to the folder. Only
 that field is read, never the title, so no title clears it; the status Evidence

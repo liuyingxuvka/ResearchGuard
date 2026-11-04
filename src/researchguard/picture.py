@@ -5,7 +5,8 @@ evaluation (state, confidence, blockers), the source model's anchors and sources
 directions that research_status derives for the trace route. A provenance locator is drawn as
 source support only when the source model holds that anchor for that source; otherwise the box says
 it is not. An evidence box shows every provenance record of its node, each anchor and source it
-cites. The picture lists every status error and warning that names something it draws, and draws a
+cites. A record that names no source is retained and marked as unlinked in this picture. The picture
+lists every status error and warning that names something it draws, and draws a
 box dashed when such a problem is about its node or about any anchor or source it shows. A
 logic model that cannot be read is reported as such instead of being drawn as absent. It keeps to
 the discussed claim and its two nearest steps, stops at a readable size, and lists by id everything
@@ -19,7 +20,7 @@ from typing import Any
 
 from .logic.evaluator import evaluate_model as evaluate_logic
 from .logic.minimal_sets import license_model_claim
-from .logic.provenance import coerce_provenance
+from .logic.provenance import ProvenanceRecord, coerce_provenance
 from .source.update import source_identity
 
 # A person reads about this many boxes and arrows at once (FlowGuard design M8); the picture
@@ -61,16 +62,14 @@ def support_picture(tree: Any, status: dict[str, Any], claim_id: str, *,
             incoming.setdefault(edge.target, []).append(edge)
     sources = {row.source_id: row for row in source.sources} if source is not None else {}
     anchors = {row.anchor_id: row for row in source.anchors} if source is not None else {}
-    # Every provenance record that names a source counts, not only the first: each is drawn in the
-    # node's box, and a problem about any of its anchors or sources marks that box.
-    records_of: dict[str, list[tuple[str | None, str]]] = {}
+    # Keep every declared record, including one that has no source-model identity.
+    records_of: dict[str, tuple[ProvenanceRecord, ...]] = {}
     node_of_anchor: dict[str, str] = {}
     for node_id, node in sorted(nodes.items()):
         if node.type != "Evidence":
             continue
-        for record in coerce_provenance(node.provenance):
-            if record.source_id:
-                records_of.setdefault(node_id, []).append((record.locator, record.source_id))
+        records_of[node_id] = coerce_provenance(node.provenance)
+        for record in records_of[node_id]:
             if record.locator and record.source_id:
                 node_of_anchor.setdefault(record.locator, node_id)
     library_sources = {row.source_id for row in tree.library.list_sources()} if tree.library is not None else set()
@@ -90,8 +89,13 @@ def support_picture(tree: Any, status: dict[str, Any], claim_id: str, *,
             return f"{anchor_id}: source {source_id} is not in the source model"
         return f"{anchor_id}: not an anchor of {source_id} in the source model"
 
-    def record_line(anchor_id: str | None, source_id: str) -> str:
+    def record_line(record: ProvenanceRecord) -> str:
         """One provenance record of a box: its anchor, or the source it names when it names no anchor."""
+        anchor_id, source_id = record.locator, record.source_id
+        if not source_id:
+            locator = anchor_id if anchor_id else "no locator named"
+            reference = _short(record.source_reference, 48) if record.source_reference else "no source reference named"
+            return f"{locator} · {reference} · names no source in the source model"
         if anchor_id:
             return anchor_line(anchor_id, source_id)
         if source_failure:
@@ -173,7 +177,7 @@ def support_picture(tree: Any, status: dict[str, Any], claim_id: str, *,
         state = f"{node_result.state} {node_result.confidence:.2f}" if node_result is not None else ""
         lines = [item if node.type in {"Claim", "Evidence"} else f"{item} ({node.type})", _short(node.text, 60 if item == claim_id else 48)]
         if node.type == "Evidence" and item in records_of:
-            lines.extend(record_line(*record) for record in records_of[item])
+            lines.extend(record_line(record) for record in records_of[item])
         elif node.type == "Evidence":
             lines.append("no anchor in the source model")
         if item == claim_id:
@@ -215,12 +219,17 @@ def support_picture(tree: Any, status: dict[str, Any], claim_id: str, *,
             return {anchor_id, anchors[anchor_id].source_id} if anchor_id in anchors else {anchor_id}
         if item not in records_of:
             return set()
-        return {part for record in records_of[item] for part in record if part}
+        return {part for record in records_of[item] if record.source_id
+                for part in (record.locator, record.source_id) if part}
 
     boxes = [box(item) for item in order]
     named = {item.split(":", 1)[1] if item.startswith("anchor:") else item for item in order}
     named |= {part for item in order for part in shown(item)}
     problems = _problems(status, named)
+    for item in order:
+        if item in records_of and any(not record.source_id for record in records_of[item]):
+            problems.append({"level": "warning", "text": f"provenance_names_no_source:{item} "
+                             "(a displayed provenance record names no source in the source model)"})
     flagged = {token for row in problems for token in _tokens(row["text"])}
     about = {token for row in problems for token in _subject(row["text"])}
     for row in boxes:

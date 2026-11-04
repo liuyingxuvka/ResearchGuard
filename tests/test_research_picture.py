@@ -249,3 +249,25 @@ def test_every_provenance_record_of_a_drawn_evidence_box_counts(tmp_path):
     assert "no anchor named · Colleague's note, 2021 · unverifiable source" in box["lines"]
     assert any(row["text"].startswith("unverifiable_source:src-note (") for row in picture["problems"])
     assert "E_dates" in _flagged(picture)
+
+
+def test_provenance_without_a_source_id_is_drawn_and_marked_without_inventing_a_source(tmp_path):
+    cases = [(0, "Colleague said so", "email", "email · Colleague said so"),
+             (1, "Colleague said so", "email", "email · Colleague said so"),
+             (1, "Colleague said so", "", "no locator named · Colleague said so")]
+    for index, (position, reference, locator, shown) in enumerate(cases):
+        folder = tmp_path / f"unlinked-{index}"
+        shutil.copytree(EVERGIVEN, folder)
+        record = {"origin_kind": "external_source", "source_reference": reference,
+                  "locator": locator, "quote": "The canal reopened on 29 March 2021."}
+        _rewrite(folder, "logic.yaml", lambda data: data["nodes"]["E_dates"]["provenance"].insert(position, record))
+        source_before = (folder / "source.yaml").read_bytes()
+        picture = _picture(folder, "h_suez")
+        box = {row["id"]: row for row in picture["boxes"]}["E_dates"]
+        assert shown + " · names no source in the source model" in box["lines"]
+        assert "anc-sca-dates · Suez Canal Authority statements on th..." in box["lines"]
+        assert "E_dates" in _flagged(picture) and "E_series" not in _flagged(picture)
+        assert any(row["text"].startswith("provenance_names_no_source:E_dates") for row in picture["problems"])
+        text = render_picture_markdown(picture)
+        assert shown in text and "names no source in the source model" in text
+        assert (folder / "source.yaml").read_bytes() == source_before
