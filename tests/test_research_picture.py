@@ -1,5 +1,6 @@
 """The picture of a conclusion is computed from the folder's models, kept readable, and says what it leaves out."""
 import json
+import copy
 import re
 import shutil
 from pathlib import Path
@@ -31,7 +32,8 @@ def test_root_claim_picture_shows_its_blockers_support_and_sources():
     assert arrows[("h_demand", "h_suez")]["label"] == "contradicts · blocks"
     assert arrows[("E_dates", "h_suez")]["label"] == "supports · trace agrees"
     assert arrows[("E_transpacific", "h_suez")] == {"from": "E_transpacific", "to": "h_suez", "relation": "oppose",
-                                                    "routes": ["trace"], "style": "trace", "label": "trace: oppose"}
+                                                    "routes": ["trace"], "trace_directions": {"anc-transpacific": ["oppose"]},
+                                                    "style": "trace", "label": "trace: oppose"}
     assert len(picture["boxes"]) <= MAX_BOXES and len(picture["arrows"]) <= MAX_ARROWS
     assert "route states shown as text, not boxes: trace not live; experiment eliminated" in picture["not_drawn"]
 
@@ -63,6 +65,88 @@ def test_parallel_relations_are_both_drawn_and_keep_their_trace_labels(tmp_path,
     assert len(kept) in (0, 2)
     if not kept:
         assert any(item.startswith("E_dates ") and "kept out to stay readable" in item for item in bounded["not_drawn"])
+
+
+@pytest.mark.parametrize("directions", [("limit",), ("oppose", "limit")])
+@pytest.mark.parametrize("reverse", [False, True])
+def test_every_trace_direction_is_retained_and_compared_with_each_parallel_logic_relation(tmp_path, directions, reverse):
+    folder = tmp_path / "mixed-trace"
+    shutil.copytree(EVERGIVEN, folder)
+
+    def mixed(data):
+        data["hypothesis_evidence_links"].extend(
+            {"link_id": f"extra-{direction}", "hypothesis_id": "h_suez", "evidence_id": "anc-sca-dates", "polarity": direction}
+            for direction in directions)
+        if reverse:
+            data["hypothesis_evidence_links"].reverse()
+
+    _rewrite(folder, "trace.yaml", mixed)
+    _rewrite(folder, "logic.yaml", lambda data: data["edges"].append(
+        {"source": "E_dates", "target": "h_suez", "type": "qualifies", "weight": 0.6}))
+    tree = load_research(folder)
+    status = research_status(tree)
+    assert status["errors"] == []
+    expected = sorted({item["direction"] for row in status["evidence"] if row["anchor"] == "anc-sca-dates"
+                       for item in row["directions"] if item["route"] == "trace" and item["hypothesis"] == "h_suez"})
+    assert {"support", "limit"} <= set(expected)
+    picture = support_picture(tree, status, "h_suez")
+    arrows = {row["relation"]: row for row in picture["arrows"] if (row["from"], row["to"]) == ("E_dates", "h_suez")}
+    assert set(arrows) == {"supports", "qualifies"}
+    for relation, matching in (("supports", "support"), ("qualifies", "limit")):
+        row = arrows[relation]
+        assert row["trace_directions"] == {"anc-sca-dates": expected}
+        assert f"agrees: {matching}; differs: " in row["label"]
+        assert all(direction in row["label"] for direction in expected)
+        assert f'|"{row["label"]}"|' in render_picture_markdown(picture)
+
+
+def test_an_anchor_used_by_two_evidence_nodes_annotates_both(tmp_path):
+    folder = tmp_path / "shared-anchor"
+    shutil.copytree(EVERGIVEN, folder)
+
+    def shared(data):
+        data["nodes"]["E_dates_copy"] = copy.deepcopy(data["nodes"]["E_dates"])
+        data["edges"].append({"source": "E_dates_copy", "target": "h_suez", "type": "qualifies", "weight": 0.6})
+
+    _rewrite(folder, "logic.yaml", shared)
+    rows = [row for row in _picture(folder, "h_suez")["arrows"] if row["from"] in {"E_dates", "E_dates_copy"}]
+    assert len(rows) == 2
+    assert all(row["routes"] == ["logic", "trace"] for row in rows)
+    assert all(row["trace_directions"] == {"anc-sca-dates": ["support"]} for row in rows)
+
+
+def test_multiple_anchors_on_one_box_keep_their_own_directions(tmp_path):
+    folder = tmp_path / "two-anchors"
+    shutil.copytree(EVERGIVEN, folder)
+    _add_second_record(folder, {"anchor_id": "anc-second", "source_id": "src-sca-2021", "locator": "para 2",
+                               "text": "The canal reopened on 29 March 2021."})
+
+    def second(data):
+        record = copy.deepcopy(next(row for row in data["evidence"] if row["evidence_id"] == "anc-sca-dates"))
+        record["evidence_id"] = "anc-second"
+        data["evidence"].append(record)
+        data["hypothesis_evidence_links"].append(
+            {"link_id": "second-oppose", "hypothesis_id": "h_suez", "evidence_id": "anc-second", "polarity": "oppose"})
+
+    _rewrite(folder, "trace.yaml", second)
+    row = next(row for row in _picture(folder, "h_suez")["arrows"] if row["from"] == "E_dates")
+    assert row["routes"] == ["logic", "trace"]
+    assert row["trace_directions"] == {"anc-sca-dates": ["support"], "anc-second": ["oppose"]}
+    assert "anc-sca-dates: support" in row["label"] and "anc-second: oppose" in row["label"]
+
+
+def test_trace_only_parallel_directions_count_against_the_existing_arrow_limit(folder):
+    _rewrite(folder, "trace.yaml", lambda data: data["hypothesis_evidence_links"].extend(
+        {"link_id": f"extra-{direction}", "hypothesis_id": "h", "evidence_id": "a", "polarity": direction}
+        for direction in ("oppose", "limit")))
+    tree = load_research(folder)
+    status = research_status(tree)
+    picture = support_picture(tree, status, "h")
+    assert {row["relation"] for row in picture["arrows"]} == {"support", "oppose", "limit"}
+    assert all(row["style"] == "trace" and row["routes"] == ["trace"] for row in picture["arrows"])
+    bounded = support_picture(tree, status, "h", max_arrows=2)
+    assert bounded["arrows"] == []
+    assert any(item.startswith("E ") and "kept out to stay readable" in item for item in bounded["not_drawn"])
 
 
 def test_the_picture_follows_the_model_not_a_description(tmp_path):

@@ -64,14 +64,14 @@ def support_picture(tree: Any, status: dict[str, Any], claim_id: str, *,
     anchors = {row.anchor_id: row for row in source.anchors} if source is not None else {}
     # Keep every declared record, including one that has no source-model identity.
     records_of: dict[str, tuple[ProvenanceRecord, ...]] = {}
-    node_of_anchor: dict[str, str] = {}
+    nodes_of_anchor: dict[str, set[str]] = {}
     for node_id, node in sorted(nodes.items()):
         if node.type != "Evidence":
             continue
         records_of[node_id] = coerce_provenance(node.provenance)
         for record in records_of[node_id]:
             if record.locator and record.source_id:
-                node_of_anchor.setdefault(record.locator, node_id)
+                nodes_of_anchor.setdefault(record.locator, set()).add(node_id)
     library_sources = {row.source_id for row in tree.library.list_sources()} if tree.library is not None else set()
 
     def anchor_line(anchor_id: str, source_id: str) -> str:
@@ -108,10 +108,15 @@ def support_picture(tree: Any, status: dict[str, Any], claim_id: str, *,
             return f"no anchor named · library source {source_id}"
         return f"no anchor named · source {source_id} is not in the source model"
 
-    trace_direction = {row["anchor"]: item["direction"] for row in status["evidence"] for item in row.get("directions", ())
-                       if item["route"] == "trace" and item["hypothesis"] == claim_id}
-    disagreeing = {row["detail"] for row in status.get("disagreements", ())
-                   if row["hypothesis"] == claim_id and row["kind"] == "anchor"}
+    trace_directions: dict[str, set[str]] = {}
+    for row in status["evidence"]:
+        for item in row.get("directions", ()):
+            if item["route"] == "trace" and item["hypothesis"] == claim_id:
+                trace_directions.setdefault(row["anchor"], set()).add(item["direction"])
+    trace_of_box: dict[str, dict[str, list[str]]] = {}
+    for anchor, directions in sorted(trace_directions.items()):
+        for node_id in sorted(nodes_of_anchor.get(anchor, {f"anchor:{anchor}"})):
+            trace_of_box.setdefault(node_id, {})[anchor] = sorted(directions)
     result = results.get(claim_id)
     blockers = set(result.blockers) if result is not None else set()
 
@@ -120,7 +125,7 @@ def support_picture(tree: Any, status: dict[str, Any], claim_id: str, *,
 
     first = [edge.source for edge in sorted(incoming.get(claim_id, ()), key=rank)]
     first = list(dict.fromkeys(first))
-    traced = [node_of_anchor.get(anchor, f"anchor:{anchor}") for anchor in sorted(trace_direction)]
+    traced = list(trace_of_box)
     second = list(dict.fromkeys(edge.source for parent in first for edge in sorted(incoming.get(parent, ()), key=rank)))
     candidates = list(dict.fromkeys([*first, *traced, *second]))
     candidates = [item for item in candidates if item != claim_id]
@@ -134,18 +139,29 @@ def support_picture(tree: Any, status: dict[str, Any], claim_id: str, *,
                     rows.append({"from": edge.source, "to": target, "relation": edge.type,
                                  "routes": ["logic"], "style": "block" if blocking else "logic",
                                  "label": edge.type + (" · blocks" if blocking else "")})
-        for anchor, direction in sorted(trace_direction.items()):
-            box = node_of_anchor.get(anchor, f"anchor:{anchor}")
+        for box, anchors in trace_of_box.items():
             if box not in drawn:
                 continue
+            directions = sorted({direction for values in anchors.values() for direction in values})
             parallel = [row for row in rows if row["from"] == box and row["to"] == claim_id]
             for row in parallel:
                 row["routes"].append("trace")
-                row["label"] += (" · trace agrees" if DIRECTION.get(row["relation"]) == direction and anchor not in disagreeing
-                                 else f" · trace says {direction} (routes disagree)")
+                row["trace_directions"] = anchors
+                matching = [direction for direction in directions if DIRECTION.get(row["relation"]) == direction]
+                differing = [direction for direction in directions if direction not in matching]
+                if len(anchors) == 1 and len(directions) == 1:
+                    row["label"] += (" · trace agrees" if matching else f" · trace says {directions[0]} (routes disagree)")
+                else:
+                    detail = ", ".join(directions) if len(anchors) == 1 else "; ".join(
+                        f"{anchor}: {', '.join(values)}" for anchor, values in anchors.items())
+                    row["label"] += (f" · trace says {detail} (agrees: {', '.join(matching) or 'none'}; "
+                                     f"differs: {', '.join(differing) or 'none'})")
             if not parallel:
-                rows.append({"from": box, "to": claim_id, "relation": direction, "routes": ["trace"],
-                             "style": "trace", "label": f"trace: {direction}"})
+                for anchor, values in anchors.items():
+                    for direction in values:
+                        rows.append({"from": box, "to": claim_id, "relation": direction, "routes": ["trace"],
+                                     "trace_directions": {anchor: [direction]}, "style": "trace",
+                                     "label": f"trace: {direction}" if len(anchors) == 1 else f"trace {anchor}: {direction}"})
         return rows
 
     drawn = {claim_id}
