@@ -8,6 +8,7 @@ from pathlib import Path
 import pytest
 
 from researchguard.cli import main
+from researchguard.logic.schema import ATTACK_EDGE_TYPES, EDGE_TYPES, SCOPE_EDGE_TYPES, SUPPORT_EDGE_TYPES, UNDERCUT_EDGE_TYPES
 from researchguard.picture import MAX_ARROWS, MAX_BOXES, render_picture_markdown, support_picture
 from researchguard.research import load_research, research_status
 from research_tree_support import EVERGIVEN, _rewrite, folder  # noqa: F401 - shared question fixture
@@ -36,6 +37,34 @@ def test_root_claim_picture_shows_its_blockers_support_and_sources():
                                                     "style": "trace", "label": "trace: oppose"}
     assert len(picture["boxes"]) <= MAX_BOXES and len(picture["arrows"]) <= MAX_ARROWS
     assert "route states shown as text, not boxes: trace not live; experiment eliminated" in picture["not_drawn"]
+
+
+@pytest.mark.parametrize("relation", sorted(EDGE_TYPES))
+@pytest.mark.parametrize("trace_direction", ["support", "oppose", "limit"])
+def test_every_native_relation_kind_projects_the_same_direction_in_status_and_picture(folder, relation, trace_direction):
+    assert SUPPORT_EDGE_TYPES | ATTACK_EDGE_TYPES | UNDERCUT_EDGE_TYPES | SCOPE_EDGE_TYPES == EDGE_TYPES
+    expected = next(direction for kinds, direction in (
+        (SUPPORT_EDGE_TYPES, "support"), (ATTACK_EDGE_TYPES | UNDERCUT_EDGE_TYPES, "oppose"), (SCOPE_EDGE_TYPES, "limit"))
+                    if relation in kinds)
+    _rewrite(folder, "logic.yaml", lambda data: data.update(edges=[{"source": "E", "target": "h", "type": relation}]))
+    _rewrite(folder, "trace.yaml", lambda data: data.update(hypothesis_evidence_links=[
+        {"link_id": "one", "hypothesis_id": "h", "evidence_id": "a", "polarity": trace_direction}]))
+    tree = load_research(folder)
+    status = research_status(tree)
+    assert status["errors"] == []
+    evidence = next(row for row in status["evidence"] if row["anchor"] == "a")
+    assert {item["direction"] for item in evidence["directions"] if item["route"] == "logic"} == {expected}
+    native_trace = sorted({item["direction"] for item in evidence["directions"] if item["route"] == "trace"})
+    assert trace_direction in native_trace
+    row = next(row for row in support_picture(tree, status, "h")["arrows"] if row["relation"] == relation)
+    assert row["trace_directions"] == {"a": native_trace}
+    if len(native_trace) > 1:
+        assert f"agrees: {expected if expected in native_trace else 'none'}; " in row["label"]
+        assert f"differs: {', '.join(direction for direction in native_trace if direction != expected) or 'none'}" in row["label"]
+    elif expected == trace_direction:
+        assert row["label"].endswith(" · trace agrees")
+    else:
+        assert row["label"].endswith(f" · trace says {trace_direction} (routes disagree)")
 
 
 @pytest.mark.parametrize("reverse", [False, True])

@@ -20,6 +20,7 @@ from .experiment.engine import observe_experiments, recommend_experiments
 from .logic.evaluator import evaluate_model as evaluate_logic
 from .logic.loader import load_model as load_logic
 from .logic.provenance import coerce_provenance, content_hash_for, validate_evidence_provenance
+from .logic.schema import edge_direction
 from .logic.minimal_sets import license_model_claim
 from .logic.source_library import SourceLibrary
 from .logic.validator import source_model_provenance_problems
@@ -298,9 +299,6 @@ def check_research_tree(index: dict[str, Any], models: dict[str, Any], observati
     return {"errors": sorted(set(errors)), "warnings": sorted(set(warnings)), "info": info}
 
 
-LOGIC_DIRECTIONS = {"supports": "support", "attacks": "oppose", "contradicts": "oppose", "undercuts": "oppose", "qualifies": "limit"}
-
-
 def evidence_directions(models, hypothesis_ids=None):
     """Direct evidence directions per route: one row {anchor, route, hypothesis, direction, node}.
 
@@ -320,7 +318,7 @@ def evidence_directions(models, hypothesis_ids=None):
     if logic:
         for edge in logic.edges:
             node = logic.nodes.get(edge.source)
-            direction = LOGIC_DIRECTIONS.get(edge.type)
+            direction = edge_direction(edge.type)
             if node is None or node.type != "Evidence" or not direction or (hypothesis_ids is not None and edge.target not in hypothesis_ids):
                 continue
             rows.update((provenance.locator, "logic", edge.target, direction, node.id)

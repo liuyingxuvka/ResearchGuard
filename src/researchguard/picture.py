@@ -21,15 +21,13 @@ from typing import Any
 from .logic.evaluator import evaluate_model as evaluate_logic
 from .logic.minimal_sets import license_model_claim
 from .logic.provenance import ProvenanceRecord, coerce_provenance
+from .logic.schema import edge_direction
 from .source.update import source_identity
 
 # A person reads about this many boxes and arrows at once (FlowGuard design M8); the picture
 # groups toward it and lists what it leaves out, it never fails for size.
 MAX_BOXES = 12
 MAX_ARROWS = 20
-OPPOSING = {"attacks", "contradicts", "undercuts"}
-DIRECTION = {"supports": "support", "depends_on": "support", "attacks": "oppose", "contradicts": "oppose",
-             "undercuts": "oppose", "qualifies": "limit"}
 
 
 def _short(text: str, limit: int) -> str:
@@ -121,7 +119,7 @@ def support_picture(tree: Any, status: dict[str, Any], claim_id: str, *,
     blockers = set(result.blockers) if result is not None else set()
 
     def rank(edge):
-        return (0 if edge.source in blockers else 1 if edge.type in OPPOSING else 2, edge.source)
+        return (0 if edge.source in blockers else 1 if edge_direction(edge.type) == "oppose" else 2, edge.source)
 
     first = [edge.source for edge in sorted(incoming.get(claim_id, ()), key=rank)]
     first = list(dict.fromkeys(first))
@@ -147,7 +145,7 @@ def support_picture(tree: Any, status: dict[str, Any], claim_id: str, *,
             for row in parallel:
                 row["routes"].append("trace")
                 row["trace_directions"] = anchors
-                matching = [direction for direction in directions if DIRECTION.get(row["relation"]) == direction]
+                matching = [direction for direction in directions if edge_direction(row["relation"]) == direction]
                 differing = [direction for direction in directions if direction not in matching]
                 if len(anchors) == 1 and len(directions) == 1:
                     row["label"] += (" · trace agrees" if matching else f" · trace says {directions[0]} (routes disagree)")

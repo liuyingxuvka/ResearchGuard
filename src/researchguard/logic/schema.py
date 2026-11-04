@@ -63,3 +63,14 @@ ACCEPTANCE_KEYS = {
 }
 
 DIAGNOSTIC_SEVERITIES = {"info", "warning", "error", "critical"}
+
+
+def edge_direction(edge_type: str) -> str | None:
+    """The coarse evidence direction of a native relation group, without licensing a claim."""
+    if edge_type in SUPPORT_EDGE_TYPES:
+        return "support"
+    if edge_type in ATTACK_EDGE_TYPES | UNDERCUT_EDGE_TYPES:
+        return "oppose"
+    if edge_type in SCOPE_EDGE_TYPES:
+        return "limit"
+    return None
