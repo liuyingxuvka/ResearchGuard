@@ -279,13 +279,23 @@ def _ip_address(host: str) -> ipaddress.IPv4Address | ipaddress.IPv6Address | No
     return None
 
 
+def _hostname_labels(host: str) -> tuple[str, ...]:
+    """A dotted name's nonempty letter/digit/hyphen labels, or no labels for malformed syntax.
+
+    One final root dot is allowed; an empty label or a leading/trailing hyphen is not. This checks
+    only spelling, not whether the host or document exists or is public.
+    """
+    labels = tuple(host.casefold().removesuffix(".").split("."))
+    return labels if len(labels) >= 2 and all(
+        _HOST_LABEL.fullmatch(label) and not label.endswith("-") for label in labels) else ()
+
+
 def _public_host(host: str) -> bool:
     """Whether a host name could be a public one: labels of letters, digits and hyphens under a top-level
     domain of the root zone, and not a name kept for examples. An IP address is not a host name."""
-    name = host.casefold().rstrip(".")
-    labels = name.split(".")
-    return (len(labels) >= 2 and all(_HOST_LABEL.match(label) and not label.endswith("-") for label in labels)
-            and labels[-1] in TOP_LEVEL_DOMAINS and labels[-1] not in _NO_PUBLIC_HOST
+    labels = _hostname_labels(host)
+    name = ".".join(labels)
+    return (bool(labels) and labels[-1] in TOP_LEVEL_DOMAINS and labels[-1] not in _NO_PUBLIC_HOST
             and not any(name == example or name.endswith("." + example) for example in _EXAMPLE_HOSTS))
 
 
@@ -330,7 +340,7 @@ def _is_link(url: str) -> bool:
     if outside_locator(url)[0]:
         return True
     host, port = _url_host(url)
-    return _port_checks(port) and ("." in host.strip(".") or _ip_address(host) is not None)
+    return _port_checks(port) and (bool(_hostname_labels(host)) or _ip_address(host) is not None)
 
 
 def _is_date(text: str) -> bool:

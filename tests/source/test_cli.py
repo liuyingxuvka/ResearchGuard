@@ -238,6 +238,9 @@ def _known_source_model(tmp_path):
     (('--date', 'unknown'), 'new_source_identity_invalid'),
     (('--title', "Lloyd's List", '--url', 'lloyds list'), 'new_source_identity_invalid'),
     (('--title', "Lloyd's List", '--url', 'https://slack.com:abc/'), 'new_source_identity_invalid'),  # a port that is no number
+    (('--url', 'https://bad..com/x'), 'new_source_identity_invalid'),
+    (('--title', "Lloyd's List", '--url', 'https://-bad.com/x'), 'new_source_identity_invalid'),
+    (('--url', 'https://bad*.com/x'), 'new_source_identity_invalid'),
     (('--title', "Lloyd's List", '--date', '2021-13'), 'new_source_identity_invalid'),
     # Review round 2: a title of one more self-written word passed. A title must name a document:
     # one with no letter or digit, a placeholder, or only words for a person or a kind of message names none.

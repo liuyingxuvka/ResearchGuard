@@ -144,6 +144,13 @@ def test_why_a_link_is_not_an_outside_locator(url, reason):
     ('http://[::1]/x', True),              # a well-formed link, but no outside locator
     ('https://[2001:db8::1]/x', True),
     ('https://[zz]/x', False),
+    ('https://bad..com/x', False),
+    ('https://-bad.com/x', False),
+    ('https://bad-.com/x', False),
+    ('https://bad*.com/x', False),
+    ('https://.bad.com/x', False),
+    ('https://bad.com../x', False),
+    ('https://well-formed.example.org./x', True),
 ])
 def test_a_link_with_a_bad_port_is_malformed_and_an_ip_literal_is_not(url, well_formed):
     from researchguard.source.update import source_identity
