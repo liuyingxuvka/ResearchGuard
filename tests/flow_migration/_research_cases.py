@@ -1,21 +1,16 @@
 """Shared finite questions, unchanged rule predicates and live native fixtures."""
-
 from dataclasses import dataclass
-
 from pathlib import Path
-
 import sys
-
-from flowguard import InvariantResult
 
 @dataclass(frozen=True)
 class Hypothesis:
     """One hypothesis row: its state in each route and the anchors each route reads for it."""
     id: str
-    logic: str | None = None          # IN / OUT / UNDECIDED, None when the logic route does not list it
-    trace_live: bool | None = None    # None when the trace route does not list it
-    experiment: str | None = None     # consistent / eliminated / underdetermined / None
-    anchors: tuple[tuple[str, str, str], ...] = ()   # direct evidence: (anchor, route, support|oppose|limit)
+    logic: str | None = None
+    trace_live: bool | None = None
+    experiment: str | None = None
+    anchors: tuple[tuple[str, str, str], ...] = ()
 
 @dataclass(frozen=True)
 class Ablation:
@@ -23,9 +18,9 @@ class Ablation:
     id: str
     hypothesis: str
     logic_moved: bool = False
-    trace_check: bool = False          # TraceGuard's expected-sensitivity check (trace's own threshold; 0 for question rows)
-    declared_by_trace: bool = False    # the ablation and its expected sensitivity are declared in trace.yaml
-    projection_moved: bool | None = None   # a second measure (projection support difference); None = same as trace_check
+    trace_check: bool = False
+    declared_by_trace: bool = False
+    projection_moved: bool | None = None
 
     def second_measure(self):
         return self.trace_check if self.projection_moved is None else self.projection_moved
@@ -35,30 +30,30 @@ class Question:
     """The inputs status reads: hypothesis rows, references, copies, ablations and the root claim."""
     name: str
     hypotheses: tuple[Hypothesis, ...]
-    dangling: tuple[str, ...] = ()           # problem codes of references to missing anchors or sources
-    drifted: tuple[str, ...] = ()            # problem codes of copied fields that differ from their owner
-    library_anchors: tuple[str, ...] = ()    # anchors that resolve only through the source library
+    dangling: tuple[str, ...] = ()
+    drifted: tuple[str, ...] = ()
+    library_anchors: tuple[str, ...] = ()
     ablations: tuple[Ablation, ...] = ()
-    gap_hypotheses: tuple[tuple[str, tuple[str, ...]], ...] = ()   # (source gap id, hypothesis ids it names)
-    searches: tuple[tuple[str, str], ...] = ()   # (next search action id, the gap it targets)
-    candidate_verdict_changes: tuple[str, ...] = ()   # verdict keys whose value differs in a candidate folder
-    root_license: str = ''                   # native wording license of the root claim
+    gap_hypotheses: tuple[tuple[str, tuple[str, ...]], ...] = ()
+    searches: tuple[tuple[str, str], ...] = ()
+    candidate_verdict_changes: tuple[str, ...] = ()
+    root_license: str = ''
 
 @dataclass(frozen=True)
 class State:
     question: Question | None = None
     errors: tuple[str, ...] = ()
     warnings: tuple[str, ...] = ()
-    disagreements: tuple[tuple[str, str, str], ...] = ()   # (hypothesis, kind, detail)
-    ablations: tuple[tuple[str, tuple[str, ...]], ...] = ()  # (id, caught_by)
+    disagreements: tuple[tuple[str, str, str], ...] = ()
+    ablations: tuple[tuple[str, tuple[str, ...]], ...] = ()
     live_hypotheses: tuple[str, ...] = ()
     contested: bool = False
     license: str = ''
-    directions: tuple[tuple[str, str, str, str], ...] = ()   # evidence rows: (anchor, route, hypothesis, direction)
-    gap_rows: tuple[tuple[str, tuple[str, ...]], ...] = ()   # open source gaps with the hypotheses they name
-    next_rows: tuple[tuple[str, tuple[str, ...]], ...] = ()  # next searches with the hypotheses they would move
-    views: tuple[tuple[str, tuple[str, ...], tuple[str, ...], tuple[str, ...]], ...] = ()  # (hypothesis, gaps, next, ablations)
-    changes: tuple[tuple[str, str], ...] = ()   # candidate comparison rows: (kind, id)
+    directions: tuple[tuple[str, str, str, str], ...] = ()
+    gap_rows: tuple[tuple[str, tuple[str, ...]], ...] = ()
+    next_rows: tuple[tuple[str, tuple[str, ...]], ...] = ()
+    views: tuple[tuple[str, tuple[str, ...], tuple[str, ...], tuple[str, ...]], ...] = ()
+    changes: tuple[tuple[str, str], ...] = ()
 
 def excluded(row):
     return row.logic == 'OUT' or row.trace_live is False or row.experiment == 'eliminated'
@@ -67,7 +62,7 @@ def accepted(row):
     return row.logic == 'IN' or row.trace_live is True
 
 def unused(row):
-    return row.logic is None and row.trace_live is None and row.experiment is None
+    return row.logic is None and row.trace_live is None and (row.experiment is None)
 
 def route_conflicts(question):
     """Direct opposite anchor directions, and a hypothesis accepted by one route and excluded by another."""
@@ -86,11 +81,12 @@ def route_conflicts(question):
     return tuple(rows)
 
 def rule(check):
-    def invariant(state, trace):
+
+    def invariant(state):
         if state.question is None:
-            return InvariantResult.pass_()
+            return True
         problem = check(state, state.question)
-        return InvariantResult.fail(problem) if problem else InvariantResult.pass_()
+        return False if problem else True
     return invariant
 
 def unknown_gap_hypotheses(question):
@@ -98,7 +94,7 @@ def unknown_gap_hypotheses(question):
     return [f'unknown_hypothesis:source:{gap}:{name}' for gap, names in question.gap_hypotheses for name in names if name not in known]
 
 def consistent_tree(state, question):
-    if not question.dangling and not question.drifted and not unknown_gap_hypotheses(question) and state.errors:
+    if not question.dangling and (not question.drifted) and (not unknown_gap_hypotheses(question)) and state.errors:
         return f'consistent tree received errors {state.errors}'
 
 def dangling_reference(state, question):
@@ -107,7 +103,7 @@ def dangling_reference(state, question):
 
 def unused_hypothesis(state, question):
     for row in question.hypotheses:
-        if unused(row) and (f'hypothesis_unused:{row.id}' not in state.warnings or any(row.id in code for code in state.errors)):
+        if unused(row) and (f'hypothesis_unused:{row.id}' not in state.warnings or any((row.id in code for code in state.errors))):
             return f'unused hypothesis {row.id} must only warn'
 
 def gap_hypotheses(state, question):
@@ -137,15 +133,15 @@ def every_ablation(state, question):
 def trace_depth_agrees(state, question):
     rows = dict(state.ablations)
     for row in question.ablations:
-        if row.declared_by_trace and row.id in rows and ('trace' in rows[row.id]) != row.trace_check:
-            return f'ablation {row.id}: trace in caught_by is {"trace" in rows[row.id]} but trace depth says {row.trace_check}'
+        if row.declared_by_trace and row.id in rows and (('trace' in rows[row.id]) != row.trace_check):
+            return f"ablation {row.id}: trace in caught_by is {'trace' in rows[row.id]} but trace depth says {row.trace_check}"
 
 def verdict_routes(state, question):
     if state.license != question.root_license:
         return f'verdict license {state.license!r} differs from the native license {question.root_license!r}'
 
 def live_hypotheses(state, question):
-    want = tuple(row.id for row in question.hypotheses if not excluded(row))
+    want = tuple((row.id for row in question.hypotheses if not excluded(row)))
     if state.live_hypotheses != want:
         return f'live_hypotheses {state.live_hypotheses} != {want} (index order, no route excludes them)'
 
@@ -159,9 +155,7 @@ def directions_rule(state, question):
 
 def view_rule(state, question):
     for hypothesis, gaps, actions, ablations in state.views:
-        want = (tuple(gap for gap, named in state.gap_rows if hypothesis in named),
-                tuple(action for action, named in state.next_rows if hypothesis in named),
-                tuple(item.id for item in question.ablations if item.hypothesis == hypothesis))
+        want = (tuple((gap for gap, named in state.gap_rows if hypothesis in named)), tuple((action for action, named in state.next_rows if hypothesis in named)), tuple((item.id for item in question.ablations if item.hypothesis == hypothesis)))
         if (gaps, actions, ablations) != want:
             return f'view of {hypothesis} lists {(gaps, actions, ablations)}, the full status names it in {want}'
 
@@ -172,103 +166,52 @@ def candidate_rule(state, question):
 def contested_rule(state, question):
     if state.contested != bool(state.disagreements):
         return f'contested={state.contested} with {len(state.disagreements)} disagreement(s)'
-
 H = Hypothesis
-
-CASES = (
-    Question('consistent', (H('h', 'UNDECIDED', True, 'consistent', (('a', 'trace', 'support'), ('a', 'logic', 'support'))),), root_license='withhold'),
-    Question('reference_only', (H('h', 'UNDECIDED', None, None, (('a', 'logic', 'support'),)),), root_license='withhold'),
-    Question('trace', (H('h', None, True),), dangling=('dangling_anchor:trace:a',)),
-    Question('logic', (H('h', 'UNDECIDED', True),), dangling=('dangling_anchor:logic:E:missing (source s)',), root_license='withhold'),
-    Question('unused', (H('h', 'UNDECIDED', True), H('unused'))),
-    Question('gaps', (H('h', 'UNDECIDED', True), H('h_alt')), gap_hypotheses=(('g_alt', ('h_alt',)), ('g_bad', ('h_missing',)))),
-    Question('readback', (H('h_suez', 'UNDECIDED', False, None, (('anc-unctad-surge', 'trace', 'oppose'), ('anc-sca', 'logic', 'support'))),
-                          H('h_demand', 'UNDECIDED', True, None, (('anc-unctad-surge', 'trace', 'support'), ('anc-unctad-surge', 'logic', 'support'),
-                                                                  ('anc-limits', 'logic', 'limit'))),
-                          H('h_yantian')),
-             gap_hypotheses=(('gap-alt-yantian', ('h_yantian',)), ('gap-pre-trend', ('h_suez', 'h_demand'))),
-             searches=(('act-yantian', 'gap-alt-yantian'), ('act-pre-trend', 'gap-pre-trend')),
-             ablations=(Ablation('abl_no_unctad', 'h_demand', logic_moved=True),)),
-    Question('candidate', (H('h_suez', 'UNDECIDED', False),), root_license='withhold',
-             candidate_verdict_changes=('root_claim.reason', 'live_hypotheses')),
-    Question('drift', (H('h', 'UNDECIDED', True),), drifted=('copy_drift:trace:a:raw_text',)),
-    Question('library', (H('h', 'UNDECIDED'),), library_anchors=('n1',)),
-    Question('anchor_disagreement', (H('h', 'UNDECIDED', True, None, (('a', 'trace', 'support'), ('a', 'logic', 'oppose'))),)),
-    Question('status_disagreement', (H('h', 'IN', False, 'consistent'),), root_license='assert'),
-    Question('ablation', (H('h', 'UNDECIDED', True),), ablations=(Ablation('caught', 'h', logic_moved=True), Ablation('unused', 'h'))),
-    Question('trace_ablation', (H('h_demand', 'UNDECIDED', True), H('h_suez', 'UNDECIDED', False)), ablations=(
-        Ablation('abl_no_unctad', 'h_demand', logic_moved=True, trace_check=True, declared_by_trace=True, projection_moved=False),
-        Ablation('question_without_unctad', 'h_demand', logic_moved=True, trace_check=True, projection_moved=True))),
-    Question('exclusions', (H('h_out', 'OUT', True), H('h_dead', 'UNDECIDED', False), H('h_gone', 'UNDECIDED', True, 'eliminated'),
-                            H('h_live', 'UNDECIDED', True, 'consistent')), root_license='qualify'),
-)
+CASES = (Question('consistent', (H('h', 'UNDECIDED', True, 'consistent', (('a', 'trace', 'support'), ('a', 'logic', 'support'))),), root_license='withhold'), Question('reference_only', (H('h', 'UNDECIDED', None, None, (('a', 'logic', 'support'),)),), root_license='withhold'), Question('trace', (H('h', None, True),), dangling=('dangling_anchor:trace:a',)), Question('logic', (H('h', 'UNDECIDED', True),), dangling=('dangling_anchor:logic:E:missing (source s)',), root_license='withhold'), Question('unused', (H('h', 'UNDECIDED', True), H('unused'))), Question('gaps', (H('h', 'UNDECIDED', True), H('h_alt')), gap_hypotheses=(('g_alt', ('h_alt',)), ('g_bad', ('h_missing',)))), Question('readback', (H('h_suez', 'UNDECIDED', False, None, (('anc-unctad-surge', 'trace', 'oppose'), ('anc-sca', 'logic', 'support'))), H('h_demand', 'UNDECIDED', True, None, (('anc-unctad-surge', 'trace', 'support'), ('anc-unctad-surge', 'logic', 'support'), ('anc-limits', 'logic', 'limit'))), H('h_yantian')), gap_hypotheses=(('gap-alt-yantian', ('h_yantian',)), ('gap-pre-trend', ('h_suez', 'h_demand'))), searches=(('act-yantian', 'gap-alt-yantian'), ('act-pre-trend', 'gap-pre-trend')), ablations=(Ablation('abl_no_unctad', 'h_demand', logic_moved=True),)), Question('candidate', (H('h_suez', 'UNDECIDED', False),), root_license='withhold', candidate_verdict_changes=('root_claim.reason', 'live_hypotheses')), Question('drift', (H('h', 'UNDECIDED', True),), drifted=('copy_drift:trace:a:raw_text',)), Question('library', (H('h', 'UNDECIDED'),), library_anchors=('n1',)), Question('anchor_disagreement', (H('h', 'UNDECIDED', True, None, (('a', 'trace', 'support'), ('a', 'logic', 'oppose'))),)), Question('status_disagreement', (H('h', 'IN', False, 'consistent'),), root_license='assert'), Question('ablation', (H('h', 'UNDECIDED', True),), ablations=(Ablation('caught', 'h', logic_moved=True), Ablation('unused', 'h'))), Question('trace_ablation', (H('h_demand', 'UNDECIDED', True), H('h_suez', 'UNDECIDED', False)), ablations=(Ablation('abl_no_unctad', 'h_demand', logic_moved=True, trace_check=True, declared_by_trace=True, projection_moved=False), Ablation('question_without_unctad', 'h_demand', logic_moved=True, trace_check=True, projection_moved=True))), Question('exclusions', (H('h_out', 'OUT', True), H('h_dead', 'UNDECIDED', False), H('h_gone', 'UNDECIDED', True, 'eliminated'), H('h_live', 'UNDECIDED', True, 'consistent')), root_license='qualify'))
 
 def native_case(kind):
     from researchguard.source.schema import BeliefState
     from researchguard.trace.schema import TraceGuardModel
     from researchguard.logic.loader import load_model_from_dict
-    source = BeliefState.from_dict({'sources': [{'source_id': 's'}], 'anchors': [
-        {'anchor_id': 'a', 'source_id': 's', 'text': 'Observed text'}] if kind != 'trace' else []})
-    trace = TraceGuardModel.from_dict({'metadata': {'schema_version': 'researchguard.trace.model.v2'},
-        'sources': [{'source_id': 's', 'lineage_id': 's', 'independence_group': 's'}],
-        'evidence': [{'evidence_id': 'a', 'source_id': 's', 'raw_text': 'Observed text'}],
-        'storyline_hypotheses': [{'hypothesis_id': 'h', 'claim': 'Hypothesis'}]})
-    logic = load_model_from_dict({'model': {'id': 'm'}, 'nodes': {
-        'h': {'type': 'Claim', 'text': 'Hypothesis'}, 'E': {'type': 'Evidence', 'text': 'Observed text',
-            'provenance': [{'origin_kind': 'external_source', 'source_id': 's',
-                            'locator': 'missing' if kind == 'logic' else 'a', 'quote': 'Observed text'}]}}, 'edges': []})
+    source = BeliefState.from_dict({'sources': [{'source_id': 's'}], 'anchors': [{'anchor_id': 'a', 'source_id': 's', 'text': 'Observed text'}] if kind != 'trace' else []})
+    trace = TraceGuardModel.from_dict({'metadata': {'schema_version': 'researchguard.trace.model.v2'}, 'sources': [{'source_id': 's', 'lineage_id': 's', 'independence_group': 's'}], 'evidence': [{'evidence_id': 'a', 'source_id': 's', 'raw_text': 'Observed text'}], 'storyline_hypotheses': [{'hypothesis_id': 'h', 'claim': 'Hypothesis'}]})
+    logic = load_model_from_dict({'model': {'id': 'm'}, 'nodes': {'h': {'type': 'Claim', 'text': 'Hypothesis'}, 'E': {'type': 'Evidence', 'text': 'Observed text', 'provenance': [{'origin_kind': 'external_source', 'source_id': 's', 'locator': 'missing' if kind == 'logic' else 'a', 'quote': 'Observed text'}]}}, 'edges': []})
     if kind == 'reference_only':
         raw = logic.to_dict()
-        raw['nodes']['E_reference'] = {'type': 'Evidence', 'text': 'A reference-only supporting sentence',
-            'provenance': [{'origin_kind': 'external_source', 'source_reference': 'Named publication',
-                            'quote': 'A reference-only supporting sentence'}]}
-        raw['edges'] = [{'source': 'E', 'target': 'h', 'type': 'supports'},
-                        {'source': 'E_reference', 'target': 'h', 'type': 'supports'}]
+        raw['nodes']['E_reference'] = {'type': 'Evidence', 'text': 'A reference-only supporting sentence', 'provenance': [{'origin_kind': 'external_source', 'source_reference': 'Named publication', 'quote': 'A reference-only supporting sentence'}]}
+        raw['edges'] = [{'source': 'E', 'target': 'h', 'type': 'supports'}, {'source': 'E_reference', 'target': 'h', 'type': 'supports'}]
         logic = load_model_from_dict(raw)
-    # The trace fault concerns only trace references, so omit the independent logic route.
     models = {'source': source, 'trace': trace}
     if kind in ('logic', 'reference_only'):
         models['logic'] = logic
     index = {'hypotheses': [{'id': 'h', 'text': 'Hypothesis'}], 'root_claim': 'h', 'models': {'source': 'source.yaml'}}
     if kind == 'unused':
         index['hypotheses'].append({'id': 'unused', 'text': 'Unused'})
-    return index, models
+    return (index, models)
 
 def project(status, root_license, trace_depth=None, views=None):
     """Abstract state of a real research_status result, so the same rules run on the real outputs."""
     rows = []
     for row in status['hypotheses']:
-        logic, trace, experiment = row.get('logic') or {}, row.get('trace') or {}, row.get('experiment') or {}
-        rows.append(Hypothesis(row['id'], logic.get('state'), trace.get('live'),
-                               experiment.get('status') if experiment.get('status') not in (None, 'not_listed') else None))
+        logic, trace, experiment = (row.get('logic') or {}, row.get('trace') or {}, row.get('experiment') or {})
+        rows.append(Hypothesis(row['id'], logic.get('state'), trace.get('live'), experiment.get('status') if experiment.get('status') not in (None, 'not_listed') else None))
     trace_depth = trace_depth or {}
-    ablations = tuple(Ablation(row['id'], row['hypothesis'], 'logic' in row['caught_by'],
-                               trace_depth.get(row['id'], 'trace' in row['caught_by']), row['id'] in trace_depth)
-                      for row in status['ablations'])
+    ablations = tuple((Ablation(row['id'], row['hypothesis'], 'logic' in row['caught_by'], trace_depth.get(row['id'], 'trace' in row['caught_by']), row['id'] in trace_depth) for row in status['ablations']))
     question = Question('native', tuple(rows), ablations=ablations, root_license=root_license)
     verdict = status['verdict']
-    directions = tuple(sorted((row['anchor'], item['route'], item['hypothesis'], item['direction'])
-                              for row in status['evidence'] for item in row.get('directions', ())))
-    gap_rows = tuple((row['id'], tuple(row.get('hypotheses', ()))) for row in status['open_gaps'] if row['route'] == 'source')
-    next_rows = tuple((row['id'], tuple(row.get('hypotheses', ()))) for row in status['next'] if row['route'] == 'search')
-    return State(question, tuple(status['errors']), tuple(status['warnings']),
-                 tuple((row['hypothesis'], row['kind'], row['detail'] if row['kind'] == 'anchor' else '') for row in status['disagreements']),
-                 tuple((row['id'], tuple(row['caught_by'])) for row in status['ablations']),
-                 tuple(verdict['live_hypotheses']), verdict['contested'],
-                 (verdict['root_claim'] or {}).get('wording_license', ''), directions, gap_rows, next_rows, tuple(views or ()))
+    directions = tuple(sorted(((row['anchor'], item['route'], item['hypothesis'], item['direction']) for row in status['evidence'] for item in row.get('directions', ()))))
+    gap_rows = tuple(((row['id'], tuple(row.get('hypotheses', ()))) for row in status['open_gaps'] if row['route'] == 'source'))
+    next_rows = tuple(((row['id'], tuple(row.get('hypotheses', ()))) for row in status['next'] if row['route'] == 'search'))
+    return State(question, tuple(status['errors']), tuple(status['warnings']), tuple(((row['hypothesis'], row['kind'], row['detail'] if row['kind'] == 'anchor' else '') for row in status['disagreements'])), tuple(((row['id'], tuple(row['caught_by'])) for row in status['ablations'])), tuple(verdict['live_hypotheses']), verdict['contested'], (verdict['root_claim'] or {}).get('wording_license', ''), directions, gap_rows, next_rows, tuple(views or ()))
 
 def trace_depth_answers(trace):
     """TraceGuard's own depth verdict for each trace-declared ablation's expected sensitivity."""
     from researchguard.trace.evaluator import evaluate_model
     depth = evaluate_model(trace, include_storyline_depth=True).storyline_depth
     mismatched = set(depth.sensitivity_mismatch_ids)
-    return {row.perturbation_id: row.sensitivity_id not in mismatched for row in trace.expected_sensitivities
-            if row.target_kind == 'hypothesis' and row.expected_direction == 'decrease'}
-
-REPO_ROOT = next(parent for parent in Path(__file__).resolve().parents
-                 if (parent / 'pyproject.toml').is_file() and (parent / 'examples/research/evergiven').is_dir())
+    return {row.perturbation_id: row.sensitivity_id not in mismatched for row in trace.expected_sensitivities if row.target_kind == 'hypothesis' and row.expected_direction == 'decrease'}
+REPO_ROOT = next((parent for parent in Path(__file__).resolve().parents if (parent / 'pyproject.toml').is_file() and (parent / 'examples/research/evergiven').is_dir()))
 EVERGIVEN = REPO_ROOT / 'examples/research/evergiven'
-
 
 def native_crossref():
     from dataclasses import replace
@@ -423,13 +366,11 @@ def native_sync():
 
     def bytes_in(folder):
         return {str(path.relative_to(folder)): path.read_bytes() for path in folder.rglob('*') if path.is_file()}
-
     with TemporaryDirectory() as directory:
         root = Path(directory)
         baseline = root / 'baseline'
         shutil.copytree(EVERGIVEN, baseline)
-        # Establish the precondition with the old, existing native member APIs.
-        trace_path, logic_path = baseline / 'trace.yaml', baseline / 'logic.yaml'
+        trace_path, logic_path = (baseline / 'trace.yaml', baseline / 'logic.yaml')
         trace, _, _, conflicts = sync_traceguard_seed(load_source(baseline / 'source.yaml'), yaml.safe_load(trace_path.read_text()))
         assert not conflicts, conflicts
         trace_path.write_text(yaml.safe_dump(trace, sort_keys=False, allow_unicode=True))
@@ -445,16 +386,13 @@ def native_sync():
             shutil.copytree(baseline, folder)
             if label == 'added_anchor':
                 with contextlib.redirect_stdout(io.StringIO()):
-                    added = main(['source', 'add-anchor', str(folder / 'source.yaml'), '--source-id', 'src-lloyds',
-                                  '--anchor-id', 'anc-lloyds', '--quote', 'The Suez blockage alone doubled Asia-Europe spot rates in April 2021.',
-                                  '--locator', "Lloyd's List, April 2021", '--title', "Lloyd's List", '--date', '2021-04',
-                                  '--output', str(folder / 'source.yaml')])
+                    added = main(['source', 'add-anchor', str(folder / 'source.yaml'), '--source-id', 'src-lloyds', '--anchor-id', 'anc-lloyds', '--quote', 'The Suez blockage alone doubled Asia-Europe spot rates in April 2021.', '--locator', "Lloyd's List, April 2021", '--title', "Lloyd's List", '--date', '2021-04', '--output', str(folder / 'source.yaml')])
                 assert added == 0, added
             if label == 'conflict':
                 trace_path = folder / 'trace.yaml'
                 trace = yaml.safe_load(trace_path.read_text())
                 evidence = trace['evidence'][0]
-                evidence['source_id'] = next(row['source_id'] for row in trace['sources'] if row['source_id'] != evidence['source_id'])
+                evidence['source_id'] = next((row['source_id'] for row in trace['sources'] if row['source_id'] != evidence['source_id']))
                 trace_path.write_text(yaml.safe_dump(trace, sort_keys=False))
             before = bytes_in(folder)
             current = research_status(load_research(folder)) if label == 'conflict' else baseline_status
@@ -462,18 +400,10 @@ def native_sync():
             with contextlib.redirect_stdout(output):
                 result = main(['sync', str(folder)])
             after = bytes_in(folder)
-            preserved = before == after if label != 'added_anchor' else (
-                set(before) == set(after) and all(after[name] == value for name, value in before.items()
-                                                if name not in ('trace.yaml', 'logic.yaml')))
+            preserved = before == after if label != 'added_anchor' else set(before) == set(after) and all((after[name] == value for name, value in before.items() if name not in ('trace.yaml', 'logic.yaml')))
             changes = compare_research_status(current, research_status(load_research(folder)))['changes']
-            results[label] = {'exit': result, 'output': output.getvalue().strip(), 'preserved': preserved,
-                              'new_anchor': 'anc-lloyds' if label == 'added_anchor' else '',
-                              'new_source': 'src-lloyds' if label == 'added_anchor' else '',
-                              # The added Lloyd's List source has a title and a date but no link.
-                              'unverifiable': label == 'added_anchor',
-                              'conflict': label == 'conflict', 'changes': changes}
+            results[label] = {'exit': result, 'output': output.getvalue().strip(), 'preserved': preserved, 'new_anchor': 'anc-lloyds' if label == 'added_anchor' else '', 'new_source': 'src-lloyds' if label == 'added_anchor' else '', 'unverifiable': label == 'added_anchor', 'conflict': label == 'conflict', 'changes': changes}
             if result == 2:
-                # Preserve the real missing-command evidence; do not simulate success.
                 break
         return results
 
@@ -481,7 +411,6 @@ def native_unanchored():
     """Check actual anchored, reference-only and source-absent boundary cases."""
     from researchguard.research import check_research_tree
     from researchguard.logic.loader import load_model_from_dict
-
     index, models = native_case('reference_only')
     with_source = check_research_tree(index, models)
     without_index = dict(index, models={})
@@ -498,7 +427,6 @@ def native_summary_numbers():
     from tempfile import TemporaryDirectory
     import yaml
     from researchguard.research import load_research, research_status
-
     baseline = research_status(load_research(EVERGIVEN))
     with TemporaryDirectory() as directory:
         folder = Path(directory) / 'C2'
@@ -509,8 +437,6 @@ def native_summary_numbers():
         assert changed != before, 'the fixed C2 edit must reach E_series'
         logic_path.write_text(changed)
         c2 = research_status(load_research(folder))
-        # A source-free question cannot retain source-owned ablations. Keep the
-        # same actual logic and quotes, with only that route listed in the index.
         index_path = folder / 'research.yaml'
         index = yaml.safe_load(index_path.read_text())
         index['models'] = {'logic': 'logic.yaml'}

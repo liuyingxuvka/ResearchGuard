@@ -167,13 +167,9 @@ def test_counter_source_that_answers_a_counter_gap_opens_no_new_gap() -> None:
 
 
 def test_stop_decision_model_replays_native_owner_and_kills_each_bad_variant() -> None:
-    import importlib.util
-    path = ROOT / ".flowguard/models/sourceguard_stop_decision_model.py"
-    spec = importlib.util.spec_from_file_location("stop_decision_model", path)
-    module = importlib.util.module_from_spec(spec)
-    sys.modules[spec.name] = module
-    spec.loader.exec_module(module)
-    assert module.conformance().ok
-    for name, explorer in module.broken_variants().items():
-        report = explorer.explore()
-        assert not report.ok, name
+    from tests.flow_migration import sourceguard_stop_decision as contract
+    from tests.flow_migration.contract_cases import bad_states, mutations
+    contract.assert_native_contract()
+    for name, rule in mutations('sourceguard_stop_decision').items():
+        predicate = contract.RULES[contract.RULE_NAMES.index(rule)]
+        assert any(not predicate(state) for state in bad_states('sourceguard_stop_decision', name)), name

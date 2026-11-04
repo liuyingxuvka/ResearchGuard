@@ -1,0 +1,1192 @@
+{
+  "schema": "researchguard.flow-migration.v1",
+  "previous_release": "e55ed68ee0a60aea669ee068a20e2c1b0bee3e6a",
+  "models": [
+    {
+      "previous_file": "experiment_elimination_model.py",
+      "topic": "experiment_elimination",
+      "rules": [
+        {
+          "id": "contradicted_prediction_eliminates",
+          "predicate": "tests/flow_migration/experiment_elimination.py:RULES[0]",
+          "unit": "tests/flow_migration/test_contracts.py::test_independent_rule[experiment_elimination:contradicted_prediction_eliminates]",
+          "production_tests": [
+            "tests/experiment/test_experiment_elimination.py:test_real_observation_closes_only_with_independent_holdout",
+            "tests/experiment/test_experiment_elimination.py:test_eliminated_hypothesis_stays_eliminated_on_a_matrix_miss"
+          ]
+        },
+        {
+          "id": "unexpected_outcome_is_model_miss",
+          "predicate": "tests/flow_migration/experiment_elimination.py:RULES[1]",
+          "unit": "tests/flow_migration/test_contracts.py::test_independent_rule[experiment_elimination:unexpected_outcome_is_model_miss]",
+          "production_tests": [
+            "tests/experiment/test_experiment_elimination.py:test_zero_survivors_is_model_miss_and_never_closes"
+          ]
+        },
+        {
+          "id": "holdout_observation_never_eliminates",
+          "predicate": "tests/flow_migration/experiment_elimination.py:RULES[2]",
+          "unit": "tests/flow_migration/test_contracts.py::test_independent_rule[experiment_elimination:holdout_observation_never_eliminates]",
+          "production_tests": [
+            "tests/experiment/test_experiment_elimination.py:test_every_valid_holdout_counterexample_blocks_closure"
+          ]
+        },
+        {
+          "id": "recommendation_separates_every_separable_pair",
+          "predicate": "tests/flow_migration/experiment_elimination.py:RULES[3]",
+          "unit": "tests/flow_migration/test_contracts.py::test_independent_rule[experiment_elimination:recommendation_separates_every_separable_pair]",
+          "production_tests": [
+            "tests/experiment/test_experiment_elimination.py:test_recommends_all_tied_minimum_sets_deterministically",
+            "tests/experiment/test_experiment_elimination.py:test_reports_indistinguishable_hypothesis_pairs"
+          ]
+        }
+      ],
+      "bad_variants": [
+        {
+          "id": "contradiction_ignored",
+          "rule": "contradicted_prediction_eliminates",
+          "unit": "tests/flow_migration/test_contracts.py::test_rejects_original_bad_facts[experiment_elimination:contradiction_ignored]",
+          "boundary": "original independent bad observation, not a mutation of shipping production code"
+        },
+        {
+          "id": "model_miss_reported_consistent",
+          "rule": "unexpected_outcome_is_model_miss",
+          "unit": "tests/flow_migration/test_contracts.py::test_rejects_original_bad_facts[experiment_elimination:model_miss_reported_consistent]",
+          "boundary": "original independent bad observation, not a mutation of shipping production code"
+        },
+        {
+          "id": "holdout_eliminates",
+          "rule": "holdout_observation_never_eliminates",
+          "unit": "tests/flow_migration/test_contracts.py::test_rejects_original_bad_facts[experiment_elimination:holdout_eliminates]",
+          "boundary": "original independent bad observation, not a mutation of shipping production code"
+        },
+        {
+          "id": "recommendation_leaves_separable_pair",
+          "rule": "recommendation_separates_every_separable_pair",
+          "unit": "tests/flow_migration/test_contracts.py::test_rejects_original_bad_facts[experiment_elimination:recommendation_leaves_separable_pair]",
+          "boundary": "original independent bad observation, not a mutation of shipping production code"
+        }
+      ],
+      "bindings": [
+        {
+          "owner": "src/researchguard/experiment/engine.py:observe_experiments",
+          "native_unit": "tests/flow_migration/test_contracts.py::test_native_contract[experiment_elimination]"
+        },
+        {
+          "owner": "src/researchguard/experiment/engine.py:recommend_experiments",
+          "native_unit": "tests/flow_migration/test_contracts.py::test_native_contract[experiment_elimination]"
+        }
+      ]
+    },
+    {
+      "previous_file": "iteration_kernel_model.py",
+      "topic": "iteration_kernel",
+      "rules": [
+        {
+          "id": "stale_prediction_is_refused",
+          "predicate": "tests/flow_migration/iteration_kernel.py:RULES[0]",
+          "unit": "tests/flow_migration/test_contracts.py::test_independent_rule[iteration_kernel:stale_prediction_is_refused]",
+          "production_tests": [
+            "tests/test_iteration.py:test_prediction_identity_is_content_bound"
+          ]
+        },
+        {
+          "id": "candidate_never_overwrites_current",
+          "predicate": "tests/flow_migration/iteration_kernel.py:RULES[1]",
+          "unit": "tests/flow_migration/test_contracts.py::test_independent_rule[iteration_kernel:candidate_never_overwrites_current]",
+          "production_tests": [
+            "tests/test_iteration.py:test_candidate_never_overwrites_current"
+          ]
+        },
+        {
+          "id": "no_progress_is_stalled",
+          "predicate": "tests/flow_migration/iteration_kernel.py:RULES[2]",
+          "unit": "tests/flow_migration/test_contracts.py::test_independent_rule[iteration_kernel:no_progress_is_stalled]",
+          "production_tests": [
+            "tests/test_iteration.py:test_no_progress_is_stalled"
+          ]
+        },
+        {
+          "id": "limit_stops_iteration",
+          "predicate": "tests/flow_migration/iteration_kernel.py:RULES[3]",
+          "unit": "tests/flow_migration/test_contracts.py::test_independent_rule[iteration_kernel:limit_stops_iteration]",
+          "production_tests": [
+            "tests/test_iteration.py:test_limit_stops_iteration"
+          ]
+        }
+      ],
+      "bad_variants": [
+        {
+          "id": "ignore_stale",
+          "rule": "stale_prediction_is_refused",
+          "unit": "tests/flow_migration/test_contracts.py::test_rejects_original_bad_facts[iteration_kernel:ignore_stale]",
+          "boundary": "original independent bad observation, not a mutation of shipping production code"
+        },
+        {
+          "id": "ignore_same_path",
+          "rule": "candidate_never_overwrites_current",
+          "unit": "tests/flow_migration/test_contracts.py::test_rejects_original_bad_facts[iteration_kernel:ignore_same_path]",
+          "boundary": "original independent bad observation, not a mutation of shipping production code"
+        },
+        {
+          "id": "ignore_same_content",
+          "rule": "candidate_never_overwrites_current",
+          "unit": "tests/flow_migration/test_contracts.py::test_rejects_original_bad_facts[iteration_kernel:ignore_same_content]",
+          "boundary": "original independent bad observation, not a mutation of shipping production code"
+        },
+        {
+          "id": "ignore_stalled",
+          "rule": "no_progress_is_stalled",
+          "unit": "tests/flow_migration/test_contracts.py::test_rejects_original_bad_facts[iteration_kernel:ignore_stalled]",
+          "boundary": "original independent bad observation, not a mutation of shipping production code"
+        },
+        {
+          "id": "ignore_limit",
+          "rule": "limit_stops_iteration",
+          "unit": "tests/flow_migration/test_contracts.py::test_rejects_original_bad_facts[iteration_kernel:ignore_limit]",
+          "boundary": "original independent bad observation, not a mutation of shipping production code"
+        }
+      ],
+      "bindings": [
+        {
+          "owner": "src/researchguard/iteration.py:require_prediction_identity",
+          "native_unit": "tests/flow_migration/test_contracts.py::test_native_contract[iteration_kernel]"
+        },
+        {
+          "owner": "src/researchguard/iteration.py:validate_candidate",
+          "native_unit": "tests/flow_migration/test_contracts.py::test_native_contract[iteration_kernel]"
+        },
+        {
+          "owner": "src/researchguard/iteration.py:select_terminal",
+          "native_unit": "tests/flow_migration/test_contracts.py::test_native_contract[iteration_kernel]"
+        }
+      ]
+    },
+    {
+      "previous_file": "research_ablations_model.py",
+      "topic": "research_ablations",
+      "rules": [
+        {
+          "id": "every_ablation_is_caught_or_named",
+          "predicate": "tests/flow_migration/research_ablations.py:RULES[0]",
+          "unit": "tests/flow_migration/test_contracts.py::test_independent_rule[research_ablations:every_ablation_is_caught_or_named]",
+          "production_tests": [
+            "tests/test_research_ablations.py:test_ablation_nobody_uses_is_named"
+          ]
+        },
+        {
+          "id": "ablation_agrees_with_trace_depth",
+          "predicate": "tests/flow_migration/research_ablations.py:RULES[1]",
+          "unit": "tests/flow_migration/test_contracts.py::test_independent_rule[research_ablations:ablation_agrees_with_trace_depth]",
+          "production_tests": [
+            "tests/test_research_ablations.py:test_trace_ablation_agrees_with_trace_depth",
+            "tests/test_research_ablations.py:test_ablation_rows_name_side_effects"
+          ]
+        }
+      ],
+      "bad_variants": [
+        {
+          "id": "drop_uncaught_ablations",
+          "rule": "every_ablation_is_caught_or_named",
+          "unit": "tests/flow_migration/test_contracts.py::test_rejects_original_bad_facts[research_ablations:drop_uncaught_ablations]",
+          "boundary": "original independent bad observation, not a mutation of shipping production code"
+        },
+        {
+          "id": "ablation_uses_a_second_sensitivity",
+          "rule": "ablation_agrees_with_trace_depth",
+          "unit": "tests/flow_migration/test_contracts.py::test_rejects_original_bad_facts[research_ablations:ablation_uses_a_second_sensitivity]",
+          "boundary": "original independent bad observation, not a mutation of shipping production code"
+        }
+      ],
+      "bindings": [
+        {
+          "owner": "src/researchguard/research.py:apply_ablations",
+          "native_unit": "tests/flow_migration/test_contracts.py::test_native_contract[research_ablations]"
+        }
+      ]
+    },
+    {
+      "previous_file": "research_tree_model.py",
+      "topic": "research_tree",
+      "rules": [
+        {
+          "id": "status_names_its_inputs",
+          "predicate": "tests/flow_migration/research_tree.py:RULES[0]",
+          "unit": "tests/flow_migration/test_contracts.py::test_independent_rule[research_tree:status_names_its_inputs]",
+          "production_tests": [
+            "tests/test_research_tree_crossref.py:test_status_reports_input_digests"
+          ]
+        },
+        {
+          "id": "consistent_tree_has_no_error",
+          "predicate": "tests/flow_migration/research_tree.py:RULES[1]",
+          "unit": "tests/flow_migration/test_contracts.py::test_independent_rule[research_tree:consistent_tree_has_no_error]",
+          "production_tests": [
+            "tests/test_research_tree_crossref.py:test_consistent_tree_has_no_errors",
+            "tests/test_research_tree_crossref.py:test_checker_is_in_memory_and_source_is_optional",
+            "tests/test_research_tree_crossref.py:test_shipped_evergiven_tree_has_consistent_shared_ids",
+            "tests/test_research_tree_crossref.py:test_candidate_view_lists_only_changes"
+          ]
+        },
+        {
+          "id": "dangling_reference_is_an_error",
+          "predicate": "tests/flow_migration/research_tree.py:RULES[2]",
+          "unit": "tests/flow_migration/test_contracts.py::test_independent_rule[research_tree:dangling_reference_is_an_error]",
+          "production_tests": [
+            "tests/test_research_tree_crossref.py:test_dangling_references_and_invalid_native_models_are_errors",
+            "tests/test_research_tree_crossref.py:test_missing_index_exits_2",
+            "tests/test_research_tree_crossref.py:test_missing_index_names_the_template"
+          ]
+        },
+        {
+          "id": "unused_hypothesis_is_only_a_warning",
+          "predicate": "tests/flow_migration/research_tree.py:RULES[3]",
+          "unit": "tests/flow_migration/test_contracts.py::test_independent_rule[research_tree:unused_hypothesis_is_only_a_warning]",
+          "production_tests": [
+            "tests/test_research_tree_crossref.py:test_unused_hypothesis_is_only_a_warning"
+          ]
+        },
+        {
+          "id": "gap_names_known_hypotheses",
+          "predicate": "tests/flow_migration/research_tree.py:RULES[4]",
+          "unit": "tests/flow_migration/test_contracts.py::test_independent_rule[research_tree:gap_names_known_hypotheses]",
+          "production_tests": [
+            "tests/test_research_tree_crossref.py:test_gap_hypotheses_are_checked_and_grouped"
+          ]
+        },
+        {
+          "id": "copied_content_matches_owner",
+          "predicate": "tests/flow_migration/research_tree.py:RULES[5]",
+          "unit": "tests/flow_migration/test_contracts.py::test_independent_rule[research_tree:copied_content_matches_owner]",
+          "production_tests": [
+            "tests/test_research_tree_crossref.py:test_copy_drift_is_an_error_for_each_copied_field",
+            "tests/test_research_tree_crossref.py:test_one_observation_reaches_trace_and_logic_by_sync"
+          ]
+        },
+        {
+          "id": "library_anchors_are_resolved",
+          "predicate": "tests/flow_migration/research_tree.py:RULES[6]",
+          "unit": "tests/flow_migration/test_contracts.py::test_independent_rule[research_tree:library_anchors_are_resolved]",
+          "production_tests": [
+            "tests/test_research_tree_crossref.py:test_library_anchored_evidence_gets_one_answer"
+          ]
+        },
+        {
+          "id": "unanchored_evidence_is_an_error",
+          "predicate": "tests/flow_migration/research_tree.py:RULES[7]",
+          "unit": "tests/flow_migration/test_contracts.py::test_independent_rule[research_tree:unanchored_evidence_is_an_error]",
+          "production_tests": [
+            "tests/test_research_tree_crossref.py:test_unanchored_logic_evidence_is_an_error_with_a_source_model",
+            "tests/test_research_tree_crossref.py:test_unanchored_logic_evidence_is_listed_without_a_source_model"
+          ]
+        }
+      ],
+      "bad_variants": [
+        {
+          "id": "digest_omits_a_model",
+          "rule": "status_names_its_inputs",
+          "unit": "tests/flow_migration/test_contracts.py::test_rejects_original_bad_facts[research_tree:digest_omits_a_model]",
+          "boundary": "original independent bad observation, not a mutation of shipping production code"
+        },
+        {
+          "id": "ignore_trace",
+          "rule": "dangling_reference_is_an_error",
+          "unit": "tests/flow_migration/test_contracts.py::test_rejects_original_bad_facts[research_tree:ignore_trace]",
+          "boundary": "original independent bad observation, not a mutation of shipping production code"
+        },
+        {
+          "id": "ignore_logic",
+          "rule": "dangling_reference_is_an_error",
+          "unit": "tests/flow_migration/test_contracts.py::test_rejects_original_bad_facts[research_tree:ignore_logic]",
+          "boundary": "original independent bad observation, not a mutation of shipping production code"
+        },
+        {
+          "id": "consistent_as_error",
+          "rule": "consistent_tree_has_no_error",
+          "unit": "tests/flow_migration/test_contracts.py::test_rejects_original_bad_facts[research_tree:consistent_as_error]",
+          "boundary": "original independent bad observation, not a mutation of shipping production code"
+        },
+        {
+          "id": "warning_as_error",
+          "rule": "unused_hypothesis_is_only_a_warning",
+          "unit": "tests/flow_migration/test_contracts.py::test_rejects_original_bad_facts[research_tree:warning_as_error]",
+          "boundary": "original independent bad observation, not a mutation of shipping production code"
+        },
+        {
+          "id": "ignore_copy_drift",
+          "rule": "copied_content_matches_owner",
+          "unit": "tests/flow_migration/test_contracts.py::test_rejects_original_bad_facts[research_tree:ignore_copy_drift]",
+          "boundary": "original independent bad observation, not a mutation of shipping production code"
+        },
+        {
+          "id": "dangling_gap_hypothesis_accepted",
+          "rule": "gap_names_known_hypotheses",
+          "unit": "tests/flow_migration/test_contracts.py::test_rejects_original_bad_facts[research_tree:dangling_gap_hypothesis_accepted]",
+          "boundary": "original independent bad observation, not a mutation of shipping production code"
+        },
+        {
+          "id": "status_ignores_library",
+          "rule": "library_anchors_are_resolved",
+          "unit": "tests/flow_migration/test_contracts.py::test_rejects_original_bad_facts[research_tree:status_ignores_library]",
+          "boundary": "original independent bad observation, not a mutation of shipping production code"
+        },
+        {
+          "id": "unanchored_evidence_passes",
+          "rule": "unanchored_evidence_is_an_error",
+          "unit": "tests/flow_migration/test_contracts.py::test_rejects_original_bad_facts[research_tree:unanchored_evidence_passes]",
+          "boundary": "original independent bad observation, not a mutation of shipping production code"
+        }
+      ],
+      "bindings": [
+        {
+          "owner": "src/researchguard/research.py:_ResearchLibrary.list_sources",
+          "native_unit": "tests/flow_migration/test_contracts.py::test_native_contract[research_tree]"
+        },
+        {
+          "owner": "src/researchguard/research.py:_ResearchLibrary.source_node_ids",
+          "native_unit": "tests/flow_migration/test_contracts.py::test_native_contract[research_tree]"
+        },
+        {
+          "owner": "src/researchguard/research.py:load_research",
+          "native_unit": "tests/flow_migration/test_contracts.py::test_native_contract[research_tree]"
+        },
+        {
+          "owner": "src/researchguard/research.py:check_research_tree",
+          "native_unit": "tests/flow_migration/test_contracts.py::test_native_contract[research_tree]"
+        },
+        {
+          "owner": "src/researchguard/research.py:status_main",
+          "native_unit": "tests/flow_migration/test_contracts.py::test_native_contract[research_tree]"
+        },
+        {
+          "owner": "src/researchguard/ownership.py:copied_content_problems",
+          "native_unit": "tests/flow_migration/test_contracts.py::test_native_contract[research_tree]"
+        }
+      ]
+    },
+    {
+      "previous_file": "research_verdict_model.py",
+      "topic": "research_verdict",
+      "rules": [
+        {
+          "id": "routes_do_not_contradict_silently",
+          "predicate": "tests/flow_migration/research_verdict.py:RULES[0]",
+          "unit": "tests/flow_migration/test_contracts.py::test_independent_rule[research_verdict:routes_do_not_contradict_silently]",
+          "production_tests": [
+            "tests/test_research_verdict.py:test_opposite_anchor_directions_are_a_disagreement",
+            "tests/test_research_verdict.py:test_ruled_out_and_accepted_is_a_disagreement"
+          ]
+        },
+        {
+          "id": "verdict_matches_the_routes",
+          "predicate": "tests/flow_migration/research_verdict.py:RULES[1]",
+          "unit": "tests/flow_migration/test_contracts.py::test_independent_rule[research_verdict:verdict_matches_the_routes]",
+          "production_tests": [
+            "tests/test_research_verdict.py:test_verdict_matches_each_route_and_page_is_readable"
+          ]
+        },
+        {
+          "id": "live_hypotheses_follow_route_exclusions",
+          "predicate": "tests/flow_migration/research_verdict.py:RULES[2]",
+          "unit": "tests/flow_migration/test_contracts.py::test_independent_rule[research_verdict:live_hypotheses_follow_route_exclusions]",
+          "production_tests": [
+            "tests/test_research_verdict.py:test_live_hypotheses_follow_every_route"
+          ]
+        },
+        {
+          "id": "evidence_directions_match_routes",
+          "predicate": "tests/flow_migration/research_verdict.py:RULES[3]",
+          "unit": "tests/flow_migration/test_contracts.py::test_independent_rule[research_verdict:evidence_directions_match_routes]",
+          "production_tests": [
+            "tests/test_research_verdict.py:test_evidence_directions_cover_both_routes",
+            "tests/test_research_verdict.py:test_writer_surface_keys_are_pinned",
+            "tests/test_research_verdict.py:test_reference_only_evidence_has_no_direction"
+          ]
+        },
+        {
+          "id": "contested_iff_disagreement",
+          "predicate": "tests/flow_migration/research_verdict.py:RULES[4]",
+          "unit": "tests/flow_migration/test_contracts.py::test_independent_rule[research_verdict:contested_iff_disagreement]",
+          "production_tests": [
+            "tests/test_research_verdict.py:test_live_hypotheses_follow_every_route",
+            "tests/test_research_verdict.py:test_verdict_matches_each_route_and_page_is_readable"
+          ]
+        },
+        {
+          "id": "summary_numbers_come_from_the_source",
+          "predicate": "tests/flow_migration/research_verdict.py:RULES[5]",
+          "unit": "tests/flow_migration/test_contracts.py::test_independent_rule[research_verdict:summary_numbers_come_from_the_source]",
+          "production_tests": [
+            "tests/test_research_verdict.py:test_summary_number_not_in_quote_warns"
+          ]
+        }
+      ],
+      "bad_variants": [
+        {
+          "id": "skip_route_comparison",
+          "rule": "routes_do_not_contradict_silently",
+          "unit": "tests/flow_migration/test_contracts.py::test_rejects_original_bad_facts[research_verdict:skip_route_comparison]",
+          "boundary": "original independent bad observation, not a mutation of shipping production code"
+        },
+        {
+          "id": "verdict_upgrades_license",
+          "rule": "verdict_matches_the_routes",
+          "unit": "tests/flow_migration/test_contracts.py::test_rejects_original_bad_facts[research_verdict:verdict_upgrades_license]",
+          "boundary": "original independent bad observation, not a mutation of shipping production code"
+        },
+        {
+          "id": "excluded_hypothesis_stays_live",
+          "rule": "live_hypotheses_follow_route_exclusions",
+          "unit": "tests/flow_migration/test_contracts.py::test_rejects_original_bad_facts[research_verdict:excluded_hypothesis_stays_live]",
+          "boundary": "original independent bad observation, not a mutation of shipping production code"
+        },
+        {
+          "id": "logic_direction_dropped",
+          "rule": "evidence_directions_match_routes",
+          "unit": "tests/flow_migration/test_contracts.py::test_rejects_original_bad_facts[research_verdict:logic_direction_dropped]",
+          "boundary": "original independent bad observation, not a mutation of shipping production code"
+        },
+        {
+          "id": "disagreement_not_contested",
+          "rule": "contested_iff_disagreement",
+          "unit": "tests/flow_migration/test_contracts.py::test_rejects_original_bad_facts[research_verdict:disagreement_not_contested]",
+          "boundary": "original independent bad observation, not a mutation of shipping production code"
+        },
+        {
+          "id": "reference_only_row_gets_a_direction",
+          "rule": "evidence_directions_match_routes",
+          "unit": "tests/flow_migration/test_contracts.py::test_rejects_original_bad_facts[research_verdict:reference_only_row_gets_a_direction]",
+          "boundary": "original independent bad observation, not a mutation of shipping production code"
+        },
+        {
+          "id": "summary_number_drift_passes",
+          "rule": "summary_numbers_come_from_the_source",
+          "unit": "tests/flow_migration/test_contracts.py::test_rejects_original_bad_facts[research_verdict:summary_number_drift_passes]",
+          "boundary": "original independent bad observation, not a mutation of shipping production code"
+        }
+      ],
+      "bindings": [
+        {
+          "owner": "src/researchguard/research.py:route_disagreements",
+          "native_unit": "tests/flow_migration/test_contracts.py::test_native_contract[research_verdict]"
+        },
+        {
+          "owner": "src/researchguard/research.py:verdict_for_writers",
+          "native_unit": "tests/flow_migration/test_contracts.py::test_native_contract[research_verdict]"
+        },
+        {
+          "owner": "src/researchguard/research.py:evidence_directions",
+          "native_unit": "tests/flow_migration/test_contracts.py::test_native_contract[research_verdict]"
+        },
+        {
+          "owner": "src/researchguard/research.py:research_status",
+          "native_unit": "tests/flow_migration/test_contracts.py::test_native_contract[research_verdict]"
+        }
+      ]
+    },
+    {
+      "previous_file": "research_views_model.py",
+      "topic": "research_views",
+      "rules": [
+        {
+          "id": "hypothesis_view_matches_status",
+          "predicate": "tests/flow_migration/research_views.py:RULES[0]",
+          "unit": "tests/flow_migration/test_contracts.py::test_independent_rule[research_views:hypothesis_view_matches_status]",
+          "production_tests": [
+            "tests/test_research_views.py:test_hypothesis_view_lists_its_rows"
+          ]
+        },
+        {
+          "id": "candidate_view_shows_verdict_changes",
+          "predicate": "tests/flow_migration/research_views.py:RULES[1]",
+          "unit": "tests/flow_migration/test_contracts.py::test_independent_rule[research_views:candidate_view_shows_verdict_changes]",
+          "production_tests": [
+            "tests/test_research_views.py:test_candidate_view_shows_verdict_changes"
+          ]
+        },
+        {
+          "id": "sync_changes_only_the_new_anchor",
+          "predicate": "tests/flow_migration/research_views.py:RULES[2]",
+          "unit": "tests/flow_migration/test_contracts.py::test_independent_rule[research_views:sync_changes_only_the_new_anchor]",
+          "production_tests": [
+            "tests/test_research_sync.py:test_sync_of_the_synced_example_changes_nothing",
+            "tests/test_research_sync.py:test_sync_after_add_anchor_adds_only_that_anchor",
+            "tests/test_research_sync.py:test_sync_conflict_writes_nothing"
+          ]
+        }
+      ],
+      "bad_variants": [
+        {
+          "id": "candidate_ignores_verdict",
+          "rule": "candidate_view_shows_verdict_changes",
+          "unit": "tests/flow_migration/test_contracts.py::test_rejects_original_bad_facts[research_views:candidate_ignores_verdict]",
+          "boundary": "original independent bad observation, not a mutation of shipping production code"
+        },
+        {
+          "id": "hypothesis_view_drops_gaps",
+          "rule": "hypothesis_view_matches_status",
+          "unit": "tests/flow_migration/test_contracts.py::test_rejects_original_bad_facts[research_views:hypothesis_view_drops_gaps]",
+          "boundary": "original independent bad observation, not a mutation of shipping production code"
+        },
+        {
+          "id": "sync_rewrites_unrelated_logic",
+          "rule": "sync_changes_only_the_new_anchor",
+          "unit": "tests/flow_migration/test_contracts.py::test_rejects_original_bad_facts[research_views:sync_rewrites_unrelated_logic]",
+          "boundary": "original independent bad observation, not a mutation of shipping production code"
+        },
+        {
+          "id": "candidate_hides_unverifiable_source",
+          "rule": "sync_changes_only_the_new_anchor",
+          "unit": "tests/flow_migration/test_contracts.py::test_rejects_original_bad_facts[research_views:candidate_hides_unverifiable_source]",
+          "boundary": "original independent bad observation, not a mutation of shipping production code"
+        }
+      ],
+      "bindings": [
+        {
+          "owner": "src/researchguard/research.py:hypothesis_view",
+          "native_unit": "tests/flow_migration/test_contracts.py::test_native_contract[research_views]"
+        },
+        {
+          "owner": "src/researchguard/research.py:compare_research_status",
+          "native_unit": "tests/flow_migration/test_contracts.py::test_native_contract[research_views]"
+        },
+        {
+          "owner": "src/researchguard/research.py:sync_main",
+          "native_unit": "tests/flow_migration/test_contracts.py::test_native_contract[research_views]"
+        }
+      ]
+    },
+    {
+      "previous_file": "researchguard_suite_model.py",
+      "topic": "researchguard_suite",
+      "rules": [
+        {
+          "id": "no_alternate_success",
+          "predicate": "tests/flow_migration/researchguard_suite.py:RULES[0]",
+          "unit": "tests/flow_migration/test_contracts.py::test_independent_rule[researchguard_suite:no_alternate_success]",
+          "production_tests": [
+            "tests/test_root_cli.py:test_direct_member_request_does_not_require_task_facts"
+          ]
+        },
+        {
+          "id": "terminal_failure_stays_terminal",
+          "predicate": "tests/flow_migration/researchguard_suite.py:RULES[1]",
+          "unit": "tests/flow_migration/test_contracts.py::test_independent_rule[researchguard_suite:terminal_failure_stays_terminal]",
+          "production_tests": [
+            "tests/test_root_cli.py:test_retired_standalone_routes_are_unknown_commands"
+          ]
+        },
+        {
+          "id": "route_matches_member",
+          "predicate": "tests/flow_migration/researchguard_suite.py:RULES[2]",
+          "unit": "tests/flow_migration/test_contracts.py::test_independent_rule[researchguard_suite:route_matches_member]",
+          "production_tests": [
+            "tests/test_skill_suite.py:test_one_skill_with_a_route_table_and_a_description",
+            "tests/test_install_skill.py:test_install_copies_one_skill_removes_retired_members_and_check_detects_drift",
+            "tests/test_root_cli.py:test_root_cli_has_only_current_public_commands"
+          ]
+        }
+      ],
+      "bad_variants": [
+        {
+          "id": "wrong_member",
+          "rule": "route_matches_member",
+          "unit": "tests/flow_migration/test_contracts.py::test_rejects_original_bad_facts[researchguard_suite:wrong_member]",
+          "boundary": "original independent bad observation, not a mutation of shipping production code"
+        },
+        {
+          "id": "alternate_route",
+          "rule": "no_alternate_success",
+          "unit": "tests/flow_migration/test_contracts.py::test_rejects_original_bad_facts[researchguard_suite:alternate_route]",
+          "boundary": "original independent bad observation, not a mutation of shipping production code"
+        },
+        {
+          "id": "reroute_on_failure",
+          "rule": "terminal_failure_stays_terminal",
+          "unit": "tests/flow_migration/test_contracts.py::test_rejects_original_bad_facts[researchguard_suite:reroute_on_failure]",
+          "boundary": "original independent bad observation, not a mutation of shipping production code"
+        }
+      ],
+      "bindings": [
+        {
+          "owner": "skills/researchguard/SKILL.md:routes",
+          "native_unit": "tests/flow_migration/test_contracts.py::test_native_contract[researchguard_suite]"
+        },
+        {
+          "owner": "src/researchguard/cli.py:_member_main",
+          "native_unit": "tests/flow_migration/test_contracts.py::test_native_contract[researchguard_suite]"
+        },
+        {
+          "owner": "src/researchguard/cli.py:main",
+          "native_unit": "tests/flow_migration/test_contracts.py::test_native_contract[researchguard_suite]"
+        },
+        {
+          "owner": "scripts/install_skill.py:main",
+          "native_unit": "tests/flow_migration/test_contracts.py::test_native_contract[researchguard_suite]"
+        }
+      ]
+    },
+    {
+      "previous_file": "source_library_model.py",
+      "topic": "source_library",
+      "rules": [
+        {
+          "id": "import_deduplicates_by_content_hash",
+          "predicate": "tests/flow_migration/source_library.py:RULES[0]",
+          "unit": "tests/flow_migration/test_contracts.py::test_independent_rule[source_library:import_deduplicates_by_content_hash]",
+          "production_tests": [
+            "tests/logic/test_source_library.py:test_import_source_deduplicates_by_content_hash"
+          ]
+        },
+        {
+          "id": "project_link_requires_selected_source",
+          "predicate": "tests/flow_migration/source_library.py:RULES[1]",
+          "unit": "tests/flow_migration/test_contracts.py::test_independent_rule[source_library:project_link_requires_selected_source]",
+          "production_tests": [
+            "tests/logic/test_source_library.py:test_project_link_requires_selected_source"
+          ]
+        },
+        {
+          "id": "deleting_a_project_keeps_sources",
+          "predicate": "tests/flow_migration/source_library.py:RULES[2]",
+          "unit": "tests/flow_migration/test_contracts.py::test_independent_rule[source_library:deleting_a_project_keeps_sources]",
+          "production_tests": [
+            "tests/logic/test_source_library.py:test_delete_project_removes_project_relationships_without_deleting_sources_or_models",
+            "tests/logic/test_source_library.py:test_project_branch_uses_references_not_source_copies"
+          ]
+        }
+      ],
+      "bad_variants": [
+        {
+          "id": "duplicate_import_adds_a_source",
+          "rule": "import_deduplicates_by_content_hash",
+          "unit": "tests/flow_migration/test_contracts.py::test_rejects_original_bad_facts[source_library:duplicate_import_adds_a_source]",
+          "boundary": "original independent bad observation, not a mutation of shipping production code"
+        },
+        {
+          "id": "link_without_selected_source",
+          "rule": "project_link_requires_selected_source",
+          "unit": "tests/flow_migration/test_contracts.py::test_rejects_original_bad_facts[source_library:link_without_selected_source]",
+          "boundary": "original independent bad observation, not a mutation of shipping production code"
+        },
+        {
+          "id": "delete_project_deletes_sources",
+          "rule": "deleting_a_project_keeps_sources",
+          "unit": "tests/flow_migration/test_contracts.py::test_rejects_original_bad_facts[source_library:delete_project_deletes_sources]",
+          "boundary": "original independent bad observation, not a mutation of shipping production code"
+        }
+      ],
+      "bindings": [
+        {
+          "owner": "src/researchguard/logic/source_library.py:SourceLibrary.import_source",
+          "native_unit": "tests/flow_migration/test_contracts.py::test_native_contract[source_library]"
+        },
+        {
+          "owner": "src/researchguard/logic/source_library.py:SourceLibrary.link_node",
+          "native_unit": "tests/flow_migration/test_contracts.py::test_native_contract[source_library]"
+        },
+        {
+          "owner": "src/researchguard/logic/source_library.py:SourceLibrary.delete_project",
+          "native_unit": "tests/flow_migration/test_contracts.py::test_native_contract[source_library]"
+        }
+      ]
+    },
+    {
+      "previous_file": "sourceguard_content_anchor_model.py",
+      "topic": "sourceguard_content_anchor",
+      "rules": [
+        {
+          "id": "added_anchor_belongs_to_its_source",
+          "predicate": "tests/flow_migration/sourceguard_content_anchor.py:RULES[0]",
+          "unit": "tests/flow_migration/test_contracts.py::test_independent_rule[sourceguard_content_anchor:added_anchor_belongs_to_its_source]",
+          "production_tests": [
+            "tests/source/test_cli.py:test_add_anchor_adds_source_and_anchor"
+          ]
+        },
+        {
+          "id": "content_anchor_identity_is_singular",
+          "predicate": "tests/flow_migration/sourceguard_content_anchor.py:RULES[1]",
+          "unit": "tests/flow_migration/test_contracts.py::test_independent_rule[sourceguard_content_anchor:content_anchor_identity_is_singular]",
+          "production_tests": [
+            "tests/source/test_semantic_gap_depth.py:test_contentless_anchor_is_blocked_by_source_depth"
+          ]
+        }
+      ],
+      "bad_variants": [
+        {
+          "id": "anchor_added_without_source",
+          "rule": "added_anchor_belongs_to_its_source",
+          "unit": "tests/flow_migration/test_contracts.py::test_rejects_original_bad_facts[sourceguard_content_anchor:anchor_added_without_source]",
+          "boundary": "original independent bad observation, not a mutation of shipping production code"
+        },
+        {
+          "id": "retired_finding",
+          "rule": "content_anchor_identity_is_singular",
+          "unit": "tests/flow_migration/test_contracts.py::test_rejects_original_bad_facts[sourceguard_content_anchor:retired_finding]",
+          "boundary": "original independent bad observation, not a mutation of shipping production code"
+        }
+      ],
+      "bindings": [
+        {
+          "owner": "src/researchguard/source/update.py:add_anchor",
+          "native_unit": "tests/flow_migration/test_contracts.py::test_native_contract[sourceguard_content_anchor]"
+        },
+        {
+          "owner": "src/researchguard/source/depth.py:_anchor_depth_rows",
+          "native_unit": "tests/flow_migration/test_contracts.py::test_native_contract[sourceguard_content_anchor]"
+        }
+      ]
+    },
+    {
+      "previous_file": "sourceguard_stop_decision_model.py",
+      "topic": "sourceguard_stop_decision",
+      "rules": [
+        {
+          "id": "declared_search_comes_first",
+          "predicate": "tests/flow_migration/sourceguard_stop_decision.py:RULES[0]",
+          "unit": "tests/flow_migration/test_contracts.py::test_independent_rule[sourceguard_stop_decision:declared_search_comes_first]",
+          "production_tests": [
+            "tests/source/test_planner.py:test_declared_search_comes_first"
+          ]
+        },
+        {
+          "id": "no_stop_while_blocking_gap_open",
+          "predicate": "tests/flow_migration/sourceguard_stop_decision.py:RULES[1]",
+          "unit": "tests/flow_migration/test_contracts.py::test_independent_rule[sourceguard_stop_decision:no_stop_while_blocking_gap_open]",
+          "production_tests": [
+            "tests/source/test_stop_decision.py:test_blocked_and_permission_gaps_still_prevent_sufficient_stop"
+          ]
+        },
+        {
+          "id": "continue_only_with_affordable_target",
+          "predicate": "tests/flow_migration/sourceguard_stop_decision.py:RULES[2]",
+          "unit": "tests/flow_migration/test_contracts.py::test_independent_rule[sourceguard_stop_decision:continue_only_with_affordable_target]",
+          "production_tests": [
+            "tests/source/test_stop_decision.py:test_model_stop_decision_reads_the_plan_and_the_blocking_gaps"
+          ]
+        },
+        {
+          "id": "sufficient_when_no_blocking_gap_and_declared",
+          "predicate": "tests/flow_migration/sourceguard_stop_decision.py:RULES[3]",
+          "unit": "tests/flow_migration/test_contracts.py::test_independent_rule[sourceguard_stop_decision:sufficient_when_no_blocking_gap_and_declared]",
+          "production_tests": [
+            "tests/source/test_stop_decision.py:test_blocking_closed_nonblocking_open_and_sufficient_stops"
+          ]
+        },
+        {
+          "id": "affordable_critical_action_continues",
+          "predicate": "tests/flow_migration/sourceguard_stop_decision.py:RULES[4]",
+          "unit": "tests/flow_migration/test_contracts.py::test_independent_rule[sourceguard_stop_decision:affordable_critical_action_continues]",
+          "production_tests": [
+            "tests/source/test_stop_decision.py:test_cheaper_critical_action_is_found_within_budget"
+          ]
+        }
+      ],
+      "bad_variants": [
+        {
+          "id": "generated_twin_outranks_declared",
+          "rule": "declared_search_comes_first",
+          "unit": "tests/flow_migration/test_contracts.py::test_rejects_original_bad_facts[sourceguard_stop_decision:generated_twin_outranks_declared]",
+          "boundary": "original independent bad observation, not a mutation of shipping production code"
+        },
+        {
+          "id": "unsafe_stop",
+          "rule": "no_stop_while_blocking_gap_open",
+          "unit": "tests/flow_migration/test_contracts.py::test_rejects_original_bad_facts[sourceguard_stop_decision:unsafe_stop]",
+          "boundary": "original independent bad observation, not a mutation of shipping production code"
+        },
+        {
+          "id": "unaffordable_continue",
+          "rule": "continue_only_with_affordable_target",
+          "unit": "tests/flow_migration/test_contracts.py::test_rejects_original_bad_facts[sourceguard_stop_decision:unaffordable_continue]",
+          "boundary": "original independent bad observation, not a mutation of shipping production code"
+        },
+        {
+          "id": "optional_never_stops",
+          "rule": "sufficient_when_no_blocking_gap_and_declared",
+          "unit": "tests/flow_migration/test_contracts.py::test_rejects_original_bad_facts[sourceguard_stop_decision:optional_never_stops]",
+          "boundary": "original independent bad observation, not a mutation of shipping production code"
+        },
+        {
+          "id": "top_action_only",
+          "rule": "affordable_critical_action_continues",
+          "unit": "tests/flow_migration/test_contracts.py::test_rejects_original_bad_facts[sourceguard_stop_decision:top_action_only]",
+          "boundary": "original independent bad observation, not a mutation of shipping production code"
+        },
+        {
+          "id": "value_vs_cost",
+          "rule": "affordable_critical_action_continues",
+          "unit": "tests/flow_migration/test_contracts.py::test_rejects_original_bad_facts[sourceguard_stop_decision:value_vs_cost]",
+          "boundary": "original independent bad observation, not a mutation of shipping production code"
+        }
+      ],
+      "bindings": [
+        {
+          "owner": "src/researchguard/source/planner.py:plan_next_actions",
+          "native_unit": "tests/flow_migration/test_contracts.py::test_native_contract[sourceguard_stop_decision]"
+        },
+        {
+          "owner": "src/researchguard/source/stop_decision.py:decide_model_search_stop",
+          "native_unit": "tests/flow_migration/test_contracts.py::test_native_contract[sourceguard_stop_decision]"
+        }
+      ]
+    },
+    {
+      "previous_file": "synthesis_plan_model.py",
+      "topic": "synthesis_plan",
+      "rules": [
+        {
+          "id": "ready_only_without_open_gaps",
+          "predicate": "tests/flow_migration/synthesis_plan.py:RULES[0]",
+          "unit": "tests/flow_migration/test_contracts.py::test_independent_rule[synthesis_plan:ready_only_without_open_gaps]",
+          "production_tests": [
+            "tests/logic/test_artifact_synthesis.py:test_ready_argument_plan_uses_native_depth_without_external_state",
+            "tests/logic/test_artifact_synthesis.py:test_missing_support_stays_blocked_in_the_argument_plan"
+          ]
+        },
+        {
+          "id": "over_budget_is_blocked_budget",
+          "predicate": "tests/flow_migration/synthesis_plan.py:RULES[1]",
+          "unit": "tests/flow_migration/test_contracts.py::test_independent_rule[synthesis_plan:over_budget_is_blocked_budget]",
+          "production_tests": [
+            "tests/logic/test_synthesis_contract.py:test_parent_predecessor_graph_and_budget_fail_closed"
+          ]
+        },
+        {
+          "id": "invalid_request_is_blocked",
+          "predicate": "tests/flow_migration/synthesis_plan.py:RULES[2]",
+          "unit": "tests/flow_migration/test_contracts.py::test_independent_rule[synthesis_plan:invalid_request_is_blocked]",
+          "production_tests": [
+            "tests/logic/test_artifact_synthesis.py:test_synthesis_requires_goal",
+            "tests/logic/test_synthesis_contract.py:test_selection_request_is_required_and_old_entry_does_not_fallback"
+          ]
+        }
+      ],
+      "bad_variants": [
+        {
+          "id": "ready_with_open_gaps",
+          "rule": "ready_only_without_open_gaps",
+          "unit": "tests/flow_migration/test_contracts.py::test_rejects_original_bad_facts[synthesis_plan:ready_with_open_gaps]",
+          "boundary": "original independent bad observation, not a mutation of shipping production code"
+        },
+        {
+          "id": "over_budget_ready",
+          "rule": "over_budget_is_blocked_budget",
+          "unit": "tests/flow_migration/test_contracts.py::test_rejects_original_bad_facts[synthesis_plan:over_budget_ready]",
+          "boundary": "original independent bad observation, not a mutation of shipping production code"
+        },
+        {
+          "id": "invalid_request_ready",
+          "rule": "invalid_request_is_blocked",
+          "unit": "tests/flow_migration/test_contracts.py::test_rejects_original_bad_facts[synthesis_plan:invalid_request_ready]",
+          "boundary": "original independent bad observation, not a mutation of shipping production code"
+        }
+      ],
+      "bindings": [
+        {
+          "owner": "src/researchguard/logic/synthesis.py:synthesize_artifact_plan",
+          "native_unit": "tests/flow_migration/test_contracts.py::test_native_contract[synthesis_plan]"
+        }
+      ]
+    },
+    {
+      "previous_file": "trace_projection_model.py",
+      "topic": "trace_projection",
+      "rules": [
+        {
+          "id": "live_within_margin_of_best",
+          "predicate": "tests/flow_migration/trace_projection.py:RULES[0]",
+          "unit": "tests/flow_migration/test_contracts.py::test_independent_rule[trace_projection:live_within_margin_of_best]",
+          "production_tests": [
+            "tests/trace/test_trace_projection.py:test_live_hypotheses_lie_within_the_margin_of_the_best",
+            "tests/trace/test_storyline_depth.py:test_live_alternatives_exclude_the_leader"
+          ]
+        },
+        {
+          "id": "rank_follows_support",
+          "predicate": "tests/flow_migration/trace_projection.py:RULES[1]",
+          "unit": "tests/flow_migration/test_contracts.py::test_independent_rule[trace_projection:rank_follows_support]",
+          "production_tests": [
+            "tests/trace/test_trace_projection.py:test_better_supported_alternative_ranks_first",
+            "tests/trace/test_trace_projection.py:test_live_hypotheses_lie_within_the_margin_of_the_best"
+          ]
+        },
+        {
+          "id": "causal_and_oppose_links_never_raise_support",
+          "predicate": "tests/flow_migration/trace_projection.py:RULES[2]",
+          "unit": "tests/flow_migration/test_contracts.py::test_independent_rule[trace_projection:causal_and_oppose_links_never_raise_support]",
+          "production_tests": [
+            "tests/trace/test_trace_projection.py:test_causal_declaration_never_raises_storyline_support",
+            "tests/trace/test_trace_projection.py:test_opposition_lowers_support"
+          ]
+        },
+        {
+          "id": "expected_sensitivity_uses_snapshot_score",
+          "predicate": "tests/flow_migration/trace_projection.py:RULES[3]",
+          "unit": "tests/flow_migration/test_contracts.py::test_independent_rule[trace_projection:expected_sensitivity_uses_snapshot_score]",
+          "production_tests": [
+            "tests/trace/test_storyline_depth.py:test_expected_sensitivity_must_match_same_engine_support_effect"
+          ]
+        }
+      ],
+      "bad_variants": [
+        {
+          "id": "live_ignores_margin",
+          "rule": "live_within_margin_of_best",
+          "unit": "tests/flow_migration/test_contracts.py::test_rejects_original_bad_facts[trace_projection:live_ignores_margin]",
+          "boundary": "original independent bad observation, not a mutation of shipping production code"
+        },
+        {
+          "id": "rank_ignores_support",
+          "rule": "rank_follows_support",
+          "unit": "tests/flow_migration/test_contracts.py::test_rejects_original_bad_facts[trace_projection:rank_ignores_support]",
+          "boundary": "original independent bad observation, not a mutation of shipping production code"
+        },
+        {
+          "id": "oppose_link_raises_support",
+          "rule": "causal_and_oppose_links_never_raise_support",
+          "unit": "tests/flow_migration/test_contracts.py::test_rejects_original_bad_facts[trace_projection:oppose_link_raises_support]",
+          "boundary": "original independent bad observation, not a mutation of shipping production code"
+        },
+        {
+          "id": "sensitivity_on_projection_support",
+          "rule": "expected_sensitivity_uses_snapshot_score",
+          "unit": "tests/flow_migration/test_contracts.py::test_rejects_original_bad_facts[trace_projection:sensitivity_on_projection_support]",
+          "boundary": "original independent bad observation, not a mutation of shipping production code"
+        }
+      ],
+      "bindings": [
+        {
+          "owner": "src/researchguard/trace/inference/projection.py:project_hypotheses",
+          "native_unit": "tests/flow_migration/test_contracts.py::test_native_contract[trace_projection]"
+        },
+        {
+          "owner": "src/researchguard/trace/evaluator.py:evaluate_model",
+          "native_unit": "tests/flow_migration/test_contracts.py::test_native_contract[trace_projection]"
+        },
+        {
+          "owner": "src/researchguard/trace/storyline_depth.py:expected_sensitivity_matches",
+          "native_unit": "tests/flow_migration/test_contracts.py::test_native_contract[trace_projection]"
+        }
+      ]
+    },
+    {
+      "previous_file": "wording_license_model.py",
+      "topic": "wording_license",
+      "rules": [
+        {
+          "id": "blocked_claim_is_withheld",
+          "predicate": "tests/flow_migration/wording_license.py:RULES[0]",
+          "unit": "tests/flow_migration/test_contracts.py::test_independent_rule[wording_license:blocked_claim_is_withheld]",
+          "production_tests": [
+            "tests/logic/test_minimal_sets.py:test_blocked_claim_names_its_attackers"
+          ]
+        },
+        {
+          "id": "assert_needs_support_and_no_blocker",
+          "predicate": "tests/flow_migration/wording_license.py:RULES[1]",
+          "unit": "tests/flow_migration/test_contracts.py::test_independent_rule[wording_license:assert_needs_support_and_no_blocker]",
+          "production_tests": [
+            "tests/logic/test_minimal_sets.py:test_missing_support_withholds_conclusion"
+          ]
+        },
+        {
+          "id": "license_never_exceeds_state",
+          "predicate": "tests/flow_migration/wording_license.py:RULES[2]",
+          "unit": "tests/flow_migration/test_contracts.py::test_independent_rule[wording_license:license_never_exceeds_state]",
+          "production_tests": [
+            "tests/logic/test_minimal_sets.py:test_model_claim_sets_come_from_the_model_evaluator"
+          ]
+        }
+      ],
+      "bad_variants": [
+        {
+          "id": "assert_despite_blocker",
+          "rule": "blocked_claim_is_withheld",
+          "unit": "tests/flow_migration/test_contracts.py::test_rejects_original_bad_facts[wording_license:assert_despite_blocker]",
+          "boundary": "original independent bad observation, not a mutation of shipping production code"
+        },
+        {
+          "id": "assert_without_support",
+          "rule": "assert_needs_support_and_no_blocker",
+          "unit": "tests/flow_migration/test_contracts.py::test_rejects_original_bad_facts[wording_license:assert_without_support]",
+          "boundary": "original independent bad observation, not a mutation of shipping production code"
+        },
+        {
+          "id": "qualify_upgraded_to_assert",
+          "rule": "license_never_exceeds_state",
+          "unit": "tests/flow_migration/test_contracts.py::test_rejects_original_bad_facts[wording_license:qualify_upgraded_to_assert]",
+          "boundary": "original independent bad observation, not a mutation of shipping production code"
+        }
+      ],
+      "bindings": [
+        {
+          "owner": "src/researchguard/logic/minimal_sets.py:license_model_claim",
+          "native_unit": "tests/flow_migration/test_contracts.py::test_native_contract[wording_license]"
+        }
+      ]
+    }
+  ],
+  "system_routes": [
+    {
+      "id": "direct-member",
+      "original_steps": [
+        "suite-orchestration:main",
+        "suite-orchestration:_member_main"
+      ],
+      "source_anchors": [
+        "src/researchguard/cli.py:main",
+        "src/researchguard/logic/cli.py:main",
+        "src/researchguard/source/cli.py:main",
+        "src/researchguard/trace/cli.py:main",
+        "src/researchguard/experiment/cli.py:main",
+        "src/researchguard/cli.py:_member_main"
+      ],
+      "destination": "tests/flow_migration/test_inventory.py::test_system_route_anchors[direct-member]",
+      "semantic_boundary": "static callable/owner existence; runtime ordering is protected by the retained production tests, not inferred from this list"
+    },
+    {
+      "id": "status",
+      "original_steps": [
+        "research-tree:status_main",
+        "research-tree:research_status",
+        "research-tree:verdict_for_writers"
+      ],
+      "source_anchors": [
+        "src/researchguard/research.py:status_main",
+        "src/researchguard/research.py:research_status",
+        "src/researchguard/research.py:verdict_for_writers"
+      ],
+      "destination": "tests/flow_migration/test_inventory.py::test_system_route_anchors[status]",
+      "semantic_boundary": "static callable/owner existence; runtime ordering is protected by the retained production tests, not inferred from this list"
+    },
+    {
+      "id": "license",
+      "original_steps": [
+        "logic-evaluation:license_model_claim"
+      ],
+      "source_anchors": [
+        "src/researchguard/logic/minimal_sets.py:license_model_claim"
+      ],
+      "destination": "tests/flow_migration/test_inventory.py::test_system_route_anchors[license]",
+      "semantic_boundary": "static callable/owner existence; runtime ordering is protected by the retained production tests, not inferred from this list"
+    },
+    {
+      "id": "search-stop",
+      "original_steps": [
+        "sourceguard:decide_model_search_stop"
+      ],
+      "source_anchors": [
+        "src/researchguard/source/stop_decision.py:decide_model_search_stop"
+      ],
+      "destination": "tests/flow_migration/test_inventory.py::test_system_route_anchors[search-stop]",
+      "semantic_boundary": "static callable/owner existence; runtime ordering is protected by the retained production tests, not inferred from this list"
+    },
+    {
+      "id": "sync",
+      "original_steps": [
+        "sourceguard:sync_traceguard_seed",
+        "traceguard:logicguard_bundle reads trace-next.yaml",
+        "logic-argument:sync_trace_bundle reads bundle.yaml"
+      ],
+      "source_anchors": [
+        "src/researchguard/source/handoff.py:sync_traceguard_seed",
+        "src/researchguard/trace/export_logicguard.py:logicguard_bundle",
+        "src/researchguard/logic/trace_import.py:sync_trace_bundle"
+      ],
+      "destination": "tests/flow_migration/test_inventory.py::test_system_route_anchors[sync]",
+      "semantic_boundary": "static callable/owner existence; runtime ordering is protected by the retained production tests, not inferred from this list"
+    },
+    {
+      "id": "argument-iteration",
+      "original_steps": [
+        "logic-argument:run_argument_iteration",
+        "logic-argument:validate_prediction_binding",
+        "researchguard-suite:require_prediction_identity",
+        "researchguard-suite:select_terminal"
+      ],
+      "source_anchors": [
+        "src/researchguard/logic/task_iteration.py:run_argument_iteration",
+        "src/researchguard/logic/task_iteration.py:validate_prediction_binding",
+        "src/researchguard/iteration.py:require_prediction_identity",
+        "src/researchguard/iteration.py:select_terminal"
+      ],
+      "destination": "tests/flow_migration/test_inventory.py::test_system_route_anchors[argument-iteration]",
+      "semantic_boundary": "static callable/owner existence; runtime ordering is protected by the retained production tests, not inferred from this list"
+    },
+    {
+      "id": "search-iteration",
+      "original_steps": [
+        "sourceguard:run_search_iteration",
+        "sourceguard:validate_search_prediction_binding",
+        "researchguard-suite:require_prediction_identity",
+        "researchguard-suite:select_terminal"
+      ],
+      "source_anchors": [
+        "src/researchguard/source/task_iteration.py:run_search_iteration",
+        "src/researchguard/source/task_iteration.py:validate_search_prediction_binding",
+        "src/researchguard/iteration.py:require_prediction_identity",
+        "src/researchguard/iteration.py:select_terminal"
+      ],
+      "destination": "tests/flow_migration/test_inventory.py::test_system_route_anchors[search-iteration]",
+      "semantic_boundary": "static callable/owner existence; runtime ordering is protected by the retained production tests, not inferred from this list"
+    },
+    {
+      "id": "trace-iteration",
+      "original_steps": [
+        "trace-depth:compare_prediction_observation",
+        "researchguard-suite:select_terminal"
+      ],
+      "source_anchors": [
+        "src/researchguard/trace/task_iteration.py:compare_prediction_observation",
+        "src/researchguard/iteration.py:select_terminal"
+      ],
+      "destination": "tests/flow_migration/test_inventory.py::test_system_route_anchors[trace-iteration]",
+      "semantic_boundary": "static callable/owner existence; runtime ordering is protected by the retained production tests, not inferred from this list"
+    },
+    {
+      "id": "experiment-observation",
+      "original_steps": [
+        "experimentguard:observe_experiments",
+        "researchguard-suite:select_terminal"
+      ],
+      "source_anchors": [
+        "src/researchguard/experiment/engine.py:observe_experiments",
+        "src/researchguard/iteration.py:select_terminal"
+      ],
+      "destination": "tests/flow_migration/test_inventory.py::test_system_route_anchors[experiment-observation]",
+      "semantic_boundary": "static callable/owner existence; runtime ordering is protected by the retained production tests, not inferred from this list"
+    }
+  ],
+  "retirements": [],
+  "notes": [
+    "All 50 original independent rules and 74 existing production bindings retained.",
+    "55 original bad variants include expanded iteration5/stop6/wording3 dynamic builders.",
+    "Pure expected functions/boolean predicates plus actual native fixture assertions replace the removed abstract engine objects.",
+    "Identity flow is a finite shared-native binding; no claim that every unit contract is a whole-program flow model."
+  ],
+  "previous_debts": [
+    {
+      "code": "hub",
+      "component": "trace-depth",
+      "reason": "splitting trace-depth creates an import cycle (RG-310): evaluator.py and storyline_depth.py import each other, and its three users read one depth snapshot",
+      "expires": "v0.8.0",
+      "disposition": "legacy map metric retired; surviving boundary explicitly retained in docs/development/flow-contracts.md"
+    },
+    {
+      "code": "unmodeled_owner",
+      "component": "trace-library",
+      "reason": "Case library file IO (create, persist, search, gap writeback) with no state machine of its own; tests/trace/test_traceguard.py covers it.",
+      "expires": "v0.8.0",
+      "disposition": "legacy map metric retired; surviving boundary explicitly retained in docs/development/flow-contracts.md"
+    },
+    {
+      "code": "never_imported",
+      "component": "logic-library",
+      "contains": "src/researchguard/logic_viewer/settings.py",
+      "reason": "settings.py is imported by the optional desktop_app.py, deliberately outside the map in RG-406; tests/logic/test_library_viewer.py covers the viewer boundary.",
+      "expires": "v0.8.0",
+      "disposition": "legacy map metric retired; surviving boundary explicitly retained in docs/development/flow-contracts.md"
+    }
+  ]
+}
