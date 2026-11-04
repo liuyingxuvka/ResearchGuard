@@ -301,7 +301,7 @@
     },
     {
       "id": "research-tree",
-      "summary": "One research question: cross-route identities, copy drift, ablations, candidate comparison and one verdict for writers. Pages name each search gap and query, group each anchor’s routes, and show only relevant ablation effects. Sync source anchors into trace and logic within the same folder, preserving reasoning and leaving all files unchanged on conflict.",
+      "summary": "One research question: cross-route identities, copy drift, ablations, candidate comparison and one verdict for writers. Pages name each search gap and query, group each anchor\u2019s routes, and show only relevant ablation effects. Sync source anchors into trace and logic within the same folder, preserving reasoning and leaving all files unchanged on conflict.",
       "responsibilities": [
         "Load the research index and resolve source-library provenance through the native validator. Name every file read in JSON input_digests, including consulted library files, and expose source-owned evidence locator, summary and boundary.",
         "Detect copied-content drift and direct evidence or conclusion disagreements between native routes.",
@@ -793,20 +793,20 @@
       "code": "hub",
       "component": "trace-depth",
       "reason": "splitting trace-depth creates an import cycle (RG-310): evaluator.py and storyline_depth.py import each other, and its three users read one depth snapshot",
-      "expires": "v0.7.0"
+      "expires": "v0.8.0"
     },
     {
       "code": "unmodeled_owner",
       "component": "trace-library",
       "reason": "Case library file IO (create, persist, search, gap writeback) with no state machine of its own; tests/trace/test_traceguard.py covers it.",
-      "expires": "v0.6.1"
+      "expires": "v0.8.0"
     },
     {
       "code": "never_imported",
       "component": "logic-library",
       "contains": "src/researchguard/logic_viewer/settings.py",
       "reason": "settings.py is imported by the optional desktop_app.py, deliberately outside the map in RG-406; tests/logic/test_library_viewer.py covers the viewer boundary.",
-      "expires": "v0.7.0"
+      "expires": "v0.8.0"
     }
   ],
   "model_digests": {
