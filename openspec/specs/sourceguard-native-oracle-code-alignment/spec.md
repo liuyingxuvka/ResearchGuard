@@ -19,7 +19,7 @@ SourceGuard source depth SHALL report `sourceguard_blocked:contentless-anchor` f
 SourceGuard depth MUST NOT emit `no_content_qualified_anchor` as an alternate finding for this condition.
 
 #### Scenario: The self-model checks the code
-- **WHEN** `python -m flowguard map models` runs the content-anchor self-model
+- **WHEN** `python -m pytest tests/flow_migration/test_contracts.py -k sourceguard_content_anchor` runs the content-anchor self-model
 - **THEN** its conformance SHALL read `src/researchguard/source/depth.py` and fail if the declared finding is missing or the retired finding is present
 
 ### Requirement: Other depth failures stay visible
