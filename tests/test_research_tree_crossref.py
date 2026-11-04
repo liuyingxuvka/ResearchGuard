@@ -118,13 +118,17 @@ OLD_SOURCES_WARN = ('This holds for every source, old or new: a source a folder 
                     'warns too, with no change to the folder.')
 
 
-def _unreleased(text):
-    return text.split('## Unreleased', 1)[1].split('\n## ', 1)[0]
+def _current_change_notes(root):
+    import tomllib
+    text = (root / 'CHANGELOG.md').read_text(encoding='utf-8')
+    version = tomllib.loads((root / 'pyproject.toml').read_text(encoding='utf-8'))['project']['version']
+    heading = '## Unreleased' if '\n## Unreleased\n' in text else f'## v{version} - '
+    return text.split(heading, 1)[1].split('\n## ', 1)[0]
 
 
 def test_the_docs_say_plainly_that_old_sources_warn_too():
     root = Path(__file__).resolve().parents[1]
-    texts = {'CHANGELOG.md "## Unreleased"': _unreleased((root / 'CHANGELOG.md').read_text(encoding='utf-8')),
+    texts = {'CHANGELOG.md current changes': _current_change_notes(root),
              'README.md': (root / 'README.md').read_text(encoding='utf-8'),
              'research-tree.md': (root / 'skills/researchguard/references/research-tree.md').read_text(encoding='utf-8')}
     for name, text in texts.items():
