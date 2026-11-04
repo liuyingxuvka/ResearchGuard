@@ -1,6 +1,6 @@
 """TraceGuard public API.
 
-TraceGuard v0.6.0 provides one constrained HL-MRF/MAP inference kernel for
+TraceGuard v0.7.0 provides one constrained HL-MRF/MAP inference kernel for
 evidence-to-trace, competing-storyline, and bounded qualitative-causal
 reasoning. It is not calibrated probability or factual causal identification."""
 

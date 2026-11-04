@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## v0.7.0 - 2026-11-04 - Sources made explicit and evidence pictures kept complete
 
 - Evidence pictures retain provenance records with no source id, show the supplied locator and source reference (or name the missing fields), and mark the evidence box with provenance_names_no_source. This is a picture diagnostic; it does not invent or write a source record.
 
