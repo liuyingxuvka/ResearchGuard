@@ -15,7 +15,7 @@ Releases:
 3. Find code with `python -m flowguard where NAME`; change code and its tests together; run the project's own test command (for example `python -m pytest -q`) and report exactly what you ran and the result.
 4. Commit code and tests together in one commit with a message in your own words; add a line `Request: R<n>` when the change answers a stored owner request.
 
-5. Before changing state values, actions, conditions, settings or endings, update the affected `.flowguard/flow/` model first; run `python -m flowguard check`. When explaining a flow, embed the `python -m flowguard show` picture as `![Flow](PATH)` using its returned path. Keep purely functional contracts in direct production tests.
+5. Before changing state values, actions, conditions, settings or endings, update the affected `.flowguard/flow/` model first; run `python -m flowguard check`. For code claims, follow the installed `flowguard/flow/HOWTO.md` and bind only the affected actions to real public calls. When explaining a flow, embed the `python -m flowguard show` picture as `![Flow](PATH)` using its returned path. Keep purely functional contracts in direct production tests.
 6. Run the complete native test suite and `python -m flowguard release` for the final source; CI also checks Windows boundaries and builds the distribution. The test extra pins FlowGuard v1.0.0 for this migrated workflow.
 
 If conflicts remain in a reply, end with “需要你决定” and the relevant question and stored owner words. Repair dead ends and unreachable behavior in code; model/code drift needs reconciliation. A provisional decision applies only to eligible contradictory requested obligations; it does not settle these defects.
