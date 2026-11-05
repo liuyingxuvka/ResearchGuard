@@ -538,7 +538,7 @@ def research_status(tree: ResearchTree) -> dict[str, Any]:
                              "unverifiable_source": anchor.source_id not in sources
                                                     or bool(source_identity(sources[anchor.source_id]).unverifiable),
                              "lineage": sources[anchor.source_id].lineage_id if anchor.source_id in sources else "",
-                             "locator": anchor.locator,
+                             "locator": anchor.locator, "quote": anchor.text,
                              "summary": anchor.normalized_summary or anchor.text[:200],
                              "boundary": sources[anchor.source_id].cannot_support_structural_use if anchor.source_id in sources else "",
                              "used_by": sorted(set(used_by)),
@@ -811,6 +811,9 @@ def compare_research_status(current, candidate):
             changes.append({"kind": "evidence", "id": identifier,
                             "before": {key: value for key, value in filed(before).items() if value != filed(after)[key]},
                             "after": {key: value for key, value in filed(after).items() if value != filed(before)[key]}})
+        if before is not None and after is not None and before.get("quote") != after.get("quote"):
+            changes.append({"kind": "evidence quote", "id": identifier, "change": "changed",
+                            "detail": f'{before.get("quote", "")!r} → {after.get("quote", "")!r}'})
     disagreement = lambda rows: {f"{row['hypothesis']}:{row['kind']}:{row['detail']}" for row in rows}
     for key, values in (("disagreement", lambda status: disagreement(status.get("disagreements", []))),
                         ("errors", lambda status: set(status["errors"])), ("warnings", lambda status: set(status["warnings"]))):
