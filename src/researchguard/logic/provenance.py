@@ -76,12 +76,15 @@ def _validate_temporal_clue(value: str | None, field_name: str) -> str | None:
         return None
     text = str(value)
     try:
-        if "T" in text or text.endswith("Z"):
+        if re.fullmatch(r"\d{4}(?:-\d{2})?", text):
+            parts = text.split("-")
+            date(int(parts[0]), int(parts[1]) if len(parts) == 2 else 1, 1)
+        elif "T" in text or text.endswith("Z"):
             datetime.fromisoformat(text.replace("Z", "+00:00"))
         else:
             date.fromisoformat(text)
     except ValueError as exc:
-        raise ProvenanceError(f"{field_name} must be an ISO-8601 date or datetime") from exc
+        raise ProvenanceError(f"{field_name} must be an ISO-8601 year, year-month, date or datetime") from exc
     return text
 
 
