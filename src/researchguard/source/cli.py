@@ -173,6 +173,14 @@ def build_parser() -> argparse.ArgumentParser:
     depth.add_argument("--updated-model-output", default="")
     depth.add_argument("--pretty", action="store_true")
 
+    capture = sub.add_parser("capture", help="Save a UTF-8 original before quoting it.")
+    capture.add_argument("source_id")
+    original = capture.add_mutually_exclusive_group(required=True)
+    original.add_argument("--file")
+    original.add_argument("--url")
+    capture.add_argument("--project", default=".")
+    capture.add_argument("--pretty", action="store_true")
+
     anchor = sub.add_parser("add-anchor", help="Add one source-owned content anchor.")
     anchor.add_argument("model")
     for option in ("source-id", "anchor-id", "quote", "locator", "output"):
@@ -559,6 +567,11 @@ def run(args: argparse.Namespace) -> int:
         if args.updated_model_output:
             write_yaml(args.updated_model_output, updated)
         _json_out(payload, args.pretty)
+        return 0
+    if args.command == "capture":
+        from .capture import capture_source
+        row = capture_source(args.project, args.source_id, file=args.file, url=args.url)
+        _json_out({"ok": True, "source_id": args.source_id, **row}, args.pretty)
         return 0
     if args.command == "add-anchor":
         record = SourceRecord(source_id=args.source_id, title=args.title, url=args.url, source_date=args.date)

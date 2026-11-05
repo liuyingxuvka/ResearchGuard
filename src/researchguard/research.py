@@ -222,7 +222,7 @@ def sync_main(argv: list[str]) -> int:
     return 0
 
 
-def check_research_tree(index: dict[str, Any], models: dict[str, Any], observations: tuple[Any, ...] = (), *, source_library=None) -> dict[str, list[str]]:
+def check_research_tree(index: dict[str, Any], models: dict[str, Any], observations: tuple[Any, ...] = (), *, source_library=None, capture_results=None) -> dict[str, list[str]]:
     """Check already-loaded native models in memory; perform no file I/O or solving."""
     errors: list[str] = []
     warnings: list[str] = []
@@ -294,6 +294,9 @@ def check_research_tree(index: dict[str, Any], models: dict[str, Any], observati
                 errors.append(f"dangling_anchor:experiment:{row.evidence_id}")
             if row.source_ref not in source_ids:
                 errors.append(f"dangling_source:experiment:{row.source_ref}")
+    if capture_results is not None:
+        errors.extend(capture_results["errors"])
+        info.extend(capture_results["info"])
     from .ownership import copied_content_problems
     errors.extend(copied_content_problems(models, content_hash_for=content_hash_for))
     return {"errors": sorted(set(errors)), "warnings": sorted(set(warnings)), "info": info}
@@ -464,8 +467,12 @@ def verdict_for_writers(tree, hypotheses, disagreements, errors):
 
 
 def research_status(tree: ResearchTree) -> dict[str, Any]:
-    problems = check_research_tree(tree.index, tree.models, tree.observations, source_library=tree.library)
+    from .source.capture import check_captures
+    captured = check_captures(tree.path.parent, tree.models.get("source"))
+    problems = check_research_tree(tree.index, tree.models, tree.observations, source_library=tree.library,
+                                  capture_results=captured)
     problems["errors"] = sorted(set(tree.errors + problems["errors"]))
+    tree.input_paths.extend(path for path in captured["paths"] if path not in tree.input_paths)
     results: dict[str, Any] = {}
     for route, model in tree.models.items():
         try:
@@ -577,7 +584,7 @@ def research_status(tree: ResearchTree) -> dict[str, Any]:
         digest = hashlib.sha256(path.read_bytes()).hexdigest()
         input_digests.append({"path": Path(os.path.relpath(path, tree.path.parent)).as_posix(), "sha256": digest})
     input_digests.sort(key=lambda row: row['path'])
-    return {"input_digests": input_digests, "suite": SUITE_ID, "question": tree.index["question"], "verdict": verdict,
+    return {"source_readings": captured["rows"], "input_digests": input_digests, "suite": SUITE_ID, "question": tree.index["question"], "verdict": verdict,
         "ablations": ablations, "disagreements": disagreements, "models": {
         key: {"path": value, "status": "ok" if key in results else "invalid"}
         for key, value in tree.index.get("models", {}).items() if key != "experiment_observations"},
