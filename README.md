@@ -4,7 +4,7 @@
 
 | Version | Runtime | Package | License |
 | --- | --- | --- | --- |
-| `v0.8.0` | Python 3.11+ | `researchguard` | MIT |
+| `v0.8.1` | Python 3.11+ | `researchguard` | MIT |
 
 ResearchGuard is a Python tool and an agent skill (Claude Code, Codex) for one question at a time. The question lives
 in a folder: the hypotheses, the sources with the exact passages quoted from them (anchors), a timeline, an argument
@@ -139,7 +139,7 @@ the argument and the timeline do with it, and that is decided by the routes, not
 **1. Install the tool, from the release tag.**
 
 ```bash
-python -m pip install "git+https://github.com/liuyingxuvka/ResearchGuard.git@v0.8.0"
+python -m pip install "git+https://github.com/liuyingxuvka/ResearchGuard.git@v0.8.1"
 ```
 
 This installs the `researchguard` command. Python 3.11 or newer.
@@ -147,7 +147,7 @@ This installs the `researchguard` command. Python 3.11 or newer.
 **2. Install the skill for your AI**, from the same tag:
 
 ```bash
-git clone --depth 1 --branch v0.8.0 https://github.com/liuyingxuvka/ResearchGuard.git
+git clone --depth 1 --branch v0.8.1 https://github.com/liuyingxuvka/ResearchGuard.git
 python ResearchGuard/scripts/install_skill.py --target ~/.claude/skills          # Claude Code
 python ResearchGuard/scripts/install_skill.py --target ~/.codex/skills           # Codex (or "$CODEX_HOME/skills")
 python ResearchGuard/scripts/install_skill.py --target ~/.claude/skills --check  # is the installed copy current?

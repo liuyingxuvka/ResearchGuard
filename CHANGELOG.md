@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.8.1 - 2026-11-06 - Keep experiment observations within their source support
+
+- Check an experiment outcome against a uniquely captured scalar or explicitly named table cell when the existing source reader can establish its literal value. A contradictory numeric or exact enum label is an error; ambiguous readings and interpreted labels remain caller-declared.
+- Show the observation basis separately from an experiment's conditional closure in status and hypothesis views. A closed declared experiment does not establish an independently measured outcome or clear other research gaps.
+- Preserve source freshness, source identity and insufficient-evidence protections. No new research route or general prose truth checker is introduced. This holds for every source, old or new: a source a folder already held before this version warns too, with no change to the folder.
+
 ## v0.8.0 - 2026-11-06 - Check saved originals before using evidence
 
 - Save original UTF-8 documents and CSV tables with `source capture`, then check anchored quotations against the saved bytes. Matching handles grouped digits, line-break hyphens and ordered omissions, and retains the document title and nearest section. A saved file or digest does not establish factual truth.
