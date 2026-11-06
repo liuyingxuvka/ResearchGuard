@@ -41,7 +41,7 @@ viewer = ["Pillow>=10.0"]
 test = [
   "pytest>=8.0",
   "physicsguard @ git+https://github.com/liuyingxuvka/PhysicsGuard.git@v0.18.0",
-  "flowguard @ git+https://github.com/liuyingxuvka/FlowGuard.git@v2.0.0",
+  "flowguard @ git+https://github.com/liuyingxuvka/FlowGuard.git@v2.1.1",
 ]
 
 [project.scripts]
