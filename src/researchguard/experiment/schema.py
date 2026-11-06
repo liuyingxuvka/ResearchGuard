@@ -201,6 +201,10 @@ class ExperimentIterationResult:
         return {
             "schema_version": self.schema_version,
             "baseline_identity": self.baseline_identity,
+            "observation_basis": "caller_declared",
+            "claim_boundary": "Closure is conditional on the caller-declared predictions and observations. "
+                              "ExperimentGuard does not independently measure an observed outcome; research status "
+                              "reports captured-literal checks separately.",
             "task_id": self.task_id,
             "iteration": self.iteration,
             "recommendation": self.recommendation.to_dict(),

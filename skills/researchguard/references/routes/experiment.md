@@ -19,6 +19,8 @@ researchguard experiment recommend <spec.json>
 researchguard experiment observe <spec.json> <observations.json>
 ```
 
+The standalone observation result is conditional on caller-declared observations; a source id does not independently verify its label. In a research folder, `status` checks direct numeric labels against one captured scalar/cell (in its original unit), or exact enum labels against one complete captured literal. Its `experiment_observation_checks` distinguish captured matches, contradictions and caller-declared interpretations; labels such as `similar_rise`, multi-cell readings and ambiguous labels stay declared.
+
 Apply real observations; explicitly update the next spec's iteration/prior gaps.
 Never rewrite the frozen matrix after seeing a result.
 

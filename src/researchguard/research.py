@@ -595,10 +595,12 @@ def research_status(tree: ResearchTree) -> dict[str, Any]:
         "sources": [{"id": row.source_id, "identity": source_identity(row).summary()}
                     for row in (tree.models["source"].sources if "source" in tree.models else ())],
         "next": next_actions, **problems}
-    if (tree.path.parent / "captures.json").is_file():
+    if (tree.path.parent / "captures.json").is_file() or tree.observations:
         from .source.readings import source_reading_results
         reading = source_reading_results(tree, status)
         status["source_checks"] = reading["checks"]
+        if tree.observations:
+            status["experiment_observation_checks"] = reading["observation_checks"]
         problems["errors"] = sorted(set(problems["errors"] + reading["errors"]))
         status["verdict"]["errors"] = len(problems["errors"])
         problems["warnings"] = sorted(set(problems["warnings"] + reading["warnings"]))
@@ -631,6 +633,7 @@ def render_status_markdown(status: dict[str, Any]) -> str:
         logic_text = f"{logic['state']} {logic['confidence']:.2f}" if logic else "not listed"
         trace_text = (f"rank {trace['rank']}, support {trace['support']:.2f}, " + ("live" if trace["live"] else "not live") + (f", causal {trace['causal_support']:.2f}" if trace.get("causal_support") is not None else "")) if trace else "not listed"
         lines.append("| " + " | ".join(cell(item) for item in (row["id"], row["text"], logic_text, trace_text, experiment.get("status", "not_run"))) + " |")
+    lines.extend(_observation_reading_lines(status.get("experiment_observation_checks", [])))
     lines.extend(["", "## Evidence", "", "| anchor | source | lineage | used by |", "|---|---|---|---|"])
     for row in status["evidence"]:
         source = row["source"] + (" (warning: unverifiable source)" if row["unverifiable_source"] else "")
@@ -667,6 +670,15 @@ def render_status_markdown(status: dict[str, Any]) -> str:
         lines.extend(f"- {kind.rstrip('s')} {cell(row)}" for row in status[kind])
     _none(lines, status["errors"] + status["warnings"] + status["info"])
     return "\n".join(lines) + "\n"
+
+
+def _observation_reading_lines(rows):
+    cell = lambda value: str(value).replace("\n", " ").replace("\r", " ")
+    if not rows:
+        return []
+    return ["", "## Experiment observation basis", "", *(
+        f"- {cell(row['experiment_id'])} / {cell(row['id'])}: {row['colour']} ({row['basis']}) — {cell(row['reason'])}"
+        for row in rows)]
 
 
 def _none(lines: list[str], rows: list[Any]) -> None:
@@ -712,7 +724,9 @@ def hypothesis_view(status: dict[str, Any], hypothesis_id: str, experiment: Any 
                           or any(effect["hypothesis"] == hypothesis_id for effect in item.get("effects", ()))],
             "disagreements": [item for item in status["disagreements"] if item["hypothesis"] == hypothesis_id],
             "open_gaps": [item for item in status["open_gaps"] if item["route"] == "source" and hypothesis_id in item.get("hypotheses", ())],
-            "next": next_rows}
+            "next": next_rows,
+            "experiment_observation_checks": [item for item in status.get("experiment_observation_checks", [])
+                                               if predicted is None or item["experiment_id"] in predicted]}
 
 
 def render_hypothesis_view(view: dict[str, Any]) -> str:
@@ -751,6 +765,7 @@ def render_hypothesis_view(view: dict[str, Any]) -> str:
     lines.extend(["", "## Next", ""])
     lines.extend(f"- search {row['id']}" if row["route"] == "search" else f"- experiment: {', '.join(row['ids'])}" for row in view["next"])
     _none(lines, view["next"])
+    lines.extend(_observation_reading_lines(view.get("experiment_observation_checks", [])))
     return "\n".join(lines) + "\n"
 
 

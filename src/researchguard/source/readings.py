@@ -749,6 +749,80 @@ class CaptureScreen:
         else:
             self.add("ANCHORS", "G", f"{anchor.anchor_id} vs table {anchor.source_id}: {n}/{n} cells match, unit {unit}{tail}", key)
 
+    def observation_checks(self):
+        """Bind direct literal observations, never infer a semantic outcome label.
+
+        The supported domain is one captured scalar or one explicitly named
+        table cell. Numeric labels retain the source unit and existing reading
+        precision; enum labels must name the complete captured literal. An
+        interpretation such as "similar_rise" remains caller-declared.
+        """
+        spec = self.tree.models.get("experiment")
+        if spec is None:
+            return []
+        checks = []
+        for observation in self.tree.observations:
+            row = dict(id=observation.evidence_id, experiment_id=observation.experiment_id,
+                       source_ref=observation.source_ref, observed_outcome=observation.observed_outcome,
+                       colour="grey", basis="caller_declared", source_digest="",
+                       reason="caller-declared outcome; no unique captured literal verifies this label")
+            checks.append(row)
+            anchor = self.anchors.get(observation.evidence_id)
+            if (observation.status != "valid" or anchor is None
+                    or anchor.source_id != observation.source_ref or not self.captured(anchor.anchor_id)
+                    or self.colour.get("anchor:" + anchor.anchor_id) != "G"):
+                continue
+            row["source_digest"] = self.captures[anchor.source_id]["sha256"]
+            labels = {prediction.outcomes_by_experiment[observation.experiment_id]
+                      for prediction in spec.hypothesis_predictions
+                      if observation.experiment_id in prediction.outcomes_by_experiment}
+            actual, basis, unit = None, "captured_scalar_literal", ""
+            if anchor.source_id in self.tables:
+                grid = self.tables[anchor.source_id]
+                _, refs, unknown = grid.walk(anchor.text)
+                if len(refs) != 1 or unknown:
+                    continue
+                index, column = refs[0]
+                actual = grid.value(index, column)
+                unit = column.unit_label
+                basis = "captured_table_literal"
+            else:
+                readings = readings_in(anchor.text, changes=False)
+                if len(readings) == 1 and readings[0].kind == "num":
+                    actual = readings[0]
+                elif not readings:
+                    actual = anchor.text
+            if actual is None:
+                continue
+            numeric = {label: parse_value(label) for label in labels}
+            if isinstance(actual, (int, float)):
+                actual = Reading("num", actual, str(actual), 0, len(str(actual)),
+                                 decimals=len(str(actual).partition(".")[2]))
+            if isinstance(actual, Reading) and all(value is not None for value in numeric.values()):
+                matches = [label for label, value in numeric.items()
+                           if same_reading(Reading("num", value, label, 0, len(label),
+                                                   decimals=len(label.partition(".")[2])), actual)]
+                # Distinct textual labels for the same reported measurement do
+                # not establish an independently distinguishable observation.
+                if len(matches) > 1:
+                    row["reason"] = "caller-declared outcome; multiple labels describe the same captured reading"
+                    continue
+            elif isinstance(actual, str):
+                matches = [label for label in labels if norm(label).casefold() == norm(actual).casefold()]
+                if len(matches) != 1:
+                    continue
+            else:
+                continue
+            if not matches or observation.observed_outcome != matches[0]:
+                row.update(colour="red", basis=basis,
+                           reason=f"outcome {observation.observed_outcome!r} disagrees with captured literal {actual.show() if isinstance(actual, Reading) else actual!r}")
+                self.errors.append(f"experiment_outcome_disagrees:{observation.experiment_id}:{observation.evidence_id}")
+            else:
+                row.update(colour="green", basis=basis,
+                           reason=f"outcome {observation.observed_outcome!r} matches one captured literal" +
+                                  (f" in original unit {unit}; no conversion" if unit else ""))
+        return checks
+
     def event_day(self, event_id):
         for event in (self.trace.events if self.trace else ()):
             if event.event_id == event_id:
@@ -1099,7 +1173,8 @@ def source_reading_results(tree, status):
     screen=CaptureScreen(tree,status)
     for step in (screen.check_anchors,screen.check_changes,screen.check_restatements,screen.check_numbers,screen.check_timeline):
         step()
-    return {"checks":[{"section":section,"colour":{"G":"green","R":"red",".":"grey"}[colour],"reason":reason}
+    observations = screen.observation_checks()
+    return {"observation_checks": observations, "checks":[{"section":section,"colour":{"G":"green","R":"red",".":"grey"}[colour],"reason":reason}
                       for section,colour,reason in screen.lines],"errors":sorted(set(screen.errors)),"warnings":sorted(set(screen.warnings)),
             "anchor_colours":{key.removeprefix("anchor:"):{"G":"green","R":"red",".":"grey"}[value]
                               for key,value in screen.colour.items() if key.startswith("anchor:")}}

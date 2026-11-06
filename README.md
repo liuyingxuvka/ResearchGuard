@@ -119,6 +119,8 @@ when a conversion is needed; conversions use the optional
 [PhysicsGuard v0.18.0](https://github.com/liuyingxuvka/PhysicsGuard/releases/tag/v0.18.0) unit reader. Direct table-cell
 quotes can be compared in their unchanged original unit label without interpreting that label.
 
+In a research folder, experiment observations also report their evidence basis. A direct numeric outcome can be checked against one captured scalar or explicitly named table cell in its original unit; an enum can match a complete captured literal. A wrong supported label is an error. Interpretations such as `similar_rise` remain caller-declared, even when the finite experiment matrix reaches closure. Standalone experiment selection and observation remain useful conditional calculations; they do not measure the world.
+
 ResearchGuard cannot tell a real title from an invented one or prove that the saved original is true.
 Every new source and evidence item is shown with its attribution before accepting the copy. A word list cannot tell a
 colleague's note from a document either ("Colleague's note, 2021" passes it), so one more thing is computed instead of
