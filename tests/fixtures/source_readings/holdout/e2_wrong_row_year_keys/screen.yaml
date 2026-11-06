@@ -1,0 +1,13 @@
+owner_quotes:
+  question: Did the protected cycle lane on Harbour Road, opened in March 2023, increase
+    weekday cycling there?
+  root_claim:h_lane: increase weekday cycling there
+ai_choices:
+  change_tolerance: 0.25
+terms:
+  opened: event_open
+lanes:
+  Harbour Road:
+  - harbour road
+  Quay Street:
+  - quay street

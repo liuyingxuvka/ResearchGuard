@@ -1,0 +1,49 @@
+metadata:
+  purpose: Who raised the alarm at the Kestrel Mill fire on 9 October 1911, and how
+    long did the fire brigade take to arrive after the alarm?
+  skill: SourceGuard
+  source_policy: public_only
+sources:
+- source_id: src-courier
+  title: Northbury Courier, 10 October 1911, page 3 (fixture)
+  source_type: report
+  source_status: saved
+  source_reliability: 0.8
+  source_role: primary_source
+  lineage_id: lin-src-courier
+  source_date: '1911-10-10'
+anchors:
+- anchor_id: anc-alarm
+  source_id: src-courier
+  anchor_type: paragraph
+  locator: Courier 10 Oct 1911, p. 3, column 2, paragraph 1
+  text: At a quarter past eight on Monday evening, 9 October 1911, the night-watchman,
+    Thomas Hale, saw smoke rising from the carding room and ran to the police box
+    in Mill Lane
+  normalized_summary: Hale saw smoke at 8.15 p.m. on 9 Oct 1911 and ran to the police
+    box.
+  modality: text
+  extraction_confidence: 0.8
+  specificity: 0.8
+  usable_for_claim: true
+- anchor_id: anc-call
+  source_id: src-courier
+  anchor_type: paragraph
+  locator: Courier 10 Oct 1911, p. 3, column 2, paragraph 1
+  text: where Constable Thomas Penn telephoned for the brigade.
+  normalized_summary: Penn telephoned the brigade from the box.
+  modality: text
+  extraction_confidence: 0.8
+  specificity: 0.8
+  usable_for_claim: true
+- anchor_id: anc-arrive
+  source_id: src-courier
+  anchor_type: paragraph
+  locator: Courier 10 Oct 1911, p. 3, column 2, paragraph 1
+  text: The engine arrived at twenty minutes to nine, and by midnight the roof had
+    fallen in.
+  normalized_summary: Engine arrived 8.40 p.m.; roof fell in by midnight.
+  modality: text
+  extraction_confidence: 0.8
+  specificity: 0.8
+  usable_for_claim: true

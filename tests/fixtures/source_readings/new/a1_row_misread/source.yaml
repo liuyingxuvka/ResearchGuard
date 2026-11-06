@@ -1,0 +1,57 @@
+metadata:
+  purpose: Did the heat pump fitted at 14 Alder Close in March 2023 cut the house's
+    gas use in January 2024 compared with January 2023, or was January 2024 simply
+    milder?
+  skill: SourceGuard
+  source_policy: public_only
+sources:
+- source_id: src-meter
+  title: Supplier meter export, 14 Alder Close, monthly totals (fixture)
+  source_type: dataset
+  source_status: saved
+  source_reliability: 0.8
+  source_role: primary_source
+  lineage_id: lin-src-meter
+  coverage_period: 2023-01 to 2024-01
+- source_id: src-install
+  title: Installer commissioning record, 14 Alder Close (fixture)
+  source_type: report
+  source_status: saved
+  source_reliability: 0.8
+  source_role: primary_source
+  lineage_id: lin-src-install
+  source_date: '2023-03-14'
+anchors:
+- anchor_id: anc-gas
+  source_id: src-meter
+  anchor_type: table
+  locator: monthly totals table, rows Jan 2023 and Jan 2024
+  text: 'Gas (cubic metres): Jan 2023 216; Jan 2024 17.'
+  normalized_summary: Gas use fell from 216 to 17 cubic metres from Jan 2023 to Jan
+    2024.
+  modality: table
+  extraction_confidence: 0.8
+  specificity: 0.8
+  usable_for_claim: true
+- anchor_id: anc-temp
+  source_id: src-meter
+  anchor_type: table
+  locator: monthly totals table, temperature column
+  text: 'Mean outdoor temperature (degrees Celsius): Jan 2023 3.1; Jan 2024 4.4.'
+  normalized_summary: 'January 2024 was milder than January 2023: 3.1 to 4.4 degrees
+    Celsius.'
+  modality: table
+  extraction_confidence: 0.8
+  specificity: 0.8
+  usable_for_claim: true
+- anchor_id: anc-commission
+  source_id: src-install
+  anchor_type: paragraph
+  locator: commissioning record, paragraph 1
+  text: The air-source heat pump was commissioned on 14 March 2023 and the gas boiler
+    was capped the same day.
+  normalized_summary: Heat pump commissioned and boiler capped on 14 Mar 2023.
+  modality: text
+  extraction_confidence: 0.8
+  specificity: 0.8
+  usable_for_claim: true

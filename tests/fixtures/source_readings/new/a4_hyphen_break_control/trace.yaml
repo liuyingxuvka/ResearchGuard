@@ -1,0 +1,142 @@
+metadata:
+  schema_version: researchguard.trace.model.v2
+  purpose: Did the heat pump fitted at 14 Alder Close in March 2023 cut the house's
+    gas use in January 2024 compared with January 2023, or was January 2024 simply
+    milder?
+sources:
+- source_id: src-meter
+  title: Supplier meter export, 14 Alder Close, monthly totals (fixture)
+  url: null
+  source_date: null
+  lineage_id: lin-src-meter
+  source_type: dataset
+  independence_group: lin-src-meter
+  source_reliability: 0.8
+  source_status: stable_keep
+  coverage_period: 2023-01 to 2024-01
+- source_id: src-install
+  title: Installer commissioning record, 14 Alder Close (fixture)
+  url: null
+  source_date: '2023-03-14'
+  lineage_id: lin-src-install
+  source_type: report
+  independence_group: lin-src-install
+  source_reliability: 0.8
+  source_status: stable_keep
+  coverage_period: null
+evidence:
+- evidence_id: anc-gas
+  raw_text: 'Gas (cubic metres): Jan 2023 216; Jan 2024 17.'
+  source_id: src-meter
+  locator: monthly totals table, rows Jan 2023 and Jan 2024
+  normalized_summary: Gas use fell from 216 to 17 cubic metres from Jan 2023 to Jan
+    2024.
+  evidence_type: table
+  extraction_confidence: 0.8
+  evidence_specificity: 0.8
+  limits: []
+  warnings: []
+  usable_as_trace_evidence: true
+- evidence_id: anc-temp
+  raw_text: 'Mean outdoor temperature (degrees Celsius): Jan 2023 3.1; Jan 2024 2.7.'
+  source_id: src-meter
+  locator: monthly totals table, temperature column
+  normalized_summary: 'January 2024 was colder than January 2023: 3.1 to 2.7 degrees
+    Celsius.'
+  evidence_type: table
+  extraction_confidence: 0.8
+  evidence_specificity: 0.8
+  limits: []
+  warnings: []
+  usable_as_trace_evidence: true
+- evidence_id: anc-commission
+  raw_text: The air-source heat pump was commissioned on 14 March 2023 and the gas
+    boiler was capped the same day.
+  source_id: src-install
+  locator: commissioning record, paragraph 1
+  normalized_summary: Heat pump commissioned and boiler capped on 14 Mar 2023.
+  evidence_type: paragraph
+  extraction_confidence: 0.8
+  evidence_specificity: 0.8
+  limits: []
+  warnings: []
+  usable_as_trace_evidence: true
+- evidence_id: anc-flow
+  raw_text: 'Measured flow on the heating circuit: 18 litres per minute at a flow
+    temperature of 45 degrees Celsius.'
+  source_id: src-install
+  locator: commissioning record, paragraph 3
+  normalized_summary: Heating-circuit flow 18 litres per minute (0.3 litres per second)
+    at 45 degrees Celsius.
+  evidence_type: paragraph
+  extraction_confidence: 0.8
+  evidence_specificity: 0.8
+  limits: []
+  warnings: []
+  usable_as_trace_evidence: true
+events:
+- event_id: event_commission
+  evidence_ids:
+  - anc-commission
+  action: heat pump commissioned, boiler capped
+  event_type: observation
+  time_interval:
+    start: '2023-03-14'
+    precision: exact_date
+    confidence: 0.9
+- event_id: event_gas_drop
+  evidence_ids:
+  - anc-gas
+  action: gas use fell
+  event_type: observation
+  time_interval:
+    start: 2024-01
+    precision: month
+    confidence: 0.9
+- event_id: event_cold
+  evidence_ids:
+  - anc-temp
+  action: January 2024 colder
+  event_type: observation
+  time_interval:
+    start: 2024-01
+    precision: month
+    confidence: 0.9
+storyline_hypotheses:
+- hypothesis_id: h_hp
+  claim: The heat pump cut the gas use.
+  role: primary
+  event_ids:
+  - event_commission
+  - event_gas_drop
+  causal: true
+- hypothesis_id: h_mild
+  claim: A milder January explains the drop.
+  role: alternative
+  event_ids:
+  - event_cold
+  - event_gas_drop
+  causal: true
+hypothesis_evidence_links:
+- link_id: l_hp_comm
+  hypothesis_id: h_hp
+  evidence_id: anc-commission
+  polarity: support
+  declared_relevance: 0.7
+- link_id: l_hp_gas
+  hypothesis_id: h_hp
+  evidence_id: anc-gas
+  polarity: support
+  declared_relevance: 0.7
+- link_id: l_mild_temp
+  hypothesis_id: h_mild
+  evidence_id: anc-temp
+  polarity: oppose
+  declared_relevance: 0.7
+causal_candidates:
+- causal_id: cc_hp
+  hypothesis_id: h_hp
+  cause_event_ids:
+  - event_commission
+  effect_event_ids:
+  - event_gas_drop

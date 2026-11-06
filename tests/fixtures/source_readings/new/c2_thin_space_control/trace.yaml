@@ -1,0 +1,137 @@
+metadata:
+  schema_version: researchguard.trace.model.v2
+  purpose: Did leakage from Norbridge's water network fall after the mains replacement
+    programme that started in April 2021?
+sources:
+- source_id: src-report
+  title: Norbridge Water Annual Performance Report 2023/24 (fixture)
+  url: null
+  source_date: '2024-07-01'
+  lineage_id: lin-src-report
+  source_type: report
+  independence_group: lin-src-report
+  source_reliability: 0.8
+  source_status: stable_keep
+  coverage_period: null
+- source_id: src-leak
+  title: Norbridge Water performance tables 2023/24, table 4 (fixture)
+  url: null
+  source_date: null
+  lineage_id: lin-src-leak
+  source_type: dataset
+  independence_group: lin-src-leak
+  source_reliability: 0.8
+  source_status: stable_keep
+  coverage_period: 2019 to 2024
+evidence:
+- evidence_id: anc-report-leak
+  raw_text: Leakage fell to 38.9 megalitres per day in 2023/24, against 47.5 megalitres
+    per day in 2019/20.
+  source_id: src-report
+  locator: Annual Performance Report 2023/24, leakage section, sentence 1
+  normalized_summary: Leakage 47.5 to 38.9 Ml/d, 2019/20 to 2023/24.
+  evidence_type: paragraph
+  extraction_confidence: 0.8
+  evidence_specificity: 0.8
+  limits: []
+  warnings: []
+  usable_as_trace_evidence: true
+- evidence_id: anc-report-mains
+  raw_text: Since April 2021 we have replaced 135 km of mains and fitted 12,400 smart
+    meters.
+  source_id: src-report
+  locator: Annual Performance Report 2023/24, leakage section, sentence 2
+  normalized_summary: 135 km of mains replaced and 12,400 smart meters fitted since
+    April 2021.
+  evidence_type: paragraph
+  extraction_confidence: 0.8
+  evidence_specificity: 0.8
+  limits: []
+  warnings: []
+  usable_as_trace_evidence: true
+- evidence_id: anc-zones
+  raw_text: 'Leakage (Ml/d): North 2019/20 21.4, 2023/24 17.2; South 2019/20 26.1,
+    2023/24 21.7.'
+  source_id: src-leak
+  locator: performance tables, table 4, leakage columns
+  normalized_summary: 'Leakage fell in both zones: North 21.4 to 17.2, South 26.1
+    to 21.7 Ml/d.'
+  evidence_type: table
+  extraction_confidence: 0.8
+  evidence_specificity: 0.8
+  limits: []
+  warnings: []
+  usable_as_trace_evidence: true
+- evidence_id: anc-mains-zones
+  raw_text: 'Mains replaced (km) in 2023/24: North 61; South 74.'
+  source_id: src-leak
+  locator: performance tables, table 4, mains columns
+  normalized_summary: South replaced more mains (74 km) than North (61 km).
+  evidence_type: table
+  extraction_confidence: 0.8
+  evidence_specificity: 0.8
+  limits: []
+  warnings: []
+  usable_as_trace_evidence: true
+events:
+- event_id: event_programme
+  evidence_ids:
+  - anc-report-mains
+  action: mains replacement programme started
+  event_type: observation
+  time_interval:
+    start: 2021-04
+    precision: month
+    confidence: 0.9
+- event_id: event_leak_fall
+  evidence_ids:
+  - anc-report-leak
+  action: leakage at 38.9 Ml/d
+  event_type: observation
+  time_interval:
+    start: 2024-03
+    precision: month
+    confidence: 0.9
+storyline_hypotheses:
+- hypothesis_id: h_mains
+  claim: Mains replacement cut leakage.
+  role: primary
+  event_ids:
+  - event_programme
+  - event_leak_fall
+  causal: true
+- hypothesis_id: h_meters
+  claim: Smart meters cut leakage.
+  role: alternative
+  event_ids:
+  - event_programme
+  - event_leak_fall
+  causal: true
+hypothesis_evidence_links:
+- link_id: l_mains_report
+  hypothesis_id: h_mains
+  evidence_id: anc-report-leak
+  polarity: support
+  declared_relevance: 0.7
+- link_id: l_mains_zones
+  hypothesis_id: h_mains
+  evidence_id: anc-zones
+  polarity: support
+  declared_relevance: 0.7
+- link_id: l_mains_km
+  hypothesis_id: h_mains
+  evidence_id: anc-mains-zones
+  polarity: support
+  declared_relevance: 0.7
+- link_id: l_meters_mains
+  hypothesis_id: h_meters
+  evidence_id: anc-report-mains
+  polarity: support
+  declared_relevance: 0.7
+causal_candidates:
+- causal_id: cc_mains
+  hypothesis_id: h_mains
+  cause_event_ids:
+  - event_programme
+  effect_event_ids:
+  - event_leak_fall

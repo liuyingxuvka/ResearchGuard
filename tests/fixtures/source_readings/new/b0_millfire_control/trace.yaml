@@ -1,0 +1,117 @@
+metadata:
+  schema_version: researchguard.trace.model.v2
+  purpose: Who raised the alarm at the Kestrel Mill fire on 9 October 1911, and how
+    long did the fire brigade take to arrive after the alarm?
+sources:
+- source_id: src-courier
+  title: Northbury Courier, 10 October 1911, page 3 (fixture)
+  url: null
+  source_date: '1911-10-10'
+  lineage_id: lin-src-courier
+  source_type: report
+  independence_group: lin-src-courier
+  source_reliability: 0.8
+  source_status: stable_keep
+  coverage_period: null
+evidence:
+- evidence_id: anc-alarm
+  raw_text: At a quarter past eight on Monday evening, 9 October 1911, the night-watchman,
+    Thomas Hale, saw smoke rising from the carding room and ran to the police box
+    in Mill Lane
+  source_id: src-courier
+  locator: Courier 10 Oct 1911, p. 3, column 2, paragraph 1
+  normalized_summary: Hale saw smoke at 8.15 p.m. on 9 Oct 1911 and ran to the police
+    box.
+  evidence_type: paragraph
+  extraction_confidence: 0.8
+  evidence_specificity: 0.8
+  limits: []
+  warnings: []
+  usable_as_trace_evidence: true
+- evidence_id: anc-call
+  raw_text: where Constable Arthur Penn telephoned for the brigade.
+  source_id: src-courier
+  locator: Courier 10 Oct 1911, p. 3, column 2, paragraph 1
+  normalized_summary: Penn telephoned the brigade from the box.
+  evidence_type: paragraph
+  extraction_confidence: 0.8
+  evidence_specificity: 0.8
+  limits: []
+  warnings: []
+  usable_as_trace_evidence: true
+- evidence_id: anc-arrive
+  raw_text: The engine arrived at twenty minutes to nine, and by midnight the roof
+    had fallen in.
+  source_id: src-courier
+  locator: Courier 10 Oct 1911, p. 3, column 2, paragraph 1
+  normalized_summary: Engine arrived 8.40 p.m.; roof fell in by midnight.
+  evidence_type: paragraph
+  extraction_confidence: 0.8
+  evidence_specificity: 0.8
+  limits: []
+  warnings: []
+  usable_as_trace_evidence: true
+events:
+- event_id: event_smoke
+  evidence_ids:
+  - anc-alarm
+  action: Hale saw smoke and ran to the police box
+  event_type: observation
+  time_interval:
+    start: '1911-10-09'
+    precision: exact_date
+    confidence: 0.9
+- event_id: event_call
+  evidence_ids:
+  - anc-call
+  action: Penn telephoned the brigade
+  event_type: observation
+  time_interval:
+    start: '1911-10-09'
+    precision: exact_date
+    confidence: 0.9
+- event_id: event_arrive
+  evidence_ids:
+  - anc-arrive
+  action: engine arrived
+  event_type: observation
+  time_interval:
+    start: '1911-10-09'
+    precision: exact_date
+    confidence: 0.9
+storyline_hypotheses:
+- hypothesis_id: h_hale
+  claim: Hale raised the alarm.
+  role: primary
+  event_ids:
+  - event_smoke
+  - event_call
+  causal: false
+- hypothesis_id: h_penn
+  claim: Penn raised the alarm.
+  role: alternative
+  event_ids:
+  - event_call
+  causal: false
+hypothesis_evidence_links:
+- link_id: l_hale_alarm
+  hypothesis_id: h_hale
+  evidence_id: anc-alarm
+  polarity: support
+  declared_relevance: 0.7
+- link_id: l_penn_alarm
+  hypothesis_id: h_penn
+  evidence_id: anc-alarm
+  polarity: oppose
+  declared_relevance: 0.7
+- link_id: l_penn_call
+  hypothesis_id: h_penn
+  evidence_id: anc-call
+  polarity: support
+  declared_relevance: 0.7
+- link_id: l_hale_arrive
+  hypothesis_id: h_hale
+  evidence_id: anc-arrive
+  polarity: support
+  declared_relevance: 0.7
+causal_candidates: []

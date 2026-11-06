@@ -1,0 +1,16 @@
+schema: researchguard.research.v1
+question: Did the recast timetable on the Elmbridge line in July 2022 cut the average
+  train delay?
+root_claim: h_recast
+hypotheses:
+- id: h_recast
+  text: The recast timetable cut the average delay.
+- id: h_season
+  text: Delays fall every autumn; the timetable made no difference.
+models:
+  source: source.yaml
+  trace: trace.yaml
+  logic: logic.yaml
+search:
+  budget: 2
+  scope_sufficient: false

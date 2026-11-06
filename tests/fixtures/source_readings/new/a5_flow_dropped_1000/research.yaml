@@ -1,0 +1,16 @@
+schema: researchguard.research.v1
+question: Did the heat pump fitted at 14 Alder Close in March 2023 cut the house's
+  gas use in January 2024 compared with January 2023, or was January 2024 simply milder?
+root_claim: h_hp
+hypotheses:
+- id: h_hp
+  text: The heat pump cut the house's gas use.
+- id: h_mild
+  text: A milder January 2024 explains the lower gas use.
+models:
+  source: source.yaml
+  trace: trace.yaml
+  logic: logic.yaml
+search:
+  budget: 2
+  scope_sufficient: false

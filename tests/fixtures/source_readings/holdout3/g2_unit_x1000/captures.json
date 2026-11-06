@@ -1,0 +1,20 @@
+{
+ "owner": {
+  "file": "owner.txt",
+  "sha256": "c9240985e883c0381bf279086b1a73587d1dbc106d8f54fbf4a15a38f8603102"
+ },
+ "sources": {
+  "src-inverter": {
+   "table": "tables/src-inverter.csv",
+   "unit": "see header",
+   "lane": "array",
+   "sha256": "c439212a7318695efec0a008c9ee6db0d90c3f637482f7d737231771a57d2243",
+   "captured_by": "fixture stand-in for a capture command"
+  },
+  "src-maintenance": {
+   "text": "captures/src-maintenance.txt",
+   "sha256": "dd58d1d052d672f593d41c7e4a7c9dc7c23f6cc14a8e6d7315ed0a49ce2b4486",
+   "captured_by": "fixture stand-in for a capture command"
+  }
+ }
+}

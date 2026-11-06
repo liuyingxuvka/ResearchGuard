@@ -1,0 +1,72 @@
+model:
+  id: rail
+  title: Did the recast timetable on the Elmbridge line in July 2022 cut the average
+    train delay?
+  root_claim: h_recast
+nodes:
+  h_recast:
+    type: Claim
+    text: The recast timetable of July 2022 cut the average delay on the Elmbridge
+      line.
+  h_season:
+    type: Claim
+    text: Seasonal effects.
+  anc-q4:
+    type: Evidence
+    text: In Q4 2022 the average delay was 252 minutes, down from 6.3 minutes in Q1.
+    provenance:
+    - origin_kind: external_source
+      quote: In the last quarter of 2022, 92.4 per cent of trains ran on time and
+        the average delay was 252 seconds, down from 6.3 minutes in the first quarter.
+      source_id: src-board
+      locator: anc-q4
+      content_hash: sha256:00ae8ceee5a67024b65f5520e287ac5c47f326bc4b36d699bfb4ecadf97d1c18
+      source_reference: null
+      source_date: '2023-01-15'
+      metadata:
+        locator_text: performance paper, paragraph 2
+  anc-start:
+    type: Evidence
+    text: The recast timetable took effect on 3 July 2022.
+    provenance:
+    - origin_kind: external_source
+      quote: The recast timetable took effect on the 3rd of July 2022.
+      source_id: src-board
+      locator: anc-start
+      content_hash: sha256:23739c2320c98f029b1b5dbfe182beb9036c0862150eb751164384de05d6aae1
+      source_reference: null
+      source_date: '2023-01-15'
+      metadata:
+        locator_text: performance paper, paragraph 1
+  anc-table:
+    type: Evidence
+    text: 'On time (%): Q1 2022 88.1; Q4 2022 92.4. Average delay (minutes): Q1 2022
+      6.3; Q4 2022 4.2.'
+    provenance:
+    - origin_kind: external_source
+      quote: 'On time (%): Q1 2022 88.1; Q4 2022 92.4. Average delay (minutes): Q1
+        2022 6.3; Q4 2022 4.2.'
+      source_id: src-punct
+      locator: anc-table
+      content_hash: sha256:cf22020f736b053f661f3ca37bdcf63a0f5f12c8acf512d2813020a1b8422d75
+      source_reference: null
+      source_date: null
+      metadata:
+        locator_text: quarterly table, rows Q1 and Q4 2022
+  A_third:
+    type: Assumption
+    text: The average delay fell by about a third from Q1 2022 to Q4 2022.
+    confidence: 0.6
+edges:
+- source: anc-q4
+  target: h_recast
+  type: supports
+- source: anc-start
+  target: h_recast
+  type: supports
+- source: anc-table
+  target: h_recast
+  type: supports
+- source: A_third
+  target: h_recast
+  type: supports

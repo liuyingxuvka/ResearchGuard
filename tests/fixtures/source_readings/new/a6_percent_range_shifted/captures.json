@@ -1,0 +1,20 @@
+{
+ "owner": {
+  "file": "owner.txt",
+  "sha256": "e4072c1dd23385256cf64c5b53cb6197d443bf15e161c2b00aa3ff61fb8e8020"
+ },
+ "sources": {
+  "src-meter": {
+   "table": "tables/src-meter.csv",
+   "unit": "see header",
+   "lane": "gas",
+   "sha256": "15557e0e583c6f3df8125045dfa6e4660aee8492f7da5e2e3411249331c941be",
+   "captured_by": "fixture stand-in for a capture command"
+  },
+  "src-install": {
+   "text": "captures/src-install.txt",
+   "sha256": "cd0642ac240546cd93a47d7ab935755045017dd8328f4c643c95751bf220bf7f",
+   "captured_by": "fixture stand-in for a capture command"
+  }
+ }
+}

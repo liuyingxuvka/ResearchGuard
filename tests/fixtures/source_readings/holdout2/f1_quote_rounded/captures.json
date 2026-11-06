@@ -1,0 +1,20 @@
+{
+ "owner": {
+  "file": "owner.txt",
+  "sha256": "4013e426a178699b42d28c0a463f28c7165511a521f7d6e4ed14289ad6411c3c"
+ },
+ "sources": {
+  "src-punct": {
+   "table": "tables/src-punct.csv",
+   "unit": "see header",
+   "lane": "Elmbridge",
+   "sha256": "a3c4f58799857a1d463ff0a7c15b0df601c493b408f845b16fbf707dafd66ca2",
+   "captured_by": "fixture stand-in for a capture command"
+  },
+  "src-board": {
+   "text": "captures/src-board.txt",
+   "sha256": "8b89696e1831e411a6463b47ac40216116bb1fb5896c4c9feec23c32053c7c39",
+   "captured_by": "fixture stand-in for a capture command"
+  }
+ }
+}

@@ -19,3 +19,13 @@ def test_unchanged_quote_is_not_a_change(folder):
     status = research_status(load_research(folder))
     comparison = compare_research_status(status, status)
     assert not any(row['kind'] == 'evidence quote' for row in comparison['changes'])
+
+
+def test_old_status_without_quote_does_not_claim_a_word_was_changed(folder):
+    import copy
+    current = research_status(load_research(folder))
+    older = copy.deepcopy(current)
+    for row in older['evidence']:
+        row.pop('quote')
+    comparison = compare_research_status(older, current)
+    assert not any(row['kind'] == 'evidence quote' for row in comparison['changes'])

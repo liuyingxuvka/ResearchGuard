@@ -1,0 +1,16 @@
+schema: researchguard.research.v1
+question: Did the protected cycle lane on Harbour Road, opened in March 2023, increase
+  weekday cycling there?
+root_claim: h_lane
+hypotheses:
+- id: h_lane
+  text: The lane increased weekday cycling on Harbour Road.
+- id: h_trend
+  text: Cycling rose everywhere; the lane made no difference.
+models:
+  source: source.yaml
+  trace: trace.yaml
+  logic: logic.yaml
+search:
+  budget: 2
+  scope_sufficient: false

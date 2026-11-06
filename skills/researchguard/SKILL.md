@@ -10,11 +10,11 @@ description: "Use for research-quality checks: argument structure and claim supp
 Quick check before a conclusion:
 - A research folder exists: run `researchguard status <folder>` and read Verdict before you answer.
 - No folder: name the claim and its sources; if a source is missing, say so instead of asserting.
-- New evidence in a folder listing a source model: `researchguard source add-anchor` (a new source is a document another reader can find, named by its own title or link; a remark or your own summary is not evidence and stays out of the argument; show the owner the `source added` and `evidence added` lines of the comparison, because no tool can check a title or where a quote is printed; a source with no link, DOI, ISBN or arXiv id stays `unverifiable_source` whatever its title, old or new, so say so when you cite it), then `researchguard sync <folder>`, then `researchguard status <current> --candidate <folder>`.
+- Before citing new evidence, save the original with `researchguard source capture SOURCE --project FOLDER --file PATH` (or `--url URL`). Use its exact passages and table cells, not retyped values. Add anchors with `researchguard source add-anchor`, then `researchguard sync <folder>` and `researchguard status <current> --candidate <folder>`. Read the source checks: red means a captured contradiction; grey means an unread part or missing original. A title or hash proves no factual truth; show the comparison's `source added` and `evidence added` lines. A source without an outside locator stays `unverifiable_source` whatever its title, old or new.
 
 - Existing folder: run `researchguard status <folder>` first; read Verdict, Open gaps and Next; take the route Next names.
 - New research folder: write `research.yaml` first (template: `references/research-tree.md`, "Start a question"); each route's first step builds its model, listed in `models`.
-- After each route step run `status` again; discuss hypotheses, anchors and the verdict.
+- After a route step, read its updated `status`.
 - Discussing or analysing a conclusion with the owner: put the output of `researchguard status <folder> --picture` (or `--hypothesis <id> --picture`) in the reply and say what its Not drawn list leaves out and what its Problems list reports; never draw the support from memory.
 - Keep the source, trace, logic and experiment models as separate route models joined by shared ids, add only the routes and hypotheses the question needs, and read one hypothesis with status --hypothesis <id>.
 

@@ -1,0 +1,99 @@
+model:
+  id: cycling
+  title: Did the protected cycle lane on Harbour Road, opened in March 2023, increase
+    weekday cycling there?
+  root_claim: h_lane
+nodes:
+  h_lane:
+    type: Claim
+    text: The Harbour Road lane increased weekday cycling there.
+  h_trend:
+    type: Claim
+    text: Cycling rose everywhere.
+  anc-control:
+    type: Evidence
+    text: 'Quay Street: 640 (2022) and 655 (2023).'
+    provenance:
+    - origin_kind: external_source
+      quote: 'Quay Street (no new lane): 2022 640; 2023 655.'
+      source_id: src-counts
+      locator: anc-control
+      content_hash: sha256:693e844bd00c4601e3a808a6a0b341102c0d9b8bbeb559c75a585f96116bd004
+      source_reference: null
+      source_date: null
+      metadata:
+        locator_text: counter table, Quay Street column
+  anc-counts:
+    type: Evidence
+    text: 'Harbour Road: 1,180 (2022), 1,650 (2023), 1,720 (2024) cyclists per weekday.'
+    provenance:
+    - origin_kind: external_source
+      quote: 'Weekday cyclists, Harbour Road: 2022 1,180; 2023 1,650; 2024 1,720.'
+      source_id: src-counts
+      locator: anc-counts
+      content_hash: sha256:c23d6471dde61f09232e34b00935cead53893bb1d2bf388d8cba7f7c60d9839a
+      source_reference: null
+      source_date: null
+      metadata:
+        locator_text: counter table, Harbour Road column
+  anc-open:
+    type: Evidence
+    text: The lane opened at 7.30 a.m. on 6 March 2023.
+    provenance:
+    - origin_kind: external_source
+      quote: The protected lane opened at half past seven on the morning of 6 March
+        2023.
+      source_id: src-release
+      locator: anc-open
+      content_hash: sha256:16005888266a16401c9e5555bd9868f0ea0342358f4a14eb696f2bb3658fa4a7
+      source_reference: null
+      source_date: '2024-03-06'
+      metadata:
+        locator_text: press release, paragraph 1
+  anc-release-rise:
+    type: Evidence
+    text: Weekday cycling on Harbour Road rose by 40 per cent in its first year, the
+      council said, with 1 650 cyclists a day counted in 2023 against 1 180 in 2022.
+    provenance:
+    - origin_kind: external_source
+      quote: Weekday cycling on Harbour Road rose by 40 per cent in its first year,
+        the council said, with 1 650 cyclists a day counted in 2023 against 1 180
+        in 2022.
+      source_id: src-release
+      locator: anc-release-rise
+      content_hash: sha256:8ff17fb691a450ebb73402a27b541b03ca814c83534280dc7b2d58a811a651c8
+      source_reference: null
+      source_date: '2024-03-06'
+      metadata:
+        locator_text: press release, paragraph 2
+  R_h_trend_anc-control:
+    type: Rebuttal
+    text: 'Opposing evidence for h_trend: Quay Street (no new lane): 2022 640; 2023
+      655.'
+  A_rise:
+    type: Assumption
+    text: Harbour Road saw a 25 per cent rise in weekday cycling between 2022 and
+      2023.
+    confidence: 0.6
+edges:
+- source: anc-control
+  target: h_lane
+  type: supports
+- source: anc-counts
+  target: h_lane
+  type: supports
+- source: anc-open
+  target: h_lane
+  type: supports
+- source: anc-release-rise
+  target: h_lane
+  type: supports
+- source: R_h_trend_anc-control
+  target: h_trend
+  type: attacks
+- source: anc-control
+  target: R_h_trend_anc-control
+  type: supports
+- source: A_rise
+  target: h_lane
+  type: supports

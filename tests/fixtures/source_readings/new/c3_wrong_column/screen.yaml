@@ -1,0 +1,10 @@
+owner_quotes:
+  question: Did leakage from Norbridge's water network fall after the mains replacement
+    programme that started in April 2021?
+  root_claim:h_mains: leakage from Norbridge's water network fall after the mains
+    replacement programme
+ai_choices:
+  change_tolerance: 0.25
+terms:
+  programme: event_programme
+lanes: {}

@@ -1,0 +1,20 @@
+{
+ "owner": {
+  "file": "owner.txt",
+  "sha256": "b02b20bc8b55d5a4e857540222c1ad15c30aeb1c4b783ec4c58cf44e46480339"
+ },
+ "sources": {
+  "src-courier": {
+   "text": "captures/src-courier.txt",
+   "sha256": "6786042cd3339be4217480d77452e8311bc9aa2fd1210a0a5b31b2ef62d66700",
+   "captured_by": "fixture stand-in for a capture command"
+  },
+  "src-log": {
+   "table": "tables/src-log.csv",
+   "unit": "time of day",
+   "lane": "log",
+   "sha256": "922bab30b39f50c004d12c6b1f45ff4192e055348b89ec4c150e3d6fd446338f",
+   "captured_by": "fixture stand-in for a capture command"
+  }
+ }
+}

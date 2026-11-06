@@ -1,0 +1,57 @@
+metadata:
+  purpose: Did the recast timetable on the Elmbridge line in July 2022 cut the average
+    train delay?
+  skill: SourceGuard
+  source_policy: public_only
+sources:
+- source_id: src-board
+  title: Elmbridge line performance paper, January 2023 (fixture)
+  source_type: report
+  source_status: saved
+  source_reliability: 0.8
+  source_role: primary_source
+  lineage_id: lin-src-board
+  source_date: '2023-01-15'
+- source_id: src-punct
+  title: Elmbridge line quarterly punctuality table 2022 (fixture)
+  source_type: dataset
+  source_status: saved
+  source_reliability: 0.8
+  source_role: primary_source
+  lineage_id: lin-src-punct
+  coverage_period: '2022'
+anchors:
+- anchor_id: anc-start
+  source_id: src-board
+  anchor_type: paragraph
+  locator: performance paper, paragraph 1
+  text: The recast timetable took effect on the 3rd of July 2022.
+  normalized_summary: Timetable changed 3 July 2022.
+  modality: text
+  extraction_confidence: 0.8
+  specificity: 0.8
+  usable_for_claim: true
+- anchor_id: anc-q4
+  source_id: src-board
+  anchor_type: paragraph
+  locator: performance paper, paragraph 2
+  text: In the last quarter of 2022, 92.4 per cent of trains ran on time and the average
+    delay was 252 seconds, down from 6.3 minutes in the first quarter.
+  normalized_summary: 'Q4 2022: 92.4% on time; average delay 4.2 minutes (252 seconds),
+    down from 6.3 minutes in Q1.'
+  modality: text
+  extraction_confidence: 0.8
+  specificity: 0.8
+  usable_for_claim: true
+- anchor_id: anc-table
+  source_id: src-punct
+  anchor_type: table
+  locator: quarterly table, rows Q1 and Q4 2022
+  text: 'On time (%): Q1 2022 6.3; Q4 2022 4.2. Average delay (minutes): Q1 2022 6.3;
+    Q4 2022 4.2.'
+  normalized_summary: On time rose from 88.1% to 92.4% and the average delay fell
+    from 6.3 to 4.2 minutes.
+  modality: table
+  extraction_confidence: 0.8
+  specificity: 0.8
+  usable_for_claim: true

@@ -1,0 +1,130 @@
+metadata:
+  schema_version: researchguard.trace.model.v2
+  purpose: 'Which libtrove release fixed the stream decoder memory leak reported in
+    issue #482, and on what date was that release published?'
+sources:
+- source_id: src-changelog
+  title: libtrove CHANGELOG.md at tag v2.4.1 (fixture)
+  url: null
+  source_date: '2024-06-11'
+  lineage_id: lin-src-changelog
+  source_type: web_page
+  independence_group: lin-src-changelog
+  source_reliability: 0.8
+  source_status: stable_keep
+  coverage_period: null
+- source_id: src-issue
+  title: 'libtrove issue #482 page (fixture)'
+  url: null
+  source_date: '2024-06-11'
+  lineage_id: lin-src-issue
+  source_type: web_page
+  independence_group: lin-src-issue
+  source_reliability: 0.8
+  source_status: stable_keep
+  coverage_period: null
+evidence:
+- evidence_id: anc-fix
+  raw_text: Fix memory leak in the stream decoder when a frame is truncated (#482).
+  source_id: src-changelog
+  locator: CHANGELOG.md, section 2.4.1, bullet 1
+  normalized_summary: Fixed in 2.4.1 (2024-06-11).
+  evidence_type: paragraph
+  extraction_confidence: 0.8
+  evidence_specificity: 0.8
+  limits: []
+  warnings: []
+  usable_as_trace_evidence: true
+- evidence_id: anc-known
+  raw_text: 'Known issue: the stream decoder leaks memory on truncated frames (#482).'
+  source_id: src-changelog
+  locator: CHANGELOG.md, section 2.4.0, bullet 2
+  normalized_summary: Still open in 2.4.0 (2024-05-28).
+  evidence_type: paragraph
+  extraction_confidence: 0.8
+  evidence_specificity: 0.8
+  limits: []
+  warnings: []
+  usable_as_trace_evidence: true
+- evidence_id: anc-opened
+  raw_text: Opened on 30 May 2024 by kmori.
+  source_id: src-issue
+  locator: 'issue #482, header'
+  normalized_summary: Opened 30 May 2024.
+  evidence_type: paragraph
+  extraction_confidence: 0.8
+  evidence_specificity: 0.8
+  limits: []
+  warnings: []
+  usable_as_trace_evidence: true
+- evidence_id: anc-closed
+  raw_text: Closed on 11 June 2024 by the release of version 2.4.1.
+  source_id: src-issue
+  locator: 'issue #482, header'
+  normalized_summary: Closed 11 Jun 2024 by 2.4.1.
+  evidence_type: paragraph
+  extraction_confidence: 0.8
+  evidence_specificity: 0.8
+  limits: []
+  warnings: []
+  usable_as_trace_evidence: true
+events:
+- event_id: event_known
+  evidence_ids:
+  - anc-known
+  action: 2.4.0 lists the leak as a known issue
+  event_type: observation
+  time_interval:
+    start: '2024-05-28'
+    precision: exact_date
+    confidence: 0.9
+- event_id: event_opened
+  evidence_ids:
+  - anc-opened
+  action: issue opened
+  event_type: observation
+  time_interval:
+    start: '2024-05-30'
+    precision: exact_date
+    confidence: 0.9
+- event_id: event_release_241
+  evidence_ids:
+  - anc-fix
+  - anc-closed
+  action: 2.4.1 released with the fix
+  event_type: observation
+  time_interval:
+    start: '2024-06-01'
+    precision: exact_date
+    confidence: 0.9
+storyline_hypotheses:
+- hypothesis_id: h_241
+  claim: 2.4.1 fixed the leak.
+  role: primary
+  event_ids:
+  - event_known
+  - event_release_241
+  causal: false
+- hypothesis_id: h_240
+  claim: 2.4.0 fixed the leak.
+  role: alternative
+  event_ids:
+  - event_known
+  causal: false
+hypothesis_evidence_links:
+- link_id: l_241_fix
+  hypothesis_id: h_241
+  evidence_id: anc-fix
+  polarity: support
+  declared_relevance: 0.7
+- link_id: l_241_closed
+  hypothesis_id: h_241
+  evidence_id: anc-closed
+  polarity: support
+  declared_relevance: 0.7
+- link_id: l_240_known
+  hypothesis_id: h_240
+  evidence_id: anc-known
+  polarity: oppose
+  declared_relevance: 0.7
+causal_candidates: []

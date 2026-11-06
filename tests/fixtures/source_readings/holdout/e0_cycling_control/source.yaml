@@ -1,0 +1,65 @@
+metadata:
+  purpose: Did the protected cycle lane on Harbour Road, opened in March 2023, increase
+    weekday cycling there?
+  skill: SourceGuard
+  source_policy: public_only
+sources:
+- source_id: src-release
+  title: Council press release, Harbour Road cycle lane one year on (fixture)
+  source_type: web_page
+  source_status: saved
+  source_reliability: 0.8
+  source_role: primary_source
+  lineage_id: lin-src-release
+  source_date: '2024-03-06'
+- source_id: src-counts
+  title: Council automatic cycle counters, weekday means (fixture)
+  source_type: dataset
+  source_status: saved
+  source_reliability: 0.8
+  source_role: primary_source
+  lineage_id: lin-src-counts
+  coverage_period: 2022 to 2024
+anchors:
+- anchor_id: anc-open
+  source_id: src-release
+  anchor_type: paragraph
+  locator: press release, paragraph 1
+  text: The protected lane opened at half past seven on the morning of 6 March 2023.
+  normalized_summary: Lane opened 7.30 a.m., 6 Mar 2023.
+  modality: text
+  extraction_confidence: 0.8
+  specificity: 0.8
+  usable_for_claim: true
+- anchor_id: anc-release-rise
+  source_id: src-release
+  anchor_type: paragraph
+  locator: press release, paragraph 2
+  text: Weekday cycling on Harbour Road rose by 40 per cent in its first year, the
+    council said, with 1 650 cyclists a day counted in 2023 against 1 180 in 2022.
+  normalized_summary: 'Release: up 40 per cent in the first year, 1,180 to 1,650 a
+    day.'
+  modality: text
+  extraction_confidence: 0.8
+  specificity: 0.8
+  usable_for_claim: true
+- anchor_id: anc-counts
+  source_id: src-counts
+  anchor_type: table
+  locator: counter table, Harbour Road column
+  text: 'Weekday cyclists, Harbour Road: 2022 1,180; 2023 1,650; 2024 1,720.'
+  normalized_summary: Harbour Road counts 1,180, 1,650, 1,720.
+  modality: table
+  extraction_confidence: 0.8
+  specificity: 0.8
+  usable_for_claim: true
+- anchor_id: anc-control
+  source_id: src-counts
+  anchor_type: table
+  locator: counter table, Quay Street column
+  text: 'Quay Street (no new lane): 2022 640; 2023 655.'
+  normalized_summary: 'Quay Street, without a new lane, stayed flat: 640 to 655 (+2%).'
+  modality: table
+  extraction_confidence: 0.8
+  specificity: 0.8
+  usable_for_claim: true

@@ -1,0 +1,15 @@
+schema: researchguard.research.v1
+question: Did cleaning the roof panels on 2 June 2024 raise the array's daily output?
+root_claim: h_clean
+hypotheses:
+- id: h_clean
+  text: Cleaning raised the daily output.
+- id: h_sun
+  text: Sunnier days explain the higher output.
+models:
+  source: source.yaml
+  trace: trace.yaml
+  logic: logic.yaml
+search:
+  budget: 2
+  scope_sufficient: false

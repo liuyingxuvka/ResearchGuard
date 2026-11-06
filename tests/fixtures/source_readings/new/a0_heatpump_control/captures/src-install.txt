@@ -1,0 +1,5 @@
+INSTALLER COMMISSIONING RECORD - 14 ALDER CLOSE
+The air-source heat pump was commissioned on 14 March 2023 and the gas boiler was
+capped the same day. The gas supply stays connected for the cooker only.
+Rated heat output 7 kW. Measured flow on the heating cir-
+cuit: 18 litres per minute at a flow temperature of 45 degrees Celsius.

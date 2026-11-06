@@ -1,0 +1,18 @@
+{
+ "owner": {
+  "file": "owner.txt",
+  "sha256": "e6df5bc01bd40ca0519dabd29ec2ef425372e2ac94fdcf2ecab53b3fa6f98293"
+ },
+ "sources": {
+  "src-changelog": {
+   "text": "captures/src-changelog.txt",
+   "sha256": "f1c9a05c99a57ae375272f242f97af3b6c457c243158d91df087505828dab072",
+   "captured_by": "fixture stand-in for a capture command"
+  },
+  "src-issue": {
+   "text": "captures/src-issue.txt",
+   "sha256": "52fd5296841a39534dac7f91b8a5b7ec5526ef61172bac333bd8f935ad706990",
+   "captured_by": "fixture stand-in for a capture command"
+  }
+ }
+}

@@ -1,0 +1,9 @@
+{
+ "e0_cycling_control": "HOLDOUT control: unit row and year rows in the table, a no-break space in the release, a change clause that names the later year first ('in 2023 compared with 2022')",
+ "e1_elided_quote_control": "HOLDOUT control: a quote with an elision ('...') in the middle",
+ "e2_wrong_row_year_keys": "HOLDOUT: value from the wrong row in a table keyed by years: 2023 given 2024's 1,720",
+ "e3_percent_without_by": "HOLDOUT: percentage shifted, written without 'by': 'rose 60 per cent from 2022 to 2023' (true +39.8%)",
+ "e4_morning_to_evening": "HOLDOUT: time copied wrong: 'half past seven on the morning' restated as 7.30 p.m.",
+ "e5_noun_change": "HOLDOUT: percentage shifted, noun form: 'a 25 per cent rise between 2022 and 2023' (true +39.8%)",
+ "e6_dropped_digit": "HOLDOUT: number misread: the release's 1 650 restated as 165 in the summary"
+}

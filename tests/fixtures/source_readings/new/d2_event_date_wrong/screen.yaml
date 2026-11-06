@@ -1,0 +1,8 @@
+owner_quotes:
+  question: 'Which libtrove release fixed the stream decoder memory leak reported
+    in issue #482, and on what date was that release published?'
+  root_claim:h_241: Which libtrove release fixed the stream decoder memory leak
+ai_choices:
+  change_tolerance: 0.25
+terms: {}
+lanes: {}

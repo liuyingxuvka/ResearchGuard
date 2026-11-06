@@ -1,0 +1,4 @@
+{"observations": [
+  {"experiment_id": "e_transpacific", "observed_outcome": "similar_rise", "evidence_id": "anc-transpacific", "source_ref": "src-wci-transpacific", "observed_at": "2026-10-21T19:40:00Z", "role": "construction", "status": "valid"},
+  {"experiment_id": "e_reversion", "observed_outcome": "keeps_rising", "evidence_id": "anc-wci-series", "source_ref": "src-drewry-wci", "observed_at": "2026-10-21T19:40:00Z", "role": "construction", "status": "valid"}
+]}

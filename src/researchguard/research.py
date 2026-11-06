@@ -473,6 +473,9 @@ def research_status(tree: ResearchTree) -> dict[str, Any]:
                                   capture_results=captured)
     problems["errors"] = sorted(set(tree.errors + problems["errors"]))
     tree.input_paths.extend(path for path in captured["paths"] if path not in tree.input_paths)
+    reading_settings = tree.path.parent / "screen.yaml"
+    if (tree.path.parent / "captures.json").is_file() and reading_settings.is_file() and reading_settings not in tree.input_paths:
+        tree.input_paths.append(reading_settings)
     results: dict[str, Any] = {}
     for route, model in tree.models.items():
         try:
@@ -584,7 +587,7 @@ def research_status(tree: ResearchTree) -> dict[str, Any]:
         digest = hashlib.sha256(path.read_bytes()).hexdigest()
         input_digests.append({"path": Path(os.path.relpath(path, tree.path.parent)).as_posix(), "sha256": digest})
     input_digests.sort(key=lambda row: row['path'])
-    return {"source_readings": captured["rows"], "input_digests": input_digests, "suite": SUITE_ID, "question": tree.index["question"], "verdict": verdict,
+    status = {"source_readings": captured["rows"], "input_digests": input_digests, "suite": SUITE_ID, "question": tree.index["question"], "verdict": verdict,
         "ablations": ablations, "disagreements": disagreements, "models": {
         key: {"path": value, "status": "ok" if key in results else "invalid"}
         for key, value in tree.index.get("models", {}).items() if key != "experiment_observations"},
@@ -592,6 +595,19 @@ def research_status(tree: ResearchTree) -> dict[str, Any]:
         "sources": [{"id": row.source_id, "identity": source_identity(row).summary()}
                     for row in (tree.models["source"].sources if "source" in tree.models else ())],
         "next": next_actions, **problems}
+    if (tree.path.parent / "captures.json").is_file():
+        from .source.readings import source_reading_results
+        reading = source_reading_results(tree, status)
+        status["source_checks"] = reading["checks"]
+        problems["errors"] = sorted(set(problems["errors"] + reading["errors"]))
+        status["verdict"]["errors"] = len(problems["errors"])
+        problems["warnings"] = sorted(set(problems["warnings"] + reading["warnings"]))
+        for row in status["source_readings"]:
+            if row["colour"] != "red" and row["id"] in reading["anchor_colours"]:
+                row["colour"] = reading["anchor_colours"][row["id"]]
+                checks=[c for c in reading["checks"] if c["section"]=="ANCHORS" and c["reason"].startswith(row["id"])]
+                if checks: row["reason"]=checks[0]["reason"]
+    return {**status, **problems}
 
 
 def _named(row: dict[str, Any]) -> str:
@@ -811,7 +827,8 @@ def compare_research_status(current, candidate):
             changes.append({"kind": "evidence", "id": identifier,
                             "before": {key: value for key, value in filed(before).items() if value != filed(after)[key]},
                             "after": {key: value for key, value in filed(after).items() if value != filed(before)[key]}})
-        if before is not None and after is not None and before.get("quote") != after.get("quote"):
+        if (before is not None and after is not None and "quote" in before and "quote" in after
+                and before["quote"] != after["quote"]):
             changes.append({"kind": "evidence quote", "id": identifier, "change": "changed",
                             "detail": f'{before.get("quote", "")!r} → {after.get("quote", "")!r}'})
     disagreement = lambda rows: {f"{row['hypothesis']}:{row['kind']}:{row['detail']}" for row in rows}

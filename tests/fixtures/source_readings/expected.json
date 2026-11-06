@@ -1,0 +1,1056 @@
+{
+  "basis": "Five original-reading sections of the supplied ResearchGuard v1 prototype; all 47 folders are public synthetic fixtures, including historical holdout group names.",
+  "seeds": {
+    "holdout/e0_cycling_control": {
+      "sections": {
+        "ANCHORS": [
+          "G",
+          "G",
+          "G",
+          "G"
+        ],
+        "CHANGES": [
+          "G",
+          "G",
+          "."
+        ],
+        "RESTATEMENTS": [
+          "G"
+        ],
+        "TIMELINE": [
+          "G"
+        ]
+      },
+      "exit": 0
+    },
+    "holdout/e1_elided_quote_control": {
+      "sections": {
+        "ANCHORS": [
+          "G",
+          "G",
+          "G",
+          "G"
+        ],
+        "CHANGES": [
+          "G",
+          "G",
+          "."
+        ],
+        "RESTATEMENTS": [
+          "G"
+        ],
+        "TIMELINE": [
+          "G"
+        ]
+      },
+      "exit": 0
+    },
+    "holdout/e2_wrong_row_year_keys": {
+      "sections": {
+        "ANCHORS": [
+          "G",
+          "G",
+          "R",
+          "G"
+        ],
+        "CHANGES": [
+          "G",
+          "G",
+          "."
+        ],
+        "RESTATEMENTS": [
+          "G"
+        ],
+        "TIMELINE": [
+          "G"
+        ]
+      },
+      "exit": 1
+    },
+    "holdout/e3_percent_without_by": {
+      "sections": {
+        "ANCHORS": [
+          "G",
+          "G",
+          "G",
+          "G"
+        ],
+        "CHANGES": [
+          "G",
+          "R",
+          "."
+        ],
+        "RESTATEMENTS": [
+          "G"
+        ],
+        "TIMELINE": [
+          "G"
+        ]
+      },
+      "exit": 1
+    },
+    "holdout/e4_morning_to_evening": {
+      "sections": {
+        "ANCHORS": [
+          "G",
+          "G",
+          "G",
+          "G"
+        ],
+        "CHANGES": [
+          "G",
+          "G",
+          "."
+        ],
+        "RESTATEMENTS": [
+          "R",
+          "."
+        ],
+        "TIMELINE": [
+          "G"
+        ]
+      },
+      "exit": 1
+    },
+    "holdout/e5_noun_change": {
+      "sections": {
+        "ANCHORS": [
+          "G",
+          "G",
+          "G",
+          "G"
+        ],
+        "CHANGES": [
+          "G",
+          "R",
+          "."
+        ],
+        "RESTATEMENTS": [
+          "G"
+        ],
+        "TIMELINE": [
+          "G"
+        ]
+      },
+      "exit": 1
+    },
+    "holdout/e6_dropped_digit": {
+      "sections": {
+        "ANCHORS": [
+          "G",
+          "G",
+          "G",
+          "G"
+        ],
+        "CHANGES": [
+          "G",
+          "G",
+          "."
+        ],
+        "RESTATEMENTS": [
+          "R",
+          "."
+        ],
+        "TIMELINE": [
+          "G"
+        ]
+      },
+      "exit": 1
+    },
+    "holdout2/f0_rail_control": {
+      "sections": {
+        "ANCHORS": [
+          "G",
+          "G",
+          "G"
+        ],
+        "CHANGES": [
+          "G",
+          "G"
+        ],
+        "RESTATEMENTS": [
+          "G"
+        ],
+        "TIMELINE": [
+          "G"
+        ]
+      },
+      "exit": 0
+    },
+    "holdout2/f1_quote_rounded": {
+      "sections": {
+        "ANCHORS": [
+          "G",
+          "R",
+          "G"
+        ],
+        "CHANGES": [
+          "G",
+          "G"
+        ],
+        "RESTATEMENTS": [
+          "G"
+        ],
+        "TIMELINE": [
+          "G"
+        ]
+      },
+      "exit": 1
+    },
+    "holdout2/f2_dropped_60": {
+      "sections": {
+        "ANCHORS": [
+          "G",
+          "G",
+          "G"
+        ],
+        "CHANGES": [
+          "G",
+          "G"
+        ],
+        "RESTATEMENTS": [
+          "R",
+          "."
+        ],
+        "TIMELINE": [
+          "G"
+        ]
+      },
+      "exit": 1
+    },
+    "holdout2/f3_other_source_halved": {
+      "sections": {
+        "ANCHORS": [
+          "G",
+          "G",
+          "G",
+          "."
+        ],
+        "CHANGES": [
+          "G",
+          "R",
+          "G",
+          "."
+        ],
+        "RESTATEMENTS": [
+          "G"
+        ],
+        "TIMELINE": [
+          "G"
+        ]
+      },
+      "exit": 1
+    },
+    "holdout2/f4_ordinal_date_wrong": {
+      "sections": {
+        "ANCHORS": [
+          "G",
+          "G",
+          "G"
+        ],
+        "CHANGES": [
+          "G",
+          "G"
+        ],
+        "RESTATEMENTS": [
+          "R",
+          "."
+        ],
+        "TIMELINE": [
+          "G"
+        ]
+      },
+      "exit": 1
+    },
+    "holdout2/f5_wrong_column": {
+      "sections": {
+        "ANCHORS": [
+          "G",
+          "G",
+          "R"
+        ],
+        "CHANGES": [
+          "G",
+          "G"
+        ],
+        "RESTATEMENTS": [
+          "G"
+        ],
+        "TIMELINE": [
+          "G"
+        ]
+      },
+      "exit": 1
+    },
+    "holdout3/g0_solar_control": {
+      "sections": {
+        "ANCHORS": [
+          "G",
+          "G"
+        ],
+        "CHANGES": [
+          "G",
+          "G"
+        ],
+        "RESTATEMENTS": [
+          "G"
+        ],
+        "TIMELINE": [
+          "G"
+        ]
+      },
+      "exit": 0
+    },
+    "holdout3/g1_dates_restyled_control": {
+      "sections": {
+        "ANCHORS": [
+          "G",
+          "G"
+        ],
+        "CHANGES": [
+          "G",
+          "G"
+        ],
+        "RESTATEMENTS": [
+          "G"
+        ],
+        "TIMELINE": [
+          "G"
+        ]
+      },
+      "exit": 0
+    },
+    "holdout3/g2_unit_x1000": {
+      "sections": {
+        "ANCHORS": [
+          "G",
+          "G"
+        ],
+        "CHANGES": [
+          "G",
+          "G"
+        ],
+        "RESTATEMENTS": [
+          "R",
+          "."
+        ],
+        "TIMELINE": [
+          "G"
+        ]
+      },
+      "exit": 1
+    },
+    "holdout3/g3_quote_date_shifted": {
+      "sections": {
+        "ANCHORS": [
+          "R",
+          "G"
+        ],
+        "CHANGES": [
+          "G",
+          "G"
+        ],
+        "RESTATEMENTS": [
+          "G"
+        ],
+        "TIMELINE": [
+          "R"
+        ]
+      },
+      "exit": 1
+    },
+    "holdout3/g4_tripled_restyled_dates": {
+      "sections": {
+        "ANCHORS": [
+          "G",
+          "G"
+        ],
+        "CHANGES": [
+          "G",
+          "R"
+        ],
+        "RESTATEMENTS": [
+          "G"
+        ],
+        "TIMELINE": [
+          "G"
+        ]
+      },
+      "exit": 1
+    },
+    "new/a0_heatpump_control": {
+      "sections": {
+        "ANCHORS": [
+          "G",
+          "G",
+          "G"
+        ],
+        "CHANGES": [
+          "G",
+          "G",
+          "G"
+        ],
+        "RESTATEMENTS": [
+          "G"
+        ],
+        "TIMELINE": [
+          "G",
+          "G"
+        ]
+      },
+      "exit": 0
+    },
+    "new/a1_row_misread": {
+      "sections": {
+        "ANCHORS": [
+          "G",
+          "R",
+          "G"
+        ],
+        "CHANGES": [
+          "G",
+          "G",
+          "G"
+        ],
+        "RESTATEMENTS": [
+          "G"
+        ],
+        "TIMELINE": [
+          "G",
+          "G"
+        ]
+      },
+      "exit": 1
+    },
+    "new/a2_second_column_control": {
+      "sections": {
+        "ANCHORS": [
+          "G",
+          "G",
+          "G",
+          "G"
+        ],
+        "CHANGES": [
+          "G",
+          "G",
+          "G",
+          "G"
+        ],
+        "RESTATEMENTS": [
+          "G"
+        ],
+        "TIMELINE": [
+          "G",
+          "G"
+        ]
+      },
+      "exit": 0
+    },
+    "new/a3_unit_dropped_factor": {
+      "sections": {
+        "ANCHORS": [
+          "R",
+          "G",
+          "G"
+        ],
+        "CHANGES": [
+          "G",
+          "G",
+          "G"
+        ],
+        "RESTATEMENTS": [
+          "G"
+        ],
+        "TIMELINE": [
+          "G",
+          "G"
+        ]
+      },
+      "exit": 1
+    },
+    "new/a4_hyphen_break_control": {
+      "sections": {
+        "ANCHORS": [
+          "G",
+          "G",
+          "G",
+          "G"
+        ],
+        "CHANGES": [
+          "G",
+          "G",
+          "G"
+        ],
+        "RESTATEMENTS": [
+          "G"
+        ],
+        "TIMELINE": [
+          "G",
+          "G"
+        ]
+      },
+      "exit": 0
+    },
+    "new/a5_flow_dropped_1000": {
+      "sections": {
+        "ANCHORS": [
+          "G",
+          "G",
+          "G",
+          "G"
+        ],
+        "CHANGES": [
+          "G",
+          "G",
+          "G"
+        ],
+        "RESTATEMENTS": [
+          "R",
+          "."
+        ],
+        "TIMELINE": [
+          "G",
+          "G"
+        ]
+      },
+      "exit": 1
+    },
+    "new/a6_percent_range_shifted": {
+      "sections": {
+        "ANCHORS": [
+          "G",
+          "G",
+          "G"
+        ],
+        "CHANGES": [
+          "G",
+          "G",
+          "R"
+        ],
+        "RESTATEMENTS": [
+          "G"
+        ],
+        "TIMELINE": [
+          "G",
+          "G"
+        ]
+      },
+      "exit": 1
+    },
+    "new/b0_millfire_control": {
+      "sections": {
+        "ANCHORS": [
+          "G",
+          "G",
+          "G"
+        ],
+        "CHANGES": [
+          "."
+        ],
+        "RESTATEMENTS": [
+          "G"
+        ],
+        "NUMBERS": [
+          "."
+        ],
+        "TIMELINE": [
+          "."
+        ]
+      },
+      "exit": 0
+    },
+    "new/b1_quote_person_swapped": {
+      "sections": {
+        "ANCHORS": [
+          "G",
+          "R",
+          "G"
+        ],
+        "CHANGES": [
+          "."
+        ],
+        "RESTATEMENTS": [
+          "G"
+        ],
+        "NUMBERS": [
+          "."
+        ],
+        "TIMELINE": [
+          "."
+        ]
+      },
+      "exit": 1
+    },
+    "new/b2_restatement_role_swap": {
+      "sections": {
+        "ANCHORS": [
+          "G",
+          "G",
+          "G"
+        ],
+        "CHANGES": [
+          "."
+        ],
+        "RESTATEMENTS": [
+          "G"
+        ],
+        "NUMBERS": [
+          "."
+        ],
+        "TIMELINE": [
+          "."
+        ]
+      },
+      "exit": 0
+    },
+    "new/b3_time_restated_wrong": {
+      "sections": {
+        "ANCHORS": [
+          "G",
+          "G",
+          "G"
+        ],
+        "CHANGES": [
+          "."
+        ],
+        "RESTATEMENTS": [
+          "R",
+          "."
+        ],
+        "NUMBERS": [
+          "."
+        ],
+        "TIMELINE": [
+          "."
+        ]
+      },
+      "exit": 1
+    },
+    "new/b4_log_table_control": {
+      "sections": {
+        "ANCHORS": [
+          "G",
+          "G",
+          "G",
+          "G"
+        ],
+        "CHANGES": [
+          "."
+        ],
+        "RESTATEMENTS": [
+          "G"
+        ],
+        "NUMBERS": [
+          "."
+        ],
+        "TIMELINE": [
+          "."
+        ]
+      },
+      "exit": 0
+    },
+    "new/b5_log_time_misread": {
+      "sections": {
+        "ANCHORS": [
+          "G",
+          "G",
+          "G",
+          "R"
+        ],
+        "CHANGES": [
+          "."
+        ],
+        "RESTATEMENTS": [
+          "G"
+        ],
+        "NUMBERS": [
+          "."
+        ],
+        "TIMELINE": [
+          "."
+        ]
+      },
+      "exit": 1
+    },
+    "new/c0_leakage_control": {
+      "sections": {
+        "ANCHORS": [
+          "G",
+          "G",
+          "G",
+          "G"
+        ],
+        "CHANGES": [
+          "G",
+          "G",
+          "."
+        ],
+        "RESTATEMENTS": [
+          "G"
+        ],
+        "TIMELINE": [
+          ".",
+          "G"
+        ]
+      },
+      "exit": 0
+    },
+    "new/c1_wrong_row": {
+      "sections": {
+        "ANCHORS": [
+          "G",
+          "G",
+          "R",
+          "G"
+        ],
+        "CHANGES": [
+          "G",
+          "G",
+          "."
+        ],
+        "RESTATEMENTS": [
+          "G"
+        ],
+        "TIMELINE": [
+          ".",
+          "G"
+        ]
+      },
+      "exit": 1
+    },
+    "new/c2_thin_space_control": {
+      "sections": {
+        "ANCHORS": [
+          "G",
+          "G",
+          "G",
+          "G"
+        ],
+        "CHANGES": [
+          "G",
+          "G",
+          "."
+        ],
+        "RESTATEMENTS": [
+          "G"
+        ],
+        "TIMELINE": [
+          ".",
+          "G"
+        ]
+      },
+      "exit": 0
+    },
+    "new/c3_wrong_column": {
+      "sections": {
+        "ANCHORS": [
+          "G",
+          "G",
+          "G",
+          "R"
+        ],
+        "CHANGES": [
+          "G",
+          "G",
+          "."
+        ],
+        "RESTATEMENTS": [
+          "G"
+        ],
+        "TIMELINE": [
+          ".",
+          "G"
+        ]
+      },
+      "exit": 1
+    },
+    "new/c4_rounding_changes_claim": {
+      "sections": {
+        "ANCHORS": [
+          "G",
+          "G",
+          "G",
+          "G"
+        ],
+        "CHANGES": [
+          "G",
+          "R",
+          "."
+        ],
+        "RESTATEMENTS": [
+          "G"
+        ],
+        "NUMBERS": [
+          "."
+        ],
+        "TIMELINE": [
+          ".",
+          "G"
+        ]
+      },
+      "exit": 1
+    },
+    "new/d0_libtrove_control": {
+      "sections": {
+        "ANCHORS": [
+          "G",
+          "G",
+          "G",
+          "G"
+        ],
+        "RESTATEMENTS": [
+          "G"
+        ],
+        "TIMELINE": [
+          "G"
+        ]
+      },
+      "exit": 0
+    },
+    "new/d1_version_off_by_one": {
+      "sections": {
+        "ANCHORS": [
+          "G",
+          "G",
+          "G",
+          "G"
+        ],
+        "RESTATEMENTS": [
+          "R",
+          "R",
+          ".",
+          ".",
+          "."
+        ],
+        "TIMELINE": [
+          "G"
+        ]
+      },
+      "exit": 1
+    },
+    "new/d2_event_date_wrong": {
+      "sections": {
+        "ANCHORS": [
+          "G",
+          "G",
+          "G",
+          "G"
+        ],
+        "RESTATEMENTS": [
+          "G"
+        ],
+        "TIMELINE": [
+          "R"
+        ]
+      },
+      "exit": 1
+    },
+    "new/d3_quote_two_words": {
+      "sections": {
+        "ANCHORS": [
+          "G",
+          "R",
+          "G",
+          "G"
+        ],
+        "RESTATEMENTS": [
+          "G"
+        ],
+        "TIMELINE": [
+          "."
+        ]
+      },
+      "exit": 1
+    },
+    "public/s0_control": {
+      "sections": {
+        "ANCHORS": [
+          "G",
+          "G",
+          "G",
+          "G"
+        ],
+        "CHANGES": [
+          "G",
+          "G",
+          "."
+        ],
+        "RESTATEMENTS": [
+          "G"
+        ],
+        "NUMBERS": [
+          "."
+        ],
+        "TIMELINE": [
+          "G",
+          "G"
+        ]
+      },
+      "exit": 0
+    },
+    "public/s1_doubled": {
+      "sections": {
+        "ANCHORS": [
+          "G",
+          "G",
+          "G",
+          "G"
+        ],
+        "CHANGES": [
+          "G",
+          "G",
+          "R",
+          "."
+        ],
+        "RESTATEMENTS": [
+          "G"
+        ],
+        "NUMBERS": [
+          "."
+        ],
+        "TIMELINE": [
+          "G",
+          "G"
+        ]
+      },
+      "exit": 1
+    },
+    "public/s2_numslip": {
+      "sections": {
+        "ANCHORS": [
+          "G",
+          "R",
+          "G",
+          "G"
+        ],
+        "CHANGES": [
+          "G",
+          "R",
+          "R",
+          "G",
+          "."
+        ],
+        "RESTATEMENTS": [
+          "G"
+        ],
+        "NUMBERS": [
+          "."
+        ],
+        "TIMELINE": [
+          "G",
+          "G"
+        ]
+      },
+      "exit": 1
+    },
+    "public/s3_paraphrase": {
+      "sections": {
+        "ANCHORS": [
+          "G",
+          "G",
+          "R",
+          "G"
+        ],
+        "CHANGES": [
+          "G",
+          "G",
+          "."
+        ],
+        "RESTATEMENTS": [
+          "G"
+        ],
+        "NUMBERS": [
+          "."
+        ],
+        "TIMELINE": [
+          "G",
+          "G"
+        ]
+      },
+      "exit": 1
+    },
+    "public/s4_lloyds": {
+      "sections": {
+        "ANCHORS": [
+          "G",
+          "G",
+          "G",
+          "G",
+          "."
+        ],
+        "CHANGES": [
+          "G",
+          "G",
+          "R",
+          "."
+        ],
+        "RESTATEMENTS": [
+          "G"
+        ],
+        "NUMBERS": [
+          "."
+        ],
+        "TIMELINE": [
+          "G",
+          "G"
+        ]
+      },
+      "exit": 1
+    },
+    "public/s4b_lloyds_dated": {
+      "sections": {
+        "ANCHORS": [
+          "G",
+          "G",
+          "G",
+          "G",
+          "."
+        ],
+        "CHANGES": [
+          "G",
+          "G",
+          "R",
+          "."
+        ],
+        "RESTATEMENTS": [
+          "G"
+        ],
+        "NUMBERS": [
+          "."
+        ],
+        "TIMELINE": [
+          "G",
+          "G"
+        ]
+      },
+      "exit": 1
+    },
+    "public/s5_correct_word": {
+      "sections": {
+        "ANCHORS": [
+          "G",
+          "G",
+          "G",
+          "G"
+        ],
+        "CHANGES": [
+          "G",
+          "G",
+          "G",
+          "."
+        ],
+        "RESTATEMENTS": [
+          "G"
+        ],
+        "NUMBERS": [
+          "."
+        ],
+        "TIMELINE": [
+          "G",
+          "G"
+        ]
+      },
+      "exit": 0
+    }
+  }
+}

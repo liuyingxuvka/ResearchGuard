@@ -1,0 +1,123 @@
+metadata:
+  schema_version: researchguard.trace.model.v2
+  purpose: Did the protected cycle lane on Harbour Road, opened in March 2023, increase
+    weekday cycling there?
+sources:
+- source_id: src-release
+  title: Council press release, Harbour Road cycle lane one year on (fixture)
+  url: null
+  source_date: '2024-03-06'
+  lineage_id: lin-src-release
+  source_type: web_page
+  independence_group: lin-src-release
+  source_reliability: 0.8
+  source_status: stable_keep
+  coverage_period: null
+- source_id: src-counts
+  title: Council automatic cycle counters, weekday means (fixture)
+  url: null
+  source_date: null
+  lineage_id: lin-src-counts
+  source_type: dataset
+  independence_group: lin-src-counts
+  source_reliability: 0.8
+  source_status: stable_keep
+  coverage_period: 2022 to 2024
+evidence:
+- evidence_id: anc-open
+  raw_text: The protected lane opened at half past seven on the morning of 6 March
+    2023.
+  source_id: src-release
+  locator: press release, paragraph 1
+  normalized_summary: Lane opened 7.30 a.m., 6 Mar 2023.
+  evidence_type: paragraph
+  extraction_confidence: 0.8
+  evidence_specificity: 0.8
+  limits: []
+  warnings: []
+  usable_as_trace_evidence: true
+- evidence_id: anc-release-rise
+  raw_text: Weekday cycling on Harbour Road rose by 40 per cent in its first year
+    ... with 1 650 cyclists a day counted in 2023 against 1 180 in 2022.
+  source_id: src-release
+  locator: press release, paragraph 2
+  normalized_summary: 'Release: up 40 per cent in the first year, 1,180 to 1,650 a
+    day.'
+  evidence_type: paragraph
+  extraction_confidence: 0.8
+  evidence_specificity: 0.8
+  limits: []
+  warnings: []
+  usable_as_trace_evidence: true
+- evidence_id: anc-counts
+  raw_text: 'Weekday cyclists, Harbour Road: 2022 1,180; 2023 1,650; 2024 1,720.'
+  source_id: src-counts
+  locator: counter table, Harbour Road column
+  normalized_summary: Harbour Road counts 1,180, 1,650, 1,720.
+  evidence_type: table
+  extraction_confidence: 0.8
+  evidence_specificity: 0.8
+  limits: []
+  warnings: []
+  usable_as_trace_evidence: true
+- evidence_id: anc-control
+  raw_text: 'Quay Street (no new lane): 2022 640; 2023 655.'
+  source_id: src-counts
+  locator: counter table, Quay Street column
+  normalized_summary: 'Quay Street, without a new lane, stayed flat: 640 to 655 (+2%).'
+  evidence_type: table
+  extraction_confidence: 0.8
+  evidence_specificity: 0.8
+  limits: []
+  warnings: []
+  usable_as_trace_evidence: true
+events:
+- event_id: event_open
+  evidence_ids:
+  - anc-open
+  action: lane opened
+  event_type: observation
+  time_interval:
+    start: '2023-03-06'
+    precision: exact_date
+    confidence: 0.9
+storyline_hypotheses:
+- hypothesis_id: h_lane
+  claim: The lane increased cycling.
+  role: primary
+  event_ids:
+  - event_open
+  causal: true
+- hypothesis_id: h_trend
+  claim: A general trend.
+  role: alternative
+  event_ids:
+  - event_open
+  causal: true
+hypothesis_evidence_links:
+- link_id: l_lane_open
+  hypothesis_id: h_lane
+  evidence_id: anc-open
+  polarity: support
+  declared_relevance: 0.7
+- link_id: l_lane_counts
+  hypothesis_id: h_lane
+  evidence_id: anc-counts
+  polarity: support
+  declared_relevance: 0.7
+- link_id: l_lane_control
+  hypothesis_id: h_lane
+  evidence_id: anc-control
+  polarity: support
+  declared_relevance: 0.7
+- link_id: l_lane_release
+  hypothesis_id: h_lane
+  evidence_id: anc-release-rise
+  polarity: support
+  declared_relevance: 0.7
+- link_id: l_trend_control
+  hypothesis_id: h_trend
+  evidence_id: anc-control
+  polarity: oppose
+  declared_relevance: 0.7
+causal_candidates: []

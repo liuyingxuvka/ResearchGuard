@@ -1,0 +1,16 @@
+schema: researchguard.research.v1
+question: Did leakage from Norbridge's water network fall after the mains replacement
+  programme that started in April 2021?
+root_claim: h_mains
+hypotheses:
+- id: h_mains
+  text: Mains replacement cut leakage.
+- id: h_meters
+  text: Smart meters finding customer-side leaks cut leakage.
+models:
+  source: source.yaml
+  trace: trace.yaml
+  logic: logic.yaml
+search:
+  budget: 2
+  scope_sufficient: false

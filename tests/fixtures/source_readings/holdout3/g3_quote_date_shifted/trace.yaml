@@ -1,0 +1,83 @@
+metadata:
+  schema_version: researchguard.trace.model.v2
+  purpose: Did cleaning the roof panels on 2 June 2024 raise the array's daily output?
+sources:
+- source_id: src-maintenance
+  title: Installer maintenance note, 7 Birch Lane array (fixture)
+  url: null
+  source_date: '2024-06-02'
+  lineage_id: lin-src-maintenance
+  source_type: report
+  independence_group: lin-src-maintenance
+  source_reliability: 0.8
+  source_status: stable_keep
+  coverage_period: null
+- source_id: src-inverter
+  title: Inverter daily export, 7 Birch Lane (fixture)
+  url: null
+  source_date: null
+  lineage_id: lin-src-inverter
+  source_type: dataset
+  independence_group: lin-src-inverter
+  source_reliability: 0.8
+  source_status: stable_keep
+  coverage_period: 2024-05-30 to 2024-06-04
+evidence:
+- evidence_id: anc-wash
+  raw_text: The panels were washed with deionised water on 3 June 2024 between 9 and
+    11 a.m.
+  source_id: src-maintenance
+  locator: maintenance note, line 2
+  normalized_summary: Washed on 2 Jun 2024.
+  evidence_type: paragraph
+  extraction_confidence: 0.8
+  evidence_specificity: 0.8
+  limits: []
+  warnings: []
+  usable_as_trace_evidence: true
+- evidence_id: anc-days
+  raw_text: 'Energy (kWh): 2024-06-01 18.6; 2024-06-03 21.4.'
+  source_id: src-inverter
+  locator: inverter export, energy column
+  normalized_summary: Daily energy rose from 18.6 kWh to 21.4 kWh across the cleaning.
+  evidence_type: table
+  extraction_confidence: 0.8
+  evidence_specificity: 0.8
+  limits: []
+  warnings: []
+  usable_as_trace_evidence: true
+events:
+- event_id: event_wash
+  evidence_ids:
+  - anc-wash
+  action: panels washed
+  event_type: observation
+  time_interval:
+    start: '2024-06-02'
+    precision: exact_date
+    confidence: 0.9
+storyline_hypotheses:
+- hypothesis_id: h_clean
+  claim: Cleaning raised output.
+  role: primary
+  event_ids:
+  - event_wash
+  causal: true
+- hypothesis_id: h_sun
+  claim: Sunnier.
+  role: alternative
+  event_ids:
+  - event_wash
+  causal: true
+hypothesis_evidence_links:
+- link_id: l_clean_wash
+  hypothesis_id: h_clean
+  evidence_id: anc-wash
+  polarity: support
+  declared_relevance: 0.7
+- link_id: l_clean_days
+  hypothesis_id: h_clean
+  evidence_id: anc-days
+  polarity: support
+  declared_relevance: 0.7
+causal_candidates: []

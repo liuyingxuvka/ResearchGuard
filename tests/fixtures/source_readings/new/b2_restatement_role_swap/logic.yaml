@@ -1,0 +1,91 @@
+model:
+  id: millfire
+  title: Who raised the alarm at the Kestrel Mill fire on 9 October 1911, and how
+    long did the fire brigade take to arrive after the alarm?
+  root_claim: h_hale
+nodes:
+  h_hale:
+    type: Claim
+    text: The night-watchman Thomas Hale raised the alarm; Constable Penn passed it
+      to the brigade.
+  h_penn:
+    type: Claim
+    text: Constable Arthur Penn raised the alarm.
+  anc-alarm:
+    type: Evidence
+    text: Constable Arthur Penn saw the smoke at a quarter past eight (8.15 p.m.)
+      and ran to the Mill Lane police box.
+    provenance:
+    - origin_kind: external_source
+      quote: At a quarter past eight on Monday evening, 9 October 1911, the night-watchman,
+        Thomas Hale, saw smoke rising from the carding room and ran to the police
+        box in Mill Lane
+      source_id: src-courier
+      locator: anc-alarm
+      content_hash: sha256:f70dc3c3252e7250be94775efe48f5e28aeb8c7d2287537fa471785e4b3b44b5
+      source_reference: null
+      source_date: '1911-10-10'
+      metadata:
+        locator_text: Courier 10 Oct 1911, p. 3, column 2, paragraph 1
+  anc-arrive:
+    type: Evidence
+    text: The engine arrived at 8.40 p.m.
+    provenance:
+    - origin_kind: external_source
+      quote: The engine arrived at twenty minutes to nine, and by midnight the roof
+        had fallen in.
+      source_id: src-courier
+      locator: anc-arrive
+      content_hash: sha256:1813836ad7afb376e01d94d1fb7ae7b36477ddfb30bdb0250216287366860658
+      source_reference: null
+      source_date: '1911-10-10'
+      metadata:
+        locator_text: Courier 10 Oct 1911, p. 3, column 2, paragraph 1
+  anc-call:
+    type: Evidence
+    text: Constable Arthur Penn telephoned the brigade from the Mill Lane box.
+    provenance:
+    - origin_kind: external_source
+      quote: where Constable Arthur Penn telephoned for the brigade.
+      source_id: src-courier
+      locator: anc-call
+      content_hash: sha256:85487db9dc9d9d59c8e3c7a29a6deb38855d30255a6a30235d05ffe59530b949
+      source_reference: null
+      source_date: '1911-10-10'
+      metadata:
+        locator_text: Courier 10 Oct 1911, p. 3, column 2, paragraph 1
+  R_h_penn_anc-alarm:
+    type: Rebuttal
+    text: 'Opposing evidence for h_penn: At a quarter past eight on Monday evening,
+      9 October 1911, the night-watchman, Thomas Hale, saw smoke rising from the carding
+      room and ran to the police box in Mill Lane'
+  W_first:
+    type: Warrant
+    text: Whoever first reported the fire raised the alarm.
+    confidence: 0.7
+  A_delay:
+    type: Assumption
+    text: The engine arrived 25 minutes after Hale saw the smoke.
+    confidence: 0.6
+edges:
+- source: anc-alarm
+  target: h_hale
+  type: supports
+- source: anc-arrive
+  target: h_hale
+  type: supports
+- source: anc-call
+  target: h_penn
+  type: supports
+- source: R_h_penn_anc-alarm
+  target: h_penn
+  type: attacks
+- source: anc-alarm
+  target: R_h_penn_anc-alarm
+  type: supports
+- source: W_first
+  target: h_hale
+  type: supports
+- source: A_delay
+  target: h_hale
+  type: supports

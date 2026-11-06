@@ -1,0 +1,31 @@
+owner_quotes:
+  question: Did the Ever Given grounding in the Suez Canal (23–29 March 2021) cause
+    the 2021 Asia–Europe container freight rate rise?
+  root_claim:h_suez: cause the 2021 Asia–Europe container freight rate rise
+  scope: 2021 Asia–Europe container freight rate
+ai_choices:
+  search.budget: 3
+  change_tolerance: 0.25
+  ablation:question_without_unctad: weaken
+terms:
+  blockage: event_grounding
+  grounding: event_grounding
+lanes:
+  Asia-Europe:
+  - asia-europe
+  - shanghai-rotterdam
+  Transpacific:
+  - transpacific
+  - shanghai-los angeles
+  - shanghai-la
+experiments:
+  e_transpacific:
+    compare:
+    - src-drewry-wci
+    - src-wci-transpacific
+    window:
+    - Jan 2021
+    - Sep 2021
+  e_reversion:
+    series: src-drewry-wci
+    after: event_grounding

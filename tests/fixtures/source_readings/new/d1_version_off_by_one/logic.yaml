@@ -1,0 +1,75 @@
+model:
+  id: libtrove
+  title: 'Which libtrove release fixed the stream decoder memory leak reported in
+    issue #482, and on what date was that release published?'
+  root_claim: h_241
+nodes:
+  h_241:
+    type: Claim
+    text: 'Release 2.4.1, published on 11 June 2024, fixed the leak from issue #482.'
+  h_240:
+    type: Claim
+    text: Release 2.4.0 fixed the leak.
+  anc-closed:
+    type: Evidence
+    text: 'Issue #482 was closed on 11 June 2024 by release 2.4.1.'
+    provenance:
+    - origin_kind: external_source
+      quote: Closed on 11 June 2024 by the release of version 2.4.1.
+      source_id: src-issue
+      locator: anc-closed
+      content_hash: sha256:3638e29f8d09fbf997158a3c63692534d9432c45af704d3c787494d48348933c
+      source_reference: null
+      source_date: '2024-06-11'
+      metadata:
+        locator_text: 'issue #482, header'
+  anc-fix:
+    type: Evidence
+    text: 'The 2.4.0 release (28 May 2024) fixed the decoder leak from issue #482.'
+    provenance:
+    - origin_kind: external_source
+      quote: Fix memory leak in the stream decoder when a frame is truncated (#482).
+      source_id: src-changelog
+      locator: anc-fix
+      content_hash: sha256:ee162525811269e4aea83b01394c95d7d975a2a9962e43054bc1119810183c2b
+      source_reference: null
+      source_date: '2024-06-11'
+      metadata:
+        locator_text: CHANGELOG.md, section 2.4.0, bullet 1
+  anc-known:
+    type: Evidence
+    text: 2.4.0 (28 May 2024) still listed the leak as a known issue.
+    provenance:
+    - origin_kind: external_source
+      quote: 'Known issue: the stream decoder leaks memory on truncated frames (#482).'
+      source_id: src-changelog
+      locator: anc-known
+      content_hash: sha256:38a40cfc22649b81e0eacfd7dc4a2b3213955a838cc5517d17587d8134e56de3
+      source_reference: null
+      source_date: '2024-06-11'
+      metadata:
+        locator_text: CHANGELOG.md, section 2.4.0, bullet 2
+  R_h_240_anc-known:
+    type: Rebuttal
+    text: 'Opposing evidence for h_240: Known issue: the stream decoder leaks memory
+      on truncated frames (#482).'
+  W_changelog:
+    type: Warrant
+    text: A changelog entry names the release that shipped a fix.
+    confidence: 0.8
+edges:
+- source: anc-closed
+  target: h_241
+  type: supports
+- source: anc-fix
+  target: h_241
+  type: supports
+- source: R_h_240_anc-known
+  target: h_240
+  type: attacks
+- source: anc-known
+  target: R_h_240_anc-known
+  type: supports
+- source: W_changelog
+  target: h_241
+  type: supports

@@ -1,0 +1,3 @@
+Issue #482: stream decoder leaks memory on truncated frames
+Opened on 30 May 2024 by kmori.
+Closed on 11 June 2024 by the release of version 2.4.1.

@@ -1,0 +1,20 @@
+{
+ "owner": {
+  "file": "owner.txt",
+  "sha256": "afa7717e37cae20402beffda531b4a52c4ddb6faf9cb98823a1b1448033e893d"
+ },
+ "sources": {
+  "src-counts": {
+   "table": "tables/src-counts.csv",
+   "unit": "cyclists per weekday",
+   "lane": "Harbour Road",
+   "sha256": "1691b200b36ebb3770e99ba5ad0c649503d2ee6b417652cde0c2c05017676589",
+   "captured_by": "fixture stand-in for a capture command"
+  },
+  "src-release": {
+   "text": "captures/src-release.txt",
+   "sha256": "7c594dcab937151a7748657565be82401bbd29c69fbcbb4b1d84698755aa942d",
+   "captured_by": "fixture stand-in for a capture command"
+  }
+ }
+}

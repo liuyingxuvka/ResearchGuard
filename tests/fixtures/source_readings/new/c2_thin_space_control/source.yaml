@@ -1,0 +1,68 @@
+metadata:
+  purpose: Did leakage from Norbridge's water network fall after the mains replacement
+    programme that started in April 2021?
+  skill: SourceGuard
+  source_policy: public_only
+sources:
+- source_id: src-report
+  title: Norbridge Water Annual Performance Report 2023/24 (fixture)
+  source_type: report
+  source_status: saved
+  source_reliability: 0.8
+  source_role: primary_source
+  lineage_id: lin-src-report
+  source_date: '2024-07-01'
+- source_id: src-leak
+  title: Norbridge Water performance tables 2023/24, table 4 (fixture)
+  source_type: dataset
+  source_status: saved
+  source_reliability: 0.8
+  source_role: primary_source
+  lineage_id: lin-src-leak
+  coverage_period: 2019 to 2024
+anchors:
+- anchor_id: anc-report-leak
+  source_id: src-report
+  anchor_type: paragraph
+  locator: Annual Performance Report 2023/24, leakage section, sentence 1
+  text: Leakage fell to 38.9 megalitres per day in 2023/24, against 47.5 megalitres
+    per day in 2019/20.
+  normalized_summary: Leakage 47.5 to 38.9 Ml/d, 2019/20 to 2023/24.
+  modality: text
+  extraction_confidence: 0.8
+  specificity: 0.8
+  usable_for_claim: true
+- anchor_id: anc-report-mains
+  source_id: src-report
+  anchor_type: paragraph
+  locator: Annual Performance Report 2023/24, leakage section, sentence 2
+  text: Since April 2021 we have replaced 135 km of mains and fitted 12,400 smart
+    meters.
+  normalized_summary: 135 km of mains replaced and 12,400 smart meters fitted since
+    April 2021.
+  modality: text
+  extraction_confidence: 0.8
+  specificity: 0.8
+  usable_for_claim: true
+- anchor_id: anc-zones
+  source_id: src-leak
+  anchor_type: table
+  locator: performance tables, table 4, leakage columns
+  text: 'Leakage (Ml/d): North 2019/20 21.4, 2023/24 17.2; South 2019/20 26.1, 2023/24
+    21.7.'
+  normalized_summary: 'Leakage fell in both zones: North 21.4 to 17.2, South 26.1
+    to 21.7 Ml/d.'
+  modality: table
+  extraction_confidence: 0.8
+  specificity: 0.8
+  usable_for_claim: true
+- anchor_id: anc-mains-zones
+  source_id: src-leak
+  anchor_type: table
+  locator: performance tables, table 4, mains columns
+  text: 'Mains replaced (km) in 2023/24: North 61; South 74.'
+  normalized_summary: South replaced more mains (74 km) than North (61 km).
+  modality: table
+  extraction_confidence: 0.8
+  specificity: 0.8
+  usable_for_claim: true

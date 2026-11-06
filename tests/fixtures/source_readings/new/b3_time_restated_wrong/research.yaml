@@ -1,0 +1,16 @@
+schema: researchguard.research.v1
+question: Who raised the alarm at the Kestrel Mill fire on 9 October 1911, and how
+  long did the fire brigade take to arrive after the alarm?
+root_claim: h_hale
+hypotheses:
+- id: h_hale
+  text: The night-watchman Thomas Hale raised the alarm.
+- id: h_penn
+  text: Constable Arthur Penn raised the alarm.
+models:
+  source: source.yaml
+  trace: trace.yaml
+  logic: logic.yaml
+search:
+  budget: 2
+  scope_sufficient: false

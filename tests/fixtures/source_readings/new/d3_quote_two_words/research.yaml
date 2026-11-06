@@ -1,0 +1,16 @@
+schema: researchguard.research.v1
+question: 'Which libtrove release fixed the stream decoder memory leak reported in
+  issue #482, and on what date was that release published?'
+root_claim: h_241
+hypotheses:
+- id: h_241
+  text: Release 2.4.1 fixed the leak.
+- id: h_240
+  text: Release 2.4.0 fixed the leak.
+models:
+  source: source.yaml
+  trace: trace.yaml
+  logic: logic.yaml
+search:
+  budget: 2
+  scope_sufficient: false

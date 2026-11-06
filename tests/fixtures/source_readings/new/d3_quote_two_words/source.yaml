@@ -1,0 +1,63 @@
+metadata:
+  purpose: 'Which libtrove release fixed the stream decoder memory leak reported in
+    issue #482, and on what date was that release published?'
+  skill: SourceGuard
+  source_policy: public_only
+sources:
+- source_id: src-changelog
+  title: libtrove CHANGELOG.md at tag v2.4.1 (fixture)
+  source_type: web_page
+  source_status: saved
+  source_reliability: 0.8
+  source_role: primary_source
+  lineage_id: lin-src-changelog
+  source_date: '2024-06-11'
+- source_id: src-issue
+  title: 'libtrove issue #482 page (fixture)'
+  source_type: web_page
+  source_status: saved
+  source_reliability: 0.8
+  source_role: primary_source
+  lineage_id: lin-src-issue
+  source_date: '2024-06-11'
+anchors:
+- anchor_id: anc-fix
+  source_id: src-changelog
+  anchor_type: paragraph
+  locator: CHANGELOG.md, section 2.4.1, bullet 1
+  text: Fix memory leak in the stream decoder when a frame is truncated (#482).
+  normalized_summary: Fixed in 2.4.1 (2024-06-11).
+  modality: text
+  extraction_confidence: 0.8
+  specificity: 0.8
+  usable_for_claim: true
+- anchor_id: anc-known
+  source_id: src-changelog
+  anchor_type: paragraph
+  locator: CHANGELOG.md, section 2.4.0, bullet 2
+  text: 'Known issue: the stream decoder leaks memory on corrupted frames (#482).'
+  normalized_summary: Still open in 2.4.0 (2024-05-28).
+  modality: text
+  extraction_confidence: 0.8
+  specificity: 0.8
+  usable_for_claim: true
+- anchor_id: anc-opened
+  source_id: src-issue
+  anchor_type: paragraph
+  locator: 'issue #482, header'
+  text: Opened on 30 May 2024 by kmori.
+  normalized_summary: Opened 30 May 2024.
+  modality: text
+  extraction_confidence: 0.8
+  specificity: 0.8
+  usable_for_claim: true
+- anchor_id: anc-closed
+  source_id: src-issue
+  anchor_type: paragraph
+  locator: 'issue #482, header'
+  text: Closed on 11 June 2024 by the release of version 2.4.1.
+  normalized_summary: Closed 11 Jun 2024 by 2.4.1.
+  modality: text
+  extraction_confidence: 0.8
+  specificity: 0.8
+  usable_for_claim: true

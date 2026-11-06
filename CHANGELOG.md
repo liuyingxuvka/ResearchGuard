@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.8.0 - 2026-11-06 - Check saved originals before using evidence
+
+- Save original UTF-8 documents and CSV tables with `source capture`, then check anchored quotations against the saved bytes. Matching handles grouped digits, line-break hyphens and ordered omissions, and retains the document title and nearest section. A saved file or digest does not establish factual truth.
+- Table anchors use row keys and merged column headers. Wrong cells, unsupported units and partially read statements stay visible. Physical-unit conversions use PhysicsGuard v0.18.0's unit reader; unchanged original unit labels can be quoted without inventing a conversion.
+- Compare restated numbers, dates, clocks and computable change claims with captured passages and tables. Captured contradictions are errors; an unread part remains grey. Status exposes source readings with their colour, reason and original digest for writing tools.
+- Candidate comparisons show changed quotation words. Source dates retain year or month precision rather than inventing a day.
+- Capturing a source does not clear `unverifiable_source`: an outside locator is still required. This holds for every source, old or new: a source a folder already held before this version warns too, with no change to the folder.
+- The readers cover finite text and table grammars. They do not extract HTML, PDF or OCR text or prove arbitrary prose and attribution.
+
 ## v0.7.0 - 2026-11-04 - Sources made explicit and evidence pictures kept complete
 
 - Evidence pictures retain provenance records with no source id, show the supplied locator and source reference (or name the missing fields), and mark the evidence box with provenance_names_no_source. This is a picture diagnostic; it does not invent or write a source record.

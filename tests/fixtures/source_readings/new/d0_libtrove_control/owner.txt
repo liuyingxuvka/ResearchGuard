@@ -1,0 +1,1 @@
+Which libtrove release fixed the stream decoder memory leak reported in issue #482, and on what date was that release published?

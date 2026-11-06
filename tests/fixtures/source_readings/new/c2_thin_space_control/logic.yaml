@@ -1,0 +1,96 @@
+model:
+  id: leakage
+  title: Did leakage from Norbridge's water network fall after the mains replacement
+    programme that started in April 2021?
+  root_claim: h_mains
+nodes:
+  h_mains:
+    type: Claim
+    text: Replacing mains from April 2021 cut Norbridge's leakage.
+  h_meters:
+    type: Claim
+    text: Smart meters finding customer-side leaks cut leakage.
+  anc-mains-zones:
+    type: Evidence
+    text: In 2023/24 North replaced 61 km and South 74 km of mains.
+    provenance:
+    - origin_kind: external_source
+      quote: 'Mains replaced (km) in 2023/24: North 61; South 74.'
+      source_id: src-leak
+      locator: anc-mains-zones
+      content_hash: sha256:b89e8d6276b9148676fb2f1538fc46ff55d4125eb76a7a3cc63dff5fa32f49e3
+      source_reference: null
+      source_date: null
+      metadata:
+        locator_text: performance tables, table 4, mains columns
+  anc-report-leak:
+    type: Evidence
+    text: Leakage fell from 47.5 Ml/d (2019/20) to 38.9 Ml/d (2023/24).
+    provenance:
+    - origin_kind: external_source
+      quote: Leakage fell to 38.9 megalitres per day in 2023/24, against 47.5 megalitres
+        per day in 2019/20.
+      source_id: src-report
+      locator: anc-report-leak
+      content_hash: sha256:27cc39e24708073b30798bd7e7b1b3a3946e921c8baae36feca2b171739fa38c
+      source_reference: null
+      source_date: '2024-07-01'
+      metadata:
+        locator_text: Annual Performance Report 2023/24, leakage section, sentence
+          1
+  anc-zones:
+    type: Evidence
+    text: North 21.4 to 17.2 Ml/d; South 26.1 to 21.7 Ml/d.
+    provenance:
+    - origin_kind: external_source
+      quote: 'Leakage (Ml/d): North 2019/20 21.4, 2023/24 17.2; South 2019/20 26.1,
+        2023/24 21.7.'
+      source_id: src-leak
+      locator: anc-zones
+      content_hash: sha256:524240eea4bbd955eba2f230b8efe6bb78a5d2930b82c210640cbced39222934
+      source_reference: null
+      source_date: null
+      metadata:
+        locator_text: performance tables, table 4, leakage columns
+  anc-report-mains:
+    type: Evidence
+    text: 135 km of mains replaced and 12,400 smart meters fitted since April 2021.
+    provenance:
+    - origin_kind: external_source
+      quote: Since April 2021 we have replaced 135 km of mains and fitted 12,400 smart
+        meters.
+      source_id: src-report
+      locator: anc-report-mains
+      content_hash: sha256:800722429653430fec00848c52399a91fec4af3596fcf9c0d029bab7bb14f226
+      source_reference: null
+      source_date: '2024-07-01'
+      metadata:
+        locator_text: Annual Performance Report 2023/24, leakage section, sentence
+          2
+  W_pipes:
+    type: Warrant
+    text: Replacing old mains removes leaking pipe.
+    confidence: 0.7
+  A_share:
+    type: Assumption
+    text: Total leakage fell by about 18% between 2019/20 and 2023/24.
+    confidence: 0.6
+edges:
+- source: anc-mains-zones
+  target: h_mains
+  type: supports
+- source: anc-report-leak
+  target: h_mains
+  type: supports
+- source: anc-zones
+  target: h_mains
+  type: supports
+- source: anc-report-mains
+  target: h_meters
+  type: supports
+- source: W_pipes
+  target: h_mains
+  type: supports
+- source: A_share
+  target: h_mains
+  type: supports

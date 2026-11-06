@@ -1,0 +1,103 @@
+metadata:
+  schema_version: researchguard.trace.model.v2
+  purpose: Did the recast timetable on the Elmbridge line in July 2022 cut the average
+    train delay?
+sources:
+- source_id: src-board
+  title: Elmbridge line performance paper, January 2023 (fixture)
+  url: null
+  source_date: '2023-01-15'
+  lineage_id: lin-src-board
+  source_type: report
+  independence_group: lin-src-board
+  source_reliability: 0.8
+  source_status: stable_keep
+  coverage_period: null
+- source_id: src-punct
+  title: Elmbridge line quarterly punctuality table 2022 (fixture)
+  url: null
+  source_date: null
+  lineage_id: lin-src-punct
+  source_type: dataset
+  independence_group: lin-src-punct
+  source_reliability: 0.8
+  source_status: stable_keep
+  coverage_period: '2022'
+evidence:
+- evidence_id: anc-start
+  raw_text: The recast timetable took effect on the 3rd of July 2022.
+  source_id: src-board
+  locator: performance paper, paragraph 1
+  normalized_summary: Timetable changed 3 July 2022.
+  evidence_type: paragraph
+  extraction_confidence: 0.8
+  evidence_specificity: 0.8
+  limits: []
+  warnings: []
+  usable_as_trace_evidence: true
+- evidence_id: anc-q4
+  raw_text: In the last quarter of 2022, 92.4 per cent of trains ran on time and the
+    average delay was 252 seconds, down from 6.3 minutes in the first quarter.
+  source_id: src-board
+  locator: performance paper, paragraph 2
+  normalized_summary: 'Q4 2022: 92.4% on time; average delay 4.2 minutes (252 seconds),
+    down from 6.3 minutes in Q1.'
+  evidence_type: paragraph
+  extraction_confidence: 0.8
+  evidence_specificity: 0.8
+  limits: []
+  warnings: []
+  usable_as_trace_evidence: true
+- evidence_id: anc-table
+  raw_text: 'On time (%): Q1 2022 88.1; Q4 2022 92.4. Average delay (minutes): Q1
+    2022 6.3; Q4 2022 4.2.'
+  source_id: src-punct
+  locator: quarterly table, rows Q1 and Q4 2022
+  normalized_summary: On time rose from 88.1% to 92.4% and the average delay fell
+    from 6.3 to 4.2 minutes.
+  evidence_type: table
+  extraction_confidence: 0.8
+  evidence_specificity: 0.8
+  limits: []
+  warnings: []
+  usable_as_trace_evidence: true
+events:
+- event_id: event_recast
+  evidence_ids:
+  - anc-start
+  action: recast timetable took effect
+  event_type: observation
+  time_interval:
+    start: '2022-07-03'
+    precision: exact_date
+    confidence: 0.9
+storyline_hypotheses:
+- hypothesis_id: h_recast
+  claim: The recast cut delays.
+  role: primary
+  event_ids:
+  - event_recast
+  causal: true
+- hypothesis_id: h_season
+  claim: Seasonal.
+  role: alternative
+  event_ids:
+  - event_recast
+  causal: true
+hypothesis_evidence_links:
+- link_id: l_recast_start
+  hypothesis_id: h_recast
+  evidence_id: anc-start
+  polarity: support
+  declared_relevance: 0.7
+- link_id: l_recast_q4
+  hypothesis_id: h_recast
+  evidence_id: anc-q4
+  polarity: support
+  declared_relevance: 0.7
+- link_id: l_recast_table
+  hypothesis_id: h_recast
+  evidence_id: anc-table
+  polarity: support
+  declared_relevance: 0.7
+causal_candidates: []

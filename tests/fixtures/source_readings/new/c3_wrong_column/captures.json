@@ -1,0 +1,20 @@
+{
+ "owner": {
+  "file": "owner.txt",
+  "sha256": "d5ed37a1f03d26db1b9528240a01593412282625efc1443834f4b223904efaf1"
+ },
+ "sources": {
+  "src-leak": {
+   "table": "tables/src-leak.csv",
+   "unit": "see header",
+   "lane": "zones",
+   "sha256": "169c854085a68dd8bd5326abb1283b357535aa9815fd026890a1c2c13b84470f",
+   "captured_by": "fixture stand-in for a capture command"
+  },
+  "src-report": {
+   "text": "captures/src-report.txt",
+   "sha256": "afcefe898e645086a450e3cd596b85364052a2912709f6c74688d48f6f3ed634",
+   "captured_by": "fixture stand-in for a capture command"
+  }
+ }
+}

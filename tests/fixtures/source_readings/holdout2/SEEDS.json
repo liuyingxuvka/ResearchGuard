@@ -1,0 +1,8 @@
+{
+ "f0_rail_control": "HOLDOUT-2 control: quarter rows, three value columns, seconds restated as minutes, 'fell by about a third', an ordinal date restated plainly",
+ "f1_quote_rounded": "HOLDOUT-2: rounding inside the quote: '92.4 per cent' copied as '92 per cent'",
+ "f2_dropped_60": "HOLDOUT-2: dropped /60: 252 seconds restated as 252 minutes",
+ "f3_other_source_halved": "HOLDOUT-2: another source's change word against the table: the Gazette's 'halved' (table: 6.3 -> 4.2, x0.67), uncaptured",
+ "f4_ordinal_date_wrong": "HOLDOUT-2: date copied wrong from an ordinal: 'the 3rd of July 2022' restated as 13 July 2022",
+ "f5_wrong_column": "HOLDOUT-2: value from the wrong column: the on-time row quoted with the delay figures 6.3 and 4.2"
+}

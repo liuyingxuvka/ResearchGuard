@@ -4,7 +4,7 @@
 
 | Version | Runtime | Package | License |
 | --- | --- | --- | --- |
-| `v0.7.0` | Python 3.11+ | `researchguard` | MIT |
+| `v0.8.0` | Python 3.11+ | `researchguard` | MIT |
 
 ResearchGuard is a Python tool and an agent skill (Claude Code, Codex) for one question at a time. The question lives
 in a folder: the hypotheses, the sources with the exact passages quoted from them (anchors), a timeline, an argument
@@ -110,9 +110,17 @@ $ researchguard status examples/research/evergiven --candidate ../evergiven-copy
 - warnings added: unverifiable_source:src-lloyds (no link, DOI, ISBN or arXiv id; nothing outside this folder to check it against)
 ```
 
-ResearchGuard cannot tell a real title from an invented one, or check that a quote is printed where its locator says,
-so every new source is listed with its title, link and date, and every new piece of evidence with the source and place
-it is filed under; the owner sees what the evidence now rests on before accepting the copy. A word list cannot tell a
+Before quoting a source, save its UTF-8 original or CSV with
+`researchguard source capture SOURCE --project FOLDER --file PATH` (or `--url URL`).
+The saved bytes and their digest back exact passages and table cells; `status --json` exposes
+`source_readings` with `id`, `colour`, `reason` and `source_digest`. It flags changed captures,
+missing quotes, wrong table cells and computable changes or restatements. Unknown units stay grey
+when a conversion is needed; conversions use the optional
+[PhysicsGuard v0.18.0](https://github.com/liuyingxuvka/PhysicsGuard/releases/tag/v0.18.0) unit reader. Direct table-cell
+quotes can be compared in their unchanged original unit label without interpreting that label.
+
+ResearchGuard cannot tell a real title from an invented one or prove that the saved original is true.
+Every new source and evidence item is shown with its attribution before accepting the copy. A word list cannot tell a
 colleague's note from a document either ("Colleague's note, 2021" passes it), so one more thing is computed instead of
 read from the title: a source whose url field holds no outside locator (an http or https link whose host name ends in a
 top-level domain of the root zone and is not an example name, a DOI, an ISBN with a correct check digit, or an arXiv id)
@@ -129,7 +137,7 @@ the argument and the timeline do with it, and that is decided by the routes, not
 **1. Install the tool, from the release tag.**
 
 ```bash
-python -m pip install "git+https://github.com/liuyingxuvka/ResearchGuard.git@v0.7.0"
+python -m pip install "git+https://github.com/liuyingxuvka/ResearchGuard.git@v0.8.0"
 ```
 
 This installs the `researchguard` command. Python 3.11 or newer.
@@ -137,7 +145,7 @@ This installs the `researchguard` command. Python 3.11 or newer.
 **2. Install the skill for your AI**, from the same tag:
 
 ```bash
-git clone --depth 1 --branch v0.7.0 https://github.com/liuyingxuvka/ResearchGuard.git
+git clone --depth 1 --branch v0.8.0 https://github.com/liuyingxuvka/ResearchGuard.git
 python ResearchGuard/scripts/install_skill.py --target ~/.claude/skills          # Claude Code
 python ResearchGuard/scripts/install_skill.py --target ~/.codex/skills           # Codex (or "$CODEX_HOME/skills")
 python ResearchGuard/scripts/install_skill.py --target ~/.claude/skills --check  # is the installed copy current?
@@ -262,16 +270,17 @@ ResearchGuard says where a failure happened; it never replaces a failure with a 
 - ExperimentGuard recommends experiments; it never runs them and never invents probabilities.
 
 **Where it can still miss.**
-- The AI still writes the argument and the timeline. A misread source is caught only when another record disagrees with
-  it (a source quote, the other route); if every record repeats the same misreading, nothing disagrees.
-- A summary in the AI's own words can carry a wrong number. From `v0.6.0` a number in an evidence summary that is in
-  neither its quote nor its anchor gives the warning `summary_number_not_in_quote`; it is a warning, not an error,
-  because a summary may legitimately derive a number ("doubled").
+- The AI still writes arguments and timelines. Captured originals can expose transcribed values, dates,
+  clocks, units and quotes that disagree; they do not prove factual truth or who did what when all the
+  same names and numbers appear. Unsupported layouts, units and partially read changes remain grey.
+- A captured contradiction in a summary or change claim is an error. Without a captured basis,
+  `summary_number_not_in_quote` remains a warning: a summary may legitimately derive a number.
+  Readers use finite grammars; HTML/PDF/OCR extraction, arbitrary prose and multiple changes in one clause are not covered.
 - Without a source model in the folder, evidence without an anchor is allowed and listed as `evidence_unanchored`.
 - A source must name its document by a link or by a title that names one; a date alone does not count, and a link or a
   date must be well formed. The title check only refuses titles with no letter or digit, placeholders and words for a
-  person or a kind of message or document; ResearchGuard cannot check that the document exists or says what the anchor
-  quotes, so an invented title ("Lloyd's market note") or an invented locator ("p. 2") passes. Each new source and each
+  person or a kind of message or document; a saved quote can be checked against captured bytes, but
+  an invented title ("Lloyd's market note") or locator ("p. 2") can still pass the identity check. Each new source and each
   new piece of evidence is shown, with the source it is filed under, in the candidate comparison, where the owner reads
   it. The date check reads only days and months written out in the quote ("29 March 2021", "April 2021", "2021-04"); a
   quote that forecasts a later month is warned too.

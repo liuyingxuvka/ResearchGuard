@@ -1,0 +1,43 @@
+metadata:
+  purpose: Did cleaning the roof panels on 2 June 2024 raise the array's daily output?
+  skill: SourceGuard
+  source_policy: public_only
+sources:
+- source_id: src-maintenance
+  title: Installer maintenance note, 7 Birch Lane array (fixture)
+  source_type: report
+  source_status: saved
+  source_reliability: 0.8
+  source_role: primary_source
+  lineage_id: lin-src-maintenance
+  source_date: '2024-06-02'
+- source_id: src-inverter
+  title: Inverter daily export, 7 Birch Lane (fixture)
+  source_type: dataset
+  source_status: saved
+  source_reliability: 0.8
+  source_role: primary_source
+  lineage_id: lin-src-inverter
+  coverage_period: 2024-05-30 to 2024-06-04
+anchors:
+- anchor_id: anc-wash
+  source_id: src-maintenance
+  anchor_type: paragraph
+  locator: maintenance note, line 2
+  text: The panels were washed with deionised water on 2 June 2024 between 9 and 11
+    a.m.
+  normalized_summary: Washed on 2 Jun 2024.
+  modality: text
+  extraction_confidence: 0.8
+  specificity: 0.8
+  usable_for_claim: true
+- anchor_id: anc-days
+  source_id: src-inverter
+  anchor_type: table
+  locator: inverter export, energy column
+  text: 'Energy (kWh): 1 June 2024 18.6; 3 June 2024 21.4.'
+  normalized_summary: Daily energy rose from 18.6 kWh to 21.4 kWh across the cleaning.
+  modality: table
+  extraction_confidence: 0.8
+  specificity: 0.8
+  usable_for_claim: true

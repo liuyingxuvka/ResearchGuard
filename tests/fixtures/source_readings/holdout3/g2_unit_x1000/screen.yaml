@@ -1,0 +1,10 @@
+owner_quotes:
+  question: Did cleaning the roof panels on 2 June 2024 raise the array's daily output?
+  root_claim:h_clean: raise the array's daily output
+ai_choices:
+  change_tolerance: 0.25
+terms:
+  cleaning: event_wash
+lanes:
+  array:
+  - array

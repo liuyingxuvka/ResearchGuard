@@ -1,6 +1,7 @@
 """Saved-original capture and quote matching; source bytes are not a truth verdict."""
 from __future__ import annotations
 
+from functools import lru_cache
 import hashlib
 import json
 import re
@@ -26,31 +27,62 @@ def normalize_text(text):
     return re.sub(r"\s+", " ", text).strip()
 
 
-def _headings(raw):
-    lines=raw.splitlines(); result=[]
+@lru_cache(maxsize=32)
+def _heading_spans(raw):
+    lines=raw.splitlines(keepends=True);result=[];offset=0
     for i,line in enumerate(lines):
+        stripped=line.strip()
         if line.lstrip().startswith("#"):
-            result.append(line.lstrip("# ").strip())
-        elif i+1<len(lines) and re.fullmatch(r"[=~-]{3,}",lines[i+1].strip()) and line.strip():
-            result.append(line.strip())
-    return result
+            result.append((line.lstrip("# ").strip(),offset))
+        elif i+1<len(lines) and re.fullmatch(r"[=~`^:+*#-]{3,}",lines[i+1].strip()) and stripped:
+            if not re.fullmatch(r"[=~`^:+*#-]{3,}",stripped):
+                result.append((stripped,offset))
+        offset+=len(line)
+    return tuple(result)
 
 
-def match_quote(capture_text, quote):
+def _headings(raw):
+    return [heading for heading,_ in _heading_spans(raw)]
+
+
+@lru_cache(maxsize=32)
+def _prepared_capture(raw, word_match):
+    normal = (lambda value: re.sub(r"\s+", " ", re.sub(r"[^\w\s]", " ", normalize_text(value))).strip().casefold()) if word_match else normalize_text
+    headings=dict((offset,(i,h)) for i,(h,offset) in enumerate(_heading_spans(raw)))
+    offset=0;length=0;placed=[]
+    for line in raw.splitlines(keepends=True):
+        normalized=normal(line)
+        if offset in headings:
+            index,heading=headings[offset]
+            placed.append((length+(1 if length and normalized else 0),index,heading))
+        if normalized:
+            length+=len(normalized)+(1 if length else 0)
+        offset+=len(line)
+    context=normalize_text(raw)
+    return normal(raw),placed,context,tuple((m.start(),m.end()) for m in re.finditer(r"\w+",context)) if word_match else ()
+
+
+def match_quote(capture_text, quote, *, word_match=False):
     """Return normalized-text offsets, omitted text and local context, or None.
 
     Ellipsis parts must occur in order with at most 300 characters between parts.
     Offsets refer to `normalized_text`, which is returned with the match.
     """
-    q=normalize_text(quote)
+    normal = (lambda value: re.sub(r"\s+", " ", re.sub(r"[^\w\s]", " ", normalize_text(value))).strip().casefold()) if word_match else normalize_text
+    q=normal(quote)
     if not q:
         return None
-    parts=[p.strip() for p in re.split(r"\s*(?:\[\s*\.\.\.\s*\]|\.\.\.|…)\s*",q) if p.strip()]
+    parts=[normal(p) for p in re.split(r"\s*(?:\[\s*\.\.\.\s*\]|\.\.\.|…)\s*",quote) if normal(p)]
     variants=[capture_text,re.sub(r"(?<=[A-Za-z])-[ \t]*\n[ \t]*(?=[a-z])","",capture_text),
               re.sub(r"(?<=[A-Za-z])-[ \t]*\n[ \t]*(?=[A-Za-z])","-",capture_text)]
-    title=next((line.lstrip("# ").strip() for line in capture_text.splitlines() if line.strip()),"")
+    pep=re.search(r"(?mi)^Title:\s*(.+)$",capture_text)
+    h1=re.search(r"(?m)^#\s+(.+)$",capture_text)
+    headings=_heading_spans(capture_text)
+    title=pep[1].strip() if pep else h1[1].strip() if h1 else headings[0][0] if headings else next(
+        (line.strip() for line in capture_text.splitlines() if line.strip() and not re.fullmatch(r"[=~`^:+*#-]+",line.strip())),"")
     for raw in variants:
-        text=normalize_text(raw); start=text.find(parts[0])
+        text,heading_positions,context_text,context_tokens=_prepared_capture(raw,word_match)
+        start=text.find(parts[0])
         while start>=0:
             pos=start+len(parts[0]); omitted=[]
             for part in parts[1:]:
@@ -59,29 +91,32 @@ def match_quote(capture_text, quote):
                     break
                 omitted.append(text[pos:nxt].strip());pos=nxt+len(part)
             else:
-                heading=""
-                for h in _headings(raw):
-                    where=text.find(normalize_text(h))
-                    if 0<=where<=start:
-                        heading=h
-                return {"start":start,"end":pos,"omitted_words":omitted,"title":title,
-                        "heading":heading,"section":heading,"normalized_text":text,"text":text[start:pos]}
+                heading="";heading_index=None
+                for found,index,h in heading_positions:
+                    if found<=start:
+                        heading=h;heading_index=index
+                context_start=start;context_end=pos
+                if word_match:
+                    first=len(text[:start].split());last=len(text[:pos].split())-1
+                    context_start=context_tokens[first][0];context_end=context_tokens[last][1]
+                return {"context_text":context_text,"context_start":context_start,"context_end":context_end,
+                        "start":start,"end":pos,"omitted_words":omitted,"title":title,
+                        "heading":heading,"heading_index":heading_index,"section":heading,
+                        "normalized_text":text,"text":text[start:pos]}
             start=text.find(parts[0],start+1)
     return None
 
 
-def capture_passage(text, quote):
+def capture_passage(text, quote, *, word_match=False):
     """Return the title and nearest heading's passage containing the matched quote."""
-    matched=match_quote(text,quote)
+    matched=match_quote(text,quote,word_match=word_match)
     if matched is None:
         return None
-    normalized=matched["normalized_text"]; start=matched["start"]; end=len(normalized)
-    for h in _headings(text):
-        at=normalized.find(normalize_text(h),matched["end"])
-        if at>=0:
-            end=min(end,at)
-    heading_at=normalized.rfind(normalize_text(matched["heading"]),0,start+1) if matched["heading"] else 0
-    return {**matched,"text":normalized[max(0,heading_at):end]}
+    spans=_heading_spans(text);index=matched["heading_index"]
+    raw_start=spans[index][1] if index is not None else 0
+    raw_end=(spans[index+1][1] if index+1<len(spans) else len(text)) if index is not None else (spans[0][1] if spans else len(text))
+    raw_text=text[raw_start:raw_end]
+    return {**matched,"text":normalize_text(raw_text),"raw_text":raw_text}
 
 
 def capture_source(project, source_id, *, file=None, url=None):
@@ -159,6 +194,22 @@ def load_anchor_capture(project, anchor_id):
     """Public bridge for writers; return original text, quote and checked status."""
     from .loader import load_model
     project=Path(project)
+    legacy=project/"tools/captures.yaml"
+    if not legacy.exists():
+        legacy=project/"captures.yaml"
+    if legacy.exists() and not (project/"captures.json").exists():
+        manifest=yaml.safe_load(legacy.read_text()) or {}
+        anchor=manifest.get("anchors",{}).get(anchor_id)
+        if not anchor:
+            return None
+        filename=anchor["file"];saved=manifest.get("files",{}).get(filename,{})
+        path=project/"captures"/filename
+        actual=digest(path);changed=actual.removeprefix("sha256:")!=str(saved.get("sha256","")).removeprefix("sha256:")
+        text=path.read_text(encoding="utf-8-sig")
+        quoted=match_quote(text,anchor["quote"])
+        return {"id":anchor_id,"source_id":saved.get("source_id",filename),"colour":"red" if changed or quoted is None else "green",
+                "reason":"capture changed" if changed else "quote not in capture" if quoted is None else "quote found in saved original", "source_digest":actual,
+                "quote":anchor["quote"],"text":text,"path":str(path),"kind":"text"}
     index=yaml.safe_load((project/"research.yaml").read_text())
     source=load_model(project/index.get("models",{}).get("source","source.yaml"))
     anchor=next((a for a in source.anchors if a.anchor_id==anchor_id),None)
@@ -173,3 +224,27 @@ def load_anchor_capture(project, anchor_id):
     path=project/(saved.get("text") or saved.get("table",""))
     return {**status,"quote":anchor.text,"text":path.read_text(encoding="utf-8-sig"),
             "path":str(path),"kind":"table" if "table" in saved else "text"}
+
+
+def table_cells(text):
+    """Pipe-table cells with their row and merged header labels for writer checks."""
+    from .readings import table_rows
+    out=[];block=[]
+    for line in text.splitlines()+[""]:
+        if line.lstrip().startswith("|"):
+            block.append(line)
+            continue
+        if block:
+            levels,body=table_rows(block)
+            row_labels=[r[0] for r in body]
+            level_labels=[sorted({cell for cell in level[1:] if cell}) for level in levels]
+            for level in levels:
+                for cell in level[1:]:
+                    out.append({"text":cell,"sentence":cell,"header":True})
+            for row in body:
+                for j,cell in enumerate(row):
+                    out.append({"text":cell,"sentence":" | ".join(row),"header":j==0,"cell":j>0,
+                                "row":row[0],"cols":[lv[j] if j<len(lv) else "" for lv in levels],
+                                "row_labels":row_labels,"level_labels":level_labels})
+            block=[]
+    return out

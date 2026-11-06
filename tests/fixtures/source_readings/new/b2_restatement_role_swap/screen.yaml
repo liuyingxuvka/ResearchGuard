@@ -1,0 +1,8 @@
+owner_quotes:
+  question: Who raised the alarm at the Kestrel Mill fire on 9 October 1911, and how
+    long did the fire brigade take to arrive after the alarm?
+  root_claim:h_hale: Who raised the alarm at the Kestrel Mill fire
+ai_choices:
+  change_tolerance: 0.25
+terms: {}
+lanes: {}

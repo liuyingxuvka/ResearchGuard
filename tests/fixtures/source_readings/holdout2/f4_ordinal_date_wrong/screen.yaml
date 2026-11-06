@@ -1,0 +1,11 @@
+owner_quotes:
+  question: Did the recast timetable on the Elmbridge line in July 2022 cut the average
+    train delay?
+  root_claim:h_recast: cut the average train delay
+ai_choices:
+  change_tolerance: 0.25
+terms:
+  recast: event_recast
+lanes:
+  Elmbridge:
+  - elmbridge

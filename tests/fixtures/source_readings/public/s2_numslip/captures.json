@@ -1,0 +1,32 @@
+{
+ "owner": {
+  "file": "owner.txt",
+  "sha256": "ecda68f367b2b1795d3ac12583e38877b0791b2f4c95313208fe83e392f5db4c"
+ },
+ "sources": {
+  "src-sca-2021": {
+   "text": "captures/src-sca-2021.txt",
+   "sha256": "b8339a8059b06045af8d0268b6fcc1508d23a418e63409ce67eb3c108ca54638",
+   "captured_by": "fixture stand-in for a capture command"
+  },
+  "src-unctad-rmt2021": {
+   "text": "captures/src-unctad-rmt2021.txt",
+   "sha256": "18fae8fccecd8cbc4f6fb72fbcdb51aca8c13a9a15cbea5f9a28257bc519a5f9",
+   "captured_by": "fixture stand-in for a capture command"
+  },
+  "src-drewry-wci": {
+   "table": "tables/src-drewry-wci.csv",
+   "unit": "USD/FEU",
+   "lane": "Asia-Europe",
+   "sha256": "dcdc96bf70ed421d5a98d9328553ae4bc0c405c986704867aa129a9bb66c24ab",
+   "captured_by": "fixture stand-in for a capture command"
+  },
+  "src-wci-transpacific": {
+   "table": "tables/src-wci-transpacific.csv",
+   "unit": "USD/FEU",
+   "lane": "Transpacific",
+   "sha256": "65217bf988568d5ed31823837d9d68a77338da76683feeafca21dea5ae7edb36",
+   "captured_by": "fixture stand-in for a capture command"
+  }
+ }
+}

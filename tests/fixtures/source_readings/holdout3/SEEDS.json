@@ -1,0 +1,7 @@
+{
+ "g0_solar_control": "HOLDOUT-3 control: ISO-date row keys quoted as written; 'rose by about 15%' (true +15.1%)",
+ "g1_dates_restyled_control": "HOLDOUT-3 control: the table quoted with its ISO dates written as '1 June 2024'",
+ "g2_unit_x1000": "HOLDOUT-3: wrong unit, x1000: 21.4 kWh restated as 21.4 MWh",
+ "g3_quote_date_shifted": "HOLDOUT-3: date copied wrong inside the quote: 'on 3 June 2024' for 'on 2 June 2024'",
+ "g4_tripled_restyled_dates": "HOLDOUT-3: change word wrong ('tripled', true x1.15) with the dates written as '1 June' and '3 June'"
+}
