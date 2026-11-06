@@ -8,14 +8,23 @@ Releases:
 - Version numbers: a release that adds features raises the second number (0.6.0 -> 0.7.0); a release with only small fixes raises the third (0.7.0 -> 0.7.1); never skip a number.
 - Maintenance needs FlowGuard at or above the tag in the `test` extra of `pyproject.toml` (install with `python -m pip install -e ".[test]"`; the PyPI package named `flowguard` is a different project). Raise that tag only when this repository starts using a newer FlowGuard feature; a FlowGuard release alone is no reason to change it or to release this repository.
 
-# FlowGuard rules for the project agent
+<!-- flowguard:start -->
+## FlowGuard rules for the project agent
 
-1. At the start of a session and after any loss of context, run `python -m flowguard status` before anything else.
-2. When the owner asks for something, store the owner's own words once, as received: `python -m flowguard req add <file|-> --id <id>`. It stores only words the owner wrote, byte for byte: never a plan, a list or text an AI wrote. When a new owner message replaces an earlier one, add `--supersedes <old id>`; never edit `.flowguard/requests/`.
-3. Find code with `python -m flowguard where NAME`; change code and its tests together; run the project's own test command (for example `python -m pytest -q`) and report exactly what you ran and the result, plus any inherited technical work still open.
-4. Commit code and tests together in one commit with a message in your own words; add a line `Request: R<n>` when the change answers a stored owner request.
+1. At session start, look at `python -m flowguard` when the project has intent rules.
+2. Before writing a decision, use `python -m flowguard show "what it decides"` to find its existing owner.
+3. Write one rule, bind each real home, and add a literal regression row only when a decision has copies, the owner says everywhere, or a bug was fixed. Otherwise stay quiet.
+4. After changing a bound decision run `python -m flowguard check`; CI runs `check --all`. Store actual owner words once with `req add`.
+<!-- flowguard:end -->
 
-5. Before changing state values, actions, conditions, settings or endings, update the affected `.flowguard/flow/` model first; run `python -m flowguard check`. For code claims, follow the installed `flowguard/flow/HOWTO.md` and bind only the affected actions to real public calls. When explaining a flow, embed the `python -m flowguard show` picture as `![Flow](PATH)` using its returned path. Keep purely functional contracts in direct production tests.
-6. Run the complete native test suite and `python -m flowguard release` for the final source; CI also checks Windows boundaries and builds the distribution. The test extra pins FlowGuard v1.0.0 for this migrated workflow.
+## Maintenance evidence
 
-If conflicts remain in a reply, end with “需要你决定” and the relevant question and stored owner words. Repair dead ends and unreachable behavior in code; model/code drift needs reconciliation. A provisional decision applies only to eligible contradictory requested obligations; it does not settle these defects.
+Store only the actual owner's words, byte for byte; never an AI plan, and never edit `.flowguard/requests/`.
+Change production code and its tests together. Add `Request: R<id>` when the commit answers stored words.
+Run the affected tests during development. For the final source run the complete native pytest suite
+and `python -m flowguard check --all`; require complete CI on the exact main commit being published.
+Retain the original inputs and real assertions when migrating a contract. A static owner list does
+not prove execution order, and a grey boundary does not become a passing claim.
+
+Each member keeps its native task and authority. Repair technical defects and model/code disagreement;
+use the stored owner words to resolve a genuine incompatible requirement rather than inventing a waiver.

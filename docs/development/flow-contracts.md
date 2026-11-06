@@ -1,28 +1,33 @@
-# Flow and functional contracts
+# Intent and functional contracts
 
-ResearchGuard uses one small native-backed flow for frozen iteration identity in
-`.flowguard/flow/iteration_identity.py`. It compares accepted, stale and recovered
-observations against the real identity owner. The model deliberately covers that
-finite boundary, not every research workflow.
+ResearchGuard uses one small decision rule for the viewer's shared importance boundary in
+`tests/intent/viewer_importance.py`: the count and node/edge markers call one production
+decision owner. A shared Map call rule keeps those three callers attached, and nine ordinary
+guarded outputs exercise their real projections at 0.74, 0.75 and 0.76. Other importance thresholds serve different policies; their distinctions and
+sources are recorded in `intent-contracts.md`, rather than replacing them with a global number.
 
-The other independent contracts are direct unit tests in `tests/flow_migration/`.
-Their 50 rule identities, 55 original bad-observation controls, 74 existing production
-test links and nine system route bindings are listed in `coverage.json`. The rule
-predicates are independent expected assertions, with actual production fixture
-checks beside them. Bad-observation controls test those assertions; they do not
-claim to mutate every shipping implementation. The index is audit data for tests,
-not another runtime registry or change route.
+The original thirteen topics remain ordinary independent and actual-production checks in
+`tests/contracts/`. Their 50 rule identities, 55 original bad-observation controls, 74 production
+test links and nine static system route bindings remain in `coverage.json`. Inputs and real
+assertions retain their meanings; bad facts test the expectations, not mutated shipping code.
+Shared generated Map queries check the recorded test/function destinations instead of another
+AST inventory. These nine route lists prove callable ownership, not runtime ordering.
 
-Three previously documented boundaries remain visible:
+Frozen iteration identity is checked directly against the real shared owner for the same accepted,
+stale and reset/recovered stimuli. There is no replacement workflow state machine or native runner.
 
-- Trace depth's evaluator and storyline-depth modules depend on each other. Deleting
-  the old ownership metric does not remove that source dependency or justify a split.
-- Trace library file operations remain covered by `tests/trace/test_traceguard.py`;
-  a separate state model is not claimed.
-- Optional desktop settings remain behind the viewer boundary covered by
-  `tests/logic/test_library_viewer.py`; ordinary CLI use does not load the desktop app.
+The error-route tests retain ResearchGuard's domain-specific error-carrying check. The shared Map
+and the old inventory found the same 43 keys/51 locations, but the Map does not establish whether
+an exception value reaches a returned error, dialog or nonzero command outcome. Keeping the original
+single domain implementation avoids a second walker or a generic taint engine in FlowGuard.
+The ordinary injected-failure and all fourteen skip/early-exit controls remain. Generic runtime
+skip enforcement uses FlowGuard's `forbid` project policy.
 
-Changing production behavior still requires the affected production tests. Change
-an executable flow first when changing its state, actions, guards or endings. Model
-loading refreshes project modules; direct model API checks in tests use an isolated
-command process so they do not replace pytest's already imported production objects.
+Three boundaries remain visible: Trace's evaluator and storyline-depth dependency is unchanged;
+trace-library file operations remain covered by `tests/trace/test_traceguard.py`; optional desktop
+settings remain covered by `tests/logic/test_library_viewer.py` and ordinary CLI use does not load
+the desktop app. Changing their behavior still requires the real production tests.
+
+Use ordinary pytest during development and `python -m flowguard check --all` for the complete
+intent/native suite and test-to-code baseline. Keep the original request archive. Migration changes
+maintenance representation, not ResearchGuard's research conclusions or source-reader authority.

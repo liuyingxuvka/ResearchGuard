@@ -900,8 +900,9 @@ def _run_inner(tmp_path, source):
     import sys
     shutil.copy(ROOT / "tests" / "conftest.py", tmp_path / "conftest.py")
     (tmp_path / "pytest.ini").write_text("[pytest]\n", encoding="utf-8")
+    (tmp_path / "pyproject.toml").write_text('[tool.flowguard]\nskip_policy="forbid"\n', encoding="utf-8")
     (tmp_path / "test_inner.py").write_text(source, encoding="utf-8")
-    return subprocess.run([sys.executable, "-m", "pytest", "-p", "no:cacheprovider", "-rA", str(tmp_path)],
+    return subprocess.run([sys.executable, "-m", "pytest", "-p", "flowguard.intent.plugin", "-p", "no:cacheprovider", "-rA", str(tmp_path)],
                           cwd=tmp_path, capture_output=True, text=True)
 
 
@@ -910,7 +911,7 @@ def test_no_skip_xfail_or_early_exit_passes_the_run(tmp_path, name):
     result = _run_inner(tmp_path, BYPASSES[name])
     output = result.stdout + result.stderr
     assert result.returncode != 0, output
-    assert "this suite allows no skip, xfail or early exit" in output, output
+    assert "this suite allows no skip, expected failure or early exit" in output, output
 
 
 def test_a_plain_passing_run_still_passes(tmp_path):

@@ -19,6 +19,8 @@ jobs:
         os: [ubuntu-latest, windows-latest]
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -28,13 +30,9 @@ jobs:
         run: git config --global core.longpaths true
       - name: Install
         run: python -m pip install --upgrade pip build && python -m pip install -e ".[test,viewer]"
-      - name: Complete native suite
+      - name: Complete native suite and intent rules
         if: runner.os == 'Linux'
-        run: python -m pytest
-      - name: FlowGuard flow models and release
-        if: runner.os == 'Linux'
-        run: |
-          python -m flowguard release
+        run: python -m flowguard check --all
       - name: Focused Windows boundaries
         if: runner.os == 'Windows'
         run: >-
@@ -45,6 +43,8 @@ jobs:
           tests/source/test_cli.py
           tests/trace/test_inference_kernel.py
           tests/experiment/test_recommendation.py
+          tests/intent
+          tests/test_flowguard_intent.py
       - name: Build release distributions
         if: runner.os == 'Linux'
         run: python -m build

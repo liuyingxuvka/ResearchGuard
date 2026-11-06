@@ -13,7 +13,7 @@ EXPECTED = {'experiment_elimination':'Observe','iteration_kernel':'Check','resea
             'trace_projection':'Project','wording_license':'License'}
 
 def module(topic):
-    return import_module('tests.flow_migration.' + topic)
+    return import_module('tests.contracts.' + topic)
 
 def cases(topic):
     m = module(topic)

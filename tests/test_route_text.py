@@ -2,21 +2,18 @@
 from __future__ import annotations
 
 import argparse
-from collections import Counter
 from contextlib import redirect_stdout
 from io import StringIO
 import json
 from pathlib import Path
-import re
 from unittest.mock import patch
-from urllib.parse import unquote, urlsplit
+
+from flowguard.testing import check_route_texts
 
 from researchguard.cli import main
 
 ROOT = Path(__file__).resolve().parents[1]
 SKILL = ROOT / "skills/researchguard"
-LINKS = re.compile(r"\[[^\]]*\]\(([^\s)]+)\)")
-CODES = re.compile(r"`([^`\n]+)`")
 HELP_ARGS = [["--help"], *[[member, "--help"] for member in ("logic", "source", "trace", "experiment", "status")]]
 
 
@@ -38,61 +35,15 @@ def _cli_options():
     return flags
 
 
-def _slug(heading):
-    return re.sub(r"[^\w\s-]", "", heading.lower()).replace(" ", "-")
-
-
-def _destination(origin, link):
-    value = urlsplit(link)
-    if value.scheme or value.netloc:
-        return None
-    path = (origin.parent / unquote(value.path)).resolve() if value.path else origin
-    return path, unquote(value.fragment)
-
-
 def _check(route, texts, flags):
-    paragraphs = Counter(
-        " ".join(part.split())
-        for text in texts.values()
-        for part in re.split(r"\n\s*\n", text)
-        if len(part.split()) >= 8
-    )
-    for paragraph, count in paragraphs.items():
-        assert count == 1, f"{route}: repeated paragraph: {paragraph}"
-    for origin, text in texts.items():
-        for link in LINKS.findall(text):
-            resolved = _destination(origin, link)
-            if resolved is None:
-                continue
-            target, fragment = resolved
-            assert target.exists(), f"{route}: dead link: {link} in {origin}"
-            if fragment:
-                headings = re.findall(r"^#+ (.+)$", target.read_text(), re.M)
-                assert fragment in {
-                    _slug(heading) for heading in headings
-                }, f"{route}: missing heading: {link} in {origin}"
-        for code in CODES.findall(text):
-            if code.startswith(
-                ("grep ", "git ", "pip ", "python -m pytest", "python -m flowguard")
-            ):
-                continue
-            for option in re.findall(r"--[a-z0-9][\w-]*", code):
-                assert option in flags, f"{route}: unknown option: {code}"
-            if code.startswith(("references/", "assets/", "scripts/", "agents/")):
-                target = SKILL / code.split()[0].split("#", 1)[0]
-            elif code.startswith(("src/", "tests/", "examples/")):
-                target = ROOT / code.split()[0].split("#", 1)[0]
-            else:
-                continue
-            if "<" in code or "*" in code:
-                continue
-            assert target.exists(), f"{route}: missing path: {code}"
+    check_route_texts(route, texts, flags, skill_root=SKILL, project_root=ROOT,
+                      project_prefixes=('src/', 'tests/', 'examples/'))
 
 
 def test_route_texts_have_no_repeats_dead_links_or_missing_names():
     flags = _cli_options()
     errors = []
-    manifest = json.loads((ROOT / "scripts/prompt_bundle_manifest.json").read_text())
+    manifest = json.loads((ROOT / "scripts/prompt_bundle_manifest.json").read_text(encoding='utf-8'))
     for route in sorted((SKILL / "references/routes").glob("*.md")):
         files = {SKILL / "SKILL.md", SKILL / "references/research-tree.md"}
         todo = [route]
@@ -109,11 +60,11 @@ def test_route_texts_have_no_repeats_dead_links_or_missing_names():
         try:
             for path in files:
                 assert path.is_file(), f"{route.name}: missing reference: {path}"
-            texts = {path: path.read_text() for path in sorted(files)}
+            texts = {path: path.read_text(encoding='utf-8') for path in sorted(files)}
             _check(route.name, texts, flags)
         except AssertionError as error:
             errors.append(str(error))
         print(
-            f"route {route.name}: {sum(len(p.read_text()) for p in files if p.is_file())} characters"
+            f"route {route.name}: {sum(len(p.read_text(encoding='utf-8')) for p in files if p.is_file())} characters"
         )
     assert not errors, "\n".join(errors)

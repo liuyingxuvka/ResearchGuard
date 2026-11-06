@@ -190,6 +190,11 @@ def _source_card(library: SourceLibrary, source: SourceRecord, project_ids: tupl
     }
 
 
+def _is_important(importance: float) -> bool:
+    """The viewer count and graph markers share one inclusive boundary."""
+    return importance >= IMPORTANT_THRESHOLD
+
+
 def _model_counts(model: LogicModel | None) -> dict[str, int]:
     if model is None:
         return {
@@ -204,7 +209,7 @@ def _model_counts(model: LogicModel | None) -> dict[str, int]:
     risk_nodes = 0
     for node_id, node in model.nodes.items():
         record = importance_for_node(model, node_id)
-        if record.importance >= IMPORTANT_THRESHOLD:
+        if _is_important(record.importance):
             important_nodes += 1
         if _node_is_risk(node, record.salience):
             risk_nodes += 1
@@ -229,7 +234,7 @@ def _graph_node(model: LogicModel, node_id: str, node: Node, *, language: str = 
     scope = localized_field(i18n, "scope", language, node.scope or "")
     markers = {
         "root": node_id == model.root_claim,
-        "important": record.importance >= IMPORTANT_THRESHOLD,
+        "important": _is_important(record.importance),
         "risk": _node_is_risk(node, record.salience),
         "evidence": node.type in SUPPORT_NODE_TYPES,
         "claim": node.type == "Claim",
@@ -269,7 +274,7 @@ def _graph_edge(model: LogicModel, edge: Edge, *, language: str = DEFAULT_LANGUA
         "salience": record.salience,
         "importance_reason": record.reason,
         "markers": {
-            "important": record.importance >= IMPORTANT_THRESHOLD,
+            "important": _is_important(record.importance),
             "risk": edge.type in RISK_EDGE_TYPES,
         },
         "metadata": dict(edge.metadata),
